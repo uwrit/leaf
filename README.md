@@ -7,3 +7,5 @@ A powerful, fun, lightweight web application for querying clinical data.
 
 ## Can I use Leaf now?
 Sure! Leaf is in active development and will evolve as development continues and features are added.
+
+Developed in partnership with ![CD2H](https://ctsa.ncats.nih.gov/cd2h/wp-content/uploads/sites/7/2018/10/site_logo-300x89.png)
