@@ -1,0 +1,35 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .find-patients-toprow {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 12px;
+}
+
+.find-patients-column-left {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.find-patients-column-right {
+    margin-bottom: 300px;
+}
+
+.find-patients-query-icon {
+    margin-right: 12px;
+    padding-top: 4px;
+    transition: transform 0.2s;
+    transform: scale(1.5);
+}
+
+.leaf-button-main:hover .find-patients-query-icon {
+    transform: scale(1.8);
+}
+

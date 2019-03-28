@@ -1,0 +1,205 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .patientlist-table-container {
+    font-family: Roboto;
+    opacity: 1;
+    padding: 0 20px;
+    transition: opacity 1s;
+}
+
+.patientlist-table-container.hidden {
+    opacity: 0;
+}
+
+.patientlist-table {
+    width: 100%;
+}
+
+/* Header */
+.patientlist-header > tr {
+    height: 50px;
+}
+
+.patientlist-column-header {
+    border-left: 2px solid transparent;
+    cursor: pointer;
+    min-width: 60px;
+    padding: 4px;
+    position: relative;
+}
+
+.patientlist-column-header:hover {
+    background-color: rgb(245, 245, 245);
+}
+
+.patientlist-column-header.can-drop {
+    border-left-color: rgb(28, 168, 221);
+}
+
+.patientlist-column-header.sort-asc,
+.patientlist-column-header.sort-desc {
+    color: rgb(28,168,221);
+    padding-right: 15px;
+}
+
+.patientlist-column-header::after {
+    font-size: 1.5rem;
+    position: absolute;
+    margin-right: 6px;
+    right: 0px;
+    top: 6px;
+}
+
+.patientlist-column-header.sort-asc::after {
+    content: '↑';
+}
+
+.patientlist-column-header.sort-desc::after {
+    content: '↓';
+}
+
+/* Row */
+.patientlist-row {
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
+    height: 40px;
+    transition: box-shadow 0.2s;
+}
+
+.patientlist-row-drilldown {
+    display: none;
+}
+
+.patientlist-row-drilldown.open {
+    display: table-row;
+}
+
+.patientlist-row:hover > .patientlist-tuple {
+    background-color: rgba(28,168,221,0.1) !important;
+}
+
+.patientlist-row:hover > .patientlist-detail-count {
+    border-left-color: rgba(28,168,221,1) !important;
+}
+
+.patientlist-row.odd > .patientlist-detail-count {
+    border-left-color: #f9f9f9;
+}
+
+.patientlist-body > .patientlist-row.odd td {
+    background-color: #f9f9f9;
+}
+
+
+/* Tuple */
+.patientlist-tuple {
+    padding: 6px;
+}
+
+.patientlist-tuple.sparkline {
+    padding: 0;
+    width: 200px;
+}
+
+.patientlist-tuple.sparkline text {
+    fill: #F44336;
+    font-size: 12px;
+    font-weight: 300;
+}
+
+.patientlist-tuple.sparkline path {
+    fill: none;
+    stroke: rgba(244, 67, 54, 0.4);
+    stroke-width: 1.75px;
+}
+
+.patientlist-tuple.sparkline circle {
+    fill: #F44336;
+}
+
+.patientlist-row:hover .patientlist-tuple.sparkline path {
+    stroke: #F44336;
+}
+
+.patientlist-tuple.patientlist-detail-count {
+    border-left: 4px solid transparent;
+}
+
+.patientlist-detail-count {
+    color: rgb(24, 142, 185);
+    font-weight: 500;
+    position: relative;
+    width: 180px;
+}
+
+.patientlist-detail-count svg {
+    margin-left: 4px;
+    padding-top: 4px;
+    transform: scale(1.2);
+    transition: all 0.5s;
+}
+
+.patientlist-detail-count.open svg {
+    margin-bottom: -4px;
+    transform: rotate(180deg) scale(1.2);
+}
+
+/* Details */
+.patientlist-tuple-detail-encounter {
+    background-color: rgba(240,240,240,0.2);
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 2px 4px 1px;
+    font-weight: 300;
+    margin: 10px 50px;
+    padding: 20px;
+}
+
+.patientlist-tuple-detail-row {
+    border-bottom: #f1f1f1 solid 1px;
+}
+
+.patientlist-tuple-detail-row:hover .patientlist-tuple-detail-column,
+.patientlist-tuple-detail-row:hover .patientlist-tuple-detail-row-datasetname {
+    background-color: rgb(245,245,245);
+}
+
+.patientlist-tuple-detail-row-datasetname {
+    color: #9B24A1;
+    font-size: 1.1rem;
+    padding-right: 20px;
+}
+
+.patientlist-tuple-detail-column {
+    display: inline-block;
+    padding: 10px;
+}
+
+.patientlist-tuple-detail-encounter-text {
+    color: rgba(150,150,150,1);
+    font-size: 0.9rem;
+    font-weight: 300;
+    margin-bottom: -2px;
+}
+
+.patientlist-tuple-detail-encounter-value {
+    color: black;
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+.patientlist-tuple-detail-column-name {
+    color: rgba(150,150,150,0.8);
+    font-size: 0.85rem;
+    margin-bottom: 0px;
+}
+
+.patientlist-tuple-detail-column-value {
+    color: black;
+    font-size: 1rem;
+    min-height: 21px;
+}

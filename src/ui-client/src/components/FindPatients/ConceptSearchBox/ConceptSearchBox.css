@@ -1,0 +1,150 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .concept-search-container {
+    font-family: Roboto;
+    margin-top: 2px;
+    padding: 10px;
+}
+
+.concept-search-container > .input-group {
+    flex-basis: 0;
+}
+
+.concept-search-roots-dropdown {
+    flex: 0 0 23%;
+    margin-right: 2px;
+    order: 0;
+    overflow: hidden;
+}
+
+.concept-search-roots-dropdown-toggle {
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    color: rgb(28, 168, 221) !important;
+    font-size: 1.15rem !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
+.concept-search-roots-dropdown-toggle:hover {
+    background-color: rgb(240, 240, 240) !important;
+}
+
+.concept-search-input-container {
+    display: inline-block;
+    flex: 1 0 auto;
+    flex-grow: 1;
+    order: 1;
+    position: relative;
+}
+
+.concept-search-input-container .loader {
+    margin-top: 14px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/* Close button */
+.concept-search-input-clear {
+    background-color: white;
+    background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,1) 100%);
+    color: rgba(28, 168, 221, 0.5);
+    font-size: 1.3rem;
+    margin-right: 4px;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 14%;
+    width: 40px;
+}
+
+.concept-search-input-clear > span {
+    cursor: pointer;
+}
+
+.concept-search-input-clear > span:hover {
+    color: rgba(28, 168, 221, 1);
+}
+
+.concept-search-input {
+    text-align: left !important;
+    width: 100%;
+}
+
+.concept-search-hint-container {
+    display: block;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    margin-top: 0px;
+    padding: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 102;
+}
+
+.concept-search-hint-item {
+    color: rgb(0,0,0,0.8) !important;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 300;
+    overflow: hidden;
+    padding: 4px 8px;
+    text-overflow: ellipsis;
+}
+
+.concept-search-hint-item-root {
+    color: rgb(0,0,0,0.3);
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-left: 8px;
+}
+
+.concept-search-hint-item-count {
+    color: rgb(0,0,0,0.5);
+    float: right;
+    font-size: 0.8rem;
+}
+
+.concept-search-hint-item-count strong {
+    color: rgb(0, 138, 0);
+    font-size: 1rem;
+    font-weight: 300;
+}
+
+.concept-search-hint-item-highlight {
+    font-weight: 800;
+}
+
+.concept-search-hint-equivalent {
+    padding: 4px 8px;
+}
+
+.concept-search-hint-equivalent-text {
+    color: rgba(0,0,0,0.7);
+    font-size: 0.8rem;
+}
+
+.concept-search-hint-equivalent-value {
+    color: #c60;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.concept-search-hint-equivalent-value:hover {
+    text-decoration: underline;
+}
+
+

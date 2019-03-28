@@ -1,0 +1,91 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ html {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    padding: 0;
+}
+
+body {
+    font-family: Roboto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 55px 0 0 0;
+}
+
+#main-content {
+    height: 101vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    transition: margin-left 0.5s;
+    width: 100%;
+    z-index: 98;
+}
+
+#sidebar-container,
+#sidebar {
+    transition: width 0.5s;
+}
+
+/* Small screen - 45px icons only */
+@media only screen and (max-width: 1400px) {
+    html {
+        font-size: 13.0px;
+    }
+    #main-content {
+        margin-left: 45px;
+    }
+    #sidebar-container,
+    #sidebar {
+        width: 45px;
+    }
+    .sidebar-text,
+    .header-options-text {
+        display: none;
+    }
+    .leaf-button-main {
+        height: 40px;
+        width: 170px;
+    }
+}
+
+/* Large screen - 145px */
+@media only screen and (min-width: 1401px) {
+    html {
+        font-size: 13.3px;
+    }
+    #main-content {
+        margin-left: 145px;
+    }
+    #sidebar-container,
+    #sidebar {
+        width: 145px;
+    }
+    .leaf-button-main {
+        height: 45px;
+        width: 180px;
+    }
+}
+
+/* Extra large screen - 160px */
+@media only screen and (min-width: 1701px) {
+    html {
+        font-size: 14px;
+    }
+    #main-content {
+        margin-left: 160px;
+    }
+    #sidebar-container,
+    #sidebar {
+        width: 160px;
+    }
+    .leaf-button-main {
+        height: 48px;
+        width: 200px;
+    }
+}

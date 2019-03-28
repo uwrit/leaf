@@ -1,0 +1,150 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .panel-filter-container {
+    color: rgb(28, 168, 221);
+    font-family: Roboto;
+    font-size: 1.1rem;
+    font-weight: 300;
+    margin: 0 0 10px 0;
+    padding: 2px 4px 4px;
+}
+
+.panel-filter-toggle {
+    cursor: pointer;
+}
+
+.panel-filter-toggle:hover {
+    text-decoration: underline;
+}
+
+.panel-filter-toggle::after {
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+    content: "";
+    display: inline-block;
+    height: 0;
+    margin-left: .255em;
+    vertical-align: middle;
+    width: 0;
+}
+
+.panel-filter-item {
+    background-color: rgb(245,245,245);
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0 8px;
+    padding: 6px 16px;
+}
+
+.panel-filter-container > .panel-filter-item ~ .panel-filter-item {
+    margin-left: 46px;
+}
+
+.panel-filter-item:hover {
+    background-color: rgb(28, 168, 221);
+    color: white;
+}
+
+.panel-filter-item::after {
+    color: #337ab7;
+    content: 'AND';
+    pointer-events: none;
+    position: absolute;
+    margin-left: 28px;
+}
+
+.panel-filter-item:last-child::after {
+    content: none;
+}
+
+.panel-filter-selection-box {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 4px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    color: rgb(100, 100, 100);
+    font-family: Roboto;
+    font-weight: 300;
+    left: -175px;
+    margin-top: 8px;
+    opacity: 1;
+    outline: none;
+    position: absolute;
+    transition: opacity 0.5s, margin-top 0.3s;
+    width: 400px;
+}
+
+.popup-box.appear .panel-filter-selection-box {
+    margin-top: -20px !important;
+    opacity: 0;
+}
+
+.panel-filter-selection-box::before,
+.panel-filter-selection-box::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; 
+    left: 50%;
+    margin-left: -11px;
+    border-width: 11px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0,0,0,0.2) transparent;
+}
+
+.panel-filter-selection-box::after {
+    margin-left: -10px;
+    border-width: 10px;
+    border-bottom-color: rgb(250, 250, 250);
+}
+
+.panel-filter-selection-title {
+    background-color: rgb(250, 250, 250);
+    border-bottom: 1px solid rgb(235, 235, 235);
+    border-radius: inherit;
+    color: rgba(0,0,0,0.4);
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 8px 14px;
+    text-align: center;
+}
+
+.panel-filter-selection-body {
+    padding: 10px 20px;
+}
+
+.panel-filter-selection-row > div {
+    display: inline-block;
+} 
+
+.panel-filter-selection-row {
+    font-size: 1rem;
+    padding: 0;
+}
+
+.panel-filter-selection-row > .checkbox-slider-container {
+    float: right;
+    margin-top: 12px;
+}
+
+.panel-filter-selection-row-title {
+    font-size: 1.2rem;
+    padding: 10px 0;
+}
+
+.panel-filter-selection-row-description-container {
+    margin-top: -8px;
+    padding: 0 100px 0 0;
+}
+
+.panel-filter-selection-row-description {
+    color: #acacac;
+    font-size: 0.9rem;
+    padding: 0;
+}

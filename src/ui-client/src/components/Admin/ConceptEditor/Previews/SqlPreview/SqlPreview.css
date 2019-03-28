@@ -1,0 +1,40 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .concept-editor-preview-sql-container {
+    background-color: rgb(240,240,240);
+    height: 280px !important;
+    margin-left: 20% !important;
+    width: 25%;
+    z-index: 101;
+}
+
+.concept-editor-preview-sql-container::after {
+    content: 'EXAMPLE GENERATED SQL';
+}
+
+.concept-editor-preview-sql-container-inner {
+    height: 100%;
+    position: relative;
+    width: 100%;
+}
+
+.concept-editor-preview-sql-container .sql-box {
+    margin: 0 auto;
+}
+
+.concept-editor-preview-sql-container .ace_editor {
+    border-radius: 8px;
+}
+
+.concept-editor-preview-sql-container .ace_cursor {
+    display: none;
+}
+
+.concept-editor-preview-sql-container .ace_scrollbar-h {
+    overflow-x: hidden;
+}

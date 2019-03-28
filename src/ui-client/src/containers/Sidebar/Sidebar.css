@@ -1,0 +1,161 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ sidebar-container {
+    background-image: linear-gradient(rgb(0, 75, 102), rgb(0, 48, 66));
+    box-flex: 0;
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;  
+    float: left;
+    height: 100%;
+    position: fixed;
+    z-index: 99;
+}
+
+.sidebar {
+    position: relative;
+}
+
+.sidebar-tab-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar-tab {
+    align-items: center;
+    border-left: 4px solid transparent;
+    border-right: 1px solid rgba(0,0,0,0.05);
+    color: rgba(100,100,100, 0.75);
+    cursor: not-allowed;
+    display: flex;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 500;
+    height: 55px;
+    overflow-x: hidden;
+    padding: 0 8px;
+    transition: color 0.2s;
+}
+
+.sidebar-tab.enabled {
+    color: rgba(150,150,150, 0.75);
+    cursor: pointer;
+}
+
+.sidebar-tab-divider {
+    background-color: rgba(0, 6, 27, 0.1);
+    height: 2px;
+    pointer-events: none;
+    width: 100%;
+}
+
+.sidebar-tab.selected,
+.sidebar-tab.enabled:hover {
+    color: rgb(250,250,250);
+    text-shadow: 1px 1px rgba(200,200,200, 1.0);
+    border-right-color: transparent;
+}
+
+.sidebar-tab a,
+.sidebar-tab-link {
+    color: inherit;
+    cursor: default;
+    text-align: left;
+    text-decoration: none !important;
+}
+
+.sidebar-text {
+    white-space: nowrap;
+}
+
+.sidebar-tooltip {
+    font-family: Roboto !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    opacity: 0.8 !important;
+}
+
+.sidebar-icon {
+    color: rgba(100,100,100, 0.75);
+    margin-right: 8px;
+    margin-top: 5px;
+    transition: color 0.2s;
+}
+
+.sidebar-tab.enabled .sidebar-icon {
+    color: rgba(150,150,150, 0.75);
+}
+
+/* Hardcode colors for now, need better solution */
+.sidebar-tab-link.findpatients .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.findpatients .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(14, 173, 152);
+}
+
+.sidebar-tab-link.findpatients .sidebar-tab.selected,
+.sidebar-tab-link.findpatients .sidebar-tab.enabled:hover {
+    border-left-color: rgb(14, 173, 152);
+}
+
+.sidebar-tab-link.map .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.map .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(56, 197, 80);
+}
+
+.sidebar-tab-link.map .sidebar-tab.selected,
+.sidebar-tab-link.map .sidebar-tab.enabled.enabled:hover {
+    border-left-color:rgb(56, 197, 80);
+}
+
+.sidebar-tab-link.visualize .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.visualize .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(255, 132, 8);
+}
+
+.sidebar-tab-link.visualize .sidebar-icon > svg {
+    stroke-width: 3;
+    stroke-linecap: square;
+    transform: scaleX(1.5) scaleY(1.2);
+}
+
+.sidebar-tab-link.visualize .sidebar-tab.selected,
+.sidebar-tab-link.visualize .sidebar-tab.enabled:hover {
+    border-left-color:rgb(255, 132, 8);
+}
+
+.sidebar-tab-link.patientlist .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.patientlist .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(186, 67, 223);
+}
+
+.sidebar-tab-link.patientlist .sidebar-tab.selected,
+.sidebar-tab-link.patientlist .sidebar-tab.enabled:hover {
+    border-left-color:rgb(186, 67, 223);
+}
+
+.sidebar-tab-link.admin .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.admin .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(190, 202, 12);
+}
+
+.sidebar-tab-link.admin .sidebar-tab.selected,
+.sidebar-tab-link.admin .sidebar-tab.enabled:hover {
+    border-left-color: rgb(190, 202, 12);
+}
+
+.sidebar-cd2h-logo-wrapper {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    bottom: 60px;
+    left: 5px;
+    position: absolute;
+}
+
+.sidebar-cd2h-logo {
+    height: auto;
+    width: 150px;
+}

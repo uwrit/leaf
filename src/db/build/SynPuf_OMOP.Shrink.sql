@@ -1,0 +1,7 @@
+use [master]
+alter database [SynPuf_OMOP] SET RECOVERY SIMPLE;
+GO
+
+use [SynPuf_OMOP]
+DBCC SHRINKDATABASE(SynPuf_OMOP, 10, TRUNCATEONLY);
+GO

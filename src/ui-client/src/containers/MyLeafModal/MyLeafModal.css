@@ -1,0 +1,52 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .myleaf-modal {
+    font-family: Roboto;
+    margin: 0;
+    padding: 0;
+}
+
+.myleaf-modal.modal-dialog {
+    max-width: 1200px !important;
+    width: 90% !important;
+    z-index: 99;
+}
+
+.myleaf-modal-close {
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+}
+
+.myleaf-modal .modal-content {
+    margin-top: -5%;
+}
+
+.myleaf-modal .modal-header { 
+    background-color: #fafbfc;
+    border-bottom: none;
+}
+
+.myleaf-modal-tab-container {
+    background-color: #fafbfc;
+} 
+
+.myleaf-modal-tab-container .nav-tabs {
+    padding: 4px 10px 0;
+}
+
+.myleaf-modal-tab-container .nav-link {
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.myleaf-modal-tab-container .nav-link.active {
+    border-top: 2px solid rgb(28, 168, 221) !important;
+    color: rgb(28, 168, 221);
+}

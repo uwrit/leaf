@@ -1,0 +1,12 @@
+*/bin/
+*/obj/
+*/out/
+*/.vs
+.vscode
+*.bak
+.git
+src/db
+src/ui-client
+src/server/Dockerfile.dev
+src/server/.gitignore
+src/server/.dockerignore

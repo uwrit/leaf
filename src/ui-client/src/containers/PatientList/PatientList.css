@@ -1,0 +1,241 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .patientlist-container {
+    font-family: Roboto;
+    margin-bottom: 120px;
+    padding: 10px;
+    user-select: none;
+}
+
+/* Loading icon */
+.patientlist-loading {
+    width: 100%;
+}
+
+.patientlist-loading > .loader {
+    position: static !important;
+}
+
+.patientlist-loading .loader-svg {
+    top: 0 !important;
+    width: 100px !important;
+}
+
+.patientlist-loading .loader-fallback {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Top row (dataset columns and export button) */
+.patientlist-toprow-container {
+    padding: 10px;
+    position: relative;
+}
+
+.patientlist-export-button-container {
+    padding: 10px;
+}
+
+.patientlist-export-button-container > .leaf-button-main {
+    float: right;
+}
+
+.patientlist-export-button-container svg {
+    margin-right: 12px;
+    padding-top: 4px;
+    transition: transform 0.2s;
+    transform: scale(1.5);
+}
+
+.patientlist-export-button-container .leaf-button-main:hover svg {
+    transform: scale(1.8);
+}
+
+.patientlist-rowcount-container {
+    color: rgb(150, 150, 150);
+    margin: 20px 0 0 8px;
+    position: relative;
+}
+
+.patientlist-rowcount-container .patientlist-rowcount {
+    color: rgb(186, 67, 223);
+}
+
+.patientlist-info {
+    color: rgb(28,168,221);
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.patientlist-info-detail {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24), 0px -2px 9px rgba(0, 0, 0, 0.1);
+    color: black;
+    font-size: 1.0rem;
+    left: 103%;
+    opacity: 0;
+    padding: 8px;
+    pointer-events: none;
+    position: absolute;
+    text-decoration: none;
+    top: 0;
+    transition: opacity 0.3s;
+    width: 500px;
+    z-index: 100;
+}
+
+.patientlist-info-inner {
+    cursor: help;
+    display: inline-block;
+    position: relative;
+}
+
+.patientlist-info-inner:hover {
+    text-decoration: underline;
+}
+
+.patientlist-info-inner:hover .patientlist-info-detail {
+    opacity: 1;
+}
+
+.patientlist-info-emphasis {
+    color: rgb(24, 142, 185);
+}
+
+.patientlist-dataset-column-selector-container {
+    font-family: Roboto;
+    min-height: 40px;
+    margin-top: 2px;
+    padding: 8px;
+}
+
+.patientlist-column-selector-text {
+    border-bottom: 1px solid rgb(240,240,240);
+    color: rgb(150,150,150);
+    font-family: Roboto;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.patientlist-dataset-column-selector-container > div {
+    display: inline-block;
+}
+
+.patientlist-column-selector-datefilter {
+    color: #1CA8DD;
+    font-family: Roboto;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.patientlist-column-selector-emphasis {
+    color: #1CA8DD;
+    font-weight: 700;
+}
+
+.patientlist-dataset-text-info {
+    color: rgb(150, 150, 150);
+}
+
+.patientlist-dataset {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    color: #1CA8DD;
+    cursor: pointer;
+    display: inline;
+    margin-left: 8px;
+    text-transform: capitalize;
+    padding: 4px 8px;
+}
+
+.patientlist-dataset::after {
+    border-top: .3em solid;
+    border-right: .3em solid transparent;
+    border-bottom: 0;
+    border-left: .3em solid transparent;
+    content: "";
+    display: inline-block;
+    height: 0;
+    margin-left: .255em;
+    vertical-align: middle;
+    width: 0;
+}
+
+.patientlist-dataset:hover {
+    background-color: #1CA8DD;
+    color: white;
+}
+
+.patientlist-column-selector-container {
+    background-color: white;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.24);
+    margin-top: 10px;
+    padding: 4px;
+    position: relative;
+    width: 350px;
+}
+
+.patientlist-column-selector-container::before,
+.patientlist-column-selector-container::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; 
+    left: 10%;
+    margin-left: -11px;
+    border-width: 11px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0,0,0,0.1) transparent;
+}
+
+.patientlist-column-selector-container::after {
+    margin-left: -10px;
+    border-width: 10px;
+    border-bottom-color: white;
+}
+
+.patientlist-column-selector {
+    border-bottom: 1px solid #f1f1f1;
+    margin: 0 6px !important;
+    padding-top: 6px;
+}
+
+.patientlist-column-selector > div {
+    padding: 0;
+}
+
+.patientlist-column-selector:last-child {
+    border-bottom: none;
+}
+
+.patientlist-column-selector .checkbox-slider-container {
+    float: right;
+}
+
+.patientlist-column-selector-remove {
+    text-align: right;
+}
+
+.patientlist-column-selector-remove > span {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-top: 2px;
+    padding: 2px 4px;
+}
+
+.patientlist-column-selector-remove > span:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+} 

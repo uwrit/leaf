@@ -1,0 +1,305 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+/* Dropdowns - override bootstrap defaults */
+.panel-header > .dropdown > button,
+.subpanel-header .dropdown > button,
+.subpanel-header,
+.panel-item-specialization-dropdown > button {
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none !important; 
+    font-weight: 500;
+    outline: none;
+    padding: 1px 12px;
+}
+
+.panel-header > .dropdown > button:hover,
+.subpanel-header .dropdown > button:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.panel-header,
+.subpanel-header {
+    font-family: Roboto;
+    font-size: 0.95em !important;
+    padding: 4px 0;
+    z-index: 100;
+}
+
+/* Panel column (bootstrap Col) */
+.panel-column {
+    padding: 0 4px !important;
+}
+
+/* Panel */
+.panel {
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 4px;
+    font-weight: 300;
+    text-align: left;
+    transition: box-shadow .3s;
+    width: 100%;
+}
+
+.panel:hover {
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.panel.has-data {
+    border-color: rgb(0, 148, 204);
+}
+
+.panel.panel-excluded {
+    border-color: #ebccd1;
+}
+
+/* Panel header */
+.panel-header{
+    background-color: rgba(0,0,0,0.03);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+
+.panel-header > .panel-header-inclusion > button {
+    color: rgb(96, 90, 102) !important;
+}
+
+.panel-header > .panel-header-date > button,
+.panel-header > .panel-header-count > button {
+    color: #337ab7 !important;
+}
+
+.panel.has-data .panel-header,
+.subpanel-wrapper.has-data .subpanel-header {
+    background-color: rgb(0, 148, 204) !important;
+}
+
+.panel.has-data .panel-header-inclusion > button {
+    color: white !important;
+}
+
+.panel.has-data .panel-header-date > button,
+.panel.has-data .panel-header-count > button,
+.panel.has-data .panel-header-samesequence > button {
+    color: rgb(212, 239, 250) !important;
+}
+
+.panel.panel-excluded .panel-header,
+.panel-excluded .subpanel-wrapper .subpanel-header,
+.subpanel-wrapper.has-data .subpanel-header.subpanel-excluded {
+    background-color: #f2dede !important;
+}
+
+.panel.panel-excluded .panel-header-date > button,
+.panel.panel-excluded .panel-header-count > button,
+.panel.panel-excluded .subpanel-header .panel-header-count > button,
+.panel.panel-excluded .subpanel-header .panel-header-inclusion > button,
+.panel.panel-excluded .subpanel-header .panel-header-samesequence> button,
+.panel.has-data .subpanel-excluded .panel-header-count > button,
+.panel.has-data .subpanel-excluded .panel-header-inclusion > button,
+.panel.has-data .subpanel-excluded .panel-header-samesequence > button {
+    color: #a94442 !important;
+}
+
+.panel.panel-excluded .panel-header-inclusion > button {
+    color: black !important;
+}
+
+/* SubPanel */
+.subpanel {
+    padding: 0px;
+}
+
+.subpanel-wrapper {
+    z-index: 99;
+}
+
+.subpanel-body {
+    background-color: white;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    min-height: 40px;
+    padding: 8px 2px;
+    padding-bottom: 50px;
+    transition: min-height 0.5s;
+}
+
+.subpanel-first .subpanel-body,
+.subpanel-wrapper.has-data .subpanel-body {
+    min-height: 110px;
+}
+
+.subpanel.can-drop .subpanel-body {
+    background-color: #e9f6ff;
+}
+
+.subpanel-dash-border-wrapper {
+    height: 100%;
+    width: 100%;
+}
+
+.subpanel.no-data.show-dash-border .subpanel-body {
+    min-height: 110px;
+}
+
+.subpanel-header {
+    border: 1px solid rgba(173, 173, 173, 0.25);
+    border-left: none;
+    border-right: none;
+    color: rgb(128, 128, 128);
+    font-weight: 700;
+}
+
+.subpanel-header.no-data,
+.panel-excluded .subpanel-header.no-data {
+    background-color: rgba(0,0,0,0.01) !important;
+    color: rgba(0,0,0,0.5);
+}
+
+.subpanel-header-preview {
+    font-size: 1rem;
+    font-weight: 300;
+    margin: 2px 10px;
+}
+
+/* Panel Item */
+.panel-item {
+    border-left: 2px solid transparent;
+    color: rgb(96, 90, 102);
+    cursor: move;
+    cursor: grab;
+    font-family: Roboto;
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 2px;
+    padding: 2px 4px;
+    transition: border 0.2s;
+}
+
+.panel-item.hidden {
+    display: none;
+}
+
+.panel-item:hover {
+    background-color: rgba(28, 168, 221, 0.08);
+    border-left-color: rgba(28, 168, 221, 0.5);
+}
+
+.panel-item-numeric-text,
+.panel-item-specialization-text {
+    background-color: transparent;
+    border-radius: 4px;
+    color: rgb(28, 168, 221);
+    cursor: pointer;
+    display: inline-block;
+    margin: 0 2px;
+    padding: 0px 1px;
+    word-wrap: break-word;
+}
+
+.panel-item-numeric-text:hover,
+.panel-item-specialization-text:hover {
+    background-color: rgb(28,168,221) !important;
+    color: white !important;
+}
+
+.panel-count-filtered .panel-item-not-encounter-based > span,
+.panel-date-filtered .panel-item-not-encounter-based > span,
+.panel-sequential-join .panel-item-not-encounter-based > span {
+    padding-bottom: 4px;
+    background-image:
+    linear-gradient(45deg, transparent 65%, rgb(221, 59, 37) 80%, transparent 90%),
+    linear-gradient(135deg, transparent 5%, rgb(221, 59, 37)15%, transparent 25%),
+    linear-gradient(135deg, transparent 45%, rgb(221, 59, 37) 55%, transparent 65%),
+    linear-gradient(45deg, transparent 25%, rgb(221, 59, 37) 35%, transparent 50%);
+    background-repeat:repeat-x;
+    background-size: 8px 2px;
+    background-position:0 95%; 
+} 
+
+.panel-count-filtered .panel-item-not-encounter-based > span:hover::before,
+.panel-date-filtered .panel-item-not-encounter-based > span:hover::before,
+.panel-sequential-join .panel-item-not-encounter-based > span:hover::before {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    color: rgb(96, 90, 102);
+    content: 'This concept cannot be filtered by date, count, or encounter. Double-check that your query logic is as intended.';
+    margin-top: 25px;
+    padding: 6px;
+    position: absolute;
+    z-index: 100;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.dropdown-menu.show {
+    opacity: 1;
+}
+
+.same-sequence-dropdown-increment {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+    box-shadow: rgba(0, 0, 0, 0.24) 2px 4px 9px 0px;
+    display: none;
+    left: 100%;
+    margin-top: -29px;
+    position: absolute;
+}
+
+.panel-header-samesequence > .leaf-dropdown-menu {
+    min-width: 270px;
+}
+
+.panel-header-samesequence .same-sequence-dropdown-input:hover > .same-sequence-dropdown-increment,
+.panel-header-samesequence .same-sequence-dropdown-increment:hover {
+    display: block;
+}
+
+.same-sequence-dropdown-increment-item {
+    min-height: 29px;
+    padding: 4px 24px;
+}
+
+.same-sequence-input {
+    background: transparent !important;
+    display: inline-block !important;
+    margin: 0 4px;
+    padding: 0 !important;
+    text-align: center;
+    width: 100px !important;
+}
+
+.same-sequence-dropdown-input {
+    background-color: inherit !important;
+    color: rgb(96, 90, 102) !important;
+    cursor: default;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    padding: 4px 24px !important;
+}
+
+.panel-item-specialization-dropdown {
+    display: inline-block;
+    word-wrap: break-word;
+}
+
+.panel-item-specialization-dropdown > button {
+    color: rgb(28, 168, 221);
+    line-height: 20px;
+    padding: 0px 2px;
+    transition: none;
+}

@@ -1,0 +1,234 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .sqlset-editor-container {
+    background-color: white;
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 20px 75px;
+}
+
+.sqlset-editor-input-container {
+    display: inline-block;
+}
+
+/* Header */
+.sqlset-editor-toprow {
+    margin-bottom: 20px;
+}
+
+.sqlset-editor-toprow .leaf-button {
+    margin-right: 20px !important;
+}
+
+.sqlset-editor-toprow .leaf-button-secondary {
+    background-color: white;
+}
+
+.sqlset-editor-toprow .back-to-editor {
+    float: right;
+}
+
+.sqlset-editor-table-header {
+    background-color: rgb(240, 240, 240);
+    color: rgb(100,100,100);
+    font-size: 1.1rem;
+    height: 32px;
+    text-align: center;
+}
+
+.sqlset-editor-table-header > div {
+    border: 1px solid rgb(220,220,220);
+    border-right: none;
+    padding-top: 4px;
+}
+
+.sqlset-editor-table-header > div:last-child {
+    border-right: 1px solid rgb(220,220,220);
+}
+
+/* Table */
+.sqlset-editor-table-row-container {
+    background-color: white;
+    border-bottom: 1px solid rgb(230,230,230);
+    margin: 8px 0;
+}
+
+.sqlset-editor-table-row {
+    min-height: 50px;
+}
+
+.sqlset-editor-table-row-id {
+    color: rgb(180,180,180);
+    font-size: 1.2rem;
+    height: 15px;
+    margin-top: 18px;
+    text-align: center;
+}
+
+/* Input */
+.sqlset-editor-table .leaf-input {
+    border: 2px solid rgba(0,0,0,0.05) !important;
+    border-radius: 4px !important;
+    text-align: center;
+}
+
+/* Checkbox */
+.sqlset-editor-input-container-checkbox {
+    position: relative;
+}
+
+.sqlset-editor-input-container-checkbox .concept-editor-checkbox {
+    border-bottom: none;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Add New Set */
+#sqlset-editor-add-sqlset {
+    background-color: rgb(13,195,106) !important;
+    border-color: rgb(13,195,106) !important;
+}
+
+.sqlset-editor-add-sqlset:hover {
+    background-color: rgb(187, 255, 222);
+}
+
+.sqlset-editor-add-sqlset svg {
+    transform: scale(1.4);
+    margin-right: 4px;
+    margin-top: 5px;
+}
+
+/* Add New Specialization Group */
+.sqlset-editor-subtable-header {
+    text-align: center;
+}
+
+.sqlset-editor-dropdown-toggle,
+.sqlset-editor-add-specializationgroup {
+    margin-bottom: 8px;
+    margin-left: 50px;
+}
+
+.sqlset-editor-add-specialization {
+    margin: 4px 0;
+}
+
+.sqlset-editor-dropdown-toggle {
+    color: rgb(24, 142, 185);
+    cursor: pointer;
+    display: inline-block;
+}
+
+.sqlset-editor-dropdown-toggle svg {
+    margin-left: 4px;
+    padding-top: 4px;
+    transform: scale(1.2);
+    transition: all 0.5s;
+}
+
+.sqlset-editor-dropdown-toggle.open svg {
+    margin-bottom: -4px;
+    transform: rotate(180deg) scale(1.2);
+}
+
+.sqlset-editor-add-specializationgroup,
+.sqlset-editor-add-specialization {
+    color: rgba(13,195,106);
+    cursor: pointer;
+    display: inline-block;
+}
+
+.sqlset-editor-add-specializationgroup:hover,
+.sqlset-editor-add-specialization:hover {
+    text-decoration: underline;
+}
+
+/* Specialization Group */
+.sqlset-editor-specializationgroup-container {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    margin: auto;
+    margin-bottom: 50px;
+    max-width: 500px;
+    position: relative;
+    text-align: center;
+}
+
+.sqlset-editor-specializationgroup-container .leaf-input {
+    color: rgb(80,80,80) !important;
+    font-size: 1.0rem;
+}
+
+.sqlset-editor-specializationgroup-default {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sqlset-editor-specializationgroup-specialization {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sqlset-editor-specializationgroup-container .leaf-input {
+    border: none !important;
+}
+
+.sqlset-editor-specializationgroup-container label small {
+    color: rgb(180,180,180) !important;
+}
+
+.sqlset-editor-input-container.left,
+.sqlset-editor-input-container.right {
+    width: 50%;
+}
+
+.sqlset-editor-input-container.right {
+    border-left: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sqlset-editor-input-container .position-relative.form-group {
+    margin-bottom: 0;
+}
+
+/* Delete Specialization Group */
+.sqlset-editor-specializationgroup-delete {
+    position: absolute;
+    right: 0;
+    z-index: 100;
+}
+
+.sqlset-editor-specializationgroup-delete > span {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 4px;
+    margin-top: 2px;
+    padding: 2px 4px;
+}
+
+.sqlset-editor-specializationgroup-delete > span:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+} 
+
+/* Text */
+.sqlset-editor-text {
+    border-bottom: 1px solid rgb(220,220,220);
+    border-radius: 4px;
+    color: rgb(100,100,100);
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.sqlset-editor-text-emphasis {
+    color: #1CA8DD;
+}

@@ -1,0 +1,241 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .concept-editor {
+    overflow-y: none;
+}
+
+/* Previews */
+.concept-editor-preview {
+    border-radius: 8px;
+    background-color: rgb(240,240,240);
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    left: 0;
+    margin: auto;
+    margin-top: 75px;
+    padding: 25px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.concept-editor-preview::after {
+    color: rgb(150,150,150);
+    font-size: 0.9rem;
+    margin-left: -15px;
+    margin-top: 4px;
+    position: absolute;
+    top: 0;
+}
+
+/* Overlay */
+.concept-editor-column-left-overlay {
+    background-color: transparent;
+    height: 110%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: background-color 0.5s;
+    width: 100%;
+    z-index: 100;
+}
+
+.concept-editor-column-left-overlay.show {
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Header */
+.concept-editor-column-right-header {
+    margin-bottom: 20px;
+}
+
+.concept-editor-column-right-header .leaf-button {
+    margin-right: 20px !important;
+}
+
+.concept-editor-column-right-header .leaf-button-secondary {
+    background-color: white;
+}
+
+.concept-editor-column-right-header .leaf-button-warning {
+    float: right;
+}
+
+/* Left Column */
+.concept-editor-column-left {
+    padding-left: 0 !important;
+}
+
+/* Right Column */
+.concept-editor-column-right {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100vh !important;
+    outline: none;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    width: 54%;
+    z-index: 100;
+}
+
+.concept-editor-main {
+    background-color: rgb(240,240,240);
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 20px 75px;
+}
+
+.concept-editor small {
+    color: rgb(130,130,130) !important;
+    margin-top: 0;
+}
+
+/* Loading icon */
+.concept-editor-loading {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 102;
+}
+
+.concept-editor-loading > .loader {
+    left: 50%;
+    top: 30%;
+}
+
+.concept-editor-loading .loader-svg {
+    top: 0 !important;
+    width: 100px !important;
+}
+
+.concept-editor-loading-overlay {
+    background-color: rgba(250,250,250,0.6);
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 100;
+}
+
+/* Error and NotApplicable */
+.concept-editor-na,
+.concept-editor-error {
+    border-radius: 8px;
+    color: black;
+    font-family: Roboto;
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    width: 450px;
+}
+
+.concept-editor-na {
+    background-color: rgba(28, 170, 221, 0.05);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+}
+
+.concept-editor-error {
+    background-color: rgba(252, 143, 152, 0.05);
+    border: 2px dashed rgba(221, 41, 28, 0.699);
+}
+
+/* Sections */
+.concept-editor-section {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.1);
+    margin: 0 0 12px;
+}
+
+.concept-editor-section-header {
+    background-color: rgb(0, 130, 177);
+    border: none;
+    color: white;
+    font-size: 1.4rem;
+    padding: 8px 0;
+    margin-bottom: 4px;
+    padding: 8px;
+}
+
+.concept-editor-section-body {
+    padding: 8px;
+}
+
+/* Input */
+.concept-editor-column-right .form-group label {
+    font-size: 1.0rem;
+    margin-bottom: 0;
+}
+
+.concept-editor-column-right text-area.leaf-input {
+    margin-top: 6px !important;
+}
+
+/* Checkbox */
+.concept-editor-checkbox {
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    margin-bottom: 8px;
+}
+
+.concept-editor-checkbox > div {
+    padding: 0;
+}
+
+.concept-editor-checkbox label {
+    float: right;
+}
+
+/* Dropdown */
+.concept-editor-dropdown {
+    outline: none;
+}
+
+.concept-editor-dropdown button {
+    background-color: rgba(28, 168, 221, 0.05);
+    border: 1px solid rgba(28, 168, 221, 0.1) !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(28, 168, 221) !important;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    text-align: left;
+    width: 100%;
+}
+
+.concept-editor-dropdown button:active ,
+.concept-editor-dropdown button:hover {
+    background-color: rgba(28, 168, 221, 0.1) !important;
+    border-color:rgba(28, 168, 221, 0.2) !important;
+}
+
+.concept-editor-dropdown-chevron {
+    float: right;
+    margin-top: 5px;
+    transform: scale(0.7);
+}
+
+.concept-editor-dropdown .dropdown-item {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgb(50,50,50) !important;
+    cursor: pointer;
+    font-size: 1.0rem;
+    outline: none;
+}
+
+.concept-editor-sqlset-date {
+    color: rgb(0, 162, 184);
+    font-size: 0.9rem;
+    float: right;
+    margin-left: 8px;
+}

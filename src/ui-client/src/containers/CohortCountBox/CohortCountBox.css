@@ -1,0 +1,265 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .cohort-count-detail-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    font-family: Roboto;
+    margin: auto;
+    margin-top: 50px;
+    width: 180px;
+    opacity: 0;
+    outline: none !important;
+    padding: 4px 8px 0;
+    position: absolute;
+    transition: opacity 0.5s, margin-top 0.2s, z-index 0.5s;
+    text-align: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 0;
+}
+
+.cohort-count-detail-container.show {
+    margin-top: 60px;
+    opacity: 1;
+    z-index: 1000;
+}
+
+/* Up-Arrow above detail container */
+.cohort-count-detail-container.show::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; 
+    left: 50%;
+    margin-left: -10px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent transparent white transparent;
+}
+
+.cohort-count-detail-seconds {
+    color: rgb(125,125,125);
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.cohort-count-detail-show {
+    border-top: 1px solid rgba(0,0,0,0.1);
+    color: rgb(28,168,221);
+    font-size: 12px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+    padding: 2px 0 0;
+    width: 100%;
+}
+
+.cohort-count-detail-show > a {
+    cursor: pointer;
+}
+
+.cohort-count-detail-show > a:hover {
+    text-decoration: underline !important;
+}
+
+.cohort-count-detail-sites,
+.cohort-count-detail-show {
+    display: inline-block;
+}
+
+.cohort-count-detail-sites {
+    color: rgb(100,100,100);
+    font-size: 1.0rem;
+}
+
+.cohort-count-detail-sites-complete {
+    color: rgb(0, 138, 0);
+}
+
+.cohort-count-detail-sites-total {
+    color: rgb(0, 138, 0);
+}
+
+.cohort-count-site-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 0 2px;
+    transform: scaleY(0);
+}
+
+.cohort-count-site-detail:first-child {
+    margin-top: 8px;
+}
+
+.cohort-count-site-detail {
+    height: 0px;
+    opacity: 0;
+    transition: opacity 0.2s, height 0.2s;
+}
+
+.cohort-count-detail-container.show-detail .cohort-count-site-container {
+    transform: scaleY(1);
+}
+
+.cohort-count-detail-container.show-detail .cohort-count-site-detail {
+    height: 50px;
+    opacity: 1;
+}
+
+.cohort-count-site-detail:hover .cohort-count-site-text-sql {
+    display: block;
+}
+
+.cohort-count-site-bar,
+.cohort-count-site-text {
+    display: block;
+    position: relative;
+}
+
+.cohort-count-site-text {
+    height: 18px;
+}
+
+.cohort-count-site-text .loader {
+    margin-top: -1px;
+    float: left;
+    margin-left: 8px;
+}
+
+.cohort-count-site-bar {
+    font-size: 0.8rem;
+    font-weight: 300;
+    margin-top: -8px;
+    pointer-events: none;
+}
+
+.cohort-count-site-text-name,
+.cohort-count-site-text-error,
+.cohort-count-site-text-sql,
+.cohort-count-site-text-na {
+    display: inline-block;
+    font-family: Roboto;
+    font-size: 0.9rem;
+}
+
+.cohort-count-site-text-name {
+    color: rgb(125,125,125);
+    float: left;
+    margin-left: 4px;
+}
+
+.cohort-count-site-text-error {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+    float: left;
+    margin-left: 8px;
+    margin-top: -2px;
+    padding: 2px 4px;
+}
+
+.cohort-count-site-text-sql,
+.cohort-count-site-text-na {
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 8px;
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    float: right;
+    padding: 0 8px;
+    transition: all 0.2s;
+}
+
+.cohort-count-site-text-sql:hover{
+    background-color: rgba(0,0,0,0.05);
+    color: rgb(28, 168, 221)
+}
+
+.cohort-count-site-text-na:hover{
+    background-color: rgba(0,0,0,0.05);
+    color: rgb(28, 168, 221)
+}
+
+.cohort-count-site-text-na:hover::before {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    color: rgb(96, 90, 102);
+    content: "This respondent was unable to run your query because it doesn't have data for at least 1 concept you've used.";
+    margin-top: 25px;
+    padding: 6px;
+    position: absolute;
+    width: 200px;
+    z-index: 100;
+}
+
+.cohort-count-site-sql-container {
+    background-color: white;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    left: 0;
+    margin-top: -30px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 106;
+}
+
+.cohort-count-site-sql-container:hover .cohort-count-site-sql-copy {
+    opacity: 1;
+}
+
+.cohort-count-site-sql-header {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    font-family: Roboto;
+}
+
+.cohort-count-site-sql-name {
+    color: rgb(125, 125, 125);
+}
+
+.cohort-count-site-sql-count {
+    color: rgb(100,100,100);
+}
+
+.cohort-count-site-sql-count > strong {
+    color: rgb(0, 138, 0);
+}
+
+.cohort-count-site-sql-close {
+    color: rgb(125, 125, 125);
+    cursor: pointer;
+    float: right;
+}
+
+.cohort-count-site-sql-copy {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    cursor: pointer;
+    margin: auto;
+    margin-right: 40px;
+    opacity: 0;
+    padding: 4px 8px;
+    right: 0;
+    position: absolute;
+    text-align: center;
+    transition: all 0.2s;
+    width: 135px;
+    z-index: 100;
+}
+
+.cohort-count-site-sql-copy:hover {
+    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.2);
+}
+
+.cohort-count-site-sql-copy.copied {
+    background-color: rgb(212, 255, 212);
+    border-color: transparent;
+    color: rgb(0, 138, 0);
+    opacity: 1;
+}

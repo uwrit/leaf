@@ -1,0 +1,27 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .patientlist-export-modal-redcap-exporting-container {
+    height: 100px;
+}
+
+.patientlist-export-modal-redcap-exporting-container .leaf-button {
+    bottom: 100%;
+    position: absolute;
+}
+
+.patientlist-export-modal-redcap-exporting-inner {
+    margin-top: 5%;
+}
+
+.patientlist-export-modal-redcap-description p {
+    font-size: 1.1rem;
+}
+
+.patientlist-export-modal.exporting .modal-footer {
+    display: none;
+}

@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2018
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{61459A09-A332-4876-BB27-D8730E012BCA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{1C2490BD-2BAD-495D-A480-890CB7648BE1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7} = {EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{A10C24DC-99F8-41E3-95AF-991D46918DDD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DTO", "DTO\DTO.csproj", "{CBFE6336-C729-4335-8589-B3DD033172E3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{61459A09-A332-4876-BB27-D8730E012BCA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61459A09-A332-4876-BB27-D8730E012BCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61459A09-A332-4876-BB27-D8730E012BCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61459A09-A332-4876-BB27-D8730E012BCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C2490BD-2BAD-495D-A480-890CB7648BE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C2490BD-2BAD-495D-A480-890CB7648BE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C2490BD-2BAD-495D-A480-890CB7648BE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C2490BD-2BAD-495D-A480-890CB7648BE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A10C24DC-99F8-41E3-95AF-991D46918DDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A10C24DC-99F8-41E3-95AF-991D46918DDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A10C24DC-99F8-41E3-95AF-991D46918DDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A10C24DC-99F8-41E3-95AF-991D46918DDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CBFE6336-C729-4335-8589-B3DD033172E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CBFE6336-C729-4335-8589-B3DD033172E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CBFE6336-C729-4335-8589-B3DD033172E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CBFE6336-C729-4335-8589-B3DD033172E3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1691ACD8-9917-41CC-A4BE-7EBACCA890E3}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.StandardHeader = $1
+		$1.Text = @Copyright (c) ${Year}, UW Medicine Research IT\nDeveloped by Nic Dobbins and Cliff Spital\nThis Source Code Form is subject to the terms of the Mozilla Public\nLicense, v. 2.0. If a copy of the MPL was not distributed with this\nfile, You can obtain one at http://mozilla.org/MPL/2.0/.
+	EndGlobalSection
+EndGlobal

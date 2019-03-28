@@ -1,0 +1,81 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .header-networkhealth-respondent-container.disabled {
+    color: rgb(150,150,150);
+}
+
+.header-networkhealth-respondent {
+    border: 1px solid transparent;
+    border-bottom-color: rgba(0,0,0,0.3);
+    font-family: Roboto;
+    overflow: hidden;
+    padding: 8px 8px;
+    position: relative;
+    text-align: left;
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+.header-networkhealth-respondent > div {
+    display: inline-block;
+}
+
+.header-networkhealth-respondent:hover {
+    border-color: rgb(28,168,221);
+    color: white;
+}
+
+.header-networkhealth-respondent-title {
+    border-left: 4px solid;
+    padding-left: 8px;
+}
+
+.header-networkhealth-respondent-title-patients {
+    color: rgb(163, 162, 100);
+    font-size: 0.8rem;
+    margin-top: -2px;
+}
+
+.disabled .header-networkhealth-respondent-title-patients,
+.disabled .header-networkhealth-respondent-text-description {
+    color: rgb(100,100,100);
+}
+
+.header-networkhealth-respondent-text-description {
+    color: rgb(180,180,180);
+    font-size: 0.82rem;
+    margin-top: 4px;
+}
+
+.header-networkhealth-respondent-indicator-container {
+    height: 25px;
+    margin-right: -1px;
+    position: relative;
+    vertical-align: top;
+    width: 20px;
+}
+
+.header-networkhealth-respondent-enabled {
+    color: rgba(35, 255, 108, 0.5);
+    float: right;
+}
+
+.disabled .header-networkhealth-respondent-enabled  {
+    color: rgb(135, 139, 137);
+}
+
+.header-networkhealth-respondent-enabled > div {
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.header-networkhealth-respondent-enabled-text {
+    font-size: 0.8rem;
+    margin-right: 8px;
+}

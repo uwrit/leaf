@@ -1,0 +1,13 @@
+# Visual Studio Code options directory
+.vscode
+.vs
+
+# MacOS
+.DS_Store
+
+# Ignores
+.env
+*.bak
+/bin
+
+.todo

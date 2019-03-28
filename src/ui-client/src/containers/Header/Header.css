@@ -1,0 +1,271 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ #header-container {
+    background-color: rgb(28,168,221);
+    background-image: linear-gradient(60deg, rgb(0, 130, 177), rgb(28,168,221));
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    display: block;
+    height: 55px;
+    overflow: visible;
+    padding: 1px 10px 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 100;
+}
+
+.header-content-side {
+    width: 30%;
+}
+
+.header-content-side-right {
+    font-size: 1.1rem;
+    text-align: right;
+}
+
+.header-option-container {
+    margin: auto 18px;
+    padding: 2px 0 0;
+}
+
+.header-options > .nav-item {
+    margin-left: 12px;
+}
+
+.header-options-chevron {
+    margin-left: 1px !important;
+    margin-bottom: -3px !important;
+    transform: scale(0.7);
+}
+
+.header-hover-menu {
+    background-color: white;
+    border-radius: 2px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    color: rgb(96, 90, 102);
+    display: none;
+    font-size: 1rem;
+    margin-right: -18px;
+    position: absolute;
+    right: 0;
+    width: 200px;
+}
+
+.header-options {
+    float: right;
+}
+
+.header-options svg {
+    margin: 8px 4px 0 0;
+}
+
+.header-options > li {
+    border-radius: 4px;
+    color: rgb(205, 238, 255);
+    cursor: pointer;
+    padding-bottom: 8px;
+}
+
+.header-options > li:hover {
+    background-color: rgb(0, 130, 177);
+    color: white;
+}
+
+.header-myleaf:hover,
+.header-networkhealth:hover {
+    background-color: rgba(0, 48, 66, 1) !important;
+    color: rgb(220,220,220) !important;
+}
+
+.header-options-text {
+    display: inline-block;
+    padding-top: 4px;
+    vertical-align: top;
+}
+
+.header-text-secondary {
+    color: rgb(144, 218, 255);
+}
+
+.title {
+    color: white;
+    display: inline-block;
+    font-size: 2rem;
+    font-family: 'Mukta Mahee';
+    font-weight: 100;
+    margin-left: -4px;
+    margin-top: 2px;
+    padding: 0;
+}
+
+.logo {
+    height: 40px;
+    margin: -12px 0 4px 0;
+    filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, 0.1) );
+}
+
+/* Custom css for each header option */
+.header-new-query-icon {
+    font-size: 1.1rem;
+}
+
+.header-options > li:hover .header-new-query-icon {
+    color: rgb(13, 206, 77);
+}
+
+.header-myleaf-icon {
+    font-size: 1rem;
+    margin-top: -1px;
+}
+
+.header-options .header-database-icon {
+    margin-bottom: -3px !important;
+}
+
+.header-options > li:hover .header-database-icon {
+    color: rgba(28,168,221,0.8);
+}
+
+.header-options > li:hover .header-myleaf-icon {
+    color: rgb(220, 169, 223);
+}
+
+.header-myleaf,
+.header-networkhealth {
+    border-bottom-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    position: relative;
+    transition: none !important;
+}
+
+.header-networkhealth {
+    position: relative;
+    padding-bottom: 0 !important;
+    padding-top: -2px;
+}
+
+.header-myleaf {
+    padding: 4px 8px; 
+}
+
+.header-myleaf-icon-container {
+    margin-top: -2px;
+}
+
+.header-networkhealth-container,
+.header-myleaf-container {
+    bottom: 0;
+    color: rgb(240, 240, 240);
+    display: none;
+    height: 2px;
+    margin: auto;
+    margin-top: -2px;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    z-index: 105;
+}
+
+.header-networkhealth-description {
+    border-bottom: 1px solid rgba(0,0,0,0.01);
+    color: rgb(200,200,200);
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.header-networkhealth-description > span {
+    border-bottom: 1px solid rgba(250,250,250,0.2);
+    padding: 0 8px 4px;
+}
+
+.header-networkhealth-text {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.header-networkhealth-text > div {
+    display: inline-block;
+    min-width: 18px;
+    padding-top: 2px;
+}
+
+.header-networkhealth-header span {
+    margin: auto;
+    vertical-align: middle;
+}
+
+.header-networkhealth-container {
+    width: 600px;
+}
+
+.header-myleaf-container {
+    color: rgb(200,200,200);
+    min-width: 200px;
+    text-align: left;
+}
+
+.header-networkhealth-inner,
+.header-myleaf-inner {
+    background-color: rgba(0, 48, 66, 1);
+    border-radius: 4px;
+    border-top-right-radius: 0;
+    box-shadow: rgba(0, 0, 0, 0.24) -4px 4px 9px 0px;
+    padding: 8px;
+    position: relative;
+}
+
+.header-networkhealth:hover .header-networkhealth-container,
+.header-myleaf:hover .header-myleaf-container {
+    display: inline-block;
+}
+
+.header-myleaf-option > span {
+    margin-left: 6px;
+}
+
+.myleaf-menu-icon-savedqueries {
+    color: rgba(255, 166, 0, 0.8);
+}
+
+.myleaf-menu-icon-logout {
+    color: rgba(90, 113, 219, 0.8);
+}
+
+.header-myleaf-option:hover > .myleaf-menu-icon-savedqueries {
+    color: rgb(255, 166, 0);
+}
+
+.header-myleaf-option:hover > .myleaf-menu-icon-logout {
+    color: rgb(90, 113, 219);
+}
+
+.myleaf-menu-icon-savedqueries {
+    font-size: 0.9rem;
+}
+
+.divider {
+    background-color: transparent !important;
+    cursor: default;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.divider > div {
+    background-color: rgba(0,0,0,0.3);
+    height: 1px;
+    margin: 0;
+}
+
+.header-myleaf-option {
+    padding: 4px 8px;
+}
+
+.header-myleaf-option:hover {
+    color: white;
+}

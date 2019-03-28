@@ -1,0 +1,59 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .leaf-dropdown-menu {
+    border: 1px solid rgba(0,0,0,0.2) !important;
+    border-radius: 4px !important;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24) !important;
+}
+
+.leaf-dropdown-item {
+    color: rgb(96, 90, 102);
+    cursor: pointer;
+    font-family: Roboto;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    outline: none !important;
+    transition: background-color 0.2s;
+}
+
+.leaf-dropdown-item.selected {
+    background-color: rgba(28, 170, 221, 0.1) !important;
+}
+
+.leaf-dropdown-item:hover {
+    background-color: rgba(28,168,221,0.2) !important;
+}
+
+.leaf-dropdown-item:active {
+    background-color: rgba(28,168,221,0.4) !important;
+    color: rgb(96, 90, 102) !important;
+}
+
+.arrow-right {
+    position: relative;
+}
+
+.arrow-right::after {
+    position: absolute;
+    left: 90%;
+    top: 20%;
+    content: " ";
+    float: right;
+    width: 0;
+    height: 0;
+    border-color: transparent;
+    border-style: solid;
+    border-width: 5px 0 5px 5px;
+    border-left-color: #ccc;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+
+.dropdown-toggle::after {
+    vertical-align: middle;
+}

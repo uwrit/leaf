@@ -1,0 +1,57 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .glowing-button {
+    bottom: 0;
+    border-radius: 50%;
+    height: 12px;
+    margin: auto;
+    position: absolute;
+    top: 0;
+    width: 12px;
+}
+
+.glowing-button.gray {
+    background-color: rgb(158, 160, 159);
+    box-shadow: 0 0 8px rgb(48, 48, 48), inset 0 0 8px rgb(88, 88, 88);
+}
+
+.glowing-button.green {
+    background-color: rgb(35, 255, 108);
+    box-shadow: 0 0 8px rgb(35, 255, 108), inset 0 0 8px rgb(98, 236, 144);
+    animation: pulse-green 2s linear 1s infinite;
+}
+
+.glowing-button.yellow {
+    background-color: rgb(206, 236, 98);
+    box-shadow: 0 0 8px rgb(215, 255, 68), inset 0 0 8px rgb(206, 236, 98);
+    animation: pulse-yellow 2s linear 1s infinite;
+}
+
+.glowing-button.red {
+    background-color: rgb(236, 85, 47);
+    box-shadow: 0 0 8px rgb(236, 85, 47), inset 0 0 8px rgb(236, 85, 47);
+    animation: pulse-red 2s linear 1s infinite;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow:0 0 10px rgb(35, 255, 108), inset 0 0 10px rgb(98, 236, 144); }
+    50% { box-shadow:0 0 20px rgb(35, 255, 108), inset 0 0 20px rgb(98, 236, 144); }
+    100% { box-shadow:0 0 10px rgb(35, 255, 108), inset 0 0 10px rgb(98, 236, 144); }
+}
+
+@keyframes pulse-yellow {
+    0% { box-shadow:0 0 4px rgb(215, 255, 68), inset 0 0 4px rgb(206, 236, 98); }
+    50% { box-shadow:0 0 8px rgb(215, 255, 68), inset 0 0 8px rgb(206, 236, 98); }
+    100% { box-shadow:0 0 4px rgb(215, 255, 68), inset 0 0 4px rgb(206, 236, 98); }
+}
+
+@keyframes pulse-red {
+    0% { box-shadow:0 0 4px rgb(236, 85, 47), inset 0 0 4px rgb(204, 132, 114); }
+    50% { box-shadow:0 0 8px rgb(236, 85, 47), inset 0 0 9px rgb(204, 132, 114); }
+    100% { box-shadow:0 0 4px rgb(236, 85, 47), inset 0 0 4px rgb(204, 132, 114); }
+}

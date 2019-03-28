@@ -1,0 +1,51 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .save-query-panel-container {
+    padding: 10px;
+}
+
+.save-query-panel-button-container {
+    /* border-top: 1px solid rgba(0,0,0,0.1); */
+    margin-top: 20px;
+    padding-top: 20px;
+}
+
+.save-query-panel-button-container .leaf-button-secondary {
+    margin-right: 10px;
+}
+
+.save-query-panel-container label {
+    color: rgba(0,0,0,0.7);
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 0;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.save-query-panel-container input {
+    padding-top: 0;
+}
+
+.save-query-panel-container textarea {
+    height: 100px;
+}
+
+.required-field-tag,
+.required-field {
+    color: rgb(224, 24, 24);
+}
+
+.required-field-tag {
+    font-family: Roboto;
+    margin-top: -10px;
+}
+
+.required-field {
+    margin-left: 4px;
+}

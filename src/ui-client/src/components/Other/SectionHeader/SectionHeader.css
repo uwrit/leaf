@@ -1,0 +1,25 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .section-header {
+    border-bottom: 1px solid rgb(238, 238, 238);
+    font-family: Roboto;
+}
+
+.section-header > h3 {
+    color: rgb(70, 70, 70);
+    font-size: 1.8rem;
+    font-weight: 300;
+    height: 28px;
+    margin-bottom: 10px;
+}
+
+.section-header > small {
+    color: rgb(174, 174, 174);
+    font-size: 0.8rem;
+    font-weight: 500;
+}

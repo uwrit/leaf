@@ -1,0 +1,83 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .leaflet-popup-tip-container {
+    display: absolute;
+    font-family: Roboto;
+    font-weight: 100;
+    bottom: -20px;
+}
+
+.endpoint-popup-bounce-appear-active .leaflet-popup-tip-container {
+    animation: bounce 2s infinite;
+}
+
+.endpoint-popup-bounce-appear-active .leaflet-popup-content-wrapper {
+    animation: bounce 2s infinite;
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    cursor: pointer;
+    min-width: 80px;
+    text-align: center;
+    transition: all .2s ease-in-out;
+}
+
+.leaflet-popup-content-wrapper:hover {
+    transform: scale(1.1);
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    padding: 0 6px;
+    width: auto !important;
+}
+
+.endpoint-popup-header {
+    font-family: Roboto;
+    padding: 2px 8px;
+    vertical-align: bottom;
+}
+
+.endpoint-popup-header-name {
+    color: rgb(125, 125, 125);
+    font-size: 0.9rem;
+    font-weight: 500;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.endpoint-popup-header-state {
+    white-space: nowrap;
+    font-size: 0.8rem;
+    color: rgb(197, 128, 0);
+}
+
+.endpoint-popup-body {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.endpoint-popup-patients {
+    color: rgb(28, 168, 221);
+    font-family: Roboto;
+    font-size: 1.4rem;
+    font-weight: 300;
+}
+
+.bounce {
+    animation: bounce 1s infinite ease-out;
+}
+  
+@keyframes bounce {
+    0%   { margin-bottom: 0px; }
+    50%  { margin-bottom: 15px; transform: scale(1.1) }
+    100% { margin-bottom: 0px; }
+}

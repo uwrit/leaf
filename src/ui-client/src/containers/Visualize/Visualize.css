@@ -1,0 +1,150 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+/* Loading icon */
+.visualize-loading {
+    width: 100%;
+}
+
+.visualize-loading > .loader {
+    position: static !important;
+}
+
+.visualize-loading .loader-svg {
+    top: 0 !important;
+    width: 100px !important;
+}
+
+.visualize-loading .loader-fallback {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.visualize-respondent-demographic-container {
+    background-color: #f5f7fc;
+    padding: 20px 20px 300px;
+}
+
+.visualize-respondent-name {
+    color: rgb(100, 100, 100);
+    font-family: Roboto;
+    font-size: 1.5rem;
+    font-weight: 500;
+    margin-bottom: -8px;
+    padding-top: 8px;
+}
+
+.visualize-respondent-count-container > div {
+    display: inline-block;
+}
+
+.visualize-respondent-count {
+    font-family: 'Open Sans';
+    font-size: 3rem;
+    font-weight: 300;
+    margin-top: -16px;
+}
+
+.visualize-respondent-text {
+    color: rgba(0,0,0,0.3);
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.visualize-demographic-container {
+    background-color:white;
+    border-radius: 4px;
+    margin: 10px;
+    transition: box-shadow 0.2s;
+    width: 100%;
+}
+
+.visualize-demographic-container.aggregate {
+    border-bottom: 1px solid rgb(220,220,220);
+    margin-bottom: 0;
+    padding: 20px;
+}
+
+.visualize-demographic-container.respondent {
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.24);
+    border-radius: 4px;
+}
+
+.visualize-demographic-container.respondent:hover {
+    box-shadow: 0px 1px 15px rgba(0, 0, 0, 0.24);
+}
+
+.visualization-agebygender-container {
+    width: 100%;
+}
+
+.visualization-agebygender-container > div,
+.visualization-ataglance-column {
+    margin: auto;
+}
+
+.visualization-agebygender-column {
+}
+
+.visualization-ataglance-column {
+    display: inline-block;
+}
+
+.visualization-ataglance-left {
+    border-right: 1px solid rgb(238, 238, 238);
+    margin-right: 0px;
+    padding-right: -1px;
+}
+
+.visualization-ataglance-right {
+    margin-left: 0px;
+}
+
+.visualize-demographic-container svg {
+    shape-rendering: crispEdges;
+}
+
+.visualize-demographic-container tspan,
+.visualize-demographic-container span {
+    fill: rgba(33, 37, 41, 1) !important;
+    font-family: Roboto;
+    font-size: 0.8rem;
+    font-weight: 300;
+    text-rendering: optimizeLegibility;
+}
+
+.visualize-demographic-container span {
+    font-size: 0.9rem;
+    text-transform: capitalize;
+}
+
+.visualize-demographic-container .recharts-cartesian-axis-tick > line,
+.visualize-demographic-container .recharts-yAxis .recharts-cartesian-axis-tick-value,
+.visualize-demographic-container .recharts-cartesian-axis-line {
+    display: none;
+}
+
+.visualization-agebygender-column .recharts-yAxis tspan {
+    fill: rgb(255, 132, 8) !important;
+    font-size: 1.2rem;
+    font-weight: 500 !important;
+}
+
+.visualization-agebygender-female .recharts-yAxis tspan {
+    fill: rgb(255, 132, 8) !important;
+}
+
+.visualization-agebygender-male .recharts-yAxis tspan {
+    fill: rgb(0, 148, 204) !important;
+}
+
+.recharts-tooltip-cursor {
+    fill: rgba(0,0,0,0.05);
+}

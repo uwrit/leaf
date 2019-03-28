@@ -1,0 +1,115 @@
+ /* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.popup-box.appear .panel-custom-date-range {
+    margin-top: -100px;
+    opacity: 0;
+}
+
+.panel-custom-date-range {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+    font-weight: 300;
+    left: -120px;
+    margin-top: -74px;
+    opacity: 1;
+    outline: none;
+    position: absolute;
+    transition: all 0.5s;
+    width: 375px;
+}
+
+.panel-custom-date-range-body {
+    padding: 10px;
+}
+
+.panel-custom-date-range::before,
+.panel-custom-date-range::after {
+    content: " ";
+    position: absolute;
+    bottom: 100%; 
+    left: 50%;
+    margin-left: -11px;
+    border-width: 11px;
+    border-style: solid;
+    border-color: transparent transparent rgba(0,0,0,0.2) transparent;
+}
+
+.panel-custom-date-range::after {
+    margin-left: -10px;
+    border-width: 10px;
+    border-bottom-color: rgb(250, 250, 250);
+}
+
+.panel-custom-date-range .transition-appear {
+    margin-top: -20px;
+    opacity: 0;
+}
+
+.panel-custom-date-range .transition-appear-active {
+    margin-top: 0;
+    opacity: 1;
+    transition: opacity 0.5s, margin-top 0.3s;
+}
+
+.panel-custom-date-range-title {
+    background-color: rgb(250, 250, 250);
+    border-bottom: 1px solid rgb(235, 235, 235);
+    border-radius: inherit;
+    color: rgba(0,0,0,0.4);
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 8px 14px;
+    text-align: center;
+}
+
+.panel-custom-date-range-input-container {
+    display: inline-block;
+}
+
+.panel-custom-date-range input {
+    border: none !important;
+    border-radius: 0px !important;
+    border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+    box-shadow: none !important;
+    color: rgb(28, 168, 221) !important;
+    display: inline-block;    
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin: 10px;
+    outline: none;
+    text-align: center;
+    width: 150px;
+
+    /* Remove up-down arrows */
+    -moz-appearance:textfield;
+    -webkit-appearance: none;
+}
+
+.panel-custom-date-range-input-container input:focus {
+    border-color: rgb(28, 168, 221) !important;
+}
+
+.panel-custom-date-range-input-container.invalid input {
+    border-color: rgb(243, 82, 103) !important;
+    color: rgb(243, 82, 103) !important;
+}
+
+.panel-custom-date-range input::placeholder {
+    color: rgba(0,0,0,0.3) !important;
+    transition: opacity 0.2s;
+}
+
+.panel-custom-date-range input:focus::placeholder {
+    opacity: 0;
+}
+
+.panel-custom-date-range-footer {
+    margin-top: 10px;
+    padding: 10px;
+}

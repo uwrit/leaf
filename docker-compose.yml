@@ -1,0 +1,68 @@
+version: "3"
+services:
+
+  mssql:
+    build:
+      context: ./src/db/build
+      args:
+        sapw: ${DB_SA_PW}
+    ports:
+      - "1433:1433"
+    volumes:
+      - "leaf-mssql:/var/opt/mssql"
+      - "${DB_BAK_DIR}:/bak"
+    networks:
+      local:
+        aliases:
+          - mssql
+  
+  # coreapi:
+  #   build: 
+  #     context: ./src/server
+  #     dockerfile: ./src/server/Dockerfile.dev
+  #   ports:
+  #     - "5001:5001"
+  #   depends_on:
+  #     - mssql
+  #   volumes:
+  #     - ./src/server:/app
+  #     - ${KEYS}:/.keys
+  #     - ${LOGGING_DIR}:/logs
+  #   environment:
+  #     LEAF_JWT_CERT: ${JWT_CERT}
+  #     LEAF_JWT_KEY: ${JWT_KEY}
+  #     LEAF_JWT_KEY_PW: ${JWT_KEY_PW}
+  #     LEAF_APP_DB: ${APP_DB}
+  #     LEAF_CLIN_DB: ${CLIN_DB}
+  #     SERILOG_DIR: /logs
+  #   working_dir: "/app/API"
+  #   command: ["dotnet", "run"]
+  #   networks:
+  #     local:
+  #       aliases:
+  #         - coreapi
+
+  # node:
+  #   build: ./src/ui-client
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - mssql
+  #     - coreapi
+  #   volumes:
+  #     - ./src/ui-client:/app
+  #   environment:
+  #     NODE_ENV: ${ENV_DOCKER_ENVIRONMENT}
+  #   working_dir: /app
+  #   command: ["npm", "start"]
+  #   networks:
+  #     local:
+  #       aliases:
+  #         - node
+
+volumes:
+  leaf-mssql:
+
+networks:
+  local:
+    driver: bridge

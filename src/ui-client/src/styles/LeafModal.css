@@ -1,0 +1,61 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .leaf-modal {
+    color: rgb(51, 51, 51);
+    font-family: Roboto;
+    font-weight: 300;
+    margin: 8% auto !important
+}
+
+.leaf-modal .modal-dialog {
+    margin: 50%;
+}
+
+.leaf-modal .modal-content {
+    border: none;
+    border-radius: 0;
+    box-shadow: rgba(0,0,0,0.5) 0px 0px 25px 0px;
+}
+
+.leaf-modal .modal-header {
+    background-color: rgb(0, 75, 102);
+    border-radius: 0;
+    color: rgb(248,248,248);
+    padding: 4px 0;
+}
+
+.leaf-modal .modal-title {
+    font-weight: 300;
+    margin: 0 auto;
+}
+
+.leaf-modal .modal-body {
+    font-size: 1.2rem;
+}
+
+.modal-backdrop {
+    background-color: rgb(100,100,100);
+}
+
+/* 
+ * Overrides to make sure content is
+ * not pushed down, and to blur background.
+ */
+body.modal-open {
+    padding-top: 0;
+    overflow: visible !important;
+}
+
+body.modal-open #main-content,
+body.modal-open #sidebar-container {
+    margin-top: 55px;
+}
+
+body.modal-open .app-container {
+    filter: blur(1px);
+}

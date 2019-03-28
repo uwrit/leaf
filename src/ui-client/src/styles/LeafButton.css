@@ -1,0 +1,96 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .leaf-button {
+    background-color: rgb(245, 245, 245);
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: none !important;
+    color: rgb(28, 168, 221);
+    font-family: Roboto;
+    font-size: 1.1rem;
+    font-weight: 500 !important;
+    min-width: 100px;
+    outline: none !important;
+    transition: 0.2s;
+}
+
+.leaf-button-primary {
+    background-color: rgb(28, 168, 221);
+    border: 1px solid rgb(28, 168, 221) !important;
+    color: rgb(245, 245, 245);
+}
+
+.leaf-button:hover {
+    background-color: rgb(235, 235, 235);
+    border: 1px solid rgba(0,0,0,0.05);
+    color: rgb(28, 168, 221);
+}
+
+.leaf-button-primary:hover {
+    background-color: rgb(34, 151, 194);
+    border: 1px solid rgba(0,0,0,0.05);
+    color: rgb(245, 245, 245);
+}
+
+.leaf-button:active {
+    background-color: rgb(225, 225, 225) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(28, 168, 221) !important;
+}
+
+.leaf-button-primary:active {
+    background-color: rgb(16, 140, 185) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+.leaf-button-warning {
+    background-color: rgb(245, 119, 115);
+    border: 1px solid rgb(241, 103, 99) !important;
+    color: rgb(245, 245, 245);
+}
+
+.leaf-button-warning:hover {
+    background-color: rgb(206, 88, 84) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+.leaf-button-warning:active {
+    background-color: rgb(202, 73, 69) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+.leaf-button:disabled {
+    background-color: rgba(0, 0, 0, 0.2) !important;
+    border: 1px solid transparent !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+/* Run Query, Export Data buttons */
+.leaf-button-main {
+    font-family: Roboto;
+    font-size: 1.6rem;
+    font-weight: 300;
+    border: none;
+    border-radius: 2px;
+    padding: 6px 4px;
+    background-color: rgb(7, 192, 69);
+    background-image: linear-gradient(60deg, rgb(114, 202, 74), rgb(68, 194, 64));
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 2px 0px;
+}
+
+.leaf-button-main:hover {
+    background-image: linear-gradient(60deg, rgb(6, 180, 64), rgb(22, 150, 64));
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+}

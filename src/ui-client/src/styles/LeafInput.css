@@ -1,0 +1,55 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .leaf-input {
+    border: none !important;
+    border-radius: 0px !important;
+    border-bottom: 2px solid rgba(0,0,0,0.1) !important;
+    box-shadow: none !important;
+    color: rgb(28, 168, 221) !important;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding-left: 2px;
+
+    /* Remove up-down arrows */
+    -moz-appearance:textfield;
+    -webkit-appearance: none;
+}
+
+.leaf-input.error {
+    border-color: red !important;
+    color: red !important;
+}
+
+.leaf-input:focus {
+    border-color: rgb(28, 168, 221) !important;
+}
+
+.leaf-input::placeholder,
+textarea.leaf-input::placeholder {
+    color: rgba(0,0,0,0.2) !important;
+    transition: opacity 0.2s;
+}
+
+.leaf-input:focus::placeholder {
+    opacity: 0;
+}
+
+.leaf-input:read-only {
+    background-color: transparent !important;
+    border-bottom-color: rgba(0,0,0,0.1) !important;
+    color: rgba(28, 168, 221, 0.5) !important;
+    cursor: default;
+}
+
+textarea.leaf-input {
+    margin-top: 2px;
+    outline: none;
+    resize: none;
+    width: 100%;
+}

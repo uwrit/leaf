@@ -1,0 +1,19 @@
+
+{
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "rules": {
+      "interface-name": [true, "never-prefix"],
+      "quotemark": [true, "single", "avoid-escape", "jsx-double"],
+      "no-empty-interface": false,
+      "no-console": false,
+      "prefer-for-of": false,
+      "semicolon": [true, "always", "ignore-interfaces"]
+  },
+  "linterOptions": {
+    "exclude": [
+      "config/**/*.js",
+      "node_modules/**/*.ts"
+    ]
+  }
+}
+  

@@ -1,0 +1,59 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+import { EXPORT_CLEAR_ERROR_OR_COMPLETE,  EXPORT_COMPLETE, EXPORT_ERROR, EXPORT_SET_OPTIONS, EXPORT_SET_PROGRESS, ExportAction, } from '../actions/dataExport';
+import ExportState, { ExportProgress } from '../models/state/Export';
+
+export function defaultExportState(): ExportState {
+    return {
+        isComplete: false,
+        isErrored: false,
+        isExporting: false,
+        progress: {
+            completed: 0,
+            estimatedSecondsRemaining: 0,
+            text: ''
+        },
+        redCap: {
+            enabled: false
+        }
+    } 
+}
+
+export const dataExport = (state: ExportState = defaultExportState(), action: ExportAction): ExportState => {
+    switch (action.type) {
+        case EXPORT_COMPLETE:
+            return Object.assign({}, state, {
+                isComplete: true,
+                redCap: {
+                    ...state.redCap,
+                    url: action.url!
+                }
+            }); 
+        case EXPORT_CLEAR_ERROR_OR_COMPLETE:
+            return Object.assign({}, state, {
+                isComplete: false,
+                isErrored: false,
+                isExporting: false
+            });
+        case EXPORT_SET_OPTIONS:
+            return Object.assign({}, state, {
+                redCap: action.exportOptions!.redCap
+            });
+        case EXPORT_SET_PROGRESS:
+            return Object.assign({}, state, {
+                isExporting: true,
+                progress: action.progress,
+            });
+        case EXPORT_ERROR:
+            return Object.assign({}, state, {
+                isErrored: true
+            });
+        default:
+            return state;
+    }
+}

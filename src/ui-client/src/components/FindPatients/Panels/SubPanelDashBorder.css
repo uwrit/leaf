@@ -1,0 +1,79 @@
+/* Copyright (c) 2019, UW Medicine Research IT
+ * Developed by Nic Dobbins and Cliff Spital
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+/* Dash border on drag
+   Inspired by https://codepen.io/techniq/pen/gzyHI 
+*/
+.show-dash-border {
+    position: relative;
+    overflow: hidden;
+    color: rgba(28,168,221, 0.8);
+    padding:0;
+}
+
+.subpanel-dash-border {
+    color: transparent;
+    display: block;
+    width: 100%;
+    height: 0;
+    pointer-events: none;
+    position: absolute;
+}
+
+.show-dash-border .subpanel-dash-border {
+    color: inherit;
+    height: 100%;
+}   
+
+.subpanel-dash-border i {
+    border: 2px transparent;
+    display: block;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.subpanel-dash-border:nth-of-type(1) i,
+.subpanel-dash-border:nth-of-type(3) i { 
+    border-top: 2px dashed;
+    width: 200%;
+}
+
+.subpanel-dash-border:nth-of-type(2) i,
+.subpanel-dash-border:nth-of-type(4) i { 
+    border-right: 2px dashed;
+    width: 100%;
+    height: 200%;
+}
+
+.show-dash-border .subpanel-dash-border:nth-of-type(1) i,
+.show-dash-border .subpanel-dash-border:nth-of-type(3) i { 
+    animation: slideDashX 15.0s infinite linear;
+}
+
+.show-dash-border .subpanel-dash-border:nth-of-type(2) i,
+.show-dash-border .subpanel-dash-border:nth-of-type(4) i { 
+    animation: slideDashY 15.0s infinite linear;
+}
+
+.subpanel-dash-border:nth-of-type(3) { transform: rotate( 180deg ); }
+.subpanel-dash-border:nth-of-type(4) { transform: rotate( 180deg ); }
+
+/*
+.show-dash-border .subpanel-dash-border:nth-of-type(3) { transform: rotate( 180deg ); }
+.show-dash-border .subpanel-dash-border:nth-of-type(4) { transform: rotate( 180deg ); }
+*/
+
+@keyframes slideDashX {
+  from { transform: translateX( -50% ); }
+  to   { transform: translateX(   0% ); }
+}
+
+@keyframes slideDashY {
+  from { transform: translateY( -50% ); }
+  to   { transform: translateY(   0% ); }
+}
