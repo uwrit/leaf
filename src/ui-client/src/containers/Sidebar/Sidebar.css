@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- sidebar-container {
+ #sidebar-container {
     background-image: linear-gradient(rgb(0, 75, 102), rgb(0, 48, 66));
     box-flex: 0;
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;  

@@ -13,10 +13,17 @@ export const setAdminConceptSpecializationGroups = (state: AdminState, action: A
     for (const grp of groups) {
         const set = state.sqlSets.sets.get(grp.sqlSetId);
         if (set) {
-            set.specializationGroups.set(grp.id, grp);
+            const newSet = Object.assign({}, set, { specializationGroups: new Map(set.specializationGroups) });
+            newSet.specializationGroups.set(grp.id, grp);
+            state.sqlSets.sets.set(newSet.id, newSet);
         }
     }
-    return Object.assign({}, state);
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: true
+        }
+    });
 };
 
 export const removeAdminConceptSpecializationGroup = (state: AdminState, action: AdminSpecializationGroupAction) => {
@@ -25,5 +32,10 @@ export const removeAdminConceptSpecializationGroup = (state: AdminState, action:
     if (set) {
         set.specializationGroups.delete(grp.id);
     }
-    return Object.assign({}, state);
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: true
+        }
+    });
 };

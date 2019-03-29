@@ -11,7 +11,7 @@ import { PropertyProps as Props } from '../Props';
 
 export class Input extends React.PureComponent<Props> {
     public render() {
-        const { label, subLabel, locked, type, value, focusToggle } = this.props;
+        const { label, subLabel, locked, type, value, placeholder } = this.props;
         let t = type || 'string' as any;
         let val = value || '';
 
@@ -28,6 +28,7 @@ export class Input extends React.PureComponent<Props> {
                     onBlur={this.handleBlur}
                     onChange={this.handleChange}
                     onFocus={this.handleFocus}
+                    placeholder={placeholder}
                     readOnly={locked}
                     spellCheck={false}
                     type={t}

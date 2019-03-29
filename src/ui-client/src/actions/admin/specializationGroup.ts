@@ -60,16 +60,9 @@ export const getAdminConceptSpecializationGroups = () => {
  */
 export const saveNewAdminConceptSpecializationGroup = (group: SpecializationGroup) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            createSpecializationGroup(state, group)
-                .then(
-                    response => dispatch(setAdminConceptSpecializationGroup(group))
-                ,   error => console.log(error)
-                );
-        } catch (err) {
-            console.log(err);
-        }
+        const state = getState();
+        const newGrp = await createSpecializationGroup(state, group);
+        dispatch(setAdminConceptSpecializationGroup(group));
     }
 };
 
@@ -78,24 +71,9 @@ export const saveNewAdminConceptSpecializationGroup = (group: SpecializationGrou
  */
 export const updateAdminConceptSpecializationGroup = (group: SpecializationGroup) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            updateSpecializationGroup(state, group)
-                .then(
-                    response => {
-                        dispatch(setAdminConceptSpecializationGroup(group));
-                },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to update the Concept Specialization Groups. Please see the Leaf error logs for details.",
-                            header: "Error Updating Concept Specialization Groups",
-                            show: true
-                        };
-                        dispatch(showInfoModal(info));
-                });
-        } catch (err) {
-            console.log(err);
-        }
+        const state = getState();
+        const newGrp = await updateSpecializationGroup(state, group);
+        dispatch(setAdminConceptSpecializationGroup(group));
     }
 };
 

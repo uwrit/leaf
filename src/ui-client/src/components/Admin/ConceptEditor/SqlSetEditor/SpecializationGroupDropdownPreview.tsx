@@ -11,8 +11,8 @@ import { SpecializationGroup, Specialization } from '../../../../models/admin/Co
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
 import { showConfirmationModal } from '../../../../actions/generalUi';
-import { setAdminConceptSpecialization, setAdminCurrentConceptSpecialization, saveOrUpdateAdminSpecialization } from '../../../../actions/admin/specialization';
-import { AdminPanelSpecializationGroupState, AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
+import { setAdminConceptSpecialization, saveOrUpdateAdminSpecialization } from '../../../../actions/admin/specialization';
+import { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
 import { SpecializationDropdownOption } from './SpecializationDropdownOption';
 import { generate as generateId } from 'shortid';
 import { upsertAdminApiQueuedEvent, removeAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
@@ -21,7 +21,6 @@ interface Props {
     changeHandler: (val: any, propName: string) => any;
     dispatch: any;
     specializationGroup: SpecializationGroup;
-    state: AdminPanelSpecializationGroupState;
 }
 
 export class SpecializationGroupDropdownPreview extends React.PureComponent<Props> {
@@ -33,7 +32,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     
 
     public render() {
-        const { specializationGroup, dispatch, state } = this.props;
+        const { specializationGroup, dispatch } = this.props;
         const c = this.className;
         const spcs: Specialization[] = [];
         specializationGroup.specializations.forEach((s) => spcs.push(s));
@@ -55,7 +54,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 </div>
 
                 {/* Specializations */}
-                {spcs.map((s) => <SpecializationDropdownOption dispatch={dispatch} specialization={s} state={state} key={s.id} group={specializationGroup} />)}
+                {spcs.map((s) => <SpecializationDropdownOption dispatch={dispatch} specialization={s} key={s.id} group={specializationGroup} />)}
                 <div className={`${c}-add-specialization`} onClick={this.handleAddSpecializationClick}>
                     <span>+Add Dropdown Option</span>
                 </div>
@@ -115,7 +114,6 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
             unsaved: true
         }
         dispatch(setAdminConceptSpecialization(newSpc, true));
-        dispatch(setAdminCurrentConceptSpecialization(newSpc));
 
         if (!specializationGroup.unsaved) {
             const apiSaveEvent = this.generateSpecializationQueuedApiEvent(newSpc);

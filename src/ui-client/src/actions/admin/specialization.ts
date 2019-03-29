@@ -12,8 +12,6 @@ import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
 
 export const SET_ADMIN_SPECIALIZATIONS = 'SET_ADMIN_SPECIALIZATIONS';
-export const SET_ADMIN_CURRENT_SPECIALIZATION = 'SET_ADMIN_CURRENT_SPECIALIZATION';
-export const SET_ADMIN_UNEDITED_SPECIALIZATION = 'SET_ADMIN_UNEDITED_SPECIALIZATION';
 export const REMOVE_ADMIN_SPECIALIZATION = 'REMOVE_ADMIN_SPECIALIZATION';
 
 export interface AdminSpecializationAction {
@@ -39,28 +37,9 @@ export const saveOrUpdateAdminSpecialization = (spc: Specialization) => {
 
 export const saveNewAdminSpecialization = (spc: Specialization) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
-            createSpecialization(state, spc)
-                .then(
-                    response => {
-                        dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
-                        dispatch(setAdminConceptSpecialization(response, false));
-                        console.log(response);
-                },  error => {
-                        dispatch(setAdminConceptSpecialization(spc, false));
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to save the Concept Specialization. Please see the Leaf error logs for details.",
-                            header: "Error Saving Concept Specialization",
-                            show: true
-                        };
-                        dispatch(showInfoModal(info));
-                });
-        } catch (err) {
-            console.log(err);
-        }
+        const state = getState();
+        const newSpc = await createSpecialization(state, spc);
+        dispatch(setAdminConceptSpecialization(spc, false));
     }
 };
 
@@ -69,29 +48,9 @@ export const saveNewAdminSpecialization = (spc: Specialization) => {
  */
 export const updateAdminSpecialization = (spc: Specialization) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            dispatch(setNoClickModalState({ message: "Updating", state: NoClickModalStates.CallingServer }));
-            updateSpecialization(state, spc)
-                .then(
-                    response => {
-                        dispatch(setNoClickModalState({ message: "Updated", state: NoClickModalStates.Complete }));
-                        dispatch(removeAdminConceptSpecialization(spc));
-                        dispatch(setAdminConceptSpecialization(response, false));
-                        console.log(response);
-                },  error => {
-                        dispatch(setAdminConceptSpecialization(spc, false));
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to update the Concept Specialization. Please see the Leaf error logs for details.",
-                            header: "Error Updating Concept Specialization",
-                            show: true
-                        };
-                        dispatch(showInfoModal(info));
-                });
-        } catch (err) {
-            console.log(err);
-        }
+        const state = getState();
+        const newSpc = await updateSpecialization(state, spc);
+        dispatch(setAdminConceptSpecialization(spc, false));
     }
 };
 
@@ -130,20 +89,6 @@ export const setAdminConceptSpecialization = (spc: Specialization, changed: bool
         spcs: [ spc ],
         changed,
         type: SET_ADMIN_SPECIALIZATIONS
-    };
-};
-
-export const setAdminCurrentConceptSpecialization = (spc: Specialization): AdminSpecializationAction => {
-    return {
-        spc,
-        type: SET_ADMIN_CURRENT_SPECIALIZATION
-    };
-};
-
-export const setAdminUneditedConceptSpecialization = (spc: Specialization): AdminSpecializationAction => {
-    return {
-        spc,
-        type: SET_ADMIN_UNEDITED_SPECIALIZATION
     };
 };
 

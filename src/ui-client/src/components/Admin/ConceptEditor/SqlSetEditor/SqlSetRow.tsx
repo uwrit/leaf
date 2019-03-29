@@ -98,7 +98,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         const apiSaveEvent = this.generateQueuedApiEvent(newSet);
 
         dispatch(upsertAdminApiQueuedEvent(apiSaveEvent));
-        dispatch(setAdminConceptSqlSet(newSet));
+        dispatch(setAdminConceptSqlSet(newSet, true));
     }
 
     /*
@@ -142,7 +142,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                         */}
                         {spcGrps.map((g) => (
                             <SpecializationGroupDropdownPreview 
-                                changeHandler={changeHandler} dispatch={dispatch} specializationGroup={g} key={g.id} state={state.specializationGroups}
+                                changeHandler={changeHandler} dispatch={dispatch} specializationGroup={g} key={g.id}
                             />
                         ))}
                         <div className={`${c}-add-specializationgroup`} onClick={this.handleAddSpecializationGroupDropdownClick}>

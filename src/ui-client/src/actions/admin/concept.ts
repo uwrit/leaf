@@ -110,7 +110,7 @@ export const loadAdminPanelDataIfNeeded = () => {
                  * Load Concept-related data.
                  */ 
                 const sqlSets = await getSqlSets(state);
-                dispatch(setAdminConceptSqlSets(sqlSets));
+                dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
             } catch (err) {
