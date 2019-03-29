@@ -1,3 +1,8 @@
+
+<div>
+   <img src="/src/ui-client/public/images/logos/apps/leaf.svg" width="120px" style="float:right" />
+</div>
+
 # Leaf &middot; [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 A powerful, fun, lightweight web application for querying clinical data.
 
@@ -9,10 +14,9 @@ A powerful, fun, lightweight web application for querying clinical data.
 Sure! Leaf is in active development and will evolve as development continues and features are added.
 
 ## Developed in partnership with
-<div>
-   <img src="https://www.iths.org/wp-content/uploads/iths-logo-dk2018.png" width="300px" />
-</div>
-<div style="width:300px"></div>
-<div>
-   <img src="https://github.com/uwrit/leaf/blob/master/src/ui-client/public/images/logos/orgs/cd2h.png" style="float:right" />
-</div>
+<span style="display:block">
+   <img src="/src/ui-client/public/images/logos/orgs/iths.png" width="300px" />
+</span>
+<span style="display:block">
+   <img src="/src/ui-client/public/images/logos/orgs/cd2h.png" style="float:right" />
+</span>
