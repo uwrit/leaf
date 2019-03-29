@@ -10,6 +10,8 @@ A powerful, fun, lightweight web application for querying clinical data.
 * **User Friendly:** Leaf is designed to be simple, intuitive, and fast. Searching for diagnosis or procedural codes, labs, or whatever you point Leaf to is easy!
 * **Secure:** Security of protected health information is critical to any healthcare organization. Leaf implements current best security practices to make clinical data both accessible and safe.
 
+See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
+
 ## Can I use Leaf now?
 Sure! Leaf is in active development and will evolve as development continues and features are added.
 
