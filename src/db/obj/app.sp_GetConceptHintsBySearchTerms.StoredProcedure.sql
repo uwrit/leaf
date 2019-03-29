@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: 3/28/19 1:44:09 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: 3/29/19 11:06:42 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -21,7 +21,8 @@ CREATE PROCEDURE [app].[sp_GetConceptHintsBySearchTerms]
     @terms app.SearchTermTable READONLY,
     @rootId [uniqueidentifier] = NULL,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -96,7 +97,7 @@ BEGIN
 	 * Filter out any Concepts not allowed for user.
 	 */
 	INSERT INTO @allowed
-	EXEC app.sp_FilterConceptsByConstraint @user, @groups, @requested;
+	EXEC app.sp_FilterConceptsByConstraint @user, @groups, @requested, @admin = @admin;
 
 	/*
 	 * Return matches and their JSON tokens.
@@ -107,6 +108,7 @@ BEGIN
 	WHERE EXISTS (SELECT 1 FROM @allowed A WHERE TI.ConceptId = A.Id)
 
 END
+
 
 
 GO
