@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 3/28/19 1:44:09 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 3/29/19 11:06:42 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -18,12 +18,13 @@ GO
 -- =======================================
 CREATE PROCEDURE [app].[sp_GetRootsPanelFilters]
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
 
-    EXEC app.sp_GetRootConcepts @user, @groups;
+    EXEC app.sp_GetRootConcepts @user, @groups, @admin = @admin;
 
     SELECT
         f.Id,
@@ -38,6 +39,7 @@ BEGIN
     WHERE c.IsEnabled = 1 and f.IsEnabled = 1;
     
 END
+
 
 
 

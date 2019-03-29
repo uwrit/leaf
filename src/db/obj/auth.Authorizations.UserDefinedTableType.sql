@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [auth].[Authorizations]    Script Date: 3/28/19 1:44:09 PM ******/
+/****** Object:  UserDefinedTableType [auth].[Authorizations]    Script Date: 3/29/19 11:06:42 AM ******/
 CREATE TYPE [auth].[Authorizations] AS TABLE(
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](200) NOT NULL

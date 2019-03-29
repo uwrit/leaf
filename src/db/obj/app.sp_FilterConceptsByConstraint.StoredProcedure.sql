@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 3/28/19 1:44:09 PM ******/
+/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 3/29/19 11:06:42 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,10 +19,18 @@ GO
 CREATE PROCEDURE [app].[sp_FilterConceptsByConstraint]
     @user [auth].[User],
     @groups auth.GroupMembership READONLY,
-    @requested app.ResourceIdTable READONLY
+    @requested app.ResourceIdTable READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
+
+    IF (@admin = 1)
+    BEGIN;
+        SELECT Id
+        FROM @requested;
+        RETURN;
+    END;
 
     DECLARE @ancestry table
     (
@@ -79,6 +87,7 @@ BEGIN
     );
 
 END
+
 
 
 
