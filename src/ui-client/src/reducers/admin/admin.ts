@@ -33,13 +33,14 @@ import {
     REMOVE_ADMIN_QUEUED_API_EVENT,
     AdminSqlSetAction,
     SET_ADMIN_UNEDITED_SQL_SETS,
-    UNDO_ADMIN_SQL_SET_CHANGES
+    UNDO_ADMIN_SQL_SET_CHANGES,
+    SET_ADMIN_SQL_SETS_UNCHANGED
 } from '../../actions/admin/sqlSet';
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, revertAdminConceptToOriginal, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminUiConceptOriginal } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
-import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, upsertAdminQueuedApiEvent, removeAdminQueuedApiEvent, undoAdminConceptSqlSetChanges } from "./sqlSet";
+import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, upsertAdminQueuedApiEvent, removeAdminQueuedApiEvent, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged } from "./sqlSet";
 import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup } from "./specializationGroup";
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization } from "./specialization";
 
@@ -126,6 +127,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminQueuedApiEvent(state, action);
         case UNDO_ADMIN_SQL_SET_CHANGES:
             return undoAdminConceptSqlSetChanges(state, action);
+        case SET_ADMIN_SQL_SETS_UNCHANGED:
+            return setAdminConceptSqlSetUnchanged(state, action);
 
         // Specialization Groups
         case SET_ADMIN_SPECIALIZATION_GROUPS:

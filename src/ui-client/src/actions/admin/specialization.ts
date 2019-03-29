@@ -31,6 +31,7 @@ export const saveOrUpdateAdminSpecialization = (spc: Specialization): AdminPanel
     return async (dispatch: any, getState: () => AppState) => {
         if (spc.unsaved) {
             const newSpc = await createSpecialization(getState(), spc);
+            dispatch(removeAdminConceptSpecialization(spc));
             dispatch(setAdminConceptSpecialization(newSpc, false));
         } else {
             const newSpc = await updateSpecialization(getState(), spc);

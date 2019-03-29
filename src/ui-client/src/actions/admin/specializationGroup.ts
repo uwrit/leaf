@@ -30,6 +30,7 @@ export const saveOrUpdateAdminConceptSpecializationGroup = (grp: SpecializationG
     return async (dispatch: any, getState: () => AppState) => {
         if (grp.unsaved) {
             const newGrp = await updateSpecializationGroup(getState(), grp);
+            dispatch(removeAdminConceptSpecializationGroup(grp))
             dispatch(setAdminConceptSpecializationGroup(newGrp));
         } else {
             const newGrp = await updateSpecializationGroup(getState(), grp);

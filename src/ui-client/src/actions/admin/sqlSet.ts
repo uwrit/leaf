@@ -14,6 +14,7 @@ import { AdminPanelQueuedApiEvent, AdminPanelQueuedApiProcess } from "../../mode
 
 export const SET_ADMIN_SQL_SETS = 'SET_ADMIN_SQL_SETS';
 export const SET_ADMIN_UNEDITED_SQL_SETS = 'SET_ADMIN_UNEDITED_SQL_SETS';
+export const SET_ADMIN_SQL_SETS_UNCHANGED = 'SET_ADMIN_SQL_SETS_UNCHANGED';
 export const UPSERT_ADMIN_QUEUED_API_EVENT = 'UPSERT_ADMIN_QUEUED_API_EVENT';
 export const REMOVE_ADMIN_QUEUED_API_EVENT = 'REMOVE_ADMIN_QUEUED_API_EVENT';
 export const REMOVE_ADMIN_SQL_SET = 'REMOVE_ADMIN_SQL_SET';
@@ -49,6 +50,7 @@ export const processApiUpdateQueue = () => {
                 }
                 dispatch(removeAdminApiQueuedEvent(ev.id));
             }
+            dispatch(setAdminConceptSqlSetsUnchanged());
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
@@ -71,6 +73,7 @@ export const saveOrUpdateAdminConceptSqlSet = (set: ConceptSqlSet): AdminPanelQu
     return async (dispatch: any, getState: () => AppState) => {
         if (set.unsaved) {
             const newSet = await createSqlSet(getState(), set);
+            dispatch(removeAdminConceptSqlSet(set));
             dispatch(setAdminConceptSqlSet(newSet, false));
         } else {
             const newSet = await updateSqlSet(getState(), set);
@@ -179,5 +182,11 @@ export const removeAdminApiQueuedEvent = (id: string | number): AdminSqlSetActio
 export const undoAdminSqlSetChanges = (): AdminSqlSetAction => {
     return {
         type: UNDO_ADMIN_SQL_SET_CHANGES
+    };
+};
+
+export const setAdminConceptSqlSetsUnchanged = (): AdminSqlSetAction => {
+    return {
+        type: SET_ADMIN_SQL_SETS_UNCHANGED
     };
 };

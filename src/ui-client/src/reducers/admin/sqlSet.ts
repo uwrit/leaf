@@ -86,3 +86,13 @@ export const removeAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSet
         }
     });
 };
+
+export const setAdminConceptSqlSetUnchanged = (state: AdminState, action: AdminSqlSetAction): AdminState => {
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: false,
+            updateQueue: []
+        }
+    });
+};
