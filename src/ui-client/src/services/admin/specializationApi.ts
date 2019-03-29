@@ -23,7 +23,7 @@ export const updateSpecialization = async (state: AppState, spc: Specialization)
 /*
  * Creates a new Concept Specialization.
  */ 
-export const createSpecialization = async (state: AppState, spc: Specialization) => {
+export const createSpecialization = async (state: AppState, spc: Specialization): Promise<Specialization> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/admin/specialization`, {

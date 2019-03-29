@@ -19,9 +19,7 @@ export const getSpecializationGroups = async (state: AppState): Promise<Speciali
     const grpDto = resp.data as SpecializationGroupDTO[];
     const grps: SpecializationGroup[] = [];
     for (const grp of grpDto) {
-        const map: Map<string,Specialization> = new Map();
-        grp.specializations.forEach((s) => map.set(s.id, s));
-        grps.push({ ...grp, specializations: map });
+        grps.push(fromDTO(grp));
     }
     return grps;
 };
@@ -29,21 +27,21 @@ export const getSpecializationGroups = async (state: AppState): Promise<Speciali
 /*
  * Updates an existing Concept SpecializationGroup.
  */ 
-export const updateSpecializationGroup = async (state: AppState, grp: SpecializationGroup): Promise<SpecializationGroupDTO> => {
+export const updateSpecializationGroup = async (state: AppState, grp: SpecializationGroup): Promise<SpecializationGroup> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/specializationgroup/${grp.id}`, grp);
-    return resp.data as SpecializationGroupDTO;
+    return fromDTO(resp.data);
 };
 
 /*
  * Creates a new Concept SpecializationGroup.
  */ 
-export const createSpecializationGroup = async (state: AppState, grp: SpecializationGroup) => {
+export const createSpecializationGroup = async (state: AppState, grp: SpecializationGroup): Promise<SpecializationGroup> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/admin/specializationgroup`, grp);
-    return resp.data as SpecializationGroupDTO;
+    return fromDTO(resp.data);
 };
 
 /*
@@ -53,4 +51,10 @@ export const deleteSpecializationGroup = async (state: AppState, grp: Specializa
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.delete(`api/admin/specializationgroup/${grp.id}`);
+};
+
+const fromDTO = (dto: SpecializationGroupDTO): SpecializationGroup => {
+    const map: Map<string,Specialization> = new Map();
+    dto.specializations.forEach((s) => map.set(s.id, s));
+    return { ...dto, specializations: map };
 };

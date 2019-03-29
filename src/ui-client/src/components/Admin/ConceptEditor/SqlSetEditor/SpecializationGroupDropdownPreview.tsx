@@ -68,7 +68,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     private generateGroupQueuedApiEvent = (grp: SpecializationGroup): AdminPanelQueuedApiEvent => {
         const { dispatch } = this.props;
         return {
-            event: () => { dispatch(saveOrUpdateAdminConceptSpecializationGroup(grp)) },
+            event: () => saveOrUpdateAdminConceptSpecializationGroup(grp),
             id: grp.id,
             objectType: AdminPanelUpdateObjectType.SPECIALIZATION_GROUP
         };
@@ -80,7 +80,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     private generateSpecializationQueuedApiEvent = (spc: Specialization): AdminPanelQueuedApiEvent => {
         const { dispatch } = this.props;
         return {
-            event: () => { dispatch(saveOrUpdateAdminSpecialization(spc)) },
+            event: () => saveOrUpdateAdminSpecialization(spc),
             id: spc.id,
             objectType: AdminPanelUpdateObjectType.SPECIALIZATION
         };

@@ -10,6 +10,7 @@ import { SpecializationGroup } from "../../models/admin/Concept";
 import { getSpecializationGroups, updateSpecializationGroup, deleteSpecializationGroup, createSpecializationGroup } from "../../services/admin/specializationGroupApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { AdminPanelQueuedApiProcess } from "../../models/state/AdminState";
 
 export const SET_ADMIN_SPECIALIZATION_GROUPS = 'SET_ADMIN_SPECIALIZATION_GROUPS';
 export const REMOVE_ADMIN_SPECIALIZATION_GROUP = 'REMOVE_ADMIN_SPECIALIZATION_GROUP';
@@ -21,12 +22,18 @@ export interface AdminSpecializationGroupAction {
 }
 
 // Asynchronous
-export const saveOrUpdateAdminConceptSpecializationGroup = (grp: SpecializationGroup) => {
+/*
+ * Save or update a Specialization Group, depending on
+ * if it is preexisting or new.
+ */
+export const saveOrUpdateAdminConceptSpecializationGroup = (grp: SpecializationGroup): AdminPanelQueuedApiProcess => {
     return async (dispatch: any, getState: () => AppState) => {
         if (grp.unsaved) {
-            dispatch(saveNewAdminConceptSpecializationGroup(grp));
+            const newGrp = await updateSpecializationGroup(getState(), grp);
+            dispatch(setAdminConceptSpecializationGroup(newGrp));
         } else {
-            dispatch(updateAdminConceptSpecializationGroup(grp));
+            const newGrp = await updateSpecializationGroup(getState(), grp);
+            dispatch(setAdminConceptSpecializationGroup(newGrp));
         }
     }
 };
@@ -53,28 +60,6 @@ export const getAdminConceptSpecializationGroups = () => {
             dispatch(showInfoModal(info));
         }
     };
-};
-
-/*
- * Save a new Concept Specialization Groups.
- */
-export const saveNewAdminConceptSpecializationGroup = (group: SpecializationGroup) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const newGrp = await createSpecializationGroup(state, group);
-        dispatch(setAdminConceptSpecializationGroup(group));
-    }
-};
-
-/*
- * Save a new Concept Specialization Group.
- */
-export const updateAdminConceptSpecializationGroup = (group: SpecializationGroup) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const newGrp = await updateSpecializationGroup(state, group);
-        dispatch(setAdminConceptSpecializationGroup(group));
-    }
 };
 
 /*

@@ -67,7 +67,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
          */
         if (!group.unsaved) {
             const apiSaveEvent: AdminPanelQueuedApiEvent = {
-                event: () => { dispatch(saveOrUpdateAdminSpecialization(newSpc)) },
+                event: () => saveOrUpdateAdminSpecialization(newSpc),
                 id: newSpc.id,
                 objectType: AdminPanelUpdateObjectType.SPECIALIZATION
             }

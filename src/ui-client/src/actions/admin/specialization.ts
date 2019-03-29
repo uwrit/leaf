@@ -10,6 +10,7 @@ import { Specialization } from "../../models/admin/Concept";
 import { createSpecialization, updateSpecialization, deleteSpecialization } from "../../services/admin/specializationApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { AdminPanelQueuedApiProcess } from "../../models/state/AdminState";
 
 export const SET_ADMIN_SPECIALIZATIONS = 'SET_ADMIN_SPECIALIZATIONS';
 export const REMOVE_ADMIN_SPECIALIZATION = 'REMOVE_ADMIN_SPECIALIZATION';
@@ -23,34 +24,18 @@ export interface AdminSpecializationAction {
 
 // Asynchronous
 /*
- * Save a new Concept Specialization Groups.
+ * Save or update a Concept Specialization, depending on
+ * if it is preexisting or new.
  */
-export const saveOrUpdateAdminSpecialization = (spc: Specialization) => {
+export const saveOrUpdateAdminSpecialization = (spc: Specialization): AdminPanelQueuedApiProcess => {
     return async (dispatch: any, getState: () => AppState) => {
         if (spc.unsaved) {
-            dispatch(saveNewAdminSpecialization(spc));
+            const newSpc = await createSpecialization(getState(), spc);
+            dispatch(setAdminConceptSpecialization(newSpc, false));
         } else {
-            dispatch(updateAdminSpecialization(spc));
+            const newSpc = await updateSpecialization(getState(), spc);
+            dispatch(setAdminConceptSpecialization(newSpc, false));
         }
-    }
-};
-
-export const saveNewAdminSpecialization = (spc: Specialization) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const newSpc = await createSpecialization(state, spc);
-        dispatch(setAdminConceptSpecialization(spc, false));
-    }
-};
-
-/*
- * Save a new Concept Specialization.
- */
-export const updateAdminSpecialization = (spc: Specialization) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const newSpc = await updateSpecialization(state, spc);
-        dispatch(setAdminConceptSpecialization(spc, false));
     }
 };
 

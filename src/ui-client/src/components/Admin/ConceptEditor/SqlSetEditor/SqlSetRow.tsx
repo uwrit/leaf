@@ -82,7 +82,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     private generateQueuedApiEvent = (set: ConceptSqlSet): AdminPanelQueuedApiEvent => {
         const { dispatch } = this.props;
         return {
-            event: () => { dispatch(saveOrUpdateAdminConceptSqlSet(set)) },
+            event: () => saveOrUpdateAdminConceptSqlSet(set),
             id: set.id,
             objectType: AdminPanelUpdateObjectType.SQL_SET
         };

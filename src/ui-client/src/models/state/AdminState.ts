@@ -10,6 +10,7 @@ import { Concept as UiConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
+import { AppState } from './AppState';
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -30,8 +31,10 @@ export enum AdminPanelUpdateObjectType {
     SPECIALIZATION = 3
 }
 
+export type AdminPanelQueuedApiProcess = (dispatch: any, getState: () => AppState) => any;
+
 export interface AdminPanelQueuedApiEvent {
-    event: () => any;
+    event: () => AdminPanelQueuedApiProcess;
     id: string | number;
     objectType: AdminPanelUpdateObjectType;
 }
