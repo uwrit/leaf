@@ -64,7 +64,8 @@ namespace Services.Compiler
                         {
                             id,
                             user = user.UUID,
-                            groups = GroupMembership.From(user)
+                            groups = GroupMembership.From(user),
+                            admin = user.IsAdmin
                         },
                         commandTimeout: opts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
@@ -94,7 +95,8 @@ namespace Services.Compiler
                     {
                         ids = ResourceIdTable.From(ids),
                         user = user.UUID,
-                        groups = GroupMembership.From(user)
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
@@ -117,7 +119,8 @@ namespace Services.Compiler
                     {
                         uids = ResourceUniversalIdTable.From(universalIds),
                         user = user.UUID,
-                        groups = GroupMembership.From(user)
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
@@ -142,7 +145,8 @@ namespace Services.Compiler
                         {
                             parentId,
                             user = user.UUID,
-                            groups = GroupMembership.From(user)
+                            groups = GroupMembership.From(user),
+                            admin = user.IsAdmin
                         },
                         commandTimeout: opts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
@@ -174,7 +178,8 @@ namespace Services.Compiler
                         {
                             ids = ResourceIdTable.From(ids),
                             user = user.UUID,
-                            groups = GroupMembership.From(user)
+                            groups = GroupMembership.From(user),
+                            admin = user.IsAdmin
                         },
                         commandTimeout: opts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
@@ -205,7 +210,8 @@ namespace Services.Compiler
                         terms = SearchTermTable.From(terms),
                         rootId,
                         user = user.UUID,
-                        groups = GroupMembership.From(user)
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
@@ -225,7 +231,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     queryRoots,
-                    new { user = user.UUID, groups = GroupMembership.From(user) },
+                    new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -244,7 +250,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     queryRootsPanelFilters,
-                    new { user = user.UUID, groups = GroupMembership.From(user) },
+                    new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );

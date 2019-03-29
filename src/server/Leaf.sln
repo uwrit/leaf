@@ -52,6 +52,6 @@ Global
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0
 		$0.StandardHeader = $1
-		$1.Text = @Copyright (c) ${Year}, UW Medicine Research IT\nDeveloped by Nic Dobbins and Cliff Spital, CRIO Sean Mooney\nThis Source Code Form is subject to the terms of the Mozilla Public\nLicense, v. 2.0. If a copy of the MPL was not distributed with this\nfile, You can obtain one at http://mozilla.org/MPL/2.0/.
+		$1.Text = @Copyright (c) ${Year}, UW Medicine Research IT, University of Washington\nDeveloped by Nic Dobbins and Cliff Spital, CRIO Sean Mooney\nThis Source Code Form is subject to the terms of the Mozilla Public\nLicense, v. 2.0. If a copy of the MPL was not distributed with this\nfile, You can obtain one at http://mozilla.org/MPL/2.0/.
 	EndGlobalSection
 EndGlobal

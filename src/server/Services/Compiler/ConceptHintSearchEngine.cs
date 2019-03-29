@@ -67,10 +67,10 @@ namespace Services.Compiler
         }
 
         /// <summary>
-        /// Search the concept tree for records matching the provided terms, and stopping at the <paramref name="rootParentId"/>
+        /// Search the concept tree for records matching the provided terms, and stopping at the <paramref name="rootId"/>
         /// </summary>
         /// <returns>Collection of concepts that match the search terms</returns>
-        /// <param name="rootParentId">Root parent identifier.</param>
+        /// <param name="rootId">Root parent identifier.</param>
         /// <param name="terms">Search terms.</param>
         public async Task<IEnumerable<ConceptHint>> SearchAsync(Guid? rootId, params string[] terms)
         {
@@ -85,7 +85,8 @@ namespace Services.Compiler
                         terms = SearchTermTable.From(terms),
                         rootId,
                         user = user.UUID,
-                        groups = GroupMembership.From(user)
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
