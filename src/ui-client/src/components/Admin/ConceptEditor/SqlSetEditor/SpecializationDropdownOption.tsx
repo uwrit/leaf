@@ -11,14 +11,13 @@ import { ConfirmationModalState } from '../../../../models/state/GeneralUiState'
 import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, saveOrUpdateAdminSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Specialization, SpecializationGroup } from '../../../../models/admin/Concept';
-import { AdminPanelSpecializationGroupState, AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
+import { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
 import { upsertAdminApiQueuedEvent, removeAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
 
 interface Props {
     dispatch: any;
     group: SpecializationGroup;
     specialization: Specialization;
-    state: AdminPanelSpecializationGroupState
 }
 
 export class SpecializationDropdownOption extends React.PureComponent<Props> {
@@ -68,7 +67,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
          */
         if (!group.unsaved) {
             const apiSaveEvent: AdminPanelQueuedApiEvent = {
-                event: () => { dispatch(saveOrUpdateAdminSpecialization(newSpc)) },
+                event: () => saveOrUpdateAdminSpecialization(newSpc),
                 id: newSpc.id,
                 objectType: AdminPanelUpdateObjectType.SPECIALIZATION
             }

@@ -34,6 +34,7 @@ export interface PropertyProps {
     label?: string;
     locked?: boolean;
     focusToggle?: (show: boolean) => void;
+    placeholder?: string;
     propName: string;
     subLabel?: string;
     type?: string;

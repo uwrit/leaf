@@ -10,17 +10,17 @@ import { ConceptSqlSet } from "../../models/admin/Concept";
 import { getSqlSets, createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { AdminPanelQueuedApiEvent } from "../../models/state/AdminState";
+import { AdminPanelQueuedApiEvent, AdminPanelQueuedApiProcess } from "../../models/state/AdminState";
 
 export const SET_ADMIN_SQL_SETS = 'SET_ADMIN_SQL_SETS';
-export const SET_ADMIN_CURRENT_SQL_SET = 'SET_ADMIN_CURRENT_SQL_SET';
-export const SET_ADMIN_UNEDITED_SQL_SET = 'SET_ADMIN_UNEDITED_SQL_SET';
-export const SET_ADMIN_UNSAVED_SQL_SETS = 'SET_ADMIN_UNSAVED_SQL_SETS';
+export const SET_ADMIN_UNEDITED_SQL_SETS = 'SET_ADMIN_UNEDITED_SQL_SETS';
+export const SET_ADMIN_SQL_SETS_UNCHANGED = 'SET_ADMIN_SQL_SETS_UNCHANGED';
 export const UPSERT_ADMIN_QUEUED_API_EVENT = 'UPSERT_ADMIN_QUEUED_API_EVENT';
 export const REMOVE_ADMIN_QUEUED_API_EVENT = 'REMOVE_ADMIN_QUEUED_API_EVENT';
 export const REMOVE_ADMIN_SQL_SET = 'REMOVE_ADMIN_SQL_SET';
 export const ADD_ADMIN_SQL_SET_QUEUE_EVENT = 'ADD_ADMIN_SQL_SET_QUEUE_EVENT';
 export const REMOVE_ADMIN_SQL_SET_QUEUE_EVENT = 'REMOVE_ADMIN_SQL_SET_QUEUE_EVENT';
+export const UNDO_ADMIN_SQL_SET_CHANGES = 'UNDO_ADMIN_SQL_SET_CHANGES';
 
 export interface AdminSqlSetAction {
     changed?: boolean;
@@ -33,14 +33,53 @@ export interface AdminSqlSetAction {
 }
 
 // Asynchronous
-export const saveOrUpdateAdminConceptSqlSet = (set: ConceptSqlSet) => {
+/*
+ * Process all queued Concept SQL Set/Specialization/Specialization Group
+ * API operations sequentially.
+ */
+export const processApiUpdateQueue = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        try {
+            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            const state = getState();
+            const queue = state.admin!.sqlSets.updateQueue;
+            for (const ev of queue) {
+                const f = ev.event();
+                if (f) {
+                    await f(dispatch, getState);
+                }
+                dispatch(removeAdminApiQueuedEvent(ev.id));
+            }
+            dispatch(setAdminConceptSqlSetsUnchanged());
+            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+        } catch (err) {
+            console.log(err);
+            const info: InformationModalState = {
+                body: "An error occurred while attempting update the Leaf database with your changes. Please see the Leaf error logs for details.",
+                header: "Error Applying Changes",
+                show: true
+            };
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(showInfoModal(info));
+        }
+    };
+};
+
+/*
+ * Save or update a Concept SQL Set, depending on
+ * if it is preexisting or new.
+ */
+export const saveOrUpdateAdminConceptSqlSet = (set: ConceptSqlSet): AdminPanelQueuedApiProcess => {
     return async (dispatch: any, getState: () => AppState) => {
         if (set.unsaved) {
-            dispatch(saveNewAdminConceptSqlSet(set));
+            const newSet = await createSqlSet(getState(), set);
+            dispatch(removeAdminConceptSqlSet(set));
+            dispatch(setAdminConceptSqlSet(newSet, false));
         } else {
-            dispatch(updateAdminConceptSqlSet(set));
+            const newSet = await updateSqlSet(getState(), set);
+            dispatch(setAdminConceptSqlSet(newSet, false));
         }
-    }
+    };
 };
 
 /*
@@ -52,7 +91,7 @@ export const getAdminConceptSqlSets = () => {
             dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
             const state = getState();
             const sets = await getSqlSets(state);
-            dispatch(setAdminConceptSqlSets(sets));
+            dispatch(setAdminConceptSqlSets(sets, false));
             dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
         } catch (err) {
             const info: InformationModalState = {
@@ -64,62 +103,6 @@ export const getAdminConceptSqlSets = () => {
             dispatch(showInfoModal(info));
         }
     };
-};
-
-/*
- * Save a new SQL Set.
- */
-export const saveNewAdminConceptSqlSet = (set: ConceptSqlSet) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
-            createSqlSet(state, set)
-                .then(
-                    response => {
-                        dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
-                        dispatch(setAdminConceptSqlSet(set));
-                },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to save the SQL Set. Please see the Leaf error logs for details.",
-                            header: "Error Saving SQL Set",
-                            show: true
-                        };
-                        dispatch(showInfoModal(info));
-                });
-        } catch (err) {
-            console.log(err);
-        }
-    }
-};
-
-/*
- * Update an existing SQL Set.
- */
-export const updateAdminConceptSqlSet = (set: ConceptSqlSet) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            dispatch(setNoClickModalState({ message: "Updating", state: NoClickModalStates.CallingServer }));
-            updateSqlSet(state, set)
-                .then(
-                    response => {
-                        dispatch(setNoClickModalState({ message: "Updated", state: NoClickModalStates.Complete }));
-                        dispatch(setAdminConceptSqlSet(set));
-                },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to update the SQL Set. Please see the Leaf error logs for details.",
-                            header: "Error Updating SQL Set",
-                            show: true
-                        };
-                        dispatch(showInfoModal(info));
-                });
-        } catch (err) {
-            console.log(err);
-        }
-    }
 };
 
 /*
@@ -152,32 +135,26 @@ export const deleteAdminSqlSet = (set: ConceptSqlSet) => {
 };
 
 // Synchronous
-export const setAdminConceptSqlSet = (set: ConceptSqlSet): AdminSqlSetAction => {
+export const setAdminConceptSqlSet = (set: ConceptSqlSet, changed: boolean): AdminSqlSetAction => {
     return {
+        changed,
         sets: [ set ],
         type: SET_ADMIN_SQL_SETS
     };
 };
 
-export const setAdminCurrentConceptSqlSet = (set: ConceptSqlSet, changed: boolean): AdminSqlSetAction => {
+export const setAdminConceptSqlSets = (sets: ConceptSqlSet[], changed: boolean): AdminSqlSetAction => {
     return {
-        sets: [ set ],
         changed,
-        type: SET_ADMIN_CURRENT_SQL_SET
-    };
-};
-
-export const setAdminUneditedConceptSqlSet = (set: ConceptSqlSet): AdminSqlSetAction => {
-    return {
-        set,
-        type: SET_ADMIN_CURRENT_SQL_SET
-    };
-};
-
-export const setAdminConceptSqlSets = (sets: ConceptSqlSet[]): AdminSqlSetAction => {
-    return {
         sets,
         type: SET_ADMIN_SQL_SETS
+    };
+};
+
+export const setAdminUneditedConceptSqlSets = (mappedSets: Map<number,ConceptSqlSet>): AdminSqlSetAction => {
+    return {
+        mappedSets,
+        type: SET_ADMIN_UNEDITED_SQL_SETS
     };
 };
 
@@ -185,13 +162,6 @@ export const removeAdminConceptSqlSet = (set: ConceptSqlSet): AdminSqlSetAction 
     return {
         set,
         type: REMOVE_ADMIN_SQL_SET
-    };
-};
-
-export const setAdminUnsavedConceptSqlSets = (mappedSets: Map<number,ConceptSqlSet>): AdminSqlSetAction => {
-    return {
-        mappedSets,
-        type: SET_ADMIN_UNSAVED_SQL_SETS
     };
 };
 
@@ -206,5 +176,17 @@ export const removeAdminApiQueuedEvent = (id: string | number): AdminSqlSetActio
     return {
         id,
         type: REMOVE_ADMIN_QUEUED_API_EVENT
+    };
+};
+
+export const undoAdminSqlSetChanges = (): AdminSqlSetAction => {
+    return {
+        type: UNDO_ADMIN_SQL_SET_CHANGES
+    };
+};
+
+export const setAdminConceptSqlSetsUnchanged = (): AdminSqlSetAction => {
+    return {
+        type: SET_ADMIN_SQL_SETS_UNCHANGED
     };
 };

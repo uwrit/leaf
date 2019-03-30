@@ -10,7 +10,7 @@ import { ConceptSqlSet, SpecializationGroup, Specialization } from '../../../../
 import { Button, Container, Row, Col } from 'reactstrap';
 import { setAdminPanelConceptEditorPane, setAdminConceptExampleSql } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
-import { setAdminConceptSqlSet, setAdminUnsavedConceptSqlSets } from '../../../../actions/admin/sqlSet';
+import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
 import { generateSampleSql } from '../../../../utils/admin';
 import { SqlSetRow } from './SqlSetRow';
@@ -24,7 +24,7 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     public componentDidMount() {
         const { dispatch, data } = this.props;
-        dispatch(setAdminUnsavedConceptSqlSets(data.sqlSets.sets));
+        dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
     }
 
     public render() {
@@ -37,8 +37,8 @@ export class SqlSetEditor extends React.PureComponent<Props> {
             <div className={`${c}-container`}>
                 <div className={`${c}-toprow`}>
                     <Button className='leaf-button leaf-button-primary' id={`${c}-add-sqlset`}>Create New SQL Set</Button>
-                    <Button className='leaf-button leaf-button-secondary mr-auto' disabled={data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
+                    <Button className='leaf-button leaf-button-secondary mr-auto' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
                     <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
                 </div>
                 <Container className={`${c}-table`}>
@@ -61,17 +61,19 @@ export class SqlSetEditor extends React.PureComponent<Props> {
             const newSet = Object.assign({}, sqlSets.sets.get(set.id), { [propName]: val });
             const sql = generateSampleSql(concepts.currentConcept!, newSet, configuration.sql);
     
-            dispatch(setAdminConceptSqlSet(newSet));
+            dispatch(setAdminConceptSqlSet(newSet, true));
             dispatch(setAdminConceptExampleSql(sql));
         }
     }
 
     private handleUndoChangesClick = () => {
-
+        const { dispatch } = this.props;
+        dispatch(undoAdminSqlSetChanges());
     }
 
     private handleSaveChangesClick = () => {
-
+        const { dispatch } = this.props;
+        dispatch(processApiUpdateQueue());
     }
 
     private handleBackToConceptEditorClick = () => {

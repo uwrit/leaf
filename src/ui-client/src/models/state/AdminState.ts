@@ -5,11 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept, ConceptSqlSet, SpecializationGroup, Specialization } from '../admin/Concept';
+import { Concept, ConceptSqlSet } from '../admin/Concept';
 import { Concept as UiConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
+import { AppState } from './AppState';
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -30,8 +31,10 @@ export enum AdminPanelUpdateObjectType {
     SPECIALIZATION = 3
 }
 
+export type AdminPanelQueuedApiProcess = (dispatch: any, getState: () => AppState) => any;
+
 export interface AdminPanelQueuedApiEvent {
-    event: () => any;
+    event: () => AdminPanelQueuedApiProcess;
     id: string | number;
     objectType: AdminPanelUpdateObjectType;
 }
@@ -50,20 +53,9 @@ export interface AdminConceptState {
 
 export interface AdminPanelSqlSetState {
     changed: boolean;
-    currentSet?: ConceptSqlSet;
     sets: Map<number, ConceptSqlSet>;
-    uneditedSet?: ConceptSqlSet;
-    unsavedSets: Map<number, ConceptSqlSet>;
+    uneditedSets?: Map<number, ConceptSqlSet>;
     updateQueue: AdminPanelQueuedApiEvent[];
-}
-
-export interface AdminPanelSpecializationGroupState {
-    specializationChanged: boolean;
-    groupChanged: boolean;
-    currentGroup?: SpecializationGroup;
-    currentSpecialization?: Specialization;
-    uneditedGroup?: SpecializationGroup;
-    uneditedSpecialization?: Specialization;
 }
 
 export interface AdminPanelFilterState {
@@ -82,6 +74,5 @@ export default interface AdminState {
     datasets: AdminDatasetState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
-    specializationGroups: AdminPanelSpecializationGroupState;
     state: AdminPanelLoadState;
 }

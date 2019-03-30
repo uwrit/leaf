@@ -48,21 +48,21 @@ export const getSqlSets = async (state: AppState): Promise<ConceptSqlSet[]> => {
 /*
  * Updates an existing Concept SQLSet.
  */ 
-export const updateSqlSet = async (state: AppState, set: ConceptSqlSet): Promise<ConceptSqlSetDTO> => {
+export const updateSqlSet = async (state: AppState, set: ConceptSqlSet): Promise<ConceptSqlSet> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/sqlset/${set.id}`, set);
-    return resp.data as ConceptSqlSetDTO;
+    return fromDTO(resp.data, set);
 };
 
 /*
  * Creates a new Concept SQLSet.
  */ 
-export const createSqlSet = async (state: AppState, set: ConceptSqlSet): Promise<ConceptSqlSetDTO> => {
+export const createSqlSet = async (state: AppState, set: ConceptSqlSet): Promise<ConceptSqlSet> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/admin/sqlset`, set );
-    return resp.data as ConceptSqlSetDTO;
+    return fromDTO(resp.data, set);
 };
 
 /*
@@ -72,4 +72,8 @@ export const deleteSqlSet = async (state: AppState, set: ConceptSqlSet) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.delete(`api/admin/sqlset/${set.id}`);
+};
+
+const fromDTO = (dto: ConceptSqlSetDTO, prev: ConceptSqlSet): ConceptSqlSet => {
+    return { ...dto, specializationGroups: prev.specializationGroups };
 };

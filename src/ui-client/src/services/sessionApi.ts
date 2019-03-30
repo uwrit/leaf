@@ -109,8 +109,7 @@ export const attemptLoginRetryIfPossible = () => {
     if (!retry) {
         sessionStorage.setItem(key, 'X');
         window.location = window.location;
-    }
-    else {
+    } else {
         sessionStorage.removeItem(key);
     }
 };

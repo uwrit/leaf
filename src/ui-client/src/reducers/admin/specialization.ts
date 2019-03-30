@@ -11,36 +11,22 @@ import { AdminSpecializationAction } from "../../actions/admin/specialization";
 export const setAdminConceptSpecialization = (state: AdminState, action: AdminSpecializationAction) => {
     const spcs = action.spcs!;
     for (const spc of spcs) {
-        const set = state.sqlSets.sets.get(spc.sqlSetId); // state.specializationGroups.groups.get(spc.specializationGroupId);
+        const set = state.sqlSets.sets.get(spc.sqlSetId); 
         if (set) {
-            const grp = set.specializationGroups.get(spc.specializationGroupId);
+            const newSet = Object.assign({}, set, { specializationGroups: new Map(set.specializationGroups) });
+            const grp = newSet.specializationGroups.get(spc.specializationGroupId);
             if (grp) {
-                grp.specializations.set(spc.id, spc);
+                const newGrp = Object.assign({}, grp, { specializations: new Map(grp.specializations) });
+                newGrp.specializations.set(spc.id, spc);
+                newSet.specializationGroups.set(newGrp.id, newGrp);
             }
+            state.sqlSets.sets.set(newSet.id, newSet);
         }
     }
     return Object.assign({}, state, {
-        specializationGroups: {
-            ...state.specializationGroups,
-            specializationChanged: action.changed
-        }
-    });
-};
-
-export const setAdminCurrentConceptSpecialization = (state: AdminState, action: AdminSpecializationAction) => {
-    return Object.assign({}, state, {
-        specializationGroups: {
-            ...state.specializationGroups,
-            currentSpecialization: action.spc
-        }
-    });
-};
-
-export const setAdminUneditedConceptSpecialization = (state: AdminState, action: AdminSpecializationAction) => {
-    return Object.assign({}, state, {
-        specializationGroups: {
-            ...state.specializationGroups,
-            uneditedSpecialization: action.spc
+        sqlSets: {
+            ...state.sqlSets,
+            changed: true
         }
     });
 };

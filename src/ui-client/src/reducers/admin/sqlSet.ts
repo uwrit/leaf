@@ -5,27 +5,21 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import AdminState, { AdminPanelUpdateObjectType } from "../../models/state/AdminState";
+import AdminState from "../../models/state/AdminState";
 import { AdminSqlSetAction } from "../../actions/admin/sqlSet";
+import { ConceptSqlSet } from "../../models/admin/Concept";
 
 export const setAdminConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const sets = action.sets!;
     for (const set of sets) {
-        state.sqlSets.sets.set(set.id, set);
-    }
-    return Object.assign({}, state);
-};
-
-export const setAdminCurrentConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const sets = action.sets!;
-    for (const set of sets) {
-        state.sqlSets.sets.set(set.id, set);
+        state.sqlSets.sets.set(set.id, Object.assign({}, set));
     }
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
+            sets: new Map(state.sqlSets.sets),
             changed: action.changed
-        }
+        },
     });
 };
 
@@ -33,7 +27,21 @@ export const setAdminUneditedConceptSqlSet = (state: AdminState, action: AdminSq
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            uneditedSet: action.set
+            uneditedSets: new Map(action.mappedSets!)
+        }
+    });
+};
+
+export const undoAdminConceptSqlSetChanges = (state: AdminState, action: AdminSqlSetAction): AdminState => {
+    const undone: Map<number, ConceptSqlSet> = new Map();
+    state.sqlSets.uneditedSets!.forEach((s) => undone.set(s.id, Object.assign({}, s)));
+
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            sets: undone,
+            changed: false,
+            updateQueue: []
         }
     });
 };
@@ -42,15 +50,6 @@ export const deleteAdminConceptSqlSet = (state: AdminState, action: AdminSqlSetA
     const set = action.set!;
     state.sqlSets.sets.delete(set.id);
     return Object.assign({}, state);
-};
-
-export const setAdminUnsavedConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    return Object.assign({}, state, {
-        sqlSets: {
-            ...state.sqlSets,
-            unsavedSets: action.mappedSets
-        }
-    });
 };
 
 export const upsertAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {
@@ -84,6 +83,16 @@ export const removeAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSet
         sqlSets: {
             ...state.sqlSets,
             updateQueue: events
+        }
+    });
+};
+
+export const setAdminConceptSqlSetUnchanged = (state: AdminState, action: AdminSqlSetAction): AdminState => {
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: false,
+            updateQueue: []
         }
     });
 };
