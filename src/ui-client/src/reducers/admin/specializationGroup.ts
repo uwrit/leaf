@@ -35,7 +35,7 @@ export const removeAdminConceptSpecializationGroup = (state: AdminState, action:
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            changed: true
+            changed: state.sqlSets.changed && state.sqlSets.updateQueue.length
         }
     });
 };

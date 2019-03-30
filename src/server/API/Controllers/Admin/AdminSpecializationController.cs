@@ -107,7 +107,7 @@ namespace API.Controllers.Admin
 
                 var spec = dto.ConceptSpecialization();
                 var created = await specializationService.Create(spec);
-                return Ok(created);
+                return Ok(SpecializationDTO.From(created));
             }
             catch (FormatException fe)
             {

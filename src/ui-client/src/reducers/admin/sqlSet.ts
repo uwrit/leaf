@@ -49,7 +49,12 @@ export const undoAdminConceptSqlSetChanges = (state: AdminState, action: AdminSq
 export const deleteAdminConceptSqlSet = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const set = action.set!;
     state.sqlSets.sets.delete(set.id);
-    return Object.assign({}, state);
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: state.sqlSets.changed && state.sqlSets.updateQueue.length
+        }
+    });
 };
 
 export const upsertAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {

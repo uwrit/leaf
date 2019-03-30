@@ -103,10 +103,6 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest("SpecializationGroup is missing.");
                 }
-                if (dto.Id == default)
-                {
-                    return BadRequest("SpecializationGroup.Id is missing.");
-                }
                 if (dto.SqlSetId == default)
                 {
                     return BadRequest("SpecializationGroup.SqlSetId is missing.");

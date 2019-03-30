@@ -36,7 +36,7 @@ export const getSqlSets = async (state: AppState): Promise<ConceptSqlSet[]> => {
     for (const grp of groups) {
         const idx = setIdxMap.get(grp.sqlSetId)!;
         grp.specializations.forEach((s) => s.sqlSetId = grp.sqlSetId);
-        if (idx) {
+        if (idx !== undefined) {
             const set = sets[idx];
             set.specializationGroups.set(grp.id, grp);
         }

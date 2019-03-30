@@ -40,5 +40,10 @@ export const removeAdminConceptSpecialization = (state: AdminState, action: Admi
                 grp.specializations.delete(spc.id);
             }
         }
-    return Object.assign({}, state);
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            changed: state.sqlSets.changed && state.sqlSets.updateQueue.length
+        }
+    });
 };

@@ -44,9 +44,9 @@ export const processApiUpdateQueue = () => {
             const state = getState();
             const queue = state.admin!.sqlSets.updateQueue;
             for (const ev of queue) {
-                const f = ev.event();
-                if (f) {
-                    await f(dispatch, getState);
+                const process = ev.getProcess();
+                if (process) {
+                    await process(dispatch, getState);
                 }
                 dispatch(removeAdminApiQueuedEvent(ev.id));
             }
@@ -108,7 +108,7 @@ export const getAdminConceptSqlSets = () => {
 /*
  * Delete an existing SQL Set.
  */
-export const deleteAdminSqlSet = (set: ConceptSqlSet) => {
+export const deleteAdminConceptSqlSet = (set: ConceptSqlSet) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();

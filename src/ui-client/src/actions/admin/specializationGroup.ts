@@ -29,7 +29,7 @@ export interface AdminSpecializationGroupAction {
 export const saveOrUpdateAdminConceptSpecializationGroup = (grp: SpecializationGroup): AdminPanelQueuedApiProcess => {
     return async (dispatch: any, getState: () => AppState) => {
         if (grp.unsaved) {
-            const newGrp = await updateSpecializationGroup(getState(), grp);
+            const newGrp = await createSpecializationGroup(getState(), grp);
             dispatch(removeAdminConceptSpecializationGroup(grp))
             dispatch(setAdminConceptSpecializationGroup(newGrp));
         } else {

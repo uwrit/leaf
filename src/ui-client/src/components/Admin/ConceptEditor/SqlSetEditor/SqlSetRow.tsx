@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { Row, Col } from 'reactstrap';
+import { Row, Col, Container } from 'reactstrap';
 import { Checkbox } from '../Sections/Checkbox';
 import { TextArea } from '../Sections/TextArea';
 import { ConceptSqlSet, SpecializationGroup } from '../../../../models/admin/Concept';
@@ -15,7 +15,9 @@ import { FaChevronDown } from 'react-icons/fa';
 import { SpecializationGroupDropdownPreview } from './SpecializationGroupDropdownPreview';
 import AdminState, { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
 import { setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { setAdminConceptSqlSet, saveOrUpdateAdminConceptSqlSet, upsertAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
+import { setAdminConceptSqlSet, saveOrUpdateAdminConceptSqlSet, upsertAdminApiQueuedEvent, removeAdminConceptSqlSet, removeAdminApiQueuedEvent, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../../actions/generalUi';
 
 interface Props {
     changeHandler: (val: any, propName: string) => any;
@@ -39,12 +41,16 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
 
     public getSnapshotBeforeUpdate(prevProps: Props) {
         if (this.props.set.specializationGroups.size === 0) {
-            this.setState({ isOpen: false });
+            return false;
         }
         return null;
     }
 
-    public componentDidUpdate() {}
+    public componentDidUpdate(prevProps: Props, prevState: State, snapshot?: boolean) {
+        if (snapshot) {
+            this.setState({ isOpen: snapshot });
+        }
+    }
 
     public render() {
         const { changeHandler, set } = this.props;
@@ -53,52 +59,32 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         set.specializationGroups.forEach((g) => spcGrps.push(g));
 
         return (
-            <div className={`${c}-table-row-container`}>
+            <Container className={`${c}-table-row-container`}>
                 <Row className={`${c}-table-row`}>
-                    <Col md={1} className={`${c}-table-row-id`}>
-                        <div>{set.id}</div>
-                    </Col>
+                    {set.unsaved &&
+                    <span className={`${c}-unsaved`}>unsaved!</span>
+                    }
                     <Col md={2} className={`${c}-input-container-checkbox`}>
                         <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased}/>
                     </Col>
                     <Col md={5} className={`${c}-input-container`}>
                         <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} />
                     </Col>
-                    <Col md={4} className={`${c}-input-container`}>
+                    <Col md={5} className={`${c}-input-container`}>
+
+                        {/* Delete Concept SQL Set */}
+                        <div className={`${c}-specializationgroup-delete`}>
+                            <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
+                        </div>
+
                         <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} />
                     </Col>
                 </Row>
-
                 <Col md={12}>
                     {this.renderSpecializationData(spcGrps)}
                 </Col>
-            </div>
+            </Container>
         );
-    }
-
-    /*
-     * Create a queued event to upsert a Sql Set on save.
-     */
-    private generateQueuedApiEvent = (set: ConceptSqlSet): AdminPanelQueuedApiEvent => {
-        const { dispatch } = this.props;
-        return {
-            event: () => saveOrUpdateAdminConceptSqlSet(set),
-            id: set.id,
-            objectType: AdminPanelUpdateObjectType.SQL_SET
-        };
-    }
-
-    /*
-     * Handle any edits to a Sql Set, updating 
-     * the store and preparing a later API save event.
-     */
-    private handleSqlSetEdit = (val: any, propName: string) => {
-        const { set, dispatch } = this.props;
-        const newSet = Object.assign({}, set, { [propName]: val });
-        const apiSaveEvent = this.generateQueuedApiEvent(newSet);
-
-        dispatch(upsertAdminApiQueuedEvent(apiSaveEvent));
-        dispatch(setAdminConceptSqlSet(newSet, true));
     }
 
     /*
@@ -167,6 +153,57 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         return Math.ceil(Math.random() * (max - min) + min);
     }
 
+    /*
+     * Create a queued event to upsert a Sql Set on save.
+     */
+    private generateQueuedApiEvent = (set: ConceptSqlSet): AdminPanelQueuedApiEvent => {
+        return {
+            getProcess: () => saveOrUpdateAdminConceptSqlSet(set),
+            id: set.id,
+            objectType: AdminPanelUpdateObjectType.SQL_SET
+        };
+    }
+
+    /*
+     * Handle any edits to a Sql Set, updating 
+     * the store and preparing a later API save event.
+     */
+    private handleSqlSetEdit = (val: any, propName: string) => {
+        const { set, dispatch } = this.props;
+        const newSet = Object.assign({}, set, { [propName]: val === '' ? null : val });
+        const apiSaveEvent = this.generateQueuedApiEvent(newSet);
+
+        dispatch(upsertAdminApiQueuedEvent(apiSaveEvent));
+        dispatch(setAdminConceptSqlSet(newSet, true));
+    }
+
+    /*
+     * Handle any edits to a Sql Set, updating 
+     * the store and preparing a later API save event.
+     */
+    private handleSqlSetDeleteClick = () => {
+        const { set, dispatch } = this.props;
+
+        if (set.unsaved) {
+            dispatch(removeAdminApiQueuedEvent(set.id));
+            dispatch(removeAdminConceptSqlSet(set));
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `Are you sure you want to delete the SQL Set (id "${set.id}")? This can't be undone.`,
+                header: 'Delete Concept SQL Set',
+                onClickNo: () => null,
+                onClickYes: () => dispatch(deleteAdminConceptSqlSet(set)),
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Delete SQL Set`
+            };
+            dispatch(showConfirmationModal(confirm));
+        }
+    }
+
+    /*
+     * Handle add Specialization Group click.
+     */
     private handleAddSpecializationGroupDropdownClick = () => {
         const { set, dispatch } = this.props;
         const grp: SpecializationGroup = {
@@ -180,6 +217,9 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         this.setState({ isOpen: true });
     }
 
+    /*
+     * Toggle the dropdown open/closed state.
+     */
     private handleDropdownToggleClick = () => {
         this.setState({ isOpen: !this.state.isOpen })
     }

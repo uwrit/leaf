@@ -34,7 +34,7 @@ export enum AdminPanelUpdateObjectType {
 export type AdminPanelQueuedApiProcess = (dispatch: any, getState: () => AppState) => any;
 
 export interface AdminPanelQueuedApiEvent {
-    event: () => AdminPanelQueuedApiProcess;
+    getProcess: () => AdminPanelQueuedApiProcess;
     id: string | number;
     objectType: AdminPanelUpdateObjectType;
 }
