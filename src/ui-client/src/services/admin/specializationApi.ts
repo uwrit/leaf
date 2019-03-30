@@ -17,7 +17,12 @@ export const updateSpecialization = async (state: AppState, spc: Specialization)
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/specialization/${spc.id}`, spc);
     const updatedSpc = resp.data as SpecializationDTO;
-    return { ...updatedSpc, sqlSetId: spc.sqlSetId } as Specialization;
+    return { 
+        ...updatedSpc, 
+        changed: false, 
+        unsaved: false, 
+        sqlSetId: spc.sqlSetId 
+    } as Specialization;
 };
 
 /*
@@ -31,7 +36,12 @@ export const createSpecialization = async (state: AppState, spc: Specialization)
         id: null
     });
     const newSpc = resp.data as SpecializationDTO;
-    return { ...newSpc, sqlSetId: spc.sqlSetId } as Specialization;
+    return { 
+        ...newSpc, 
+        changed: false,
+        unsaved: false,
+        sqlSetId: spc.sqlSetId 
+    } as Specialization;
 };
 
 /*

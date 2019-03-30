@@ -19,6 +19,7 @@ export interface EditorPaneProps {
 }
 
 export interface SectionProps {
+    changed: boolean;
     changeHandler: (val: any, propName: string) => any;
     concept?: Concept;
     dispatch: any;

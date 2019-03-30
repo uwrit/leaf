@@ -76,9 +76,7 @@ export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConc
         concepts: { 
             ...state.concepts,
             changed: false,
-            currentConcept: undefined,
-            originalConcept: undefined,
-            originalUiConcept: undefined
+            currentConcept: undefined
         }
     });
 };

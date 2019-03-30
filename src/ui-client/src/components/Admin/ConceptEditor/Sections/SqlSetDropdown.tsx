@@ -8,14 +8,21 @@
 import React from 'react';
 import { FormGroup, Label, FormText, DropdownToggle } from 'reactstrap';
 import { PropertyProps } from '../Props';
-import { ConceptSqlSet } from '../../../../models/admin/Concept';
+import { ConceptSqlSet, Concept } from '../../../../models/admin/Concept';
+import { Concept as UiConcept } from '../../../../models/concept/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { setAdminPanelConceptEditorPane } from '../../../../actions/admin/concept';
+import { setAdminPanelConceptEditorPane, saveAdminConcept, revertAdminConceptToOriginal } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../../actions/generalUi';
+import { setConcept } from '../../../../actions/concepts';
 
 interface Props extends PropertyProps {
+    changed: boolean;
     dispatch: any;
+    handleSave: () => any;
+    handleUndoChanges: () => any;
     sqlSets: Map<number,ConceptSqlSet>;
     toggleSqlPreview: (show: boolean) => any;
     toggleOverlay: (show: boolean) => any;
@@ -86,8 +93,22 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     }
 
     private handleManageSqlSetsClick = () => {
-        const { dispatch, toggleOverlay, toggleSqlPreview } = this.props;
-        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+        const { dispatch, changed, handleSave, handleUndoChanges } = this.props;
+
+        if (changed) {
+            const confirm: ConfirmationModalState = {
+                body: `Do you want to save your current changes to this Concept?"`,
+                header: 'Save Changes',
+                onClickNo: () => { handleUndoChanges(); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET)); },
+                onClickYes: () => { handleSave(); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET)); },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, I'll Save Changes`
+            };
+            dispatch(showConfirmationModal(confirm));
+        } else {
+            dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+        }
     }
 
     private toggle = () => {

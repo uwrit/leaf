@@ -26,8 +26,7 @@ import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
 import { setPanelFilters } from './panelFilter';
-import { addDatasets, searchDatasets } from '../services/datasetSearchApi';
-import { getSqlSets } from '../services/admin/sqlSetApi';
+import { addDatasets } from '../services/datasetSearchApi';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';

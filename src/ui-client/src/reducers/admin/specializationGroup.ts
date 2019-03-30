@@ -7,6 +7,7 @@
 
 import AdminState from "../../models/state/AdminState";
 import { AdminSpecializationGroupAction } from "../../actions/admin/specializationGroup";
+import { conceptSqlSetsChanged } from "../../utils/admin";
 
 export const setAdminConceptSpecializationGroups = (state: AdminState, action: AdminSpecializationGroupAction) => {
     const groups = action.groups!;
@@ -30,12 +31,13 @@ export const removeAdminConceptSpecializationGroup = (state: AdminState, action:
     const grp = action.group!;
     const set = state.sqlSets.sets.get(grp.sqlSetId);
     if (set) {
+        set.specializationGroups = new Map(set.specializationGroups);
         set.specializationGroups.delete(grp.id);
     }
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            changed: state.sqlSets.changed && state.sqlSets.updateQueue.length
+            changed: conceptSqlSetsChanged(state.sqlSets.sets)
         }
     });
 };

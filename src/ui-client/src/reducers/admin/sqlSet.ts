@@ -8,6 +8,7 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminSqlSetAction } from "../../actions/admin/sqlSet";
 import { ConceptSqlSet } from "../../models/admin/Concept";
+import { conceptSqlSetsChanged } from "../../utils/admin";
 
 export const setAdminConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const sets = action.sets!;
@@ -52,42 +53,7 @@ export const deleteAdminConceptSqlSet = (state: AdminState, action: AdminSqlSetA
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            changed: state.sqlSets.changed && state.sqlSets.updateQueue.length
-        }
-    });
-};
-
-export const upsertAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const newEv = action.queuedApiEvent!;
-    const events = state.sqlSets.updateQueue.slice();
-    let isUpdate = false;
-
-    for (let i = 0; i < events.length; i++) {
-        const ev = events[i];
-        if (ev.objectType === newEv.objectType && ev.id === newEv.id) {
-            events.splice(i, 1, newEv);
-            isUpdate = true;
-        }
-    }
-    if (!isUpdate) {
-        events.push(newEv);
-    }
-    console.log('reducer events', events);
-    return Object.assign({}, state, {
-        sqlSets: {
-            ...state.sqlSets,
-            updateQueue: events
-        }
-    });
-};
-
-export const removeAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const events = state.sqlSets.updateQueue.filter((ev) => ev.id !== action.id!);
-    console.log('reducer events', events);
-    return Object.assign({}, state, {
-        sqlSets: {
-            ...state.sqlSets,
-            updateQueue: events
+            changed: conceptSqlSetsChanged(state.sqlSets.sets)
         }
     });
 };
@@ -96,8 +62,7 @@ export const setAdminConceptSqlSetUnchanged = (state: AdminState, action: AdminS
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            changed: false,
-            updateQueue: []
+            changed: false
         }
     });
 };

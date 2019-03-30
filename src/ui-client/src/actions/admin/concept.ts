@@ -14,12 +14,10 @@ import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
 import { getSqlSets } from '../../services/admin/sqlSetApi';
-import { getSpecializationGroups } from '../../services/admin/specializationGroupApi';
 import { getAdminSqlConfiguration } from './configuration';
-import { generateSampleSql } from '../../utils/admin';
-import { setConcept, removeConcept } from '../concepts';
-import { setAdminConceptSqlSets } from './sqlSet';
-import { setAdminConceptSpecializationGroups } from './specializationGroup';
+import { generateSampleSql, adminToNormalConcept } from '../../utils/admin';
+import { setConcept, removeConcept, fetchSingleConcept } from '../concepts';
+import { setAdminConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from './sqlSet';
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
 export const SET_ADMIN_CONCEPT_ORIGINAL = 'SET_ADMIN_CONCEPT_ORIGINAL'
@@ -127,6 +125,40 @@ export const loadAdminPanelDataIfNeeded = () => {
 };
 
 /*
+ * As the admin clicks out of Admin Panel, check for unsaved changes
+ * and prompt for instructions if there are any.
+ */
+export const checkForAdminPanelUnsavedChanges = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const admin = getState().admin!;
+        if (admin.activeTab === AdminPanelConceptEditorPane.MAIN && admin.concepts.changed) {
+            const cpt = admin.concepts.currentConcept!;
+            const confirm: ConfirmationModalState = {
+                body: `Do you want to save changes to the current concept, "${cpt!.uiDisplayName}?"`,
+                header: 'Save Changes',
+                onClickNo: () => { dispatch(revertAdminConceptToOriginal()); dispatch(fetchSingleConcept(cpt.id)) },
+                onClickYes: () => { dispatch(saveAdminConcept(cpt!)); },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, I'll Save Changes`
+            };
+            dispatch(showConfirmationModal(confirm));
+        } else if (admin.activeTab === AdminPanelConceptEditorPane.SQL_SET && admin.sqlSets.changed) {
+            const confirm: ConfirmationModalState = {
+                body: `Do you want to save your changes?`,
+                header: 'Save Changes',
+                onClickNo: () => { dispatch(undoAdminSqlSetChanges()); },
+                onClickYes: () => { dispatch(processApiUpdateQueue()); },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, I'll Save Changes`
+            };
+            dispatch(showConfirmationModal(confirm));
+        }
+    };
+};
+
+/*
  * Handle clicks on concepts. Only proceeds if the
  * user is an admin and they are currently in the in 
  * Admin Panel.
@@ -149,7 +181,7 @@ export const handleAdminConceptClick = (newConcept: UiConcept) => {
                 body: `Do you want to save changes to the current concept, "${currentConcept!.uiDisplayName}?"`,
                 header: 'Save Changes',
                 onClickNo: () => { dispatch(revertAdminConceptToOriginal()); dispatch(fetchAdminConceptIfNeeded(newConcept)); },
-                onClickYes: () => { dispatch(saveAdminConcept(currentConcept!, newConcept)) },
+                onClickYes: () => { dispatch(saveAdminConcept(currentConcept!)) },
                 show: true,
                 noButtonText: `No`,
                 yesButtonText: `Yes, I'll Save Changes`
@@ -197,7 +229,7 @@ export const saveNewAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
 /*
  * Update an existing concept.
  */
-export const saveAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
+export const saveAdminConcept = (concept: Concept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
@@ -207,7 +239,7 @@ export const saveAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
                     response => {
                         dispatch(setNoClickModalState({ message: "Concept Updated", state: NoClickModalStates.Complete }));
                         dispatch(setAdminConcept(concept, false));
-                        dispatch(setConcept(uiConcept));
+                        dispatch(fetchSingleConcept(concept.id));
                 },  error => {
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to update the Concept. Please see the Leaf error logs for details.",

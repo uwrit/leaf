@@ -62,10 +62,6 @@
     background-color: white;
 }
 
-.concept-editor-column-right-header .leaf-button-warning {
-    float: right;
-}
-
 /* Left Column */
 .concept-editor-column-left {
     padding-left: 0 !important;

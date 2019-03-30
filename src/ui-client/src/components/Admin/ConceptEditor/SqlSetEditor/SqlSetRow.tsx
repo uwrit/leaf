@@ -13,11 +13,11 @@ import { ConceptSqlSet, SpecializationGroup } from '../../../../models/admin/Con
 import { Collapse } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import { SpecializationGroupDropdownPreview } from './SpecializationGroupDropdownPreview';
-import AdminState, { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
+import AdminState from '../../../../models/state/AdminState';
 import { setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { setAdminConceptSqlSet, saveOrUpdateAdminConceptSqlSet, upsertAdminApiQueuedEvent, removeAdminConceptSqlSet, removeAdminApiQueuedEvent, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
-import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { showConfirmationModal } from '../../../../actions/generalUi';
+import { setAdminConceptSqlSet, removeAdminConceptSqlSet, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
+import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 
 interface Props {
     changeHandler: (val: any, propName: string) => any;
@@ -61,9 +61,13 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         return (
             <Container className={`${c}-table-row-container`}>
                 <Row className={`${c}-table-row`}>
-                    {set.unsaved &&
-                    <span className={`${c}-unsaved`}>unsaved!</span>
+
+                    {/* Unsaved notifier */}
+                    {(set.unsaved || set.changed) &&
+                    <span className={`${c}-unsaved`}>unsaved</span>
                     }
+
+                    {/* Values */}
                     <Col md={2} className={`${c}-input-container-checkbox`}>
                         <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased}/>
                     </Col>
@@ -80,6 +84,8 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                         <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} />
                     </Col>
                 </Row>
+                
+                {/* Specialization Groups */}
                 <Col md={12}>
                     {this.renderSpecializationData(spcGrps)}
                 </Col>
@@ -154,26 +160,12 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Create a queued event to upsert a Sql Set on save.
-     */
-    private generateQueuedApiEvent = (set: ConceptSqlSet): AdminPanelQueuedApiEvent => {
-        return {
-            getProcess: () => saveOrUpdateAdminConceptSqlSet(set),
-            id: set.id,
-            objectType: AdminPanelUpdateObjectType.SQL_SET
-        };
-    }
-
-    /*
      * Handle any edits to a Sql Set, updating 
      * the store and preparing a later API save event.
      */
     private handleSqlSetEdit = (val: any, propName: string) => {
         const { set, dispatch } = this.props;
-        const newSet = Object.assign({}, set, { [propName]: val === '' ? null : val });
-        const apiSaveEvent = this.generateQueuedApiEvent(newSet);
-
-        dispatch(upsertAdminApiQueuedEvent(apiSaveEvent));
+        const newSet = Object.assign({}, set, { [propName]: val === '' ? null : val, changed: true });
         dispatch(setAdminConceptSqlSet(newSet, true));
     }
 
@@ -185,8 +177,14 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         const { set, dispatch } = this.props;
 
         if (set.unsaved) {
-            dispatch(removeAdminApiQueuedEvent(set.id));
             dispatch(removeAdminConceptSqlSet(set));
+        } else if (set.specializationGroups.size) {
+            const info: InformationModalState = {
+                body: "This SQL Set has dropdowns which depend on it. Please delete all dependent dropdowns first.",
+                header: "Cannot Delete SQL Set",
+                show: true
+            };
+            dispatch(showInfoModal(info));
         } else {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete the SQL Set (id "${set.id}")? This can't be undone.`,

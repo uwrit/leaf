@@ -29,8 +29,6 @@ import {
 import {
     SET_ADMIN_SQL_SETS,
     REMOVE_ADMIN_SQL_SET,
-    UPSERT_ADMIN_QUEUED_API_EVENT,
-    REMOVE_ADMIN_QUEUED_API_EVENT,
     AdminSqlSetAction,
     SET_ADMIN_UNEDITED_SQL_SETS,
     UNDO_ADMIN_SQL_SET_CHANGES,
@@ -40,7 +38,7 @@ import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, set
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
-import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, upsertAdminQueuedApiEvent, removeAdminQueuedApiEvent, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged } from "./sqlSet";
+import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged } from "./sqlSet";
 import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup } from "./specializationGroup";
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization } from "./specialization";
 
@@ -74,8 +72,7 @@ export const defaultAdminState = (): AdminState => {
         sqlSets: {
             changed: false,
             sets: new Map(),
-            uneditedSets: new Map(),
-            updateQueue: []
+            uneditedSets: new Map()
         },
         state: AdminPanelLoadState.NOT_LOADED
     };
@@ -121,10 +118,6 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return deleteAdminConceptSqlSet(state, action);
         case SET_ADMIN_UNEDITED_SQL_SETS:
             return setAdminUneditedConceptSqlSet(state, action);
-        case UPSERT_ADMIN_QUEUED_API_EVENT:
-            return upsertAdminQueuedApiEvent(state, action);
-        case REMOVE_ADMIN_QUEUED_API_EVENT:
-            return removeAdminQueuedApiEvent(state, action);
         case UNDO_ADMIN_SQL_SET_CHANGES:
             return undoAdminConceptSqlSetChanges(state, action);
         case SET_ADMIN_SQL_SETS_UNCHANGED:

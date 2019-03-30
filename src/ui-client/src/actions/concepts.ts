@@ -11,7 +11,7 @@ import { AppState, ConceptMap } from '../models/state/AppState';
 import { Concept } from '../models/concept/Concept';
 import { AggregateConceptHintRef } from '../models/concept/ConceptHint';
 import { PanelFilter } from '../models/panel/PanelFilter';
-import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, fetchConceptChildren, fetchRootConcepts } from '../services/conceptApi';
+import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, fetchConceptChildren, fetchRootConcepts, fetchConcept } from '../services/conceptApi';
 import { handleAdminConceptClick } from './admin/concept';
 import { sendSearch } from './conceptSearch';
 
@@ -122,6 +122,20 @@ export const fetchSearchTreeFromTerms = (term: string) => {
         } catch (err) {
             console.log(err);
             dispatch(setSearchTree([]));
+        }
+    };
+};
+
+/*
+ * Fetch a single concept.
+ */
+export const fetchSingleConcept = (id: string) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        try {
+            const response = await fetchConcept(getState(), id);
+            dispatch(setConcept(response.data));
+        } catch (err) {
+            console.log(err);
         }
     };
 };

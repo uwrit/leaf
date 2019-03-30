@@ -5,10 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept as AdminConcept, ConceptSqlSet } from '../models/admin/Concept';
+import { Concept as AdminConcept, ConceptSqlSet, SpecializationGroup } from '../models/admin/Concept';
 import { Concept } from '../models/concept/Concept';
 import { SqlConfiguration } from '../models/admin/Configuration';
 import formatSql from './formatSql';
+import { AppState } from '../models/state/AppState';
+import { saveOrUpdateAdminConceptSqlSet } from '../actions/admin/sqlSet';
+import { saveOrUpdateAdminConceptSpecializationGroup } from '../actions/admin/specializationGroup';
+import { saveOrUpdateAdminSpecialization } from '../actions/admin/specialization';
 
 const year = new Date().getFullYear();
 
@@ -46,4 +50,66 @@ export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, 
     sql = sql.replace(new RegExp(a, 'g'), 'T');
 
     return formatSql(sql);
+};
+
+export const conceptSqlSetsChanged = (sets: Map<number,ConceptSqlSet>): boolean => {
+    sets.forEach((set): any => {
+        if (set.unsaved || set.changed) {
+            return true;
+        }
+        set.specializationGroups.forEach((grp): any => {
+            if (grp.unsaved || grp.changed) {
+                return true;
+            }
+            grp.specializations.forEach((s): any => {
+                if (s.unsaved || s.changed) {
+                    return true;
+                }
+            });
+        });
+    });
+    return false;
+};
+
+export const getApiUpdateQueue = (sets: Map<number,ConceptSqlSet>, dispatch: any, state: AppState): any[] => {
+    const queue: any[] = [];
+    sets.forEach((set) => {
+        if (set.unsaved || set.changed) {
+            queue.push( async () => {
+
+                // Get any Specialization Groups in the SQL Set
+                const grps: SpecializationGroup[] = [];
+                set.specializationGroups.forEach((grp) => grps.push(grp));
+
+                // Save the Concept SQL Set.
+                const newSet = await saveOrUpdateAdminConceptSqlSet(set, dispatch, state);
+
+                // Loop through Specialization Groups within the set.
+                for (const grp of grps) {
+
+                    // Update the SqlSetId and save the Specialialization Group.
+                    grp.sqlSetId = newSet.id;
+                    await saveOrUpdateAdminConceptSpecializationGroup(grp, dispatch, state);
+                }
+            });
+        } else {
+            set.specializationGroups.forEach( async (grp) => {
+
+                // Save the Specialialization Group if unsaved.
+                if (grp.unsaved || grp.changed) {
+                    queue.push(() => saveOrUpdateAdminConceptSpecializationGroup(grp, dispatch, state)); 
+                } 
+                
+                // Loop through Specializations within the group.
+                grp.specializations.forEach( async (spc) => {
+
+                    // Save the Specialialization if unsaved.
+                    if ((spc.unsaved || spc.changed) && !grp.unsaved) {
+                        queue.push(() => saveOrUpdateAdminSpecialization(spc, dispatch, state));
+                    }
+                });
+            });
+        }
+    });
+    return queue;
 };

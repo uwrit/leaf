@@ -15,7 +15,7 @@ import { RouteConfig } from '../../config/routes';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { Routes } from '../../models/state/GeneralUiState';
-import { loadAdminPanelDataIfNeeded } from '../../actions/admin/concept';
+import { loadAdminPanelDataIfNeeded, checkForAdminPanelUnsavedChanges } from '../../actions/admin/concept';
 import './Sidebar.css';
 
 interface StateProps {
@@ -70,7 +70,8 @@ class Sidebar extends React.Component<Props> {
 
         if (route === currentRoute) {
             return;
-        } else if (route === Routes.FindPatients) {
+        } 
+        else if (route === Routes.FindPatients) {
             dispatch(setRoute(route));
         } else if (route === Routes.AdminPanel) {
             dispatch(setRoute(route));
@@ -80,6 +81,9 @@ class Sidebar extends React.Component<Props> {
                 dispatch(getDemographicsIfNeeded());
             }
             dispatch(setRoute(route));
+        }
+        if (currentRoute === Routes.AdminPanel) {
+            dispatch(checkForAdminPanelUnsavedChanges())
         }
     }
 };

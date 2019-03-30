@@ -36,6 +36,7 @@ export class MainEditor extends React.PureComponent<Props> {
         const { sets } = data.sqlSets
         const c = this.className;
         const sectionProps: SectionProps = {
+            changed,
             changeHandler: this.handleInputChange,
             concept: currentConcept,
             dispatch,
@@ -50,8 +51,9 @@ export class MainEditor extends React.PureComponent<Props> {
             <div className={`${c}-main`}>
                 {showConceptStatus.has(state) &&
                             <div className={`${c}-column-right-header`}>
-                                <Button className='leaf-button leaf-button-secondary mr-auto' disabled={!changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
-                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChangesClick}>Save</Button>
+                                <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
+                                <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
+                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
                                 <Button className='leaf-button leaf-button-warning' disabled={!currentConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
                             </div>
                             }
@@ -70,7 +72,7 @@ export class MainEditor extends React.PureComponent<Props> {
                             <Configuration data={sectionProps}/>
                         </Col>
                         <Col md={6} className={`${c}-inner-column-right`}>
-                            <SqlEditor data={sectionProps} />
+                            <SqlEditor data={sectionProps} handleSave={this.handleSaveChanges} handleUndoChanges={this.handleUndoChanges} />
                             <Identifiers data={sectionProps} />
                         </Col>
                     </Row>
@@ -118,7 +120,7 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(setConcept(newUiConcept));
     }
 
-    private handleUndoChangesClick = () => {
+    private handleUndoChanges = () => {
         const { uneditedUiConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
 
@@ -126,12 +128,15 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(setConcept(uneditedUiConcept!));
     }
 
-    private handleSaveChangesClick = () => {
-        const { currentConcept, uneditedUiConcept } = this.props.data.concepts;
+    private handleSaveChanges = () => {
+        const { currentConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-        const newUiConcept = adminToNormalConcept(currentConcept!, uneditedUiConcept! );
 
-        dispatch(saveAdminConcept(currentConcept!, newUiConcept));
+        dispatch(saveAdminConcept(currentConcept!));
+    }
+
+    private handleAddConceptClick = () => {
+
     }
 
     private handleDeleteConceptClick = () => {

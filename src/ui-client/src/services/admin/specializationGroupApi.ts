@@ -30,8 +30,13 @@ export const getSpecializationGroups = async (state: AppState): Promise<Speciali
 export const updateSpecializationGroup = async (state: AppState, grp: SpecializationGroup): Promise<SpecializationGroup> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/specializationgroup/${grp.id}`, grp);
-    return fromDTO(resp.data);
+    const resp = await http.put(`api/admin/specializationgroup/${grp.id}`, toDTO(grp));
+
+    // Updates don't actually change the Specialization children,
+    // so just use the originals
+    const newGrp = fromDTO(resp.data) as SpecializationGroup;
+    newGrp.specializations = grp.specializations
+    return newGrp;
 };
 
 /*
@@ -58,8 +63,16 @@ export const deleteSpecializationGroup = async (state: AppState, grp: Specializa
  */ 
 const fromDTO = (dto: SpecializationGroupDTO): SpecializationGroup => {
     const map: Map<string,Specialization> = new Map();
-    dto.specializations.forEach((s) => map.set(s.id, s));
-    return { ...dto, specializations: map };
+    dto.specializations.forEach((s) => {
+        s.sqlSetId = dto.sqlSetId;
+        map.set(s.id, s);
+    });
+    return { 
+        ...dto, 
+        changed: false,
+        unsaved: false,
+        specializations: map 
+    };
 };
 
 /*

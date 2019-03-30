@@ -75,5 +75,10 @@ export const deleteSqlSet = async (state: AppState, set: ConceptSqlSet) => {
 };
 
 const fromDTO = (dto: ConceptSqlSetDTO, prev: ConceptSqlSet): ConceptSqlSet => {
-    return { ...dto, specializationGroups: prev.specializationGroups };
+    return { 
+        ...dto,
+        changed: false,
+        unsaved: false,
+        specializationGroups: prev.specializationGroups 
+    };
 };

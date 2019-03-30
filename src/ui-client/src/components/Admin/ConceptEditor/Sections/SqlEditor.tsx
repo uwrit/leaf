@@ -14,7 +14,9 @@ import { SectionProps } from '../Props';
 import { SqlSetDropdown } from './SqlSetDropdown';
 
 interface Props {
-    data: SectionProps
+    data: SectionProps;
+    handleSave: () => any;
+    handleUndoChanges: () => any;
 }
 
 export class SqlEditor extends React.PureComponent<Props> {
@@ -23,12 +25,14 @@ export class SqlEditor extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { concept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch } = this.props.data;
+        const { data, handleSave, handleUndoChanges } = this.props;
+        const { concept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch, changed } = data;
         return (
             <Section header='SQL'>
                 <SqlSetDropdown
                     changeHandler={this.handleSqlUpdate} propName={'sqlSetId'} value={concept!.sqlSetId} sqlSets={sqlSets}
                     dispatch={dispatch} focusToggle={toggleSqlPreview} toggleOverlay={toggleOverlay} toggleSqlPreview={toggleSqlPreview}
+                    handleSave={handleSave} handleUndoChanges={handleUndoChanges} changed={changed}
                     label='Table, View, or Subquery'
                 />
                 <TextArea 

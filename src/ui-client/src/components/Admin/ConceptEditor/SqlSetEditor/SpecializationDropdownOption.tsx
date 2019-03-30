@@ -8,14 +8,11 @@
 import React from 'react';
 import { TextArea } from '../Sections/TextArea';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, saveOrUpdateAdminSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
+import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Specialization, SpecializationGroup } from '../../../../models/admin/Concept';
-import { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
-import { upsertAdminApiQueuedEvent, removeAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
 import { Row, Col, Container } from 'reactstrap';
 import { Input } from '../Sections/Input';
-import { saveOrUpdateAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
 
 interface Props {
     dispatch: any;
@@ -36,8 +33,9 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
             <Container>
                 <Row className={`${c}-specializationgroup-specialization`} key={specialization.id}>
 
-                    {specialization.unsaved &&
-                    <span className={`${c}-unsaved`}>unsaved!</span>
+                    {/* Unsaved notifier */}
+                    {(specialization.unsaved || specialization.changed) &&
+                    <span className={`${c}-unsaved`}>unsaved</span>
                     }
 
                     {/* UniversalId */}
@@ -73,31 +71,8 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
     }
 
     private handleDropdownOptionEdit = (val: any, propName: string) => {
-        const { dispatch, specialization, group } = this.props;
-        const newSpc = Object.assign({}, specialization, { [propName]: val === '' ? null : val });
-
-        /*
-         * If the parent Specialization Group is unsaved, this specialization 
-         * will be saved along with it. Else this specialization needs to be
-         * saved/updated in its own API call.
-         */
-        if (group.unsaved) {
-            group.specializations.set(newSpc.id, newSpc);
-            const apiSaveEvent: AdminPanelQueuedApiEvent = {
-                getProcess: () => saveOrUpdateAdminConceptSpecializationGroup(group),
-                id: group.id,
-                objectType: AdminPanelUpdateObjectType.SPECIALIZATION_GROUP
-            }
-            dispatch(upsertAdminApiQueuedEvent(apiSaveEvent))
-        } else {
-            const apiSaveEvent: AdminPanelQueuedApiEvent = {
-                getProcess: () => saveOrUpdateAdminSpecialization(newSpc),
-                id: newSpc.id,
-                objectType: AdminPanelUpdateObjectType.SPECIALIZATION
-            }
-            dispatch(upsertAdminApiQueuedEvent(apiSaveEvent))
-        }
-
+        const { dispatch, specialization } = this.props;
+        const newSpc = Object.assign({}, specialization, { [propName]: val === '' ? null : val, changed: true });
         dispatch(setAdminConceptSpecialization(newSpc, true));
     }
 
@@ -105,7 +80,6 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
         const { dispatch, specialization } = this.props;
 
         if (specialization.unsaved) {
-            dispatch(removeAdminApiQueuedEvent(specialization.id));
             dispatch(removeAdminConceptSpecialization(specialization));
         } else {
             const confirm: ConfirmationModalState = {

@@ -10,7 +10,6 @@ import { Concept as UiConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
-import { AppState } from './AppState';
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -23,20 +22,6 @@ export enum AdminPanelLoadState {
 export enum AdminPanelConceptEditorPane {
     MAIN = 1,
     SQL_SET = 2
-}
-
-export enum AdminPanelUpdateObjectType {
-    SQL_SET = 1,
-    SPECIALIZATION_GROUP = 2,
-    SPECIALIZATION = 3
-}
-
-export type AdminPanelQueuedApiProcess = (dispatch: any, getState: () => AppState) => any;
-
-export interface AdminPanelQueuedApiEvent {
-    getProcess: () => AdminPanelQueuedApiProcess;
-    id: string | number;
-    objectType: AdminPanelUpdateObjectType;
 }
 
 export interface AdminConceptState {
@@ -55,7 +40,6 @@ export interface AdminPanelSqlSetState {
     changed: boolean;
     sets: Map<number, ConceptSqlSet>;
     uneditedSets?: Map<number, ConceptSqlSet>;
-    updateQueue: AdminPanelQueuedApiEvent[];
 }
 
 export interface AdminPanelFilterState {

@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConceptSqlSet, SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
+import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { Button, Container, Row, Col } from 'reactstrap';
 import { setAdminPanelConceptEditorPane, setAdminConceptExampleSql } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
@@ -14,6 +14,8 @@ import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetC
 import { EditorPaneProps as Props } from '../Props';
 import { generateSampleSql } from '../../../../utils/admin';
 import { SqlSetRow } from './SqlSetRow';
+import { showConfirmationModal } from '../../../../actions/generalUi';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import './SqlSetEditor.css';
 
 export class SqlSetEditor extends React.PureComponent<Props> {
@@ -36,8 +38,8 @@ export class SqlSetEditor extends React.PureComponent<Props> {
         return (
             <div className={`${c}-container`}>
                 <div className={`${c}-toprow`}>
-                    <Button className='leaf-button leaf-button-primary' id={`${c}-add-sqlset`} onClick={this.handleAddSqlSetClick}>Create New SQL Set</Button>
-                    <Button className='leaf-button leaf-button-secondary mr-auto' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>+ Create New SQL Set</Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
                     <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
                     <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
                 </div>
@@ -57,7 +59,7 @@ export class SqlSetEditor extends React.PureComponent<Props> {
         return (val: any, propName: string) => {
             const { data, dispatch } = this.props;
             const { concepts, sqlSets, configuration } = data;
-            const newSet = Object.assign({}, sqlSets.sets.get(set.id), { [propName]: val });
+            const newSet = Object.assign({}, sqlSets.sets.get(set.id), { [propName]: val === '' ? null : val, changed: true });
             const sql = generateSampleSql(concepts.currentConcept!, newSet, configuration.sql);
     
             dispatch(setAdminConceptSqlSet(newSet, true));
@@ -77,7 +79,6 @@ export class SqlSetEditor extends React.PureComponent<Props> {
      */
     private handleAddSqlSetClick = () => {
         const { dispatch } = this.props;
-        let apiSaveEvent = null;
         const newSet: ConceptSqlSet = {
             id: this.generateRandomIntegerId(),
             isEncounterBased: false,
@@ -101,7 +102,21 @@ export class SqlSetEditor extends React.PureComponent<Props> {
     }
 
     private handleBackToConceptEditorClick = () => {
-        const { dispatch } = this.props;
-        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.MAIN))
+        const { dispatch, data } = this.props;
+
+        if (data.sqlSets.changed) {
+            const confirm: ConfirmationModalState = {
+                body: `Do you want to save your current changes?"`,
+                header: 'Save Changes',
+                onClickNo: () => { dispatch(undoAdminSqlSetChanges()); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.MAIN)); },
+                onClickYes: () => { dispatch(processApiUpdateQueue()); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.MAIN)); },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, I'll Save Changes`
+            };
+            dispatch(showConfirmationModal(confirm));
+        } else {
+            dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.MAIN));
+        }
     }
 };

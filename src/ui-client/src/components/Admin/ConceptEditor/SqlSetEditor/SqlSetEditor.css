@@ -23,9 +23,9 @@
 }
 
 .sqlset-editor-unsaved {
-    background-color: rgba(0, 130, 177, 0.05);
+    background-color: rgba(255, 248, 145, 0.5);
     border-radius: 8px;
-    color: rgba(0, 130, 177, 0.5);
+    color: rgb(117, 109, 0);
     font-size: 0.8rem;
     left: 0;
     margin: 4px 0 0 10px;
@@ -113,15 +113,6 @@
 }
 
 /* Add New Set */
-#sqlset-editor-add-sqlset {
-    background-color: rgb(13,195,106) !important;
-    border-color: rgb(13,195,106) !important;
-}
-
-.sqlset-editor-add-sqlset:hover {
-    background-color: rgb(187, 255, 222);
-}
-
 .sqlset-editor-add-sqlset svg {
     transform: scale(1.4);
     margin-right: 4px;
