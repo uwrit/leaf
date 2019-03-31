@@ -10,14 +10,28 @@ import { FormGroup, Label, FormText } from 'reactstrap';
 import TextareaAutosize from 'react-textarea-autosize'
 import { PropertyProps as Props } from '../Props';
 
-export class TextArea extends React.PureComponent<Props> {
+interface State {
+    valid: boolean;
+}
+
+export class TextArea extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
+        this.state = {
+            valid: true
+        }
     }
 
     public render() {
-        const { label, subLabel, locked, value, focusToggle } = this.props;
+        const { label, subLabel, locked, value } = this.props;
+        const { valid } = this.state;
+        const classes = [ 'leaf-input' ];
         let val = value || '';
+
+        if (!valid) {
+            classes.push('error');
+        }
+
         return (
             <FormGroup>
                 <Label>
@@ -28,7 +42,7 @@ export class TextArea extends React.PureComponent<Props> {
                 </Label>
                 <div>
                     <TextareaAutosize 
-                        className="leaf-input"
+                        className={classes.join(' ')}
                         minRows={1}
                         maxRows={5}
                         onBlur={this.handleBlur}
@@ -44,8 +58,11 @@ export class TextArea extends React.PureComponent<Props> {
     }
 
     private handleBlur = () => {
-        const { focusToggle } = this.props;
+        const { focusToggle, required, value } = this.props;
         if (focusToggle) { focusToggle(false); }
+        if (required && !value) {
+            this.setState({ valid: false });
+        }
     }
 
     private handleFocus = () => {
@@ -54,8 +71,11 @@ export class TextArea extends React.PureComponent<Props> {
     }
 
     private handleChange = (e: any) => {
-        const { changeHandler, propName } = this.props;
+        const { changeHandler, propName, required } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);
+        if (required && !newVal) {
+            this.setState({ valid: false });
+        }
     };
 };

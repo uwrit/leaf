@@ -72,7 +72,7 @@ export class MainEditor extends React.PureComponent<Props> {
                             <Configuration data={sectionProps}/>
                         </Col>
                         <Col md={6} className={`${c}-inner-column-right`}>
-                            <SqlEditor data={sectionProps} handleSave={this.handleSaveChanges} handleUndoChanges={this.handleUndoChanges} />
+                            <SqlEditor data={sectionProps} />
                             <Identifiers data={sectionProps} />
                         </Col>
                     </Row>

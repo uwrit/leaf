@@ -8,21 +8,14 @@
 import React from 'react';
 import { FormGroup, Label, FormText, DropdownToggle } from 'reactstrap';
 import { PropertyProps } from '../Props';
-import { ConceptSqlSet, Concept } from '../../../../models/admin/Concept';
-import { Concept as UiConcept } from '../../../../models/concept/Concept';
+import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { setAdminPanelConceptEditorPane, saveAdminConcept, revertAdminConceptToOriginal } from '../../../../actions/admin/concept';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
-import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { showConfirmationModal } from '../../../../actions/generalUi';
-import { setConcept } from '../../../../actions/concepts';
 
 interface Props extends PropertyProps {
-    changed: boolean;
     dispatch: any;
-    handleSave: () => any;
-    handleUndoChanges: () => any;
     sqlSets: Map<number,ConceptSqlSet>;
     toggleSqlPreview: (show: boolean) => any;
     toggleOverlay: (show: boolean) => any;
@@ -65,7 +58,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c} onFocus={this.handleFocus}>
                         <DropdownToggle>
                             {selected &&
-                                <div>{selected.sqlSetFrom} <FaChevronDown className={`${c}-dropdown-chevron`}/></div>
+                                <div>
+                                    {selected.sqlSetFrom.length > 30 ? (selected.sqlSetFrom.substr(0,30) + '...') : selected.sqlSetFrom} 
+                                    <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                                </div>
                             }
                         </DropdownToggle>
                         <DropdownMenu>
@@ -93,21 +89,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     }
 
     private handleManageSqlSetsClick = () => {
-        const { dispatch, changed, handleSave, handleUndoChanges } = this.props;
-
-        if (changed) {
-            const confirm: ConfirmationModalState = {
-                body: `Do you want to save your current changes to this Concept?"`,
-                header: 'Save Changes',
-                onClickNo: () => { handleUndoChanges(); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET)); },
-                onClickYes: () => { handleSave(); dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET)); },
-                show: true,
-                noButtonText: `No`,
-                yesButtonText: `Yes, I'll Save Changes`
-            };
-            dispatch(showConfirmationModal(confirm));
-        } else {
-            dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+        const { dispatch, focusToggle } = this.props;
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.SQL_SET));
+        if (focusToggle) {
+            focusToggle(false);
         }
     }
 

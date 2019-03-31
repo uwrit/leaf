@@ -12,6 +12,9 @@ import { Dispatch } from 'redux';
 import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../models/patientList/Dataset';
 import { AppState } from '../models/state/AppState';
 import { searchDatasets, allowAllDatasets } from '../services/datasetSearchApi';
+import { loadAdminPanelDataIfNeeded } from './admin/concept';
+import { getDemographicsIfNeeded } from './cohort/count';
+import { CohortStateType } from '../models/state/CohortState';
 
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
 export const SET_ROUTE = 'SET_ROUTE';
@@ -63,6 +66,38 @@ export const getAllPatientListDatasets = () => {
         dispatch(setDatasetSearchTerm(''));
     };
 };
+
+export const handleSidebarTabClick = (route: Routes) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const state = getState();
+        const currentRoute = state.generalUi.currentRoute;
+        const cohortCountState = state.cohort.count.state;
+
+        if (route === currentRoute) {
+            return;
+        } 
+        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed)) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        } else if (route === Routes.FindPatients) {
+            dispatch(setRoute(route));
+        } else if (route === Routes.AdminPanel) {
+            dispatch(setRoute(route));
+            dispatch(loadAdminPanelDataIfNeeded());
+        } else if (cohortCountState === CohortStateType.LOADED)  {
+            if (route === Routes.PatientList || route === Routes.Visualize) {
+                dispatch(getDemographicsIfNeeded());
+            }
+            dispatch(setRoute(route));
+        }
+    }
+}
+
+
 
 // Synchronous
 export const setNoClickModalState = (noclickModal: NoClickModalState): GeneralUiAction => {

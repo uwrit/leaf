@@ -52,23 +52,30 @@ export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, 
     return formatSql(sql);
 };
 
+export const conceptEditorValid = () => {
+    const errors = document.querySelectorAll('.concept-editor .leaf-input.error');
+    return errors.length === 0;
+};
+
 export const conceptSqlSetsChanged = (sets: Map<number,ConceptSqlSet>): boolean => {
+    let changeDetected = false;
+
     sets.forEach((set): any => {
         if (set.unsaved || set.changed) {
-            return true;
+            changeDetected = true;
         }
         set.specializationGroups.forEach((grp): any => {
             if (grp.unsaved || grp.changed) {
-                return true;
+                changeDetected = true;
             }
             grp.specializations.forEach((s): any => {
                 if (s.unsaved || s.changed) {
-                    return true;
+                    changeDetected = true;
                 }
             });
         });
     });
-    return false;
+    return changeDetected;
 };
 
 export const getApiUpdateQueue = (sets: Map<number,ConceptSqlSet>, dispatch: any, state: AppState): any[] => {

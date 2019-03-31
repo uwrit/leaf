@@ -34,25 +34,29 @@ export const setAdminUneditedConceptSqlSet = (state: AdminState, action: AdminSq
 };
 
 export const undoAdminConceptSqlSetChanges = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const undone: Map<number, ConceptSqlSet> = new Map();
-    state.sqlSets.uneditedSets!.forEach((s) => undone.set(s.id, Object.assign({}, s)));
+    const savedOnly: Map<number, ConceptSqlSet> = new Map();
+    state.sqlSets.uneditedSets!.forEach((s) => {
+        savedOnly.set(s.id, Object.assign({}, s))
+    });
 
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            sets: undone,
-            changed: false,
-            updateQueue: []
+            sets: savedOnly,
+            changed: false
         }
     });
 };
 
 export const deleteAdminConceptSqlSet = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const set = action.set!;
+    state.sqlSets.uneditedSets!.delete(set.id);
     state.sqlSets.sets.delete(set.id);
+
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
+            sets: new Map(state.sqlSets.sets),
             changed: conceptSqlSetsChanged(state.sqlSets.sets)
         }
     });
@@ -62,7 +66,26 @@ export const setAdminConceptSqlSetUnchanged = (state: AdminState, action: AdminS
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            changed: false
+            changed: false,
+            uneditedSets: new Map(state.sqlSets.sets)
+        }
+    });
+};
+
+export const syncAdminConceptSqlSetUnsavedWithSaved = (state: AdminState, action: AdminSqlSetAction): AdminState => {
+    const prev = action.prevSqlSet!;
+    const set = action.set!;
+
+    state.sqlSets.uneditedSets!.delete(prev.id);
+    state.sqlSets.uneditedSets!.set(set.id, set);
+    state.sqlSets.sets.delete(prev.id);
+    state.sqlSets.sets.set(set.id, set);
+
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            sets: new Map(state.sqlSets.sets),
+            uneditedSets: new Map(state.sqlSets.uneditedSets!)
         }
     });
 };

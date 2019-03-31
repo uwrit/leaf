@@ -30,14 +30,44 @@ export const setAdminConceptSpecializationGroups = (state: AdminState, action: A
 export const removeAdminConceptSpecializationGroup = (state: AdminState, action: AdminSpecializationGroupAction) => {
     const grp = action.group!;
     const set = state.sqlSets.sets.get(grp.sqlSetId);
+    const uneditedSet = state.sqlSets.uneditedSets!.get(grp.sqlSetId);
+
+    if (uneditedSet) {
+        uneditedSet.specializationGroups.delete(grp.id);
+    }
+
     if (set) {
         set.specializationGroups = new Map(set.specializationGroups);
         set.specializationGroups.delete(grp.id);
     }
+
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
             changed: conceptSqlSetsChanged(state.sqlSets.sets)
         }
     });
+};
+
+export const syncAdminConceptSpecializationGroupUnsavedWithSaved = (state: AdminState, action: AdminSpecializationGroupAction): AdminState => {
+    const prev = action.prevGroup!;
+    const group = action.group!;
+
+    const uneditedPrevSet = state.sqlSets.uneditedSets!.get(prev.sqlSetId);
+    const set = state.sqlSets.sets.get(group.sqlSetId);
+
+    if (uneditedPrevSet) {
+        const newUneditedSet = Object.assign({}, uneditedPrevSet, { specializationGroups: new Map(uneditedPrevSet.specializationGroups) });
+        newUneditedSet.specializationGroups.delete(prev.id);
+        newUneditedSet.specializationGroups.set(group.id, group);
+        state.sqlSets.uneditedSets!.set(newUneditedSet.id, newUneditedSet);
+    }
+    if (set) {
+        const newSet = Object.assign({}, set, { specializationGroups: new Map(set.specializationGroups) });
+        newSet.specializationGroups.delete(prev.id);
+        newSet.specializationGroups.set(group.id, group);
+        state.sqlSets.sets.set(newSet.id, newSet);
+    }
+
+    return Object.assign({}, state);
 };

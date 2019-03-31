@@ -33,14 +33,15 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     public render() {
         const { specializationGroup, dispatch } = this.props;
         const c = this.className;
+        const unsaved = specializationGroup.unsaved || specializationGroup.changed;
         const spcs: Specialization[] = [];
         specializationGroup.specializations.forEach((s) => spcs.push(s));
 
         return (
-            <div className={`${c}-specializationgroup-container`}>
+            <div className={`${c}-specializationgroup-container ${unsaved ? 'unsaved' : ''}`}>
 
                 {/* Unsaved notifier */}
-                {(specializationGroup.unsaved || specializationGroup.changed) &&
+                {unsaved &&
                 <span className={`${c}-unsaved`}>unsaved</span>
                 }
                 
@@ -53,7 +54,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 <div className={`${c}-specializationgroup-default`}>
                     <TextArea 
                         changeHandler={this.handleSpecializationGroupEdit} propName={'uiDefaultText'} value={specializationGroup.uiDefaultText} 
-                        subLabel='Default Text'
+                        subLabel='Default Text' required={true}
                     />
                 </div>
 

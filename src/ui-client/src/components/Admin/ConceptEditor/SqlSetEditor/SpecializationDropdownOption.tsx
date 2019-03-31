@@ -28,13 +28,14 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
     public render() {
         const { specialization } = this.props;
+        const unsaved = specialization.unsaved || specialization.changed;
         const c = this.className;
         return (
             <Container>
-                <Row className={`${c}-specializationgroup-specialization`} key={specialization.id}>
+                <Row className={`${c}-specializationgroup-specialization ${unsaved ? 'unsaved' : ''}`} key={specialization.id}>
 
                     {/* Unsaved notifier */}
-                    {(specialization.unsaved || specialization.changed) &&
+                    {unsaved &&
                     <span className={`${c}-unsaved`}>unsaved</span>
                     }
 
@@ -49,7 +50,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                     {/* Text */}
                     <Col className={`${c}-input-container`} md={4}>
                         <TextArea
-                            changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText}
+                            changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText} required={true}
                         />
                     </Col>
 
@@ -62,7 +63,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                         </div>
 
                         <TextArea
-                            changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere} 
+                            changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere} required={true}
                         />
                     </Col>
                 </Row>

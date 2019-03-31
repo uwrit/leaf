@@ -15,12 +15,14 @@ import { getApiUpdateQueue } from "../../utils/admin";
 export const SET_ADMIN_SQL_SETS = 'SET_ADMIN_SQL_SETS';
 export const SET_ADMIN_UNEDITED_SQL_SETS = 'SET_ADMIN_UNEDITED_SQL_SETS';
 export const SET_ADMIN_SQL_SETS_UNCHANGED = 'SET_ADMIN_SQL_SETS_UNCHANGED';
+export const SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED = 'SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED';
 export const REMOVE_ADMIN_SQL_SET = 'REMOVE_ADMIN_SQL_SET';
 export const UNDO_ADMIN_SQL_SET_CHANGES = 'UNDO_ADMIN_SQL_SET_CHANGES';
 
 export interface AdminSqlSetAction {
     changed?: boolean;
     id?: string | number;
+    prevSqlSet?: ConceptSqlSet;
     set?: ConceptSqlSet;
     sets?: ConceptSqlSet[];
     mappedSets?: Map<number,ConceptSqlSet>
@@ -68,11 +70,10 @@ export const saveOrUpdateAdminConceptSqlSet = async (set: ConceptSqlSet, dispatc
     let newSet = null;
     if (set.unsaved) {
         newSet = await createSqlSet(state, set);
-        dispatch(removeAdminConceptSqlSet(set));
     } else {
         newSet = await updateSqlSet(state, set);
     }
-    dispatch(setAdminConceptSqlSet(newSet, false));
+    dispatch(syncAdminConceptSqlSetUnsavedWithSaved(set, newSet));
     return newSet;
 };
 
@@ -169,4 +170,12 @@ export const setAdminConceptSqlSetsUnchanged = (): AdminSqlSetAction => {
     return {
         type: SET_ADMIN_SQL_SETS_UNCHANGED
     };
+};
+
+export const syncAdminConceptSqlSetUnsavedWithSaved = (prevSqlSet: ConceptSqlSet, set: ConceptSqlSet): AdminSqlSetAction => {
+    return {
+        prevSqlSet,
+        set,
+        type: SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
+    }
 };

@@ -20,7 +20,6 @@ import { ConfirmationModalState, InformationModalState } from '../../../../model
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 
 interface Props {
-    changeHandler: (val: any, propName: string) => any;
     dispatch: any;
     set: ConceptSqlSet;
     state: AdminState;
@@ -53,17 +52,18 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { changeHandler, set } = this.props;
+        const { set } = this.props;
         const c = this.className;
+        const unsaved = set.unsaved || set.changed;
         const spcGrps: SpecializationGroup[] = [];
         set.specializationGroups.forEach((g) => spcGrps.push(g));
 
         return (
-            <Container className={`${c}-table-row-container`}>
+            <Container className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
                 <Row className={`${c}-table-row`}>
 
                     {/* Unsaved notifier */}
-                    {(set.unsaved || set.changed) &&
+                    {unsaved &&
                     <span className={`${c}-unsaved`}>unsaved</span>
                     }
 
@@ -72,7 +72,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                         <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased}/>
                     </Col>
                     <Col md={5} className={`${c}-input-container`}>
-                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} />
+                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} required={true} />
                     </Col>
                     <Col md={5} className={`${c}-input-container`}>
 
@@ -97,7 +97,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
      * Render Specialization dropdowns specific to this set.
      */
     private renderSpecializationData = (spcGrps: SpecializationGroup[]) => {
-        const { changeHandler, dispatch, set, state } = this.props;
+        const { dispatch, set } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
 
@@ -132,11 +132,10 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                             </p>
                         </div>
                         */}
-                        {spcGrps.map((g) => (
-                            <SpecializationGroupDropdownPreview 
-                                changeHandler={changeHandler} dispatch={dispatch} specializationGroup={g} key={g.id}
-                            />
-                        ))}
+                        {spcGrps
+                            .sort((a,b) => a.id > b.id ? 1 : -1)
+                            .map((g) => <SpecializationGroupDropdownPreview changeHandler={this.handleSqlSetEdit} dispatch={dispatch} specializationGroup={g} key={g.id}/>)
+                        }
                         <div className={`${c}-add-specializationgroup`} onClick={this.handleAddSpecializationGroupDropdownClick}>
                             <span>+Add New Dropdown</span>
                         </div>

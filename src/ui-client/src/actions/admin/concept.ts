@@ -283,6 +283,26 @@ export const deleteAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
     }
 };
 
+/*
+ * Handles switching between Admin Panel views. Prevents
+ * view pane changes if admin has unsaved Concept changes.
+ */
+export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelConceptEditorPane) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const admin = getState().admin!;
+        if (admin.concepts.changed || admin.sqlSets.changed) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        } else {
+            dispatch(setAdminPanelConceptEditorPane(pane));
+        }
+    };
+};
+
 // Synchronous
 export const setAdminConcept = (concept: Concept, changed: boolean): AdminConceptAction => {
     return {

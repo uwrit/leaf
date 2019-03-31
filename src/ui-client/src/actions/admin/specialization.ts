@@ -13,9 +13,11 @@ import { NoClickModalStates, InformationModalState } from "../../models/state/Ge
 
 export const SET_ADMIN_SPECIALIZATIONS = 'SET_ADMIN_SPECIALIZATIONS';
 export const REMOVE_ADMIN_SPECIALIZATION = 'REMOVE_ADMIN_SPECIALIZATION';
+export const SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED = 'SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED';
 
 export interface AdminSpecializationAction {
     changed?: boolean;
+    prevSpc?: Specialization;
     spc?: Specialization;
     spcs?: Specialization[];
     type: string;
@@ -87,5 +89,13 @@ export const removeAdminConceptSpecialization = (spc: Specialization): AdminSpec
     return {
         spc,
         type: REMOVE_ADMIN_SPECIALIZATION
+    };
+};
+
+export const syncAdminSpecializationUnsavedWithSaved = (prevSpc: Specialization, spc: Specialization): AdminSpecializationAction => {
+    return {
+        prevSpc,
+        spc,
+        type: SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED
     };
 };

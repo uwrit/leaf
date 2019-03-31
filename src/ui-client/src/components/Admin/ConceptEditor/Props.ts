@@ -37,6 +37,7 @@ export interface PropertyProps {
     focusToggle?: (show: boolean) => void;
     placeholder?: string;
     propName: string;
+    required?: boolean;
     subLabel?: string;
     type?: string;
     value?: any;

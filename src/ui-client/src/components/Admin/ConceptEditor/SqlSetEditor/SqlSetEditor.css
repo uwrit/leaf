@@ -27,7 +27,7 @@
     border-radius: 8px;
     color: rgb(117, 109, 0);
     font-size: 0.8rem;
-    left: 0;
+    left: -0.5%;
     margin: 4px 0 0 10px;
     padding: 2px 4px;
     position: absolute;
@@ -71,6 +71,12 @@
     border-bottom: 1px solid rgb(230,230,230);
     margin: 0;
     position: relative;   
+}
+
+.sqlset-editor-table-row-container.unsaved,
+.sqlset-editor-specializationgroup-container.unsaved,
+.sqlset-editor-specializationgroup-specialization.unsaved {
+    box-shadow: inset 0px 0px 10px rgb(255, 248, 145);
 }
 
 .sqlset-editor-table-row {

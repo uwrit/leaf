@@ -26,7 +26,7 @@ export class Display extends React.PureComponent<Props> {
             <Section header='General Display'>
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplayName'} value={concept!.uiDisplayName}
-                    label='Name' subLabel='Text shown in Concept Tree'
+                    label='Name' subLabel='Text shown in Concept Tree' required={true}
                 />
                 <Input 
                     changeHandler={changeHandler} propName={'uiDisplaySubtext'} value={concept!.uiDisplaySubtext}
@@ -34,7 +34,7 @@ export class Display extends React.PureComponent<Props> {
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplayText'} value={concept!.uiDisplayText}
-                    focusToggle={togglePanelPreview} 
+                    focusToggle={togglePanelPreview} required={true}
                     label='Full Text' subLabel='Descriptive text shown when dragged in query'
                 />
                 <TextArea 

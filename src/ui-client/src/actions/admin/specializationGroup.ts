@@ -13,10 +13,12 @@ import { NoClickModalStates, InformationModalState } from "../../models/state/Ge
 
 export const SET_ADMIN_SPECIALIZATION_GROUPS = 'SET_ADMIN_SPECIALIZATION_GROUPS';
 export const REMOVE_ADMIN_SPECIALIZATION_GROUP = 'REMOVE_ADMIN_SPECIALIZATION_GROUP';
+export const SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED = 'SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED';
 
 export interface AdminSpecializationGroupAction {
     group?: SpecializationGroup;
     groups?: SpecializationGroup[];
+    prevGroup?: SpecializationGroup;
     type: string;
 }
 
@@ -29,11 +31,10 @@ export const saveOrUpdateAdminConceptSpecializationGroup = async (grp: Specializ
     let newGrp = null;
     if (grp.unsaved) {
         newGrp = await createSpecializationGroup(state, grp);
-        dispatch(removeAdminConceptSpecializationGroup(grp))
     } else {
         newGrp = await updateSpecializationGroup(state, grp);
     }
-    dispatch(setAdminConceptSpecializationGroup(newGrp));
+    dispatch(syncAdminSpecializationGroupUnsavedWithSaved(grp, newGrp));
     return newGrp;
 };
 
@@ -109,5 +110,13 @@ export const removeAdminConceptSpecializationGroup = (group: SpecializationGroup
     return {
         group,
         type: REMOVE_ADMIN_SPECIALIZATION_GROUP
+    };
+};
+
+export const syncAdminSpecializationGroupUnsavedWithSaved = (prevGroup: SpecializationGroup, group: SpecializationGroup): AdminSpecializationGroupAction => {
+    return {
+        prevGroup,
+        group,
+        type: SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED
     };
 };

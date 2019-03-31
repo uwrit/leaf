@@ -19,12 +19,14 @@ import {
 import {
     SET_ADMIN_SPECIALIZATIONS,
     REMOVE_ADMIN_SPECIALIZATION,
-    AdminSpecializationAction
+    AdminSpecializationAction,
+    SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED
 } from '../../actions/admin/specialization';
 import {
     SET_ADMIN_SPECIALIZATION_GROUPS,
     REMOVE_ADMIN_SPECIALIZATION_GROUP,
-    AdminSpecializationGroupAction
+    AdminSpecializationGroupAction,
+    SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED
 } from '../../actions/admin/specializationGroup';
 import {
     SET_ADMIN_SQL_SETS,
@@ -32,15 +34,16 @@ import {
     AdminSqlSetAction,
     SET_ADMIN_UNEDITED_SQL_SETS,
     UNDO_ADMIN_SQL_SET_CHANGES,
-    SET_ADMIN_SQL_SETS_UNCHANGED
+    SET_ADMIN_SQL_SETS_UNCHANGED,
+    SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, revertAdminConceptToOriginal, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminUiConceptOriginal } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
-import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged } from "./sqlSet";
-import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup } from "./specializationGroup";
-import { setAdminConceptSpecialization, removeAdminConceptSpecialization } from "./specialization";
+import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
+import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup, syncAdminConceptSpecializationGroupUnsavedWithSaved } from "./specializationGroup";
+import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -122,18 +125,24 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return undoAdminConceptSqlSetChanges(state, action);
         case SET_ADMIN_SQL_SETS_UNCHANGED:
             return setAdminConceptSqlSetUnchanged(state, action);
+        case SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSqlSetUnsavedWithSaved(state, action);
 
         // Specialization Groups
         case SET_ADMIN_SPECIALIZATION_GROUPS:
             return setAdminConceptSpecializationGroups(state, action);
         case REMOVE_ADMIN_SPECIALIZATION_GROUP:
             return removeAdminConceptSpecializationGroup(state, action);
+        case SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSpecializationGroupUnsavedWithSaved(state, action);
 
         // Specializations
         case SET_ADMIN_SPECIALIZATIONS:
             return setAdminConceptSpecialization(state, action);
         case REMOVE_ADMIN_SPECIALIZATION:
             return removeAdminConceptSpecialization(state, action);
+        case SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSpecializationUnsavedWithSaved(state, action);
 
         default:
             return state;
