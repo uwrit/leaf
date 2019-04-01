@@ -89,6 +89,8 @@ export interface Concept {
     uiDisplayPatientCountByYear?: PatientCountPerYear[];
     uiDisplayRowOrder?: number;
     uiNumericDefaultText?: string;
+
+    unsaved?: boolean;
 }
 
 export enum ConstraintType {

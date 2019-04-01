@@ -266,12 +266,13 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
     const newConcept = Object.assign({}, concept, { parentId });
     const newParent = Object.assign({}, state.currentTree.get(parentId), { isParent: true });
     const oldParent = Object.assign({}, state.currentTree.get(concept.parentId!));
-    oldParent.isParent = oldParent.childrenIds!.size > 0;
 
-    if (oldParent.childrenIds) {
-        oldParent.childrenIds!.delete(concept.id);
+    if (oldParent.isParent) {
+        oldParent.isParent = oldParent.childrenIds!.size > 0;
+        if (oldParent.childrenIds) {
+            oldParent.childrenIds!.delete(concept.id);
+        }
     }
-    
     if (newParent.childrenIds) {
         newParent.childrenIds!.add(concept.id);
     } else {
@@ -287,10 +288,13 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
         state.searchTree.set(newParent.id, newParent);
         state.searchTree.set(newConcept.id, newConcept);
     }
-    
+
     return Object.assign({}, state, {
         currentTree: new Map(state.currentTree),
-        searchTree: new Map(state.searchTree)
+        searchTree: new Map(state.searchTree),
+        roots: newConcept.parentId 
+            ? state.roots.slice().filter((r) => r !== concept.id) 
+            : state.roots
     });
 };
 

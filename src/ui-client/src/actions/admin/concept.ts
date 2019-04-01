@@ -150,6 +150,7 @@ export const loadAdminPanelDataIfNeeded = () => {
  */
 export const handleAdminConceptClick = (newConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
+        if (newConcept.unsaved) { return; }
         const state = getState();
         const { changed, currentAdminConcept } = state.admin!.concepts
         /*

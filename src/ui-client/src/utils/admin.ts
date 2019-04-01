@@ -16,20 +16,6 @@ import { saveOrUpdateAdminSpecialization } from '../actions/admin/specialization
 
 const year = new Date().getFullYear();
 
-export const adminToNormalConcept = (admConcept: AdminConcept, concept: UserConcept): UserConcept => {
-    const normProps = Object.keys(concept);
-    const admProps = new Set(Object.keys(admConcept));
-    const alwaysAdd = new Set([ 'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 'uiDisplayName', 'uiDisplayText', 'isNumeric' ]);
-    let outConcept: any = { };
-
-    for (const prop of normProps) {
-        if (admProps.has(prop) || alwaysAdd.has(prop)) {
-            outConcept[prop] = admConcept[prop];
-        }
-    }
-    return outConcept;
-};
-
 export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any): UserConcept => {
     const alwaysAdd = new Set([ 'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 'uiDisplayName', 'uiDisplayText', 'isNumeric' ]);
     const out = Object.assign({}, userConcept);
@@ -41,6 +27,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
 };
 
 export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, config: SqlConfiguration): string => {
+    if (!sqlSet || !config) { return ''; }
     const a = config.alias;
     const person = config.fieldPersonId;
     const where: string[] = [];

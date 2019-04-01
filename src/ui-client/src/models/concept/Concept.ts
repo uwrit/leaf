@@ -43,6 +43,7 @@ export interface Concept extends BaseConcept {
     isExtension?: boolean;
     isOpen: boolean;
     isFetching: boolean;
+    unsaved?: boolean;
 }
 
 export interface ExtensionConcept extends Concept {

@@ -23,7 +23,7 @@ import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { Concept as UserConcept } from '../../../../models/concept/Concept';
 import { generate as generateId } from 'shortid';
-import { adminToNormalConcept, updateUserConceptFromAdminChange } from '../../../../utils/admin';
+import { updateUserConceptFromAdminChange } from '../../../../utils/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -55,7 +55,7 @@ export class MainEditor extends React.PureComponent<Props> {
         return (
             <div className={`${c}-main`}>
                 <div className={`${c}-column-right-header`}>
-                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
+                    <Button className='leaf-button leaf-button-addnew' disabled={currentAdminConcept && currentAdminConcept.unsaved} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
 
                     {showConceptStatus.has(state) &&
                     [
@@ -161,11 +161,11 @@ export class MainEditor extends React.PureComponent<Props> {
             isSpecializable: false,
             uiDisplayName: '',
             uiDisplayText: '',
-            uiDisplayPatientCount: -1,
             uiDisplaySubtext: '',
             uiDisplayTooltip: '',
-            universalId: ''
-        }
+            universalId: '',
+            unsaved: true
+        };
         const newAdminConcept: AdminConcept = {
             ...baseProps,
             constraints: [],
