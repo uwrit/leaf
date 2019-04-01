@@ -55,19 +55,19 @@ namespace API.Controllers.Admin
             {
                 if (dto == null)
                 {
-                    return BadRequest("SpecializationGroup is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup is missing."));
                 }
                 if (dto.Id == default)
                 {
-                    return BadRequest("SpecializationGroup.Id is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup.Id is missing."));
                 }
                 if (dto.SqlSetId == default)
                 {
-                    return BadRequest("SpecializationGroup.SqlSetId is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup.SqlSetId is missing."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.UiDefaultText))
                 {
-                    return BadRequest("SpecializationGroup.UiDefaultText is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup.UiDefaultText is missing."));
                 }
 
                 var group = dto.SpecializationGroup();
@@ -101,19 +101,19 @@ namespace API.Controllers.Admin
             {
                 if (dto == null)
                 {
-                    return BadRequest("SpecializationGroup is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup is missing."));
                 }
                 if (dto.SqlSetId == default)
                 {
-                    return BadRequest("SpecializationGroup.SqlSetId is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup.SqlSetId is missing."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.UiDefaultText))
                 {
-                    return BadRequest("SpecializationGroup.UiDefaultText is missing.");
+                    return BadRequest(CRUDError.From("SpecializationGroup.UiDefaultText is missing."));
                 }
                 if (dto.Specializations?.Any(s => string.IsNullOrWhiteSpace(s.SqlSetWhere) || string.IsNullOrWhiteSpace(s.UiDisplayText)) ?? false)
                 {
-                    return BadRequest("Malformed Specializations.");
+                    return BadRequest(CRUDError.From("Malformed Specializations."));
                 }
 
                 var group = dto.SpecializationGroup();

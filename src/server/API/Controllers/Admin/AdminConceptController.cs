@@ -49,7 +49,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Concept>> Update(Guid id, [FromBody] ConceptDTO o)
+        public async Task<ActionResult<ConceptDTO>> Update(Guid id, [FromBody] ConceptDTO o)
         {
             try
             {
@@ -69,6 +69,54 @@ namespace API.Controllers.Admin
             catch (Exception ex)
             {
                 logger.LogError("Could not update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<ConceptDTO>> Create([FromBody] ConceptDTO o)
+        {
+            try
+            {
+                if (o == null)
+                {
+                    return BadRequest(CRUDError.From("Concept missing."));
+                }
+
+                var c = o.Concept();
+                var updated = await cService.Create(c);
+                return Ok(new ConceptDTO(updated));
+            }
+            catch (LeafDbException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Could not create concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ConceptDeleteResult>> Delete(Guid id)
+        {
+            try
+            {
+                var result = await cService.Delete(id);
+                if (!result.Ok)
+                {
+                    return Conflict(new ConceptDeleteResponse(result));
+                }
+                return Ok();
+            }
+            catch (LeafDbException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Could not delete concept. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

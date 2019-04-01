@@ -37,6 +37,85 @@ namespace Services.Admin
             user = userContext;
         }
 
+        public async Task<Concept> Create(Concept c)
+        {
+            logger.LogInformation("Creating Concept. Concept:{@Concept}", c);
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                try
+                {
+                    var grid = await cn.QueryMultipleAsync(
+                        Sql.Create,
+                        new
+                        {
+                            universalId = c.UniversalId?.ToString(),
+                            parentId = c.ParentId,
+                            rootId = c.RootId,
+                            externalId = c.ExternalId,
+                            externalParentId = c.ExternalParentId,
+                            isPatientCountAutoCalculated = c.IsPatientCountAutoCalculated,
+                            isNumeric = c.IsNumeric,
+                            isParent = c.IsParent,
+                            isRoot = c.IsRoot,
+                            isSpecializable = c.IsSpecializable,
+                            sqlSetId = c.SqlSetId,
+                            sqlSetWhere = c.SqlSetWhere,
+                            sqlFieldNumeric = c.SqlFieldNumeric,
+                            uiDisplayName = c.UiDisplayName,
+                            uiDisplayText = c.UiDisplayText,
+                            uiDisplaySubtext = c.UiDisplaySubtext,
+                            uiDisplayUnits = c.UiDisplayUnits,
+                            uiDisplayTooltip = c.UiDisplayTooltip,
+                            uiDisplayPatientCount = c.UiDisplayPatientCount,
+                            uiNumericDefaultText = c.UiNumericDefaultText,
+                            constraints = ConceptConstraintTable.From(c),
+                            specializationGroups = ConceptSpecializationGroupTable.From(c),
+                            user = user.UUID
+                        },
+                        commandType: CommandType.StoredProcedure,
+                        commandTimeout: opts.DefaultTimeout
+                    );
+
+                    return AdminConceptReader.Read(grid);
+                }
+                catch (SqlException se)
+                {
+                    logger.LogError("Could not create concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
+                    LeafDbException.ThrowFrom(se);
+                    throw;
+                }
+            }
+        }
+
+        public async Task<ConceptDeleteResult> Delete(Guid id)
+        {
+            logger.LogInformation("Deleting Concept. Id:{Id}", id);
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                try
+                {
+                    var grid = await cn.QueryMultipleAsync(
+                        Sql.Delete,
+                        new { id, user = user.UUID },
+                        commandType: CommandType.StoredProcedure,
+                        commandTimeout: opts.DefaultTimeout
+                    );
+
+                    return AdminConceptDeleteReader.Read(grid);
+                }
+                catch (SqlException se)
+                {
+                    logger.LogError("Could not delete concept. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
+                    LeafDbException.ThrowFrom(se);
+                    throw;
+                }
+            }
+        }
+
         public async Task<Concept> Get(Guid id)
         {
             logger.LogInformation("Getting Concept. Id:{Id}", id);
@@ -112,6 +191,8 @@ namespace Services.Admin
         {
             public const string Get = "adm.sp_GetConceptById";
             public const string Update = "adm.sp_UpdateConcept";
+            public const string Create = "adm.sp_CreateConcept";
+            public const string Delete = "adm.sp_DeleteConcept";
         }
     }
 
@@ -127,6 +208,23 @@ namespace Services.Admin
             var groups = grid.Read<SpecializationGroupRelationship>();
             var ccr = grid.Read<ConceptConstraintRecord>();
             return cr.Concept(groups, ccr);
+        }
+    }
+
+    static class AdminConceptDeleteReader
+    {
+        public static ConceptDeleteResult Read(SqlMapper.GridReader grid)
+        {
+            var pf = grid.Read<PanelFilterDependent>();
+            var q = grid.Read<QueryDependent>();
+            var c = grid.Read<ConceptDependent>();
+
+            return new ConceptDeleteResult
+            {
+                PanelFilterDependents = pf,
+                QueryDependents = q,
+                ConceptDependents = c
+            };
         }
     }
 
