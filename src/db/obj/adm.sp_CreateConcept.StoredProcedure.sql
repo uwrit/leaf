@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConcept]    Script Date: 4/1/19 1:47:55 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -14,10 +14,9 @@ GO
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/29
--- Description: Updates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
+-- Description: Creates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateConcept]
-    @id uniqueidentifier,
+CREATE PROCEDURE [adm].[sp_CreateConcept]
     @universalId nvarchar(200),
     @parentId uniqueidentifier,
     @rootId uniqueidentifier,
@@ -45,11 +44,6 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    IF NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @id)
-    BEGIN;
-        THROW 70404, N'Concept not found.', 1;
-    END;
-
     IF (@parentId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @parentId))
     BEGIN;
         THROW 70404, N'Parent concept not found.', 1;
@@ -67,8 +61,34 @@ BEGIN
 
     BEGIN TRAN;
     BEGIN TRY
-        UPDATE app.Concept
-        SET
+        DECLARE @ids app.ResourceIdTable;
+
+        INSERT INTO app.Concept (
+            UniversalId,
+            ParentId,
+            RootId,
+            ExternalId,
+            ExternalParentId,
+            IsPatientCountAutoCalculated,
+            [IsNumeric],
+            IsParent,
+            IsRoot,
+            IsSpecializable,
+            SqlSetId,
+            SqlSetWhere,
+            SqlFieldNumeric,
+            UiDisplayName,
+            UiDisplayText,
+            UiDisplaySubtext,
+            UiDisplayUnits,
+            UiDisplayTooltip,
+            UiDisplayPatientCount,
+            UiNumericDefaultText,
+            ContentLastUpdateDateTime,
+            PatientCountLastUpdateDateTime
+        )
+        OUTPUT inserted.Id INTO @ids
+        SELECT
             UniversalId = @universalId,
             ParentId = @parentId,
             RootId = @rootId,
@@ -90,18 +110,14 @@ BEGIN
             UiDisplayPatientCount = @uiDisplayPatientCount,
             UiNumericDefaultText = @uiNumericDefaultText,
             ContentLastUpdateDateTime = GETDATE(),
-            PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
-        WHERE Id = @id;
+            PatientCountLastUpdateDateTime = GETDATE();
 
-        DELETE FROM auth.ConceptConstraint
-        WHERE ConceptId = @id;
+        DECLARE @id UNIQUEIDENTIFIER;
+        SELECT TOP 1 @id = Id FROM @ids;
 
         INSERT INTO auth.ConceptConstraint
         SELECT @id, ConstraintId, ConstraintValue
         FROM @constraints;
-
-        DELETE FROM rela.ConceptSpecializationGroup
-        WHERE ConceptId = @id;
 
         INSERT INTO rela.ConceptSpecializationGroup
         SELECT @id, SpecializationGroupId, OrderId
@@ -116,6 +132,7 @@ BEGIN
         THROW;
     END CATCH;
 END
+
 
 
 

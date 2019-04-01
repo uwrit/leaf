@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [auth].[GroupMembership]    Script Date: 4/1/19 10:56:32 AM ******/
+/****** Object:  UserDefinedTableType [auth].[GroupMembership]    Script Date: 4/1/19 1:47:54 PM ******/
 CREATE TYPE [auth].[GroupMembership] AS TABLE(
 	[Group] [nvarchar](100) NOT NULL
 )
