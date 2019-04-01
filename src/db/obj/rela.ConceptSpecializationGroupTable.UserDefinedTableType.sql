@@ -5,6 +5,10 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Schema [app]    Script Date: 4/1/19 10:56:32 AM ******/
-CREATE SCHEMA [app]
+/****** Object:  UserDefinedTableType [rela].[ConceptSpecializationGroupTable]    Script Date: 4/1/19 10:56:32 AM ******/
+CREATE TYPE [rela].[ConceptSpecializationGroupTable] AS TABLE(
+	[ConceptId] [uniqueidentifier] NOT NULL,
+	[SpecializationGroupId] [int] NOT NULL,
+	[OrderId] [int] NULL
+)
 GO

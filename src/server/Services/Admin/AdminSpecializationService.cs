@@ -42,22 +42,31 @@ namespace Services.Admin
             {
                 await cn.OpenAsync();
 
-                var created = await cn.QueryFirstAsync<SpecializationRecord>(
-                    Sql.Create,
-                    new
-                    {
-                        groupId = spec.SpecializationGroupId,
-                        uid = spec.UniversalId?.ToString(),
-                        uiDisplayText = spec.UiDisplayText,
-                        sqlSetWhere = spec.SqlSetWhere,
-                        order = spec.OrderId,
-                        user = user.UUID
-                    },
-                    commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
-                );
+                try
+                {
+                    var created = await cn.QueryFirstAsync<SpecializationRecord>(
+                        Sql.Create,
+                        new
+                        {
+                            groupId = spec.SpecializationGroupId,
+                            uid = spec.UniversalId?.ToString(),
+                            uiDisplayText = spec.UiDisplayText,
+                            sqlSetWhere = spec.SqlSetWhere,
+                            order = spec.OrderId,
+                            user = user.UUID
+                        },
+                        commandType: CommandType.StoredProcedure,
+                        commandTimeout: opts.DefaultTimeout
+                    );
 
-                return created.Specialization();
+                    return created.Specialization();
+                }
+                catch (SqlException se)
+                {
+                    logger.LogError("Could not create Specialization. Specialization:{@Specialization} Code:{Code} Error:{Error}", spec, se.ErrorCode, se.Message);
+                    LeafDbException.ThrowFrom(se);
+                    throw;
+                }
             }
         }
 

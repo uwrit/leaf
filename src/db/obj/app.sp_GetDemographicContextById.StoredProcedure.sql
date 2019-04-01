@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDemographicContextById]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDemographicContextById]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,13 +19,14 @@ GO
 CREATE PROCEDURE [app].[sp_GetDemographicContextById]
     @queryid UNIQUEIDENTIFIER,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
 
     -- queryconstraint ok?
-    IF (auth.fn_UserIsAuthorizedForQueryById(@user, @groups, @queryid) = 0)
+    IF (auth.fn_UserIsAuthorizedForQueryById(@user, @groups, @queryid, @admin) = 0)
     BEGIN;
         DECLARE @query403 nvarchar(400) = @user + N' is not authorized to execute query ' + app.fn_StringifyGuid(@queryid);
         THROW 70403, @query403, 1;
@@ -43,6 +44,7 @@ BEGIN
         SqlStatement
     FROM app.DemographicQuery
 END
+
 
 
 

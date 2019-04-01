@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorized]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorized]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,11 +20,17 @@ CREATE FUNCTION [auth].[fn_UserIsAuthorized]
 (
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
-    @authorizations auth.Authorizations READONLY
+    @authorizations auth.Authorizations READONLY,
+    @admin bit
 )
 RETURNS bit
 AS
 BEGIN
+
+    -- pass through on admin
+    IF (@admin = 1)
+        RETURN 1;
+
     DECLARE @totalCount int;
     SELECT @totalCount = COUNT(*)
     FROM @authorizations;
@@ -72,6 +78,7 @@ BEGIN
     RETURN 0;
 
 END
+
 
 
 

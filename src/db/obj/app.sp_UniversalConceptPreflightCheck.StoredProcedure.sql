@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_UniversalConceptPreflightCheck]    Script Date: 3/29/19 11:06:43 AM ******/
+/****** Object:  StoredProcedure [app].[sp_UniversalConceptPreflightCheck]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,7 +20,8 @@ GO
 CREATE PROCEDURE [app].[sp_UniversalConceptPreflightCheck]
     @uids app.ResourceUniversalIdTable READONLY,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -54,7 +55,7 @@ BEGIN
 
     DECLARE @allowed app.ResourceIdTable;
     INSERT INTO @allowed
-    SELECT Id FROM app.fn_FilterConceptsByConstraint(@user, @groups, @requested);
+    SELECT Id FROM app.fn_FilterConceptsByConstraint(@user, @groups, @requested, @admin);
 
     UPDATE @results
     SET
@@ -70,6 +71,7 @@ BEGIN
     FROM @results;
 
 END
+
 
 
 

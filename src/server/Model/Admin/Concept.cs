@@ -21,6 +21,7 @@ namespace Model.Admin
         public int? SqlSetId { get; set; }
         public bool? IsNumeric { get; set; }
         public bool? IsParent { get; set; }
+        public bool? IsRoot { get; set; }
         public bool? IsPatientCountAutoCalculated { get; set; }
         public bool? IsSpecializable { get; set; }
         public string SqlSetWhere { get; set; }

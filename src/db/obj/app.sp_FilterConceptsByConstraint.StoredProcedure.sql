@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -58,25 +58,40 @@ BEGIN
 
     -- Identify any requested Ids that are disallowed by constraint anywhere in their ancestry.
     DECLARE @disallowed app.ResourceIdTable;
-    INSERT INTO @disallowed
-    SELECT DISTINCT
-        a.Base
-    FROM @ancestry a
-    JOIN auth.ConceptConstraint c on a.[Current] = c.ConceptId and c.ConstraintId = 1 -- User Constrained
-    WHERE @user NOT IN (
-        SELECT ConstraintValue
-        FROM auth.ConceptConstraint
-        WHERE ConceptId = c.ConceptId
-        AND c.ConstraintId = 1
+    WITH constrained AS
+        (
+            SELECT c.ConceptId, c.ConstraintId, c.ConstraintValue
+            FROM auth.ConceptConstraint c
+            WHERE EXISTS (SELECT 1 FROM @ancestry a WHERE a.[Current] = c.ConceptId)
+        )
+    , permitted AS
+    (
+        SELECT 
+            a.Base
+        , a.[Current]
+        , HasConstraint = CASE WHEN EXISTS 
+                        (SELECT 1 FROM constrained c 
+                WHERE c.ConceptId = a.[Current])
+                        THEN 1 ELSE 0 END
+        , UserPermitted = CASE WHEN EXISTS 
+                        (SELECT 1 FROM constrained c 
+                WHERE c.ConceptId = a.[Current] 
+                        AND c.ConstraintId = 1 
+                        AND c.ConstraintValue = @user)
+                        THEN 1 ELSE 0 END
+        , GroupPermitted = CASE WHEN EXISTS 
+                        (SELECT 1 FROM constrained c 
+                WHERE c.ConceptId = a.[Current] 
+                        AND c.ConstraintId = 2 
+                        AND c.ConstraintValue IN (SELECT g.[Group] FROM @groups g))
+                        THEN 1 ELSE 0 END
+        FROM @ancestry a
     )
-    UNION
-    SELECT DISTINCT
-        a.Base
-    FROM @ancestry a
-    JOIN auth.ConceptConstraint c on a.[Current] = c.ConceptId and c.ConstraintId = 2 -- Group Constrained
-    WHERE NOT EXISTS (
-        SELECT 1 FROM @groups WHERE [Group] = c.ConstraintValue
-    );
+    INSERT INTO @disallowed
+    SELECT p.Base
+    FROM permitted p
+    WHERE p.HasConstraint = 1
+        AND (p.UserPermitted = 0 AND p.GroupPermitted = 0)
 
     -- Select only the allowed requested ids.
     SELECT Id
@@ -87,6 +102,7 @@ BEGIN
     );
 
 END
+
 
 
 

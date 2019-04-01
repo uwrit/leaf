@@ -57,7 +57,7 @@ namespace Services.Authorization
             }
         }
 
-        public bool IsAdmin => user.IsInRole(Role.Admin);
+        public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstutional;
 
         string username;
         string Username

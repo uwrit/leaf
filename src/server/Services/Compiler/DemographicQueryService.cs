@@ -90,7 +90,7 @@ namespace Services.Compiler
             }
             if (!context.QueryContext.Found)
             {
-                log.LogWarning("Incomplete demographic compiler context. Context:{@Context}", contextById);
+                log.LogWarning("Incomplete demographic compiler context. Context:{@Context}", context);
                 return CompilerContextState.QueryNotFound;
             }
             return CompilerContextState.Ok;
@@ -127,7 +127,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     contextById,
-                    new { queryid, user = user.UUID, groups = GroupMembership.From(user) },
+                    new { queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -146,7 +146,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     contextByUId,
-                    new { queryuid, user = user.UUID, groups = GroupMembership.From(user) },
+                    new { queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

@@ -59,7 +59,7 @@ namespace Services.Compiler
         {
             var grid = await cn.QueryMultipleAsync(
                     querySingleId,
-                    new { id, user = user.UUID, groups = GroupMembership.From(user) },
+                    new { id, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -71,7 +71,7 @@ namespace Services.Compiler
         {
             var grid = await cn.QueryMultipleAsync(
                     querySingleUId,
-                    new { uid, user = user.UUID, groups = GroupMembership.From(user) },
+                    new { uid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -98,7 +98,7 @@ namespace Services.Compiler
         {
             var grid = await cn.QueryMultipleAsync(
                     queryManyIds,
-                    new { ids = ResourceIdTable.From(ids), user = user.UUID, groups = GroupMembership.From(user) },
+                    new { ids = ResourceIdTable.From(ids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -110,7 +110,7 @@ namespace Services.Compiler
         {
             var grid = await cn.QueryMultipleAsync(
                     queryManyUIds,
-                    new { uids = ResourceUniversalIdTable.From(uids), user = user.UUID, groups = GroupMembership.From(user) },
+                    new { uids = ResourceUniversalIdTable.From(uids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );

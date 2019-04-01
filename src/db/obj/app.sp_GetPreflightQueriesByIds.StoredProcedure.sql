@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,7 +19,8 @@ GO
 CREATE PROCEDURE [app].[sp_GetPreflightQueriesByIds]
     @qids app.ResourceIdTable READONLY,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY    
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -59,7 +60,7 @@ BEGIN
         left join app.Query q on qs.QueryId = q.Id
     ),
     authQ (QueryId, UniversalId, Ver, IsPresent, IsAuthorized) as (
-        select e.QueryId, e.UniversalId, e.Ver, e.IsPresent, auth.fn_UserIsAuthorizedForQueryById(@user, @groups, e.QueryId)
+        select e.QueryId, e.UniversalId, e.Ver, e.IsPresent, auth.fn_UserIsAuthorizedForQueryById(@user, @groups, e.QueryId, @admin)
         from enriched e
     ),
     withConcepts (QueryId, UniversalId, Ver, IsPresent, IsAuthorized, ConceptId) as (
@@ -78,7 +79,7 @@ BEGIN
 
     declare @conceptAuths app.ConceptPreflightTable;
     insert @conceptAuths
-    exec app.sp_InternalConceptPreflightCheck @concIds, @user, @groups;
+    exec app.sp_InternalConceptPreflightCheck @concIds, @user, @groups, @admin = @admin;
 
     update p
     set
@@ -92,6 +93,7 @@ BEGIN
     from @preflight
     order by QueryId desc;
 END
+
 
 
 

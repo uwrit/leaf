@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryId]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryId]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,7 +20,8 @@ CREATE PROCEDURE [app].[sp_GetDatasetContextByDatasetUIdQueryId]
     @datasetuid app.UniversalId,
     @queryid UNIQUEIDENTIFIER,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -32,8 +33,9 @@ BEGIN
     WHERE app.DatasetQuery.UniversalId = @datasetuid;
 
     -- do the normal thing
-    EXEC app.sp_GetDatasetContextById @did, @queryid, @user, @groups;
+    EXEC app.sp_GetDatasetContextById @did, @queryid, @user, @groups, @admin = @admin;
 END
+
 
 
 

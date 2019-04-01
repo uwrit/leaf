@@ -5,6 +5,6 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedDataType [app].[QueryDefinitionJson]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  UserDefinedDataType [app].[QueryDefinitionJson]    Script Date: 4/1/19 10:56:32 AM ******/
 CREATE TYPE [app].[QueryDefinitionJson] FROM [nvarchar](max) NOT NULL
 GO
