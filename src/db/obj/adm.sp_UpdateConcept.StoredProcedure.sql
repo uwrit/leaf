@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 4/1/19 9:36:43 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 4/1/19 10:56:32 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -37,7 +37,6 @@ CREATE PROCEDURE [adm].[sp_UpdateConcept]
 	@uiDisplayUnits nvarchar(50),
 	@uiDisplayTooltip nvarchar(max),
 	@uiDisplayPatientCount int,
-	@uiDisplayPatientCountByYear nvarchar(max),
 	@uiNumericDefaultText nvarchar(50),
     @constraints auth.ConceptConstraintTable READONLY,
     @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
@@ -75,7 +74,7 @@ BEGIN
             RootId = @rootId,
             ExternalId = @externalId,
             ExternalParentId = @externalParentId,
-            IsPatientCountAutoCalculated = @isPatientCountAutoCalculated, -- ??
+            IsPatientCountAutoCalculated = @isPatientCountAutoCalculated,
             [IsNumeric] = @isNumeric,
             IsParent = @isParent,
             IsRoot = @isRoot,
@@ -89,18 +88,35 @@ BEGIN
             UiDisplayUnits = @uiDisplayUnits,
             UiDisplayTooltip = @uiDisplayTooltip,
             UiDisplayPatientCount = @uiDisplayPatientCount,
-            UiDisplayPatientCountByYear = @uiDisplayPatientCountByYear, -- ??
             UiNumericDefaultText = @uiNumericDefaultText,
             ContentLastUpdateDateTime = GETDATE(),
             PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
         WHERE Id = @id;
 
-        ROLLBACK;
+        DELETE FROM auth.ConceptConstraint
+        WHERE ConceptId = @id;
+
+        INSERT INTO auth.ConceptConstraint
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        DELETE FROM rela.ConceptSpecializationGroup
+        WHERE ConceptId = @id;
+
+        INSERT INTO rela.ConceptSpecializationGroup
+        SELECT @id, SpecializationGroupId, OrderId
+        FROM @specializationGroups;
+
+        COMMIT;
+
+        EXEC adm.sp_GetConceptById @id;
     END TRY
     BEGIN CATCH
-
+        ROLLBACK;
+        THROW;
     END CATCH;
 END
+
 
 
 
