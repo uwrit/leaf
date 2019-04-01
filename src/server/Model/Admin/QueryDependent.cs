@@ -4,17 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Model.Admin;
-
-namespace Services.Admin
+namespace Model.Admin
 {
-    public interface IAdminConceptService
+    public class QueryDependent
     {
-        Task<Concept> Get(Guid id);
-        Task<Concept> Update(Concept c);
-        Task<Concept> Create(Concept c);
-        Task<ConceptDeleteResult> Delete(Guid id);
+        public Guid Id { get; set; }
+        public string UniversalId { get; set; }
+        public string Name { get; set; }
+        public string Owner { get; set; }
     }
 }

@@ -56,15 +56,15 @@ namespace API.Controllers.Admin
             {
                 if (conceptSqlSet == null)
                 {
-                    return BadRequest("ConceptSqlSet is missing.");
+                    return BadRequest(CRUDError.From("ConceptSqlSet is missing."));
                 }
                 if (conceptSqlSet.Id == default)
                 {
-                    return BadRequest("ConceptSqlSet.Id must not be null.");
+                    return BadRequest(CRUDError.From("ConceptSqlSet.Id must not be null."));
                 }
                 if (string.IsNullOrWhiteSpace(conceptSqlSet.SqlSetFrom))
                 {
-                    return BadRequest("ConceptSqlSet.SqlSetFrom is required.");
+                    return BadRequest(CRUDError.From("ConceptSqlSet.SqlSetFrom is required."));
                 }
 
                 var updated = await setService.Update(conceptSqlSet);
@@ -76,7 +76,7 @@ namespace API.Controllers.Admin
             }
             catch (LeafDbException le)
             {
-                return StatusCode(le.StatusCode);
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
@@ -92,11 +92,11 @@ namespace API.Controllers.Admin
             {
                 if (conceptSqlSet == null)
                 {
-                    return BadRequest("ConceptSqlSet is missing.");
+                    return BadRequest(CRUDError.From("ConceptSqlSet is missing."));
                 }
                 if (string.IsNullOrWhiteSpace(conceptSqlSet.SqlSetFrom))
                 {
-                    return BadRequest("ConceptSqlSet.SqlSetFrom is required.");
+                    return BadRequest(CRUDError.From("ConceptSqlSet.SqlSetFrom is required."));
                 }
 
                 var created = await setService.Create(conceptSqlSet);
@@ -104,7 +104,7 @@ namespace API.Controllers.Admin
             }
             catch (LeafDbException le)
             {
-                return StatusCode(le.StatusCode);
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {

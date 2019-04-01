@@ -40,23 +40,23 @@ namespace API.Controllers.Admin
             {
                 if (dto == null)
                 {
-                    return BadRequest("Specialization is missing.");
+                    return BadRequest(CRUDError.From("Specialization is missing."));
                 }
                 if (dto.Id == default)
                 {
-                    return BadRequest("Specialization.Id is missing.");
+                    return BadRequest(CRUDError.From("Specialization.Id is missing."));
                 }
                 if (dto.SpecializationGroupId == default)
                 {
-                    return BadRequest("Specialization.SpecializationGroupId is required.");
+                    return BadRequest(CRUDError.From("Specialization.SpecializationGroupId is required."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.UiDisplayText))
                 {
-                    return BadRequest("Specialization.UiDisplayText is required.");
+                    return BadRequest(CRUDError.From("Specialization.UiDisplayText is required."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.SqlSetWhere))
                 {
-                    return BadRequest("Specialization.SqlSetWhere is required.");
+                    return BadRequest(CRUDError.From("Specialization.SqlSetWhere is required."));
                 }
 
                 var spec = dto.ConceptSpecialization();
@@ -70,11 +70,11 @@ namespace API.Controllers.Admin
             catch (FormatException fe)
             {
                 logger.LogError("Malformed Specialization:{@Specialization} Error:{Error}", dto, fe.Message);
-                return BadRequest("Malformed Specialization.UniversalId.");
+                return BadRequest(CRUDError.From("Malformed Specialization.UniversalId."));
             }
             catch (LeafDbException le)
             {
-                return StatusCode(le.StatusCode);
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
@@ -90,19 +90,19 @@ namespace API.Controllers.Admin
             {
                 if (dto == null)
                 {
-                    return BadRequest("Specialization is missing.");
+                    return BadRequest(CRUDError.From("Specialization is missing."));
                 }
                 if (dto.SpecializationGroupId == default)
                 {
-                    return BadRequest("Specialization.SpecializationGroupId is required.");
+                    return BadRequest(CRUDError.From("Specialization.SpecializationGroupId is required."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.UiDisplayText))
                 {
-                    return BadRequest("Specialization.UiDisplayText is required.");
+                    return BadRequest(CRUDError.From("Specialization.UiDisplayText is required."));
                 }
                 if (string.IsNullOrWhiteSpace(dto.SqlSetWhere))
                 {
-                    return BadRequest("Specialization.SqlSetWhere is required.");
+                    return BadRequest(CRUDError.From("Specialization.SqlSetWhere is required."));
                 }
 
                 var spec = dto.ConceptSpecialization();
@@ -112,11 +112,11 @@ namespace API.Controllers.Admin
             catch (FormatException fe)
             {
                 logger.LogError("Malformed Specialization:{@Specialization} Error:{Error}", dto, fe.Message);
-                return BadRequest("Malformed Specialization.UniversalId.");
+                return BadRequest(CRUDError.From("Malformed Specialization.UniversalId."));
             }
             catch (LeafDbException le)
             {
-                return StatusCode(le.StatusCode);
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
