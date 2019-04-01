@@ -73,12 +73,6 @@
     position: relative;   
 }
 
-.sqlset-editor-table-row-container.unsaved,
-.sqlset-editor-specializationgroup-container.unsaved,
-.sqlset-editor-specializationgroup-specialization.unsaved {
-    box-shadowz: inset 0px 0px 10px rgb(255, 248, 145);
-}
-
 .sqlset-editor-table-row {
     min-height: 50px;
     padding: 0 10px;
