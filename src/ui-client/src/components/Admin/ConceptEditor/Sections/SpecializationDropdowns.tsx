@@ -29,6 +29,7 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
         const { data, set } = this.props;
         const { adminConcept, userConcept } = data;
         const c = this.className;
+        const concept = userConcept!;
         const alreadyAdded = new Set(adminConcept!.specializationGroups.map((grp) => grp.specializationGroupId));
         const available: ConceptSpecializationGroup[] = [];
 
@@ -45,10 +46,11 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
         return (
             <Section header='Dropdowns'>
                 <div className={`${c}-concept-specialization-dropdowns`}>
-                    <p>Dropdowns allow users to make concept logic more granular without needing to create additional child Concepts.</p>
+                    <p>Allow more granular logic without additional child Concepts</p>
                     <small>Dropdowns appear after the user has dragged the Concept into a query</small>
                     <div className={`${c}-concept-specialization-dropdowns-container`}>
-                        {userConcept!.specializationGroups!.map((grp) => 
+                        {concept.specializationGroups &&
+                         concept.specializationGroups.map((grp) => 
                             <SpecializationDropdown specializationGroup={grp} key={grp.id}/>
                         )}
                     </div>

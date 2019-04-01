@@ -164,8 +164,14 @@ export const handleAdminConceptClick = (newConcept: UserConcept) => {
             const confirm: ConfirmationModalState = {
                 body: `Do you want to save changes to the current concept, "${currentAdminConcept!.uiDisplayName}?"`,
                 header: 'Save Changes',
-                onClickNo: () => { dispatch(fetchAdminConceptIfNeeded(newConcept)); },
-                onClickYes: () => { dispatch(saveAdminConcept(currentAdminConcept!)) },
+                onClickNo: () => { 
+                    dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!)); 
+                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
+                },
+                onClickYes: () => { 
+                    dispatch(saveAdminConcept(currentAdminConcept!)); 
+                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
+                },
                 show: true,
                 noButtonText: `No`,
                 yesButtonText: `Yes, I'll Save Changes`

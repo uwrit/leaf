@@ -71,8 +71,8 @@ export class Input extends React.PureComponent<Props,State> {
         const { changeHandler, propName, required } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);
-        if (required && !newVal) {
-            this.setState({ valid: false });
+        if (required) {
+            this.setState({ valid: !!newVal });
         }
     };
 };
