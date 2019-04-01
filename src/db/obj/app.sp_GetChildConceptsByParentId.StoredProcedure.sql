@@ -50,7 +50,7 @@ BEGIN
 
     -- TODO(cspital) this is wasteful, we've already checked parent up to root, just need to check children, write focused version with no recursion
     INSERT INTO @allowed
-    EXEC app.sp_FilterConceptsByConstraint @user, @groups, @requested;
+    EXEC app.sp_FilterConceptsByConstraint @user, @groups, @requested, @admin = @admin
 
     EXEC app.sp_HydrateConceptsByIds @allowed;
 

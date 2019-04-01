@@ -318,12 +318,12 @@ namespace Services.Compiler.SqlServer
                     foreach (int k in subPanelsWithHavingClause)
                     {
                         SubPanel subPanel = panel.SubPanels.ElementAt(k);
-                        string countDistinctDate = $"{Dialect.SQL_COUNT}DISTINCT {PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", subPanel.PanelItems.ElementAt(0).Concept.SqlFieldDate)}) ";
+                        string countDistinctDate = $"HAVING {Dialect.SQL_COUNT}DISTINCT {PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", subPanel.PanelItems.ElementAt(0).Concept.SqlFieldDate)}) ";
 
                         // If SubPanel is Included and has a COUNT filter
                         if (subPanel.HasCountFilter && subPanel.IncludeSubPanel)
                         {
-                            panelSql.Append($"HAVING {countDistinctDate} >= {subPanel.MinimumCount} ");
+                            panelSql.Append($"{countDistinctDate} >= {subPanel.MinimumCount} ");
                         }
                         // If SubPanel is Excluded and has a COUNT filter
                         else if (subPanel.HasCountFilter && !subPanel.IncludeSubPanel)

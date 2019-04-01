@@ -15,6 +15,7 @@ import LearnMoreButton from './LearnMoreButton';
 import ConceptTreeNodeText from './ConceptTreeNodeText';
 import { handleConceptClick, fetchConceptChildrenIfNeeded } from '../../../actions/concepts';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
+import { findDOMNode } from 'react-dom';
 
 interface DndProps {
     canDrop?: boolean;
@@ -155,8 +156,9 @@ class ConceptTreeNode extends React.PureComponent<Props> {
         );
     }
 
-    private handleClick = () => {
+    private handleClick = (e: any) => {
         const { dispatch, concept } = this.props;
+        // if (e.target && e.target.className.indexOf('concept-tree-node-arrow') > -1) { return; }
         dispatch(handleConceptClick(concept));
     }
 
