@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForQueryById]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForQueryById]    Script Date: 4/1/19 9:36:42 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -20,7 +20,8 @@ CREATE FUNCTION [auth].[fn_UserIsAuthorizedForQueryById]
 (
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
-    @id UNIQUEIDENTIFIER
+    @id UNIQUEIDENTIFIER,
+    @admin bit
 )
 RETURNS  bit
 AS
@@ -37,8 +38,9 @@ BEGIN
     WHERE
         qc.QueryId = @id;
 
-    RETURN auth.fn_UserIsAuthorized(@user, @groups, @authorizations);
+    RETURN auth.fn_UserIsAuthorized(@user, @groups, @authorizations, @admin);
 END
+
 
 
 

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateSpecializationGroup]    Script Date: 3/29/19 11:06:42 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateSpecializationGroup]    Script Date: 4/1/19 9:36:43 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -76,6 +76,7 @@ BEGIN
     FROM @s;
 
 END
+
 
 
 
