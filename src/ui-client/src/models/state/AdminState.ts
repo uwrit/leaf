@@ -5,12 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept, ConceptSqlSet } from '../admin/Concept';
-import { Concept as UiConcept } from '../concept/Concept';
+import { Concept as AdminConcept, ConceptSqlSet } from '../admin/Concept';
+import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
-import { AppState } from './AppState';
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -25,37 +24,21 @@ export enum AdminPanelConceptEditorPane {
     SQL_SET = 2
 }
 
-export enum AdminPanelUpdateObjectType {
-    SQL_SET = 1,
-    SPECIALIZATION_GROUP = 2,
-    SPECIALIZATION = 3
-}
-
-export type AdminPanelQueuedApiProcess = (dispatch: any, getState: () => AppState) => any;
-
-export interface AdminPanelQueuedApiEvent {
-    event: () => AdminPanelQueuedApiProcess;
-    id: string | number;
-    objectType: AdminPanelUpdateObjectType;
-}
-
 export interface AdminConceptState {
     changed: boolean;
-    concepts: Map<string,Concept>;
-    currentConcept?: Concept;
+    concepts: Map<string, AdminConcept>;
+    currentAdminConcept?: AdminConcept;
+    currentUserConcept?: UserConcept;
     pane: AdminPanelConceptEditorPane;
     examplePanel: Panel;
     exampleSql: string;
     state: AdminPanelLoadState;
-    uneditedAdminConcept?: Concept;
-    uneditedUiConcept?: UiConcept;
 }
 
 export interface AdminPanelSqlSetState {
     changed: boolean;
     sets: Map<number, ConceptSqlSet>;
     uneditedSets?: Map<number, ConceptSqlSet>;
-    updateQueue: AdminPanelQueuedApiEvent[];
 }
 
 export interface AdminPanelFilterState {

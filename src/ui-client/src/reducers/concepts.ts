@@ -17,6 +17,7 @@ import {
     SET_EXTENSION_CONCEPTS,
     SET_EXTENSION_CONCEPT,
     SET_SELECTED_CONCEPT,
+    REPARENT_CONCEPT,
     MERGE_EXTENSION_CONCEPTS,
     REMOVE_EXTENSION_CONCEPT,
     SHOW_DRILL_TREE,
@@ -126,8 +127,12 @@ const requestConceptChildren = (state: ConceptsState, concept: Concept): Concept
 };
 
 const receiveConceptChildren = (state: ConceptsState, concept: Concept, children: Concept[]): ConceptsState => {
+    const childrenIds = concept.childrenIds 
+        ? new Set<string>([ ...concept.childrenIds, ...children.map(c => c.id)])
+        : new Set<string>(children.map(c => c.id))
+
     const newConcept = Object.assign({}, concept, {
-        childrenIds: new Set<string>(children.map(c => c.id)),
+        childrenIds,
         childrenLoaded: true,
         isFetching: false,
         isOpen: true
@@ -246,6 +251,39 @@ const removeConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
     });
 };
 
+const reparentConcept = (state: ConceptsState, concept: Concept, parentId: string): ConceptsState => {
+
+    const newConcept = Object.assign({}, concept, { parentId });
+    const newParent = Object.assign({}, state.currentTree.get(parentId), { isParent: true });
+    const oldParent = Object.assign({}, state.currentTree.get(concept.parentId!));
+    oldParent.isParent = oldParent.childrenIds!.size > 0;
+
+    if (oldParent.childrenIds) {
+        oldParent.childrenIds!.delete(concept.id);
+    }
+    
+    if (newParent.childrenIds) {
+        newParent.childrenIds!.add(concept.id);
+    } else {
+        newParent.childrenIds = new Set([ concept.id ]);
+    }
+
+    state.currentTree.set(oldParent.id, oldParent);
+    state.currentTree.set(newParent.id, newParent);
+    state.currentTree.set(newConcept.id, newConcept);
+
+    if (state.searchTree.has(concept.id)) {
+        state.searchTree.set(oldParent.id, oldParent);
+        state.searchTree.set(newParent.id, newParent);
+        state.searchTree.set(newConcept.id, newConcept);
+    }
+    
+    return Object.assign({}, state, {
+        currentTree: new Map(state.currentTree),
+        searchTree: new Map(state.searchTree)
+    });
+};
+
 export const concepts = (state: ConceptsState = defaultConceptsState(), action: ConceptsAction): ConceptsState => {
     switch (action.type) {
         case TOGGLE_CONCEPT_OPEN:
@@ -277,6 +315,8 @@ export const concepts = (state: ConceptsState = defaultConceptsState(), action: 
             return setSelectedConcept(state, action.concept!);
         case REMOVE_CONCEPT:
             return removeConcept(state, action.concept!);
+        case REPARENT_CONCEPT:
+            return reparentConcept(state, action.concept!, action.parentId!);
         case ERROR_CONCEPTS:
         default:
             return state;

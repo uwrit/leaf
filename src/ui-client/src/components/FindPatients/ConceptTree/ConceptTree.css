@@ -48,8 +48,13 @@
 }
 
 .concept-tree-node-text-wrapper {
+    border-radius: 4px !important;
     max-width: calc(100% - 50px);
     padding-top: 4px;
+}
+
+.concept-tree-node-text-wrapper.can-drop {
+    background-color: rgba(28, 168, 221, 0.08);
 }
 
 .concept-tree-node-subtext {

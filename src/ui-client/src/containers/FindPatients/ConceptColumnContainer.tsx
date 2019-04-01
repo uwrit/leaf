@@ -11,8 +11,10 @@ import { Dispatch } from 'redux';
 import ConceptSearchBox from '../../components/FindPatients/ConceptSearchBox/ConceptSearchBox';
 import ConceptTree from '../../components/FindPatients/ConceptTree/ConceptTree';
 import { AppState, ConceptsSearchState, ConceptsState } from '../../models/state/AppState';
+import { Routes } from '../../models/state/GeneralUiState';
 
 interface StateProps {
+    allowReparent: boolean;
     concepts: ConceptsState;
     conceptSearch: ConceptsSearchState;
 }
@@ -31,7 +33,7 @@ class ConceptTreeColumn extends React.Component<Props> {
     }
 
     public render() {
-        const { concepts, conceptSearch, dispatch } = this.props;
+        const { allowReparent, concepts, conceptSearch, dispatch } = this.props;
         const tree = this.props.concepts.currentTree;
         const roots = !concepts.showSearchTree
             ? concepts.roots
@@ -45,6 +47,7 @@ class ConceptTreeColumn extends React.Component<Props> {
                     dispatch={dispatch} 
                 />
                 <ConceptTree
+                    allowReparent={allowReparent}
                     allowRerender={concepts.allowRerender}
                     tree={tree}
                     dispatch={dispatch}
@@ -58,6 +61,7 @@ class ConceptTreeColumn extends React.Component<Props> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
+        allowReparent: state.generalUi.currentRoute === Routes.AdminPanel,
         conceptSearch: state.conceptSearch,
         concepts: state.concepts
     };

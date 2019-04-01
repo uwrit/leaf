@@ -8,6 +8,7 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminSqlSetAction } from "../../actions/admin/sqlSet";
 import { ConceptSqlSet } from "../../models/admin/Concept";
+import { conceptSqlSetsChanged } from "../../utils/admin";
 
 export const setAdminConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const sets = action.sets!;
@@ -33,56 +34,30 @@ export const setAdminUneditedConceptSqlSet = (state: AdminState, action: AdminSq
 };
 
 export const undoAdminConceptSqlSetChanges = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const undone: Map<number, ConceptSqlSet> = new Map();
-    state.sqlSets.uneditedSets!.forEach((s) => undone.set(s.id, Object.assign({}, s)));
+    const savedOnly: Map<number, ConceptSqlSet> = new Map();
+    state.sqlSets.uneditedSets!.forEach((s) => {
+        savedOnly.set(s.id, Object.assign({}, s))
+    });
 
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            sets: undone,
-            changed: false,
-            updateQueue: []
+            sets: savedOnly,
+            changed: false
         }
     });
 };
 
 export const deleteAdminConceptSqlSet = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const set = action.set!;
+    state.sqlSets.uneditedSets!.delete(set.id);
     state.sqlSets.sets.delete(set.id);
-    return Object.assign({}, state);
-};
 
-export const upsertAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const newEv = action.queuedApiEvent!;
-    const events = state.sqlSets.updateQueue.slice();
-    let isUpdate = false;
-
-    for (let i = 0; i < events.length; i++) {
-        const ev = events[i];
-        if (ev.objectType === newEv.objectType && ev.id === newEv.id) {
-            events.splice(i, 1, newEv);
-            isUpdate = true;
-        }
-    }
-    if (!isUpdate) {
-        events.push(newEv);
-    }
-    console.log('reducer events', events);
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
-            updateQueue: events
-        }
-    });
-};
-
-export const removeAdminQueuedApiEvent = (state: AdminState, action: AdminSqlSetAction): AdminState => {
-    const events = state.sqlSets.updateQueue.filter((ev) => ev.id !== action.id!);
-    console.log('reducer events', events);
-    return Object.assign({}, state, {
-        sqlSets: {
-            ...state.sqlSets,
-            updateQueue: events
+            sets: new Map(state.sqlSets.sets),
+            changed: conceptSqlSetsChanged(state.sqlSets.sets)
         }
     });
 };
@@ -92,7 +67,25 @@ export const setAdminConceptSqlSetUnchanged = (state: AdminState, action: AdminS
         sqlSets: {
             ...state.sqlSets,
             changed: false,
-            updateQueue: []
+            uneditedSets: new Map(state.sqlSets.sets)
+        }
+    });
+};
+
+export const syncAdminConceptSqlSetUnsavedWithSaved = (state: AdminState, action: AdminSqlSetAction): AdminState => {
+    const prev = action.prevSqlSet!;
+    const set = action.set!;
+
+    state.sqlSets.uneditedSets!.delete(prev.id);
+    state.sqlSets.uneditedSets!.set(set.id, set);
+    state.sqlSets.sets.delete(prev.id);
+    state.sqlSets.sets.set(set.id, set);
+
+    return Object.assign({}, state, {
+        sqlSets: {
+            ...state.sqlSets,
+            sets: new Map(state.sqlSets.sets),
+            uneditedSets: new Map(state.sqlSets.uneditedSets!)
         }
     });
 };

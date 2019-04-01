@@ -8,41 +8,41 @@
 import AdminState, { AdminPanelLoadState, AdminPanelConceptEditorPane } from "../../models/state/AdminState";
 import {
     SET_ADMIN_CONCEPT,
-    SET_ADMIN_CONCEPT_ORIGINAL,
+    SET_ADMIN_PANEL_CURRENT_USER_CONCEPT,
     AdminConceptAction,
     SET_ADMIN_PANEL_LOAD_STATE,
     SET_ADMIN_PANEL_CONCEPT_LOAD_STATE,
     SET_ADMIN_CONCEPT_EXAMPLE_SQL,
-    REVERT_ADMIN_CONCEPT_TO_ORIGINAL,
     SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE
 } from '../../actions/admin/concept';
 import {
     SET_ADMIN_SPECIALIZATIONS,
     REMOVE_ADMIN_SPECIALIZATION,
-    AdminSpecializationAction
+    AdminSpecializationAction,
+    SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED
 } from '../../actions/admin/specialization';
 import {
     SET_ADMIN_SPECIALIZATION_GROUPS,
     REMOVE_ADMIN_SPECIALIZATION_GROUP,
-    AdminSpecializationGroupAction
+    AdminSpecializationGroupAction,
+    SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED
 } from '../../actions/admin/specializationGroup';
 import {
     SET_ADMIN_SQL_SETS,
     REMOVE_ADMIN_SQL_SET,
-    UPSERT_ADMIN_QUEUED_API_EVENT,
-    REMOVE_ADMIN_QUEUED_API_EVENT,
     AdminSqlSetAction,
     SET_ADMIN_UNEDITED_SQL_SETS,
     UNDO_ADMIN_SQL_SET_CHANGES,
-    SET_ADMIN_SQL_SETS_UNCHANGED
+    SET_ADMIN_SQL_SETS_UNCHANGED,
+    SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
-import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, revertAdminConceptToOriginal, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminUiConceptOriginal } from './concept';
+import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminCurrentUserConcept } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
-import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, upsertAdminQueuedApiEvent, removeAdminQueuedApiEvent, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged } from "./sqlSet";
-import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup } from "./specializationGroup";
-import { setAdminConceptSpecialization, removeAdminConceptSpecialization } from "./specialization";
+import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
+import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup, syncAdminConceptSpecializationGroupUnsavedWithSaved } from "./specializationGroup";
+import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -74,8 +74,7 @@ export const defaultAdminState = (): AdminState => {
         sqlSets: {
             changed: false,
             sets: new Map(),
-            uneditedSets: new Map(),
-            updateQueue: []
+            uneditedSets: new Map()
         },
         state: AdminPanelLoadState.NOT_LOADED
     };
@@ -95,16 +94,14 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
         // Concepts
         case SET_ADMIN_CONCEPT:
             return setAdminConcept(state, action);
-        case SET_ADMIN_CONCEPT_ORIGINAL:
-            return setAdminUiConceptOriginal(state, action);
+        case SET_ADMIN_PANEL_CURRENT_USER_CONCEPT:
+            return setAdminCurrentUserConcept(state, action);
         case SET_ADMIN_PANEL_LOAD_STATE:
             return setAdminPanelLoadState(state, action);
         case SET_ADMIN_PANEL_CONCEPT_LOAD_STATE:
             return setAdminPanelConceptLoadState(state, action);
         case SET_ADMIN_CONCEPT_EXAMPLE_SQL:
             return setExampleSql(state, action);
-        case REVERT_ADMIN_CONCEPT_TO_ORIGINAL:
-            return revertAdminConceptToOriginal(state, action);
         case REMOVE_CONCEPT:
             return deleteAdminConceptFromCache(state, action);
         case SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE:
@@ -121,26 +118,28 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return deleteAdminConceptSqlSet(state, action);
         case SET_ADMIN_UNEDITED_SQL_SETS:
             return setAdminUneditedConceptSqlSet(state, action);
-        case UPSERT_ADMIN_QUEUED_API_EVENT:
-            return upsertAdminQueuedApiEvent(state, action);
-        case REMOVE_ADMIN_QUEUED_API_EVENT:
-            return removeAdminQueuedApiEvent(state, action);
         case UNDO_ADMIN_SQL_SET_CHANGES:
             return undoAdminConceptSqlSetChanges(state, action);
         case SET_ADMIN_SQL_SETS_UNCHANGED:
             return setAdminConceptSqlSetUnchanged(state, action);
+        case SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSqlSetUnsavedWithSaved(state, action);
 
         // Specialization Groups
         case SET_ADMIN_SPECIALIZATION_GROUPS:
             return setAdminConceptSpecializationGroups(state, action);
         case REMOVE_ADMIN_SPECIALIZATION_GROUP:
             return removeAdminConceptSpecializationGroup(state, action);
+        case SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSpecializationGroupUnsavedWithSaved(state, action);
 
         // Specializations
         case SET_ADMIN_SPECIALIZATIONS:
             return setAdminConceptSpecialization(state, action);
         case REMOVE_ADMIN_SPECIALIZATION:
             return removeAdminConceptSpecialization(state, action);
+        case SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED:
+            return syncAdminConceptSpecializationUnsavedWithSaved(state, action);
 
         default:
             return state;

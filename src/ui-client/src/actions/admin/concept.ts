@@ -6,52 +6,68 @@
  */ 
 
 import { Concept } from '../../models/admin/Concept';
-import { Concept as UiConcept } from '../../models/concept/Concept';
+import { Concept as UserConcept } from '../../models/concept/Concept';
+import { Concept as AdminConcept } from '../../models/admin/Concept';
 import { AppState } from '../../models/state/AppState';
 import { Routes, InformationModalState, NoClickModalStates, ConfirmationModalState } from '../../models/state/GeneralUiState';
-import { getConcept, updateConcept, createConcept, deleteConcept } from '../../services/admin/conceptApi';
+import { getAdminConcept, updateAdminConcept, createAdminConcept, deleteAdminConcept } from '../../services/admin/conceptApi';
 import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
 import { getSqlSets } from '../../services/admin/sqlSetApi';
-import { getSpecializationGroups } from '../../services/admin/specializationGroupApi';
 import { getAdminSqlConfiguration } from './configuration';
 import { generateSampleSql } from '../../utils/admin';
-import { setConcept, removeConcept } from '../concepts';
+import { setConcept, removeConcept, fetchSingleConcept } from '../concepts';
 import { setAdminConceptSqlSets } from './sqlSet';
-import { setAdminConceptSpecializationGroups } from './specializationGroup';
+import { fetchConcept } from '../../services/conceptApi'
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
-export const SET_ADMIN_CONCEPT_ORIGINAL = 'SET_ADMIN_CONCEPT_ORIGINAL'
 export const SET_ADMIN_CONCEPT_EXAMPLE_SQL = 'SET_ADMIN_CONCEPT_EXAMPLE_SQL';
 export const SET_ADMIN_PANEL_LOAD_STATE = 'SET_ADMIN_PANEL_LOAD_STATE';
 export const SET_ADMIN_PANEL_CONCEPT_LOAD_STATE = 'SET_ADMIN_PANEL_CONCEPT_LOAD_STATE';
 export const SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE = 'SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE';
-export const REVERT_ADMIN_CONCEPT_TO_ORIGINAL = 'REVERT_ADMIN_CONCEPT_TO_ORIGINAL';
+export const SET_ADMIN_PANEL_CURRENT_USER_CONCEPT = 'SET_ADMIN_PANEL_CURRENT_USER_CONCEPT';
 
 export interface AdminConceptAction {
+    adminConcept?: AdminConcept;
     changed?: boolean;
-    concept?: Concept;
     pane?: AdminPanelConceptEditorPane;
-    uiConcept?: UiConcept;
     sql?: string;
     state?: AdminPanelLoadState;
+    userConcept?: UserConcept;
     type: string;
 }
 
 // Asynchronous
+export const revertAdminAndUserConceptChanges = (adminConcept: AdminConcept) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        try {
+            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
+            const state = getState();
+            const serverAdminConcept = await getAdminConcept(state, adminConcept.id);
+            const serverUserConceptResp = await fetchConcept(state, adminConcept.id);
+            const serverUserConcept = serverUserConceptResp.data as UserConcept;
+            dispatch(setConcept(serverUserConcept));
+            dispatch(setAdminConcept(serverAdminConcept, false));
+            dispatch(setAdminPanelCurrentUserConcept(serverUserConcept));
+        } catch (err) {
+            console.log(err);
+        }
+        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+    };
+};
+
 /*
  * Fetch full concept if user is admin and it hasn't
  * already been loaded.
  */
-export const fetchAdminConceptIfNeeded = (concept: UiConcept) => {
+export const fetchAdminConceptIfNeeded = (userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             const adm = state.admin!.concepts;
-            const uiConcept = state.concepts.currentTree.get(concept.id)!;
-            const embedded = isEmbeddedQuery(concept.universalId);
-            dispatch(setAdminConceptOriginal(uiConcept));
+            const embedded = isEmbeddedQuery(userConcept.universalId);
+            dispatch(setAdminPanelCurrentUserConcept(userConcept));
 
             /*
              * If an embedded query, don't fetch.
@@ -63,20 +79,20 @@ export const fetchAdminConceptIfNeeded = (concept: UiConcept) => {
                 /*
                 * Try to load from local cache.
                 */ 
-                let admConcept = adm.concepts.get(concept.id);
+                let admConcept = adm.concepts.get(userConcept.id);
 
                 /*
                 * If not previously loaded, fetch from server.
                 */ 
                 if (!admConcept) {
                     dispatch(setAdminPanelConceptLoadState(AdminPanelLoadState.LOADING));
-                    admConcept = await getConcept(state, concept.id);
+                    admConcept = await getAdminConcept(state, userConcept.id);
                 } 
                 
                 const sqlConfig = state.admin!.configuration.sql;
-                const sqlSet = state.admin!.sqlSets.sets.get(admConcept.sqlSetId)!;
-                const sql = generateSampleSql(admConcept, sqlSet, sqlConfig);
-                dispatch(setAdminConcept(admConcept, false));
+                const sqlSet = state.admin!.sqlSets.sets.get(admConcept!.sqlSetId)!;
+                const sql = generateSampleSql(admConcept!, sqlSet, sqlConfig);
+                dispatch(setAdminConcept(admConcept!, false));
                 dispatch(setAdminConceptExampleSql(sql));
             }
         } catch (err) {
@@ -131,10 +147,10 @@ export const loadAdminPanelDataIfNeeded = () => {
  * user is an admin and they are currently in the in 
  * Admin Panel.
  */
-export const handleAdminConceptClick = (newConcept: UiConcept) => {
+export const handleAdminConceptClick = (newConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        const { changed, currentConcept } = state.admin!.concepts
+        const { changed, currentAdminConcept } = state.admin!.concepts
         /*
          * If user is an admin and current route is Admin Panel, proceed.
          */
@@ -144,12 +160,18 @@ export const handleAdminConceptClick = (newConcept: UiConcept) => {
          * If there are changes and user is switching to new concept,
          * check to see if they want to save.
          */
-        if (changed && currentConcept!.id !== newConcept.id) {
+        if (changed && currentAdminConcept!.id !== newConcept.id) {
             const confirm: ConfirmationModalState = {
-                body: `Do you want to save changes to the current concept, "${currentConcept!.uiDisplayName}?"`,
+                body: `Do you want to save changes to the current concept, "${currentAdminConcept!.uiDisplayName}?"`,
                 header: 'Save Changes',
-                onClickNo: () => { dispatch(revertAdminConceptToOriginal()); dispatch(fetchAdminConceptIfNeeded(newConcept)); },
-                onClickYes: () => { dispatch(saveAdminConcept(currentConcept!, newConcept)) },
+                onClickNo: () => { 
+                    dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!)); 
+                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
+                },
+                onClickYes: () => { 
+                    dispatch(saveAdminConcept(currentAdminConcept!)); 
+                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
+                },
                 show: true,
                 noButtonText: `No`,
                 yesButtonText: `Yes, I'll Save Changes`
@@ -168,17 +190,17 @@ export const handleAdminConceptClick = (newConcept: UiConcept) => {
 /*
  * Save a new concept.
  */
-export const saveNewAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
+export const saveNewAdminConcept = (concept: Concept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
             dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
-            createConcept(state, concept)
+            createAdminConcept(state, concept)
                 .then(
                     response => {
                         dispatch(setNoClickModalState({ message: "Concept Saved", state: NoClickModalStates.Complete }));
                         dispatch(setAdminConcept(concept, false));
-                        dispatch(setConcept(uiConcept));
+                        dispatch(setConcept(userConcept));
                 },  error => {
                         dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
@@ -197,17 +219,17 @@ export const saveNewAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
 /*
  * Update an existing concept.
  */
-export const saveAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
+export const saveAdminConcept = (concept: Concept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
             dispatch(setNoClickModalState({ message: "Updating", state: NoClickModalStates.CallingServer }));
-            updateConcept(state, concept)
+            updateAdminConcept(state, concept)
                 .then(
                     response => {
                         dispatch(setNoClickModalState({ message: "Concept Updated", state: NoClickModalStates.Complete }));
                         dispatch(setAdminConcept(concept, false));
-                        dispatch(setConcept(uiConcept));
+                        dispatch(fetchSingleConcept(concept.id));
                 },  error => {
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to update the Concept. Please see the Leaf error logs for details.",
@@ -226,16 +248,16 @@ export const saveAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
 /*
  * Delete a existing concept.
  */
-export const deleteAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
+export const deleteAdminConceptFromServer = (concept: Concept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
             dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
-            deleteConcept(state, concept.id)
+            deleteAdminConcept(state, concept.id)
                 .then(
                     response => {
                         dispatch(setNoClickModalState({ message: "Concept Deleted", state: NoClickModalStates.Complete }));
-                        dispatch(removeConcept(uiConcept));
+                        dispatch(removeConcept(userConcept));
                 },  error => {
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.",
@@ -251,19 +273,39 @@ export const deleteAdminConcept = (concept: Concept, uiConcept: UiConcept) => {
     }
 };
 
+/*
+ * Handles switching between Admin Panel views. Prevents
+ * view pane changes if admin has unsaved Concept changes.
+ */
+export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelConceptEditorPane) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const admin = getState().admin!;
+        if (admin.concepts.changed || admin.sqlSets.changed) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        } else {
+            dispatch(setAdminPanelConceptEditorPane(pane));
+        }
+    };
+};
+
 // Synchronous
-export const setAdminConcept = (concept: Concept, changed: boolean): AdminConceptAction => {
+export const setAdminConcept = (adminConcept: AdminConcept, changed: boolean): AdminConceptAction => {
     return {
-        concept,
+        adminConcept,
         changed,
         type: SET_ADMIN_CONCEPT
     };
 };
 
-export const setAdminConceptOriginal = (uiConcept: UiConcept): AdminConceptAction => {
+export const setAdminPanelCurrentUserConcept = (userConcept: UserConcept): AdminConceptAction => {
     return {
-        uiConcept,
-        type: SET_ADMIN_CONCEPT_ORIGINAL
+        userConcept,
+        type: SET_ADMIN_PANEL_CURRENT_USER_CONCEPT
     };
 };
 
@@ -285,12 +327,6 @@ export const setAdminConceptExampleSql = (sql: string): AdminConceptAction => {
     return {
         sql,
         type: SET_ADMIN_CONCEPT_EXAMPLE_SQL
-    };
-};
-
-export const revertAdminConceptToOriginal = (): AdminConceptAction => {
-    return {
-        type: REVERT_ADMIN_CONCEPT_TO_ORIGINAL
     };
 };
 

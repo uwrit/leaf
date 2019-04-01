@@ -12,7 +12,7 @@ import { Concept } from '../../models/admin/Concept';
 /*
  * Gets a full Concept (including SQL).
  */ 
-export const getConcept = async (state: AppState, conceptId: string) => {
+export const getAdminConcept = async (state: AppState, conceptId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/concept/${conceptId}`);
@@ -22,7 +22,7 @@ export const getConcept = async (state: AppState, conceptId: string) => {
 /*
  * Updates an existing Concept.
  */ 
-export const updateConcept = async (state: AppState, concept: Concept) => {
+export const updateAdminConcept = async (state: AppState, concept: Concept) => {
 
     return;
     
@@ -35,7 +35,7 @@ export const updateConcept = async (state: AppState, concept: Concept) => {
 /*
  * Creates a new Concept.
  */ 
-export const createConcept = async (state: AppState, concept: Concept) => {
+export const createAdminConcept = async (state: AppState, concept: Concept) => {
 
     return;
 
@@ -47,7 +47,7 @@ export const createConcept = async (state: AppState, concept: Concept) => {
 /*
  * Deletes an existing Concept SQLSet.
  */ 
-export const deleteConcept = async (state: AppState, conceptId: string) => {
+export const deleteAdminConcept = async (state: AppState, conceptId: string) => {
 
     return;
 

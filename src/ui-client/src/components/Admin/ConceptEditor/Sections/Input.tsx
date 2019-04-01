@@ -9,11 +9,28 @@ import React from 'react';
 import { FormGroup, Input as BSInput, Label, FormText } from 'reactstrap';
 import { PropertyProps as Props } from '../Props';
 
-export class Input extends React.PureComponent<Props> {
+interface State {
+    valid: boolean;
+}
+
+export class Input extends React.PureComponent<Props,State> {
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            valid: true
+        }
+    }
+
     public render() {
         const { label, subLabel, locked, type, value, placeholder } = this.props;
+        const { valid } = this.state;
+        const classes = [ 'leaf-input' ];
         let t = type || 'string' as any;
         let val = value || '';
+
+        if (!valid) {
+            classes.push('error');
+        }
 
         return (
             <FormGroup>
@@ -24,7 +41,7 @@ export class Input extends React.PureComponent<Props> {
                     }
                 </Label>
                 <BSInput 
-                    className="leaf-input"
+                    className={classes.join(' ')}
                     onBlur={this.handleBlur}
                     onChange={this.handleChange}
                     onFocus={this.handleFocus}
@@ -38,8 +55,11 @@ export class Input extends React.PureComponent<Props> {
     }
 
     private handleBlur = () => {
-        const { focusToggle } = this.props;
+        const { focusToggle, required, value } = this.props;
         if (focusToggle) { focusToggle(false); }
+        if (required && !value) {
+            this.setState({ valid: false });
+        }
     }
 
     private handleFocus = () => {
@@ -48,8 +68,11 @@ export class Input extends React.PureComponent<Props> {
     }
 
     private handleChange = (e: React.FormEvent<HTMLInputElement>) => {
-        const { changeHandler, propName } = this.props;
+        const { changeHandler, propName, required } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);
+        if (required) {
+            this.setState({ valid: !!newVal });
+        }
     };
 };

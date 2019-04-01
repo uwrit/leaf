@@ -17,6 +17,7 @@ export interface ConceptSqlSetDTO {
 }
 
 export interface ConceptSqlSet extends ConceptSqlSetDTO {
+    changed?: boolean;
     specializationGroups: Map<number,SpecializationGroup>;
     unsaved?: boolean;
 }
@@ -29,11 +30,17 @@ export interface SpecializationGroupDTO {
 }
 
 export interface SpecializationGroup {
+    changed?: boolean;
     id: number;
     sqlSetId: number;
     specializations: Map<string,Specialization>;
     uiDefaultText: string;
     unsaved?: boolean;
+}
+
+export interface SpecializationGroupRelationship {
+    specializationGroupId: number
+    orderId?: number
 }
 
 export interface SpecializationDTO {
@@ -46,6 +53,7 @@ export interface SpecializationDTO {
 }
 
 export interface Specialization extends SpecializationDTO {
+    changed?: boolean;
     sqlSetId: number;
     unsaved?: boolean;
 }
@@ -67,7 +75,7 @@ export interface Concept {
 
     constraints: ConceptConstraint[];
 
-    specializationGroups: SpecializationGroup[];
+    specializationGroups: SpecializationGroupRelationship[];
 
     sqlSetId: number;
     sqlSetWhere?: string;

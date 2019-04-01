@@ -66,6 +66,24 @@
     color: rgb(245, 245, 245) !important;
 }
 
+.leaf-button-addnew {
+    background-color: rgb(13,195,106);
+    border: 1px solid rgb(13,195,106) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+.leaf-button-addnew:hover {
+    background-color: rgb(12, 168, 93) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
+.leaf-button-addnew:active {
+    background-color: rgb(11, 148, 82) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
+}
+
 .leaf-button:disabled {
     background-color: rgba(0, 0, 0, 0.2) !important;
     border: 1px solid transparent !important;

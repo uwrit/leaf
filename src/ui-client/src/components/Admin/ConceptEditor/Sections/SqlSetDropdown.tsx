@@ -11,7 +11,7 @@ import { PropertyProps } from '../Props';
 import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { setAdminPanelConceptEditorPane } from '../../../../actions/admin/concept';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 
 interface Props extends PropertyProps {
@@ -58,7 +58,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c} onFocus={this.handleFocus}>
                         <DropdownToggle>
                             {selected &&
-                                <div>{selected.sqlSetFrom} <FaChevronDown className={`${c}-dropdown-chevron`}/></div>
+                                <div>
+                                    {selected.sqlSetFrom.length > 30 ? (selected.sqlSetFrom.substr(0,30) + '...') : selected.sqlSetFrom} 
+                                    <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                                </div>
                             }
                         </DropdownToggle>
                         <DropdownMenu>
@@ -86,8 +89,11 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     }
 
     private handleManageSqlSetsClick = () => {
-        const { dispatch, toggleOverlay, toggleSqlPreview } = this.props;
-        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+        const { dispatch, focusToggle } = this.props;
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.SQL_SET));
+        if (focusToggle) {
+            focusToggle(false);
+        }
     }
 
     private toggle = () => {

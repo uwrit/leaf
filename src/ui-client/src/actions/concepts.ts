@@ -11,9 +11,8 @@ import { AppState, ConceptMap } from '../models/state/AppState';
 import { Concept } from '../models/concept/Concept';
 import { AggregateConceptHintRef } from '../models/concept/ConceptHint';
 import { PanelFilter } from '../models/panel/PanelFilter';
-import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, fetchConceptChildren, fetchRootConcepts } from '../services/conceptApi';
+import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, fetchConceptChildren, fetchRootConcepts, fetchConcept } from '../services/conceptApi';
 import { handleAdminConceptClick } from './admin/concept';
-import { sendSearch } from './conceptSearch';
 
 export const SET_CONCEPT = 'SET_CONCEPT';
 export const SET_CONCEPTS = 'SET_CONCEPTS';
@@ -22,6 +21,7 @@ export const SET_EXTENSION_CONCEPT = 'SET_EXTENSION_CONCEPT';
 export const SET_EXTENSION_CONCEPTS = 'SET_EXTENSION_CONCEPTS';
 export const SET_SEARCH_TREE = 'SET_SEARCH_TREE';
 export const SET_SELECTED_CONCEPT = 'SET_SELECTED_CONCEPT';
+export const REPARENT_CONCEPT = 'REPARENT_CONCEPT';
 export const REMOVE_CONCEPT = 'REMOVE_CONCEPT';
 export const MERGE_EXTENSION_CONCEPTS = 'MERGE_EXTENSION_CONCEPTS';
 export const REMOVE_EXTENSION_CONCEPT = 'REMOVE_EXTENSION_CONCEPT';
@@ -38,6 +38,7 @@ export interface ConceptsAction {
     children?: Concept[];
     concept?: Concept;
     concepts?: Concept[];
+    parentId?: string;
     error?: string;
     roots?: string[];
     tree?: number[];
@@ -122,6 +123,20 @@ export const fetchSearchTreeFromTerms = (term: string) => {
         } catch (err) {
             console.log(err);
             dispatch(setSearchTree([]));
+        }
+    };
+};
+
+/*
+ * Fetch a single concept.
+ */
+export const fetchSingleConcept = (id: string) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        try {
+            const response = await fetchConcept(getState(), id);
+            dispatch(setConcept(response.data));
+        } catch (err) {
+            console.log(err);
         }
     };
 };
@@ -249,4 +264,12 @@ export const removeConcept = (concept: Concept): ConceptsAction => {
         concept,
         type: REMOVE_CONCEPT
     };
+};
+
+export const reparentConcept = (concept: Concept, parentId: string): ConceptsAction  => {
+    return {
+        concept,
+        parentId,
+        type: REPARENT_CONCEPT
+    }
 };

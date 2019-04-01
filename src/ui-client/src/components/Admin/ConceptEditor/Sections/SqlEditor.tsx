@@ -14,7 +14,7 @@ import { SectionProps } from '../Props';
 import { SqlSetDropdown } from './SqlSetDropdown';
 
 interface Props {
-    data: SectionProps
+    data: SectionProps;
 }
 
 export class SqlEditor extends React.PureComponent<Props> {
@@ -23,21 +23,22 @@ export class SqlEditor extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { concept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch } = this.props.data;
+        const { data } = this.props;
+        const { adminConcept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch, changed } = data;
         return (
             <Section header='SQL'>
                 <SqlSetDropdown
-                    changeHandler={this.handleSqlUpdate} propName={'sqlSetId'} value={concept!.sqlSetId} sqlSets={sqlSets}
+                    changeHandler={this.handleSqlUpdate} propName={'sqlSetId'} value={adminConcept!.sqlSetId} sqlSets={sqlSets}
                     dispatch={dispatch} focusToggle={toggleSqlPreview} toggleOverlay={toggleOverlay} toggleSqlPreview={toggleSqlPreview}
                     label='Table, View, or Subquery'
                 />
                 <TextArea 
-                    changeHandler={this.handleSqlUpdate} propName={'sqlSetWhere'} value={concept!.sqlSetWhere}
+                    changeHandler={this.handleSqlUpdate} propName={'sqlSetWhere'} value={adminConcept!.sqlSetWhere}
                     focusToggle={toggleSqlPreview}
                     label='WHERE Clause'
                 />
                 <TextArea 
-                    changeHandler={this.handleSqlUpdate} propName={'sqlFieldNumeric'} value={concept!.sqlFieldNumeric} 
+                    changeHandler={this.handleSqlUpdate} propName={'sqlFieldNumeric'} value={adminConcept!.sqlFieldNumeric} 
                     focusToggle={toggleSqlPreview}
                     label='Numeric Field' subLabel='Used if filtered by a number'
                 />
@@ -46,11 +47,11 @@ export class SqlEditor extends React.PureComponent<Props> {
     }
 
     private handleSqlUpdate = (val: any, propName: string) => {
-        const { changeHandler, concept, sqlSets, sqlConfig, dispatch } = this.props.data;
+        const { changeHandler, adminConcept, sqlSets, sqlConfig, dispatch } = this.props.data;
         changeHandler(val, propName);
 
-        if (concept) {
-            const cpt = Object.assign({}, concept, { [propName]: val });
+        if (adminConcept) {
+            const cpt = Object.assign({}, adminConcept, { [propName]: val });
             const sql = generateSampleSql(cpt, sqlSets.get(cpt.sqlSetId)!, sqlConfig);
             dispatch(setAdminConceptExampleSql(sql));
         }

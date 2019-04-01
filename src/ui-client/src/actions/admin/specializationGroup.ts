@@ -10,14 +10,15 @@ import { SpecializationGroup } from "../../models/admin/Concept";
 import { getSpecializationGroups, updateSpecializationGroup, deleteSpecializationGroup, createSpecializationGroup } from "../../services/admin/specializationGroupApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { AdminPanelQueuedApiProcess } from "../../models/state/AdminState";
 
 export const SET_ADMIN_SPECIALIZATION_GROUPS = 'SET_ADMIN_SPECIALIZATION_GROUPS';
 export const REMOVE_ADMIN_SPECIALIZATION_GROUP = 'REMOVE_ADMIN_SPECIALIZATION_GROUP';
+export const SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED = 'SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED';
 
 export interface AdminSpecializationGroupAction {
     group?: SpecializationGroup;
     groups?: SpecializationGroup[];
+    prevGroup?: SpecializationGroup;
     type: string;
 }
 
@@ -26,17 +27,15 @@ export interface AdminSpecializationGroupAction {
  * Save or update a Specialization Group, depending on
  * if it is preexisting or new.
  */
-export const saveOrUpdateAdminConceptSpecializationGroup = (grp: SpecializationGroup): AdminPanelQueuedApiProcess => {
-    return async (dispatch: any, getState: () => AppState) => {
-        if (grp.unsaved) {
-            const newGrp = await updateSpecializationGroup(getState(), grp);
-            dispatch(removeAdminConceptSpecializationGroup(grp))
-            dispatch(setAdminConceptSpecializationGroup(newGrp));
-        } else {
-            const newGrp = await updateSpecializationGroup(getState(), grp);
-            dispatch(setAdminConceptSpecializationGroup(newGrp));
-        }
+export const saveOrUpdateAdminConceptSpecializationGroup = async (grp: SpecializationGroup, dispatch: any, state: AppState): Promise<SpecializationGroup> => {
+    let newGrp = null;
+    if (grp.unsaved) {
+        newGrp = await createSpecializationGroup(state, grp);
+    } else {
+        newGrp = await updateSpecializationGroup(state, grp);
     }
+    dispatch(syncAdminSpecializationGroupUnsavedWithSaved(grp, newGrp));
+    return newGrp;
 };
 
 /*
@@ -111,5 +110,13 @@ export const removeAdminConceptSpecializationGroup = (group: SpecializationGroup
     return {
         group,
         type: REMOVE_ADMIN_SPECIALIZATION_GROUP
+    };
+};
+
+export const syncAdminSpecializationGroupUnsavedWithSaved = (prevGroup: SpecializationGroup, group: SpecializationGroup): AdminSpecializationGroupAction => {
+    return {
+        prevGroup,
+        group,
+        type: SYNC_ADMIN_SPECIALIZATION_GROUP_UNSAVED_WITH_SAVED
     };
 };

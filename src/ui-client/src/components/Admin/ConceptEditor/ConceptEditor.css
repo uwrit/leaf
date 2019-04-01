@@ -62,10 +62,6 @@
     background-color: white;
 }
 
-.concept-editor-column-right-header .leaf-button-warning {
-    float: right;
-}
-
 /* Left Column */
 .concept-editor-column-left {
     padding-left: 0 !important;
@@ -238,4 +234,94 @@
     font-size: 0.9rem;
     float: right;
     margin-left: 8px;
+}
+
+/* Constraints */
+.concept-editor-constraints > p {
+    margin-bottom: -4px;
+}
+
+.concept-editor-constraints-container {
+    margin-top: 20px;
+}
+
+.concept-editor-constraint-dropdown > div {
+    display: inline-block;
+    padding: 0 4px;
+    width: 50%;
+}
+
+.concept-editor-constraint-dropdown > .dropdown {
+    width: 40%;
+}
+
+.concept-editor-constraint-dropdown > .dropdown > button {
+    margin-bottom: 20px;
+    text-align: center;
+    width: 100%;
+}
+
+.concept-editor-constraint-delete {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin: auto;
+    margin-top: 6px;
+    padding: 4px;
+    position: absolute;
+    text-align: center;
+    width: 10% !important;
+}
+
+.concept-editor-constraint-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+}
+
+.concept-editor-constraints .form-group {
+    margin-bottom: 0;
+}
+
+.concept-editor-constraints .leaf-input {
+    text-align: center;
+}
+
+.concept-editor-constraints label {
+    display: none;
+}
+
+.concept-editor-constraints-addnew {
+    color: rgb(13, 195, 106);
+    cursor: pointer;
+}
+
+.concept-editor-constraints-addnew:hover {
+    text-decoration: underline;
+}
+
+/* Specialization Dropdowns */
+.concept-editor-concept-specialization-dropdowns > p {
+    margin-bottom: -4px;
+}
+
+.concept-editor-concept-specialization-dropdown-container {
+    margin: 4px 0;
+}
+
+.concept-editor-concept-specialization-dropdown-preview {
+    border-radius: 3.5px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    display: inline-block;
+    margin: 20px;
+    text-align: left;
+}
+
+.concept-editor-concept-specialization-dropdown-default {
+    border-bottom: 1px solid rgb(233, 236, 239);
+    padding: 3.5px 21px;
+}
+
+.concept-editor-concept-specialization-dropdown-item {
+    padding: 3.5px 21px;
 }

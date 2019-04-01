@@ -12,14 +12,15 @@ import LoaderIcon from '../../../Other/LoaderIcon/LoaderIcon';
 import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
 import { Configuration } from '../Sections/Configuration';
-import { adminToNormalConcept } from '../../../../utils/admin';
-import { Concept } from '../../../../models/admin/Concept';
-import { setAdminConcept, revertAdminConceptToOriginal, saveAdminConcept, deleteAdminConcept } from '../../../../actions/admin/concept';
+import { Concept as AdminConcept } from '../../../../models/admin/Concept';
+import { setAdminConcept, saveAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges } from '../../../../actions/admin/concept';
 import { setConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../../actions/generalUi';
+import { Constraints } from '../Sections/Contraints';
+import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -32,12 +33,14 @@ export class MainEditor extends React.PureComponent<Props> {
     public render() {
         const { data, dispatch, togglePanelPreview, toggleSqlPreview, toggleOverlay } = this.props;
         const { configuration } = data;
-        const { changed, currentConcept, state } = data.concepts;
+        const { changed, currentAdminConcept, currentUserConcept, state } = data.concepts;
         const { sets } = data.sqlSets
         const c = this.className;
         const sectionProps: SectionProps = {
+            adminConcept: currentAdminConcept,
+            userConcept: currentUserConcept,
+            changed,
             changeHandler: this.handleInputChange,
-            concept: currentConcept,
             dispatch,
             sqlSets: sets,
             sqlConfig: configuration.sql,
@@ -50,17 +53,18 @@ export class MainEditor extends React.PureComponent<Props> {
             <div className={`${c}-main`}>
                 {showConceptStatus.has(state) &&
                             <div className={`${c}-column-right-header`}>
-                                <Button className='leaf-button leaf-button-secondary mr-auto' disabled={!changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
-                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChangesClick}>Save</Button>
-                                <Button className='leaf-button leaf-button-warning' disabled={!currentConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
+                                <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
+                                <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
+                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
+                                <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
                             </div>
                             }
-                {!currentConcept &&
+                {!currentAdminConcept &&
                     <div className={`${c}-na`}>
                     <p>Click on a Concept to the left to edit.</p>
                 </div>
                 }
-                {currentConcept && 
+                {currentAdminConcept && 
                 <div>
                     {this.getStatusDependentContent(state, c)}
                     {showConceptStatus.has(state) &&
@@ -68,10 +72,12 @@ export class MainEditor extends React.PureComponent<Props> {
                         <Col md={6} className={`${c}-inner-column-left`}>
                             <Display data={sectionProps}/>
                             <Configuration data={sectionProps}/>
+                            <SpecializationDropdowns data={sectionProps} set={sets.get(currentAdminConcept.sqlSetId)}/>
                         </Col>
                         <Col md={6} className={`${c}-inner-column-right`}>
                             <SqlEditor data={sectionProps} />
                             <Identifiers data={sectionProps} />
+                            <Constraints data={sectionProps}/>
                         </Col>
                     </Row>
                     }
@@ -108,41 +114,47 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     private handleInputChange = (val: string | number, propName: string) => {
-        const { currentConcept, uneditedUiConcept } = this.props.data.concepts;
+        const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
+        let newUserConcept = currentUserConcept!;
 
-        const newConcept = Object.assign({}, currentConcept, { [propName]: val }) as Concept;
-        const newUiConcept = adminToNormalConcept(newConcept, uneditedUiConcept! );
+        const newConcept = Object.assign({}, currentAdminConcept, { [propName]: val }) as AdminConcept;
+
+        if (newUserConcept![propName]) {
+            newUserConcept = Object.assign({}, newUserConcept, { [propName]: val })
+        }
 
         dispatch(setAdminConcept(newConcept, true));
-        dispatch(setConcept(newUiConcept));
+        dispatch(setConcept(newUserConcept));
     }
 
-    private handleUndoChangesClick = () => {
-        const { uneditedUiConcept } = this.props.data.concepts;
+    private handleUndoChanges = () => {
+        const { currentAdminConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
 
-        dispatch(revertAdminConceptToOriginal());
-        dispatch(setConcept(uneditedUiConcept!));
+        dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!));
     }
 
-    private handleSaveChangesClick = () => {
-        const { currentConcept, uneditedUiConcept } = this.props.data.concepts;
+    private handleSaveChanges = () => {
+        const { currentAdminConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-        const newUiConcept = adminToNormalConcept(currentConcept!, uneditedUiConcept! );
 
-        dispatch(saveAdminConcept(currentConcept!, newUiConcept));
+        dispatch(saveAdminConcept(currentAdminConcept!));
+    }
+
+    private handleAddConceptClick = () => {
+
     }
 
     private handleDeleteConceptClick = () => {
-        const { currentConcept, uneditedUiConcept } = this.props.data.concepts;
+        const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
 
         const confirm: ConfirmationModalState = {
-            body: `Are you sure you want to delete the Concept, "${currentConcept!.uiDisplayName}"? This can't be undone.`,
+            body: `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This can't be undone.`,
             header: 'Delete Concept',
             onClickNo: () => null,
-            onClickYes: () => { dispatch(deleteAdminConcept(currentConcept!, uneditedUiConcept!)) },
+            onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
             show: true,
             noButtonText: `No`,
             yesButtonText: `Yes, Delete Concept`

@@ -5,7 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept } from "../../../models/admin/Concept";
+import { Concept as AdminConcept } from "../../../models/admin/Concept";
+import { Concept as UserConcept } from "../../../models/concept/Concept";
 import { ConceptSqlSet } from "../../../models/admin/Concept";
 import { SqlConfiguration } from "../../../models/admin/Configuration";
 import AdminState from "../../../models/state/AdminState";
@@ -19,10 +20,12 @@ export interface EditorPaneProps {
 }
 
 export interface SectionProps {
+    adminConcept?: AdminConcept;
+    userConcept?: UserConcept;
+    changed: boolean;
     changeHandler: (val: any, propName: string) => any;
-    concept?: Concept;
     dispatch: any;
-    sqlSets: Map<number,ConceptSqlSet>;
+    sqlSets: Map<number, ConceptSqlSet>;
     sqlConfig: SqlConfiguration;
     toggleSqlPreview: (show: boolean) => any;
     togglePanelPreview: (show: boolean) => any;
@@ -36,6 +39,7 @@ export interface PropertyProps {
     focusToggle?: (show: boolean) => void;
     placeholder?: string;
     propName: string;
+    required?: boolean;
     subLabel?: string;
     type?: string;
     value?: any;

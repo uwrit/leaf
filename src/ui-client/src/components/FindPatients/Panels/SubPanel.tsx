@@ -20,16 +20,14 @@ import SubPanelDashBorder from './SubPanelDashBorder';
 import SubPanelHeader from './SubPanelHeader';
 
 interface Props {
-    panel: PanelModel,
-    subPanel: SubPanelModel,
-    index: number,
-    canDrop?: boolean,
-    isOver?: boolean,
-    connectDropTarget?: ConnectDropTarget
-    dispatch?: any
+    panel: PanelModel;
+    subPanel: SubPanelModel;
+    index: number;
+    canDrop?: boolean;
+    isOver?: boolean;
+    connectDropTarget?: ConnectDropTarget;
+    dispatch?: any;
 }
-
-interface State { }
 
 const panelTarget = {
     drop(props: Props, monitor: DropTargetMonitor) {
@@ -45,7 +43,7 @@ const collect = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
     isOver: monitor.isOver()
 });
 
-class SubPanel extends React.Component<Props, State> {
+class SubPanel extends React.Component<Props> {
     constructor(props: Props) {
         super(props);
     }

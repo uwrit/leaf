@@ -8,14 +8,13 @@
 import React from 'react';
 import { TextArea } from '../Sections/TextArea';
 import { SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
-import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
 import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { showConfirmationModal } from '../../../../actions/generalUi';
-import { setAdminConceptSpecialization, saveOrUpdateAdminSpecialization } from '../../../../actions/admin/specialization';
-import { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
+import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
+import { setAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { SpecializationDropdownOption } from './SpecializationDropdownOption';
 import { generate as generateId } from 'shortid';
-import { upsertAdminApiQueuedEvent, removeAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
+import { Row, Col, Container } from 'reactstrap';
 
 interface Props {
     changeHandler: (val: any, propName: string) => any;
@@ -34,11 +33,17 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     public render() {
         const { specializationGroup, dispatch } = this.props;
         const c = this.className;
+        const unsaved = specializationGroup.unsaved || specializationGroup.changed;
         const spcs: Specialization[] = [];
         specializationGroup.specializations.forEach((s) => spcs.push(s));
 
         return (
-            <div className={`${c}-specializationgroup-container`}>
+            <div className={`${c}-specializationgroup-container ${unsaved ? 'unsaved' : ''}`}>
+
+                {/* Unsaved notifier */}
+                {unsaved &&
+                <span className={`${c}-unsaved`}>unsaved</span>
+                }
                 
                 {/* Delete Group button */}
                 <div className={`${c}-specializationgroup-delete`}>
@@ -49,41 +54,38 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 <div className={`${c}-specializationgroup-default`}>
                     <TextArea 
                         changeHandler={this.handleSpecializationGroupEdit} propName={'uiDefaultText'} value={specializationGroup.uiDefaultText} 
-                        subLabel='Default Text'
+                        subLabel='Default Text' required={true}
                     />
                 </div>
 
+                {/* Specializations Header */}
+                <Container>
+                    <Row className={`${c}-specialization-header`}>
+                        <Col md={4}>UniversalId</Col>
+                        <Col md={4}>Text</Col>
+                        <Col md={4}>SQL WHERE</Col>
+                    </Row>
+                </Container>
+                
                 {/* Specializations */}
-                {spcs.map((s) => <SpecializationDropdownOption dispatch={dispatch} specialization={s} key={s.id} group={specializationGroup} />)}
-                <div className={`${c}-add-specialization`} onClick={this.handleAddSpecializationClick}>
-                    <span>+Add Dropdown Option</span>
+                {spcs.sort(this.sortSpecializations).map((s) => <SpecializationDropdownOption dispatch={dispatch} specialization={s} key={s.id} group={specializationGroup} />)}
+
+                {/* Add Specialization Button */}
+                <div className={`${c}-add-specialization-container`}>
+                    <div className={`${c}-add-specialization`} onClick={this.handleAddSpecializationClick}>
+                        <span>+Add Dropdown Option</span>
+                    </div>
                 </div>
             </div>
         );
     }
 
-    /*
-     * Create a queued event to upsert a specialization group on save.
-     */
-    private generateGroupQueuedApiEvent = (grp: SpecializationGroup): AdminPanelQueuedApiEvent => {
-        const { dispatch } = this.props;
-        return {
-            event: () => saveOrUpdateAdminConceptSpecializationGroup(grp),
-            id: grp.id,
-            objectType: AdminPanelUpdateObjectType.SPECIALIZATION_GROUP
-        };
-    }
-
-    /*
-     * Create a queued event to upsert a specialization on save.
-     */
-    private generateSpecializationQueuedApiEvent = (spc: Specialization): AdminPanelQueuedApiEvent => {
-        const { dispatch } = this.props;
-        return {
-            event: () => saveOrUpdateAdminSpecialization(spc),
-            id: spc.id,
-            objectType: AdminPanelUpdateObjectType.SPECIALIZATION
-        };
+    private sortSpecializations = (a: Specialization, b: Specialization): number => {
+        if (!a.orderId && !b.orderId) { return 1; }
+        if (a.orderId && !b.orderId)  { return 1; }
+        if (!a.orderId && b.orderId)  { return -1; }
+        if (a.orderId! >= b.orderId!) { return 1; }
+        return -1;
     }
 
     /*
@@ -92,10 +94,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
      */
     private handleSpecializationGroupEdit = (val: any, propName: string) => {
         const { dispatch, specializationGroup } = this.props;
-        const newGrp = Object.assign({}, specializationGroup, { [propName]: val });
-        const apiSaveEvent = this.generateGroupQueuedApiEvent(newGrp);
-
-        dispatch(upsertAdminApiQueuedEvent(apiSaveEvent));
+        const newGrp = Object.assign({}, specializationGroup, { [propName]: val === '' ? null : val, changed: true });
         dispatch(setAdminConceptSpecializationGroup(newGrp));
     }
 
@@ -107,6 +106,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
         const { specializationGroup, dispatch } = this.props;
         const newSpc: Specialization = {
             id: generateId(),
+            orderId: specializationGroup.specializations.size + 1,
             sqlSetId: specializationGroup.sqlSetId,
             specializationGroupId: specializationGroup.id,
             sqlSetWhere: '',
@@ -114,11 +114,6 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
             unsaved: true
         }
         dispatch(setAdminConceptSpecialization(newSpc, true));
-
-        if (!specializationGroup.unsaved) {
-            const apiSaveEvent = this.generateSpecializationQueuedApiEvent(newSpc);
-            dispatch(upsertAdminApiQueuedEvent(apiSaveEvent))
-        }
     }
 
     /*
@@ -130,7 +125,13 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
 
         if (specializationGroup.unsaved) {
             dispatch(removeAdminConceptSpecializationGroup(specializationGroup));
-            dispatch(removeAdminApiQueuedEvent(specializationGroup.id));
+        } else if (specializationGroup.specializations.size) {
+            const info: InformationModalState = {
+                body: "This Specialization Dropdown has dropdown options that depend on it. Please delete all dropdown options first.",
+                header: "Cannot Delete Dropdown",
+                show: true
+            };
+            dispatch(showInfoModal(info));
         } else {    
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete this dropdown (id "${specializationGroup.id}")? This can't be undone.`,

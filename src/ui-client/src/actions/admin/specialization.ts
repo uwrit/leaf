@@ -10,13 +10,14 @@ import { Specialization } from "../../models/admin/Concept";
 import { createSpecialization, updateSpecialization, deleteSpecialization } from "../../services/admin/specializationApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { AdminPanelQueuedApiProcess } from "../../models/state/AdminState";
 
 export const SET_ADMIN_SPECIALIZATIONS = 'SET_ADMIN_SPECIALIZATIONS';
 export const REMOVE_ADMIN_SPECIALIZATION = 'REMOVE_ADMIN_SPECIALIZATION';
+export const SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED = 'SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED';
 
 export interface AdminSpecializationAction {
     changed?: boolean;
+    prevSpc?: Specialization;
     spc?: Specialization;
     spcs?: Specialization[];
     type: string;
@@ -27,17 +28,16 @@ export interface AdminSpecializationAction {
  * Save or update a Concept Specialization, depending on
  * if it is preexisting or new.
  */
-export const saveOrUpdateAdminSpecialization = (spc: Specialization): AdminPanelQueuedApiProcess => {
-    return async (dispatch: any, getState: () => AppState) => {
-        if (spc.unsaved) {
-            const newSpc = await createSpecialization(getState(), spc);
-            dispatch(removeAdminConceptSpecialization(spc));
-            dispatch(setAdminConceptSpecialization(newSpc, false));
-        } else {
-            const newSpc = await updateSpecialization(getState(), spc);
-            dispatch(setAdminConceptSpecialization(newSpc, false));
-        }
+export const saveOrUpdateAdminSpecialization = async (spc: Specialization, dispatch: any, state: AppState): Promise<Specialization> => {
+    let newSpc = null;
+    if (spc.unsaved) {
+        newSpc = await createSpecialization(state, spc);
+        dispatch(removeAdminConceptSpecialization(spc));
+    } else {
+        newSpc = await updateSpecialization(state, spc);
     }
+    dispatch(setAdminConceptSpecialization(newSpc, false));
+    return newSpc;
 };
 
 /*
@@ -89,5 +89,13 @@ export const removeAdminConceptSpecialization = (spc: Specialization): AdminSpec
     return {
         spc,
         type: REMOVE_ADMIN_SPECIALIZATION
+    };
+};
+
+export const syncAdminSpecializationUnsavedWithSaved = (prevSpc: Specialization, spc: Specialization): AdminSpecializationAction => {
+    return {
+        prevSpc,
+        spc,
+        type: SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED
     };
 };

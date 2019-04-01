@@ -6,14 +6,14 @@
  */ 
 
 import React from 'react';
-import { Container, Row, Col, Button } from 'reactstrap';
+import { Container, Row, Col } from 'reactstrap';
 import ConceptColumnContainer from '../../../containers/FindPatients/ConceptColumnContainer';
 import AdminState, { AdminPanelConceptEditorPane } from '../../../models/state/AdminState';
 import { MainEditor } from './MainEditor/MainEditor';
-import './ConceptEditor.css';
 import { SqlPreview } from './Previews/SqlPreview/SqlPreview';
 import { PanelPreview } from './Previews/PanelPreview/PanelPreview';
 import { SqlSetEditor } from './SqlSetEditor/SqlSetEditor';
+import './ConceptEditor.css';
 
 interface Props { 
     data: AdminState;

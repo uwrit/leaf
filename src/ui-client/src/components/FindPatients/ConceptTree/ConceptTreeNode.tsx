@@ -6,29 +6,37 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd'
-import { GoPerson } from 'react-icons/go'
-import { MdAccessTime } from 'react-icons/md'
+import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor, DropTargetMonitor, ConnectDropTarget, DropTarget, DropTargetConnector } from 'react-dnd'
 import { Collapse } from 'reactstrap';
 import { ConceptMap } from '../../../models/state/AppState';
 import { Concept } from '../../../models/concept/Concept';
 import getDragPreview from '../../../utils/getDragPreview';
-import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon'
 import LearnMoreButton from './LearnMoreButton';
+import ConceptTreeNodeText from './ConceptTreeNodeText';
+import { handleConceptClick, fetchConceptChildrenIfNeeded } from '../../../actions/concepts';
+import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 
-interface Props {
+interface DndProps {
+    canDrop?: boolean;
+    connectDragSource?: ConnectDragSource;
+    connectDragPreview?: ConnectDragPreview;
+    connectDropTarget?: ConnectDropTarget;
+    isDragging?: boolean;
+    isDropped?: boolean;
+    isOver?: boolean;
+}
+
+interface OwnProps {
+    allowReparent: boolean;
     allowRerender: Set<string>;
     concept: Concept;
     concepts: ConceptMap;
-    onArrowClick: (c: Concept) => void;
-    onClick: (c: Concept) => void;
-    connectDragSource?: ConnectDragSource;
-    connectDragPreview?: ConnectDragPreview;
-    isDragging?: boolean;
-    isDropped?: boolean;
+    dispatch: any;
     parentShown: boolean;
     selectedId: string;
 }
+
+type Props = DndProps & OwnProps
 
 // Object to return to the connector when drag begins. This will
 // be sent to the panel on the drop() event.
@@ -38,7 +46,7 @@ const conceptNodeSource = {
     }
 }
 
-const collect = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
+const collectDrag = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
     return ({
         connectDragPreview: connect.dragPreview(),
         connectDragSource: connect.dragSource(),
@@ -63,25 +71,22 @@ class ConceptTreeNode extends React.PureComponent<Props> {
         }
     }
 
-    public render(): any {
-        const { allowRerender, concept, concepts, connectDragSource, onClick, onArrowClick, parentShown, selectedId } = this.props;
+    public render() {
+        const { 
+            allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId,
+            canDrop, connectDragSource, isOver
+        } = this.props;
         const c = 'concept-tree-node';
-        const arrowClasses = [ `${c}-arrow` ];
         const nodeTextClasses = [ `${c}-text` ];
+        const arrowClasses = [ `${c}-arrow` ];
         const mainClasses = [ c ];
-        const showCount = (concept.uiDisplayPatientCount === 0 || concept.uiDisplayPatientCount) && concept.uiDisplayPatientCount > -1 ? true : false;
-        const icon = concept.isEncounterBased 
-            ? <MdAccessTime className={`${c}-icon ${c}-icon-clock`} /> 
-            : <GoPerson className={`${c}-icon ${c}-icon-person`} />;
 
         if (concept.uiDisplayPatientCount === 0) { nodeTextClasses.push(`${c}-text-nopatients`); }
         if (concept.id === selectedId)           { mainClasses.push(`selected`); }
-        
-        // Set arrow state and display if parent
+
+        // Set arrow state
         if (concept.isParent) {
-            // Render an array of nested children concepts if showChildren is true
             if (concept.isOpen && concept.childrenIds) {
-                // Update arrow class to rotate if children are shown
                 arrowClasses.push(`${c}-arrow-expanded`);
             }
         } else {
@@ -93,60 +98,73 @@ class ConceptTreeNode extends React.PureComponent<Props> {
             connectDragSource(
                 <ul className={`${c}-wrapper`}>
                     <li>
-                        <div className={mainClasses.join(' ')} onClick={onClick.bind(null, concept)}>
+                        <div className={mainClasses.join(' ')} onMouseDown={this.handleClick}>
+
+                            {/* Drilldown arrow */}
                             <div className={`${c}-arrow-wrapper`}>
-                                {/* Drilldown arrow */}
                                 {!concept.isFetching &&
                                 <span
                                     className={arrowClasses.join(' ')}
-                                    onClick={onArrowClick.bind(null, concept)}
+                                    onClick={this.handleArrowClick}
                                 />
                                 }
+
                                 {/* Loader, shown when calling server */}
                                 {concept.isFetching &&
                                 <LoaderIcon />
                                 }
+
                             </div>
-                            {/* Concept name */}
-                            <div className={`${c}-text-wrapper`}>
-                                {icon}
-                                <span className={nodeTextClasses.join(' ')}>{concept.uiDisplayName}</span>
-                                {concept.uiDisplaySubtext &&
-                                <span className={`${c}-subtext`}>{concept.uiDisplaySubtext}</span>}
-                                {showCount && 
-                                <span className={`${c}-count`}>
-                                    <GoPerson className={`${c}-icon ${c}-icon-lgm`} />
-                                    {concept.uiDisplayPatientCount}
-                                </span>}
-                            </div>
+
+                            {/* Main Text */}
+                            <ConceptTreeNodeText
+                                allowReparent={allowReparent}
+                                concept={concept}
+                                dispatch={dispatch}
+                            />
+
+                            {/* Learn More */}
                             <LearnMoreButton concept={concept} />
                         </div>
+                        <div>
+
+                            {/* Collapse wrapper for children */}
+                            {concept.isParent && parentShown && (
+                                <Collapse 
+                                    isOpen={concept.isOpen} 
+                                    className={`${c}-child-container`}>
+                                    {concept.childrenIds && 
+                                    Array.from(concept.childrenIds).map((childId) => (
+                                        <ConceptTreeNodeContainer
+                                            key={childId}
+                                            allowReparent={allowReparent}
+                                            allowRerender={allowRerender}
+                                            concept={concepts.get(childId)!}
+                                            concepts={concepts}
+                                            dispatch={dispatch}
+                                            parentShown={concept.isOpen}
+                                            selectedId={selectedId}
+                                        />
+                                    ))}
+                                </Collapse>
+                            )}
+                        </div>
                     </li>
-                    {/* Collapse wrapper for children */}
-                    {concept.isParent && parentShown && (
-                        <Collapse 
-                            isOpen={concept.isOpen} 
-                            className={`${c}-child-container`}>
-                            {concept.childrenIds && 
-                            Array.from(concept.childrenIds).map((childId) => (
-                                <ConceptTreeNodeContainer 
-                                    key={childId}
-                                    allowRerender={allowRerender}
-                                    concept={concepts.get(childId)!}
-                                    concepts={concepts}
-                                    onClick={onClick}
-                                    onArrowClick={onArrowClick}
-                                    parentShown={concept.isOpen}
-                                    selectedId={selectedId}
-                                />
-                            ))}
-                        </Collapse>
-                    )}
                 </ul>
             )
         );
     }
+
+    private handleClick = () => {
+        const { dispatch, concept } = this.props;
+        dispatch(handleConceptClick(concept));
+    }
+
+    private handleArrowClick = () => {
+        const { dispatch, concept } = this.props;
+        dispatch(fetchConceptChildrenIfNeeded(concept));
+    }
 }
 
-const ConceptTreeNodeContainer = DragSource('CONCEPT', conceptNodeSource, collect)(ConceptTreeNode);
+const ConceptTreeNodeContainer = DragSource('CONCEPT', conceptNodeSource, collectDrag)(ConceptTreeNode);
 export default ConceptTreeNodeContainer;

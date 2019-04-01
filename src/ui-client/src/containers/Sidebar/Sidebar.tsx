@@ -8,14 +8,12 @@
 import React from 'react';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux'
-import { getDemographicsIfNeeded } from '../../actions/cohort/count';
-import { setRoute } from '../../actions/generalUi';
+import { handleSidebarTabClick } from '../../actions/generalUi';
 import { SidebarTab} from '../../components/Sidebar/SidebarTab';
 import { RouteConfig } from '../../config/routes';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { Routes } from '../../models/state/GeneralUiState';
-import { loadAdminPanelDataIfNeeded } from '../../actions/admin/concept';
 import './Sidebar.css';
 
 interface StateProps {
@@ -66,21 +64,8 @@ class Sidebar extends React.Component<Props> {
     }  
     
     private handleTabClick = (route: Routes) => {
-        const { cohortCountState, currentRoute, dispatch } = this.props;
-
-        if (route === currentRoute) {
-            return;
-        } else if (route === Routes.FindPatients) {
-            dispatch(setRoute(route));
-        } else if (route === Routes.AdminPanel) {
-            dispatch(setRoute(route));
-            dispatch(loadAdminPanelDataIfNeeded());
-        } else if (cohortCountState === CohortStateType.LOADED)  {
-            if (route === Routes.PatientList || route === Routes.Visualize) {
-                dispatch(getDemographicsIfNeeded());
-            }
-            dispatch(setRoute(route));
-        }
+        const { dispatch } = this.props;
+        dispatch(handleSidebarTabClick(route));
     }
 };
 

@@ -8,11 +8,11 @@
 import React from 'react';
 import { TextArea } from '../Sections/TextArea';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, saveOrUpdateAdminSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
+import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Specialization, SpecializationGroup } from '../../../../models/admin/Concept';
-import { AdminPanelQueuedApiEvent, AdminPanelUpdateObjectType } from '../../../../models/state/AdminState';
-import { upsertAdminApiQueuedEvent, removeAdminApiQueuedEvent } from '../../../../actions/admin/sqlSet';
+import { Row, Col, Container } from 'reactstrap';
+import { Input } from '../Sections/Input';
 
 interface Props {
     dispatch: any;
@@ -28,51 +28,52 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
     public render() {
         const { specialization } = this.props;
+        const unsaved = specialization.unsaved || specialization.changed;
         const c = this.className;
         return (
-            <div className={`${c}-specializationgroup-specialization`} key={specialization.id}>
+            <Container>
+                <Row className={`${c}-specializationgroup-specialization ${unsaved ? 'unsaved' : ''}`} key={specialization.id}>
 
-                {/* Text */}
-                <div className={`${c}-input-container left`}>
-                    <TextArea
-                        changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText} 
-                        subLabel='Text'
-                    />
-                </div>
+                    {/* Unsaved notifier */}
+                    {unsaved &&
+                    <span className={`${c}-unsaved`}>unsaved</span>
+                    }
 
-                {/* SQL */}
-                <div className={`${c}-input-container right`}>
+                    {/* UniversalId */}
+                    <Col className={`${c}-input-container`} md={4}>
 
-                    {/* Delete Specialization button */}
-                    <div className={`${c}-specializationgroup-delete`}>
-                        <span onClick={this.handleDeleteSpecializationClick}>Delete</span>
-                    </div>
-                    <TextArea
-                        changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere} 
-                        subLabel='SQL'    
-                    />
-                </div>
-            </div>
+                        <Input
+                            changeHandler={this.handleDropdownOptionEdit} propName={'universalId'} value={specialization.universalId}
+                        />
+                    </Col>
+
+                    {/* Text */}
+                    <Col className={`${c}-input-container`} md={4}>
+                        <TextArea
+                            changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText} required={true}
+                        />
+                    </Col>
+
+                    {/* SQL */}
+                    <Col className={`${c}-input-container`} md={4}>
+
+                        {/* Delete Specialization button */}
+                        <div className={`${c}-specializationgroup-delete`}>
+                            <span onClick={this.handleDeleteSpecializationClick}>Delete</span>
+                        </div>
+
+                        <TextArea
+                            changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere} required={true}
+                        />
+                    </Col>
+                </Row>
+            </Container>
         );
     }
 
     private handleDropdownOptionEdit = (val: any, propName: string) => {
-        const { dispatch, specialization, group } = this.props;
-        const newSpc = Object.assign({}, specialization, { [propName]: val });
-
-        /*
-         * If the parent Specialization Group is unsaved, this specialization 
-         * will be saved along with it. Else this specialization needs to be
-         * saved/updated in its own API call.
-         */
-        if (!group.unsaved) {
-            const apiSaveEvent: AdminPanelQueuedApiEvent = {
-                event: () => saveOrUpdateAdminSpecialization(newSpc),
-                id: newSpc.id,
-                objectType: AdminPanelUpdateObjectType.SPECIALIZATION
-            }
-            dispatch(upsertAdminApiQueuedEvent(apiSaveEvent))
-        }
+        const { dispatch, specialization } = this.props;
+        const newSpc = Object.assign({}, specialization, { [propName]: val === '' ? null : val, changed: true });
         dispatch(setAdminConceptSpecialization(newSpc, true));
     }
 
@@ -81,7 +82,6 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
         if (specialization.unsaved) {
             dispatch(removeAdminConceptSpecialization(specialization));
-            dispatch(removeAdminApiQueuedEvent(specialization.id));
         } else {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete this dropdown option (id "${specialization.id}")? This can't be undone.`,

@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { Dispatch } from 'redux';
-import { fetchConceptChildrenIfNeeded, handleConceptClick } from '../../../actions/concepts';
 import { ConceptMap } from '../../../models/state/AppState';
 import { Concept } from '../../../models/concept/Concept';
 import ConceptTreeNode from './ConceptTreeNode';
 import './ConceptTree.css';
 
 interface Props {
+    allowReparent: boolean;
     allowRerender: Set<string>;
     dispatch: Dispatch<any>
     roots: string[];
@@ -27,7 +27,7 @@ export default class ConceptTree extends React.Component<Props> {
     }
 
     public render() {
-        const { tree, allowRerender, selectedId } = this.props;
+        const { tree, allowReparent, allowRerender, dispatch, selectedId } = this.props;
         const roots = this.props.roots
             .map(id => tree.get(id)!)
             .sort((a: Concept, b: Concept) => a.uiDisplayName.localeCompare(b.uiDisplayName));
@@ -36,28 +36,18 @@ export default class ConceptTree extends React.Component<Props> {
             <div className="concept-tree">
                 {roots.map((concept: Concept) => (
                     <ConceptTreeNode 
+                        allowReparent={allowReparent}
                         allowRerender={allowRerender}
                         key={concept.id} 
                         concept={concept}
                         concepts={tree}
-                        onClick={this.handleClick}
-                        onArrowClick={this.handleArrowClick}
+                        dispatch={dispatch}
                         parentShown={true}
                         selectedId={selectedId} 
                     />
                 ))}
             </div>
         );
-    }
-
-    private handleClick = (concept: Concept) => {
-        const { dispatch } = this.props;
-        dispatch(handleConceptClick(concept));
-    }
-
-    private handleArrowClick = (concept: Concept) => {
-        const { dispatch } = this.props;
-        dispatch(fetchConceptChildrenIfNeeded(concept));
     }
 }
 

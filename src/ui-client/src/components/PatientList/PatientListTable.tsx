@@ -6,18 +6,14 @@
  */ 
 
 import React from 'react';
-import { FaChevronDown } from 'react-icons/fa';
-import { Collapse } from 'reactstrap';
 import { getCurrentPatientList } from '../../actions/cohort/patientList';
-import { togglePatientRowOpen } from '../../actions/cohort/patientList';
 import { PatientListState } from '../../models/state/CohortState';
 import { NetworkRespondentMap } from '../../models/NetworkRespondent';
-import EncounterDetailGroup from './EncounterDetailGroup';
-import Header from './Header';
-import Tuple from './Tuple';
 import { PatientListColumn } from '../../models/patientList/Column';
-import { PatientListRow, PatientListDetailEncounter } from '../../models/patientList/Patient';
+import { PatientListRow } from '../../models/patientList/Patient';
 import { PatientListSortType, PatientListSort } from '../../models/patientList/Configuration';
+import Header from './Header';
+import Row from './Row';
 import './PatientListTable.css';
 
 interface Props {
@@ -44,7 +40,7 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
     }
 
     public render() {
-        const { patientList, dispatch, className, respondents } = this.props;
+        const { patientList, dispatch, className } = this.props;
         const c = className ? className : 'patientlist';
         const sort = patientList.configuration.sort;
         const classes = [ `${c}-table-container`, (this.state.hidden ? 'hidden' : '') ];
@@ -62,17 +58,15 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
                             <td />
 
                             {/* Columns */}
-                            {cols.map((col: PatientListColumn) => {
-                                return (
-                                    <Header 
-                                        data={col}
-                                        dispatch={dispatch}
-                                        key={`${col.datasetId}_${col.id}`}
-                                        onClick={this.handleHeaderCellClick.bind(null, col.index)}
-                                        sort={sort} 
-                                    />
-                                )
-                            })}
+                            {cols.map((col: PatientListColumn) => (
+                                <Header 
+                                    data={col}
+                                    dispatch={dispatch}
+                                    key={`${col.datasetId}_${col.id}`}
+                                    onClick={this.handleHeaderCellClick.bind(null, col.index)}
+                                    sort={sort} 
+                                />
+                            ))}
                         </tr>
                     </thead>
 
@@ -80,43 +74,24 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
                     <tbody className={`${c}-body`}>
 
                         {/* Rows */}
-                        {patientList.display.map((r: PatientListRow, idx: number) => {
-                            const rowClass = `${c}-row ${idx % 2 === 0 ? 'even' : 'odd'}`;
-                            const openClass = r.isOpen ? 'open' : '';
-                            return ([
-                                (<tr 
-                                    key={r.compoundId} className={rowClass} onClick={this.handlePatientRowClick.bind(null, idx)}>
-                                    <td className={`${c}-tuple ${c}-detail-count ${openClass}`}>
-                                        View details ({r.detailRowCount ? r.detailRowCount : 0} rows)<FaChevronDown />
-                                    </td>
-                                    {r.values.map((v: any, i: number) => {
-                                        return <Tuple key={`${r.compoundId}_${cols[i].id}`} index={idx} type={cols[i].type} value={v}/>
-                                    })}
-                                </tr>),
-                                (<tr key={`${r.compoundId}_drilldown`} className={`${c}-row-drilldown ${openClass}`}>
-                                    <td colSpan={cols.length}>
-                                        <Collapse className={`${c}-tuple-detail-container`} isOpen={r.isOpen}>
-                                            {r.isOpen && r.detailValues.map((v: PatientListDetailEncounter) => {
-                                                return <EncounterDetailGroup key={v.encounterId} className={`${c}-tuple-detail`} data={v} />
-                                            })}
-                                        </Collapse>
-                                    </td>
-                                </tr>)
-                            ])
-                        })}
+                        {patientList.display.map((r: PatientListRow, idx: number) => (
+                            <Row 
+                                columns={cols}
+                                dispatch={dispatch}
+                                index={idx}
+                                row={r}
+                            />
+                        ))}
                     </tbody>
                 </table>
             </div>
         )
     }
 
-    private handlePatientRowClick = (idx: number) => {
-        this.props.dispatch(togglePatientRowOpen(idx));
-    }
-
     private handleHeaderCellClick = (idx: number) => {
-        const cols = this.props.patientList.configuration.displayColumns;
-        const pl = this.props.patientList;
+        const { dispatch, patientList } = this.props;
+        const cols = patientList.configuration.displayColumns;
+        const pl = patientList;
         const prevSortCol = pl.configuration.sort.column;
         const col = cols[idx];
 
@@ -133,6 +108,6 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
             sortType: newSortType
         };
         
-        this.props.dispatch(getCurrentPatientList(newSort));
+        dispatch(getCurrentPatientList(newSort));
     }
 }

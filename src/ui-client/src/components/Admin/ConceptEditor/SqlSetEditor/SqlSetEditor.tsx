@@ -6,15 +6,17 @@
  */ 
 
 import React from 'react';
-import { ConceptSqlSet, SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
+import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { Button, Container, Row, Col } from 'reactstrap';
-import { setAdminPanelConceptEditorPane, setAdminConceptExampleSql } from '../../../../actions/admin/concept';
+import { setAdminConceptExampleSql, checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
-import { generateSampleSql } from '../../../../utils/admin';
+import { generateSampleSql, conceptEditorValid } from '../../../../utils/admin';
 import { SqlSetRow } from './SqlSetRow';
 import './SqlSetEditor.css';
+import { InformationModalState } from '../../../../models/state/GeneralUiState';
+import { showInfoModal } from '../../../../actions/generalUi';
 
 export class SqlSetEditor extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
@@ -36,34 +38,48 @@ export class SqlSetEditor extends React.PureComponent<Props> {
         return (
             <div className={`${c}-container`}>
                 <div className={`${c}-toprow`}>
-                    <Button className='leaf-button leaf-button-primary' id={`${c}-add-sqlset`}>Create New SQL Set</Button>
-                    <Button className='leaf-button leaf-button-secondary mr-auto' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>+ Create New SQL Set</Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
                     <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
                     <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
                 </div>
                 <Container className={`${c}-table`}>
                     <Row className={`${c}-table-header`}>
-                        <Col md={1}>Id</Col>
                         <Col md={2}>Is Longitudinal</Col>
                         <Col md={5}>SQL FROM</Col>
-                        <Col md={4}>SQL Date Field</Col>
+                        <Col md={5}>SQL Date Field</Col>
                     </Row>
-                    {sets.map((s) => <SqlSetRow changeHandler={this.handleSqlSetChange(s)} set={s} dispatch={dispatch} key={s.id} state={data} />)}
+                    {sets
+                        .sort((a,b) => a.id > b.id ? 1 : -1)
+                        .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} />)
+                    }
                 </Container>
             </div>
         );
     }
 
-    private handleSqlSetChange = (set: ConceptSqlSet) => {
-        return (val: any, propName: string) => {
-            const { data, dispatch } = this.props;
-            const { concepts, sqlSets, configuration } = data;
-            const newSet = Object.assign({}, sqlSets.sets.get(set.id), { [propName]: val });
-            const sql = generateSampleSql(concepts.currentConcept!, newSet, configuration.sql);
-    
-            dispatch(setAdminConceptSqlSet(newSet, true));
-            dispatch(setAdminConceptExampleSql(sql));
+    private generateRandomIntegerId = () => {
+        const min = 1;
+        const max = 100000;
+        return Math.ceil(Math.random() * (max - min) + min);
+    }
+
+    /*
+     * Create a new Concept SQL Set, updating 
+     * the store and preparing a later API save event.
+     */
+    private handleAddSqlSetClick = () => {
+        const { dispatch } = this.props;
+        const newSet: ConceptSqlSet = {
+            id: this.generateRandomIntegerId(),
+            isEncounterBased: false,
+            isEventBased: false,
+            sqlFieldDate: '',
+            sqlSetFrom: '',
+            specializationGroups: new Map(),
+            unsaved: true
         }
+        dispatch(setAdminConceptSqlSet(newSet, true));
     }
 
     private handleUndoChangesClick = () => {
@@ -73,11 +89,21 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     private handleSaveChangesClick = () => {
         const { dispatch } = this.props;
-        dispatch(processApiUpdateQueue());
+        const valid = conceptEditorValid();
+        if (valid) {
+            dispatch(processApiUpdateQueue());
+        } else {
+            const info: InformationModalState = {
+                body: "One or more validation errors were found, and are highlighted in red below. Please fill in data for these before saving changes.",
+                header: "Validation Error",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        }
     }
 
     private handleBackToConceptEditorClick = () => {
         const { dispatch } = this.props;
-        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.MAIN))
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.MAIN));
     }
 };

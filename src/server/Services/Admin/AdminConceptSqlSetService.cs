@@ -45,7 +45,6 @@ namespace Services.Admin
                         Sql.Create,
                         new
                         {
-                            id = set.Id,
                             isEncounterBased = set.IsEncounterBased,
                             isEventBased = set.IsEventBased,
                             sqlSetFrom = set.SqlSetFrom,
