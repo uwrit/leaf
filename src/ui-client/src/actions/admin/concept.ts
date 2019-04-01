@@ -9,11 +9,11 @@ import { Concept } from '../../models/admin/Concept';
 import { Concept as UserConcept } from '../../models/concept/Concept';
 import { Concept as AdminConcept } from '../../models/admin/Concept';
 import { AppState } from '../../models/state/AppState';
-import { Routes, InformationModalState, NoClickModalStates, ConfirmationModalState } from '../../models/state/GeneralUiState';
+import { Routes, InformationModalState, NoClickModalStates } from '../../models/state/GeneralUiState';
 import { getAdminConcept, updateAdminConcept, createAdminConcept, deleteAdminConcept } from '../../services/admin/conceptApi';
 import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../models/state/AdminState';
-import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
+import { showInfoModal, setNoClickModalState } from '../generalUi';
 import { getSqlSets } from '../../services/admin/sqlSetApi';
 import { getAdminSqlConfiguration } from './configuration';
 import { generateSampleSql } from '../../utils/admin';
@@ -163,22 +163,12 @@ export const handleAdminConceptClick = (newConcept: UserConcept) => {
          * check to see if they want to save.
          */
         if (changed && currentAdminConcept!.id !== newConcept.id) {
-            const confirm: ConfirmationModalState = {
-                body: `Do you want to save changes to the current concept, "${currentAdminConcept!.uiDisplayName}?"`,
-                header: 'Save Changes',
-                onClickNo: () => { 
-                    dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!)); 
-                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
-                },
-                onClickYes: () => { 
-                    dispatch(saveAdminConcept(currentAdminConcept!)); 
-                    dispatch(fetchAdminConceptIfNeeded(newConcept)); 
-                },
-                show: true,
-                noButtonText: `No`,
-                yesButtonText: `Yes, I'll Save Changes`
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
             };
-            dispatch(showConfirmationModal(confirm));
+            dispatch(showInfoModal(info));
         } 
         /*
          * Else load the new concept.

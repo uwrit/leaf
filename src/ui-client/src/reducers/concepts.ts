@@ -72,8 +72,7 @@ const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsStat
         }
     }
     return Object.assign({}, addConcepts(state, updated), {
-        allowRerender: getAncestors(concept, state.currentTree),
-        selectedId: concept.id
+        allowRerender: getAncestors(concept, state.currentTree)
     })
 };
 

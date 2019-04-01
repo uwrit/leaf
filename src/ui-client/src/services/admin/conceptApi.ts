@@ -23,12 +23,9 @@ export const getAdminConcept = async (state: AppState, conceptId: string) => {
  * Updates an existing Concept.
  */ 
 export const updateAdminConcept = async (state: AppState, concept: Concept) => {
-
-    return;
-    
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/concept/${concept.id}`);
+    const resp = await http.put(`api/admin/concept/${concept.id}`, concept);
     return resp.data as Concept;
 };
 

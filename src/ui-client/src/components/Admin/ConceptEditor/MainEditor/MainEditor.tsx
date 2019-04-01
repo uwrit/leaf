@@ -159,7 +159,7 @@ export class MainEditor extends React.PureComponent<Props> {
             isRoot: true,
             isPatientCountAutoCalculated: true,
             isSpecializable: false,
-            uiDisplayName: '',
+            uiDisplayName: 'New Concept',
             uiDisplayText: '',
             uiDisplaySubtext: '',
             uiDisplayTooltip: '',

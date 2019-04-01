@@ -73,6 +73,7 @@ class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
             : <GoPerson className={`${c}-icon ${c}-icon-person`} />;
 
         if (concept.uiDisplayPatientCount === 0) { nodeTextClasses.push(`${c}-text-nopatients`); }
+        if (concept.unsaved)                     { nodeTextClasses.push(`${c}-text-unsaved`); }
     
         return (
             connectDropTarget &&

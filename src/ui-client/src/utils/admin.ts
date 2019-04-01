@@ -17,7 +17,9 @@ import { saveOrUpdateAdminSpecialization } from '../actions/admin/specialization
 const year = new Date().getFullYear();
 
 export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any): UserConcept => {
-    const alwaysAdd = new Set([ 'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 'uiDisplayName', 'uiDisplayText', 'isNumeric' ]);
+    const alwaysAdd = new Set([ 
+        'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 'uiDisplayName', 'uiDisplayText', 'isNumeric', 'isEncounterBased' 
+    ]);
     const out = Object.assign({}, userConcept);
 
     if (alwaysAdd.has(propName) || userConcept[propName] !== undefined) {

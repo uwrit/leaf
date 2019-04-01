@@ -27,7 +27,9 @@ namespace Services.Tables
 
         ConceptConstraintTable(Guid conceptId, IEnumerable<ConceptConstraint> cons)
         {
-
+            var table = Schema();
+            Fill(table, conceptId, cons);
+            Value = table;
         }
 
         DataTable Schema()
