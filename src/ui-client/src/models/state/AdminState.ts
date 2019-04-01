@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept, ConceptSqlSet } from '../admin/Concept';
-import { Concept as UiConcept } from '../concept/Concept';
+import { Concept as AdminConcept, ConceptSqlSet } from '../admin/Concept';
+import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
@@ -26,14 +26,13 @@ export enum AdminPanelConceptEditorPane {
 
 export interface AdminConceptState {
     changed: boolean;
-    concepts: Map<string,Concept>;
-    currentConcept?: Concept;
+    concepts: Map<string, AdminConcept>;
+    currentAdminConcept?: AdminConcept;
+    currentUserConcept?: UserConcept;
     pane: AdminPanelConceptEditorPane;
     examplePanel: Panel;
     exampleSql: string;
     state: AdminPanelLoadState;
-    uneditedAdminConcept?: Concept;
-    uneditedUiConcept?: UiConcept;
 }
 
 export interface AdminPanelSqlSetState {

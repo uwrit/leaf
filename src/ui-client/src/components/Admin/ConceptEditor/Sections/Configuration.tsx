@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { Section } from './Section';
-import { Concept } from '../../../../models/admin/Concept';
 import { Checkbox } from './Checkbox';
 import { SectionProps } from '../Props';
 import { Container } from 'reactstrap';
@@ -22,29 +21,29 @@ export class Configuration extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { changeHandler, concept, togglePanelPreview } = this.props.data;
+        const { changeHandler, adminConcept, togglePanelPreview } = this.props.data;
         return (
             <Section header='Configuration'>
                 <Container fluid={true}>
                     <Checkbox 
-                        changeHandler={changeHandler} propName={'isParent'} value={concept!.isParent} 
+                        changeHandler={changeHandler} propName={'isParent'} value={adminConcept!.isParent} 
                         label='Has Child Concepts'
                     />
                     <Checkbox 
-                        changeHandler={changeHandler} propName={'isRoot'} value={concept!.isRoot} 
+                        changeHandler={changeHandler} propName={'isRoot'} value={adminConcept!.isRoot} 
                         label='Is Root Concept'
                     />
                     <Checkbox 
-                        changeHandler={changeHandler} propName={'isNumeric'} value={concept!.isNumeric}
+                        changeHandler={changeHandler} propName={'isNumeric'} value={adminConcept!.isNumeric}
                         focusToggle={togglePanelPreview}
                         label='Is Numeric'
                     />
                     <Checkbox
-                        changeHandler={changeHandler} propName={'isPatientCountAutoCalculated'} value={concept!.isPatientCountAutoCalculated} 
+                        changeHandler={changeHandler} propName={'isPatientCountAutoCalculated'} value={adminConcept!.isPatientCountAutoCalculated} 
                         label='Auto-Calculate Patient Count'
                     />
                     <Checkbox 
-                        changeHandler={changeHandler} propName={'isSpecializable'} value={concept!.isSpecializable} 
+                        changeHandler={changeHandler} propName={'isSpecializable'} value={adminConcept!.isSpecializable} 
                         label='Allow Dropdowns'
                     />
                 </Container>

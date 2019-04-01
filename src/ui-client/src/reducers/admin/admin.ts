@@ -8,12 +8,11 @@
 import AdminState, { AdminPanelLoadState, AdminPanelConceptEditorPane } from "../../models/state/AdminState";
 import {
     SET_ADMIN_CONCEPT,
-    SET_ADMIN_CONCEPT_ORIGINAL,
+    SET_ADMIN_PANEL_CURRENT_USER_CONCEPT,
     AdminConceptAction,
     SET_ADMIN_PANEL_LOAD_STATE,
     SET_ADMIN_PANEL_CONCEPT_LOAD_STATE,
     SET_ADMIN_CONCEPT_EXAMPLE_SQL,
-    REVERT_ADMIN_CONCEPT_TO_ORIGINAL,
     SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE
 } from '../../actions/admin/concept';
 import {
@@ -37,7 +36,7 @@ import {
     SET_ADMIN_SQL_SETS_UNCHANGED,
     SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
-import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, revertAdminConceptToOriginal, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminUiConceptOriginal } from './concept';
+import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminCurrentUserConcept } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
@@ -95,16 +94,14 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
         // Concepts
         case SET_ADMIN_CONCEPT:
             return setAdminConcept(state, action);
-        case SET_ADMIN_CONCEPT_ORIGINAL:
-            return setAdminUiConceptOriginal(state, action);
+        case SET_ADMIN_PANEL_CURRENT_USER_CONCEPT:
+            return setAdminCurrentUserConcept(state, action);
         case SET_ADMIN_PANEL_LOAD_STATE:
             return setAdminPanelLoadState(state, action);
         case SET_ADMIN_PANEL_CONCEPT_LOAD_STATE:
             return setAdminPanelConceptLoadState(state, action);
         case SET_ADMIN_CONCEPT_EXAMPLE_SQL:
             return setExampleSql(state, action);
-        case REVERT_ADMIN_CONCEPT_TO_ORIGINAL:
-            return revertAdminConceptToOriginal(state, action);
         case REMOVE_CONCEPT:
             return deleteAdminConceptFromCache(state, action);
         case SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE:

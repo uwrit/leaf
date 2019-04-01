@@ -38,6 +38,11 @@ export interface SpecializationGroup {
     unsaved?: boolean;
 }
 
+export interface SpecializationGroupRelationship {
+    specializationGroupId: number
+    orderId?: number
+}
+
 export interface SpecializationDTO {
     id: string;
     specializationGroupId: number;
@@ -70,7 +75,7 @@ export interface Concept {
 
     constraints: ConceptConstraint[];
 
-    specializationGroups: SpecializationGroup[];
+    specializationGroups: SpecializationGroupRelationship[];
 
     sqlSetId: number;
     sqlSetWhere?: string;

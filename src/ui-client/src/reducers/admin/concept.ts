@@ -20,30 +20,31 @@ export const setAdminPanelConceptLoadState = (state: AdminState, action: AdminCo
 };
 
 export const setAdminConcept = (state: AdminState, action: AdminConceptAction) => {
-    const concept = action.concept!;
-    const newPanel = Object.assign({}, state.concepts.examplePanel);
-    const newPanelItem = Object.assign({}, newPanel.subPanels[0].panelItems[0], { concept });
+    const adminConcept = action.adminConcept!;
     const changed = action.changed;
-    newPanel.subPanels[0].panelItems[0] = newPanelItem;
-    state.concepts.concepts.set(concept.id, concept);
+    state.concepts.concepts.set(adminConcept.id, adminConcept);
 
     return Object.assign({}, state, { 
         concepts: { 
             ...state.concepts,
             changed,
-            examplePanel: newPanel,
-            currentConcept: concept,
-            uneditedAdminConcept: changed ? state.concepts.uneditedAdminConcept : concept,
+            currentAdminConcept: adminConcept,
             state: AdminPanelLoadState.LOADED
         }
     });
 };
 
-export const setAdminUiConceptOriginal = (state: AdminState, action: AdminConceptAction) => {
+export const setAdminCurrentUserConcept = (state: AdminState, action: AdminConceptAction) => {
+    const userConcept = action.userConcept!;
+    const newPanel = Object.assign({}, state.concepts.examplePanel);
+    const newPanelItem = Object.assign({}, newPanel.subPanels[0].panelItems[0], { concept: userConcept });
+    newPanel.subPanels[0].panelItems[0] = newPanelItem;
+
     return Object.assign({}, state, { 
         concepts: { 
             ...state.concepts,
-            uneditedUiConcept: action.uiConcept,
+            examplePanel: newPanel,
+            currentUserConcept: action.userConcept
         }
     });
 };
@@ -57,26 +58,13 @@ export const setExampleSql = (state: AdminState, action: AdminConceptAction) => 
     });
 }; 
 
-export const revertAdminConceptToOriginal = (state: AdminState, action: AdminConceptAction) => {
-    const orig = state.concepts.uneditedAdminConcept!;
-    state.concepts.concepts.set(orig.id, orig);
-
-    return Object.assign({}, state, {
-        concepts: { 
-            ...state.concepts,
-            changed: false,
-            currentConcept: orig
-        }
-    });
-};
-
 export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConceptAction) => {
-    state.concepts.concepts.delete(state.concepts.currentConcept!.id);
+    state.concepts.concepts.delete(state.concepts.currentAdminConcept!.id);
     return Object.assign({}, state, {
         concepts: { 
             ...state.concepts,
             changed: false,
-            currentConcept: undefined
+            currentAdminConcept: undefined
         }
     });
 };
