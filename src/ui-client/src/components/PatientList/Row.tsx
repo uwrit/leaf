@@ -44,11 +44,11 @@ export default class Row extends React.PureComponent<Props> {
             </tr>),
             (<tr key={`${row.compoundId}_drilldown`} className={`${c}-row-drilldown ${openClass}`}>
                 <td colSpan={columns.length}>
-                    <Collapse className={`${c}-tuple-detail-container`} isOpen={row.isOpen}>
+                    <div className={`${c}-tuple-detail-container`}>
                         {row.isOpen && row.detailValues.map((v: PatientListDetailEncounter) => {
                             return <EncounterDetailGroup key={v.encounterId} className={`${c}-tuple-detail`} data={v} />
                         })}
-                    </Collapse>
+                    </div>
                 </td>
             </tr>)
         ])
