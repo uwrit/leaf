@@ -170,7 +170,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryId,
-                    new { datasetid, queryid, user = user.UUID, groups = user.GetGroupMembership() },
+                    new { datasetid, queryid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -191,7 +191,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryUId,
-                    new { datasetid, queryuid, user = user.UUID, groups = user.GetGroupMembership() },
+                    new { datasetid, queryuid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -212,7 +212,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryId,
-                    new { datasetuid, queryid, user = user.UUID, groups = user.GetGroupMembership() },
+                    new { datasetuid, queryid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -233,7 +233,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryUId,
-                    new { datasetuid, queryuid, user = user.UUID, groups = user.GetGroupMembership() },
+                    new { datasetuid, queryuid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
