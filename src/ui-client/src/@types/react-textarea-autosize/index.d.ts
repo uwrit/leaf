@@ -19,6 +19,7 @@ declare module "react-textarea-autosize" {
         onBlur?: any;
         onChange?: any;
         onFocus?: any;
+        onKeyDown?: any;
         readOnly?: boolean;
         rows?: number;
         spellCheck?: boolean;

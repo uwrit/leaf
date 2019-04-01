@@ -23,6 +23,7 @@ import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { Concept as UserConcept } from '../../../../models/concept/Concept';
 import { generate as generateId } from 'shortid';
+import { adminToNormalConcept, updateUserConceptFromAdminChange } from '../../../../utils/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -121,15 +122,9 @@ export class MainEditor extends React.PureComponent<Props> {
     private handleInputChange = (val: any, propName: string) => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-        let newUserConcept: any = null;
 
         const newConcept = Object.assign({}, currentAdminConcept, { [propName]: val }) as AdminConcept;
-
-        if (currentUserConcept![propName] !== undefined) {
-            newUserConcept = Object.assign({}, currentUserConcept, { [propName]: val })
-        } else {
-            newUserConcept = Object.assign({}, currentUserConcept);
-        }
+        const newUserConcept = Object.assign({}, updateUserConceptFromAdminChange(currentUserConcept!, propName, val)) as UserConcept;
 
         dispatch(setAdminConcept(newConcept, true));
         dispatch(setAdminPanelCurrentUserConcept(newUserConcept));

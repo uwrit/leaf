@@ -130,6 +130,14 @@
     margin-top: 14px;
 }
 
+.concept-tree-learn-more-info > textarea {
+    border: none;
+    color: rgba(0,0,0,0.8);
+    pointer-events: none;
+    resize: none;
+    width: 100%;
+}
+
 .concept-tree-learn-more-info > p {
     margin-bottom: 2px;
 }

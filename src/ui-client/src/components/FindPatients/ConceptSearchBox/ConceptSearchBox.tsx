@@ -87,7 +87,9 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
                         </DropdownToggle>
                         <DropdownMenu>
                             {roots.map((id: string) => {
-                                const display = id === '' ? 'All Concepts' : drillTree.get(id)!.uiDisplayName;
+                                const root = drillTree.get(id);
+                                if (!root) { return null }
+                                const display = id === ''  ? 'All Concepts' : root.uiDisplayName;
                                 const classes = [ 'leaf-dropdown-item', (id === conceptsSearchState.rootId ? 'selected' : '') ]; 
                                 return (
                                     <DropdownItem  className={classes.join(' ')} key={id} onClick={this.handleRootDropdownSelect.bind(null, id)}>
@@ -269,7 +271,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
     }
 
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
-        const { conceptsSearchState, dispatch } = this.props;
+        const { conceptsSearchState } = this.props;
         const { selectedHintIndex } = this.state;
         const { term, currentHints } = conceptsSearchState;
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
