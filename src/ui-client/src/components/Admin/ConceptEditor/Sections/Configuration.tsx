@@ -30,10 +30,6 @@ export class Configuration extends React.PureComponent<Props> {
                         label='Has Child Concepts'
                     />
                     <Checkbox 
-                        changeHandler={changeHandler} propName={'isRoot'} value={adminConcept!.isRoot} 
-                        label='Is Root Concept'
-                    />
-                    <Checkbox 
                         changeHandler={changeHandler} propName={'isNumeric'} value={adminConcept!.isNumeric}
                         focusToggle={togglePanelPreview}
                         label='Is Numeric'

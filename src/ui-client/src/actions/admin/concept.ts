@@ -190,7 +190,7 @@ export const saveNewAdminConcept = (concept: Concept, userConcept: UserConcept) 
             createAdminConcept(state, concept)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Concept Saved", state: NoClickModalStates.Complete }));
+                        dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
                         dispatch(setAdminConcept(concept, false));
                         dispatch(setConcept(userConcept));
                 },  error => {
@@ -215,11 +215,11 @@ export const saveAdminConcept = (concept: Concept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
-            dispatch(setNoClickModalState({ message: "Updating", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
             updateAdminConcept(state, concept)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Concept Updated", state: NoClickModalStates.Complete }));
+                        dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
                         dispatch(setAdminConcept(concept, false));
                         dispatch(fetchSingleConcept(concept.id));
                 },  error => {

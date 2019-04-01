@@ -20,7 +20,7 @@ export const setAdminPanelConceptLoadState = (state: AdminState, action: AdminCo
 };
 
 export const setAdminConcept = (state: AdminState, action: AdminConceptAction): AdminState => {
-    const adminConcept = action.adminConcept!;
+    const adminConcept = Object.assign({}, action.adminConcept!, { isRoot: !action.adminConcept!.parentId });
     const changed = action.changed;
     state.concepts.concepts.set(adminConcept.id, adminConcept);
 
