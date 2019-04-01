@@ -67,7 +67,6 @@ export interface Concept {
     universalId?: string;
     
     isNumeric: boolean;
-    isEventBased: boolean;
     isParent: boolean;
     isRoot: boolean;
     isPatientCountAutoCalculated: boolean;
@@ -77,7 +76,7 @@ export interface Concept {
 
     specializationGroups: SpecializationGroupRelationship[];
 
-    sqlSetId: number;
+    sqlSetId?: number;
     sqlSetWhere?: string;
     sqlFieldNumeric?: string;
 

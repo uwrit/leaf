@@ -10,7 +10,7 @@ import { AdminConceptAction } from "../../actions/admin/concept";
 import { Panel } from "../../models/panel/Panel";
 import { DateIncrementType } from "../../models/panel/Date";
 
-export const setAdminPanelConceptLoadState = (state: AdminState, action: AdminConceptAction) => {
+export const setAdminPanelConceptLoadState = (state: AdminState, action: AdminConceptAction): AdminState => {
     return Object.assign({}, state, { 
         concepts: { 
             ...state.concepts,
@@ -19,7 +19,7 @@ export const setAdminPanelConceptLoadState = (state: AdminState, action: AdminCo
     });
 };
 
-export const setAdminConcept = (state: AdminState, action: AdminConceptAction) => {
+export const setAdminConcept = (state: AdminState, action: AdminConceptAction): AdminState => {
     const adminConcept = action.adminConcept!;
     const changed = action.changed;
     state.concepts.concepts.set(adminConcept.id, adminConcept);
@@ -34,7 +34,7 @@ export const setAdminConcept = (state: AdminState, action: AdminConceptAction) =
     });
 };
 
-export const setAdminCurrentUserConcept = (state: AdminState, action: AdminConceptAction) => {
+export const setAdminCurrentUserConcept = (state: AdminState, action: AdminConceptAction): AdminState => {
     const userConcept = action.userConcept!;
     const newPanel = Object.assign({}, state.concepts.examplePanel);
     const newPanelItem = Object.assign({}, newPanel.subPanels[0].panelItems[0], { concept: userConcept });
@@ -49,7 +49,7 @@ export const setAdminCurrentUserConcept = (state: AdminState, action: AdminConce
     });
 };
 
-export const setExampleSql = (state: AdminState, action: AdminConceptAction) => {
+export const setExampleSql = (state: AdminState, action: AdminConceptAction): AdminState => {
     return Object.assign({}, state, {
         concepts: { 
             ...state.concepts,
@@ -58,7 +58,7 @@ export const setExampleSql = (state: AdminState, action: AdminConceptAction) => 
     });
 }; 
 
-export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConceptAction) => {
+export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConceptAction): AdminState => {
     state.concepts.concepts.delete(state.concepts.currentAdminConcept!.id);
     return Object.assign({}, state, {
         concepts: { 
@@ -69,7 +69,7 @@ export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConc
     });
 };
 
-export const setAdminPanelConceptEditorPane = (state: AdminState, action: AdminConceptAction) => {
+export const setAdminPanelConceptEditorPane = (state: AdminState, action: AdminConceptAction): AdminState => {
     return Object.assign({}, state, {
         concepts: { 
             ...state.concepts,
@@ -77,6 +77,19 @@ export const setAdminPanelConceptEditorPane = (state: AdminState, action: AdminC
         }
     });
 }; 
+
+export const createAdminConcept = (state: AdminState,  action: AdminConceptAction): AdminState => {
+    const adminConcept = action.adminConcept!;
+    state.concepts.concepts.set(adminConcept.id, adminConcept);
+
+    return Object.assign({}, state, { 
+        concepts: { 
+            ...state.concepts,
+            changed: true,
+            currentAdminConcept: adminConcept
+        }
+    });
+};
 
 export const generateDummyPanel = (): Panel => {
     const panel: Panel = {

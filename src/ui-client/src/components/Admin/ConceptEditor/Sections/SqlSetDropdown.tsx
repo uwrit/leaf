@@ -44,6 +44,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
         const selected = sqlSets.get((value));
         const c = this.className;
         const sets: ConceptSqlSet[] = [];
+        const displayText = selected 
+            ? selected.sqlSetFrom.length > 30 ? (selected.sqlSetFrom.substr(0,30) + '...') : selected.sqlSetFrom
+            : 'No SQL Set Selected';
+
         sqlSets.forEach((s) => sets.push(s));
 
         return (
@@ -57,12 +61,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                 <div className={`${c}-dropdown`} ref={this.state.ref} onBlur={this.handleBlur} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c} onFocus={this.handleFocus}>
                         <DropdownToggle>
-                            {selected &&
-                                <div>
-                                    {selected.sqlSetFrom.length > 30 ? (selected.sqlSetFrom.substr(0,30) + '...') : selected.sqlSetFrom} 
-                                    <FaChevronDown className={`${c}-dropdown-chevron`}/>
-                                </div>
-                            }
+                            <div>
+                                {displayText} 
+                                <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                            </div>
                         </DropdownToggle>
                         <DropdownMenu>
                             {sets.map((s) => {

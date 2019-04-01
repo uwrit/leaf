@@ -73,7 +73,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
     private handleDropdownOptionEdit = (val: any, propName: string) => {
         const { dispatch, specialization } = this.props;
-        const newSpc = Object.assign({}, specialization, { [propName]: val === '' ? null : val, changed: true });
+        const newSpc = Object.assign({}, specialization, { [propName]: val, changed: true });
         dispatch(setAdminConceptSpecialization(newSpc, true));
     }
 

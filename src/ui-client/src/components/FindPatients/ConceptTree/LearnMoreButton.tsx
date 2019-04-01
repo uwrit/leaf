@@ -107,13 +107,14 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             {countsByYear && <div className={`${className}-separator-long`} />}
                             {concept.uiDisplayTooltip &&
                             <div className={`${className}-info`}>
-                                {concept.uiDisplayTooltip
+                                <textarea>{concept.uiDisplayText}</textarea>
+                                {/* concept.uiDisplayTooltip
                                     .split('\n')
                                     .map((item: string, i: number) => {
                                         const c = item.indexOf('\t') > -1 ? `${className}-info-tab` : '';
                                         return <p className={c} key={i}>{item}</p>
                                     })
-                                }
+                                */}
                             </div>
                             }
                             {!concept.uiDisplayTooltip &&

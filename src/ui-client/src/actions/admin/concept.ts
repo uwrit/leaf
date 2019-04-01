@@ -27,6 +27,7 @@ export const SET_ADMIN_PANEL_LOAD_STATE = 'SET_ADMIN_PANEL_LOAD_STATE';
 export const SET_ADMIN_PANEL_CONCEPT_LOAD_STATE = 'SET_ADMIN_PANEL_CONCEPT_LOAD_STATE';
 export const SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE = 'SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE';
 export const SET_ADMIN_PANEL_CURRENT_USER_CONCEPT = 'SET_ADMIN_PANEL_CURRENT_USER_CONCEPT';
+export const CREATE_ADMIN_CONCEPT = 'CREATE_ADMIN_CONCEPT';
 
 export interface AdminConceptAction {
     adminConcept?: AdminConcept;
@@ -90,7 +91,7 @@ export const fetchAdminConceptIfNeeded = (userConcept: UserConcept) => {
                 } 
                 
                 const sqlConfig = state.admin!.configuration.sql;
-                const sqlSet = state.admin!.sqlSets.sets.get(admConcept!.sqlSetId)!;
+                const sqlSet = state.admin!.sqlSets.sets.get(admConcept!.sqlSetId!)!;
                 const sql = generateSampleSql(admConcept!, sqlSet, sqlConfig);
                 dispatch(setAdminConcept(admConcept!, false));
                 dispatch(setAdminConceptExampleSql(sql));
@@ -334,5 +335,12 @@ export const setAdminPanelConceptEditorPane = (pane: AdminPanelConceptEditorPane
     return {
         pane,
         type: SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE
+    };
+};
+
+export const createNewAdminConcept = (adminConcept: AdminConcept): AdminConceptAction => {
+    return {
+        adminConcept,
+        type: CREATE_ADMIN_CONCEPT
     };
 };
