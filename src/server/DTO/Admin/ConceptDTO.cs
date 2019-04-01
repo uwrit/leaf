@@ -7,6 +7,7 @@ using System;
 using Model.Admin;
 using Model.Compiler;
 using System.Collections.Generic;
+using Model.Tagging;
 
 namespace DTO.Admin
 {
@@ -21,6 +22,7 @@ namespace DTO.Admin
         public int? SqlSetId { get; set; }
         public bool? IsNumeric { get; set; }
         public bool? IsParent { get; set; }
+        public bool? IsRoot { get; set; }
         public bool? IsPatientCountAutoCalculated { get; set; }
         public bool? IsSpecializable { get; set; }
         public string SqlSetWhere { get; set; }
@@ -54,6 +56,7 @@ namespace DTO.Admin
             SqlSetId = c.SqlSetId;
             IsNumeric = c.IsNumeric;
             IsParent = c.IsParent;
+            IsRoot = c.IsRoot;
             IsPatientCountAutoCalculated = c.IsPatientCountAutoCalculated;
             IsSpecializable = c.IsSpecializable;
             SqlSetWhere = c.SqlSetWhere;
@@ -68,6 +71,37 @@ namespace DTO.Admin
             UiNumericDefaultText = c.UiNumericDefaultText;
             Constraints = c.Constraints;
             SpecializationGroups = c.SpecializationGroups;
+        }
+
+        public Model.Admin.Concept Concept()
+        {
+            return new Model.Admin.Concept
+            {
+                Id = Id,
+                UniversalId = ConceptUrn.From(UniversalId),
+                ParentId = ParentId,
+                RootId = RootId,
+                ExternalId = ExternalId,
+                ExternalParentId = ExternalParentId,
+                SqlSetId = SqlSetId,
+                IsNumeric = IsNumeric,
+                IsParent = IsParent,
+                IsRoot = IsRoot,
+                IsPatientCountAutoCalculated = IsPatientCountAutoCalculated,
+                IsSpecializable = IsSpecializable,
+                SqlSetWhere = SqlSetWhere,
+                SqlFieldNumeric = SqlFieldNumeric,
+                UiDisplayName = UiDisplayName,
+                UiDisplayText = UiDisplayText,
+                UiDisplaySubtext = UiDisplaySubtext,
+                UiDisplayUnits = UiDisplayUnits,
+                UiDisplayTooltip = UiDisplayTooltip,
+                UiDisplayPatientCount = UiDisplayPatientCount,
+                UiDisplayPatientCountByYear = UiDisplayPatientCountByYear,
+                UiNumericDefaultText = UiNumericDefaultText,
+                Constraints = Constraints,
+                SpecializationGroups = SpecializationGroups,
+            };
         }
     }
 }

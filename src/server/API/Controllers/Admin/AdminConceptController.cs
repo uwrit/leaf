@@ -47,5 +47,30 @@ namespace API.Controllers.Admin
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Concept>> Update(Guid id, [FromBody] ConceptDTO o)
+        {
+            try
+            {
+                if (o == null)
+                {
+                    return BadRequest(CRUDError.From("Concept missing."));
+                }
+
+                var c = o.Concept();
+                var updated = await cService.Update(c);
+                return Ok(new ConceptDTO(updated));
+            }
+            catch (LeafDbException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Could not update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

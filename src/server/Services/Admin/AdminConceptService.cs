@@ -55,9 +55,63 @@ namespace Services.Admin
             }
         }
 
+        public async Task<Concept> Update(Concept c)
+        {
+            logger.LogInformation("Updating Concept. Concept:{@Concept}", c);
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                try
+                {
+                    var grid = await cn.QueryMultipleAsync(
+                        Sql.Update,
+                        new
+                        {
+                            id = c.Id,
+                            universalId = c.UniversalId?.ToString(),
+                            parentId = c.ParentId,
+                            rootId = c.RootId,
+                            externalId = c.ExternalId,
+                            externalParentId = c.ExternalParentId,
+                            isPatientCountAutoCalculated = c.IsPatientCountAutoCalculated,
+                            isNumeric = c.IsNumeric,
+                            isParent = c.IsParent,
+                            isRoot = c.IsRoot,
+                            isSpecializable = c.IsSpecializable,
+                            sqlSetId = c.SqlSetId,
+                            sqlSetWhere = c.SqlSetWhere,
+                            sqlFieldNumeric = c.SqlFieldNumeric,
+                            uiDisplayName = c.UiDisplayName,
+                            uiDisplayText = c.UiDisplayText,
+                            uiDisplaySubtext = c.UiDisplaySubtext,
+                            uiDisplayUnits = c.UiDisplayUnits,
+                            uiDisplayTooltip = c.UiDisplayTooltip,
+                            uiDisplayPatientCount = c.UiDisplayPatientCount,
+                            uiNumericDefaultText = c.UiNumericDefaultText,
+                            constraints = ConceptConstraintTable.From(c),
+                            specializationGroups = ConceptSpecializationGroupTable.From(c),
+                            user = user.UUID
+                        },
+                        commandType: CommandType.StoredProcedure,
+                        commandTimeout: opts.DefaultTimeout
+                    );
+
+                    return AdminConceptReader.Read(grid);
+                }
+                catch (SqlException se)
+                {
+                    logger.LogError("Could not update concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
+                    LeafDbException.ThrowFrom(se);
+                    throw;
+                }
+            }
+        }
+
         static class Sql
         {
             public const string Get = "adm.sp_GetConceptById";
+            public const string Update = "adm.sp_UpdateConcept";
         }
     }
 

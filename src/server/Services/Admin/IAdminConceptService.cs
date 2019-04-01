@@ -13,5 +13,6 @@ namespace Services.Admin
     public interface IAdminConceptService
     {
         Task<Concept> Get(Guid id);
+        Task<Concept> Update(Concept c);
     }
 }
