@@ -94,7 +94,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
      */
     private handleSpecializationGroupEdit = (val: any, propName: string) => {
         const { dispatch, specializationGroup } = this.props;
-        const newGrp = Object.assign({}, specializationGroup, { [propName]: val === '' ? null : val, changed: true });
+        const newGrp = Object.assign({}, specializationGroup, { [propName]: val, changed: true });
         dispatch(setAdminConceptSpecializationGroup(newGrp));
     }
 

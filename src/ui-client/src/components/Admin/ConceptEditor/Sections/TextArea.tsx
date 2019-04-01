@@ -8,7 +8,11 @@
 import React from 'react';
 import { FormGroup, Label, FormText } from 'reactstrap';
 import TextareaAutosize from 'react-textarea-autosize'
-import { PropertyProps as Props } from '../Props';
+import { PropertyProps } from '../Props';
+
+interface Props extends PropertyProps {
+    overrideTabKeyDown?: boolean;
+}
 
 interface State {
     valid: boolean;
@@ -48,6 +52,7 @@ export class TextArea extends React.PureComponent<Props,State> {
                         onBlur={this.handleBlur}
                         onChange={this.handleChange}
                         onFocus={this.handleFocus}
+                        onKeyDown={this.handleKeydown}
                         readOnly={locked}
                         spellCheck={false}
                         value={val}
@@ -55,6 +60,15 @@ export class TextArea extends React.PureComponent<Props,State> {
                 </div>
             </FormGroup>
         );
+    }
+
+    private handleKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
+        const { changeHandler, propName, value, overrideTabKeyDown } = this.props;
+        if (k.key !== 'Tab' || !overrideTabKeyDown) { return; }
+        k.preventDefault();
+        const tabbed = '    ';
+        const newVal = value ? value + tabbed : tabbed;
+        changeHandler(newVal, propName);
     }
 
     private handleBlur = () => {

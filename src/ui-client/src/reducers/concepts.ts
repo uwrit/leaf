@@ -22,7 +22,8 @@ import {
     REMOVE_EXTENSION_CONCEPT,
     SHOW_DRILL_TREE,
     TOGGLE_CONCEPT_OPEN,
-    REMOVE_CONCEPT
+    REMOVE_CONCEPT,
+    CREATE_CONCEPT
 } from '../actions/concepts';
 import { ConceptsAction } from '../actions/concepts';
 import { ConceptMap, ConceptsState } from '../models/state/AppState';
@@ -227,6 +228,16 @@ const setSelectedConcept = (state: ConceptsState, concept: Concept): ConceptsSta
     return Object.assign({}, state, { selectedId: concept.id });
 };
 
+const createConcept = (state: ConceptsState, concept: Concept): ConceptsState => {
+    state.currentTree.set(concept.id, concept);
+    return Object.assign({}, state, { 
+        currentTree: new Map(state.currentTree),
+        roots: !concept.parentId 
+            ? [ concept.id ].concat(state.roots) 
+            : state.roots
+    });
+};
+
 const removeConcept = (state: ConceptsState, concept: Concept): ConceptsState => {
 
     // Delete concept directly
@@ -252,16 +263,16 @@ const removeConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
 };
 
 const reparentConcept = (state: ConceptsState, concept: Concept, parentId: string): ConceptsState => {
-
     const newConcept = Object.assign({}, concept, { parentId });
     const newParent = Object.assign({}, state.currentTree.get(parentId), { isParent: true });
     const oldParent = Object.assign({}, state.currentTree.get(concept.parentId!));
-    oldParent.isParent = oldParent.childrenIds!.size > 0;
 
-    if (oldParent.childrenIds) {
-        oldParent.childrenIds!.delete(concept.id);
+    if (oldParent.isParent) {
+        oldParent.isParent = oldParent.childrenIds!.size > 0;
+        if (oldParent.childrenIds) {
+            oldParent.childrenIds!.delete(concept.id);
+        }
     }
-    
     if (newParent.childrenIds) {
         newParent.childrenIds!.add(concept.id);
     } else {
@@ -277,10 +288,13 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
         state.searchTree.set(newParent.id, newParent);
         state.searchTree.set(newConcept.id, newConcept);
     }
-    
+
     return Object.assign({}, state, {
         currentTree: new Map(state.currentTree),
-        searchTree: new Map(state.searchTree)
+        searchTree: new Map(state.searchTree),
+        roots: newConcept.parentId 
+            ? state.roots.slice().filter((r) => r !== concept.id) 
+            : state.roots
     });
 };
 
@@ -317,6 +331,8 @@ export const concepts = (state: ConceptsState = defaultConceptsState(), action: 
             return removeConcept(state, action.concept!);
         case REPARENT_CONCEPT:
             return reparentConcept(state, action.concept!, action.parentId!);
+        case CREATE_CONCEPT:
+            return createConcept(state, action.concept!);
         case ERROR_CONCEPTS:
         default:
             return state;

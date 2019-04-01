@@ -13,14 +13,17 @@ import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
 import { Configuration } from '../Sections/Configuration';
 import { Concept as AdminConcept } from '../../../../models/admin/Concept';
-import { setAdminConcept, saveAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges } from '../../../../actions/admin/concept';
-import { setConcept } from '../../../../actions/concepts';
+import { setAdminConcept, saveAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, createNewAdminConcept, setAdminPanelCurrentUserConcept } from '../../../../actions/admin/concept';
+import { setConcept, createConcept, setSelectedConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
+import { Concept as UserConcept } from '../../../../models/concept/Concept';
+import { generate as generateId } from 'shortid';
+import { updateUserConceptFromAdminChange } from '../../../../utils/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -51,14 +54,17 @@ export class MainEditor extends React.PureComponent<Props> {
 
         return (
             <div className={`${c}-main`}>
-                {showConceptStatus.has(state) &&
-                            <div className={`${c}-column-right-header`}>
-                                <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
-                                <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
-                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                                <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
-                            </div>
-                            }
+                <div className={`${c}-column-right-header`}>
+                    <Button className='leaf-button leaf-button-addnew' disabled={currentAdminConcept && currentAdminConcept.unsaved} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
+
+                    {showConceptStatus.has(state) &&
+                    [
+                    <Button key={1} className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>,
+                    <Button key={2} className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>,
+                    <Button key={3}className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
+                    ]
+                    }
+                </div>
                 {!currentAdminConcept &&
                     <div className={`${c}-na`}>
                     <p>Click on a Concept to the left to edit.</p>
@@ -72,7 +78,7 @@ export class MainEditor extends React.PureComponent<Props> {
                         <Col md={6} className={`${c}-inner-column-left`}>
                             <Display data={sectionProps}/>
                             <Configuration data={sectionProps}/>
-                            <SpecializationDropdowns data={sectionProps} set={sets.get(currentAdminConcept.sqlSetId)}/>
+                            <SpecializationDropdowns data={sectionProps} set={sets.get(currentAdminConcept.sqlSetId!)}/>
                         </Col>
                         <Col md={6} className={`${c}-inner-column-right`}>
                             <SqlEditor data={sectionProps} />
@@ -113,18 +119,15 @@ export class MainEditor extends React.PureComponent<Props> {
         return null;
     }
 
-    private handleInputChange = (val: string | number, propName: string) => {
+    private handleInputChange = (val: any, propName: string) => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-        let newUserConcept = currentUserConcept!;
 
         const newConcept = Object.assign({}, currentAdminConcept, { [propName]: val }) as AdminConcept;
-
-        if (newUserConcept![propName]) {
-            newUserConcept = Object.assign({}, newUserConcept, { [propName]: val })
-        }
+        const newUserConcept = Object.assign({}, updateUserConceptFromAdminChange(currentUserConcept!, propName, val)) as UserConcept;
 
         dispatch(setAdminConcept(newConcept, true));
+        dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
         dispatch(setConcept(newUserConcept));
     }
 
@@ -143,7 +146,50 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     private handleAddConceptClick = () => {
+        const { dispatch } = this.props;
+        const { sets } = this.props.data.sqlSets;
+        const defaultSet = sets.size ? sets.get(sets.keys[0]) : undefined;
+        const id = generateId();
 
+        const baseProps = {
+            id,
+            rootId: id,
+            isNumeric: false,
+            isParent: false,
+            isRoot: true,
+            isPatientCountAutoCalculated: true,
+            isSpecializable: false,
+            uiDisplayName: '',
+            uiDisplayText: '',
+            uiDisplaySubtext: '',
+            uiDisplayTooltip: '',
+            universalId: '',
+            unsaved: true
+        };
+        const newAdminConcept: AdminConcept = {
+            ...baseProps,
+            constraints: [],
+            specializationGroups: []
+        };
+        const newUserConcept: UserConcept = {
+            ...baseProps,
+            childrenLoaded: false,
+            isEncounterBased: false,
+            isEventBased: false,
+            isFetching: false,
+            isOpen: false
+        };
+
+        if (defaultSet) {
+            newAdminConcept.sqlSetId = defaultSet.id;
+            newUserConcept.isEncounterBased = defaultSet.isEncounterBased;
+            newUserConcept.isEventBased = defaultSet.isEventBased;
+        }
+
+        dispatch(createConcept(newUserConcept));
+        dispatch(setSelectedConcept(newUserConcept));
+        dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
+        dispatch(setAdminConcept(newAdminConcept, true));
     }
 
     private handleDeleteConceptClick = () => {

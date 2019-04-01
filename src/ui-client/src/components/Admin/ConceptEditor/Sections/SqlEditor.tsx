@@ -52,7 +52,7 @@ export class SqlEditor extends React.PureComponent<Props> {
 
         if (adminConcept) {
             const cpt = Object.assign({}, adminConcept, { [propName]: val });
-            const sql = generateSampleSql(cpt, sqlSets.get(cpt.sqlSetId)!, sqlConfig);
+            const sql = generateSampleSql(cpt, sqlSets.get(cpt.sqlSetId!)!, sqlConfig);
             dispatch(setAdminConceptExampleSql(sql));
         }
     }

@@ -21,6 +21,7 @@ export const SET_EXTENSION_CONCEPT = 'SET_EXTENSION_CONCEPT';
 export const SET_EXTENSION_CONCEPTS = 'SET_EXTENSION_CONCEPTS';
 export const SET_SEARCH_TREE = 'SET_SEARCH_TREE';
 export const SET_SELECTED_CONCEPT = 'SET_SELECTED_CONCEPT';
+export const CREATE_CONCEPT = 'CREATE_CONCEPT';
 export const REPARENT_CONCEPT = 'REPARENT_CONCEPT';
 export const REMOVE_CONCEPT = 'REMOVE_CONCEPT';
 export const MERGE_EXTENSION_CONCEPTS = 'MERGE_EXTENSION_CONCEPTS';
@@ -271,5 +272,12 @@ export const reparentConcept = (concept: Concept, parentId: string): ConceptsAct
         concept,
         parentId,
         type: REPARENT_CONCEPT
+    }
+};
+
+export const createConcept = (concept: Concept): ConceptsAction  => {
+    return {
+        concept,
+        type: CREATE_CONCEPT
     }
 };

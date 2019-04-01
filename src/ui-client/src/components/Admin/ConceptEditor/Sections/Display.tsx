@@ -38,7 +38,7 @@ export class Display extends React.PureComponent<Props> {
                     label='Full Text' subLabel='Descriptive text shown when dragged in query'
                 />
                 <TextArea 
-                    changeHandler={changeHandler} propName={'uiDisplayTooltip'} value={adminConcept!.uiDisplayTooltip}
+                    changeHandler={changeHandler} propName={'uiDisplayTooltip'} value={adminConcept!.uiDisplayTooltip} overrideTabKeyDown={true}
                     label='Tooltip' subLabel={`Displayed on the bottom when user clicks 'Learn More'`}
                 />
                 <Input 

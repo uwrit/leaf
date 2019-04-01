@@ -12,6 +12,8 @@ import { Concept, PatientCountPerYear } from '../../../models/concept/Concept';
 import { formatLargeNumber, formatSmallNumber } from '../../../utils/formatNumber';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import './LearnMoreButton.css';
+import { TextArea } from '../../Admin/ConceptEditor/Sections/TextArea';
+import TextareaAutosize from 'react-textarea-autosize';
 
 interface Props {
     concept: Concept;
@@ -107,13 +109,11 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             {countsByYear && <div className={`${className}-separator-long`} />}
                             {concept.uiDisplayTooltip &&
                             <div className={`${className}-info`}>
-                                {concept.uiDisplayTooltip
-                                    .split('\n')
-                                    .map((item: string, i: number) => {
-                                        const c = item.indexOf('\t') > -1 ? `${className}-info-tab` : '';
-                                        return <p className={c} key={i}>{item}</p>
-                                    })
-                                }
+                                <TextareaAutosize
+                                    readOnly={true}
+                                    spellCheck={false}
+                                    value={concept.uiDisplayTooltip}>
+                                </TextareaAutosize>
                             </div>
                             }
                             {!concept.uiDisplayTooltip &&
