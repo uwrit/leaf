@@ -229,6 +229,17 @@ const setSelectedConcept = (state: ConceptsState, concept: Concept): ConceptsSta
 
 const createConcept = (state: ConceptsState, concept: Concept): ConceptsState => {
     state.currentTree.set(concept.id, concept);
+
+    if (concept.parentId) {
+        const parent = state.currentTree.get(concept.parentId);
+        if (parent) {
+            const childrenIds = parent.childrenIds 
+                ? new Set<string>([ ...parent.childrenIds, concept.id ])
+                : new Set<string>([ concept.id ]);
+            state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true }));
+        }
+    }
+
     return Object.assign({}, state, { 
         currentTree: new Map(state.currentTree),
         roots: !concept.parentId 
@@ -267,9 +278,9 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
     const oldParent = Object.assign({}, state.currentTree.get(concept.parentId!));
 
     if (oldParent.isParent) {
-        oldParent.isParent = oldParent.childrenIds!.size > 0;
         if (oldParent.childrenIds) {
             oldParent.childrenIds!.delete(concept.id);
+            oldParent.isParent = oldParent.childrenIds!.size > 0;
         }
     }
     if (newParent.childrenIds) {
@@ -277,6 +288,7 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
     } else {
         newParent.childrenIds = new Set([ concept.id ]);
     }
+    newConcept.rootId = newParent.rootId;
 
     state.currentTree.set(oldParent.id, oldParent);
     state.currentTree.set(newParent.id, newParent);
@@ -291,9 +303,7 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
     return Object.assign({}, state, {
         currentTree: new Map(state.currentTree),
         searchTree: new Map(state.searchTree),
-        roots: newConcept.parentId 
-            ? state.roots.slice().filter((r) => r !== concept.id) 
-            : state.roots
+        roots: state.roots.slice().filter((r) => r !== concept.id)
     });
 };
 

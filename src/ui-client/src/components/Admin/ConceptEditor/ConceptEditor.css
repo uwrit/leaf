@@ -91,6 +91,11 @@
     margin-top: 0;
 }
 
+.concept-editor .required {
+    color: rgba(221, 41, 28, 0.699);
+    margin-left: 4px;
+}
+
 /* Loading icon */
 .concept-editor-loading {
     height: 100%;
@@ -172,6 +177,10 @@
     margin-bottom: 0;
 }
 
+.concept-editor-column-right .leaf-input {
+    font-size: 1.1rem;
+}
+
 .concept-editor-column-right text-area.leaf-input {
     margin-top: 6px !important;
 }
@@ -203,7 +212,7 @@
     border: none;
     color: rgb(28, 168, 221) !important;
     font-family: Roboto;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     text-align: left;
     width: 100%;
 }

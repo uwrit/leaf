@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor, DropTargetMonitor, ConnectDropTarget, DropTarget, DropTargetConnector } from 'react-dnd'
+import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor, ConnectDropTarget } from 'react-dnd'
 import { Collapse } from 'reactstrap';
 import { ConceptMap } from '../../../models/state/AppState';
 import { Concept } from '../../../models/concept/Concept';
@@ -15,7 +15,6 @@ import LearnMoreButton from './LearnMoreButton';
 import ConceptTreeNodeText from './ConceptTreeNodeText';
 import { handleConceptClick, fetchConceptChildrenIfNeeded } from '../../../actions/concepts';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
-import { findDOMNode } from 'react-dom';
 
 interface DndProps {
     canDrop?: boolean;
@@ -73,17 +72,13 @@ class ConceptTreeNode extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { 
-            allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId,
-            canDrop, connectDragSource, isOver
-        } = this.props;
+        const { allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId, connectDragSource } = this.props;
         const c = 'concept-tree-node';
-        const nodeTextClasses = [ `${c}-text` ];
         const arrowClasses = [ `${c}-arrow` ];
         const mainClasses = [ c ];
 
-        if (concept.uiDisplayPatientCount === 0) { nodeTextClasses.push(`${c}-text-nopatients`); }
-        if (concept.id === selectedId)           { mainClasses.push(`selected`); }
+        if (concept.id === selectedId) { mainClasses.push(`selected`); }
+        if (concept.unsaved)           { mainClasses.push(`unsaved`); }
 
         // Set arrow state
         if (concept.isParent) {
@@ -158,7 +153,7 @@ class ConceptTreeNode extends React.PureComponent<Props> {
 
     private handleClick = (e: any) => {
         const { dispatch, concept } = this.props;
-        // if (e.target && e.target.className.indexOf('concept-tree-node-arrow') > -1) { return; }
+        if (this.arrowWasClicked(e)) { return; }
         dispatch(handleConceptClick(concept));
     }
 
@@ -166,6 +161,13 @@ class ConceptTreeNode extends React.PureComponent<Props> {
         const { dispatch, concept } = this.props;
         dispatch(fetchConceptChildrenIfNeeded(concept));
     }
+
+    private arrowWasClicked = (e: any): boolean => {
+        if (e && e.target && e.target.className && typeof(e.target.className) === 'string') {
+            return e.target.className.includes('arrow');
+        }
+        return false;
+    };
 }
 
 const ConceptTreeNodeContainer = DragSource('CONCEPT', conceptNodeSource, collectDrag)(ConceptTreeNode);

@@ -13,8 +13,8 @@ import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
 import { Configuration } from '../Sections/Configuration';
 import { Concept as AdminConcept } from '../../../../models/admin/Concept';
-import { setAdminConcept, saveAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, createNewAdminConcept, setAdminPanelCurrentUserConcept } from '../../../../actions/admin/concept';
-import { setConcept, createConcept, setSelectedConcept } from '../../../../actions/concepts';
+import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, setAdminPanelCurrentUserConcept, removeUnsavedAdminConcept, saveAdminConcept } from '../../../../actions/admin/concept';
+import { setConcept, createConcept, setSelectedConcept, removeConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
@@ -55,15 +55,10 @@ export class MainEditor extends React.PureComponent<Props> {
         return (
             <div className={`${c}-main`}>
                 <div className={`${c}-column-right-header`}>
-                    <Button className='leaf-button leaf-button-addnew' disabled={currentAdminConcept && currentAdminConcept.unsaved} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
-
-                    {showConceptStatus.has(state) &&
-                    [
-                    <Button key={1} className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>,
-                    <Button key={2} className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>,
-                    <Button key={3}className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
-                    ]
-                    }
+                    <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
+                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
                 </div>
                 {!currentAdminConcept &&
                     <div className={`${c}-na`}>
@@ -120,11 +115,13 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     private handleInputChange = (val: any, propName: string) => {
+        const { sets } = this.props.data.sqlSets;
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
+        const newVal = val === '' ? null : val;
 
-        const newConcept = Object.assign({}, currentAdminConcept, { [propName]: val }) as AdminConcept;
-        const newUserConcept = Object.assign({}, updateUserConceptFromAdminChange(currentUserConcept!, propName, val)) as UserConcept;
+        const newConcept = Object.assign({}, currentAdminConcept, { [propName]: newVal }) as AdminConcept;
+        const newUserConcept = updateUserConceptFromAdminChange(currentUserConcept!, propName, newVal, sets.get(newConcept!.sqlSetId!));
 
         dispatch(setAdminConcept(newConcept, true));
         dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
@@ -132,19 +129,30 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     private handleUndoChanges = () => {
-        const { currentAdminConcept } = this.props.data.concepts;
+        const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
 
-        dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!));
+        if (currentAdminConcept!.unsaved) {
+            this.removeUnsavedAdminConcept();
+        } else {
+            dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!, currentUserConcept!));
+        }
+    }
+
+    private removeUnsavedAdminConcept = () => {
+        const { currentUserConcept } = this.props.data.concepts;
+        const { dispatch } = this.props;
+        dispatch(removeConcept(currentUserConcept!));
+        dispatch(removeUnsavedAdminConcept());
     }
 
     private handleSaveChanges = () => {
-        const { currentAdminConcept } = this.props.data.concepts;
+        const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-
-        dispatch(saveAdminConcept(currentAdminConcept!));
+        dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
     }
 
+    // TODO: move this to a util or clean up.
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
         const { sets } = this.props.data.sqlSets;
@@ -196,15 +204,19 @@ export class MainEditor extends React.PureComponent<Props> {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
 
-        const confirm: ConfirmationModalState = {
-            body: `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This can't be undone.`,
-            header: 'Delete Concept',
-            onClickNo: () => null,
-            onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
-            show: true,
-            noButtonText: `No`,
-            yesButtonText: `Yes, Delete Concept`
-        };
-        dispatch(showConfirmationModal(confirm));
+        if (currentAdminConcept!.unsaved) {
+            this.removeUnsavedAdminConcept();
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This can't be undone.`,
+                header: 'Delete Concept',
+                onClickNo: () => null,
+                onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Delete Concept`
+            };
+            dispatch(showConfirmationModal(confirm));
+        }
     }
 }

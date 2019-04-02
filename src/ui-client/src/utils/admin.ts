@@ -16,11 +16,21 @@ import { saveOrUpdateAdminSpecialization } from '../actions/admin/specialization
 
 const year = new Date().getFullYear();
 
-export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any): UserConcept => {
+/*
+ * After an admin Concept is edited, copy and
+ * transform a corresponding user Concept with
+ * the changes if applicable.
+ */
+export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any, sqlSet?: ConceptSqlSet): UserConcept => {
     const alwaysAdd = new Set([ 
-        'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 'uiDisplayName', 'uiDisplayText', 'isNumeric', 'isEncounterBased' 
+        'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 
+        'uiDisplayName', 'uiDisplayText', 'isNumeric', 'isEncounterBased' 
     ]);
     const out = Object.assign({}, userConcept);
+
+    if (sqlSet) {
+        out.isEncounterBased = sqlSet.isEncounterBased;
+    }
 
     if (alwaysAdd.has(propName) || userConcept[propName] !== undefined) {
         out[propName] = val;
@@ -28,6 +38,9 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
     return out;
 };
 
+/*
+ * Generate an example SQL statement based on current concept attributes.
+ */
 export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, config: SqlConfiguration): string => {
     if (!sqlSet || !config) { return ''; }
     const a = config.alias;
@@ -51,11 +64,24 @@ export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, 
     return formatSql(sql);
 };
 
+/*
+ * Check if a concept is valid by checking for
+ * errored inputs in the DOM. 
+ * TODO: this is quite a flawed approach, make a proper
+ * analysis method of the object in the future.
+ */
 export const conceptEditorValid = () => {
     const errors = document.querySelectorAll('.concept-editor .leaf-input.error');
     return errors.length === 0;
 };
 
+/*
+ * Check if there are any changes to a ConceptSqlSet.
+ * Note that because calling 'return' in Map.forEach doesn't
+ * actually finish the function (as it does in a normal 
+ * array), the method unfortunately has to run through
+ * all elements before returning the result.
+ */
 export const conceptSqlSetsChanged = (sets: Map<number,ConceptSqlSet>): boolean => {
     let changeDetected = false;
 

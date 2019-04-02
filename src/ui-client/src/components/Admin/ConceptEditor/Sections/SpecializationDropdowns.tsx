@@ -30,10 +30,13 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
         const { adminConcept, userConcept } = data;
         const c = this.className;
         const concept = userConcept!;
-        const alreadyAdded = new Set(adminConcept!.specializationGroups.map((grp) => grp.specializationGroupId));
+        const alreadyAdded = new Set();
         const available: ConceptSpecializationGroup[] = [];
 
         if (set) {
+            if (adminConcept!.specializationGroups) {
+                alreadyAdded.add(adminConcept!.specializationGroups.map((grp) => grp.specializationGroupId));
+            }
             set.specializationGroups.forEach((grp) => {
                 if (!alreadyAdded.has(grp.id)) {
                     const spcs: ConceptSpecialization[] = [];

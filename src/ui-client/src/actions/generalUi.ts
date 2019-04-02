@@ -97,8 +97,6 @@ export const handleSidebarTabClick = (route: Routes) => {
     }
 }
 
-
-
 // Synchronous
 export const setNoClickModalState = (noclickModal: NoClickModalState): GeneralUiAction => {
     return {

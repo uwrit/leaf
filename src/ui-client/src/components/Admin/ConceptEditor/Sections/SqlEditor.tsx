@@ -29,7 +29,7 @@ export class SqlEditor extends React.PureComponent<Props> {
             <Section header='SQL'>
                 <SqlSetDropdown
                     changeHandler={this.handleSqlUpdate} propName={'sqlSetId'} value={adminConcept!.sqlSetId} sqlSets={sqlSets}
-                    dispatch={dispatch} focusToggle={toggleSqlPreview} toggleOverlay={toggleOverlay} toggleSqlPreview={toggleSqlPreview}
+                    dispatch={dispatch} focusToggle={toggleSqlPreview} toggleOverlay={toggleOverlay} toggleSqlPreview={toggleSqlPreview} required={true}
                     label='Table, View, or Subquery'
                 />
                 <TextArea 

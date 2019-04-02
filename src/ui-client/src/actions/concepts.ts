@@ -12,7 +12,9 @@ import { Concept } from '../models/concept/Concept';
 import { AggregateConceptHintRef } from '../models/concept/ConceptHint';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, fetchConceptChildren, fetchRootConcepts, fetchConcept } from '../services/conceptApi';
-import { handleAdminConceptClick } from './admin/concept';
+import { fetchAdminConceptIfNeeded } from './admin/concept';
+import { Routes, InformationModalState } from '../models/state/GeneralUiState';
+import { showInfoModal } from './generalUi';
 
 export const SET_CONCEPT = 'SET_CONCEPT';
 export const SET_CONCEPTS = 'SET_CONCEPTS';
@@ -135,7 +137,7 @@ export const fetchSingleConcept = (id: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
             const response = await fetchConcept(getState(), id);
-            dispatch(setConcept(response.data));
+            dispatch(setConcept(response));
         } catch (err) {
             console.log(err);
         }
@@ -148,9 +150,42 @@ export const fetchSingleConcept = (id: string) => {
  * the Admin Panel.
  */
 export const handleConceptClick = (concept: Concept) => {
-    return async (dispatch: Dispatch<any>) => {
-        dispatch(handleAdminConceptClick(concept));
-        dispatch(setSelectedConcept(concept));
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+
+        /*
+         * If user is not an admin and current route is not the Admin Panel,
+         * set the current Concept to 'selected' and peace out.
+         */
+        if (!state.auth.userContext!.isAdmin || state.generalUi.currentRoute !== Routes.AdminPanel) { 
+            dispatch(setSelectedConcept(concept));
+            return;
+        }
+
+        /*
+         * If there are changes and user is switching to new Concept,
+         * prevent switch to the new Concept until a save is completed or changes discarded.
+         */
+        const { changed, currentAdminConcept } = state.admin!.concepts;
+        if (currentAdminConcept && currentAdminConcept.id === concept.id) {
+            dispatch(setSelectedConcept(concept));
+        }
+        else if (changed || concept.unsaved) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        }
+        
+        /*
+         * Else switch to the new concept.
+         */
+        else {
+            dispatch(setSelectedConcept(concept));
+            dispatch(fetchAdminConceptIfNeeded(concept));
+        }
     };
 };
 

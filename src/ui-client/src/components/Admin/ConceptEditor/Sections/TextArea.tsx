@@ -27,7 +27,7 @@ export class TextArea extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { label, subLabel, locked, value } = this.props;
+        const { label, subLabel, locked, value, required } = this.props;
         const { valid } = this.state;
         const classes = [ 'leaf-input' ];
         let val = value || '';
@@ -40,6 +40,9 @@ export class TextArea extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>
                     {label}
+                    {required &&
+                    <span className='required'>*</span>
+                    }
                     {subLabel &&
                     <FormText color="muted">{subLabel}</FormText>
                     }

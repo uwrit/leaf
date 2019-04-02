@@ -39,7 +39,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { label, value, subLabel, sqlSets } = this.props;
+        const { label, value, subLabel, sqlSets, required } = this.props;
         const { isOpen } = this.state;
         const selected = sqlSets.get((value));
         const c = this.className;
@@ -54,6 +54,9 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>
                     {label}
+                    {required &&
+                    <span className='required'>*</span>
+                    }
                     {subLabel &&
                     <FormText color="muted">{subLabel}</FormText>
                     }
