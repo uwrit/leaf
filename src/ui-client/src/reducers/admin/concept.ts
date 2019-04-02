@@ -58,6 +58,17 @@ export const setExampleSql = (state: AdminState, action: AdminConceptAction): Ad
     });
 }; 
 
+export const removeUnsavedAdminConcept = (state: AdminState, action: AdminConceptAction): AdminState => {
+    return Object.assign({}, state, {
+        concepts: { 
+            ...state.concepts,
+            currentAdminConcept: undefined,
+            currentUserConcept: undefined,
+            changed: false
+        }
+    });
+}; 
+
 export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConceptAction): AdminState => {
     state.concepts.concepts.delete(state.concepts.currentAdminConcept!.id);
     return Object.assign({}, state, {

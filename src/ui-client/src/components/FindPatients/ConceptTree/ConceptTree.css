@@ -73,8 +73,9 @@
     color: rgba(0,0,0,0.25);
 }
 
-.concept-tree-node-text-unsaved {
-    box-shadow: 0 0 4px 10px rgba(6, 192, 0, 0.05), inset 0 0 4px 10px rgba(6, 192, 0, 0.05);
+.concept-tree-node.unsaved {
+    background-color: rgba(6, 192, 0, 0.05) !important;
+    border-left-color: rgb(6, 192, 0);
     color: rgb(6, 192, 0);
 }
 

@@ -14,7 +14,8 @@ import {
     SET_ADMIN_PANEL_CONCEPT_LOAD_STATE,
     SET_ADMIN_CONCEPT_EXAMPLE_SQL,
     SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE,
-    CREATE_ADMIN_CONCEPT
+    CREATE_ADMIN_CONCEPT,
+    REMOVE_UNSAVED_ADMIN_CONCEPT
 } from '../../actions/admin/concept';
 import {
     SET_ADMIN_SPECIALIZATIONS,
@@ -37,7 +38,7 @@ import {
     SET_ADMIN_SQL_SETS_UNCHANGED,
     SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
-import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminCurrentUserConcept, createAdminConcept } from './concept';
+import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
@@ -109,6 +110,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminPanelConceptEditorPane(state, action);
         case CREATE_ADMIN_CONCEPT:
             return createAdminConcept(state, action);
+        case REMOVE_UNSAVED_ADMIN_CONCEPT:
+            return removeUnsavedAdminConcept(state, action);
 
         // Configuration
         case SET_ADMIN_SQL_CONFIGURATION:

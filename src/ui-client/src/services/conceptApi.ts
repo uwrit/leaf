@@ -31,8 +31,9 @@ export const fetchRootConcepts = (state: AppState) => {
 /*
  * Fetch concept. Called on saved query open.
  */
-export const fetchConcept = (state: AppState, id: string) => {
-    return makeRequest(state, `api/concept/${id}`);
+export const fetchConcept = async (state: AppState, id: string) => {
+    const con = await makeRequest(state, `api/concept/${id}`);
+    return con.data as Concept;
 };
 
 /*

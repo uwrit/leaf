@@ -25,7 +25,11 @@ export const getAdminConcept = async (state: AppState, conceptId: string) => {
 export const updateAdminConcept = async (state: AppState, concept: Concept) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/concept/${concept.id}`, concept);
+    const resp = await http.put(`api/admin/concept/${concept.id}`, { 
+        ...concept, 
+        isRoot: !concept.parentId,
+        rootId: concept.id === concept.rootId ? null : concept.rootId
+    });
     return resp.data as Concept;
 };
 
@@ -33,21 +37,21 @@ export const updateAdminConcept = async (state: AppState, concept: Concept) => {
  * Creates a new Concept.
  */ 
 export const createAdminConcept = async (state: AppState, concept: Concept) => {
-
-    return;
-
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.post(`api/admin/concept`, concept);
+    const resp = await http.post(`api/admin/concept`, { 
+        ...concept, 
+        id: null,
+        isRoot: !concept.parentId,
+        rootId: concept.id === concept.rootId ? null : concept.rootId
+    });
+    return resp.data as Concept;
 };
 
 /*
  * Deletes an existing Concept SQLSet.
  */ 
 export const deleteAdminConcept = async (state: AppState, conceptId: string) => {
-
-    return;
-
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.delete(`api/admin/concept/${conceptId}`);

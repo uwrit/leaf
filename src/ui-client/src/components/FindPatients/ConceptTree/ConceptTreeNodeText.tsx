@@ -10,7 +10,7 @@ import { ConnectDragPreview, ConnectDragSource, DropTargetMonitor, ConnectDropTa
 import { Concept } from '../../../models/concept/Concept';
 import { MdAccessTime } from 'react-icons/md';
 import { GoPerson } from 'react-icons/go';
-import { reparentConcept } from '../../../actions/concepts';
+import { handleReparentDrop } from '../../../actions/admin/concept';
 
 interface DndProps {
     canDrop?: boolean;
@@ -34,7 +34,7 @@ const conceptNodeTarget = {
     drop(props: Props, monitor: DropTargetMonitor, component: any) {
         const { dispatch } = props;
         const concept: Concept = monitor.getItem();
-        dispatch(reparentConcept(concept, props.concept.id));
+        dispatch(handleReparentDrop(concept, props.concept.id));
     },
     canDrop(props: Props, monitor: DropTargetMonitor) {
         const con = (monitor.getItem() as Concept);
@@ -73,7 +73,6 @@ class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
             : <GoPerson className={`${c}-icon ${c}-icon-person`} />;
 
         if (concept.uiDisplayPatientCount === 0) { nodeTextClasses.push(`${c}-text-nopatients`); }
-        if (concept.unsaved)                     { nodeTextClasses.push(`${c}-text-unsaved`); }
     
         return (
             connectDropTarget &&

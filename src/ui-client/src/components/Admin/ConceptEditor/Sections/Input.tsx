@@ -22,7 +22,7 @@ export class Input extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { label, subLabel, locked, type, value, placeholder } = this.props;
+        const { label, subLabel, locked, type, value, placeholder, required } = this.props;
         const { valid } = this.state;
         const classes = [ 'leaf-input' ];
         let t = type || 'string' as any;
@@ -36,6 +36,9 @@ export class Input extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>
                     {label}
+                    {required &&
+                    <span className='required'>*</span>
+                    }
                     {subLabel &&
                     <FormText color="muted">{subLabel}</FormText>
                     }
