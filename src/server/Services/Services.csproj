@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TieredCompilation>true</TieredCompilation>
+    <ReleaseVersion>3.0.0</ReleaseVersion>
   </PropertyGroup>
 
   <PropertyGroup>
