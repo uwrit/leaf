@@ -5,6 +5,7 @@
     <TieredCompilation>true</TieredCompilation>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
+    <ReleaseVersion>3.0.0</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>

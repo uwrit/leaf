@@ -10,4 +10,5 @@
 *.bak
 /bin
 
-.todo
+todo.md
+
