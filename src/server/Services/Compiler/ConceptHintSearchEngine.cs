@@ -18,6 +18,7 @@ using Services.Authorization;
 using System.Security.Claims;
 using Services.Extensions;
 using Services.Tables;
+using Model.Authorization;
 
 namespace Services.Compiler
 {

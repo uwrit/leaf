@@ -19,6 +19,7 @@ using Services.Authorization;
 using System.Data.SqlClient;
 using Services.Extensions;
 using Model.Anonymization;
+using Model.Authorization;
 
 namespace Services.Cohort
 {

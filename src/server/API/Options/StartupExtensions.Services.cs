@@ -15,15 +15,20 @@ using Model.Network;
 using Model.Options;
 using Model.Compiler;
 using Services;
-using Services.Authentication;
 using Services.Authorization;
-using Services.Jwt;
+using Services.Authentication;
+using API.Jwt;
 using Services.Network;
 using Services.Compiler;
 using Services.Compiler.SqlServer;
 using Services.Cohort;
 using Services.Export;
 using Services.Admin;
+using Model.Authorization;
+using Model.Authentication;
+using Model.Admin;
+using API.Authorization;
+using API.Authentication;
 
 namespace API.Options
 {
@@ -36,7 +41,6 @@ namespace API.Options
             services.AddHttpContextAccessor();
 
             services.AddScoped<IUserContext, HttpUserContext>();
-
             services.AddTransient<UserContextLoggingMiddleware>();
             services.AddTransient<RejectIdentifiedFederationMiddleware>();
 
@@ -129,7 +133,7 @@ namespace API.Options
 
         static IServiceCollection AddIAMServices(this IServiceCollection services)
         {
-            services.AddSingleton<TokenBlacklistCache>();
+            services.AddSingleton<ITokenBlacklistCache, TokenBlacklistCache>();
             services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>();
             services.AddHostedService<BackgroundTokenBlacklistSynchronizer>();
 
@@ -151,20 +155,11 @@ namespace API.Options
             switch (opts.Mechanism)
             {
                 case AuthenticationMechanism.Saml2:
-                    services.AddScoped<IFederatedIdentityService, SAML2IdentityService>();
-                    services.AddSingleton<ILoginService, NoLoginService>();
-                    break;
-
-                case AuthenticationMechanism.ActiveDirectory:
-                    services.AddSingleton<ActiveDirectoryCache>();
-                    services.AddHostedService<BackgroundActiveDirectoryCacheSynchronizer>();
-                    services.AddScoped<IFederatedIdentityService, ActiveDirectoryIdentityService>();
-                    services.AddScoped<ILoginService, ActiveDirectoryIdentityService>();
+                    services.AddScoped<IFederatedIdentityProvider, SAML2IdentityProvider>();
                     break;
 
                 case AuthenticationMechanism.Unsecured:
-                    services.AddSingleton<IFederatedIdentityService, UnsecureIdentityService>();
-                    services.AddSingleton<ILoginService, NoLoginService>();
+                    services.AddSingleton<IFederatedIdentityProvider, UnsecureIdentityProvider>();
                     break;
             }
 
@@ -182,7 +177,7 @@ namespace API.Options
 
                 case AuthorizationMechanism.ActiveDirectory:
                     services.AddScoped<UserPrincipalContext>();
-                    services.AddSingleton<ActiveDirectoryService>();
+                    services.AddSingleton<ActiveDirectoryMembershipProvider>();
                     services.AddScoped<IFederatedEntitlementService, ActiveDirectoryEntitlementService>();
                     break;
 

@@ -18,6 +18,7 @@ using Model.Cohort;
 using Model.Compiler;
 using Model.Anonymization;
 using Services.Extensions;
+using Model.Authorization;
 
 namespace Services.Cohort
 {

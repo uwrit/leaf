@@ -14,9 +14,8 @@ namespace Model.Options
     {
         public const string Saml2 = @"SAML2";
         public const string Unsecured = @"UNSECURED";
-        public const string ActiveDirectory = @"ACTIVEDIRECTORY";
 
-        public static readonly IEnumerable<string> LocalMechanisms = new string[] { Unsecured, ActiveDirectory };
+        public static readonly IEnumerable<string> LocalMechanisms = new string[] { Unsecured };
         public static readonly IEnumerable<string> FederatedMechanisms = new string[] { Saml2 };
         public static readonly IEnumerable<string> ValidMechanisms = LocalMechanisms.Concat(FederatedMechanisms);
 
@@ -39,9 +38,6 @@ namespace Model.Options
                 case Saml2:
                     Mechanism = AuthenticationMechanism.Saml2;
                     break;
-                case ActiveDirectory:
-                    Mechanism = AuthenticationMechanism.ActiveDirectory;
-                    break;
                 default:
                     Mechanism = AuthenticationMechanism.Unsecured;
                     break;
@@ -57,7 +53,6 @@ namespace Model.Options
         }
 
         public bool IsSaml2 => Mechanism == AuthenticationMechanism.Saml2;
-        public bool IsActiveDirectory => Mechanism == AuthenticationMechanism.ActiveDirectory;
         public bool IsUnsecured => Mechanism == AuthenticationMechanism.Unsecured;
     }
 
@@ -72,17 +67,6 @@ namespace Model.Options
         }
     }
 
-    public class ActiveDirectoryAuthenticationOptions : IBindTarget
-    {
-        public const AuthenticationMechanism Mechanism = AuthenticationMechanism.ActiveDirectory;
-        public DomainConnectionOptions DomainConnection { get; set; }
-
-        public bool DefaultEqual()
-        {
-            return DomainConnection == null;
-        }
-    }
-
     public class SAML2AuthenticationHeaderMappingOptions
     {
         public string ScopedIdentity { get; set; }
@@ -91,7 +75,6 @@ namespace Model.Options
     public enum AuthenticationMechanism
     {
         Unsecured = 0,
-        ActiveDirectory = 1,
-        Saml2 = 2
+        Saml2 = 1
     }
 }

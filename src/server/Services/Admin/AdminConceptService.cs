@@ -18,6 +18,7 @@ using Services.Authorization;
 using Services.Tables;
 using Services.Compiler;
 using System.Linq;
+using Model.Authorization;
 
 namespace Services.Admin
 {

@@ -7,30 +7,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Model.Authentication;
-using Services.Authentication;
 using Model.Authorization;
 using Microsoft.AspNetCore.Http;
 using System.DirectoryServices.AccountManagement;
 using Model.Options;
 using Microsoft.Extensions.Options;
+using Services.Authorization;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     public class ActiveDirectoryEntitlementService : IFederatedEntitlementService
     {
-        readonly UserPrincipalContext userContext;
+        readonly IScopedIdentity scopedIdentity;
         readonly RolesMappingOptions roles;
-        readonly ActiveDirectoryService adService;
+        readonly IMembershipProvider mProvider;
 
         public ActiveDirectoryEntitlementService(
-            UserPrincipalContext userPrincipalContext,
+            IScopedIdentity scopedIdentity,
             IOptions<ActiveDirectoryAuthorizationOptions> authOpts,
-            ActiveDirectoryService activeDirectoryService
+            IMembershipProvider membershipProvider
         )
         {
-            userContext = userPrincipalContext;
+            this.scopedIdentity = scopedIdentity;
             roles = authOpts.Value.RolesMapping;
-            adService = activeDirectoryService;
+            mProvider = membershipProvider;
         }
 
         public Entitlement GetEntitlement(HttpContext _)
@@ -75,11 +75,7 @@ namespace Services.Authorization
 
         IEnumerable<string> GetGroups()
         {
-            if (userContext.HasPrincipal)
-            {
-                return adService.GetMembership(userContext.User);
-            }
-            return adService.GetMembership(userContext.ScopedIdentity.Identity);
+            return mProvider.GetMembership(scopedIdentity.Identity);
         }
     }
 }

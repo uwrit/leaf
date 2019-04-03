@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
-namespace Services.Jwt
+namespace Services.Authentication
 {
     public class TokenBlacklistService : ITokenBlacklistService
     {
@@ -23,10 +23,10 @@ namespace Services.Jwt
         const string queryRefresh = @"auth.sp_RefreshTokenBlacklist";
 
         readonly AppDbOptions opts;
-        readonly TokenBlacklistCache blacklistCache;
+        readonly ITokenBlacklistCache blacklistCache;
         readonly ILogger<TokenBlacklistService> logger;
 
-        public TokenBlacklistService(IOptions<AppDbOptions> dbOpts, TokenBlacklistCache blacklistCache, ILogger<TokenBlacklistService> logger)
+        public TokenBlacklistService(IOptions<AppDbOptions> dbOpts, ITokenBlacklistCache blacklistCache, ILogger<TokenBlacklistService> logger)
         {
             opts = dbOpts.Value;
             this.blacklistCache = blacklistCache;

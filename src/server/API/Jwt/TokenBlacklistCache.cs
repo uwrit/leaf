@@ -9,9 +9,9 @@ using Model.Authentication;
 using System.Threading;
 using System.Collections.Generic;
 
-namespace Services.Jwt
+namespace API.Jwt
 {
-    public class TokenBlacklistCache
+    public class TokenBlacklistCache : ITokenBlacklistCache
     {
         readonly ReaderWriterLockSlim sync;
         HashSet<Guid> blacklist;

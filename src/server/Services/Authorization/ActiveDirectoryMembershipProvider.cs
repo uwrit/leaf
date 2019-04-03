@@ -10,12 +10,13 @@ using System.Text;
 using System.DirectoryServices.AccountManagement;
 using System.DirectoryServices;
 using Model.Authentication;
+using Model.Authorization;
 using Model.Options;
 using Microsoft.Extensions.Options;
 
 namespace Services.Authorization
 {
-    public class ActiveDirectoryService
+    public class ActiveDirectoryMembershipProvider : IMembershipProvider
     {
         readonly ContextOptions optionMask;
         readonly DomainConnectionOptions domain;
@@ -28,7 +29,7 @@ namespace Services.Authorization
             }
         }
 
-        public ActiveDirectoryService(IOptions<ActiveDirectoryAuthorizationOptions> adOpts)
+        public ActiveDirectoryMembershipProvider(IOptions<ActiveDirectoryAuthorizationOptions> adOpts)
         {
             domain = adOpts.Value?.DomainConnection;
             optionMask = ContextOptions.Negotiate | ContextOptions.Signing | ContextOptions.Sealing | ContextOptions.SecureSocketLayer;
@@ -45,7 +46,7 @@ namespace Services.Authorization
             if (ps.FindOne() is GroupPrincipal adGroup)
             {
                 return adGroup.GetMembers(true)
-                              .Select(u => u as UserPrincipal)
+                              .OfType<UserPrincipal>()
                               .Where(u => u != null && u.Enabled.HasValue && u.Enabled.Value)
                               .Select(u => u.SamAccountName);
             }
@@ -63,27 +64,11 @@ namespace Services.Authorization
             return new string[] { };
         }
 
-        public IEnumerable<string> GetMembership(UserPrincipal user)
+        IEnumerable<string> GetMembership(UserPrincipal user)
         {
             return user.GetGroups()
                        .Select(g => (g as GroupPrincipal)?.SamAccountName)
                        .Where(g => g != null);
-        }
-
-        public bool ValidateCredentials(LoginCredentials login, out UserPrincipal user)
-        {
-            user = null;
-            var context = Context;
-            if (context.ValidateCredentials(login.Username, login.Password))
-            {
-                var tmp = GetUser(context, login.Username);
-                if (tmp != null)
-                {
-                    user = tmp;
-                    return true;
-                }
-            }
-            return false;
         }
 
         UserPrincipal GetUser(PrincipalContext context, string username)

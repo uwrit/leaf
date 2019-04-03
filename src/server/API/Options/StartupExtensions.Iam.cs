@@ -14,7 +14,7 @@ using Model.Authorization;
 using Model.Network;
 using Model.Options;
 using Services.Network;
-using Services.Jwt;
+using API.Jwt;
 
 namespace API.Options
 {

@@ -18,6 +18,7 @@ using Services.Extensions;
 using Model.Cohort;
 using Services.Cohort;
 using Services.Authorization;
+using Model.Authorization;
 
 namespace Services.Cohort
 {

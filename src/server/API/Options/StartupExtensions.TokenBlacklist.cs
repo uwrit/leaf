@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using Model.Authentication;
 using Model.Authorization;
-using Services.Jwt;
+using Services.Authentication;
 using API.Options;
 using Microsoft.Extensions.Logging;
 
@@ -28,7 +28,7 @@ namespace API.Options
         public static IApplicationBuilder UseTokenBlacklistMiddleware(this IApplicationBuilder app)
         {
             var sp = app.ApplicationServices;
-            var cache = sp.GetRequiredService<TokenBlacklistCache>();
+            var cache = sp.GetRequiredService<ITokenBlacklistCache>();
             var logger = sp.GetRequiredService<ILogger<TokenBlacklistMiddleware>>();
 
             return app.UseMiddleware<TokenBlacklistMiddleware>(cache, logger);
@@ -37,10 +37,10 @@ namespace API.Options
         class TokenBlacklistMiddleware
         {
             readonly RequestDelegate next;
-            readonly TokenBlacklistCache cache;
+            readonly ITokenBlacklistCache cache;
             readonly ILogger<TokenBlacklistMiddleware> logger;
 
-            public TokenBlacklistMiddleware(RequestDelegate next, TokenBlacklistCache cache, ILogger<TokenBlacklistMiddleware> logger)
+            public TokenBlacklistMiddleware(RequestDelegate next, ITokenBlacklistCache cache, ILogger<TokenBlacklistMiddleware> logger)
             {
                 this.next = next;
                 this.cache = cache;

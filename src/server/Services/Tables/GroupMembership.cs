@@ -7,6 +7,7 @@ using System;
 using System.Data;
 using Dapper;
 using Services.Authorization;
+using Model.Authorization;
 
 namespace Services.Tables
 {

@@ -17,6 +17,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Dapper;
 using Services.Tables;
+using Model.Authorization;
 
 namespace Services.Compiler
 {

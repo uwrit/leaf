@@ -17,9 +17,8 @@ using Model.Authentication;
 using Model.Authorization;
 using Model.Network;
 using Services;
-using Services.Authentication;
 using Services.Authorization;
-using Services.Jwt;
+using API.Jwt;
 using DTO.User;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -59,11 +58,6 @@ namespace API.Controllers
         [HttpGet]
         public ActionResult<IdTokenDTO> GetUser()
         {
-            if (authenticationOptions.IsActiveDirectory)
-            {
-                return StatusCode(StatusCodes.Status404NotFound);
-            }
-
             try
             {
                 var token = jwtProvider.IdToken(HttpContext);
@@ -86,7 +80,7 @@ namespace API.Controllers
         [HttpGet("attest")]
         public ActionResult<AccessTokenDTO> Attest(
             [FromQuery] Attestation attestation,
-            [FromServices] TokenBlacklistCache blacklistCache)
+            [FromServices] ITokenBlacklistCache blacklistCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -113,7 +107,7 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Access)]
         [Authorize(Policy = Access.Institutional)]
         [HttpGet("refresh")]
-        public ActionResult<AccessTokenDTO> Refresh([FromServices] TokenBlacklistCache blacklistCache)
+        public ActionResult<AccessTokenDTO> Refresh([FromServices] ITokenBlacklistCache blacklistCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -153,46 +147,6 @@ namespace API.Controllers
                 ClientOptions = clientOptions
             };
             return Ok(config);
-        }
-
-        [AllowAnonymous]
-        [HttpPost("login")]
-        public async Task<ActionResult<IdTokenDTO>> Login(
-            [FromBody] LoginCredentials credentials,
-            [FromServices] ILoginService loginService,
-            [FromServices] ActiveDirectoryCache adCache
-        )
-        {
-            if (!authenticationOptions.IsActiveDirectory)
-            {
-                return StatusCode(StatusCodes.Status404NotFound);
-            }
-
-            if (!adCache.CanLogin(credentials.Username))
-            {
-                return StatusCode(StatusCodes.Status403Forbidden);
-            }
-
-            try
-            {
-                var ok = await loginService.AuthenticateAsync(credentials);
-                if (!ok)
-                {
-                    return StatusCode(StatusCodes.Status401Unauthorized);
-                }
-                var token = jwtProvider.IdToken(HttpContext);
-                return Ok(new IdTokenDTO { IdToken = token });
-            }
-            catch (LeafAuthenticationException lae)
-            {
-                logger.LogError("User is not authorized to use Leaf. {Error}", lae.Message);
-                return StatusCode(StatusCodes.Status403Forbidden);
-            }
-            catch (Exception e)
-            {
-                logger.LogError("Could not authenticate user. {Error}", e.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
 
         [Authorize(Policy = TokenType.Id)]

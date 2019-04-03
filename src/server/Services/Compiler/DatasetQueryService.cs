@@ -16,6 +16,8 @@ using Services.Extensions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using Model.Authorization;
+using Services.Tables;
 
 namespace Services.Compiler
 {
@@ -78,7 +80,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     CRUDQuery.getDatasetQueries,
-                    new { user = user.UUID, groups = user.GetGroupMembership() },
+                    new { user = user.UUID, groups = GroupMembership.From(user) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -170,7 +172,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryId,
-                    new { datasetid, queryid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
+                    new { datasetid, queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -191,7 +193,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryUId,
-                    new { datasetid, queryuid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
+                    new { datasetid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -212,7 +214,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryId,
-                    new { datasetuid, queryid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
+                    new { datasetuid, queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -233,7 +235,7 @@ namespace Services.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryUId,
-                    new { datasetuid, queryuid, user = user.UUID, groups = user.GetGroupMembership(), admin = user.IsAdmin },
+                    new { datasetuid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

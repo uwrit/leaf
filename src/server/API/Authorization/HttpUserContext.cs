@@ -13,7 +13,7 @@ using Model.Authorization;
 using Model.Options;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     /// <summary>
     /// Provides an accessor to the current ClaimsPrincipal from the HttpContext.
@@ -167,7 +167,6 @@ namespace Services.Authorization
         readonly static Dictionary<string, AuthenticationMechanism> mechMap = new Dictionary<string, AuthenticationMechanism>
         {
             { AuthenticationMechanism.Unsecured.ToString(), AuthenticationMechanism.Unsecured },
-            { AuthenticationMechanism.ActiveDirectory.ToString(), AuthenticationMechanism.ActiveDirectory },
             { AuthenticationMechanism.Saml2.ToString(), AuthenticationMechanism.Saml2 },
         };
 
