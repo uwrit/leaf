@@ -17,13 +17,12 @@ import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConcep
 import { setConcept, createConcept, setSelectedConcept, removeConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
-import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { showConfirmationModal } from '../../../../actions/generalUi';
+import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { Concept as UserConcept } from '../../../../models/concept/Concept';
-import { generate as generateId } from 'shortid';
-import { updateUserConceptFromAdminChange } from '../../../../utils/admin';
+import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -152,52 +151,23 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
     }
 
-    // TODO: move this to a util or clean up.
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
         const { sets } = this.props.data.sqlSets;
         const defaultSet = sets.size ? sets.get(sets.keys[0]) : undefined;
-        const id = generateId();
 
-        const baseProps = {
-            id,
-            rootId: id,
-            isNumeric: false,
-            isParent: false,
-            isRoot: true,
-            isPatientCountAutoCalculated: true,
-            isSpecializable: false,
-            uiDisplayName: 'New Concept',
-            uiDisplayText: '',
-            uiDisplaySubtext: '',
-            uiDisplayTooltip: '',
-            universalId: '',
-            unsaved: true
-        };
-        const newAdminConcept: AdminConcept = {
-            ...baseProps,
-            constraints: [],
-            specializationGroups: []
-        };
-        const newUserConcept: UserConcept = {
-            ...baseProps,
-            childrenLoaded: false,
-            isEncounterBased: false,
-            isEventBased: false,
-            isFetching: false,
-            isOpen: false
-        };
+        const { adminConcept, userConcept } = createEmptyConcept();
 
         if (defaultSet) {
-            newAdminConcept.sqlSetId = defaultSet.id;
-            newUserConcept.isEncounterBased = defaultSet.isEncounterBased;
-            newUserConcept.isEventBased = defaultSet.isEventBased;
+            adminConcept.sqlSetId = defaultSet.id;
+            userConcept.isEncounterBased = defaultSet.isEncounterBased;
+            userConcept.isEventBased = defaultSet.isEventBased;
         }
 
-        dispatch(createConcept(newUserConcept));
-        dispatch(setSelectedConcept(newUserConcept));
-        dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
-        dispatch(setAdminConcept(newAdminConcept, true));
+        dispatch(createConcept(userConcept));
+        dispatch(setSelectedConcept(userConcept));
+        dispatch(setAdminPanelCurrentUserConcept(userConcept));
+        dispatch(setAdminConcept(adminConcept, true));
     }
 
     private handleDeleteConceptClick = () => {
@@ -207,16 +177,30 @@ export class MainEditor extends React.PureComponent<Props> {
         if (currentAdminConcept!.unsaved) {
             this.removeUnsavedAdminConcept();
         } else {
-            const confirm: ConfirmationModalState = {
-                body: `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This can't be undone.`,
-                header: 'Delete Concept',
-                onClickNo: () => null,
-                onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
-                show: true,
-                noButtonText: `No`,
-                yesButtonText: `Yes, Delete Concept`
-            };
-            dispatch(showConfirmationModal(confirm));
+            if (currentUserConcept!.childrenIds && currentUserConcept!.childrenIds!.size) {
+                const info: InformationModalState = {
+                    body: 
+                        `The Concept "${currentAdminConcept!.uiDisplayName}" has child Concepts underneath it which depend on it. ` +
+                        `Please move or delete the dependent child Concepts first.`,
+                    header: "Save or Undo Changes",
+                    show: true
+                };
+                dispatch(showInfoModal(info));
+            } else {
+                const confirm: ConfirmationModalState = {
+                    body: !currentUserConcept!.childrenIds && currentUserConcept!.isParent
+                        ? `The Concept "${currentAdminConcept!.uiDisplayName}" may be a parent of Concepts underneath it, and the delete ` +
+                          `operation will fail if any are found. Are you sure you want to continue? This will take effect immediately and can't be undone.`
+                        : `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This will take effect immediately and can't be undone.`,
+                    header: 'Delete Concept',
+                    onClickNo: () => null,
+                    onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
+                    show: true,
+                    noButtonText: `No`,
+                    yesButtonText: `Yes, Delete Concept`
+                };
+                dispatch(showConfirmationModal(confirm));
+            }
         }
     }
 }

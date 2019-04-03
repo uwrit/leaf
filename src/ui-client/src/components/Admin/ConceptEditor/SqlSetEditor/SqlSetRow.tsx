@@ -72,7 +72,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                         <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased}/>
                     </Col>
                     <Col md={5} className={`${c}-input-container`}>
-                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} required={true} />
+                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom}/>
                     </Col>
                     <Col md={5} className={`${c}-input-container`}>
 
@@ -81,7 +81,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                             <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
                         </div>
 
-                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} />
+                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate}/>
                     </Col>
                 </Row>
                 

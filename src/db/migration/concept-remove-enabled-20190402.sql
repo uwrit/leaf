@@ -123,6 +123,226 @@ BEGIN
     JOIN app.Concept c on f.ConceptId = c.Id
     
 END
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/3/29
+-- Description: Creates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
+-- =======================================
+ALTER PROCEDURE [adm].[sp_CreateConcept]
+    @universalId nvarchar(200),
+    @parentId uniqueidentifier,
+    @rootId uniqueidentifier,
+    @externalId nvarchar(200),
+    @externalParentId nvarchar(200),
+    @isPatientCountAutoCalculated bit,
+    @isNumeric bit,
+    @isParent bit,
+    @isRoot bit,
+    @isSpecializable bit,
+    @sqlSetId int,
+    @sqlSetWhere nvarchar(1000),
+    @sqlFieldNumeric nvarchar(1000),
+    @uiDisplayName nvarchar(400),
+    @uiDisplayText nvarchar(1000),
+    @uiDisplaySubtext nvarchar(100),
+	@uiDisplayUnits nvarchar(50),
+	@uiDisplayTooltip nvarchar(max),
+	@uiDisplayPatientCount int,
+	@uiNumericDefaultText nvarchar(50),
+    @constraints auth.ConceptConstraintTable READONLY,
+    @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@parentId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @parentId))
+    BEGIN;
+        THROW 70404, N'Parent concept not found.', 1;
+    END;
+
+    IF (@rootId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @rootId))
+    BEGIN;
+        THROW 70404, N'Root concept not found.', 1;
+    END;
+
+    IF ((SELECT COUNT(*) FROM app.SpecializationGroup WHERE Id IN (SELECT SpecializationGroupId FROM @specializationGroups)) != (SELECT COUNT(*) FROM @specializationGroups))
+    BEGIN;
+        THROW 70404, N'SpecializationGroup not found.', 1;
+    END;
+
+    BEGIN TRAN;
+    BEGIN TRY
+        DECLARE @ids app.ResourceIdTable;
+
+        INSERT INTO app.Concept (
+            UniversalId,
+            ParentId,
+            RootId,
+            ExternalId,
+            ExternalParentId,
+            IsPatientCountAutoCalculated,
+            [IsNumeric],
+            IsParent,
+            IsRoot,
+            IsSpecializable,
+            SqlSetId,
+            SqlSetWhere,
+            SqlFieldNumeric,
+            UiDisplayName,
+            UiDisplayText,
+            UiDisplaySubtext,
+            UiDisplayUnits,
+            UiDisplayTooltip,
+            UiDisplayPatientCount,
+            UiNumericDefaultText,
+            ContentLastUpdateDateTime,
+            PatientCountLastUpdateDateTime
+        )
+        OUTPUT inserted.Id INTO @ids
+        SELECT
+            UniversalId = @universalId,
+            ParentId = @parentId,
+            RootId = @rootId,
+            ExternalId = @externalId,
+            ExternalParentId = @externalParentId,
+            IsPatientCountAutoCalculated = @isPatientCountAutoCalculated,
+            [IsNumeric] = @isNumeric,
+            IsParent = @isParent,
+            IsRoot = @isRoot,
+            IsSpecializable = @isSpecializable,
+            SqlSetId = @sqlSetId,
+            SqlSetWhere = @sqlSetWhere,
+            SqlFieldNumeric = @sqlFieldNumeric,
+            UiDisplayName = @uiDisplayName,
+            UiDisplayText = @uiDisplayText,
+            UiDisplaySubtext = @uiDisplaySubtext,
+            UiDisplayUnits = @uiDisplayUnits,
+            UiDisplayTooltip = @uiDisplayTooltip,
+            UiDisplayPatientCount = @uiDisplayPatientCount,
+            UiNumericDefaultText = @uiNumericDefaultText,
+            ContentLastUpdateDateTime = GETDATE(),
+            PatientCountLastUpdateDateTime = GETDATE();
+
+        DECLARE @id UNIQUEIDENTIFIER;
+        SELECT TOP 1 @id = Id FROM @ids;
+
+        INSERT INTO auth.ConceptConstraint
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        INSERT INTO rela.ConceptSpecializationGroup
+        SELECT @id, SpecializationGroupId, OrderId
+        FROM @specializationGroups;
+
+		IF (@isRoot = 1)
+		BEGIN
+			UPDATE app.Concept
+			SET RootId = @id
+			WHERE Id = @id
+		END
+
+        COMMIT;
+
+        EXEC adm.sp_GetConceptById @id;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+END
+GO
+
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/4/1
+-- Description: Deletes a concept if unhooked, returns dependents.
+-- =======================================
+ALTER PROCEDURE [adm].[sp_DeleteConcept]
+    @id uniqueidentifier,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    BEGIN TRAN;
+
+    IF NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @id)
+    BEGIN;
+        THROW 70404, N'Concept not found.', 1;
+    END;
+
+    declare @filters table (
+        Id int,
+        UiDisplayText nvarchar(1000) NULL
+    );
+    INSERT INTO @filters
+    SELECT Id, UiDisplayText
+    FROM app.PanelFilter
+    WHERE ConceptId = @id;
+
+    declare @queries table (
+        Id uniqueidentifier,
+        UniversalId nvarchar(200) null,
+        [Name] nvarchar(200) null,
+        [Owner] nvarchar(200) not null
+    );
+    INSERT INTO @queries
+    SELECT q.Id, q.UniversalId, q.[Name], q.[Owner]
+    FROM app.Query q
+    JOIN rela.QueryConceptDependency cd on q.Id = cd.QueryId
+    WHERE cd.DependsOn = @id;
+
+    declare @concepts table(
+        Id UNIQUEIDENTIFIER,
+        UniversalId nvarchar(200) null,
+        UiDisplayName nvarchar(400) null
+    );
+    INSERT INTO @concepts
+    SELECT Id, UniversalId, UiDisplayName
+    FROM app.Concept
+    WHERE ParentId = @id;
+
+    IF NOT(EXISTS(SELECT 1 FROM @filters) OR EXISTS(SELECT 1 FROM @queries) OR EXISTS(SELECT 1 FROM @concepts))
+    BEGIN;
+        BEGIN TRY
+            DELETE FROM auth.ConceptConstraint
+            WHERE ConceptId = @id;
+
+            DELETE FROM rela.ConceptSpecializationGroup
+            WHERE ConceptId = @id;
+
+            DELETE FROM app.Concept
+            WHERE Id = @id;
+
+            COMMIT;
+        END TRY
+        BEGIN CATCH
+            ROLLBACK;
+        END CATCH;
+    END;
+    ELSE
+    BEGIN;
+        ROLLBACK;
+    END;
+
+    SELECT Id, UiDisplayText
+    FROM @filters;
+    SELECT Id, UniversalId, [Name], [Owner]
+    FROM @queries;
+    SELECT Id, UniversalId, UiDisplayName
+    FROM @concepts;
+END
+GO
+
+
+
+
+
+
 
 ALTER TABLE app.Concept
 DROP COLUMN IsEnabled

@@ -28,7 +28,7 @@ export const updateAdminConcept = async (state: AppState, concept: Concept) => {
     const resp = await http.put(`api/admin/concept/${concept.id}`, { 
         ...concept, 
         isRoot: !concept.parentId,
-        rootId: concept.id === concept.rootId ? null : concept.rootId
+        rootId: concept.rootId
     });
     return resp.data as Concept;
 };

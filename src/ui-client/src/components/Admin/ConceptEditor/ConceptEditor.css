@@ -316,14 +316,44 @@
 
 .concept-editor-concept-specialization-dropdown-container {
     margin: 4px 0;
+    position: relative;
+    text-align: left;
+}
+
+.concept-editor-concept-specialization-dropdown-container.enabled {
+    background-color: #a9ffb333;
+}
+
+.concept-editor-concept-specialization-dropdown-container.enabled::after {
+    background-color: #96fca293;
+    border-radius: 4px;
+    content: 'enabled!';
+    margin: auto;
+    padding: 2px 4px;
+    position: absolute;
+    top: 40%;
 }
 
 .concept-editor-concept-specialization-dropdown-preview {
+    background-color: white;
     border-radius: 3.5px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    box-shadow: 0px 4px 9px 0px rgba(0, 0, 0, 0.1);
+    color: rgb(180,180,180);
+    cursor: pointer;
     display: inline-block;
     margin: 20px;
+    max-width: 50%;
     text-align: left;
+    transition: box-shadow 0.3s;
+}
+
+.concept-editor-concept-specialization-dropdown-preview:hover,
+.enabled > .concept-editor-concept-specialization-dropdown-preview {
+    box-shadow: 0px 4px 9px 0px rgba(0, 0, 0, 0.24);
+}
+
+.enabled > .concept-editor-concept-specialization-dropdown-preview {
+    color: black;
 }
 
 .concept-editor-concept-specialization-dropdown-default {
@@ -333,4 +363,13 @@
 
 .concept-editor-concept-specialization-dropdown-item {
     padding: 3.5px 21px;
+}
+
+.concept-editor-concept-specialization-no-dropdowns {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    color: rgb(100,100,100);
+    margin: 20px 0;
+    padding: 2px;
+    text-align: center;
 }

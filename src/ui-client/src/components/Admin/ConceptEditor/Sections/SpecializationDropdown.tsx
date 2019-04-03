@@ -6,9 +6,11 @@
  */ 
 
 import React from 'react';
-import { ConceptSpecialization, ConceptSpecializationGroup } from '../../../../models/concept/Concept';
+import {  ConceptSpecializationGroup } from '../../../../models/concept/Concept';
 
 interface Props {
+    clickHandler: (grp: ConceptSpecializationGroup, enabled: boolean) => any;
+    enabled: boolean;
     specializationGroup: ConceptSpecializationGroup;
 }
 
@@ -16,21 +18,24 @@ export class SpecializationDropdown extends React.PureComponent<Props> {
     private className = "concept-editor"
     public render() {
         const c = this.className;
-        const grp = this.props.specializationGroup;
-        const spcs: ConceptSpecialization[] = [];
-        grp.specializations.forEach((s) => spcs.push(s));
+        const { specializationGroup, enabled } = this.props;
 
         return (
-            <div className={`${c}-concept-specialization-dropdown-container`}>
-                <div className={`${c}-concept-specialization-dropdown-preview`}>
+            <div className={`${c}-concept-specialization-dropdown-container ${enabled ? 'enabled' : ''}`}>
+                <div className={`${c}-concept-specialization-dropdown-preview`} onClick={this.handleClick}>
                     <div className={`${c}-concept-specialization-dropdown-default`}>
-                        {grp.uiDefaultText}
+                        {specializationGroup.uiDefaultText}
                     </div>
-                    {spcs.map((s) => 
+                    {specializationGroup.specializations.map((s) => 
                         <div key={s.id} className={`${c}-concept-specialization-dropdown-item`}>{s.uiDisplayText}</div>
                     )}
                 </div>
             </div>
         );
+    }
+
+    private handleClick = () => {
+        const { clickHandler, enabled, specializationGroup } = this.props;
+        clickHandler(specializationGroup, !enabled);
     }
 };
