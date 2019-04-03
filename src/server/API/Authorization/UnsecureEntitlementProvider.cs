@@ -15,7 +15,7 @@ using System.Linq;
 
 namespace Services.Authorization
 {
-    public class UnsecureEntitlementService : IFederatedEntitlementService
+    public class UnsecureEntitlementProvider : IFederatedEntitlementProvider
     {
         public Entitlement GetEntitlement(HttpContext context)
         {

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Services.Authorization
 {
-    public interface IFederatedEntitlementService
+    public interface IFederatedEntitlementProvider
     {
         Entitlement GetEntitlement(HttpContext context);
     }

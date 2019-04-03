@@ -16,13 +16,13 @@ using Services.Authorization;
 
 namespace API.Authorization
 {
-    public class ActiveDirectoryEntitlementService : IFederatedEntitlementService
+    public class ActiveDirectoryEntitlementProvider : IFederatedEntitlementProvider
     {
         readonly IScopedIdentity scopedIdentity;
         readonly RolesMappingOptions roles;
         readonly IMembershipProvider mProvider;
 
-        public ActiveDirectoryEntitlementService(
+        public ActiveDirectoryEntitlementProvider(
             IScopedIdentity scopedIdentity,
             IOptions<ActiveDirectoryAuthorizationOptions> authOpts,
             IMembershipProvider membershipProvider

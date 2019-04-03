@@ -6,9 +6,6 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "API\API.csproj", "{61459A09-A332-4876-BB27-D8730E012BCA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{1C2490BD-2BAD-495D-A480-890CB7648BE1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7} = {EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{EC0E7F46-FEE2-4484-9D31-C77AFF03DFD7}"
 EndProject

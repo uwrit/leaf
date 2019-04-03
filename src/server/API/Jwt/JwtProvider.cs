@@ -29,7 +29,7 @@ namespace API.Jwt
         readonly AuthenticationOptions authenticationOptions;
         readonly JwtSigningOptions jwtOptions;
         readonly LeafVersionOptions versionOptions;
-        readonly IFederatedEntitlementService entitlementService;
+        readonly IFederatedEntitlementProvider entitlementService;
         readonly IFederatedIdentityProvider idProvider;
 
         string Timestamp => DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
@@ -39,7 +39,7 @@ namespace API.Jwt
             IOptions<AuthenticationOptions> authOpts,
             IOptions<LeafVersionOptions> versionOpts,
             IFederatedIdentityProvider identityService,
-            IFederatedEntitlementService entitlementService
+            IFederatedEntitlementProvider entitlementService
         )
         {
             jwtOptions = signingOpts.Value;

@@ -16,11 +16,11 @@ using System.Collections.Generic;
 
 namespace Services.Authorization
 {
-    public class SAML2EntitlementService : IFederatedEntitlementService
+    public class SAML2EntitlementProvider : IFederatedEntitlementProvider
     {
         readonly SAML2AuthorizationOptions options;
 
-        public SAML2EntitlementService(IOptions<SAML2AuthorizationOptions> saml)
+        public SAML2EntitlementProvider(IOptions<SAML2AuthorizationOptions> saml)
         {
             options = saml.Value;
         }

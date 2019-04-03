@@ -7,10 +7,9 @@ using System;
 using System.Threading.Tasks;
 using System.Security.Claims;
 using Model.Cohort;
-using Services.Authorization;
 using Model.Authorization;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
     public interface ICohortCacheService
     {
