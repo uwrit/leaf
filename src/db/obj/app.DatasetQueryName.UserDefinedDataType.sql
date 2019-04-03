@@ -5,6 +5,6 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedDataType [app].[DatasetQueryName]    Script Date: 4/3/19 12:21:22 PM ******/
+/****** Object:  UserDefinedDataType [app].[DatasetQueryName]    Script Date: 4/3/19 1:22:36 PM ******/
 CREATE TYPE [app].[DatasetQueryName] FROM [nvarchar](200) NOT NULL
 GO
