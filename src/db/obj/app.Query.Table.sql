@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[Query]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Table [app].[Query]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -27,7 +27,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Query_Nonce]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Index [IX_Query_Nonce]    Script Date: 4/3/19 12:21:23 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 (
 	[Nonce] ASC
@@ -35,7 +35,7 @@ CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_Owner]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Index [IX_Query_Owner]    Script Date: 4/3/19 12:21:23 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 (
 	[Owner] ASC
@@ -43,19 +43,19 @@ CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_UniversalId]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Index [IX_Query_UniversalId]    Script Date: 4/3/19 12:21:23 PM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_UniversalId] ON [app].[Query]
 (
 	[UniversalId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-ALTER TABLE [app].[Query] ADD  DEFAULT (newsequentialid()) FOR [Id]
+ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
-ALTER TABLE [app].[Query] ADD  DEFAULT (newid()) FOR [Pepper]
+ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_]  DEFAULT (newid()) FOR [Pepper]
 GO
-ALTER TABLE [app].[Query] ADD  DEFAULT (getdate()) FOR [Created]
+ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Created]  DEFAULT (getdate()) FOR [Created]
 GO
-ALTER TABLE [app].[Query] ADD  DEFAULT (getdate()) FOR [Updated]
+ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Updated]  DEFAULT (getdate()) FOR [Updated]
 GO
-ALTER TABLE [app].[Query] ADD  DEFAULT ((1)) FOR [Ver]
+ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Ver]  DEFAULT ((1)) FOR [Ver]
 GO

@@ -50,7 +50,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                     {/* Text */}
                     <Col className={`${c}-input-container`} md={4}>
                         <TextArea
-                            changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText} required={true}
+                            changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText}
                         />
                     </Col>
 
@@ -63,7 +63,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                         </div>
 
                         <TextArea
-                            changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere} required={true}
+                            changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere}
                         />
                     </Col>
                 </Row>

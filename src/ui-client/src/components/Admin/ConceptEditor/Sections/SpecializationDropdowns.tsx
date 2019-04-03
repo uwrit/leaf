@@ -53,7 +53,7 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
                             return <SpecializationDropdown specializationGroup={grp} key={grp.id} enabled={enabled} clickHandler={this.handleDropdownClick}/>
                         })}
                         {grps.length === 0 &&
-                        <div className={`${c}-concept-specialization-no-dropdowns`}>No dropdowns currently available for this SQL Set</div>
+                        <div className={`${c}-concept-specialization-no-dropdowns`}>No dropdowns available for this SQL Set</div>
                         }
                     </div>
                 </div>

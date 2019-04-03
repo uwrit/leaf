@@ -249,11 +249,12 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                          * until the dependents owned by others are first deleted.
                          */
                         if (nonOwners.length) {
+                            const ex = nonOwners[0];
                             const info: InformationModalState = {
                                 body: nonOwners.length > 1
-                                    ? `There are ${nonOwners.length} other queries, including "${nonOwners[0].name}", owned by ${nonOwners[0].owner},` + 
+                                    ? `There are ${nonOwners.length} other queries, including "${ex.name}", owned by ${ex.owner},` + 
                                       `that depend on this query and therefore this cannot be deleted.`
-                                    : `Another query, "${nonOwners[0].name}", owned by ${nonOwners[0].owner}, ` + 
+                                    : `Another query, "${ex.name}", owned by ${ex.owner}, ` + 
                                       `depends on this query and therefore this cannot be deleted.`,
                                 header: "Error Deleting Query",
                                 show: true
@@ -271,12 +272,13 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                          */
                         if (!force) {
                             const cnt = dependents.length;
+                            const ex = dependents[0];
                             const confirm: ConfirmationModalState = {
                                 body: cnt > 1
-                                    ? `There are ${cnt} other saved queries that depend on this query, including "${dependents[0].name}". Do you want to proceed? ` +
+                                    ? `There are ${cnt} other saved queries that depend on this query, including "${ex.name}". Do you want to proceed? ` +
                                       `This will delete "${query.name}" and the ${cnt} other dependent queries.`
-                                    : `Another saved query, "${dependents[0].name}" depends on this query. Do you want to proceed? ` +
-                                      `This will delete both "${query.name}" and "${dependents[0].name}".`,
+                                    : `Another saved query, "${ex.name}" depends on this query. Do you want to proceed? ` +
+                                      `This will delete both "${query.name}" and "${ex.name}".`,
                                 header: 'Delete Dependent Queries',
                                 onClickNo: () => null,
                                 onClickYes: () => { dispatch(deleteSavedQueryAndCohort(query, true, dependents)); },

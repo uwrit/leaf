@@ -5,11 +5,12 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 
 -- =======================================
 -- Author:      Cliff Spital
@@ -59,7 +60,7 @@ BEGIN
     INSERT INTO @concepts
     SELECT Id, UniversalId, UiDisplayName
     FROM app.Concept
-    WHERE ParentId = @id;
+    WHERE ParentId = @id OR (RootId = @id AND Id != @id);
 
     IF NOT(EXISTS(SELECT 1 FROM @filters) OR EXISTS(SELECT 1 FROM @queries) OR EXISTS(SELECT 1 FROM @concepts))
     BEGIN;
@@ -91,6 +92,4 @@ BEGIN
     SELECT Id, UniversalId, UiDisplayName
     FROM @concepts;
 END
-
-
 GO

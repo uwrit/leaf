@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from "../../models/state/AppState";
-import { ConceptSqlSet } from "../../models/admin/Concept";
+import { ConceptSqlSet, ConceptSqlSetDeleteResponse } from "../../models/admin/Concept";
 import { getSqlSets, createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
@@ -114,14 +114,22 @@ export const deleteAdminConceptSqlSet = (set: ConceptSqlSet) => {
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptSqlSet(set));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        const info: InformationModalState = {
-                            body: "An error occurred while attempting to delete the SQL Set. Please see the Leaf error logs for details.",
-                            header: "Error Deleting SQL Set",
-                            show: true
-                        };
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-                        dispatch(showInfoModal(info));
+                    const info: InformationModalState = {
+                        body: "",
+                        header: "Error Deleting SQL Set",
+                        show: true
+                    };
+                    if (error.response.status === 409) {
+                        const conflicts = error.response.data as ConceptSqlSetDeleteResponse;
+                        info.body = 
+                            `There are ${conflicts.conceptCount} Concept(s) and ${conflicts.specializationGroupCount} ` +
+                            `Specialization Group(s) (dropdowns) which depend on this SQL Set. Please set these to use a different ` +
+                            `SQL Set or delete them first.`;
+                    } else {
+                        info.body = "An error occurred while attempting to delete the SQL Set. Please see the Leaf error logs for details.";
+                    }
+                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(showInfoModal(info));
                 });
         } catch (err) {
             console.log(err);

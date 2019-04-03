@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[PanelFilter]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Table [app].[PanelFilter]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,7 +24,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [app].[PanelFilter] ADD  DEFAULT (getdate()) FOR [LastChanged]
+ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_LastChanged]  DEFAULT (getdate()) FOR [LastChanged]
 GO
 ALTER TABLE [app].[PanelFilter]  WITH CHECK ADD  CONSTRAINT [FK_PanelFilter_ConceptId] FOREIGN KEY([ConceptId])
 REFERENCES [app].[Concept] ([Id])

@@ -5,11 +5,12 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 
 -- =======================================
 -- Author:      Cliff Spital
@@ -38,15 +39,4 @@ BEGIN
     JOIN app.Concept c on f.ConceptId = c.Id
     
 END
-
-
-
-
-
-
-
-
-
-
-
 GO
