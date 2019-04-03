@@ -14,12 +14,10 @@ namespace API.Authentication
 {
     public class SAML2IdentityProvider : IFederatedIdentityProvider
     {
-        readonly UserPrincipalContext userContext;
         readonly SAML2AuthenticationOptions options;
 
-        public SAML2IdentityProvider(IOptions<SAML2AuthenticationOptions> options, UserPrincipalContext userPrincipalContext)
+        public SAML2IdentityProvider(IOptions<SAML2AuthenticationOptions> options)
         {
-            userContext = userPrincipalContext;
             this.options = options.Value;
         }
 
@@ -33,7 +31,6 @@ namespace API.Authentication
             }
 
             var id = new SAML2ScopedIdentity(scoped);
-            userContext.ScopedIdentity = id;
             return id;
         }
     }

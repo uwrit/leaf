@@ -23,13 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Mock\Controllers\" />
-    <Folder Include="Mock\Compilers\" />
     <Folder Include="Mock\Services\" />
     <Folder Include="Mock\Options\" />
     <Folder Include="Mock\Models\Collections\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="BaseSchemaFieldTests.cs" />
   </ItemGroup>
 </Project>

@@ -24,6 +24,7 @@ using Services.Compiler.SqlServer;
 using Services.Cohort;
 using Services.Export;
 using Services.Admin;
+using Model.Cohort;
 using Model.Authorization;
 using Model.Authentication;
 using Model.Admin;
@@ -171,18 +172,16 @@ namespace API.Options
             switch (opts.Mechanism)
             {
                 case AuthorizationMechanism.Saml2:
-                    services.AddScoped<UserPrincipalContext>();
-                    services.AddSingleton<IFederatedEntitlementService, SAML2EntitlementService>();
+                    services.AddSingleton<IFederatedEntitlementProvider, SAML2EntitlementProvider>();
                     break;
 
                 case AuthorizationMechanism.ActiveDirectory:
-                    services.AddScoped<UserPrincipalContext>();
                     services.AddSingleton<ActiveDirectoryMembershipProvider>();
-                    services.AddScoped<IFederatedEntitlementService, ActiveDirectoryEntitlementService>();
+                    services.AddScoped<IFederatedEntitlementProvider, ActiveDirectoryEntitlementProvider>();
                     break;
 
                 case AuthorizationMechanism.Unsecured:
-                    services.AddSingleton<IFederatedEntitlementService, UnsecureEntitlementService>();
+                    services.AddSingleton<IFederatedEntitlementProvider, UnsecureEntitlementProvider>();
                     break;
             }
 
