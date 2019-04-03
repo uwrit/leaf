@@ -36,7 +36,6 @@ BEGIN
     FROM
         app.PanelFilter f
     JOIN app.Concept c on f.ConceptId = c.Id
-    WHERE c.IsEnabled = 1 and f.IsEnabled = 1;
     
 END
 
