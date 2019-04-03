@@ -6,6 +6,7 @@
 using System;
 using Xunit;
 using API.Authentication;
+using Model.Authentication;
 using Model.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
@@ -46,6 +47,36 @@ namespace Tests
 
             Assert.Equal("johndoe", identity.Identity);
             Assert.Equal("entity.tld", identity.Scope);
+        }
+
+        [Fact]
+        public void GetIdentity_Should_Throw_On_Header_Not_Found()
+        {
+            var ctx = GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
+            var opts = GetAuthenticationOptions("eppn");
+            var idProvider = new SAML2IdentityProvider(opts);
+
+            Assert.Throws<LeafAuthenticationException>(() => idProvider.GetIdentity(ctx));
+        }
+
+        [Fact]
+        public void GetIdentity_Should_Throw_On_Missing_Value()
+        {
+            var ctx = GetHttpContext(("eppn", ""));
+            var opts = GetAuthenticationOptions("eppn");
+            var idProvider = new SAML2IdentityProvider(opts);
+
+            Assert.Throws<LeafAuthenticationException>(() => idProvider.GetIdentity(ctx));
+        }
+
+        [Fact]
+        public void GetIdentity_Should_Throw_On_Malformed_Value()
+        {
+            var ctx = GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
+            var opts = GetAuthenticationOptions("targeted_id");
+            var idProvider = new SAML2IdentityProvider(opts);
+
+            Assert.Throws<FormatException>(() => idProvider.GetIdentity(ctx));
         }
     }
 }

@@ -21,12 +21,12 @@ namespace API.Jwt
 {
     public class BackgroundTokenBlacklistSynchronizer : BackgroundService
     {
-        readonly TokenBlacklistCache cache;
+        readonly ITokenBlacklistCache cache;
         readonly ITokenBlacklistService tokenBlacklistService;
         readonly ILogger<BackgroundTokenBlacklistSynchronizer> logger;
 
         public BackgroundTokenBlacklistSynchronizer(
-            TokenBlacklistCache cache,
+            ITokenBlacklistCache cache,
             ITokenBlacklistService tokenBlacklistService,
             ILogger<BackgroundTokenBlacklistSynchronizer> logger)
         {

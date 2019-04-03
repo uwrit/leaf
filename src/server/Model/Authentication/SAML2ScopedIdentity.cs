@@ -15,6 +15,10 @@ namespace Model.Authentication
         public SAML2ScopedIdentity() { }
         public SAML2ScopedIdentity(string scopedId)
         {
+            if (string.IsNullOrWhiteSpace(scopedId))
+            {
+                throw new FormatException($"SAML scoped identity vale is missing.");
+            }
             var parts = scopedId.Split('@');
             if (parts.Length != 2)
             {
