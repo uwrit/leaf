@@ -31,10 +31,6 @@ namespace Model.Options
                     }
                     return false;
                 }
-                set
-                {
-                    throw new InvalidOperationException($"{nameof(ExportOptions)}.{nameof(Enabled)} cannot be set");
-                }
             }
         }
     }

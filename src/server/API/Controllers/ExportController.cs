@@ -93,19 +93,19 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("redcap/project/failure")]
-        public ActionResult LogREDCapProjectFailure([FromBody] string token, [FromServices] IREDCapExportService exportService)
-        {
-            try
-            {
-                // Do something with token
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Could not log REDCap project failure. Error:{Error}", ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
+        //[HttpPost("redcap/project/failure")]
+        //public ActionResult LogREDCapProjectFailure([FromBody] string token, [FromServices] IREDCapExportService exportService)
+        //{
+        //    try
+        //    {
+        //        // Do something with token
+        //        return Ok();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.LogError("Could not log REDCap project failure. Error:{Error}", ex.Message);
+        //        return StatusCode(StatusCodes.Status500InternalServerError);
+        //    }
+        //}
     }
 }

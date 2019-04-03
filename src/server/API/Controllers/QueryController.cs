@@ -87,7 +87,6 @@ namespace API.Controllers
             [FromBody] QuerySaveDTO querySave,
             [FromServices] IPanelConverterService panelConverter,
             [FromServices] IPanelValidator panelValidator,
-            [FromServices] IPatientCountService patientCountService,
             CancellationToken cancelToken
         )
         {
@@ -195,11 +194,11 @@ namespace API.Controllers
             }
         }
 
-        [HttpPut("{ident}/share")]
-        public ActionResult Share(string ident, [FromBody] PatientCountQueryDTO query)
-        {
-            return NotFound();
-        }
+        //[HttpPut("{ident}/share")]
+        //public ActionResult Share(string ident, [FromBody] PatientCountQueryDTO query)
+        //{
+        //    return NotFound();
+        //}
 
         [Authorize(Policy = Access.Institutional)]
         [HttpPost("preflight")]

@@ -106,7 +106,7 @@ namespace Services.Compiler
             return ByQueryId;
         }
 
-        DemographicCompilerContext ReadContextGrid(SqlMapper.GridReader gridReader, QueryRef queryRef)
+        DemographicCompilerContext ReadContextGrid(SqlMapper.GridReader gridReader)
         {
             var queryCtx = gridReader.ReadFirstOrDefault<QueryContext>();
             var demoQuery = gridReader.ReadFirstOrDefault<DemographicQuery>();
@@ -133,7 +133,7 @@ namespace Services.Compiler
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return ReadContextGrid(grid, queryRef);
+                return ReadContextGrid(grid);
             }
         }
 
@@ -152,7 +152,7 @@ namespace Services.Compiler
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return ReadContextGrid(grid, queryRef);
+                return ReadContextGrid(grid);
             }
         }
 

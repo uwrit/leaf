@@ -57,10 +57,6 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("SpecializationGroup is missing."));
                 }
-                if (dto.Id == default)
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup.Id is missing."));
-                }
                 if (dto.SqlSetId == default)
                 {
                     return BadRequest(CRUDError.From("SpecializationGroup.SqlSetId is missing."));
@@ -69,6 +65,7 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("SpecializationGroup.UiDefaultText is missing."));
                 }
+                dto.Id = id;
 
                 var group = dto.SpecializationGroup();
                 var updated = await sgService.Update(group);

@@ -18,6 +18,7 @@ using Services.Authorization;
 using Microsoft.AspNetCore.Http;
 using Model.Authentication;
 using API.Authentication;
+using API.Authorization;
 
 namespace API.Jwt
 {

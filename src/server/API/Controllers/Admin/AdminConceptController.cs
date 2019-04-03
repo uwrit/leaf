@@ -57,6 +57,7 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("Concept missing."));
                 }
+                o.Id = id;
 
                 var c = o.Concept();
                 var updated = await cService.Update(c);

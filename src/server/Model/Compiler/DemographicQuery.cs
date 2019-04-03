@@ -12,14 +12,4 @@ namespace Model.Compiler
         public Shape Shape => Shape.Demographic;
         public string SqlStatement { get; set; }
     }
-    //public class DemographicQuery : IDemographicQuery
-    //{
-    //    public string SqlStatement { get; set; }
-    //    public SqlSelectors SqlSelectors { get; set; }
-    //}
-
-    //public class ExecutableDemographicQuery : DemographicQuery
-    //{
-    //    public Guid Pepper { get; set; }
-    //}
 }
