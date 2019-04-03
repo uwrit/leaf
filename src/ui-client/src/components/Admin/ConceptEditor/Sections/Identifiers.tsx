@@ -29,8 +29,12 @@ export class Identifiers extends React.PureComponent<Props> {
                     label='Concept Id' subLabel='Id for the Concept. This is used internally by Leaf and cannot be edited directly.'
                 />
                 <Input 
-                    changeHandler={changeHandler} propName={'parentId'} value={adminConcept!.parentId} 
-                    label='Parent Id' subLabel='Id for the parent Concept that appears above this in the tree. Edit with caution.'
+                    changeHandler={changeHandler} propName={'parentId'} value={adminConcept!.parentId} locked={true}
+                    label='Parent Id' subLabel='Id for the parent Concept that appears above this in the tree. Edit by dragging Concept into a new parent.'
+                />
+                <Input 
+                    changeHandler={changeHandler} propName={'rootId'} value={adminConcept!.rootId} locked={true}
+                    label='Root Id' subLabel='Root (top-most) ancestor Id for the Concept.'
                 />
                 <TextArea
                     changeHandler={changeHandler} propName={'universalId'} value={adminConcept!.universalId} 

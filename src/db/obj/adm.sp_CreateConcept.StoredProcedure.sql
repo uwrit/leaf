@@ -123,6 +123,13 @@ BEGIN
         SELECT @id, SpecializationGroupId, OrderId
         FROM @specializationGroups;
 
+		IF (@isRoot = 1)
+		BEGIN
+			UPDATE app.Concept
+			SET RootId = @id
+			WHERE Id = @id
+		END
+
         COMMIT;
 
         EXEC adm.sp_GetConceptById @id;

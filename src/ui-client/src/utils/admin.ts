@@ -13,6 +13,7 @@ import { AppState } from '../models/state/AppState';
 import { saveOrUpdateAdminConceptSqlSet } from '../actions/admin/sqlSet';
 import { saveOrUpdateAdminConceptSpecializationGroup } from '../actions/admin/specializationGroup';
 import { saveOrUpdateAdminSpecialization } from '../actions/admin/specialization';
+import { generate as generateId } from 'shortid';
 
 const year = new Date().getFullYear();
 
@@ -22,6 +23,7 @@ const year = new Date().getFullYear();
  * the changes if applicable.
  */
 export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any, sqlSet?: ConceptSqlSet): UserConcept => {
+    const neverAdd = new Set(['specializationGroups']);
     const alwaysAdd = new Set([ 
         'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 
         'uiDisplayName', 'uiDisplayText', 'isNumeric', 'isEncounterBased' 
@@ -32,7 +34,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
         out.isEncounterBased = sqlSet.isEncounterBased;
     }
 
-    if (alwaysAdd.has(propName) || userConcept[propName] !== undefined) {
+    if (alwaysAdd.has(propName) || userConcept[propName] !== undefined && !neverAdd.has(propName)) {
         out[propName] = val;
     }
     return out;
@@ -103,6 +105,22 @@ export const conceptSqlSetsChanged = (sets: Map<number,ConceptSqlSet>): boolean 
     return changeDetected;
 };
 
+/*
+ * Determines the rootId of a given Concept. Called before saving.
+ */
+export const getRootId = (concept: UserConcept, conceptTree: Map<string, UserConcept>) => {
+    if (!concept.parentId) {
+        return concept.id;
+    }
+    let parentId = concept.parentId;
+    let rootId = parentId;
+    while (parentId) {
+        rootId = parentId;
+        parentId = conceptTree.get(parentId)!.parentId!;
+    }
+    return rootId;
+};
+
 export const getApiUpdateQueue = (sets: Map<number,ConceptSqlSet>, dispatch: any, state: AppState): any[] => {
     const queue: any[] = [];
     sets.forEach((set) => {
@@ -144,4 +162,46 @@ export const getApiUpdateQueue = (sets: Map<number,ConceptSqlSet>, dispatch: any
         }
     });
     return queue;
+};
+
+/* 
+ * Return a new empty concept.
+ */
+export interface EmptyConceptPair {
+    adminConcept: AdminConcept;
+    userConcept: UserConcept;
+}
+
+export const createEmptyConcept = (): EmptyConceptPair => {
+    const id = generateId();
+    const baseProps = {
+        id,
+        rootId: id,
+        isNumeric: false,
+        isParent: false,
+        isRoot: true,
+        isPatientCountAutoCalculated: true,
+        isSpecializable: false,
+        uiDisplayName: 'New Concept',
+        uiDisplayText: '',
+        uiDisplaySubtext: '',
+        uiDisplayTooltip: '',
+        universalId: '',
+        unsaved: true
+    };
+    const adminConcept: AdminConcept = {
+        ...baseProps,
+        constraints: [],
+        specializationGroups: []
+    };
+    const userConcept: UserConcept = {
+        ...baseProps,
+        childrenLoaded: false,
+        isEncounterBased: false,
+        isEventBased: false,
+        isFetching: false,
+        isOpen: false
+    };
+
+    return { adminConcept, userConcept };
 };

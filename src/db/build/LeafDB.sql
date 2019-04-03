@@ -1519,6 +1519,13 @@ BEGIN
         SELECT @id, SpecializationGroupId, OrderId
         FROM @specializationGroups;
 
+		IF (@isRoot = 1)
+		BEGIN
+			UPDATE app.Concept
+			SET RootId = @id
+			WHERE Id = @id
+		END
+
         COMMIT;
 
         EXEC adm.sp_GetConceptById @id;
@@ -1739,7 +1746,7 @@ BEGIN
     INSERT INTO @concepts
     SELECT Id, UniversalId, UiDisplayName
     FROM app.Concept
-    WHERE ParentId = @id OR RootId = @id;
+    WHERE ParentId = @id OR (RootId = @id AND IsRoot = 0);
 
     IF NOT(EXISTS(SELECT 1 FROM @filters) OR EXISTS(SELECT 1 FROM @queries) OR EXISTS(SELECT 1 FROM @concepts))
     BEGIN;

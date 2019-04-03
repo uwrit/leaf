@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept } from '../../models/admin/Concept';
+import { Concept, ConceptDeleteResponse } from '../../models/admin/Concept';
 import { Concept as UserConcept } from '../../models/concept/Concept';
 import { Concept as AdminConcept } from '../../models/admin/Concept';
 import { AppState } from '../../models/state/AppState';
@@ -16,7 +16,7 @@ import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../models/s
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
 import { getSqlSets } from '../../services/admin/sqlSetApi';
 import { getAdminSqlConfiguration } from './configuration';
-import { generateSampleSql } from '../../utils/admin';
+import { generateSampleSql, getRootId } from '../../utils/admin';
 import { setConcept, removeConcept, reparentConcept, createConcept } from '../concepts';
 import { setAdminConceptSqlSets } from './sqlSet';
 import { fetchConcept } from '../../services/conceptApi'
@@ -76,9 +76,9 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
          */
         if (userConcept.unsaved) {
             dispatch(reparentConcept(userConcept, parentId));
-
-            const reparented = getState().concepts.currentTree.get(userConcept.id);
-            const adminConcept = Object.assign({}, state.admin!.concepts.concepts.get(userConcept.id), { parentId });
+            const currentTree = getState().concepts.currentTree;
+            const reparented = currentTree.get(userConcept.id)!;
+            const adminConcept = Object.assign({}, state.admin!.concepts.concepts.get(userConcept.id), { parentId, rootId: reparented.rootId });
             dispatch(setAdminConcept(adminConcept, true));
             dispatch(setAdminPanelCurrentUserConcept(reparented!));
 
@@ -87,17 +87,18 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
             /*
              * Load the Admin Concept if not already cached.
              */
-            let adminConcept = Object.assign({}, state.admin!.concepts.currentAdminConcept, { parentId });
-            if (!adminConcept) {
+            const newParent = state.concepts.currentTree.get(parentId)!;
+            const newRootId = getRootId(newParent, getState().concepts.currentTree);
+            let adminConcept = Object.assign({}, state.admin!.concepts.currentAdminConcept, { parentId, rootId: newRootId });
+            if (!state.admin!.concepts.currentAdminConcept) {
                 dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
-                adminConcept =  Object.assign({}, await getAdminConcept(state, userConcept.id), { parentId });
+                adminConcept =  Object.assign({}, await getAdminConcept(state, userConcept.id), { parentId, newRootId });
                 dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
             }
 
             /*
              * Confirm that the move was intentional, and save to server if 'yes'.
              */
-            const newParent = state.concepts.currentTree.get(parentId)!
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to move "${adminConcept.uiDisplayName}" under "${newParent.uiDisplayName}"? `+
                       `This will take effect immediately and be visible to users`,
@@ -222,7 +223,7 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
             dispatch(removeConcept(userConcept));
             dispatch(createConcept(newUserConcept));
             dispatch(setAdminConcept(newAdminConcept, false));
-            dispatch(setAdminPanelCurrentUserConcept(userConcept));
+            dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
             
             /*
              * Update parent Concept if needed.
@@ -266,22 +267,32 @@ export const updateAdminParentOnSaveIfNeeded = async (adminConcept: Concept, use
  */
 export const deleteAdminConceptFromServer = (concept: Concept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            const state = getState();
-            dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
-            await deleteAdminConcept(state, concept.id);
-            dispatch(setNoClickModalState({ message: "Concept Deleted", state: NoClickModalStates.Complete }));
-            dispatch(removeConcept(userConcept));
-        } catch (err) {
-            console.log(err);
-            const info: InformationModalState = {
-                body: "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.",
-                header: "Error Deleting Concept",
-                show: true
-            };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-            dispatch(showInfoModal(info));
-        }
+        const state = getState();
+        dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+        deleteAdminConcept(state, concept.id)
+            .then(
+                response => {
+                    dispatch(setNoClickModalState({ message: "Concept Deleted", state: NoClickModalStates.Complete }));
+                    dispatch(removeConcept(userConcept));
+                }, error => {
+                    const info: InformationModalState = {
+                        body: "",
+                        header: "Error Deleting Concept",
+                        show: true
+                    };
+                    if (error.response.status === 409) {
+                        const conflicts = error.response.data as ConceptDeleteResponse;
+                        info.body = 
+                            `The Leaf server has found ${conflicts.conceptCount} child Concept(s), ${conflicts.panelFilterCount} filter(s), ` + 
+                            `and ${conflicts.queryCount} saved user queries which depend on this. Please delete these first.`;
+                    } else {
+                        info.body = "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.";
+                    }
+                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(showInfoModal(info));
+                }
+            );
+        
     }
 };
 

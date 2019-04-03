@@ -103,3 +103,30 @@ export interface ConceptConstraint {
     constraintId: ConstraintType;
     constraintValue: string;
 }
+
+export interface ConceptDeleteResponse {
+    panelFilterCount: number;
+    panelFilters: PanelFilterDependent[];
+    queryCount: number;
+    queries: QueryDependent[];
+    conceptCount: number;
+    concepts: ConceptDependent[];
+}
+
+interface PanelFilterDependent {
+    id: number;
+    uiDisplayText: string;
+}
+
+interface QueryDependent {
+    id: string;
+    universalId: string;
+    name: string;
+    owner: string;
+}
+
+interface ConceptDependent {
+    id: string;
+    universalId?: string;
+    uiDisplayName: string;
+}
