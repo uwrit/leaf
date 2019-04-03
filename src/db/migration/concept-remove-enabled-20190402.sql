@@ -304,7 +304,7 @@ BEGIN
     INSERT INTO @concepts
     SELECT Id, UniversalId, UiDisplayName
     FROM app.Concept
-    WHERE ParentId = @id;
+    WHERE ParentId = @id OR (RootId = @id AND IsRoot = 0);
 
     IF NOT(EXISTS(SELECT 1 FROM @filters) OR EXISTS(SELECT 1 FROM @queries) OR EXISTS(SELECT 1 FROM @concepts))
     BEGIN;
