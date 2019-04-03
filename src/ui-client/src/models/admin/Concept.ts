@@ -113,6 +113,18 @@ export interface ConceptDeleteResponse {
     concepts: ConceptDependent[];
 }
 
+export interface ConceptSqlSetDeleteResponse {
+    conceptCount: number;
+    concepts: ConceptDependent[];
+    specializationGroupCount: number;
+    specializationGroups: SpecializationGroupDependent[];
+}
+
+export interface SpecializationGroupDeleteResponse {
+    conceptCount: number;
+    concepts: ConceptDependent[];
+}
+
 interface PanelFilterDependent {
     id: number;
     uiDisplayText: string;
@@ -129,4 +141,9 @@ interface ConceptDependent {
     id: string;
     universalId?: string;
     uiDisplayName: string;
+}
+
+interface SpecializationGroupDependent {
+    id: string;
+    uiDefaultText: string;
 }

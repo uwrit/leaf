@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteSpecializationGroup]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteSpecializationGroup]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -33,6 +33,7 @@ BEGIN
         UniversalId nvarchar(200) NULL,
         UiDisplayName nvarchar(400) NULL
     );
+    INSERT INTO @deps (Id, UniversalId, UiDisplayName)
     SELECT c.Id, c.UniversalId, c.UiDisplayName
     FROM app.Concept c
     JOIN rela.ConceptSpecializationGroup csg ON c.Id = csg.ConceptId
@@ -61,6 +62,7 @@ BEGIN
     WHERE 0 = 1;
 
 END
+
 
 
 GO

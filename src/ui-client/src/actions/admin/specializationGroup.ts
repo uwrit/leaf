@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from "../../models/state/AppState";
-import { SpecializationGroup } from "../../models/admin/Concept";
+import { SpecializationGroup, SpecializationGroupDeleteResponse } from "../../models/admin/Concept";
 import { getSpecializationGroups, updateSpecializationGroup, deleteSpecializationGroup, createSpecializationGroup } from "../../services/admin/specializationGroupApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
@@ -76,12 +76,22 @@ export const deleteAdminConceptSpecializationGroup = (group: SpecializationGroup
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptSpecializationGroup(group));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
-                            body: "An error occurred while attempting to delete the Concept Specialization Group. Please see the Leaf error logs for details.",
-                            header: "Error Deleting Concept Specialization Group",
+                            body: "",
+                            header: "Error Deleting Specialization Group",
                             show: true
                         };
+                        if (error.response.status === 409) {
+                            const conflicts = error.response.data as SpecializationGroupDeleteResponse;
+                            const ex = conflicts.concepts[0];
+                            info.body = 
+                                `There are ${conflicts.conceptCount} Concept(s) which depend on this Specialization Group, ` +
+                                `including "${ex.uiDisplayName}" (Id "${ex.id}"). Please delete these first.`;
+                        } else {
+                            info.body = 
+                                "An error occurred while attempting to delete the Concept Specialization Group. " +
+                                "Please see the Leaf error logs for details.";
+                        }
                         dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });

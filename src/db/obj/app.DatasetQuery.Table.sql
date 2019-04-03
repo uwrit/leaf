@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[DatasetQuery]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Table [app].[DatasetQuery]    Script Date: 4/3/19 12:21:23 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -30,7 +30,7 @@ PRIMARY KEY CLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 4/3/19 12:21:23 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
 (
 	[Name] ASC
@@ -38,17 +38,17 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQue
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 4/1/19 1:47:55 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 4/3/19 12:21:23 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
 	[UniversalId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-ALTER TABLE [app].[DatasetQuery] ADD  DEFAULT (newsequentialid()) FOR [Id]
+ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
-ALTER TABLE [app].[DatasetQuery] ADD  DEFAULT (getdate()) FOR [Created]
+ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Created]  DEFAULT (getdate()) FOR [Created]
 GO
-ALTER TABLE [app].[DatasetQuery] ADD  DEFAULT (getdate()) FOR [Updated]
+ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Updated]  DEFAULT (getdate()) FOR [Updated]
 GO
 ALTER TABLE [app].[DatasetQuery]  WITH CHECK ADD  CONSTRAINT [FK_DatasetQuery_CategoryId] FOREIGN KEY([CategoryId])
 REFERENCES [app].[DatasetQueryCategory] ([Id])

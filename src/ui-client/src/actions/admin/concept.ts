@@ -283,7 +283,7 @@ export const deleteAdminConceptFromServer = (concept: Concept, userConcept: User
                     if (error.response.status === 409) {
                         const conflicts = error.response.data as ConceptDeleteResponse;
                         info.body = 
-                            `The Leaf server has found ${conflicts.conceptCount} child Concept(s), ${conflicts.panelFilterCount} filter(s), ` + 
+                            `There are ${conflicts.conceptCount} descendent Concept(s), ${conflicts.panelFilterCount} filter(s), ` + 
                             `and ${conflicts.queryCount} saved user queries which depend on this. Please delete these first.`;
                     } else {
                         info.body = "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.";

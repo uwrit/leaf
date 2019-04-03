@@ -123,13 +123,6 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
 
         if (specializationGroup.unsaved) {
             dispatch(removeAdminConceptSpecializationGroup(specializationGroup));
-        } else if (specializationGroup.specializations.size) {
-            const info: InformationModalState = {
-                body: "This Specialization Dropdown has dropdown options that depend on it. Please delete all dropdown options first.",
-                header: "Cannot Delete Dropdown",
-                show: true
-            };
-            dispatch(showInfoModal(info));
         } else {    
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete this dropdown (id "${specializationGroup.id}")? This can't be undone.`,
