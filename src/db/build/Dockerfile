@@ -20,10 +20,10 @@ VOLUME /bak
 # Set up database
 RUN /opt/mssql/bin/sqlservr & sleep 10 \
     && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./LeafDB.sql \
-    && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./LeafDB.Data.sql \
+    # && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./LeafDB.Data.sql \
     && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./LeafDB.Exec.sql \
     && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./SynPuf_OMOP.Restore.sql \
-    && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./SynPuf_OMOP.Shrink.sql \
+    # && /opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P ${MSSQL_SA_PASSWORD} -i ./SynPuf_OMOP.Shrink.sql \
     && pkill sqlservr
 
 RUN rm /data/SynPuf_OMOP.bak

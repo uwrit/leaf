@@ -112,7 +112,7 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
                 // Else if concept
                 } else {
                     const concept = await fetchConcept(state, resRef.id);
-                    panelItem.concept = concept.data;
+                    panelItem.concept = concept;
                 }
                 subpanel.panelItems[pi] = panelItem;
             }

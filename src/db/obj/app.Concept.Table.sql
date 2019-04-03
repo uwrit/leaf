@@ -21,7 +21,6 @@ CREATE TABLE [app].[Concept](
 	[IsNumeric] [bit] NULL,
 	[IsParent] [bit] NULL,
 	[IsRoot] [bit] NULL,
-	[IsEnabled] [bit] NULL,
 	[IsSpecializable] [bit] NULL,
 	[SqlSetId] [int] NULL,
 	[SqlSetWhere] [nvarchar](1000) NULL,

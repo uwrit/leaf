@@ -16,7 +16,6 @@ CREATE TABLE [app].[PanelFilter](
 	[IsInclusion] [bit] NOT NULL,
 	[UiDisplayText] [nvarchar](1000) NULL,
 	[UiDisplayDescription] [nvarchar](4000) NULL,
-	[IsEnabled] [bit] NOT NULL,
 	[LastChanged] [datetime] NULL,
 	[ChangedBy] [nvarchar](200) NOT NULL,
 PRIMARY KEY CLUSTERED 
@@ -24,8 +23,6 @@ PRIMARY KEY CLUSTERED
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
-GO
-ALTER TABLE [app].[PanelFilter] ADD  DEFAULT ((1)) FOR [IsEnabled]
 GO
 ALTER TABLE [app].[PanelFilter] ADD  DEFAULT (getdate()) FOR [LastChanged]
 GO

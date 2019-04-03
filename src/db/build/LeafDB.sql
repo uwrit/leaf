@@ -634,7 +634,6 @@ CREATE TABLE [app].[Concept](
 	[IsNumeric] [bit] NULL,
 	[IsParent] [bit] NULL,
 	[IsRoot] [bit] NULL,
-	[IsEnabled] [bit] NULL,
 	[IsSpecializable] [bit] NULL,
 	[SqlSetId] [int] NULL,
 	[SqlSetWhere] [nvarchar](1000) NULL,
@@ -840,7 +839,6 @@ CREATE TABLE [app].[PanelFilter](
 	[IsInclusion] [bit] NOT NULL,
 	[UiDisplayText] [nvarchar](1000) NULL,
 	[UiDisplayDescription] [nvarchar](4000) NULL,
-	[IsEnabled] [bit] NOT NULL,
 	[LastChanged] [datetime] NULL,
 	[ChangedBy] [nvarchar](200) NOT NULL,
 PRIMARY KEY CLUSTERED 
@@ -1244,8 +1242,6 @@ GO
 ALTER TABLE [app].[DatasetQueryCategory] ADD  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [app].[DemographicQuery] ADD  CONSTRAINT [DF_DemographicQuery_Lock]  DEFAULT ('X') FOR [Lock]
-GO
-ALTER TABLE [app].[PanelFilter] ADD  DEFAULT ((1)) FOR [IsEnabled]
 GO
 ALTER TABLE [app].[PanelFilter] ADD  DEFAULT (getdate()) FOR [LastChanged]
 GO
@@ -4356,7 +4352,6 @@ BEGIN
     FROM
         app.PanelFilter f
     JOIN app.Concept c on f.ConceptId = c.Id
-    WHERE c.IsEnabled = 1 and f.IsEnabled = 1;
     
 END
 
@@ -4637,15 +4632,7 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-	DECLARE @enabled app.ResourceIdTable
 	DECLARE @specializedGroups app.ListTable
-
-	-- Get enabled concepts only
-	INSERT INTO @enabled (Id)
-	SELECT c.Id
-	FROM app.Concept c
-	WHERE c.IsEnabled = 1
-		  AND EXISTS (SELECT 1 FROM @ids i WHERE i.Id = c.Id)
 
 	-- Get specialization groups for
 	-- the concepts to be retrieved
@@ -4656,7 +4643,7 @@ BEGIN
 				  FROM rela.ConceptSpecializationGroup csg
 					   INNER JOIN app.Concept c
 							ON csg.ConceptId = c.Id
-				  WHERE EXISTS (SELECT 1 FROM @enabled i WHERE i.Id = c.Id)
+				  WHERE EXISTS (SELECT 1 FROM @ids i WHERE i.Id = c.Id)
 						AND c.SqlSetId = sg.SqlSetId
 						AND c.IsSpecializable = 1)
 
@@ -4690,7 +4677,7 @@ BEGIN
     FROM app.Concept c
 		 INNER JOIN app.ConceptSqlSet s
 			ON c.SqlSetId = s.Id
-    WHERE EXISTS (SELECT 1 FROM @enabled i WHERE c.Id = i.Id)
+    WHERE EXISTS (SELECT 1 FROM @ids i WHERE c.Id = i.Id)
     ORDER BY c.UiDisplayRowOrder, c.UiDisplayName
 
 	-- Return Specialization groups
@@ -4702,7 +4689,7 @@ BEGIN
 	FROM rela.ConceptSpecializationGroup csg
 		 INNER JOIN app.SpecializationGroup sg
 			ON csg.SpecializationGroupId = sg.Id
-	WHERE EXISTS (SELECT 1 FROM @enabled i WHERE i.Id = csg.ConceptId)
+	WHERE EXISTS (SELECT 1 FROM @ids i WHERE i.Id = csg.ConceptId)
 		  AND EXISTS (SELECT 1 FROM @specializedGroups sg WHERE sg.Id = sg.Id)
 
 	-- Return Specializations
