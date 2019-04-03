@@ -35,7 +35,7 @@ namespace API.Authorization
 
         public Entitlement GetEntitlement(HttpContext _)
         {
-            var groups = GetGroups();
+            var groups = mProvider.GetMembership(scopedIdentity.Identity);
 
             var mask = GetMask(groups);
 
@@ -71,11 +71,6 @@ namespace API.Authorization
             }
 
             return mask;
-        }
-
-        IEnumerable<string> GetGroups()
-        {
-            return mProvider.GetMembership(scopedIdentity.Identity);
         }
     }
 }
