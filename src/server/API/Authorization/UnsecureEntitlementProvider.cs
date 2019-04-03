@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     public class UnsecureEntitlementProvider : IFederatedEntitlementProvider
     {

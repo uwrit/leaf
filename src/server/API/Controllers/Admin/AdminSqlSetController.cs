@@ -58,14 +58,11 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("ConceptSqlSet is missing."));
                 }
-                if (conceptSqlSet.Id == default)
-                {
-                    return BadRequest(CRUDError.From("ConceptSqlSet.Id must not be null."));
-                }
                 if (string.IsNullOrWhiteSpace(conceptSqlSet.SqlSetFrom))
                 {
                     return BadRequest(CRUDError.From("ConceptSqlSet.SqlSetFrom is required."));
                 }
+                conceptSqlSet.Id = id;
 
                 var updated = await setService.Update(conceptSqlSet);
                 if (updated == null)

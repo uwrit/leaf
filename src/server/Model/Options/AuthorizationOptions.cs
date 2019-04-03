@@ -106,7 +106,6 @@ namespace Model.Options
     public class HeaderDigestionOptions
     {
         public string Name { get; set; }
-        public bool IsMulti { get; set; }
         public string Delimiter { get; set; }
     }
 

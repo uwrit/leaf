@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Model.Authorization;
 using Microsoft.AspNetCore.Http;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     public interface IFederatedEntitlementProvider
     {

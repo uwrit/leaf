@@ -42,10 +42,6 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("Specialization is missing."));
                 }
-                if (dto.Id == default)
-                {
-                    return BadRequest(CRUDError.From("Specialization.Id is missing."));
-                }
                 if (dto.SpecializationGroupId == default)
                 {
                     return BadRequest(CRUDError.From("Specialization.SpecializationGroupId is required."));
@@ -58,6 +54,7 @@ namespace API.Controllers.Admin
                 {
                     return BadRequest(CRUDError.From("Specialization.SqlSetWhere is required."));
                 }
+                dto.Id = id;
 
                 var spec = dto.ConceptSpecialization();
                 var updated = await specializationService.Update(spec);

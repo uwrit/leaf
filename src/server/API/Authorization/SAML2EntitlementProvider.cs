@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     public class SAML2EntitlementProvider : IFederatedEntitlementProvider
     {

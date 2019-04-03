@@ -5,11 +5,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using Xunit;
-using API.Authentication;
+using API.Authorization;
 using Model.Authentication;
+using Model.Authorization;
 using Model.Options;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace Tests
 {
@@ -25,15 +27,94 @@ namespace Tests
             return httpContext;
         }
 
-        //static IOptions<SAML2AuthorizationOptions> GetAuthOptions()
-        //{
-
-        //}
+        static IOptions<SAML2AuthorizationOptions> GetAuthOptions(HeaderDigestionOptions digs, RolesMappingOptions roles)
+        {
+            return Options.Create(new SAML2AuthorizationOptions
+            {
+                HeadersMapping = new HeadersMappingOptions
+                {
+                    Entitlements = digs
+                },
+                RolesMapping = roles
+            });
+        }
 
         [Fact]
-        public void GetEntitlement_Should_Return_Entitlement_Ok()
+        public void GetEntitlement_Multi_Should_Return_Entitlement_Ok()
         {
+            var headerDigestion = new HeaderDigestionOptions
+            {
+                Name = "iam-groups",
+                Delimiter = ";"
+            };
+            var roleMapping = new RolesMappingOptions
+            {
+                User = "leaf_users",
+                Super = "leaf_supers",
+                Identified = "leaf_phi",
+                Admin = "leaf_admin"
+            };
+            var opts = GetAuthOptions(headerDigestion, roleMapping);
+            var eProvider = new SAML2EntitlementProvider(opts);
+            var ctx = GetHttpContext(("iam-groups", "leaf_users; leaf_admin; surgery"));
 
+            var entitlement = eProvider.GetEntitlement(ctx);
+
+            Assert.Contains(entitlement.Groups, g => g == "surgery");
+            Assert.True(entitlement.Groups.Count() == 1);
+            Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
+            Assert.True(entitlement.Mask.HasFlag(RoleMask.Admin));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.Super));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.CanIdentify));
+        }
+
+        [Fact]
+        public void GetEntitlement_Single_Should_Return_Entitlement_Ok()
+        {
+            var headerDigestion = new HeaderDigestionOptions
+            {
+                Name = "iam-groups",
+                Delimiter = ";"
+            };
+            var roleMapping = new RolesMappingOptions
+            {
+                User = "leaf_users",
+                Super = "leaf_supers",
+                Identified = "leaf_phi",
+                Admin = "leaf_admin"
+            };
+            var opts = GetAuthOptions(headerDigestion, roleMapping);
+            var eProvider = new SAML2EntitlementProvider(opts);
+            var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+
+            var entitlement = eProvider.GetEntitlement(ctx);
+
+            Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.Admin));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.Super));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.CanIdentify));
+        }
+
+        [Fact]
+        public void GetEntitlement_Should_Throw_If_Header_Not_Found()
+        {
+            var headerDigestion = new HeaderDigestionOptions
+            {
+                Name = "iam-group",
+                Delimiter = ";"
+            };
+            var roleMapping = new RolesMappingOptions
+            {
+                User = "leaf_users",
+                Super = "leaf_supers",
+                Identified = "leaf_phi",
+                Admin = "leaf_admin"
+            };
+            var opts = GetAuthOptions(headerDigestion, roleMapping);
+            var eProvider = new SAML2EntitlementProvider(opts);
+            var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+
+            Assert.Throws<LeafAuthenticationException>(() => eProvider.GetEntitlement(ctx));
         }
     }
 }
