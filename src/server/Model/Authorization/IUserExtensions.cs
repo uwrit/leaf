@@ -4,17 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Model.Admin;
+using System.Data;
 
-namespace Services.Admin
+namespace Model.Authorization
 {
-    public interface IAdminConceptService
+    public static class IUserExtensions
     {
-        Task<Concept> Get(Guid id);
-        Task<Concept> Update(Concept c);
-        Task<Concept> Create(Concept c);
-        Task<ConceptDeleteResult> Delete(Guid id);
+        public static bool Anonymize(this IUserContext userContext)
+        {
+            return !userContext.Identified || !userContext.IsInstutional;
+        }
     }
 }

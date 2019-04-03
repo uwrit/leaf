@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Services.Authorization;
+using Model.Authorization;
 
 namespace Services.Admin
 {

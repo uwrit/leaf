@@ -9,13 +9,13 @@ using Model.Options;
 using Model.Authentication;
 using Microsoft.Extensions.Options;
 
-namespace Services.Authentication
+namespace API.Authentication
 {
-    public class UnsecureIdentityService : IFederatedIdentityService
+    public class UnsecureIdentityProvider : IFederatedIdentityProvider
     {
         readonly JwtVerifyingOptions jwtVerifyingOptions;
 
-        public UnsecureIdentityService(IOptions<JwtVerifyingOptions> jwtOptions)
+        public UnsecureIdentityProvider(IOptions<JwtVerifyingOptions> jwtOptions)
         {
             jwtVerifyingOptions = jwtOptions.Value;
         }

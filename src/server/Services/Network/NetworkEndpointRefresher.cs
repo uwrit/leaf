@@ -11,7 +11,6 @@ using System.Net.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Model.Authentication;
-using Services.Jwt;
 
 namespace Services.Network
 {

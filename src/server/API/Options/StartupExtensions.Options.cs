@@ -210,17 +210,6 @@ namespace API.Options
                         opts.Headers = saml2.Headers;
                     });
                     break;
-
-                case AuthenticationMechanism.ActiveDirectory:
-                    if (!config.TryBind<ActiveDirectoryAuthenticationOptions>(Config.Authentication.ActiveDirectory, out var adOptions))
-                    {
-                        throw new LeafConfigurationException($"ActiveDirectory authentication mechanism is missing a complete {Config.Authentication.DomainConnection} authentication configuration object");
-                    }
-                    services.Configure<ActiveDirectoryAuthenticationOptions>(opts =>
-                    {
-                        opts.DomainConnection = adOptions.DomainConnection;
-                    });
-                    break;
             }
 
             return services;
@@ -268,34 +257,6 @@ namespace API.Options
             {
                 throw new LeafConfigurationException($"{Config.Authentication.LogoutURI} must be a valid URI");
             }
-        }
-
-        static DomainConnectionOptions GetActiveDirectoryConnection(IConfiguration config)
-        {
-            if (!config.TryGetValue<string>(Config.Authentication.DomainServer, out var server))
-            {
-                throw new LeafConfigurationException($"{Config.Authentication.DomainServer} is required if {Config.Authentication.DomainConnection} is set");
-            }
-            if (!config.TryGetValue<int>(Config.Authentication.DomainSSLPort, out var ssl))
-            {
-                throw new LeafConfigurationException($"{Config.Authentication.DomainSSLPort} is required if {Config.Authentication.DomainConnection} is set");
-            }
-            if (!config.TryGetByProxy(Config.Authentication.DomainUsername, out var username))
-            {
-                username = null;
-            }
-            if (!config.TryGetByProxy(Config.Authentication.DomainPassword, out var password))
-            {
-                password = null;
-            }
-
-            return new DomainConnectionOptions
-            {
-                Server = server,
-                SSLPort = ssl,
-                Username = username,
-                Password = password
-            };
         }
 
         static IServiceCollection ConfigureAuthorizationOptions(this IServiceCollection services, IConfiguration config)
@@ -352,10 +313,6 @@ namespace API.Options
                     services.Configure<ActiveDirectoryAuthorizationOptions>(opts =>
                     {
                         opts.DomainConnection = ad.DomainConnection;
-                        if (authentication.IsActiveDirectory)
-                        {
-                            opts.DomainConnection = sp.GetRequiredService<IOptions<ActiveDirectoryAuthenticationOptions>>().Value.DomainConnection;
-                        }
                         opts.RolesMapping = ad.RolesMapping;
                     });
                     break;

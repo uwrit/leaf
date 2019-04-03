@@ -17,7 +17,7 @@ using Model.Options;
 using Model.Authentication;
 using Services.Authorization;
 
-namespace Services.Jwt
+namespace API.Jwt
 {
     public class BackgroundTokenBlacklistSynchronizer : BackgroundService
     {

@@ -18,8 +18,7 @@ using Services.Extensions;
 using Model.Compiler;
 using Model.Options;
 using Services.Tables;
-
-// TODO(cspital) replace with IPreflightResourceReader that accepts tables of various resource ids
+using Model.Authorization;
 
 namespace Services.Compiler
 {

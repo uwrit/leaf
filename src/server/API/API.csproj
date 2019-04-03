@@ -12,6 +12,9 @@
     <Folder Include="Middleware\" />
     <Folder Include="Middleware\Federation\" />
     <Folder Include="Middleware\Logging\" />
+    <Folder Include="Authentication\" />
+    <Folder Include="Jwt\" />
+    <Folder Include="Authorization\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />

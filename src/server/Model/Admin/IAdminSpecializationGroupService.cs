@@ -4,18 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.DirectoryServices.AccountManagement;
+using System.Threading.Tasks;
 using System.Collections.Generic;
-using Model.Authentication;
 
-namespace Services.Authentication
+namespace Model.Admin
 {
-    public class UserPrincipalContext
+    public interface IAdminSpecializationGroupService
     {
-        public IScopedIdentity ScopedIdentity { get; set; }
-
-        public UserPrincipal User { get; set; }
-        public string UserPrincipalName => User?.UserPrincipalName;
-        public bool HasPrincipal => User != null;
+        Task<IEnumerable<SpecializationGroup>> Get();
+        Task<SpecializationGroup> Update(SpecializationGroup spec);
+        Task<SpecializationGroup> Create(SpecializationGroup spec);
+        Task<SpecializationGroupDeleteResult> Delete(int id);
     }
 }

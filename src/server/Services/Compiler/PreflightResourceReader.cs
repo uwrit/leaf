@@ -17,6 +17,7 @@ using Dapper;
 using System.Linq;
 using Model.Tagging;
 using Services.Tables;
+using Model.Authorization;
 
 namespace Services.Compiler
 {

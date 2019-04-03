@@ -13,7 +13,7 @@ using Model.Authorization;
 using Model.Options;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Services.Authorization
+namespace API.Authorization
 {
     public class HttpServerContext : IServerContext
     {

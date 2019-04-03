@@ -10,14 +10,14 @@ using Model.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 
-namespace Services.Authentication
+namespace API.Authentication
 {
-    public class SAML2IdentityService : IFederatedIdentityService
+    public class SAML2IdentityProvider : IFederatedIdentityProvider
     {
         readonly UserPrincipalContext userContext;
         readonly SAML2AuthenticationOptions options;
 
-        public SAML2IdentityService(IOptions<SAML2AuthenticationOptions> options, UserPrincipalContext userPrincipalContext)
+        public SAML2IdentityProvider(IOptions<SAML2AuthenticationOptions> options, UserPrincipalContext userPrincipalContext)
         {
             userContext = userPrincipalContext;
             this.options = options.Value;

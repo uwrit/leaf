@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Options;
 
-namespace Services.Jwt
+namespace API.Jwt
 {
     public class JwtKeyResolver : IJwtKeyResolver
     {

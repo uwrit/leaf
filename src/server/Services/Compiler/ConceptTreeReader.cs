@@ -17,6 +17,7 @@ using Model.Options;
 using Services.Authorization;
 using Services.Extensions;
 using Services.Tables;
+using Model.Authorization;
 
 namespace Services.Compiler
 {

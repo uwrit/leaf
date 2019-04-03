@@ -17,6 +17,7 @@ using Dapper;
 using Services.Authorization;
 using Services.Tables;
 using System.Linq;
+using Model.Authorization;
 
 namespace Services.Admin
 {

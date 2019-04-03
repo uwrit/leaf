@@ -15,11 +15,11 @@ using Microsoft.IdentityModel.Tokens;
 using Model.Authorization;
 using Model.Options;
 using Services.Authorization;
-using Services.Authentication;
 using Microsoft.AspNetCore.Http;
 using Model.Authentication;
+using API.Authentication;
 
-namespace Services.Jwt
+namespace API.Jwt
 {
     /// <summary>
     /// Produces RSA+SHA512 signed Jwt tokens.
@@ -30,7 +30,7 @@ namespace Services.Jwt
         readonly JwtSigningOptions jwtOptions;
         readonly LeafVersionOptions versionOptions;
         readonly IFederatedEntitlementService entitlementService;
-        readonly IFederatedIdentityService identityService;
+        readonly IFederatedIdentityProvider idProvider;
 
         string Timestamp => DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
@@ -38,20 +38,20 @@ namespace Services.Jwt
             IOptions<JwtSigningOptions> signingOpts,
             IOptions<AuthenticationOptions> authOpts,
             IOptions<LeafVersionOptions> versionOpts,
-            IFederatedIdentityService identityService,
+            IFederatedIdentityProvider identityService,
             IFederatedEntitlementService entitlementService
         )
         {
             jwtOptions = signingOpts.Value;
             authenticationOptions = authOpts.Value;
             versionOptions = versionOpts.Value;
-            this.identityService = identityService;
+            this.idProvider = identityService;
             this.entitlementService = entitlementService;
         }
 
         public string IdToken(HttpContext context)
         {
-            var identity = identityService.GetIdentity(context);
+            var identity = idProvider.GetIdentity(context);
             var entitlement = entitlementService.GetEntitlement(context);
 
             var claims = IdClaims(identity, entitlement);

@@ -4,13 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Authentication;
-using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
-namespace Services.Authentication
+namespace Model.Authentication
 {
-    public interface IFederatedIdentityService
+    public interface ITokenBlacklistService
     {
-        IScopedIdentity GetIdentity(HttpContext context);
+        Task<IEnumerable<BlacklistedToken>> GetBlacklist();
+        Task Blacklist(BlacklistedToken token);
     }
 }

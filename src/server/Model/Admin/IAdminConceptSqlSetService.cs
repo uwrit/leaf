@@ -5,15 +5,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
-using Model.Authentication;
+using System.Collections.Generic;
 
-namespace Services.Authentication
+namespace Model.Admin
 {
-    public class NoLoginService : ILoginService
+    public interface IAdminConceptSqlSetService
     {
-        public Task<bool> AuthenticateAsync(LoginCredentials _)
-        {
-            return Task.FromResult(false);
-        }
+        Task<IEnumerable<ConceptSqlSet>> Get();
+        Task<ConceptSqlSet> Update(ConceptSqlSet set);
+        Task<ConceptSqlSet> Create(ConceptSqlSet set);
+        Task<ConceptSqlSetDeleteResult> Delete(int id);
     }
 }

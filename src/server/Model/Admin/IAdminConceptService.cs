@@ -6,15 +6,14 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Model.Admin;
 
-namespace Services.Admin
+namespace Model.Admin
 {
-    public interface IAdminConceptSqlSetService
+    public interface IAdminConceptService
     {
-        Task<IEnumerable<ConceptSqlSet>> Get();
-        Task<ConceptSqlSet> Update(ConceptSqlSet set);
-        Task<ConceptSqlSet> Create(ConceptSqlSet set);
-        Task<ConceptSqlSetDeleteResult> Delete(int id);
+        Task<Concept> Get(Guid id);
+        Task<Concept> Update(Concept c);
+        Task<Concept> Create(Concept c);
+        Task<ConceptDeleteResult> Delete(Guid id);
     }
 }

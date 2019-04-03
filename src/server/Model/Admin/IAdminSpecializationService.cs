@@ -4,15 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Model.Authentication;
+using System.Collections.Generic;
 
-namespace Services.Authentication
+namespace Model.Admin
 {
-    public interface ILoginService
+    public interface IAdminSpecializationService
     {
-        Task<bool> AuthenticateAsync(LoginCredentials credentials);
+        Task<IEnumerable<Specialization>> GetByGroupId(int id);
+        Task<Specialization> Update(Specialization spec);
+        Task<Specialization> Create(Specialization spec);
+        Task<Specialization> Delete(Guid id);
     }
 }

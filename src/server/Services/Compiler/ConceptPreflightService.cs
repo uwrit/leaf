@@ -16,6 +16,7 @@ using System.Data;
 using Dapper;
 using Microsoft.Extensions.Options;
 using Services.Tables;
+using Model.Authorization;
 
 namespace Services.Compiler
 {
@@ -40,13 +41,8 @@ namespace Services.Compiler
             {
                 return await InternalCheckAsync(concepts);
             }
-            //else
-            //{
-            //    // TODO(cspital) execute the UId based stored procedure
-            //    return await FederatedCheckAsync(concepts);
-            //}
 
-            throw new NotImplementedException();
+            throw new InvalidOperationException("Concept preflight checks from federated users disallowed.");
         }
 
         async Task<IEnumerable<ConceptPreflightCheckResult>> InternalCheckAsync(IEnumerable<ConceptRef> concepts)

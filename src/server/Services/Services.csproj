@@ -13,13 +13,9 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="1.50.5" />
     <PackageReference Include="System.Data.SqlClient" Version="4.6.0" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="5.3.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="5.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.1.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Cryptography.KeyDerivation" Version="2.1.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="4.5.0" />
   </ItemGroup>
 
@@ -34,5 +30,6 @@
     <Folder Include="Tables\" />
     <Folder Include="Startup\" />
     <Folder Include="Admin\" />
+    <Folder Include="Authentication\" />
   </ItemGroup>
 </Project>

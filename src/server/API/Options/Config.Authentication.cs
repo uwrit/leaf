@@ -21,12 +21,6 @@ namespace API.Options
             public const string LogoutURI = @"Authentication:LogoutURI";
 
             public const string SAML2 = @"Authentication:SAML2";
-            public const string ActiveDirectory = @"Authentication:ActiveDirectory";
-            public const string DomainConnection = @"Authentication:ActiveDirectory:DomainConnection";
-            public const string DomainServer = @"Authentication:ActiveDirectory:DomainConnection:Server";
-            public const string DomainSSLPort = @"Authentication:ActiveDirectory:DomainConnection:SSLPort";
-            public const string DomainUsername = @"Authentication:ActiveDirectory:DomainConnection:Username";
-            public const string DomainPassword = @"Authentication:ActiveDirectory:DomainConnection:Password";
         }
     }
 }

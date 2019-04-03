@@ -4,13 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
-namespace Services.Jwt
+namespace Model.Authorization
 {
-    public interface IApiJwtProvider
+    public interface IMembershipProvider
     {
-        string ApiToken(int expireMinutes = 5);
+        IEnumerable<string> GetMembers(string group);
+        IEnumerable<string> GetMembership(string username);
     }
 }
