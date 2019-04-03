@@ -18,18 +18,23 @@ namespace Tests.Mock.Services.Authorization
 {
     public class MockMembershipProvider : IMembershipProvider
     {
-        public MockMembershipProvider()
+        readonly IEnumerable<string> members;
+        readonly IEnumerable<string> membership;
+
+        public MockMembershipProvider(IEnumerable<string> ms, IEnumerable<string> mship)
         {
+            members = ms;
+            membership = mship;
         }
 
         public IEnumerable<string> GetMembers(string group)
         {
-            throw new NotImplementedException();
+            return members;
         }
 
         public IEnumerable<string> GetMembership(string username)
         {
-            throw new NotImplementedException();
+            return membership;
         }
     }
 }

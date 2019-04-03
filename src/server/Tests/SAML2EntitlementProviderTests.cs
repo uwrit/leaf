@@ -39,6 +39,11 @@ namespace Tests
             });
         }
 
+        static IScopedIdentity GetUserContext(string id)
+        {
+            return new SAML2ScopedIdentity(id);
+        }
+
         [Fact]
         public void GetEntitlement_Multi_Should_Return_Entitlement_Ok()
         {
@@ -57,11 +62,12 @@ namespace Tests
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
             var ctx = GetHttpContext(("iam-groups", "leaf_users; leaf_admin; surgery"));
+            var identity = GetUserContext("johndoe@entity.tld");
 
-            var entitlement = eProvider.GetEntitlement(ctx);
+            var entitlement = eProvider.GetEntitlement(ctx, identity);
 
             Assert.Contains(entitlement.Groups, g => g == "surgery");
-            Assert.True(entitlement.Groups.Count() == 1);
+            Assert.True(1 == entitlement.Groups.Count());
             Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
             Assert.True(entitlement.Mask.HasFlag(RoleMask.Admin));
             Assert.False(entitlement.Mask.HasFlag(RoleMask.Super));
@@ -86,8 +92,9 @@ namespace Tests
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
             var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+            var identity = GetUserContext("johndoe@entity.tld");
 
-            var entitlement = eProvider.GetEntitlement(ctx);
+            var entitlement = eProvider.GetEntitlement(ctx, identity);
 
             Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
             Assert.False(entitlement.Mask.HasFlag(RoleMask.Admin));
@@ -113,8 +120,9 @@ namespace Tests
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
             var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+            var identity = GetUserContext("johndoe@entity.tld");
 
-            Assert.Throws<LeafAuthenticationException>(() => eProvider.GetEntitlement(ctx));
+            Assert.Throws<LeafAuthenticationException>(() => eProvider.GetEntitlement(ctx, identity));
         }
     }
 }

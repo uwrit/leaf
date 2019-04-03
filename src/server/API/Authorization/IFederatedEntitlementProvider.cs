@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
+using Model.Authentication;
 using Model.Authorization;
 using Microsoft.AspNetCore.Http;
 
@@ -12,6 +13,6 @@ namespace API.Authorization
 {
     public interface IFederatedEntitlementProvider
     {
-        Entitlement GetEntitlement(HttpContext context);
+        Entitlement GetEntitlement(HttpContext context, IScopedIdentity identity);
     }
 }

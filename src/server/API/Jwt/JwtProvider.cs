@@ -53,7 +53,7 @@ namespace API.Jwt
         public string IdToken(HttpContext context)
         {
             var identity = idProvider.GetIdentity(context);
-            var entitlement = entitlementService.GetEntitlement(context);
+            var entitlement = entitlementService.GetEntitlement(context, identity);
 
             var claims = IdClaims(identity, entitlement);
 

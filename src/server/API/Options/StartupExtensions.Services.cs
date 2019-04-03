@@ -176,7 +176,7 @@ namespace API.Options
                     break;
 
                 case AuthorizationMechanism.ActiveDirectory:
-                    services.AddSingleton<ActiveDirectoryMembershipProvider>();
+                    services.AddSingleton<IMembershipProvider, ActiveDirectoryMembershipProvider>();
                     services.AddScoped<IFederatedEntitlementProvider, ActiveDirectoryEntitlementProvider>();
                     break;
 

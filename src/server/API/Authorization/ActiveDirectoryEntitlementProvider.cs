@@ -13,36 +13,34 @@ using System.DirectoryServices.AccountManagement;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using Services.Authorization;
+using API.Authentication;
 
 namespace API.Authorization
 {
     public class ActiveDirectoryEntitlementProvider : IFederatedEntitlementProvider
     {
-        readonly IScopedIdentity scopedIdentity;
         readonly RolesMappingOptions roles;
         readonly IMembershipProvider mProvider;
 
         public ActiveDirectoryEntitlementProvider(
-            IScopedIdentity scopedIdentity,
             IOptions<ActiveDirectoryAuthorizationOptions> authOpts,
             IMembershipProvider membershipProvider
         )
         {
-            this.scopedIdentity = scopedIdentity;
             roles = authOpts.Value.RolesMapping;
             mProvider = membershipProvider;
         }
 
-        public Entitlement GetEntitlement(HttpContext _)
+        public Entitlement GetEntitlement(HttpContext _, IScopedIdentity identity)
         {
-            var groups = mProvider.GetMembership(scopedIdentity.Identity);
+            var groups = mProvider.GetMembership(identity.Identity);
 
             var mask = GetMask(groups);
 
             return new Entitlement
             {
                 Mask = mask,
-                Groups = groups
+                Groups = groups.Where(e => !roles.Roles.Contains(e))
             };
         }
 

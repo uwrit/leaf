@@ -18,6 +18,7 @@ namespace API.Authorization
 {
     public class SAML2EntitlementProvider : IFederatedEntitlementProvider
     {
+
         readonly SAML2AuthorizationOptions options;
 
         public SAML2EntitlementProvider(IOptions<SAML2AuthorizationOptions> saml)
@@ -25,7 +26,7 @@ namespace API.Authorization
             options = saml.Value;
         }
 
-        public Entitlement GetEntitlement(HttpContext context)
+        public Entitlement GetEntitlement(HttpContext context, IScopedIdentity _)
         {
             var headerMapping = options.HeadersMapping.Entitlements;
             var headers = context.Request.Headers;

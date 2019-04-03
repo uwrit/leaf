@@ -17,7 +17,7 @@ namespace API.Authorization
 {
     public class UnsecureEntitlementProvider : IFederatedEntitlementProvider
     {
-        public Entitlement GetEntitlement(HttpContext context)
+        public Entitlement GetEntitlement(HttpContext _, IScopedIdentity __)
         {
             return new Entitlement
             {
