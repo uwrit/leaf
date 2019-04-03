@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[Specialization]    Script Date: 4/3/19 1:22:36 PM ******/
+/****** Object:  Table [app].[Specialization]    Script Date: 4/3/19 1:31:59 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ CREATE TABLE [app].[Specialization](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [app].[Specialization] ADD  CONSTRAINT [DF__ConceptSpecialization__Id]  DEFAULT (newsequentialid()) FOR [Id]
+ALTER TABLE [app].[Specialization] ADD  CONSTRAINT [DF_ConceptSpecialization_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
 ALTER TABLE [app].[Specialization]  WITH CHECK ADD  CONSTRAINT [FK_Specialization_SpecializationGroup] FOREIGN KEY([SpecializationGroupId])
 REFERENCES [app].[SpecializationGroup] ([Id])
