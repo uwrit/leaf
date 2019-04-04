@@ -49,7 +49,7 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
                     <small>Dropdowns appear after the user has dragged the Concept into a query</small>
                     {grps.length > 0 && !adminConcept!.isSpecializable && concept.specializationGroups!.length > 0 &&
                     <div className={`${c}-warning`}>
-                        Dropdowns will not be visible because <span className='code'>Allow Dropdowns</span> is set to false
+                        Dropdowns will not be visible as <span className='code'>Allow Dropdowns</span> is false
                     </div>
                     }
                     <div className={`${c}-concept-specialization-dropdowns-container`}>
