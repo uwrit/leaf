@@ -69,9 +69,21 @@ class Visualize extends React.Component<Props, State> {
         /*
          * If too many patients for caching, let user know.
          */
-        if (cohort.count.value > auth.config!.cacheLimit) {
+        if (data.length === 1 && cohort.count.value > auth.config!.cacheLimit) {
             return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
         }
+        /*
+         * Show a loading spinner if no respondents have completed yet.
+         */
+        if (cohort.visualization.state === CohortStateType.IN_ERROR) {
+            return (
+                <div className={`${c}-error`}>
+                <p>
+                    An error occurred while loading patient visualizations. We are sorry for the inconvenience.
+                </p>
+            </div>
+            );
+        } 
         /*
          * Show a loading spinner if no respondents have completed yet.
          */

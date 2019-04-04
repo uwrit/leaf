@@ -46,6 +46,10 @@
     color: rgb(100,100,100);
 }
 
+.header-networkhealth-respondent-title {
+    width: 100%;
+}
+
 .header-networkhealth-respondent-text-description {
     color: rgb(180,180,180);
     font-size: 0.82rem;
