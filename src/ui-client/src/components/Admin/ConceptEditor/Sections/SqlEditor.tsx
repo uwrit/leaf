@@ -40,7 +40,7 @@ export class SqlEditor extends React.PureComponent<Props> {
                 <TextArea 
                     changeHandler={this.handleSqlUpdate} propName={'sqlFieldNumeric'} value={adminConcept!.sqlFieldNumeric} 
                     focusToggle={toggleSqlPreview}
-                    label='Numeric Field' subLabel='Used if filtered by a number'
+                    label='Numeric Field or expression' subLabel='Used if filtered by a number'
                 />
             </Section>
         );

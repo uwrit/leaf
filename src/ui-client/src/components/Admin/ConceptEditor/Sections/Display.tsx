@@ -30,7 +30,7 @@ export class Display extends React.PureComponent<Props> {
                 />
                 <Input 
                     changeHandler={changeHandler} propName={'uiDisplaySubtext'} value={adminConcept!.uiDisplaySubtext}
-                    label='Subtext' subLabel='Addition information shown next to name in lighter, smaller text'
+                    label='Subtext' subLabel='Additional information shown next to name in lighter, smaller text'
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplayText'} value={adminConcept!.uiDisplayText}
