@@ -5,9 +5,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
-using Model.Network;
 
-namespace Services.Network
+namespace Model.Network
 {
     public interface INetworkEndpointRefresher
     {

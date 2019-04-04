@@ -24,7 +24,7 @@ namespace API.Options
         {
             var sp = services.BuildServiceProvider();
             var jwtOpts = sp.GetService<IOptions<JwtVerifyingOptions>>().Value;
-            var cache = sp.GetService<NetworkEndpointCache>();
+            var cache = sp.GetService<INetworkEndpointCache>();
             var resolver = sp.GetService<IJwtKeyResolver>();
 
             var issuers = cache.All().Select(ne => ne.Issuer).ToList();

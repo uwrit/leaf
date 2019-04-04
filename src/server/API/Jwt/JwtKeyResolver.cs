@@ -19,13 +19,13 @@ namespace API.Jwt
     public class JwtKeyResolver : IJwtKeyResolver
     {
         readonly JwtVerifyingOptions jwtOpts;
-        readonly NetworkEndpointCache cache;
+        readonly INetworkEndpointCache cache;
         readonly NetworkEndpointConcurrentQueueSet refresh;
         readonly ILogger<JwtKeyResolver> log;
 
         public JwtKeyResolver(
             IOptions<JwtVerifyingOptions> options,
-            NetworkEndpointCache cache,
+            INetworkEndpointCache cache,
             NetworkEndpointConcurrentQueueSet refresh,
             ILogger<JwtKeyResolver> logger)
         {

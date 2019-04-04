@@ -7,11 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using Model.Options;
-using Model.Network;
 
-namespace Services.Network
+namespace Model.Network
 {
     public class NetworkValidator : INetworkValidator
     {

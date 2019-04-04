@@ -15,6 +15,7 @@
     <Folder Include="Authentication\" />
     <Folder Include="Jwt\" />
     <Folder Include="Authorization\" />
+    <Folder Include="Jobs\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />

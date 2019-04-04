@@ -189,7 +189,7 @@ namespace Services.Network
             {
                 try
                 {
-                    var nr = rec.ToNetworkEndpoint();
+                    var nr = rec.NetworkEndpoint();
                     validator.Validate(nr);
 
                     ok.Add(nr);
@@ -200,6 +200,49 @@ namespace Services.Network
                 }
             }
             return ok;
+        }
+    }
+
+    class NetworkEndpointRecord
+    {
+        public int Id { get; set; }
+
+        public string Name { get; set; }
+
+        public string Address { get; set; }
+
+        public string Issuer { get; set; }
+
+        public string KeyId { get; set; }
+
+        public string Certificate { get; set; }
+
+        public NetworkEndpointRecord()
+        {
+
+        }
+
+        public NetworkEndpointRecord(NetworkEndpoint ne)
+        {
+            Id = ne.Id;
+            Name = ne.Name;
+            Address = ne.Address.AbsoluteUri;
+            Issuer = ne.Issuer;
+            KeyId = ne.KeyId;
+            Certificate = Convert.ToBase64String(ne.Certificate);
+        }
+
+        public NetworkEndpoint NetworkEndpoint()
+        {
+            return new NetworkEndpoint
+            {
+                Id = Id,
+                Name = Name,
+                Address = new Uri(Address),
+                Issuer = Issuer,
+                KeyId = KeyId,
+                Certificate = Convert.FromBase64String(Certificate)
+            };
         }
     }
 }

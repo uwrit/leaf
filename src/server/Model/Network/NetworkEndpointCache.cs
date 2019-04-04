@@ -6,17 +6,16 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Network;
 using Model.Collections;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 
-namespace Services.Network
+namespace Model.Network
 {
     using Issuer = String;
 
-    public class NetworkEndpointCache
+    public class NetworkEndpointCache : INetworkEndpointCache
     {
         Dictionary<Issuer, NetworkEndpoint> store;
         readonly ReaderWriterLockSlim sync;
