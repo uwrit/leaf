@@ -365,11 +365,27 @@
     padding: 3.5px 21px;
 }
 
-.concept-editor-concept-specialization-no-dropdowns {
+.concept-editor-concept-specialization-no-dropdowns,
+.concept-editor-constraints-none {
     background-color: rgba(0, 0, 0, 0.05);
     border-radius: 4px;
     color: rgb(100,100,100);
     margin: 20px 0;
     padding: 2px;
     text-align: center;
+}
+
+.concept-editor-warning {
+    background-color: rgba(252, 255, 67, 0.4);
+    border-radius: 4px;
+    color: rgb(50,50,50);
+    margin: 20px 0;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.concept-editor .code {
+    background-color: rgba(230, 230, 230, 0.5);
+    border-radius: 4px;
+    padding: 2px 4px;
 }

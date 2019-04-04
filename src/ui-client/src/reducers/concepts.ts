@@ -238,18 +238,7 @@ const createConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
                 ? new Set<string>([ ...parent.childrenIds, concept.id ])
                 : new Set<string>([ concept.id ]);
             state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true }));
-        }
-    }
-
-    /*
-     * Loop through to get the rootId.
-     */
-    let nextParent = concept.parentId;
-    while (nextParent !== undefined) {
-        concept.rootId = nextParent;
-        const next = state.currentTree.get(nextParent);
-        if (next) { 
-            nextParent = next.parentId!;
+            concept.rootId = getRootId(parent, state.currentTree);
         }
     }
 
@@ -286,8 +275,9 @@ const removeConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
 };
 
 const reparentConcept = (state: ConceptsState, concept: Concept, parentId: string): ConceptsState => {
+    const parent = state.currentTree.get(parentId)!;
     const newConcept = Object.assign({}, concept, { parentId });
-    const newParent = Object.assign({}, state.currentTree.get(parentId), { isParent: true });
+    const newParent = Object.assign({}, parent, { isParent: true, isOpen: !parent.isParent });
     const oldParent = Object.assign({}, state.currentTree.get(concept.parentId!));
 
     /*

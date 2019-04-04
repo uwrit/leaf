@@ -38,6 +38,9 @@ export class Constraints extends React.PureComponent<Props> {
                                 changeHandler={this.handleConstraintChange} deleteHandler={this.handleConstraintDelete} 
                             />
                         )}
+                        {adminConcept!.constraints.length === 0 &&
+                            <div className={`${c}-constraints-none`}>No restrictions on this Concept. All users can see it</div>
+                        }
                     </div>
                 </div>
                 <div className={`${c}-constraints-addnew`} onClick={this.handleAddNewClick}>+ Add New Restriction</div>
