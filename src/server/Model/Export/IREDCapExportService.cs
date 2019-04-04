@@ -7,9 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using Model.Export;
 
-namespace Services.Export
+namespace Model.Export
 {
     public interface IREDCapExportService
     {

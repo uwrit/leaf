@@ -6,7 +6,7 @@
 using System;
 using System.Runtime.Serialization;
 
-namespace Services.Export
+namespace Model.Export
 {
     public class ExportException : ApplicationException
     {

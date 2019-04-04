@@ -28,6 +28,7 @@ using Model.Cohort;
 using Model.Authorization;
 using Model.Authentication;
 using Model.Admin;
+using Model.Export;
 using API.Authorization;
 using API.Authentication;
 using API.Jobs;
