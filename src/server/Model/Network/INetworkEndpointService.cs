@@ -6,9 +6,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Network;
 
-namespace Services.Network
+namespace Model.Network
 {
     public interface INetworkEndpointService
     {

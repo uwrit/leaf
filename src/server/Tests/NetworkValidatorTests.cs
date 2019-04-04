@@ -9,7 +9,7 @@ using System.Text;
 using Xunit;
 using Tests.Mock.Models;
 using Model.Options;
-using Services.Network;
+using Model.Network;
 using Microsoft.Extensions.Options;
 
 namespace Tests

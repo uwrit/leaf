@@ -6,6 +6,8 @@
 using System;
 using Model.Cohort;
 
+// TODO(cspital) move this into the Model
+
 namespace Services.Extensions
 {
     public static class PatientDemographicExtensions

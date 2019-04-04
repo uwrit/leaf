@@ -30,6 +30,7 @@ using Model.Authentication;
 using Model.Admin;
 using API.Authorization;
 using API.Authentication;
+using API.Jobs;
 
 namespace API.Options
 {
@@ -121,7 +122,7 @@ namespace API.Options
 
         static IServiceCollection AddNetworkCache(this IServiceCollection services)
         {
-            services.AddSingleton(sp =>
+            services.AddSingleton<INetworkEndpointCache, NetworkEndpointCache>(sp =>
             {
                 var network = sp.GetService<INetworkEndpointService>();
                 var initial = network.AllAsync().Result;

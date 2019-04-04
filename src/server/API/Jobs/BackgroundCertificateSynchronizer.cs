@@ -15,22 +15,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Options;
 using Model.Network;
+using Services.Network;
 
 // NOTE(cspital) this does not support clustered deployments yet....Redis impl incoming soon
 
-namespace Services.Network
+namespace API.Jobs
 {
     public class BackgroundCertificateSynchronizer : BackgroundService
     {
         readonly INetworkEndpointRefresher refresher;
-        readonly NetworkEndpointCache cache;
+        readonly INetworkEndpointCache cache;
         readonly INetworkEndpointService endpointService;
         readonly NetworkEndpointConcurrentQueueSet queue;
         readonly ILogger<BackgroundCertificateSynchronizer> log;
 
         public BackgroundCertificateSynchronizer(
             INetworkEndpointRefresher refresher,
-            NetworkEndpointCache cache,
+            INetworkEndpointCache cache,
             INetworkEndpointService endpointService,
             NetworkEndpointConcurrentQueueSet queue,
             ILogger<BackgroundCertificateSynchronizer> logger)
