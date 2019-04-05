@@ -44,6 +44,7 @@ import {
     SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT
 } from '../actions/generalUi';
 import { CategorizedDatasetRef } from '../models/patientList/Dataset';
+import { OPEN_SAVED_QUERY } from '../actions/queries';
 
 export const defaultGeneralUiState = (): GeneralUiState => {
     return {
@@ -127,6 +128,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return setCohortCountBoxState(state, action.cohortCountBoxVisible!, action.cohortCountBoxMinimized!, action.cohortInfoButtonVisible!);
         case COHORT_COUNT_START:
             return setCohortCountBoxState(state, true, false, false);
+        case OPEN_SAVED_QUERY:
+            return Object.assign({}, state, { currentRoute: Routes.FindPatients }); 
         case SET_ROUTE:
             return Object.assign({}, state, { currentRoute: action.route }); 
         case SET_ROUTE_CONFIG:
