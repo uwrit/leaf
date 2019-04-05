@@ -500,11 +500,15 @@ namespace Services.Compiler.SqlServer
 
         string AddDate(DateFilter filter, bool setToEndOfDay)
         {
-            DateTime _date = setToEndOfDay ? filter.Date.AddDays(1).AddMinutes(-1) : filter.Date;
-
+            var timeFormat = "yyyy-MM-dd HH:mm:ss";
+            var defaultTime = new DateTime(filter.Date.Year, filter.Date.Month, filter.Date.Day, 0, 0, 0);
+            var date = setToEndOfDay 
+                ? defaultTime.AddHours(23).AddMinutes(59).AddSeconds(59)
+                : defaultTime;
+            
             return
                 filter.DateIncrementType == DateIncrementType.Now ? Dialect.SQL_NOW :
-                filter.DateIncrementType == DateIncrementType.Specific ? $"'{_date.ToShortDateString()}'" :
+                filter.DateIncrementType == DateIncrementType.Specific ? $"'{date.ToString(timeFormat)}'" :
                 $"{Dialect.SQL_DATEADD}{filter.DateIncrementType.ToString().ToUpper()},{filter.Increment},{Dialect.SQL_NOW})";
         }
 

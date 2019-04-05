@@ -26,12 +26,6 @@ interface State {
     showCustomDateRangeBox: boolean;
 }
 
-let dateConfigBeforeOpenCustom: DateBoundary = { 
-    display: 'Anytime', 
-    end: { dateIncrementType: DateIncrementType.NONE },  
-    start: { dateIncrementType: DateIncrementType.NONE }
-};
-
 export default class PanelHeader extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -83,17 +77,8 @@ export default class PanelHeader extends React.PureComponent<Props, State> {
         });
     }
 
-    private toggleCustomDateRangeBox = (defaultDateFilter: boolean = false) => {
-        const { panel, dispatch } = this.props;
-        const { showCustomDateRangeBox } = this.state;
-
-        this.setState({ showCustomDateRangeBox: !showCustomDateRangeBox });
-
-        if (!showCustomDateRangeBox && defaultDateFilter) {
-            dispatch(setPanelDateFilter(panel.index, dateConfigBeforeOpenCustom));
-        }
-        else if (defaultDateFilter) {
-            dateConfigBeforeOpenCustom = panel.dateFilter;
-        }
+    private toggleCustomDateRangeBox = (show?: boolean) => {
+        const showCustomDateRangeBox = show !== undefined ? show : !this.state.showCustomDateRangeBox;
+        this.setState({ showCustomDateRangeBox });
     }
 }

@@ -22,7 +22,7 @@ interface Props {
     dispatch: any;
     panel: PanelModel;
     parentDomRect: DOMRect;
-    toggleCustomDateRangeBox: any;
+    toggleCustomDateRangeBox: (show?: boolean) => any;
 }
 
 interface State { 
@@ -37,76 +37,118 @@ enum DateInputType {
     End = 2
 }
 
-const c = 'panel-custom-date-range'
-const noDateFilter: DateFilter = { dateIncrementType: DateIncrementType.NONE, increment: 0 }
-const anytime: DateBoundary = { display: 'Anytime', start: noDateFilter, end: noDateFilter };
-const dateFormat = 'YYYY-MM-DD';
+
 
 export default class CustomDateRangePicker extends React.PureComponent<Props, State> {
+    private className = 'panel-custom-date-range';
+    private noDateFilter: DateFilter = { dateIncrementType: DateIncrementType.NONE, increment: 0 };
+    private anytime: DateBoundary = { display: 'Anytime', start: this.noDateFilter, end: this.noDateFilter };
+    private dateFormat = 'YYYY-MM-DD';
+    private focusPoller: any;
+    
     constructor(props: Props) {
         super(props);
         this.state = {
-            endDateInput: this.props.panel.dateFilter.end.date ? moment(this.props.panel.dateFilter.end.date).format(dateFormat) : '',
+            endDateInput: props.panel.dateFilter.end.date ? moment(props.panel.dateFilter.end.date).format(this.dateFormat) : '',
             endDateValid: true,
-            startDateInput: this.props.panel.dateFilter.start.date ? moment(this.props.panel.dateFilter.start.date).format(dateFormat) : '',
+            startDateInput: props.panel.dateFilter.start.date ? moment(props.panel.dateFilter.start.date).format(this.dateFormat) : '',
             startDateValid: true
         }
     }
 
     public render() {
-        const panelIndex = this.props.panel.index;
-        const baseDateClass = `${c}-input-container`;
-        const startDateClasses = `${baseDateClass} ${c}-input-container-start${panelIndex} ${this.state.startDateValid ? '' : 'invalid'}`;
-        const endDateClasses = `${baseDateClass} ${c}-input-container-end${panelIndex} ${this.state.endDateValid ? '' : 'invalid'}`;
+        const { panel, parentDomRect } = this.props;
+        const { startDateValid, endDateValid, startDateInput, endDateInput } = this.state;
+        const c = this.className;
+        const b = `${c}-input-container`;
+        const startDateClasses = `${b} ${c}-input-container-start ${startDateValid ? '' : 'invalid'}`;
+        const endDateClasses = `${b} ${c}-input-container-end ${endDateValid ? '' : 'invalid'}`;
 
         return (
-            <PopupBox 
+            <PopupBox
                 forceMouseInOnMount={true}
-                toggle={this.handleClickOutsidePopupBox}
-                parentDomRect={this.props.parentDomRect}>
-                <div className={`${c}`}>
-                    <div className={`${c}-title`}>Set Custom Date Range </div>
+                toggle={this.closeCustomDateRangeBox}
+                parentDomRect={parentDomRect}>
+                <div className={c}>
+
+                    <span className={`${c}-close`} onClick={this.handleClearClick}>x</span>
                     <div className={`${c}-body`}>
-                        <div className={startDateClasses}>
+
+                        {/* Start date */}
+                        <div className={startDateClasses} id={`${c}-input-container-start${panel.index}`}>
                             <DayPickerInput
                                 formatDate={this.formatDate}
-                                format={dateFormat}
-                                value={this.state.startDateInput}
+                                format={this.dateFormat}
+                                value={startDateInput}
+                                onBlur={this.closeCustomDateRangeBox}
                                 onDayChange={this.handleDateChange.bind(null, DateInputType.Start)}
-                                dayPickerProps={{ selectedDays: this.props.panel.dateFilter.start.date }}
-                                placeholder={dateFormat}
+                                onDayPickerHide={this.pollForFocusOut}
+                                dayPickerProps={{ selectedDays: panel.dateFilter.start.date }}
+                                placeholder={this.dateFormat}
                             />
                         </div>
+
                         <span>to</span>
-                        <div className={endDateClasses}>
+
+                        {/* End date */}
+                        <div className={endDateClasses} id={`${c}-input-container-end${panel.index}`}>
                             <DayPickerInput
-                                format={dateFormat}
-                                value={this.state.endDateInput}
+                                format={this.dateFormat}
+                                value={endDateInput}
+                                onBlur={this.closeCustomDateRangeBox}
+                                onDayPickerHide={this.pollForFocusOut}
                                 onDayChange={this.handleDateChange.bind(null, DateInputType.End)}
-                                dayPickerProps={{ selectedDays: this.props.panel.dateFilter.end.date }}
-                                placeholder={dateFormat}
+                                dayPickerProps={{ selectedDays: panel.dateFilter.end.date }}
+                                placeholder={this.dateFormat}
                             />
                         </div>
+
                     </div>
-                    <div className={`${c}-footer`}>
-                        <Button className="leaf-button leaf-button-secondary" onClick={this.handleClearClick} >Clear</Button>
-                        <Button className="leaf-button leaf-button-primary" onClick={this.handleAddDatesClick} style={{ float: 'right' }}>Add Dates</Button>
-                    </div>
-            </div>
-          </PopupBox>
+                </div>
+            </PopupBox>
         );
     }
 
+    /*
+     * Not ideal, but the date picker doesn't properly fire onBlur()
+     * events after a calendar date is selected, so poll for DOM focus
+     * changes 4x a second to see if focus has been lost. If it's changed,
+     * hide the element.
+     */
+    private pollForFocusOut = () => {
+        if (this.focusPoller) {
+            clearTimeout(this.focusPoller);
+        }
+
+        this.focusPoller = setTimeout(() =>  {
+            const active = document.activeElement;
+            if (active) {
+                const picker = document.querySelector('.DayPickerInput-Overlay');
+                if (!picker && active.tagName === 'BODY') {
+                    this.closeCustomDateRangeBox();
+                } else {
+                    this.pollForFocusOut();
+                }
+            }
+        }, 300)
+    }
+
+    /*
+     * Updates the store with a DateBoundary object based on current input.
+     */
     private setDateBoundary = (startDate: DateFilter, endDate: DateFilter) => {
-        const panelIndex = this.props.panel.index;
+        const { panel, dispatch } = this.props;
         const dateBoundary: DateBoundary = {
             display: `${startDate.date!.toLocaleDateString()} - ${endDate.date!.toLocaleDateString()}`,
             end: { date: endDate.date, dateIncrementType: DateIncrementType.SPECIFIC },
             start: { date: startDate.date, dateIncrementType: DateIncrementType.SPECIFIC }
         };
-        this.props.dispatch(setPanelDateFilter(panelIndex, dateBoundary));
+        dispatch(setPanelDateFilter(panel.index, dateBoundary));
     }
 
+    /*
+     * Determines whether the current input is a valid date.
+     */
     private validateDateString = (input: string) => {
         let isValid = false;
         const date = new Date(input);
@@ -126,6 +168,9 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         return { date, isValid };
     }
 
+    /*
+     * Handles changes to inputs.
+     */
     private handleDateChange = (type: DateInputType, selectedDay: Date, modifiers: any, dayPickerInput: any) => {
         const input: string = dayPickerInput.input.value;
         let updateDate = true;
@@ -146,14 +191,20 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
     }
 
+    /*
+     * Handles changes to the end date.
+     */
     private handleEndDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
+        const { panel, dispatch } = this.props;
+        const { startDateInput } = this.state;
+
         if (updateDate && date) {
-            let startDate: Date = this.props.panel.dateFilter.start.date!;
+            let startDate: Date = panel.dateFilter.start.date!;
 
             if (!startDate) {
-                const momentDate = moment(this.state.startDateInput);
+                const momentDate = moment(startDateInput);
                 startDate = momentDate.isValid() ? momentDate.toDate() : moment(date).add(-1, 'd').toDate();
-                this.setState({ startDateInput: moment(startDate).format(dateFormat) });
+                this.setState({ startDateInput: moment(startDate).format(this.dateFormat) });
             }
             const startDateFilter: DateFilter = { date: startDate, dateIncrementType: DateIncrementType.SPECIFIC };
             const endDateFilter: DateFilter = { date, dateIncrementType: DateIncrementType.SPECIFIC };
@@ -162,22 +213,28 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ endDateValid: false });
-            this.props.dispatch(setPanelDateFilter(this.props.panel.index, anytime));
+            dispatch(setPanelDateFilter(panel.index, this.anytime));
         }
         else {
             this.setState({ startDateValid: true });
-            this.props.dispatch(setPanelDateFilter(this.props.panel.index, anytime));
+            dispatch(setPanelDateFilter(panel.index, this.anytime));
         }
     }
 
+    /*
+     * Handles changes to the start date.
+     */
     private handleStartDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
+        const { panel, dispatch } = this.props;
+        const { endDateInput } = this.state;
+
         if (updateDate && date) {
-            let endDate: Date = this.props.panel.dateFilter.end.date!;
+            let endDate: Date = panel.dateFilter.end.date!;
 
             if (!endDate) {
-                const momentDate = moment(this.state.endDateInput);
+                const momentDate = moment(endDateInput);
                 endDate = momentDate.isValid() ? momentDate.toDate() : moment(date).add(1, 'd').toDate();
-                this.setState({ endDateInput: moment(endDate).format(dateFormat) });
+                this.setState({ endDateInput: moment(endDate).format(this.dateFormat) });
             }
             const startDateFilter: DateFilter = { date, dateIncrementType: DateIncrementType.SPECIFIC };
             const endDateFilter: DateFilter = { date: endDate, dateIncrementType: DateIncrementType.SPECIFIC };
@@ -186,36 +243,37 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ startDateValid: false });
-            this.props.dispatch(setPanelDateFilter(this.props.panel.index, anytime));
+            dispatch(setPanelDateFilter(panel.index, this.anytime));
         }
         else {
             this.setState({ startDateValid: true });
-            this.props.dispatch(setPanelDateFilter(this.props.panel.index, anytime));
+            dispatch(setPanelDateFilter(panel.index, this.anytime));
         }
     }
 
-    private formatDate = (date: Date): string => moment(date).format(dateFormat);
+    /*
+     * Custom date formatter sent to the date picker.
+     */
+    private formatDate = (date: Date): string => moment(date).format(this.dateFormat);
 
-    private handleClickOutsidePopupBox = () => this.props.toggleCustomDateRangeBox(true);
-
+    /*
+     * Handles 'x' clicked if user wants to clear the date, which resets
+     * the filter to 'Anytime'.
+     */
     private handleClearClick = () => {
-        this.props.dispatch(setPanelDateFilter(this.props.panel.index, anytime));
-        this.props.toggleCustomDateRangeBox();
+        const { panel, dispatch } = this.props;
+        dispatch(setPanelDateFilter(panel.index, this.anytime));
+        this.closeCustomDateRangeBox();
     }
 
-    private handleAddDatesClick = () => {
-        const { endDateValid, endDateInput, startDateInput, startDateValid } = this.state;
-        if (endDateValid && startDateValid && endDateInput.length && startDateInput.length) {
-            this.props.toggleCustomDateRangeBox();
+    /* 
+     * Closes the range box and clears any currently running poll.
+     */
+    private closeCustomDateRangeBox = () => {
+        const { toggleCustomDateRangeBox } = this.props;
+        if (this.focusPoller) {
+            clearTimeout(this.focusPoller);
         }
-        else {
-            const { dispatch } = this.props;
-            const info: InformationModalState = {
-                body: 'Make sure dates are correctly formatted (MM/DD/YYYY) and the end date follows the start date',
-                header: 'Date formatting error',
-                show: true
-            };
-            dispatch(showInfoModal(info));
-        }
+        toggleCustomDateRangeBox(false);
     }
 }

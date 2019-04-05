@@ -90,6 +90,10 @@ export const getPrevSession = (state: AppState) => {
     const prev = sessionStorage.getItem(key);
     if (prev) { 
         const parsed = JSON.parse(prev) as StoredSessionState;
+        for (const panel of parsed.panels) {
+            if (panel.dateFilter.start.date) { panel.dateFilter.start.date = new Date(panel.dateFilter.start.date); }
+            if (panel.dateFilter.end.date) { panel.dateFilter.end.date = new Date(panel.dateFilter.end.date); }
+        }
         sessionStorage.removeItem(key);
         return parsed;
     }
