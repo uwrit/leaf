@@ -24,11 +24,13 @@ export class PanelPreview extends React.PureComponent<Props> {
             createPortal(
                 <div className={`${c}-panel-container concept-editor-preview`}>
                     <div className={`${c}-panel-container-inner`}>
-                        <Panel panel={panel} isFirst={true} />
+                        <Panel dispatch={this.dummyDispatch} panel={panel} isFirst={true} />
                     </div>
                 </div>,
                 document.body
             )
         );
     }
+
+    private dummyDispatch = () => null;
 };
