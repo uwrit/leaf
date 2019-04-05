@@ -49,7 +49,7 @@ class SubPanel extends React.Component<Props> {
     }
 
     public render() {
-        const { connectDropTarget, isOver, canDrop, subPanel, index, panel } = this.props;
+        const { connectDropTarget, dispatch, isOver, canDrop, subPanel, index, panel } = this.props;
         const totalPanelItems = subPanel.panelItems.length;
         const wrapperClasses = 'subpanel-wrapper ' + (totalPanelItems > 0 ? 'has-data' : '');
         const classes = [ 'subpanel' ];
@@ -65,7 +65,7 @@ class SubPanel extends React.Component<Props> {
         // Set PanelItems and -or- objects
         for (let i = 0; i < totalPanelItems; i++) {
             panelItem = subPanel.panelItems[i];
-            items.push(<PanelItem key={panelItem.id} panelItem={panelItem}/>);
+            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch}/>);
 
             // Add -or- if necessary
             if (subPanel.panelItems[i+1] &&         // Followed by another panelItem

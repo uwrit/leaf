@@ -15,14 +15,19 @@ import getDragPreview from '../../../utils/getDragPreview';
 import PanelItemNumericFilter from './PanelItemNumericFilter';
 import ConceptSpecializationGroup from './ConceptSpecializationGroup';
 
-interface Props {
-    panelItem: PanelItemModel,
-    connectDragSource?: ConnectDragSource,
-    connectDragPreview?: ConnectDragPreview,
-    isDragging?: boolean,
-    isDropped?: boolean,
-    dispatch?: any
+interface DndProps {
+    connectDragSource?: ConnectDragSource;
+    connectDragPreview?: ConnectDragPreview;
+    isDragging?: boolean;
+    isDropped?: boolean;
 }
+
+interface OwnProps {
+    panelItem: PanelItemModel;
+    dispatch: any;
+}
+
+type Props = DndProps & OwnProps
 
 // Object to return to the connector when drag begins. This will
 // be sent to the panel on the drop() event.
@@ -86,18 +91,17 @@ export class PanelItem extends React.Component<Props> {
                 <div className={classes.join(' ')}>
                     <span>{concept.uiDisplayText}</span>
                     {concept.isSpecializable && concept.specializationGroups &&
-                    concept.specializationGroups.map((g) => {
-                        return (
-                            <ConceptSpecializationGroup 
-                                dispatch={dispatch} 
-                                key={g.id} 
-                                panelItem={panelItem} 
-                                selected={specializations} 
-                                specializationGroup={g} />
-                        )
-                    })}
+                     concept.specializationGroups.map((g) => (
+                        <ConceptSpecializationGroup 
+                            dispatch={dispatch} 
+                            key={g.id} 
+                            panelItem={panelItem} 
+                            selected={specializations} 
+                            specializationGroup={g} 
+                        />
+                    ))}
                     {concept.isNumeric &&
-                    <PanelItemNumericFilter panelItem={this.props.panelItem} />
+                    <PanelItemNumericFilter panelItem={panelItem} dispatch={dispatch}/>
                     }
                 </div>
             )
@@ -111,7 +115,6 @@ const mapDispatchToProps = (dispatch: any) => {
     };
 };
 
-// export default reduxConnect(null, mapDispatchToProps)(PanelItem);
 export default compose(
     connect(null, mapDispatchToProps),
     DragSource('CONCEPT', conceptNodeSource, collect)

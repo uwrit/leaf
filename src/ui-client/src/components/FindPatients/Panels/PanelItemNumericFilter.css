@@ -12,18 +12,22 @@
 
 .panel-item-numeric-selection {
     background-color: white;
-    border: 1px solid rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.1);
     border-radius: 4px;
     box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
     color: rgb(100, 100, 100);
     font-weight: 300;
     left: -150px;
-    margin-top: 0;
+    margin-top: 5px;
     opacity: 1;
     outline: none;
     position: absolute;
     transition: all 0.5s;
     width: 400px;
+}
+
+.panel-item-numeric-selection-between {
+    margin-top: 15px;
 }
 
 .panel-item-numeric-selection::before,
@@ -35,7 +39,7 @@
     margin-left: -11px;
     border-width: 11px;
     border-style: solid;
-    border-color: transparent transparent rgba(0,0,0,0.2) transparent;
+    border-color: transparent transparent rgba(0,0,0,0.1) transparent;
 }
 
 .panel-item-numeric-selection::after {
@@ -51,7 +55,7 @@
     color: rgba(0,0,0,0.4);
     font-size: 1.1rem;
     font-weight: 500;
-    padding: 8px 14px;
+    padding: 2px 14px;
     text-align: center;
 }
 
@@ -65,7 +69,7 @@
 }
 
 .panel-item-numeric-selection-type {
-    background-color: transparent !important;
+    background-color: rgb(248,248,248) !important;
     border: none !important;
     border-radius: 4px !important;
     box-shadow: none !important;
@@ -107,4 +111,17 @@
     color: rgb(175,175,175);
     font-family: Roboto;
     padding-top: 8px;
+}
+
+.panel-item-numeric-selection-close {
+    color: rgb(180, 180, 180); 
+    cursor: pointer;
+    float: right;
+    font-size: 1.4rem;
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.panel-item-numeric-selection-close:hover {
+    color: rgb(120, 120, 120); 
 }

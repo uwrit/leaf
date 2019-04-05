@@ -42,6 +42,7 @@ export default class CohortSql extends React.PureComponent<Props, State> {
     }
 
     public render() {
+        const { toggle, DOMRect } = this.props;
         const c = this.className;
         const d = this.props.data;
         const sql = d.countResults.sqlStatements[0];
@@ -68,7 +69,7 @@ export default class CohortSql extends React.PureComponent<Props, State> {
         };
 
         return (
-            <PopupBox parentDomRect={this.props.DOMRect!} toggle={this.props.toggle}>
+            <PopupBox parentDomRect={DOMRect!} toggle={toggle}>
                 <div className={`${c}-sql-container`} style={containerStyle}>
                     <div className={`${c}-sql-header`} style={headerStyle}>
                         <span className={`${c}-sql-name`}>
@@ -79,7 +80,7 @@ export default class CohortSql extends React.PureComponent<Props, State> {
                             <strong>{d.countResults.value.toLocaleString()}</strong>
                             <span> patients</span>
                         </span>
-                        <span className={`${c}-sql-close`} onClick={this.props.toggle}>✖</span>
+                        <span className={`${c}-sql-close`} onClick={toggle}>✖</span>
                     </div>
                     <CopyToClipboard 
                         text={sql}>

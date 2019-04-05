@@ -9,5 +9,10 @@ export enum NumericFilterType { None, GreaterThan, GreaterThanOrEqualTo, LessTha
 
 export interface NumericFilter {
     filterType: NumericFilterType;
+    filter: number[] | null[];
+}
+
+export interface NumericFilterDTO {
+    filterType: NumericFilterType;
     filter: number[];
 }

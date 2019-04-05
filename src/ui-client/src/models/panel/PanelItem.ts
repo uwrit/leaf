@@ -6,7 +6,7 @@
  */ 
 
 import { Concept, ResourceRef, ConceptSpecialization, ExtensionConcept } from '../concept/Concept';
-import { NumericFilter } from './NumericFilter';
+import { NumericFilter, NumericFilterType, NumericFilterDTO } from './NumericFilter';
 import { RecencyFilterType } from './RecencyFilter';
 import { isEmbeddedQuery } from '../../utils/panelUtils';
 
@@ -45,8 +45,31 @@ export const panelItemToDto = (panelItem: PanelItem): PanelItemDTO => {
         },
         id: panelItem.id,
         index: panelItem.index,
-        numericFilter: panelItem.numericFilter,
+        numericFilter: panelItemNumericFilterToDto(panelItem.numericFilter),
         recencyFilter: panelItem.recencyFilter,
         specializations: panelItem.specializations
     }
-}
+};
+
+const panelItemNumericFilterToDto = (numFilter: NumericFilter): NumericFilterDTO => {
+    const [ val1, val2 ] = numFilter.filter;
+    if (numFilter.filterType === NumericFilterType.None) { 
+        return {
+            filterType: numFilter.filterType,
+            filter: []
+        };
+    }
+    if (numFilter.filterType === NumericFilterType.Between) {
+        return {
+            filterType: numFilter.filterType,
+            filter: [ 
+                val1 === null ? 0 : val1, 
+                val2 === null ? 0 : val2
+            ]
+        };
+    }
+    return {
+        filterType: numFilter.filterType,
+        filter: [ val1 === null ? 0 : val1 ]
+    };
+};
