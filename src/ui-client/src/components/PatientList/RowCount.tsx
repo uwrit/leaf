@@ -11,17 +11,20 @@ import { formatSmallNumber } from '../../utils/formatNumber';
 interface Props {
     exportLimit: number;
     isIdentified: boolean;
+    isFederated: boolean;
     totalCohortPatients: number;
     totalDatapoints: number;
     totalPatients: number;
 }
 
-export function RowCount(props: Props) {
-    const { totalPatients, totalDatapoints, isIdentified, exportLimit, totalCohortPatients } = props;
+export const RowCount = (props: Props) => {
+    const { totalPatients, totalDatapoints, isIdentified, isFederated, exportLimit, totalCohortPatients } = props;
     const c = 'patientlist';
 
     return (
         <div className={`${c}-rowcount-container`}>
+
+            {/* Total Patient and Row counts */}
             <span>Displaying </span>
             <span className={`${c}-rowcount`}>{formatSmallNumber(totalPatients)} 
                 {!isIdentified &&
@@ -31,17 +34,32 @@ export function RowCount(props: Props) {
             <span> with </span>
             <span className={`${c}-rowcount`}>{formatSmallNumber(totalPatients + totalDatapoints)} rows</span>
             <span> of data</span>
-            {totalPatients < totalCohortPatients && 
+
+            {/* Total Displayed Patients less than Total in Cohort - Single Node */}
+            {totalPatients < totalCohortPatients &&
             <div className={`${c}-info`}>
                 <div className={`${c}-info-inner`}>Why can't I see data for all {formatSmallNumber(totalCohortPatients)} patients?
+
+                    {/* Single Node */}
+                    {!isFederated &&
                     <div className={`${c}-info-detail`}>
                         <span>Your administrator has limited viewing and exporting to </span>
                         <span className={`${c}-info-emphasis`}>{formatSmallNumber(exportLimit)} patients at a time</span> 
                         <span>, which is less than the total number in your cohort.</span>
                     </div>
+                    }
+
+                    {/* Federated */}
+                    {isFederated &&
+                    <div className={`${c}-info-detail`}>
+                        <span>One or more of the Leaf server you are querying may be limiting the total amount of patients you are able to view.</span>
+                    </div>
+                    }
                 </div>
             </div>
             }
+
+            {/* De-identification info */}
             {!isIdentified &&
             <div className={`${c}-info`}>
                 <div className={`${c}-info-inner`}>What is de-identification?

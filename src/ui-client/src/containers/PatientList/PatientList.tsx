@@ -67,13 +67,14 @@ class PatientList extends React.PureComponent<Props, State> {
         const classes = [ `${c}-container` ];
         const datasetDefs: PatientListDatasetDefinition[] = [];
         patientList.configuration.singletonDatasets.forEach((d: PatientListDatasetDefinition) => datasetDefs.push(d));
+        
         /*
          * Calculate the number of patients and rows displayed.
          */
-        let completedRespondents = 0;
+        let totalRespondents = 0;
         cohort.networkCohorts.forEach((nc: NetworkCohortState) => {
-            if (nc.patientList.state !== CohortStateType.REQUESTING) {
-                completedRespondents++;
+            if (nc.count.state === CohortStateType.LOADED) {
+                totalRespondents++;
             }
         });
         const showPaginate = patientList.totalPatients > patientList.configuration.pageSize;
@@ -118,6 +119,7 @@ class PatientList extends React.PureComponent<Props, State> {
                         <RowCount 
                             exportLimit={auth.config!.exportLimit}
                             isIdentified={isIdentified}
+                            isFederated={totalRespondents > 1}
                             totalCohortPatients={cohort.count.value} 
                             totalPatients={patientList.totalPatients} 
                             totalDatapoints={patientList.totalRows} 
@@ -158,14 +160,16 @@ class PatientList extends React.PureComponent<Props, State> {
     }
 
     private handlePageCountClick = (data: any) => {
+        const { dispatch, patientList } = this.props;
         const page = data.selected;
-        if (page !== this.props.patientList.configuration.pageNumber) {
-            this.props.dispatch(setPatientListPagination(page));
+        if (page !== patientList.configuration.pageNumber) {
+            dispatch(setPatientListPagination(page));
         }
     }
 
     private handleExportClick = () => {
-        this.props.dispatch(toggleExportDataModal());
+        const { dispatch } = this.props;
+        dispatch(toggleExportDataModal());
     }
 }
 

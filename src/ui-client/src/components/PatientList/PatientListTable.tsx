@@ -80,6 +80,7 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
                                 dispatch={dispatch}
                                 index={idx}
                                 row={r}
+                                key={r.compoundId}
                             />
                         ))}
                     </tbody>

@@ -124,13 +124,14 @@ namespace Services.Compiler.SqlServer
 
         string BuildSequentialPanelSql(Panel panel, bool showPersonId)
         {
+            var firstSubpanelIndex = panel.SubPanels.ElementAt(0).Index;
             var panelSql = new StringBuilder();
-            var outputColumn = showPersonId ? $"{Dialect.ALIAS_PERSON}{panel.Index}.{compilerOptions.FieldPersonId} " : "1 ";
+            var outputColumn = showPersonId ? $"{Dialect.ALIAS_SUBQUERY}{firstSubpanelIndex}.{compilerOptions.FieldPersonId} " : "1 ";
 
             // SELECT ...
             // FROM ...
             panelSql.Append($"{Dialect.SQL_SELECT} {outputColumn}" +
-                            $"{Dialect.SQL_FROM} {compilerOptions.SetPerson} {Dialect.ALIAS_PERSON}{panel.Index} ");
+                            $"{Dialect.SQL_FROM} ");
 
             bool hasAnchorDate = false;
             bool isAnchorDate = false;
@@ -159,12 +160,16 @@ namespace Services.Compiler.SqlServer
                 {
                     if (subPanel.IncludeSubPanel && subPanel.JoinSequence.SequenceType == SequenceType.WithinFollowing)
                     {
-                        anchorDate = $"DATEADD({subPanel.DateFilter.DateIncrementType.ToString()}, {subPanel.DateFilter.Increment}, {anchorDate})";
+                        anchorDate = $"DATEADD({subPanel.JoinSequence.DateIncrementType.ToString()}, {subPanel.JoinSequence.Increment}, {anchorDate})";
                     }
                 }
 
                 // JOIN ...
-                panelSql.Append((subPanel.IncludeSubPanel ? Dialect.SQL_INNERJOIN : Dialect.SQL_LEFTJOIN) + Dialect.SQL_SPACE + "(");
+                if (k > 0)
+                {
+                    panelSql.Append(" " + (subPanel.IncludeSubPanel ? Dialect.SQL_INNERJOIN : Dialect.SQL_LEFTJOIN) + Dialect.SQL_SPACE);
+                }
+                panelSql.Append("(");
 
                 for (int j = 0; j < subPanel.PanelItems.Count; j++)
                 {
@@ -194,13 +199,17 @@ namespace Services.Compiler.SqlServer
                     }
                 }
 
-                // ON A.PersonID = B.PersonID
-                panelSql.Append(") " +
-                                $"{Dialect.ALIAS_SUBQUERY}{k} {Dialect.SQL_ON} {Dialect.ALIAS_PERSON}{panel.Index}.{compilerOptions.FieldPersonId} = " +
-                                $"{Dialect.ALIAS_SUBQUERY}{k}.{compilerOptions.FieldPersonId} ");
-
-                if (k > 0)
+                if (k == 0)
                 {
+                    panelSql.Append($") AS {Dialect.ALIAS_SUBQUERY}{k} ");
+                }
+                else
+                {
+                    // ON A.PersonID = B.PersonID
+                    panelSql.Append(") AS " +
+                       $"{Dialect.ALIAS_SUBQUERY}{k} {Dialect.SQL_ON} {Dialect.ALIAS_SUBQUERY}{firstSubpanelIndex}.{compilerOptions.FieldPersonId} = " +
+                       $"{Dialect.ALIAS_SUBQUERY}{k}.{compilerOptions.FieldPersonId} ");
+
                     panelSql.Append(Dialect.SQL_AND + " ");
                     var prevSub = panel.SubPanels.ElementAt(k - 1);
 
@@ -311,14 +320,16 @@ namespace Services.Compiler.SqlServer
             if (subPanelsWithHavingClause.Count > 0 || showPersonId)
             {
                 // GROUP BY PersonId
-                panelSql.Append($" {Dialect.SQL_GROUPBY} {Dialect.ALIAS_PERSON}{panel.Index}.{compilerOptions.FieldPersonId} ");
+                panelSql.Append($" {Dialect.SQL_GROUPBY} {Dialect.ALIAS_SUBQUERY}{firstSubpanelIndex}.{compilerOptions.FieldPersonId} ");
 
                 if (subPanelsWithHavingClause.Count > 0)
                 {
+                    panelSql.Append($"HAVING ");
+
                     foreach (int k in subPanelsWithHavingClause)
                     {
                         SubPanel subPanel = panel.SubPanels.ElementAt(k);
-                        string countDistinctDate = $"HAVING {Dialect.SQL_COUNT}DISTINCT {PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", subPanel.PanelItems.ElementAt(0).Concept.SqlFieldDate)}) ";
+                        string countDistinctDate = $"{Dialect.SQL_COUNT}DISTINCT {PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", subPanel.PanelItems.ElementAt(0).Concept.SqlFieldDate)}) ";
 
                         // If SubPanel is Included and has a COUNT filter
                         if (subPanel.HasCountFilter && subPanel.IncludeSubPanel)
