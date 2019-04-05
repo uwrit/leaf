@@ -22,7 +22,7 @@ interface Props {
     panel: PanelModel,
 }
 
-export const inclusionDropdownType = {
+export const INCLUSION_DROPDOWN_TYPE = {
     PANEL: 'PANEL',
     SUBPANEL: 'SUBPANEL'
 }
@@ -42,31 +42,34 @@ export default class InclusionDropdown extends React.PureComponent<Props, State>
     }
 
     public selectItem(item: any) {
+        const { dispatch, inclusionDropdownType } = this.props;
         const text = item.target.innerText;
         const include = text === 'Patients Who' || text === 'And' ? true : false;
 
         // Update state
-        if (this.props.inclusionDropdownType === inclusionDropdownType.PANEL) { 
-            this.props.dispatch(setPanelInclusion(this.props.panel.index, include));
+        if (inclusionDropdownType === INCLUSION_DROPDOWN_TYPE.PANEL) { 
+            dispatch(setPanelInclusion(this.props.panel.index, include));
         }
         else {
-            this.props.dispatch(setSubPanelInclusion(this.props.panel.index, this.props.index, include));
+            dispatch(setSubPanelInclusion(this.props.panel.index, this.props.index, include));
         }
     }
 
     public render() {
-        let displayText: string;
-        let opts: string[];
+        const { inclusionDropdownType, index, isFirst, panel } = this.props;
+        const { dropdownOpen } = this.state;
         const classes: string[] = [ 'panel-header-inclusion' ];
-        const isInclusionCriteria = this.props.inclusionDropdownType === inclusionDropdownType.PANEL 
-            ? this.props.panel.includePanel 
-            : this.props.panel.subPanels[this.props.index].includeSubPanel;
+        const isInclusionCriteria = inclusionDropdownType === INCLUSION_DROPDOWN_TYPE.PANEL 
+            ? panel.includePanel 
+            : panel.subPanels[index].includeSubPanel;
         const includeClasses = `leaf-dropdown-item ${isInclusionCriteria ? 'selected' : ''}`;
         const excludeClasses = `leaf-dropdown-item ${!isInclusionCriteria ? 'selected' : ''}`;
+        let displayText: string;
+        let opts: string[];
 
         // Set the text and options to display, depending on inclusion state and
         // whether it is the first panel or not
-        if (this.props.isFirst) { 
+        if (isFirst) { 
             opts = [ 'Patients Who', 'Not Patients Who' ];
             displayText = isInclusionCriteria ? 'Patients Who' : 'Not Patients Who';
         }
@@ -81,7 +84,7 @@ export default class InclusionDropdown extends React.PureComponent<Props, State>
         }
 
         return (
-            <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle} className={classes.join(' ')}>
+            <Dropdown isOpen={dropdownOpen} toggle={this.toggle} className={classes.join(' ')}>
                 <DropdownToggle caret={true} >
                     {displayText}
                 </DropdownToggle>

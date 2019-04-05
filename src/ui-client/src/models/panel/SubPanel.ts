@@ -47,7 +47,7 @@ export const subPanelToDto = (subpanel: SubPanel): SubPanelDTO => {
 }
 
 export interface SubPanelJoinSequence {
-    increment: number;
+    increment: number | null;
     dateIncrementType: DateIncrementType;
     sequenceType: SequenceType;
 }

@@ -9,27 +9,24 @@ import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { setSubPanelJoinSequence } from '../../../actions/panels';
 import { DateIncrementType } from '../../../models/panel/Date';
-import { SubPanel as SubPanelModel, SequenceType } from '../../../models/panel/SubPanel';
+import { SubPanel as SubPanelModel, SequenceType, SubPanelJoinSequence } from '../../../models/panel/SubPanel';
 import SameSequenceDropdownIncrement from './SameSequenceDropdownIncrement';
 
 interface Props {
     dispatch: any
     index: number,
-    SubPanel: SubPanelModel,
+    subPanel: SubPanelModel,
 }
 
 interface State {
     dropdownOpen: boolean;
-    withinPlusMinusInput: string;
-    withinFollowingInput: string;
+    withinPlusMinusInput: number | null;
+    withinFollowingInput: number | null;
 }
 
-interface NullableSubPanelJoinSequence {
-    dateIncrementType?: DateIncrementType;
-    increment?: number;
-    sequenceType?: SequenceType; 
-}
-
+/*
+ * Join sequence types available in UI.
+ */
 const joinSequenceTypes = new Map([
     [ SequenceType.Encounter, { display: 'In the Same Encounter', type: SequenceType.Encounter }],
     [ SequenceType.Event, { display: 'In the Same Event', type: SequenceType.Event }],
@@ -37,130 +34,21 @@ const joinSequenceTypes = new Map([
     [ SequenceType.WithinFollowing, { display: 'In the Following', type: SequenceType.WithinFollowing }],
     [ SequenceType.AnytimeFollowing, { display: 'Anytime After', type: SequenceType.AnytimeFollowing }]
 ]);
-const encounterText = 'In the Same Encounter';
-const eventText = 'In the Same Event';
-const anytimeAfterText = 'Anytime After';
-const withinFollowingText = 'In the Following';
-const plusMinusText = 'Within +/-';
 
 export default class SameSequenceDropdown extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = { 
             dropdownOpen: false,
-            withinFollowingInput: '1',
-            withinPlusMinusInput: '1'
+            withinFollowingInput: 1,
+            withinPlusMinusInput: 1
         };
     }
 
-    public updateStoreWithJoinSequence = (joinSequence: NullableSubPanelJoinSequence) => {
-        this.props.dispatch(
-            setSubPanelJoinSequence(
-                this.props.SubPanel.panelIndex,
-                this.props.index,
-                { ...this.props.SubPanel.joinSequence, ...joinSequence }
-            )
-        );
-    }
-
-    public setDisplayText = () => {
-        const reg = /^\w/;
-        const sequence = this.props.SubPanel.joinSequence; 
-        const text = [ joinSequenceTypes.get(sequence.sequenceType)!.display ];
-
-        if (sequence.sequenceType === SequenceType.PlusMinus || 
-            sequence.sequenceType === SequenceType.WithinFollowing 
-        ) {
-            text.push(`${sequence.increment} 
-                ${DateIncrementType[sequence.dateIncrementType]
-                    .toString()
-                    .toLowerCase()
-                    .replace(reg, (c: string) => c.toUpperCase())}${sequence.increment === 1 ? '' : 's'}`);
-        }
-        return text.join(' ');
-    }
-    
-    public toggleDropdown = () => {
-        this.setState((prevState: any) => ({
-            dropdownOpen: !prevState.dropdownOpen
-        }));
-    }
-
-    public handleWithinPlusMinusInputChange = (e: any) => {
-        const text: string = e.target.value;
-        if (this.isValidNumericInput(text)) {
-            this.setState({ withinPlusMinusInput: text });
-            this.updateStoreWithJoinSequence({ increment: +text, sequenceType: SequenceType.PlusMinus });
-        }
-    }
-
-    public handleWithinFollowingInputChange = (e: any) => {
-        const text: string = e.target.value;
-        if (this.isValidNumericInput(text)) {
-            this.setState({ withinFollowingInput: text });
-            this.updateStoreWithJoinSequence({ increment: +text, sequenceType: SequenceType.WithinFollowing });
-        }
-    }
-
-    public handleDropdownSelect = (e: any) => {
-        const text: string = e.target.innerText;
-        switch (text) {
-            case encounterText:
-                this.updateStoreWithJoinSequence({ sequenceType: SequenceType.Encounter });
-                return;
-            case eventText:
-                this.updateStoreWithJoinSequence({ sequenceType: SequenceType.Event });
-                return;
-            case anytimeAfterText:
-                this.updateStoreWithJoinSequence({ sequenceType: SequenceType.AnytimeFollowing });
-                return;
-        }
-        if (text.indexOf(plusMinusText) > -1) {
-            this.updateStoreWithJoinSequence({ increment: +this.state.withinPlusMinusInput, sequenceType: SequenceType.PlusMinus });
-            this.setState({ dropdownOpen: false });
-        }
-        else if (text.indexOf(withinFollowingText) > -1) {
-            this.updateStoreWithJoinSequence({ increment: +this.state.withinFollowingInput, sequenceType: SequenceType.WithinFollowing });
-            this.setState({ dropdownOpen: false });
-        }
-    }
-
-    public handleWithinPlusMinusDropdownIncrementSelect = (dateTypeString: any) => {
-        this.updateStoreWithJoinSequence({ 
-            dateIncrementType: DateIncrementType[dateTypeString] as any, 
-            increment: +this.state.withinPlusMinusInput, 
-            sequenceType: SequenceType.PlusMinus 
-        });
-    }
-
-    public handleWithinFollowingDropdownIncrementSelect = (dateTypeString: any) => {
-        this.updateStoreWithJoinSequence({ 
-            dateIncrementType: DateIncrementType[dateTypeString] as any, 
-            increment: +this.state.withinFollowingInput, 
-            sequenceType: SequenceType.WithinFollowing 
-        });
-    }
-
-    public handleClickPreventDefault = (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    public isValidNumericInput = (val: string, allowEmpty: boolean = true): boolean => {
-        const value = val.trim();
-        if (isNaN(+value) || value.indexOf('.') > -1)           { return false; }
-        else if (value.indexOf('0') !== value.lastIndexOf('0')) { return false; }
-        else if (!allowEmpty && val.length === 0)               { return false; }
-        return true;
-    }
-
-    public addSelectedClassIfMatched = (classes: string, sequenceType: SequenceType) => {
-        return `${classes} ${sequenceType === this.props.SubPanel.joinSequence.sequenceType ? 'selected' : ''}`;
-    }
-
     public render() {
-        const displayText = this.setDisplayText();
-        const currentIncrement = DateIncrementType[this.props.SubPanel.joinSequence.dateIncrementType].toString();
+        const { subPanel } = this.props;
+        const { withinFollowingInput, withinPlusMinusInput } = this.state;
+        const dateType = DateIncrementType[subPanel.joinSequence.dateIncrementType].toString();
         const encounterClasses = this.addSelectedClassIfMatched('leaf-dropdown-item', SequenceType.Encounter);
         const eventClasses = this.addSelectedClassIfMatched('leaf-dropdown-item', SequenceType.Event);
         const plusMinusClasses = this.addSelectedClassIfMatched('leaf-dropdown-item same-sequence-dropdown-input arrow-right', SequenceType.PlusMinus);
@@ -173,54 +61,239 @@ export default class SameSequenceDropdown extends React.PureComponent<Props, Sta
                 isOpen={this.state.dropdownOpen} 
                 toggle={this.toggleDropdown}>
                 <DropdownToggle caret={true}>
-                    {displayText}
+                    {this.setDisplayText()}
                 </DropdownToggle>
                 <DropdownMenu className="leaf-dropdown-menu">
+
+                    {/* Same Encounter */}
                     <DropdownItem 
                         className={encounterClasses}
-                        onClick={this.handleDropdownSelect}>
-                        {encounterText}
+                        onClick={this.handleDropdownSelect.bind(null, SequenceType.Encounter)}>
+                        In the Same Encounter
                     </DropdownItem>
+
+                    {/* Same Event (hidden for now) */}
+                    {/*
                     <DropdownItem 
                         className={eventClasses}
                         onClick={this.handleDropdownSelect}>
-                        {eventText}
-                    </DropdownItem>
+                        In the Same Event
+                    </DropdownItem>*
+                    /}
+
+                    {/* Within +/- */}
                     <div 
                         className={plusMinusClasses}
-                        onClick={this.handleDropdownSelect}>
-                        {plusMinusText}
+                        onClick={this.handleDropdownSelect.bind(null, SequenceType.PlusMinus)}>
+                        Within +/-
                         <Input 
                             className="same-sequence-input leaf-input" 
                             onChange={this.handleWithinPlusMinusInputChange}
+                            onClick={this.handleClickPreventDefault}
                             placeholder="1, 2, 3..."
-                            value={this.state.withinPlusMinusInput}
-                            />
-                        <SameSequenceDropdownIncrement 
-                            currentIncrement={currentIncrement} 
-                            onClickFunc={this.handleWithinPlusMinusDropdownIncrementSelect} />
+                            value={this.storeNumericValueToString(withinPlusMinusInput)}
+                        />
+                        <SameSequenceDropdownIncrement
+                            dateType={dateType} 
+                            increment={withinPlusMinusInput}
+                            onClick={this.handleWithinPlusMinusDropdownIncrementSelect} />
                     </div>
+
+                    {/* Within the Following */}
                     <div 
                         className={withinFollowingClasses}
-                        onClick={this.handleDropdownSelect}>
-                        {withinFollowingText}
+                        onClick={this.handleDropdownSelect.bind(null, SequenceType.WithinFollowing)}>
+                        Within the Following
                         <Input 
                             className="same-sequence-input leaf-input" 
                             onChange={this.handleWithinFollowingInputChange}
+                            onClick={this.handleClickPreventDefault}
                             placeholder="1, 2, 3..."
-                            value={this.state.withinFollowingInput}
+                            value={this.storeNumericValueToString(withinFollowingInput)}
                             />
                         <SameSequenceDropdownIncrement 
-                            currentIncrement={currentIncrement} 
-                            onClickFunc={this.handleWithinFollowingDropdownIncrementSelect} />    
+                            dateType={dateType} 
+                            increment={withinFollowingInput}
+                            onClick={this.handleWithinFollowingDropdownIncrementSelect} />    
                     </div>
+
+                    {/* Anytime after */}
                     <DropdownItem 
                         className={anytimeAfterClasses}
-                        onClick={this.handleDropdownSelect}>
-                        {anytimeAfterText}
+                        onClick={this.handleDropdownSelect.bind(null, SequenceType.AnytimeFollowing)}>
+                        Anytime After
                     </DropdownItem>
                 </DropdownMenu>
             </Dropdown>
         );
+    }
+
+    /*
+     * Updates Redux store with current data.
+     */
+    private updateStoreWithJoinSequence = (joinSequence: SubPanelJoinSequence) => {
+        const { dispatch, subPanel, index } = this.props;
+        dispatch(setSubPanelJoinSequence(subPanel.panelIndex, index, { ...subPanel.joinSequence, ...joinSequence }));
+    }
+
+    /*
+     * Sets the text to be displayed in the SubPanel Header
+     * (e.g., 'Within +/- 3 Days', 'In the Same Encounter').
+     */
+    private setDisplayText = () => {
+        const reg = /^\w/;
+        const sequence = this.props.subPanel.joinSequence; 
+        const text = [ joinSequenceTypes.get(sequence.sequenceType)!.display ];
+
+        if (sequence.sequenceType === SequenceType.PlusMinus || 
+            sequence.sequenceType === SequenceType.WithinFollowing 
+        ) {
+            text.push(`${sequence.increment === null ? 0 : sequence.increment} 
+                ${DateIncrementType[sequence.dateIncrementType]
+                    .toString()
+                    .toLowerCase()
+                    .replace(reg, (c: string) => c.toUpperCase())}${sequence.increment === 1 ? '' : 's'}`);
+        }
+        return text.join(' ');
+    }
+    
+    /*
+     * Toggles the dropdown and handles possible null values.
+     */
+    private toggleDropdown = () => {
+        const { joinSequence } = this.props.subPanel;
+        const dropdownOpen = !this.state.dropdownOpen;
+
+        /*
+         * Update store with an increment value of zero if null on
+         * dropdown close. This prevents issues with nulls being sent
+         * to the server on query run, as the server will always expect
+         * a numeric value, and in any case the UI is already displaying '0'.
+         */
+        if (!dropdownOpen && joinSequence.increment === null) {
+            this.updateStoreWithJoinSequence({ ...joinSequence, increment: 0 });
+        }
+
+        this.setState({ dropdownOpen });
+    }
+
+    /*
+     * Handles changes to the given Input. Empty strings default to null.
+     */
+    private handleInputChange = (text: string, sequenceType: SequenceType): SubPanelJoinSequence | undefined => {
+        const { dateIncrementType } = this.props.subPanel.joinSequence;
+        let val: any = text;
+
+        if (val === '') { 
+            val = null; 
+        } else if (!this.isNumeric(val)) { 
+            return; 
+        } else if (val.length > 0 && val[val.length - 1] !== '.') {
+            val = +val;
+        }
+
+        return { increment: val, sequenceType, dateIncrementType }
+    }
+
+    /*
+     * Handles changes to the PlusMinus Input. Empty strings default to null.
+     */
+    private handleWithinPlusMinusInputChange = (e: any) => {
+        const seq = this.handleInputChange(e.target.value, SequenceType.PlusMinus);
+        if (!seq) { return; }
+
+        this.setState({ withinPlusMinusInput: seq.increment });
+        this.updateStoreWithJoinSequence(seq);
+    }
+
+    /*
+     * Handles changes to the WithinFollowing Input. Empty strings default to null.
+     */
+    private handleWithinFollowingInputChange = (e: any) => {
+        const seq = this.handleInputChange(e.target.value, SequenceType.WithinFollowing);
+        if (!seq) { return; }
+
+        this.setState({ withinFollowingInput: seq.increment });
+        this.updateStoreWithJoinSequence(seq);
+    }
+
+    /*
+     * Handles clicks on the sequence type dropdown. Note that 
+     * <input> clicks are intercepted and prevented from triggering this.
+     */
+    private handleDropdownSelect = (sequenceType: SequenceType) => {
+        const { withinPlusMinusInput, withinFollowingInput } = this.state;
+        const { joinSequence } = this.props.subPanel;
+
+        switch (sequenceType) {
+            case SequenceType.Encounter:
+            case SequenceType.Event:
+            case SequenceType.AnytimeFollowing:
+                this.updateStoreWithJoinSequence({ ...joinSequence, sequenceType });
+                return;
+            case SequenceType.PlusMinus:
+                this.updateStoreWithJoinSequence({ ...joinSequence, increment: withinPlusMinusInput, sequenceType });
+                this.toggleDropdown();
+                return;
+            case SequenceType.WithinFollowing:
+                this.updateStoreWithJoinSequence({ ...joinSequence, increment: withinFollowingInput, sequenceType });
+                this.toggleDropdown();
+                return;
+        }
+    }
+
+    /*
+     * The App Store values are number | null, so this handles stringifying those 
+     * to satisfy DOM <input> elements.
+     */
+    private storeNumericValueToString = (val: number | null): string => val === null ? '' : `${val}`;
+
+    /*
+     * Handles selection of a given dateType in the PlusMinus dropdown
+     * (e.g., 'Days', 'Hours')
+     */
+    private handleWithinPlusMinusDropdownIncrementSelect = (dateTypeString: any) => {
+        const { withinPlusMinusInput } = this.state;
+        const dateIncrementType = DateIncrementType[dateTypeString] as any;
+        this.updateStoreWithJoinSequence({ dateIncrementType, increment: withinPlusMinusInput, sequenceType: SequenceType.PlusMinus });
+    }
+
+    /*
+     * Handles selection of a given dateType in the WithinFollowing dropdown
+     * (e.g., 'Days', 'Hours')
+     */
+    private handleWithinFollowingDropdownIncrementSelect = (dateTypeString: any) => {
+        const { withinFollowingInput } = this.state;
+        const dateIncrementType = DateIncrementType[dateTypeString] as any;
+        this.updateStoreWithJoinSequence({ dateIncrementType, increment: withinFollowingInput, sequenceType: SequenceType.WithinFollowing });
+    }
+
+    /*
+     * The onClick handler for <input> elements. This prevents the action from
+     * bubbling up and inadvertently closing the dropdown, and instead ensures
+     * it stays open and the focus moves to the intended <input>.
+     */
+    private handleClickPreventDefault = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    /*
+     * Validates whether a string input is numeric or not.
+     */
+    private isNumeric = (val: string): boolean => {
+        const value = val.trim();
+        if (isNaN(+value) || value.indexOf('.') > -1)           { return false; }
+        else if (value.indexOf('0') !== value.lastIndexOf('0')) { return false; }
+        else if (val.length === 0)                              { return false; }
+        return true;
+    }
+
+    /*
+     * Checks the current SequenceType in store and adds the
+     * 'selected' CSS class if it is.
+     */
+    private addSelectedClassIfMatched = (classes: string, sequenceType: SequenceType) => {
+        return `${classes} ${sequenceType === this.props.subPanel.joinSequence.sequenceType ? 'selected' : ''}`;
     }
 }

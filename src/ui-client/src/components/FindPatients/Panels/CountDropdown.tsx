@@ -10,14 +10,14 @@ import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap
 import { setSubPanelCount } from '../../../actions/panels';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 
-interface State {
-    dropdownOpen: boolean
-}
-
 interface Props {
     dispatch: any
     index: number,
     panel: PanelModel,
+}
+
+interface State {
+    dropdownOpen: boolean
 }
 
 export default class CountDropdown extends React.Component<Props, State> {
@@ -29,13 +29,15 @@ export default class CountDropdown extends React.Component<Props, State> {
     }
 
     public shouldComponentUpdate(nextProps: Props, nextState: State) {
+        const { panel, index } = this.props;
+        const { dropdownOpen } = this.state;
         
         // Update the dropdown state changed
-        if (this.state.dropdownOpen !== nextState.dropdownOpen) {
+        if (dropdownOpen !== nextState.dropdownOpen) {
             return true;
         }
         // Update if the mincount is different
-        else if (this.props.panel.subPanels[this.props.index].minimumCount !== nextProps.panel.subPanels[nextProps.index].minimumCount) {
+        else if (panel.subPanels[index].minimumCount !== nextProps.panel.subPanels[nextProps.index].minimumCount) {
             return true;
         }
         // Else don't update
@@ -49,27 +51,29 @@ export default class CountDropdown extends React.Component<Props, State> {
     }
 
     public selectItem(item: any) {
+        const { dispatch, index, panel } = this.props;
         const text: string = item.target.innerText;
         const val: number = +text.replace('At Least ','').replace('x','').trim();
 
         // Update state
-        this.props.dispatch(setSubPanelCount(this.props.panel.index, this.props.index, val));
+        dispatch(setSubPanelCount(panel.index, index, val));
     }
 
     public render() {
-        const minCount = this.props.panel.subPanels[this.props.index].minimumCount;
-        const items = new Array(10).fill(null).map((val: any, i: number) => {
-            const classes = `leaf-dropdown-item ${minCount === (i + 1) ? 'selected' : ''}`;
-            return <DropdownItem className={classes} key={i} onClick={this.selectItem}>At Least {i + 1}x</DropdownItem>
-        });
-
+        const { index, panel } = this.props;
+        const { dropdownOpen } = this.state;
+        const minCount = panel.subPanels[index].minimumCount;
+        
         return (
-            <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle} className="panel-header-count">
+            <Dropdown isOpen={dropdownOpen} toggle={this.toggle} className="panel-header-count">
                 <DropdownToggle caret={true}>
                     At Least {minCount}x
                 </DropdownToggle>
                 <DropdownMenu>
-                    {items}
+                    {new Array(10).fill(null).map((val: any, i: number) => {
+                        const classes = `leaf-dropdown-item ${minCount === (i + 1) ? 'selected' : ''}`;
+                        return <DropdownItem className={classes} key={i} onClick={this.selectItem}>At Least {i + 1}x</DropdownItem>
+                    })}
                 </DropdownMenu>
             </Dropdown>
         );

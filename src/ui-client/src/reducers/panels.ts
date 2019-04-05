@@ -194,6 +194,9 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
             subpanel.panelItems.splice(piIndex, 1);
 
             // Reset indexes and remove empty subpanels
+            if (subpanel.panelItems.length === 0 && subpanel.index > 0) { 
+                newpanels[action.panelIndex].subPanels.splice(subpanel.index, 1);
+            }
             resetSubPanelIndexes(panel);
 
             // Add a new subpanel if the current last subpanel now has at least 1 panel item

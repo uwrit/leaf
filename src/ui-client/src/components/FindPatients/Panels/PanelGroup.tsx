@@ -11,6 +11,7 @@ import { Panel as PanelModel } from '../../../models/panel/Panel';
 import Panel from './Panel';
 
 interface PanelGroupProps {
+    dispatch: any;
     panels: PanelModel[];
 }
 
@@ -20,17 +21,18 @@ export class PanelGroup extends React.PureComponent<PanelGroupProps> {
     }
 
     public render() {
-        const panels = this.props.panels.map((panel: PanelModel, i: number) =>
-            <Panel 
-                key={panel.id} 
-                isFirst={i === 0 ? true : false}
-                panel={panel}
-            />
-        );
+        const { panels, dispatch } = this.props;
 
         return (
             <Row>
-                {panels}
+                {panels.map((panel: PanelModel, i: number) =>
+                    <Panel 
+                        dispatch={dispatch}
+                        key={panel.id} 
+                        isFirst={i === 0}
+                        panel={panel}
+                    />
+                )}
             </Row>
         );
     }

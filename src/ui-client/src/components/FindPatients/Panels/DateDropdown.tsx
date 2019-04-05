@@ -29,26 +29,28 @@ export default class DateDropdown extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const dateFilter = this.props.panel.dateFilter;
+        const { handleCustomDateClick, panel } = this.props;
+        const { dropdownOpen } = this.state;
+        const { dateFilter } = panel;
         const customDateFilterClasses = `leaf-dropdown-item ${dateFilter.start.dateIncrementType === DateIncrementType.SPECIFIC ? 'selected' : ''}`;
         const anytimeDateFilterClasses = `leaf-dropdown-item ${dateFilter.start.dateIncrementType === DateIncrementType.NONE ? 'selected' : ''}`;
         const anytime: DateBoundary = { start: none, end: none };
 
         return (
-            <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggle} className="panel-header-date">
+            <Dropdown isOpen={dropdownOpen} toggle={this.toggle} className="panel-header-date">
                 <DropdownToggle caret={true}>
                     {this.getDateDisplay(dateFilter)}
                 </DropdownToggle>
                 <DropdownMenu>
                     <DropdownItem className={anytimeDateFilterClasses} onClick={this.handleClick.bind(null, anytime)}>Anytime</DropdownItem>
                     <DropdownItem divider={true} />
-                    <DropdownItem className={customDateFilterClasses} onClick={this.props.handleCustomDateClick}>Custom Date Range</DropdownItem>
+                    <DropdownItem className={customDateFilterClasses} onClick={handleCustomDateClick}>Custom Date Range</DropdownItem>
                     <DropdownItem divider={true} />
-                    {pastDates.map((opt: DateBoundary, i: number) => (
+                    {pastDates.map((opt: DateBoundary) => (
                         <DropdownItem className={this.setDropdownItemClasses(opt)} key={opt.display} onClick={this.handleClick.bind(null, opt)}>{opt.display}</DropdownItem>
                     ))}
                     <DropdownItem divider={true} />
-                    {futureDates.map((opt: DateBoundary, i: number) => (
+                    {futureDates.map((opt: DateBoundary) => (
                         <DropdownItem className={this.setDropdownItemClasses(opt)} key={opt.display} onClick={this.handleClick.bind(null, opt)}>{opt.display}</DropdownItem>
                     ))}
                 </DropdownMenu>
@@ -61,7 +63,8 @@ export default class DateDropdown extends React.PureComponent<Props, State> {
     }
 
     private handleClick = (dateFilter: DateBoundary) => {
-        this.props.dispatch(setPanelDateFilter(this.props.panel.index, dateFilter));
+        const { dispatch, panel } = this.props;
+        dispatch(setPanelDateFilter(panel.index, dateFilter));
     }
 
     private setDropdownItemClasses = (dates: DateBoundary) => {

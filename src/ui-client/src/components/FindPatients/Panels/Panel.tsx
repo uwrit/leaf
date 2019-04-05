@@ -14,6 +14,7 @@ import { DateIncrementType } from '../../../models/panel/Date';
 import './Panel.css';
 
 export interface Props {
+    dispatch: any;
     panel: PanelModel,
     isFirst: boolean;
 }
@@ -24,7 +25,7 @@ export default class Panel extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { isFirst, panel } = this.props;
+        const { dispatch, isFirst, panel } = this.props;
         const isDateFiltered = 
             panel.dateFilter.end.dateIncrementType !== DateIncrementType.NONE && 
             panel.dateFilter.start.dateIncrementType !== DateIncrementType.NONE;
@@ -37,6 +38,7 @@ export default class Panel extends React.PureComponent<Props> {
             if (subPanel.index > 0 && subPanel.panelItems.length)      { hasSequentialJoin = true; }
             if (subPanel.minimumCount > 1)                             { isCountFiltered = true; }
         }
+
         // Set classes
         const classes = [ 'panel', (hasPanelItems ? 'has-data' : 'no-data') ];
         if (!panel.includePanel) { classes.push('panel-excluded'); }
@@ -47,9 +49,14 @@ export default class Panel extends React.PureComponent<Props> {
         return (
             <Col className="panel-column" md={4}>
                 <div className={classes.join(' ')}>
-                    <PanelHeader isFirst={isFirst} panel={panel} />
+                    <PanelHeader 
+                        dispatch={dispatch}
+                        isFirst={isFirst} 
+                        panel={panel} 
+                    />
                     {panel.subPanels.map((subpanel,i) => (
                         <SubPanel 
+                            dispatch={dispatch}
                             key={subpanel.id}
                             index={i}
                             panel={this.props.panel}

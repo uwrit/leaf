@@ -8,24 +8,26 @@
 import React from 'react';
 
 interface Props {
-    currentIncrement: string;
-    onClickFunc: (dateTypeString: string) => any;
+    increment: number | null;
+    dateType: string;
+    onClick: (dateTypeString: string) => any;
 }
 
 const SameSequenceDropdownIncrement = (props: Props) => {
     const className = 'same-sequence-dropdown-increment';
     const dateStrings = [ 'MINUTE', 'HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR' ];
+    const postfix = props.increment === 1 ? '' : 's';
     const incrementTypes = dateStrings.map((key: string, i) => {
 
-        const onClick = () => { props.onClickFunc(key)};
-        const classes = [ `${className}-item leaf-dropdown-item`, (key === props.currentIncrement ? 'selected' : '') ];
+        const onClick = (e: any) => { e.stopPropagation(); props.onClick(key)};
+        const classes = [ `${className}-item leaf-dropdown-item`, (key === props.dateType ? 'selected' : '') ];
 
         return (
             <div 
                 className={classes.join(' ')} 
                 key={key} 
                 onClick={onClick}>
-                {`${key[0]}${key.substring(1).toLowerCase()}(s)`}
+                {`${key[0]}${key.substring(1).toLowerCase()}${postfix}`}
             </div>
         );
     })

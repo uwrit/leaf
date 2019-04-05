@@ -57,12 +57,14 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         }
     }
 
+    /*
     public componentDidMount() {
         const { numericFilter } = this.props.panelItem;
         const newFilter = Object.assign({}, numericFilter, { filterType: types[0].enum });
         this.dispatchUpdate(newFilter);
     }
-    
+    */
+
     public render(): any {
         const { panelItem } = this.props;
         const { filterType, filter } = panelItem.numericFilter;
@@ -171,22 +173,6 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
     }
 
     /*
-     * Validates the current filter state such that incomplete
-     * data will safely default it to a state of 'None'.
-     */
-    private validateFilter = (filter: NumericFilter): NumericFilter => {
-        const { panelItem } = this.props;
-        const [ val1, val2 ] = panelItem.numericFilter.filter;
-
-        if (filter.filterType === NumericFilterType.Between && (val1 === null || val2 === null)) {
-            panelItem.numericFilter.filterType = NumericFilterType.None;
-        } else if (filter.filterType !== NumericFilterType.Between && val1 === null) {
-            panelItem.numericFilter.filterType = NumericFilterType.None;
-        }
-        return filter;
-    }
-
-    /*
      * Handles changes to the equality value dropdown (e.g., >, <, =).
      */
     private handleDropdownItemSelect = (ev: EqualityValue) => {
@@ -290,10 +276,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
     }
 
     private handleBlur = () => {
-        const { numericFilter } = this.props.panelItem;
         if (this.mouseOut) {
-            const validated = this.validateFilter(numericFilter);
-            this.dispatchUpdate(validated);
             this.setState({ showSelectionBox: false });
         }
     }
