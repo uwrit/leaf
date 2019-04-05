@@ -6,11 +6,10 @@
  */ 
 
 import React from 'react';
-import { connect } from 'react-redux';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import CountDropdown from './CountDropdown';
 import InclusionDropdown from './InclusionDropdown';
-import { inclusionDropdownType } from './InclusionDropdown'
+import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown'
 import SameSequenceDropdown from './SameSequenceDropdown';
 
 interface Props {
@@ -19,15 +18,16 @@ interface Props {
     panel: PanelModel;
 }
 
-class SubPanelHeader extends React.PureComponent<Props> {
+export default class SubPanelHeader extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
     }
 
     public render(): any {
-        let content: any; 
-        const subpanel = this.props.panel.subPanels[this.props.index];
+        const { panel, index, dispatch } = this.props;
+        const subpanel = panel.subPanels[index];
         const classes = [ 'subpanel-header' ];
+        let content: any; 
 
         if (!subpanel.includeSubPanel) {
             classes.push('subpanel-excluded');
@@ -41,21 +41,21 @@ class SubPanelHeader extends React.PureComponent<Props> {
             content = 
                 <div>
                     <InclusionDropdown 
-                        dispatch={this.props.dispatch}
-                        inclusionDropdownType={inclusionDropdownType.SUBPANEL}
-                        index={this.props.index}
+                        dispatch={dispatch}
+                        inclusionDropdownType={INCLUSION_DROPDOWN_TYPE.SUBPANEL}
+                        index={index}
                         isFirst={false} 
-                        panel={this.props.panel} 
+                        panel={panel} 
                     />
                     <SameSequenceDropdown
-                        dispatch={this.props.dispatch}
-                        index={this.props.index}
-                        SubPanel={this.props.panel.subPanels[this.props.index]}
+                        dispatch={dispatch}
+                        index={index}
+                        subPanel={subpanel}
                     /> 
                     <CountDropdown 
-                        dispatch={this.props.dispatch}
-                        index={this.props.index}
-                        panel={this.props.panel}
+                        dispatch={dispatch}
+                        index={index}
+                        panel={panel}
                     /> 
                 </div>;
         }
@@ -67,9 +67,3 @@ class SubPanelHeader extends React.PureComponent<Props> {
         )       
     }
 }
-
-const mapDispatchToProps = (dispatch: any) => {
-    return { dispatch };
-}
-
-export default connect(null, mapDispatchToProps)(SubPanelHeader)

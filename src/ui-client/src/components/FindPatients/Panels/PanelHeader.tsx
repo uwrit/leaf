@@ -6,7 +6,6 @@
  */ 
 
 import React from 'react';
-import { connect } from 'react-redux';
 import { setPanelDateFilter } from '../../../actions/panels';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
@@ -14,17 +13,17 @@ import CountDropdown from './CountDropdown';
 import CustomDateRangePicker from './CustomDateRangePicker';
 import DateDropdown from './DateDropdown';
 import InclusionDropdown from './InclusionDropdown';
-import { inclusionDropdownType } from './InclusionDropdown';
-
-interface State {
-    DOMRect?: DOMRect;
-    showCustomDateRangeBox: boolean;
-}
+import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown';
 
 interface Props {
     dispatch: any;
     isFirst: boolean;
     panel: PanelModel;
+}
+
+interface State {
+    DOMRect?: DOMRect;
+    showCustomDateRangeBox: boolean;
 }
 
 let dateConfigBeforeOpenCustom: DateBoundary = { 
@@ -33,7 +32,7 @@ let dateConfigBeforeOpenCustom: DateBoundary = {
     start: { dateIncrementType: DateIncrementType.NONE }
 };
 
-class PanelHeader extends React.PureComponent<Props, State> {
+export default class PanelHeader extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -42,32 +41,35 @@ class PanelHeader extends React.PureComponent<Props, State> {
     }
 
     public render() {
+        const { dispatch, isFirst, panel } = this.props;
+        const { DOMRect } = this.state;
+
         return (
-            <div className="panel-header" id={`panel-header-${this.props.panel.index}`}>
+            <div className="panel-header" id={`panel-header-${panel.index}`}>
                 <InclusionDropdown 
-                    dispatch={this.props.dispatch}
-                    inclusionDropdownType={inclusionDropdownType.PANEL}
+                    dispatch={dispatch}
+                    inclusionDropdownType={INCLUSION_DROPDOWN_TYPE.PANEL}
                     index={0}
-                    isFirst={this.props.isFirst} 
-                    panel={this.props.panel}
+                    isFirst={isFirst} 
+                    panel={panel}
                 />
                 <DateDropdown
-                    dispatch={this.props.dispatch}
+                    dispatch={dispatch}
                     handleCustomDateClick={this.handleCustomDateSelectionClick}
-                    panel={this.props.panel}
+                    panel={panel}
                 />
                 {this.state.showCustomDateRangeBox &&
                 <CustomDateRangePicker 
-                    dispatch={this.props.dispatch}
-                    panel={this.props.panel}
-                    parentDomRect={this.state.DOMRect!}
+                    dispatch={dispatch}
+                    panel={panel}
+                    parentDomRect={DOMRect!}
                     toggleCustomDateRangeBox={this.toggleCustomDateRangeBox}
                 />
                 }
                 <CountDropdown 
-                    dispatch={this.props.dispatch}
+                    dispatch={dispatch}
                     index={0}
-                    panel={this.props.panel}
+                    panel={panel}
                 /> 
             </div>
         );
@@ -82,20 +84,16 @@ class PanelHeader extends React.PureComponent<Props, State> {
     }
 
     private toggleCustomDateRangeBox = (defaultDateFilter: boolean = false) => {
-        const showCustomDateRangeBox = !this.state.showCustomDateRangeBox;
-        this.setState({ showCustomDateRangeBox });
+        const { panel, dispatch } = this.props;
+        const { showCustomDateRangeBox } = this.state;
+
+        this.setState({ showCustomDateRangeBox: !showCustomDateRangeBox });
 
         if (!showCustomDateRangeBox && defaultDateFilter) {
-            this.props.dispatch(setPanelDateFilter(this.props.panel.index, dateConfigBeforeOpenCustom));
+            dispatch(setPanelDateFilter(panel.index, dateConfigBeforeOpenCustom));
         }
         else if (defaultDateFilter) {
-            dateConfigBeforeOpenCustom = this.props.panel.dateFilter;
+            dateConfigBeforeOpenCustom = panel.dateFilter;
         }
     }
 }
-
-const mapDispatchToProps = (dispatch: any) => {
-    return { dispatch };
-}
-
-export default connect(null, mapDispatchToProps)(PanelHeader)

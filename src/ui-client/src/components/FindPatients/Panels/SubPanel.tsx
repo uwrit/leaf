@@ -7,27 +7,30 @@
 
 import React from 'react';
 import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
-import { connect } from 'react-redux';
 import { addPanelItem } from '../../../actions/panels';
 import { Concept } from '../../../models/concept/Concept';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
 import { SubPanel as SubPanelModel } from '../../../models/panel/SubPanel';
 import PanelItem from './PanelItem';
-import { compose } from 'redux';
 import PanelItemOr from './PanelItemOr';
 import SubPanelDashBorder from './SubPanelDashBorder';
 import SubPanelHeader from './SubPanelHeader';
 
-interface Props {
-    panel: PanelModel;
-    subPanel: SubPanelModel;
-    index: number;
+interface DndProps {
     canDrop?: boolean;
     isOver?: boolean;
     connectDropTarget?: ConnectDropTarget;
+}
+
+interface OwnProps {
+    panel: PanelModel;
+    subPanel: SubPanelModel;
+    index: number;
     dispatch?: any;
 }
+
+type Props = DndProps & OwnProps
 
 const panelTarget = {
     drop(props: Props, monitor: DropTargetMonitor) {
@@ -82,7 +85,7 @@ class SubPanel extends React.Component<Props> {
                 <div className={wrapperClasses}>
                     {/* Header - only set if subpanel is not the first */}
                     {index !== 0 &&
-                    <SubPanelHeader index={index} panel={panel} 
+                    <SubPanelHeader dispatch={dispatch} index={index} panel={panel} 
                     />}
                     <div className={classes.join(' ')}>
                         {/* Dashed borders that move when user is dragging a concept */}
@@ -98,14 +101,5 @@ class SubPanel extends React.Component<Props> {
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return { 
-        dispatch
-    };
-};
 
-const SubPanelContainer = compose(
-    connect(null, mapDispatchToProps),
-    DropTarget('CONCEPT', panelTarget, collect)
-)(SubPanel) as any;
-export default SubPanelContainer;
+export default DropTarget('CONCEPT', panelTarget, collect)(SubPanel) as any;

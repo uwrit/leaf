@@ -109,13 +109,5 @@ export class PanelItem extends React.Component<Props> {
     }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-    return { 
-        dispatch
-    };
-};
 
-export default compose(
-    connect(null, mapDispatchToProps),
-    DragSource('CONCEPT', conceptNodeSource, collect)
-)(PanelItem) as any;
+export default DragSource('CONCEPT', conceptNodeSource, collect)(PanelItem) as any;
