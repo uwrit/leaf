@@ -275,6 +275,10 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         this.setState({ showSelectionBox: false });
     }
 
+    /*
+     * Handles cursor focus away from the selection box, which
+     * if the mouse is outside it ensures the box gracefully closes.
+     */
     private handleBlur = () => {
         if (this.mouseOut) {
             this.setState({ showSelectionBox: false });

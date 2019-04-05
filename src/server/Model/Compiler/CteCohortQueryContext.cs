@@ -32,12 +32,12 @@ namespace Model.Compiler
             {
                 var years = GetYears(Panel.DateFilter);
 
-                var encounterBased = concepts.Where(c => c.IsEncounterBased)
+                var encounterBased = concepts.Where(c => c.IsEncounterBased && c.UiDisplayPatientCountByYear != null)
                                              .SelectMany(c => c.UiDisplayPatientCountByYear)
                                              .Where(y => y != null && years.Contains(y.Year))
                                              .Sum(count => count.PatientCount);
 
-                var notEncounterBased = concepts.Where(c => !c.IsEncounterBased)
+                var notEncounterBased = concepts.Where(c => !c.IsEncounterBased && c.UiDisplayPatientCountByYear != null)
                                                 .Sum(c => c.UiDisplayPatientCount.Value);
 
                 estimatedCount = encounterBased + notEncounterBased;
