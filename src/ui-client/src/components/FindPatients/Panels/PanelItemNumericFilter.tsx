@@ -12,22 +12,19 @@ import { setPanelItemNumericFilter } from '../../../actions/panels';
 import { showInfoModal } from '../../../actions/generalUi';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
-import { NumericFilterType } from '../../../models/panel/NumericFilter';
+import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
-import { AppState } from '../../../models/state/AppState';
 import './PanelItemNumericFilter.css';
 
 interface Props {
     dispatch: any;
-    panelItem: PanelItem; 
-    panels: any;
+    panelItem: PanelItem;
 }
 
 interface State {
     DOMRect?: DOMRect;
     showSelectionBox: boolean;
     showDropdown: boolean;
-    tempFilter: LocalTempFilter;
 }
 
 interface EqualityValue {
@@ -36,108 +33,126 @@ interface EqualityValue {
     display: string;
 }
 
-interface LocalTempFilter {
-    filter: any[];
-    filterType: NumericFilterType;
-}
-
 const types: EqualityValue[] = [
     { enum: NumericFilterType.GreaterThanOrEqualTo, display: 'Greater than or equal (>=)', operator: '>=' },
     { enum: NumericFilterType.GreaterThan, display: 'Greater than (>)', operator: '>' },
     { enum: NumericFilterType.LessThanOrEqualTo, display: 'Less than or equal (<=)', operator: '<=' },
     { enum: NumericFilterType.LessThan, display: 'Less Than (<)', operator: '<' },
     { enum: NumericFilterType.EqualTo, display: 'Equal to (=)', operator: '=' },
-    { enum: NumericFilterType.Between, display: 'Between', operator: 'BETWEEN' },
+    { enum: NumericFilterType.Between, display: 'Between', operator: 'between' },
     { enum: NumericFilterType.None, display: '', operator: '' }
 ];
-const defaultFilter: LocalTempFilter = { 
-    filter: ['', ''], 
-    filterType: types[0].enum
-}
 
-class PanelItemNumericFilter extends React.Component<Props, State> {
+const options = types.filter((t: EqualityValue) => t.enum !== NumericFilterType.None);
+
+export default class PanelItemNumericFilter extends React.Component<Props, State> {
     private baseClassName = 'panel-item-numeric'; 
     private className = `${this.baseClassName}-selection`;
-    private mouseOutBubbleUpMillisecondThreshold = 150;
-    private lastMouseOutClickTime: number = 0;
+    private mouseOut = true;
     constructor(props: Props) {
         super(props);
         this.state = {
             showDropdown: false,
-            showSelectionBox: false,
-            tempFilter: props.panelItem.numericFilter.filterType !== NumericFilterType.None 
-                ? props.panelItem.numericFilter 
-                : defaultFilter
+            showSelectionBox: false
         }
+    }
+
+    public componentDidMount() {
+        const { numericFilter } = this.props.panelItem;
+        const newFilter = Object.assign({}, numericFilter, { filterType: types[0].enum });
+        this.dispatchUpdate(newFilter);
     }
     
     public render(): any {
-        const { concept } = this.props.panelItem;
-        const isBetween = this.state.tempFilter.filterType === NumericFilterType.Between;
-        const selectedType = this.state.tempFilter.filterType === NumericFilterType.None 
-            ? types[0]
-            : types.find((p: EqualityValue) => p.enum === this.state.tempFilter.filterType)!; 
-        const classes = [this.className, (isBetween ? `${this.className}-between` : '')];
-        const display = this.setNumericDisplayText();
-        const items = types
-            .filter((t: EqualityValue) => t.enum !== NumericFilterType.None)
-            .map((t: EqualityValue) => {
-                const classed = `leaf-dropdown-item ${t.enum === this.state.tempFilter.filterType ? 'selected' : ''}`;
-                return <DropdownItem className={classed} key={t.enum} onMouseUp={this.handleDropdownItemSelect}>{t.display}</DropdownItem>
-            });
-        
+        const { panelItem } = this.props;
+        const { filterType, filter } = panelItem.numericFilter;
+        const { showSelectionBox, showDropdown, DOMRect } = this.state;
+        const b = this.baseClassName;
+        const c = this.className;
+        const isBetween = filterType === NumericFilterType.Between;
+        const classes = [c, (isBetween ? `${c}-between` : '')];
+        const display = filterType === NumericFilterType.None 
+            ? types[0].display
+            : types.find((p: EqualityValue) => p.enum === filterType)!.display;
+        const val1 = `${filter[0] === null ? '' : filter[0]}`;
+        const val2 = `${filter[1] === null ? '' : filter[1]}`;
+
         return (
-            <div 
-                className={`${this.baseClassName}-text`} 
-                onClick={this.handleSelectionTextClick}>
-                {display}
-                {this.state.showSelectionBox && 
-                <PopupBox parentDomRect={this.state.DOMRect!} 
-                    toggle={this.handleSelectionBoxClickedOutside}>
-                    <div className={classes.join(' ')}>
-                        <div className={`${this.className}-title`}>Filter {concept.uiDisplayName} {concept.uiDisplayUnits && `(${concept.uiDisplayUnits})`}</div>
-                        <div className={`${this.className}-body`}>
+            <div className={`${b}-text`} onClick={this.handleSelectionTextClick}>
+                {this.setNumericDisplayText()}
+
+                {/* Selection Box */}
+                {showSelectionBox && 
+                <PopupBox parentDomRect={DOMRect!} toggle={this.handleSelectionBoxClickedOutside}>
+                    <div className={classes.join(' ')} 
+                        onBlur={this.handleBlur}
+                        onMouseLeave={this.handleMouseLeave} 
+                        onMouseEnter={this.handleMouseEnter}
+                        tabIndex={0}>
+                        <span className={`${c}-close`} onClick={this.handleClickClearFilter}>x</span>
+                        <div className={`${c}-body`}>
                             <InputGroup>
+
+                                {/* Inequality Dropdown */}
                                 <InputGroupButtonDropdown 
                                     addonType="append" 
-                                    isOpen={this.state.showDropdown} 
+                                    isOpen={showDropdown} 
                                     toggle={this.toggleDropdown}>
                                     <DropdownToggle 
                                         caret={true} 
-                                        className={`${this.className}-type`}>
-                                        {selectedType.display}
+                                        className={`${c}-type`}>
+                                        {display}
                                     </DropdownToggle>
                                     <DropdownMenu>
-                                        {items}
+
+                                        {/* Equality Options */}
+                                        {options.map((t: EqualityValue) => {
+                                            const classed = `leaf-dropdown-item ${t.enum === filterType ? 'selected' : ''}`;
+                                            return (
+                                                <DropdownItem 
+                                                    className={classed} 
+                                                    key={t.enum} 
+                                                    onMouseUp={this.handleDropdownItemSelect.bind(null,t)}>
+                                                    {t.display}
+                                                </DropdownItem>
+                                        )})}
+
                                     </DropdownMenu>
                                 </InputGroupButtonDropdown>
+
+                                {/* Main non-between Input */}
                                 {!isBetween && 
                                 <Input 
-                                    className={`${this.className}-number leaf-input`} 
-                                    onChange={this.handleNumberInputChange}
+                                    className={`${c}-number leaf-input`} 
+                                    onChange={this.handleInputOneChange}
                                     placeholder="1, 2, 3..." 
-                                    value={this.state.tempFilter.filter[0]} />
+                                    value={val1} />
                                 }
+
+                                {/* Between Input */}
                                 {isBetween && 
-                                <div className={`${this.className}-between-container`}>
+                                <div className={`${c}-between-container`}>
+
+                                    {/* High val */}
                                     <Input 
-                                        className={`${this.className}-number ${this.className}-number-low leaf-input`} 
-                                        onChange={this.handleNumberInputChange}
+                                        className={`${c}-number ${c}-number-low leaf-input`} 
+                                        onChange={this.handleInputOneChange}
                                         placeholder="Low"
-                                        value={this.state.tempFilter.filter[0]} />
-                                    <span className={`${this.className}-and`}>and</span>
+                                        value={val1} 
+                                    />
+
+                                    <span className={`${c}-and`}>and</span>
+
+                                    {/* Low val */}
                                     <Input 
-                                        className={`${this.className}-number ${this.className}-high leaf-input`} 
-                                        onChange={this.handleHighRangeInputChange}
+                                        className={`${c}-number ${c}-high leaf-input`} 
+                                        onChange={this.handleInputTwoChange}
                                         placeholder="High"
-                                        value={this.state.tempFilter.filter[1]} />
+                                        value={val2} 
+                                    />
                                 </div>
                                 }
                             </InputGroup>
-                        </div>
-                        <div className={`${this.className}-footer`}>
-                            <Button className="leaf-button leaf-button-secondary" onClick={this.handleClickClearFilter}>Clear Filter</Button>
-                            <Button className="leaf-button leaf-button-secondary" onClick={this.handleClickAddFilter} style={{ float: 'right' }}>Add Filter</Button>
                         </div>
                     </div>
                 </PopupBox>
@@ -146,165 +161,144 @@ class PanelItemNumericFilter extends React.Component<Props, State> {
         );
     }
 
-    private updateStoreWithFilter = () => {
-        const pi = this.props.panelItem;
-        const temp = this.state.tempFilter;
-        const filter = {
-            filter: (temp.filterType !== NumericFilterType.Between
-                ? [temp.filter[0]]
-                : temp.filter) 
-                    .map((v: string) => +(v[v.length - 1] === '.' ? `${v}0` : v)),
-            filterType: temp.filterType
+    /*
+     * Dispatches an update to Redux store after input change.
+     */
+    private dispatchUpdate = (filter: NumericFilter) => {
+        const { panelItem, dispatch } = this.props;
+        const pi = panelItem;
+        dispatch(setPanelItemNumericFilter(pi.concept, pi.panelIndex, pi.subPanelIndex, pi.index, filter));
+    }
+
+    /*
+     * Validates the current filter state such that incomplete
+     * data will safely default it to a state of 'None'.
+     */
+    private validateFilter = (filter: NumericFilter): NumericFilter => {
+        const { panelItem } = this.props;
+        const [ val1, val2 ] = panelItem.numericFilter.filter;
+
+        if (filter.filterType === NumericFilterType.Between && (val1 === null || val2 === null)) {
+            panelItem.numericFilter.filterType = NumericFilterType.None;
+        } else if (filter.filterType !== NumericFilterType.Between && val1 === null) {
+            panelItem.numericFilter.filterType = NumericFilterType.None;
         }
-        this.props.dispatch(
-            setPanelItemNumericFilter(
-                pi.concept,
-                pi.panelIndex,
-                pi.subPanelIndex,
-                pi.index,
-                filter
-            )
-        );
+        return filter;
     }
 
-    private handleDropdownItemSelect = (e: any) => {
-        const text = e.target.innerText;
-        const selectedType: EqualityValue = types.find((p: EqualityValue) => p.display === text)!; 
-        this.setState({
-            tempFilter: {
-                filter: this.state.tempFilter.filter,
-                filterType: selectedType.enum
-            }
+    /*
+     * Handles changes to the equality value dropdown (e.g., >, <, =).
+     */
+    private handleDropdownItemSelect = (ev: EqualityValue) => {
+        const { numericFilter } = this.props.panelItem;
+        const newFilter = Object.assign({}, numericFilter, { filterType: ev.enum });
+        this.dispatchUpdate(newFilter);
+    }
+
+    /*
+     * Handles changes to value one input.
+     */
+    private handleNumberInputChange = (e: any, isFirst: boolean) => {
+        const { numericFilter } = this.props.panelItem;
+        let val = e.target.value.trim();
+
+        if (val === '') { 
+            val = null; 
+        } else if (!this.isNumeric(val)) { 
+            return; 
+        } else if (val.length > 0 && val[val.length - 1] !== '.') {
+            val = parseFloat(val);
+        }
+
+        const newFilter = Object.assign({}, numericFilter, { 
+            filter: isFirst 
+                ? [ val, numericFilter.filter[1] ]
+                : [ numericFilter.filter[0], val ], 
+            filterType: numericFilter.filterType === NumericFilterType.None ? types[0].enum : numericFilter.filterType
         });
+        this.dispatchUpdate(newFilter);
     }
 
-    private handleNumberInputChange = (e: any) => {
-        const value: string = e.target.value.trim();
-        if (!this.isValidNumericInput(value)) { return; }
+    private handleInputOneChange = (e: any) => this.handleNumberInputChange(e, true);
 
-        this.setState({
-            tempFilter: {
-                filter: [ value, this.state.tempFilter.filter[1] ],
-                filterType: this.state.tempFilter.filterType
-            }
-        });
-    }
+    private handleInputTwoChange = (e: any) => this.handleNumberInputChange(e, false);
 
-    private handleHighRangeInputChange = (e: any) => {
-        const value = e.target.value.trim();
-        if (!this.isValidNumericInput(value)) { return; }
-
-        this.setState({
-            tempFilter: {
-                filter: [ this.state.tempFilter.filter[0], value ],
-                filterType: this.state.tempFilter.filterType
-            }
-        });
-    }
-
-    private isValidNumericInput = (val: string, allowEmpty: boolean = true): boolean => {
+    /*
+     * Checks if a value is numeric.
+     */
+    private isNumeric = (val: string): boolean => {
         const firstDecimal = val.indexOf('.');
 
         if (isNaN(+val) && val[val.length - 1] !== '.') { return false; }
         else if (firstDecimal > -1 && firstDecimal !== val.lastIndexOf('.')) { return false; }
-        else if (!allowEmpty && val.length === 0) { return false; }
+        else if (val.length === 0) { return false; }
         return true;
     }
 
-    private isTempFilterValid = (): boolean => {
-        const type = this.state.tempFilter.filterType;
-        const val1 = this.state.tempFilter.filter[0];
-        const val2 = this.state.tempFilter.filter[1];
-        const val1Valid = this.isValidNumericInput(val1, false);
-        const val2Valid = this.isValidNumericInput(val2, false);
-        
-        if (type === NumericFilterType.Between && val1Valid && val2Valid && +val1 < +val2) {
-            return true;
-        }
-        else if (type !== NumericFilterType.Between && val1Valid) {
-            return true;
-        }
-        return false;
-    }
-
+    /*
+     * Sets the text displayed in the panel item.
+     */
     private setNumericDisplayText = () => {
-        const type = this.state.tempFilter.filterType;
-        const val1 = this.state.tempFilter.filter[0];
-        const val2 = this.state.tempFilter.filter[1];
-        const units = this.props.panelItem.concept.uiDisplayUnits;
-        const display = 
-            type === NumericFilterType.Between ? `${types.find((p: EqualityValue) => p.enum === NumericFilterType.Between)!.operator} ${val1} and ${val2} ${units}` :
-            val1 === '' ? this.props.panelItem.concept.uiNumericDefaultText :
-            `${types.find((p: EqualityValue) => p.enum === type)!.operator} ${val1} ${units}`
+        const { panelItem } = this.props;
+        const { filter, filterType } = panelItem.numericFilter;
+        const [ val1, val2 ] = filter;
+        const { uiNumericDefaultText, uiDisplayUnits } = panelItem.concept;
 
-        return display;
+        if (filterType === NumericFilterType.None || val1 === null) {
+            return uiNumericDefaultText;
+        } else if (filterType === NumericFilterType.Between && val2 === null) {
+            return uiNumericDefaultText;
+        } else if (filterType === NumericFilterType.Between) {
+            const between = types.find((p: EqualityValue) => p.enum === NumericFilterType.Between)!;
+            return `${between.operator} ${val1} and ${val2} ${uiDisplayUnits}`;
+        } else {
+            const ev = types.find((p: EqualityValue) => p.enum === filterType)!;
+            return `${ev.operator} ${val1} ${uiDisplayUnits}`;
+        }
     }   
 
+    /*
+     * Toggles dropdown 'isOpen' state.
+     */
     private toggleDropdown = () => this.setState({ showDropdown: !this.state.showDropdown });
 
+    /*
+     * Sets selection text click time to head off
+     * false positive detections of clicks outside the box 
+     * (which auto-hide the selection box, perhaps unintentionally).
+     */
     private handleSelectionTextClick = (e: any) => { 
-        const timeSinceMouseOutClicked = (new Date().getTime() - this.lastMouseOutClickTime);
-
-        if (timeSinceMouseOutClicked > this.mouseOutBubbleUpMillisecondThreshold && 
-            e.target.className === e.currentTarget.className
-        ) {
-            const domRect: DOMRect = e.target.getBoundingClientRect();
-            this.setState({ 
-                DOMRect: domRect, 
-                showSelectionBox: !this.state.showSelectionBox, 
-                tempFilter: !this.state.showSelectionBox ? defaultFilter : this.state.tempFilter
-            });
-        }
+        if (e.target.className !== "panel-item-numeric-text") { return; }
+        const domRect: DOMRect = e.target.getBoundingClientRect();
+        this.setState({ DOMRect: domRect, showSelectionBox: true });
     }
 
+    /*
+     * Hides the selection box if clicked outside.
+     */
     private handleSelectionBoxClickedOutside = () => {
-        this.lastMouseOutClickTime = new Date().getTime();
-        this.setState({ 
-            showSelectionBox: !this.state.showSelectionBox, 
-            tempFilter: !this.state.showSelectionBox ? defaultFilter : this.state.tempFilter
-        });
+        this.setState({ showSelectionBox: !this.state.showSelectionBox });
     }
 
-    private handleClickAddFilter = () => {
-        const { dispatch } = this.props;
+    /*
+     * Clears any current filter and hides the selection box.
+     */
+    private handleClickClearFilter = () => {
+        const newFilter: NumericFilter = { filter: [null, null], filterType: NumericFilterType.None };
+        this.dispatchUpdate(newFilter);
+        this.setState({ showSelectionBox: false });
+    }
 
-        if (this.isTempFilterValid()) {
-            this.updateStoreWithFilter();
+    private handleBlur = () => {
+        const { numericFilter } = this.props.panelItem;
+        if (this.mouseOut) {
+            const validated = this.validateFilter(numericFilter);
+            this.dispatchUpdate(validated);
             this.setState({ showSelectionBox: false });
         }
-        else {
-            const info: InformationModalState = {
-                body: 'Numeric filters must be correctly formatted numbers, and if using "Between", the lower range number must be less than the higher.',
-                header: 'Error adding numeric filter',
-                show: true
-            }
-            dispatch(showInfoModal(info));
-        }
     }
 
-    private handleClickClearFilter = () => {
-        this.setState({
-            showSelectionBox: false,
-            tempFilter: defaultFilter
-        });
-    }
-}
+    private handleMouseEnter = () => this.mouseOut = false;
 
-// Not sure if this is a Redux bug or intended behavior, but 
-// if we don't define something (anything) in mapStateToProps(), 
-// changes in the <Input> fields aren't updated in the UI, likely
-// because React thinks state never changes. Therefore though it's
-// a waste, panels are added as a prop here.
-const mapStateToProps = (state: AppState) => {
-    return {
-        panels: state.panels
-    }
+    private handleMouseLeave = () => this.mouseOut = true;
 }
-
-const mapDispatchToProps = (dispatch: any) => {
-    return { 
-        dispatch
-    };
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(PanelItemNumericFilter);

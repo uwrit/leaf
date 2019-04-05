@@ -96,20 +96,6 @@ export class LeafMap extends React.Component<Props, State> {
         const markers: any[] = [];
         const popups: any[] = [];
         const paths: any[] = [];
-
-        /*
-        const respondents: NetworkIdentity[] = [
-            { abbreviation: '', isHomeNode: true, latitude: 47.6062, longitude: -122.3321, primaryColor: '#4B2E83', secondaryColor: '', id: 0, name: 'University of Example1', address: '', enabled: true },
-            { abbreviation: '', isHomeNode: false, latitude: 41.8781, longitude: -87.6298, primaryColor: '#800000', secondaryColor: '', id: 1, name: 'University of Example2', address: '' },
-            { abbreviation: '', isHomeNode: false, latitude: 30.2672, longitude: -97.7431, primaryColor: '#BF5700', secondaryColor: '', id: 2, name: 'University of Example3', address: '' },
-        ];
-        const cohorts = new Map<number, any>();
-        cohorts.set(0, { count: { value: 262, state: CohortStateType.LOADED } })
-        cohorts.set(1, { count: { value: 308, state: CohortStateType.LOADED } })
-        cohorts.set(2, { count: { value: 801, state: CohortStateType.LOADED } })
-        const home: NetworkIdentity = respondents[0];
-        */
-
         const home: NetworkIdentity = networkRespondents.get(0)!;
         const respondents: NetworkIdentity[] = networkRespondents.size > 0 && cohort.networkCohorts.size > 0
             ? Array
@@ -121,7 +107,6 @@ export class LeafMap extends React.Component<Props, State> {
         
         for (const nr of respondents) {
             const netCohort = cohort.networkCohorts.get(nr.id);
-            // const cohort = cohorts.get(nr.id);
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 

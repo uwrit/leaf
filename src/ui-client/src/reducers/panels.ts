@@ -173,7 +173,7 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
                     id: generateId(),
                     index: subpanel.panelItems.length,
                     numericFilter: {
-                        filter: [0, 0],
+                        filter: [null, null],
                         filterType: NumericFilterType.None
                     },
                     panelIndex: panel.index,
