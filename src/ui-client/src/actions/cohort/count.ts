@@ -101,8 +101,7 @@ export const getCounts = () => {
                         },  error => {
                             if (getState().cohort.count.state !== CohortStateType.REQUESTING) { return; }
 
-                            const { status } = error.response;
-                            if (status === 400 && error.response.data) {
+                            if (error.response && error.response.status === 400) {
                                 const preflight = error.response.data.preflight as PreflightCheckDTO;
                                 dispatch(setNetworkCohortCountNotImplemented(nr.id))
                             } else {

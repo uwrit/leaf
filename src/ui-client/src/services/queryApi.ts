@@ -18,6 +18,7 @@ import moment from 'moment';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
+import { PanelItem } from '../models/panel/PanelItem';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -113,6 +114,12 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
                 } else {
                     const concept = await fetchConcept(state, resRef.id);
                     panelItem.concept = concept;
+                    if (panelItem.numericFilter && panelItem.numericFilter.filter) {
+                        let numFilter = panelItem.numericFilter.filter;
+                        if (panelItem.numericFilter.filter.length === 0)      { numFilter = [ null, null ]; }
+                        else if (panelItem.numericFilter.filter.length === 1) { numFilter = [ numFilter[0] as any, null ]; }
+                        panelItem.numericFilter.filter = numFilter;
+                    }
                 }
                 subpanel.panelItems[pi] = panelItem;
             }
