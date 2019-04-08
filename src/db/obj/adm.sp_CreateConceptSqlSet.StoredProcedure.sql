@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 4/8/19 2:16:06 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 4/8/19 2:27:20 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -21,7 +21,8 @@ CREATE PROCEDURE [adm].[sp_CreateConceptSqlSet]
     @isEventBased bit,
     @sqlSetFrom nvarchar(1000),
     @sqlFieldDate nvarchar(1000),
-    @sqlFieldEventId nvarchar(400),
+    @sqlFieldEvent nvarchar(400),
+    @eventId int,
     @user auth.[User]
 AS
 BEGIN
@@ -30,10 +31,12 @@ BEGIN
     IF (@sqlSetFrom IS NULL OR LEN(@sqlSetFrom) = 0)
         THROW 70409, N'ConceptSqlSet.SqlSetFrom is required.', 1;
 
-    INSERT INTO app.ConceptSqlSet (IsEncounterBased, IsEventBased, SqlSetFrom, SqlFieldDate, SqlFieldEventId, Created, CreatedBy, Updated, UpdatedBy)
-    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEventId
-    SELECT @isEncounterBased, @isEventBased, @sqlSetFrom, @sqlFieldDate, @sqlFieldEventId, GETDATE(), @user, GETDATE(), @user
+    INSERT INTO app.ConceptSqlSet (IsEncounterBased, IsEventBased, SqlSetFrom, SqlFieldDate, SqlFieldEvent, EventId, Created, CreatedBy, Updated, UpdatedBy)
+    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent, inserted.EventId
+    SELECT @isEncounterBased, @isEventBased, @sqlSetFrom, @sqlFieldDate, @sqlFieldEvent, @eventId, GETDATE(), @user, GETDATE(), @user
 END
+
+
 
 
 

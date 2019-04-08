@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 4/8/19 2:16:07 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 4/8/19 2:27:20 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -22,7 +22,8 @@ CREATE PROCEDURE [adm].[sp_UpdateConceptSqlSet]
     @isEventBased bit,
     @sqlSetFrom nvarchar(1000),
     @sqlFieldDate nvarchar(1000),
-    @sqlFieldEventId nvarchar(400),
+    @sqlFieldEvent nvarchar(400),
+    @eventId int,
     @user auth.[User]
 AS
 BEGIN
@@ -40,12 +41,14 @@ BEGIN
         IsEventBased = @isEventBased,
         SqlSetFrom = @sqlSetFrom,
         SqlFieldDate = @sqlFieldDate,
-        SqlFieldEventId = @sqlFieldEventId,
+        SqlFieldEvent = @sqlFieldEvent,
+        EventId = @eventId,
         Updated = GETDATE(),
         UpdatedBy = @user
-    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEventId
+    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent
     WHERE Id = @id;
 END
+
 
 
 
