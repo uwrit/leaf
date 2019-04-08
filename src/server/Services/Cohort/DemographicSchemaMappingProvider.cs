@@ -9,6 +9,7 @@ using System.Linq;
 using System.Data.SqlClient;
 using System.Data.Common;
 using Model.Compiler;
+using Model.Cohort;
 
 namespace Services.Cohort
 {

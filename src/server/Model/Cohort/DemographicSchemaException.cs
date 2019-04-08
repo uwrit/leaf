@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
     public class DemographicSchemaException : ApplicationException
     {

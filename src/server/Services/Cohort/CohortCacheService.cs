@@ -60,7 +60,7 @@ namespace Services.Cohort
                 if (cohort.Count <= cohortOptions.RowLimit)
                 {
 
-                    var cohortTable = new PatientCohortTable(queryId, cohort, cohortOptions.ExportLimit);
+                    var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(cohortOptions.ExportLimit, queryId));
 
                     using (var bc = new SqlBulkCopy(cn))
                     {

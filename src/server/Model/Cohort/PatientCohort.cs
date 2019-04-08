@@ -33,5 +33,68 @@ namespace Model.Cohort
                 return count;
             }
         }
+
+        public IEnumerable<SeasonedPatient> SeasonedPatients(int maxExport, Guid queryId)
+        {
+            var exporter = SeasonedPatient.Exporter(maxExport, queryId, this);
+            var seas = new List<SeasonedPatient>();
+            foreach (var id in PatientIds)
+            {
+                var exported = exporter(id);
+                Guid? salt = null;
+                if (exported)
+                {
+                    salt = Guid.NewGuid();
+                }
+                seas.Add(new SeasonedPatient
+                {
+                    Id = id,
+                    Exported = exported,
+                    Salt = salt
+                });
+            }
+
+            return seas;
+        }
+    }
+
+    public class SeasonedPatient
+    {
+        public string Id { get; set; }
+        public bool Exported { get; set; }
+        public Guid? Salt { get; set; }
+
+        public static Func<string, bool> Exporter(int maxExport, Guid qid, PatientCohort cohort)
+        {
+            // small cohort, export them all
+            var csize = cohort.PatientIds.Count;
+            if (csize <= maxExport)
+            {
+                return (string _) => true;
+            }
+
+            // need a subset
+            var tmp = new HashSet<string>(cohort.PatientIds);
+            var set = new HashSet<string>();
+            var rnd = new Random(qid.GetHashCode());
+            foreach (var _ in Enumerable.Range(0, maxExport))
+            {
+                var done = false;
+                string candidate;
+
+                do
+                {
+                    candidate = tmp.ElementAt(rnd.Next(csize - 1));
+                    if (set.Add(candidate))
+                    {
+                        tmp.Remove(candidate);
+                        csize--;
+                        done = true;
+                    }
+                } while (!done);
+            }
+
+            return (string patid) => set.Contains(patid);
+        }
     }
 }

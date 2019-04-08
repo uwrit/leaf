@@ -8,9 +8,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Model.Cohort;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
-    // TODO(cspital) mode to model
     public class PatientCountAggregator
     {
         public HashSet<string> Aggregate(IReadOnlyCollection<PartialPatientCountContext> partials)

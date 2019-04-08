@@ -8,9 +8,8 @@ using System.Linq;
 using Model.Cohort;
 using System.Collections.Generic;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
-    // TODO(cspital) move to model
     public class DemographicAggregator
     {
         const string Female = "Female";

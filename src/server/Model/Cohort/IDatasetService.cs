@@ -6,14 +6,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Model.Cohort;
 using Model.Compiler;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
-    public interface IPatientCountService
+    public interface IDatasetService
     {
-        Task<PatientCount> GetPatientCountAsync(PatientCountQuery query, CancellationToken token);
+        Task<Dataset> GetDatasetAsync(DatasetCompilerContext context, CancellationToken token);
     }
 }
