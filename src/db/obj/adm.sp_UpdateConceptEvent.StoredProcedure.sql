@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlEvent]    Script Date: 4/8/19 1:11:21 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptEvent]    Script Date: 4/8/19 2:16:07 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -16,7 +16,7 @@ GO
 -- Create date: 2019/4/8
 -- Description: Updates an app.ConceptSqlEvent.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateConceptSqlEvent]
+CREATE PROCEDURE [adm].[sp_UpdateConceptEvent]
     @id int,
     @uiDisplayEventName nvarchar(50),
     @user auth.[User]
@@ -30,7 +30,7 @@ BEGIN
     IF (@uiDisplayEventName IS NULL OR LEN(@uiDisplayEventName) = 0)
         THROW 70400, N'ConceptSqlEvent.UiDisplayEventName is required', 1;
 
-    UPDATE app.ConceptSqlEvent
+    UPDATE app.ConceptEvent
     SET
         UiDisplayEventName = @uiDisplayEventName,
         Updated = GETDATE(),
@@ -40,6 +40,7 @@ BEGIN
         Id = @id;
 
 END
+
 
 
 

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConceptSqlEvent]    Script Date: 4/8/19 1:11:21 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConceptEvent]    Script Date: 4/8/19 2:16:06 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -16,19 +16,19 @@ GO
 -- Create date: 2019/4/8
 -- Description: Deletes an app.ConceptSqlEvent by id.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_DeleteConceptSqlEvent]
+CREATE PROCEDURE [adm].[sp_DeleteConceptEvent]
     @id int,
     @user auth.[User]
 AS
 BEGIN
     SET NOCOUNT ON
 
-    IF NOT EXISTS(SELECT 1 FROM app.ConceptSqlEvent WHERE Id = @id)
+    IF NOT EXISTS(SELECT 1 FROM app.ConceptEvent WHERE Id = @id)
         THROW 70404, N'app.ConceptSqEvent is missing.', 1;
 
     BEGIN TRAN;
     BEGIN TRY
-        DELETE FROM app.ConceptSqlEvent
+        DELETE FROM app.ConceptEvent
         WHERE Id = @id;
 
         COMMIT;
@@ -44,7 +44,7 @@ BEGIN
         INSERT INTO @sqlSets
         SELECT Id, SqlSetFrom
         FROM app.ConceptSqlSet
-        WHERE app.ConceptSqlSet.SqlEventId = @id;
+        WHERE app.ConceptSqlSet.EventId = @id;
 
         ROLLBACK;
 
@@ -57,6 +57,7 @@ BEGIN
         THROW;
     END CATCH;
 END
+
 
 
 

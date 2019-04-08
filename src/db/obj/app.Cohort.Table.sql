@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[Cohort]    Script Date: 4/8/19 1:11:21 PM ******/
+/****** Object:  Table [app].[Cohort]    Script Date: 4/8/19 2:16:06 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,7 +17,7 @@ CREATE TABLE [app].[Cohort](
 	[Salt] [uniqueidentifier] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Cohort_QueryId]    Script Date: 4/8/19 1:11:21 PM ******/
+/****** Object:  Index [IX_Cohort_QueryId]    Script Date: 4/8/19 2:16:06 PM ******/
 CREATE CLUSTERED INDEX [IX_Cohort_QueryId] ON [app].[Cohort]
 (
 	[QueryId] ASC

@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3.7
+#!/usr/local/bin/python3
 # Script to fully dump out LeafDB schema objects, initialization data, and executables.
 
 import os

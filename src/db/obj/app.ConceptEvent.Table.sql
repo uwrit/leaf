@@ -5,12 +5,12 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[ConceptSqlEvent]    Script Date: 4/8/19 1:11:21 PM ******/
+/****** Object:  Table [app].[ConceptEvent]    Script Date: 4/8/19 2:16:06 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [app].[ConceptSqlEvent](
+CREATE TABLE [app].[ConceptEvent](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[UiDisplayEventName] [nvarchar](50) NOT NULL,
 	[Created] [datetime] NOT NULL,
