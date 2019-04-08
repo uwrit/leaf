@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [rela].[QueryConceptDependency]    Script Date: 4/3/19 1:31:59 PM ******/
+/****** Object:  Table [rela].[QueryConceptDependency]    Script Date: 4/8/19 1:11:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

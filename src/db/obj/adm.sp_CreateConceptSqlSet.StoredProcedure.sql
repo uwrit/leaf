@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 4/3/19 1:31:59 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 4/8/19 1:11:21 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -30,10 +30,11 @@ BEGIN
     IF (@sqlSetFrom IS NULL OR LEN(@sqlSetFrom) = 0)
         THROW 70409, N'ConceptSqlSet.SqlSetFrom is required.', 1;
 
-    INSERT INTO app.ConceptSqlSet (IsEncounterBased, IsEventBased, SqlSetFrom, SqlFieldDate, SqlFieldEventId)
+    INSERT INTO app.ConceptSqlSet (IsEncounterBased, IsEventBased, SqlSetFrom, SqlFieldDate, SqlFieldEventId, Created, CreatedBy, Updated, UpdatedBy)
     OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEventId
-    SELECT @isEncounterBased, @isEventBased, @sqlSetFrom, @sqlFieldDate, @sqlFieldEventId
+    SELECT @isEncounterBased, @isEventBased, @sqlSetFrom, @sqlFieldDate, @sqlFieldEventId, GETDATE(), @user, GETDATE(), @user
 END
+
 
 
 GO
