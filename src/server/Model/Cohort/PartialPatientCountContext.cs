@@ -4,13 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Compiler;
+using System.Collections.Generic;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
-    public class LeafQuery : ISqlStatement
+    // TODO(cspital) move to model
+    public class PartialPatientCountContext
     {
-        public string SqlStatement { get; set; }
+        public HashSet<string> PatientIds { get; set; }
         public bool IsInclusionCriteria { get; set; }
     }
 }

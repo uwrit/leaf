@@ -4,18 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Model.Compiler;
-using Model.Cohort;
 
-namespace Services.Cohort
+namespace Model.Cohort
 {
-    public interface IDemographicService
+    public interface IPatientCountService
     {
-        Task<PatientDemographicContext> GetDemographicsAsync(
-            DemographicCompilerContext context,
-            CancellationToken token);
+        Task<PatientCount> GetPatientCountAsync(PatientCountQuery query, CancellationToken token);
     }
 }
