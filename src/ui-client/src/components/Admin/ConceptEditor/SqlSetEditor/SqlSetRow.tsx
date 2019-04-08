@@ -164,7 +164,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
      */
     private handleSqlSetEdit = (val: any, propName: string) => {
         const { set, dispatch } = this.props;
-        const newSet = Object.assign({}, set, { [propName]: val, changed: true });
+        const newSet = Object.assign({}, set, { [propName]: val === '' ? null : val, changed: true });
         dispatch(setAdminConceptSqlSet(newSet, true));
     }
 

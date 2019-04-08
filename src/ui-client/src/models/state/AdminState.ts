@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept as AdminConcept, ConceptSqlSet } from '../admin/Concept';
+import { Concept as AdminConcept, ConceptSqlSet, ConceptEvent } from '../admin/Concept';
 import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
@@ -35,6 +35,12 @@ export interface AdminConceptState {
     state: AdminPanelLoadState;
 }
 
+export interface AdminConceptEventState {
+    changed: boolean;
+    events: Map<number,ConceptEvent>;
+    uneditedEvent?: ConceptEvent;
+}
+
 export interface AdminPanelSqlSetState {
     changed: boolean;
     sets: Map<number, ConceptSqlSet>;
@@ -53,6 +59,7 @@ export interface AdminDatasetState {
 export default interface AdminState {
     activeTab: number;
     concepts: AdminConceptState;
+    conceptEvents: AdminConceptEventState;
     configuration: AdminConfiguration;
     datasets: AdminDatasetState;
     panelFilters: AdminPanelFilterState;

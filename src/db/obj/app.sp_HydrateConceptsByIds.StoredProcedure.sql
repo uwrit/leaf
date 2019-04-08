@@ -66,7 +66,7 @@ BEGIN
         c.UiDisplayPatientCountByYear,
         e.UiDisplayEventName,
         c.UiNumericDefaultText,
-        EventId = e.Id
+        EventTypeId = e.Id
     FROM app.Concept c
 		 INNER JOIN app.ConceptSqlSet s
 			ON c.SqlSetId = s.Id

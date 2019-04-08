@@ -27,7 +27,8 @@ BEGIN
         IsEventBased,
         SqlSetFrom,
         SqlFieldDate,
-        SqlFieldEventId
+        SqlFieldEvent,
+		EventId
     FROM
         app.ConceptSqlSet;
 END

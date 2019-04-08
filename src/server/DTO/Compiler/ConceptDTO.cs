@@ -26,10 +26,13 @@ namespace DTO.Compiler
         public string UiDisplaySubtext { get; set; }
         public string UiDisplayUnits { get; set; }
         public string UiDisplayTooltip { get; set; }
+        public string UiDisplayEventName { get; set; }
         public int? UiDisplayPatientCount { get; set; }
+        public int? EventTypeId { get; set; }
         public IEnumerable<ConceptSpecializationGroup> SpecializationGroups { get; set; }
         public IEnumerable<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
+        
 
         public ConceptDTO() { }
 
@@ -52,7 +55,9 @@ namespace DTO.Compiler
             UiDisplayTooltip = c.UiDisplayTooltip;
             UiDisplayPatientCount = c.UiDisplayPatientCount;
             UiDisplayPatientCountByYear = c.UiDisplayPatientCountByYear;
+            UiDisplayEventName = c.UiDisplayEventName;
             UiNumericDefaultText = c.UiNumericDefaultText;
+            EventTypeId = c.EventTypeId;
         }
     }
 

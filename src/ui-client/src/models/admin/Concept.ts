@@ -12,14 +12,21 @@ export interface ConceptSqlSetDTO {
     isEncounterBased: boolean;
     isEventBased: boolean;
     sqlFieldDate?: string;
-    sqlFieldEventId?: string;
+    sqlFieldEvent?: string;
     sqlSetFrom: string;
+    eventId?: number;
 }
 
 export interface ConceptSqlSet extends ConceptSqlSetDTO {
     changed?: boolean;
     specializationGroups: Map<number,SpecializationGroup>;
     unsaved?: boolean;
+}
+
+export interface ConceptEvent {
+    id: number;
+    uiDisplayEventName: string;
+    changed?: boolean;
 }
 
 export interface SpecializationGroupDTO {

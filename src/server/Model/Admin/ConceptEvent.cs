@@ -5,14 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 namespace Model.Admin
 {
-    public class ConceptSqlSet
+    public class ConceptEvent
     {
         public int Id { get; set; }
-        public bool IsEncounterBased { get; set; }
-        public bool IsEventBased { get; set; }
-        public string SqlSetFrom { get; set; }
-        public string SqlFieldDate { get; set; }
-        public string SqlFieldEvent { get; set; }
-        public int? EventId { get; set; }
+        public string UiDisplayEventName { get; set; }
     }
 }

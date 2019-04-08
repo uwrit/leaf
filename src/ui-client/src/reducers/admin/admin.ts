@@ -45,6 +45,8 @@ import { REMOVE_CONCEPT } from "../../actions/concepts";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
 import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup, syncAdminConceptSpecializationGroupUnsavedWithSaved } from "./specializationGroup";
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
+import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEPT_EVENT_CHANGE, SET_ADMIN_UNEDITED_CONCEPT_EVENT } from "../../actions/admin/conceptEvent";
+import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -65,6 +67,10 @@ export const defaultAdminState = (): AdminState => {
             exampleSql: '',
             pane: AdminPanelConceptEditorPane.MAIN,
             state: AdminPanelLoadState.NOT_LOADED
+        },
+        conceptEvents: {
+            changed: false,
+            events: new Map()
         },
         datasets: {
 
@@ -146,6 +152,16 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminConceptSpecialization(state, action);
         case SYNC_ADMIN_SPECIALIZATION_UNSAVED_WITH_SAVED:
             return syncAdminConceptSpecializationUnsavedWithSaved(state, action);
+
+        // Concept Events
+        case SET_ADMIN_CONCEPT_EVENTS:
+            return setAdminConceptEvents(state, action);
+        case SET_ADMIN_UNEDITED_CONCEPT_EVENT:
+            return setAdminUneditedConceptEvent(state, action);
+        case REMOVE_ADMIN_CONCEPT_EVENT:
+            return removeAdminConceptEvent(state, action);
+        case UNDO_ADMIN_CONCEPT_EVENT_CHANGE:
+            return undoAdminConceptEventChange(state, action);
 
         default:
             return state;

@@ -18,14 +18,14 @@ using Model.Authorization;
 
 namespace Services.Admin
 {
-    public class AdminConceptSqlSetService : IAdminConceptSqlSetService
+    public class AdminConceptEventService : IAdminConceptEventService
     {
         readonly IUserContext user;
-        readonly ILogger<AdminConceptSqlSetService> logger;
+        readonly ILogger<AdminConceptEventService> logger;
         readonly AppDbOptions opts;
 
-        public AdminConceptSqlSetService(
-            ILogger<AdminConceptSqlSetService> logger,
+        public AdminConceptEventService(
+            ILogger<AdminConceptEventService> logger,
             IOptions<AppDbOptions> options,
             IUserContext userContext)
         {
@@ -34,44 +34,39 @@ namespace Services.Admin
             user = userContext;
         }
 
-        public async Task<ConceptSqlSet> Create(ConceptSqlSet set)
+        public async Task<ConceptEvent> Create(ConceptEvent ev)
         {
-            logger.LogInformation("Creating ConceptSqlSet:{@ConceptSqlSet}", set);
+            logger.LogInformation("Creating ConceptEvent:{@ConceptEvent}", ev);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
                 try
                 {
-                    var created = await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
+                    var created = await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
                         Sql.Create,
                         new
                         {
-                            isEncounterBased = set.IsEncounterBased,
-                            isEventBased = set.IsEventBased,
-                            sqlSetFrom = set.SqlSetFrom,
-                            sqlFieldDate = set.SqlFieldDate,
-                            sqlFieldEvent = set.SqlFieldEvent,
-                            eventId = set.EventId,
+                            uiDisplayEventName = ev.UiDisplayEventName,
                             user = user.UUID
                         },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    logger.LogInformation("Created ConceptSqlSet:{@ConceptSqlSet}", set);
+                    logger.LogInformation("Created ConceptEvent:{@ConceptEvent}", ev);
                     return created;
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not create ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
+                    logger.LogError("Could not create ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
                     LeafDbException.ThrowFrom(se);
                     throw;
                 }
             }
         }
 
-        public async Task<ConceptSqlSetDeleteResult> Delete(int id)
+        public async Task<ConceptEventDeleteResult> Delete(int id)
         {
-            logger.LogInformation("Deleting ConceptSqlSet. Id:{Id}", id);
+            logger.LogInformation("Deleting ConceptEvent. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -83,27 +78,26 @@ namespace Services.Admin
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    var concepts = grid.Read<ConceptDependent>();
-                    var specs = grid.Read<SpecializationGroupDependent>();
-                    return new ConceptSqlSetDeleteResult { ConceptDependents = concepts, SpecializationGroupDependents = specs };
+                    var sqlSets = grid.Read<ConceptSqlSetDependent>();
+                    return new ConceptEventDeleteResult { ConceptSqlSetDependents = sqlSets };
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not delete ConceptSqlSet. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
+                    logger.LogError("Could not delete ConceptEvent. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
                     LeafDbException.ThrowFrom(se);
                     throw;
                 }
             }
         }
 
-        public async Task<IEnumerable<ConceptSqlSet>> Get()
+        public async Task<IEnumerable<ConceptEvent>> Get()
         {
-            logger.LogInformation("Getting all ConceptSqlSets");
+            logger.LogInformation("Getting all ConceptEvents");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                return await cn.QueryAsync<ConceptSqlSet>(
+                return await cn.QueryAsync<ConceptEvent>(
                     Sql.GetAll,
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
@@ -111,25 +105,20 @@ namespace Services.Admin
             }
         }
 
-        public async Task<ConceptSqlSet> Update(ConceptSqlSet set)
+        public async Task<ConceptEvent> Update(ConceptEvent ev)
         {
-            logger.LogInformation("Updating ConceptSqlSet:{@ConceptSqlSet}", set);
+            logger.LogInformation("Updating ConceptEvent:{@ConceptEvent}", ev);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
                 try
                 {
-                    return await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
+                    return await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
                         Sql.Update,
                         new
                         {
-                            id = set.Id,
-                            isEncounterBased = set.IsEncounterBased,
-                            isEventBased = set.IsEventBased,
-                            sqlSetFrom = set.SqlSetFrom,
-                            sqlFieldDate = set.SqlFieldDate,
-                            sqlFieldEvent = set.SqlFieldEvent,
-                            eventId = set.EventId,
+                            id = ev.Id,
+                            uiDisplayEventName = ev.UiDisplayEventName,
                             user = user.UUID
                         },
                         commandType: CommandType.StoredProcedure,
@@ -138,7 +127,7 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not update ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
+                    logger.LogError("Could not update ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
                     LeafDbException.ThrowFrom(se);
                     throw;
                 }
@@ -147,10 +136,10 @@ namespace Services.Admin
 
         static class Sql
         {
-            public const string GetAll = "adm.sp_GetConceptSqlSets";
-            public const string Update = "adm.sp_UpdateConceptSqlSet";
-            public const string Create = "adm.sp_CreateConceptSqlSet";
-            public const string Delete = "adm.sp_DeleteConceptSqlSet";
+            public const string GetAll = "adm.sp_GetConceptEvents";
+            public const string Update = "adm.sp_UpdateConceptEvent";
+            public const string Create = "adm.sp_CreateConceptEvent";
+            public const string Delete = "adm.sp_DeleteConceptEvent";
         }
     }
 }

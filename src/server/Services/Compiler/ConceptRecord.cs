@@ -37,9 +37,12 @@ namespace Services.Compiler
         public string UiDisplaySubtext { get; set; }
         public string UiDisplayUnits { get; set; }
         public string UiDisplayTooltip { get; set; }
+        public string UiDisplayEventName { get; set; }
         public int? UiDisplayPatientCount { get; set; }
+        public int? EventTypeId { get; set; }
         public string UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
+        
 
         public ConceptRecord() { }
 
@@ -67,9 +70,11 @@ namespace Services.Compiler
             UiDisplaySubtext = c.UiDisplaySubtext;
             UiDisplayUnits = c.UiDisplayUnits;
             UiDisplayTooltip = c.UiDisplayTooltip;
+            UiDisplayEventName = c.UiDisplayEventName;
             UiDisplayPatientCount = c.UiDisplayPatientCount;
             UiDisplayPatientCountByYear = ConceptPatientYearCountSerde.Serialize(c.UiDisplayPatientCountByYear);
             UiNumericDefaultText = c.UiNumericDefaultText;
+            EventTypeId = c.EventTypeId;
         }
 
         public Concept ToConcept(IEnumerable<ConceptSpecializationGroup> groups)
@@ -106,8 +111,10 @@ namespace Services.Compiler
                 UiDisplayUnits = UiDisplayUnits,
                 UiDisplayTooltip = UiDisplayTooltip,
                 UiDisplayPatientCount = UiDisplayPatientCount,
+                UiDisplayEventName = UiDisplayEventName,
                 UiDisplayPatientCountByYear = ConceptPatientYearCountSerde.Deserialize(UiDisplayPatientCountByYear),
-                UiNumericDefaultText = UiNumericDefaultText
+                UiNumericDefaultText = UiNumericDefaultText,
+                EventTypeId = EventTypeId
             };
         }
     }

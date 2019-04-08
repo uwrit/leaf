@@ -2116,6 +2116,33 @@ END
 
 
 GO
+
+/****** Object:  StoredProcedure [adm].[sp_GetConceptEvents]    Script Date: 4/8/19 2:27:08 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/4/8
+-- Description: Gets all app.ConceptEvent records.
+-- =======================================
+CREATE PROCEDURE [adm].[sp_GetConceptEvents]    
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT
+        Id,
+        UiDisplayEventName
+    FROM
+        app.ConceptEvent;
+END
+
+
+GO
+
 /****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 4/8/19 2:27:08 PM ******/
 SET ANSI_NULLS ON
 GO
@@ -2138,7 +2165,8 @@ BEGIN
         IsEventBased,
         SqlSetFrom,
         SqlFieldDate,
-        SqlFieldEventId
+        SqlFieldEvent,
+		EventId
     FROM
         app.ConceptSqlSet;
 END
@@ -4834,7 +4862,7 @@ BEGIN
         c.UiDisplayPatientCountByYear,
         e.UiDisplayEventName,
         c.UiNumericDefaultText,
-        EventId = e.Id
+        EventTypeId = e.Id
     FROM app.Concept c
 		 INNER JOIN app.ConceptSqlSet s
 			ON c.SqlSetId = s.Id
