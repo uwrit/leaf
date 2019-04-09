@@ -70,6 +70,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                             </div>
                         </DropdownToggle>
                         <DropdownMenu>
+                            <div className={`${c}-dropdown-item-container`}>
                             {sets.map((s) => {
                                 return (
                                     <DropdownItem 
@@ -84,6 +85,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                                     </DropdownItem>
                                 );
                             })}
+                            </div>
                             <DropdownItem divider={true} />
                             <DropdownItem onClick={this.handleManageSqlSetsClick}>Manage SQL Sets</DropdownItem>
                         </DropdownMenu>
