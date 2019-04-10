@@ -52,7 +52,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 <div className={`${c}-specializationgroup-default`}>
                     <TextArea 
                         changeHandler={this.handleSpecializationGroupEdit} propName={'uiDefaultText'} value={specializationGroup.uiDefaultText} 
-                        subLabel='Default Text'
+                        label=' ' subLabel='Default Text'
                     />
                 </div>
 

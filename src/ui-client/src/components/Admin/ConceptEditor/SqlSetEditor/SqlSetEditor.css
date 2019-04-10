@@ -107,6 +107,14 @@
     color: rgb(50,50,50);
 }
 
+.sqlset-editor-specializationgroup-specialization label {
+    display: none;
+}
+
+.sqlset-editor-specializationgroup-default .leaf-input {
+    text-align: center !important;
+}
+
 /* Checkbox */
 .sqlset-editor-input-container-checkbox {
     position: relative;
@@ -216,13 +224,19 @@
 
 .sqlset-editor-input-container .position-relative.form-group {
     margin-bottom: 0;
+    margin-top: 15px;
 }
 
 /* Delete Specialization Group */
 .sqlset-editor-specializationgroup-delete {
+    margin-top: -5px;
     position: absolute;
     right: 0;
     z-index: 100;
+}
+
+.sqlset-editor-specializationgroup-container > .sqlset-editor-specializationgroup-delete {
+    margin-top: 0;
 }
 
 .sqlset-editor-sqlset-delete > span,
@@ -273,7 +287,7 @@
 }
 
 .concept-editor-concept-event-edit-container .leaf-input {
-    border: none !important;
+    border: none !important
 }
 
 .concept-editor-concept-event-delete, 
