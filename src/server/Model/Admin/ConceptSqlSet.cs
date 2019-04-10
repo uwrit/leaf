@@ -12,6 +12,7 @@ namespace Model.Admin
         public bool IsEventBased { get; set; }
         public string SqlSetFrom { get; set; }
         public string SqlFieldDate { get; set; }
-        public string SqlFieldEventId { get; set; }
+        public string SqlFieldEvent { get; set; }
+        public int? EventId { get; set; }
     }
 }

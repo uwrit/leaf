@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 4/3/19 1:31:59 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 4/8/19 2:27:20 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -27,7 +27,8 @@ BEGIN
         IsEventBased,
         SqlSetFrom,
         SqlFieldDate,
-        SqlFieldEventId
+        SqlFieldEvent,
+		EventId
     FROM
         app.ConceptSqlSet;
 END

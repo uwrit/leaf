@@ -50,7 +50,8 @@ namespace Services.Admin
                             isEventBased = set.IsEventBased,
                             sqlSetFrom = set.SqlSetFrom,
                             sqlFieldDate = set.SqlFieldDate,
-                            sqlFieldEventId = set.SqlFieldEventId,
+                            sqlFieldEvent = set.SqlFieldEvent,
+                            eventId = set.EventId,
                             user = user.UUID
                         },
                         commandType: CommandType.StoredProcedure,
@@ -127,7 +128,8 @@ namespace Services.Admin
                             isEventBased = set.IsEventBased,
                             sqlSetFrom = set.SqlSetFrom,
                             sqlFieldDate = set.SqlFieldDate,
-                            sqlFieldEventId = set.SqlFieldEventId,
+                            sqlFieldEvent = set.SqlFieldEvent,
+                            eventId = set.EventId,
                             user = user.UUID
                         },
                         commandType: CommandType.StoredProcedure,

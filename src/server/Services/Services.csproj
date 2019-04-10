@@ -29,7 +29,6 @@
     <Folder Include="Cohort\" />
     <Folder Include="Tables\" />
     <Folder Include="Startup\" />
-    <Folder Include="Admin\" />
     <Folder Include="Authentication\" />
   </ItemGroup>
 </Project>

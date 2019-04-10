@@ -27,6 +27,7 @@ export interface Concept extends BaseConcept {
     isPatientCountAutoCalculated: boolean;
     isSpecializable: boolean;
     specializationGroups?: ConceptSpecializationGroup[];
+    eventTypeId?: number;
 
     uiDisplayName: string;
     uiDisplayText: string;
@@ -35,6 +36,7 @@ export interface Concept extends BaseConcept {
     uiDisplayTooltip?: string;
     uiDisplayPatientCount?: number;
     uiDisplayPatientCountByYear?: PatientCountPerYear[];
+    uiDisplayEventName?: string;
     uiNumericDefaultText?: string;
 
     // client-only props

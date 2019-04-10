@@ -20,6 +20,8 @@ import { generateSampleSql, getRootId } from '../../utils/admin';
 import { setConcept, removeConcept, reparentConcept, createConcept } from '../concepts';
 import { setAdminConceptSqlSets } from './sqlSet';
 import { fetchConcept } from '../../services/conceptApi'
+import { getConceptEvents } from '../../services/admin/conceptEventApi';
+import { setAdminConceptEvents } from './conceptEvent';
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
 export const SET_ADMIN_CONCEPT_EXAMPLE_SQL = 'SET_ADMIN_CONCEPT_EXAMPLE_SQL';
@@ -190,7 +192,9 @@ export const loadAdminPanelDataIfNeeded = () => {
                  * Load Concept-related data.
                  */ 
                 const sqlSets = await getSqlSets(state);
+                const conceptEvents = await getConceptEvents(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
+                dispatch(setAdminConceptEvents(conceptEvents));
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
             } catch (err) {

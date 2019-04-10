@@ -117,6 +117,7 @@ namespace API.Options
             services.AddTransient<IAdminSpecializationService, AdminSpecializationService>();
             services.AddTransient<IAdminSpecializationGroupService, AdminSpecializationGroupService>();
             services.AddTransient<IAdminConceptService, AdminConceptService>();
+            services.AddTransient<IAdminConceptEventService, AdminConceptEventService>();
 
             return services;
         }

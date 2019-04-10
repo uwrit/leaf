@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: 4/3/19 1:31:59 PM ******/
+/****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: 4/8/19 2:27:20 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -56,7 +56,7 @@ BEGIN
         c.SqlSetWhere,
         s.SqlFieldDate,
         c.SqlFieldNumeric,
-        s.SqlFieldEventId,
+        s.SqlFieldEvent,
         c.UiDisplayName,
         c.UiDisplayText,
 		c.UiDisplaySubtext,
@@ -64,10 +64,14 @@ BEGIN
         c.UiDisplayTooltip,
         c.UiDisplayPatientCount,
         c.UiDisplayPatientCountByYear,
-        c.UiNumericDefaultText
+        e.UiDisplayEventName,
+        c.UiNumericDefaultText,
+        EventTypeId = e.Id
     FROM app.Concept c
 		 INNER JOIN app.ConceptSqlSet s
 			ON c.SqlSetId = s.Id
+         LEFT JOIN app.ConceptEvent e
+            ON s.EventId = e.Id
     WHERE EXISTS (SELECT 1 FROM @ids i WHERE c.Id = i.Id)
     ORDER BY c.UiDisplayRowOrder, c.UiDisplayName
 
@@ -94,6 +98,7 @@ BEGIN
 	WHERE EXISTS (SELECT 1 FROM @specializedGroups sg WHERE sg.Id = s.SpecializationGroupId)
 
 END
+
 
 
 
