@@ -24,15 +24,15 @@ export class Identifiers extends React.PureComponent<Props> {
         const { changeHandler, adminConcept } = this.props.data;
         return (
             <Section header='Identifiers'>
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'id'} value={adminConcept!.id} locked={true}
                     label='Concept Id' subLabel='Id for the Concept. This is used internally by Leaf and cannot be edited directly.'
                 />
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'parentId'} value={adminConcept!.parentId} locked={true}
                     label='Parent Id' subLabel='Id for the parent Concept that appears above this in the tree. Edit by dragging Concept into a new parent.'
                 />
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'rootId'} value={adminConcept!.rootId} locked={true}
                     label='Root Id' subLabel='Root (top-most) ancestor Id for the Concept.'
                 />
@@ -40,11 +40,11 @@ export class Identifiers extends React.PureComponent<Props> {
                     changeHandler={changeHandler} propName={'universalId'} value={adminConcept!.universalId} 
                     label='Universal Id' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.'
                 />
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'externalId'} value={adminConcept!.externalId}
                     label='External Id' subLabel='Optional Id used if this Concept is updated by automated scripts, etc. Not used by Leaf itself.'
                 />
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'externalParentId'} value={adminConcept!.externalParentId!} 
                     label='External Parent Id'
                 />

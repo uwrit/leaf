@@ -83,15 +83,21 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
                             <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} label='SQL FROM'/>
-                            <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} label='Date Field'/>
                         </div>
                     </Col>
 
                     {/* SQL Event */}
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
-                            <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'/>
-                            <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType}/>
+                            <Container>
+                                <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased} label='Has Encounters'/>
+                            </Container>
+                            {set.isEncounterBased &&
+                            <TextArea 
+                                changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} 
+                                label='Date Field'
+                            />
+                            }
                         </div>
                     </Col>
 
@@ -99,9 +105,14 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
                             <Container>
-                                <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased} label='Has Encounters'/>
                                 <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEventBased'} value={set.isEventBased} label='Joinable by Event'/>
                             </Container>
+                            {set.isEventBased &&
+                            <div>
+                                <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'/>
+                                <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType}/>
+                            </div>
+                            }
                         </div>
                     </Col>
 
