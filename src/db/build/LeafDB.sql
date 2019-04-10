@@ -1854,7 +1854,7 @@ BEGIN
     SET NOCOUNT ON
 
     IF NOT EXISTS(SELECT 1 FROM app.ConceptEvent WHERE Id = @id)
-        THROW 70404, N'app.ConceptSqEvent is missing.', 1;
+        THROW 70404, N'app.ConceptEvent is missing.', 1;
 
     BEGIN TRAN;
     BEGIN TRY

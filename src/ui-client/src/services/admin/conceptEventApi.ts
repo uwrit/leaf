@@ -15,7 +15,7 @@ import { ConceptEvent } from '../../models/admin/Concept';
 export const getConceptEvents = async (state: AppState): Promise<ConceptEvent[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get('api/admin/conceptEvent');
+    const resp = await http.get('api/admin/conceptevent');
     const evs = resp.data as ConceptEvent[];
     return evs;
 };
@@ -26,7 +26,7 @@ export const getConceptEvents = async (state: AppState): Promise<ConceptEvent[]>
 export const updateConceptEvent = async (state: AppState, ev: ConceptEvent): Promise<ConceptEvent> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/conceptEvent/${ev.id}`, ev);
+    const resp = await http.put(`api/admin/conceptevent/${ev.id}`, ev);
     const updatedEv = resp.data as ConceptEvent;
     return updatedEv;
 };
@@ -37,7 +37,7 @@ export const updateConceptEvent = async (state: AppState, ev: ConceptEvent): Pro
 export const createConceptEvent = async (state: AppState, ev: ConceptEvent): Promise<ConceptEvent> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.post(`api/admin/conceptEvent`, {
+    const resp = await http.post(`api/admin/conceptevent`, {
         ...ev,
         id: null
     });
@@ -51,5 +51,5 @@ export const createConceptEvent = async (state: AppState, ev: ConceptEvent): Pro
 export const deleteConceptEvent = async (state: AppState, ev: ConceptEvent) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.delete(`api/admin/conceptEvent/${ev.id}`);
+    return http.delete(`api/admin/conceptevent/${ev.id}`);
 };

@@ -21,7 +21,7 @@ namespace API.Controllers.Admin
 {
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
-    [Route("api/admin/conceptEvent")]
+    [Route("api/admin/conceptevent")]
     public class AdminConceptEventController : Controller
     {
         readonly ILogger<AdminConceptEventController> logger;
