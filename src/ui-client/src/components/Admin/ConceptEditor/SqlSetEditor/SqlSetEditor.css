@@ -282,6 +282,10 @@
     position: relative;
 }
 
+.concept-editor-concept-event-edit-container > div {
+    margin-top: 0 !important;
+}
+
 .concept-editor-concept-event-edit-container > div > div {
     width: 60%;
 }
