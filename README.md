@@ -3,7 +3,7 @@
 
 **Leaf** is a powerful, fun, lightweight web application for querying clinical data. Leaf helps query clinical databases of nearly any data model for cohort estimation and data extraction. Leaf seamlessly integrates with clinical databases and enterprise authentication systems to unleash the potential of translational biomedical research.
 
-## Developed in partnership with
+##
 <span style="display:block">
    <img src="/src/ui-client/public/images/logos/orgs/iths.png" width="300px" />
 </span>
@@ -17,7 +17,7 @@
 * **Secure:** Security of protected health information is critical to any healthcare organization. Leaf implements current best security practices to make clinical data both accessible and safe.
 * **Open:** Curious how Leaf works, how you can help, or how you can use Leaf to help researchers at your <a href="https://ncats.nih.gov/ctsa">CTSA</a>? Let us know! Leaf is an open-source project by CTSAs, for CTSAs.
 
-Leaf is developed by real people passionate about translational biomedical science and software engineering. :smiley:
+Leaf is developed by *real people* passionate about translational biomedical science and software engineering. :smiley:
 
 See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
 
