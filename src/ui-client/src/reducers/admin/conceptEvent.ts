@@ -13,7 +13,8 @@ export const setAdminConceptEvents = (state: AdminState, action: AdminConceptEve
         state.conceptEvents.events.set(ev.id, Object.assign({}, ev));
     }
     return Object.assign({}, state, { 
-        conceptEvents: { 
+        conceptEvents: {
+            ...state.conceptEvents,
             changed: action.changed,
             events: new Map(state.conceptEvents.events)
         }
@@ -22,8 +23,9 @@ export const setAdminConceptEvents = (state: AdminState, action: AdminConceptEve
 
 export const setAdminUneditedConceptEvent = (state: AdminState, action: AdminConceptEventAction): AdminState => {
     return Object.assign({}, state, { 
-        conceptEvents: { 
-            uneditedEvent: Object.assign({}, action.ev)
+        conceptEvents: {
+            ...state.conceptEvents,
+            uneditedEvent: Object.assign({}, action.ev, { changed: false })
         }
     });
 };
@@ -40,7 +42,10 @@ export const removeAdminConceptEvent = (state: AdminState, action: AdminConceptE
 export const undoAdminConceptEventChange = (state: AdminState, action: AdminConceptEventAction): AdminState => {
     const unedited = state.conceptEvents.uneditedEvent!;
 
-    state.conceptEvents.events.set(unedited.id, Object.assign({}, unedited));
+    if (unedited.id) {
+        state.conceptEvents.events.set(unedited.id, Object.assign({}, unedited));
+    }
+
     return Object.assign({}, state, { 
         conceptEvents: { 
             changed: false,

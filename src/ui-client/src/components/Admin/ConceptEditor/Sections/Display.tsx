@@ -28,7 +28,7 @@ export class Display extends React.PureComponent<Props> {
                     changeHandler={changeHandler} propName={'uiDisplayName'} value={adminConcept!.uiDisplayName}
                     label='Name' subLabel='Text shown in Concept Tree' required={true}
                 />
-                <Input 
+                <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplaySubtext'} value={adminConcept!.uiDisplaySubtext}
                     label='Subtext' subLabel='Additional information shown next to name in lighter, smaller text'
                 />

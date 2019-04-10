@@ -12,7 +12,7 @@ import AdminState from '../../models/state/AdminState';
 import { AppState } from '../../models/state/AppState';
 
 interface StateProps { 
-    admin?: AdminState
+    admin?: AdminState;
 }
 interface DispatchProps {
     dispatch: any;
@@ -32,7 +32,9 @@ const selectable: AdminTab[] = [
     {
         id: 1,
         display: "Concepts",
-        render: (admin: AdminState, dispatch: any) => <ConceptEditor data={admin} dispatch={dispatch} />
+        render: (admin: AdminState, dispatch: any) => (
+            <ConceptEditor data={admin} dispatch={dispatch}/>
+        )
     }
 ];
 

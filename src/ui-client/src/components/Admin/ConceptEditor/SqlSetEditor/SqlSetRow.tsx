@@ -9,7 +9,7 @@ import React from 'react';
 import { Row, Col, Container } from 'reactstrap';
 import { Checkbox } from '../Sections/Checkbox';
 import { TextArea } from '../Sections/TextArea';
-import { ConceptSqlSet, SpecializationGroup } from '../../../../models/admin/Concept';
+import { ConceptSqlSet, SpecializationGroup, ConceptEvent } from '../../../../models/admin/Concept';
 import { Collapse } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import { SpecializationGroupDropdownPreview } from './SpecializationGroupDropdownPreview';
@@ -18,9 +18,11 @@ import { setAdminConceptSpecializationGroup } from '../../../../actions/admin/sp
 import { setAdminConceptSqlSet, removeAdminConceptSqlSet, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
+import { ConceptEventTypeDropdown } from './ConceptEventTypeDropdown';
 
 interface Props {
     dispatch: any;
+    eventTypes: ConceptEvent[];
     set: ConceptSqlSet;
     state: AdminState;
 }
@@ -52,43 +54,74 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { set } = this.props;
+        const { set, eventTypes, dispatch } = this.props;
         const c = this.className;
         const unsaved = set.unsaved || set.changed;
+        const currentEventType = set.eventId ? eventTypes.find((ev) => ev.id === set.eventId) : undefined;
         const spcGrps: SpecializationGroup[] = [];
         set.specializationGroups.forEach((g) => spcGrps.push(g));
 
         return (
             <Container className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
+
+                {/* Unsaved notifier */}
+                {unsaved &&
+                <span className={`${c}-unsaved`}>unsaved</span>
+                }
+
+                {/* Set Id */}
+                {<span className={`${c}-row-id`}>{set.id}</span>}
+
+                {/* Delete Concept SQL Set */}
+                <div className={`${c}-sqlset-delete`}>
+                    <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
+                </div>
+
                 <Row className={`${c}-table-row`}>
 
-                    {/* Unsaved notifier */}
-                    {unsaved &&
-                    <span className={`${c}-unsaved`}>unsaved</span>
-                    }
-
-                    {/* Values */}
-                    <Col md={2} className={`${c}-input-container-checkbox`}>
-                        <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased}/>
-                    </Col>
-                    <Col md={5} className={`${c}-input-container`}>
-                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom}/>
-                    </Col>
-                    <Col md={5} className={`${c}-input-container`}>
-
-                        {/* Delete Concept SQL Set */}
-                        <div className={`${c}-specializationgroup-delete`}>
-                            <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
+                    {/* SQL Set and Date */}
+                    <Col md={4} className={`${c}-input-column`}>
+                        <div className={`${c}-input-container`}>
+                            <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} label='SQL FROM'/>
                         </div>
-
-                        <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate}/>
                     </Col>
+
+                    {/* SQL Event */}
+                    <Col md={4} className={`${c}-input-column`}>
+                        <div className={`${c}-input-container`}>
+                            <Container>
+                                <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEncounterBased'} value={set.isEncounterBased} label='Has Encounters'/>
+                            </Container>
+                            {set.isEncounterBased &&
+                            <TextArea 
+                                changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} 
+                                label='Date Field'
+                            />
+                            }
+                        </div>
+                    </Col>
+
+                    {/* Checkboxes */}
+                    <Col md={4} className={`${c}-input-column`}>
+                        <div className={`${c}-input-container`}>
+                            <Container>
+                                <Checkbox changeHandler={this.handleSqlSetEdit} propName={'isEventBased'} value={set.isEventBased} label='Joinable by Event'/>
+                            </Container>
+                            {set.isEventBased &&
+                            <div>
+                                <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'/>
+                                <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType} dispatch={dispatch}/>
+                            </div>
+                            }
+                        </div>
+                    </Col>
+
                 </Row>
                 
                 {/* Specialization Groups */}
-                <Col md={12}>
+                <div className={`${c}-specializationgroups-container`}>
                     {this.renderSpecializationData(spcGrps)}
-                </Col>
+                </div>
             </Container>
         );
     }

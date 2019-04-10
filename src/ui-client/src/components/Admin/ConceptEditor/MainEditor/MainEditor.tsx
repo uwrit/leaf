@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { Row, Col, Button } from 'reactstrap';
-import AdminState, { AdminPanelLoadState } from '../../../../models/state/AdminState';
+import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import LoaderIcon from '../../../Other/LoaderIcon/LoaderIcon';
 import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
 import { Configuration } from '../Sections/Configuration';
-import { Concept as AdminConcept } from '../../../../models/admin/Concept';
-import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, setAdminPanelCurrentUserConcept, removeUnsavedAdminConcept, saveAdminConcept } from '../../../../actions/admin/concept';
+import { Concept as AdminConcept, ConceptSqlSet } from '../../../../models/admin/Concept';
+import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, setAdminPanelCurrentUserConcept, removeUnsavedAdminConcept, saveAdminConcept, setAdminPanelConceptEditorPane } from '../../../../actions/admin/concept';
 import { setConcept, createConcept, setSelectedConcept, removeConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
@@ -21,8 +21,8 @@ import { ConfirmationModalState, InformationModalState } from '../../../../model
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
-import { Concept as UserConcept } from '../../../../models/concept/Concept';
 import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin';
+import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -53,17 +53,36 @@ export class MainEditor extends React.PureComponent<Props> {
 
         return (
             <div className={`${c}-main`}>
+
+                {/* Header */}
+                {sets.size > 0 &&
                 <div className={`${c}-column-right-header`}>
                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
-                </div>
-                {!currentAdminConcept &&
-                    <div className={`${c}-na`}>
-                    <p>Click on a Concept to the left to edit.</p>
+                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
                 </div>
                 }
+
+                {/* Create a SQL Set link, used at initial setup */}
+                {data.state === AdminPanelLoadState.LOADED && sets.size === 0 &&
+                <div className={`${c}-start`}>
+                    <p>Hi there! It looks like you need to create Concepts to connect to your clinical data.</p>
+                    <p>
+                        Start by <a onClick={this.handleCreateSqlSetClick}>creating a Concept SQL Set</a>
+                        , which is a SQL table, view, or subquery which your Concepts can point to.
+                    </p>
+                </div>
+                }
+
+                {/* Hint to click on a Concept to edit */}
+                {!currentAdminConcept && sets.size > 0 &&
+                <div className={`${c}-na`}>
+                    <p>Click on a Concept to the left to edit <br></br> or <a onClick={this.handleAddConceptClick}>create a new one</a></p>
+                </div>
+                }
+
+                {/* Main editor */}
                 {currentAdminConcept && 
                 <div>
                     {this.getStatusDependentContent(state, c)}
@@ -87,6 +106,9 @@ export class MainEditor extends React.PureComponent<Props> {
         );
     }
 
+    /* 
+     * Sets optional content if a edit-able Concept is not selected.
+     */
     private getStatusDependentContent = (state: AdminPanelLoadState, c: string) => {
         if (state === AdminPanelLoadState.LOADING) {
             return (
@@ -113,6 +135,28 @@ export class MainEditor extends React.PureComponent<Props> {
         return null;
     }
 
+    /* 
+     * Handles click on initial startup if no SQL Sets exist.
+     */
+    private handleCreateSqlSetClick = () => {
+        const { dispatch } = this.props;
+        const newSet: ConceptSqlSet = {
+            id: 1,
+            isEncounterBased: false,
+            isEventBased: false,
+            sqlFieldDate: '',
+            sqlSetFrom: '',
+            specializationGroups: new Map(),
+            unsaved: true
+        }
+        dispatch(setAdminConceptSqlSet(newSet, true));
+        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+    }
+
+    /* 
+     * Handles tracking of input changes to the Concept, generating cloned, updated
+     * copies of the User and Admin Concepts to the store as edits are made.
+     */
     private handleInputChange = (val: any, propName: string) => {
         const { sets } = this.props.data.sqlSets;
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
@@ -127,6 +171,9 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(setConcept(newUserConcept));
     }
 
+    /*
+     * Triggers a fallback to the uneditedSet, undoing any current changes.
+     */
     private handleUndoChanges = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
@@ -138,6 +185,9 @@ export class MainEditor extends React.PureComponent<Props> {
         }
     }
 
+    /*
+     * Removes an unedited Admin Concept, basically refreshing the left admin pane.
+     */
     private removeUnsavedAdminConcept = () => {
         const { currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
@@ -145,16 +195,22 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(removeUnsavedAdminConcept());
     }
 
+    /*
+     * Handles initiation of saving async changes and syncing with the DB.
+     */
     private handleSaveChanges = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
         dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
     }
 
+    /*
+     * Creates a new unsaved Concept which the admin can immmediately edit and save.
+     */
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
         const { sets } = this.props.data.sqlSets;
-        const defaultSet = sets.size ? sets.get(sets.keys[0]) : undefined;
+        const defaultSet = sets.size ? sets.get(Array.from(sets.keys())[0]) : undefined;
 
         const { adminConcept, userConcept } = createEmptyConcept();
 
@@ -170,6 +226,9 @@ export class MainEditor extends React.PureComponent<Props> {
         dispatch(setAdminConcept(adminConcept, true));
     }
 
+    /*
+     * Deletes a Concept, or warns if their are children under it.
+     */
     private handleDeleteConceptClick = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;

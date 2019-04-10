@@ -27,6 +27,7 @@ export interface ConceptEvent {
     id: number;
     uiDisplayEventName: string;
     changed?: boolean;
+    unsaved?: boolean;
 }
 
 export interface SpecializationGroupDTO {

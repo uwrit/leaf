@@ -39,7 +39,7 @@ export class Constraints extends React.PureComponent<Props> {
                             />
                         )}
                         {adminConcept!.constraints.length === 0 &&
-                            <div className={`${c}-constraints-none`}>No restrictions on this Concept. All users can see it</div>
+                            <div className={`${c}-constraints-none`}>No restrictions - all users can see this Concept</div>
                         }
                     </div>
                 </div>

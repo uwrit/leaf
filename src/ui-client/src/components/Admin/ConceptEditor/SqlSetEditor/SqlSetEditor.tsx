@@ -6,17 +6,17 @@
  */ 
 
 import React from 'react';
-import { ConceptSqlSet } from '../../../../models/admin/Concept';
-import { Button, Container, Row, Col } from 'reactstrap';
-import { setAdminConceptExampleSql, checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
+import { ConceptSqlSet, ConceptEvent } from '../../../../models/admin/Concept';
+import { Button, Container } from 'reactstrap';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
-import { generateSampleSql, conceptEditorValid } from '../../../../utils/admin';
+import { conceptEditorValid } from '../../../../utils/admin';
 import { SqlSetRow } from './SqlSetRow';
-import './SqlSetEditor.css';
 import { InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../../actions/generalUi';
+import './SqlSetEditor.css';
 
 export class SqlSetEditor extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
@@ -26,14 +26,23 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     public componentDidMount() {
         const { dispatch, data } = this.props;
-        dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
+        const { sets } = data.sqlSets;
+        const firstSet = sets.get(Array.from(sets.keys())[0]);
+
+        if (sets.size === 1 && firstSet!.unsaved) {
+            dispatch(setAdminUneditedConceptSqlSets(new Map()));
+        } else {
+            dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
+        }
     }
 
     public render() {
         const { data, dispatch } = this.props;
         const c = this.className;
+        const evs: ConceptEvent[] = [];
         const sets: ConceptSqlSet[] = [];
         data.sqlSets.sets.forEach((s) => sets.push(s));
+        data.conceptEvents.events.forEach((ev) => evs.push(ev));
 
         return (
             <div className={`${c}-container`}>
@@ -44,14 +53,9 @@ export class SqlSetEditor extends React.PureComponent<Props> {
                     <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
                 </div>
                 <Container className={`${c}-table`}>
-                    <Row className={`${c}-table-header`}>
-                        <Col md={2}>Is Longitudinal</Col>
-                        <Col md={5}>SQL FROM</Col>
-                        <Col md={5}>SQL Date Field</Col>
-                    </Row>
                     {sets
                         .sort((a,b) => a.id > b.id ? 1 : -1)
-                        .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} />)
+                        .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs}/>)
                     }
                 </Container>
             </div>
