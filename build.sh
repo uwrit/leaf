@@ -26,7 +26,7 @@ class FSEnv:
 
 
 class Runtime:
-    def __init__(self, name, output_folder, args):
+    def __init__(self, name, output_folder, args = []):
         self.name = name
         self.output_folder = output_folder
         self.tar_file = 'leaf_{}.tar.gz'.format(self.name)
@@ -39,8 +39,7 @@ class Runtime:
 
     @staticmethod
     def win(env: FSEnv):
-        return Runtime('win', os.path.join(env.bin_dir, 'win'), [
-            '-r', 'win-x64'])
+        return Runtime('win', os.path.join(env.bin_dir, 'win'))
 
 
 class LeafBuilder:
@@ -146,9 +145,9 @@ def get_args() -> Namespace:
     parser = ArgumentParser(
         prog='build.sh', description="This script builds Leaf's backend for various runtime targets.")
     parser.add_argument('--rhel7', action='store_true',
-                        help='Targets RHEL7 and Cent7, outputs to ./bin/rhel7/leaf_rhel7.tar.gz')
+                        help='Targets RHEL7 and Cent7 (not self-contained), outputs to ./bin/rhel7/leaf_rhel7.tar.gz')
     parser.add_argument('--win', action='store_true',
-                        help='Targets Windows, outputs to ./bin/win/leaf_win.tar.gz')
+                        help='Targets Windows (not self-contained), outputs to ./bin/win/leaf_win.tar.gz')
     return parser.parse_args()
 
 
