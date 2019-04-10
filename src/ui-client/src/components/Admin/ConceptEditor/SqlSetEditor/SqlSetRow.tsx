@@ -54,7 +54,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { set, eventTypes } = this.props;
+        const { set, eventTypes, dispatch } = this.props;
         const c = this.className;
         const unsaved = set.unsaved || set.changed;
         const currentEventType = set.eventId ? eventTypes.find((ev) => ev.id === set.eventId) : undefined;
@@ -110,7 +110,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                             {set.isEventBased &&
                             <div>
                                 <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'/>
-                                <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType}/>
+                                <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType} dispatch={dispatch}/>
                             </div>
                             }
                         </div>

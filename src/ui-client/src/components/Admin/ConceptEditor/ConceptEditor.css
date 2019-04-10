@@ -122,11 +122,12 @@
     z-index: 100;
 }
 
-/* Error and NotApplicable */
+/* Get Started, Error, and Not Applicable message boxes */
+.concept-editor-start,
 .concept-editor-na,
 .concept-editor-error {
     border-radius: 8px;
-    color: black;
+    color: rgb(50,50,50);
     font-family: Roboto;
     font-size: 1.4rem;
     font-weight: 300;
@@ -140,8 +141,24 @@
     width: 450px;
 }
 
+.concept-editor-start {
+    background-color: white;
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+}
+
+.concept-editor-start a,
+.concept-editor-na a {
+    color: rgb(0, 130, 177) !important;
+    cursor: pointer;
+}
+
+.concept-editor-start a:hover,
+.concept-editor-na a:hover {
+    text-decoration: underline !important;
+}
+
 .concept-editor-na {
-    background-color: rgba(28, 170, 221, 0.05);
+    background-color: white;
     border: 2px dashed rgba(28, 170, 221, 0.699);
 }
 
@@ -185,7 +202,7 @@
 
 .concept-editor-column-right .leaf-input:hover,
 .concept-editor-column-right .leaf-input:focus {
-    background-color:rgba(28, 168, 221, 0.15) !important;
+    background-color:rgba(28, 168, 221, 0.1) !important;
 }
 
 .concept-editor-column-right text-area.leaf-input {

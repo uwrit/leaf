@@ -80,7 +80,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
             case AdminPanelConceptEditorPane.SQL_SET:
                 return (
                     <SqlSetEditor
-                        data={data} dispatch={dispatch} 
+                        data={data} dispatch={dispatch}
                         togglePanelPreview={this.togglePanelPreview} 
                         toggleSqlPreview={this.toggleSqlPreview} 
                         toggleOverlay={this.toggleOverlay}

@@ -7,16 +7,16 @@
 
 import React from 'react';
 import { ConceptSqlSet, ConceptEvent } from '../../../../models/admin/Concept';
-import { Button, Container, Row, Col } from 'reactstrap';
+import { Button, Container } from 'reactstrap';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
 import { conceptEditorValid } from '../../../../utils/admin';
 import { SqlSetRow } from './SqlSetRow';
-import './SqlSetEditor.css';
 import { InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../../actions/generalUi';
+import './SqlSetEditor.css';
 
 export class SqlSetEditor extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
@@ -26,7 +26,14 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     public componentDidMount() {
         const { dispatch, data } = this.props;
-        dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
+        const { sets } = data.sqlSets;
+        const firstSet = sets.get(Array.from(sets.keys())[0]);
+
+        if (sets.size === 1 && firstSet!.unsaved) {
+            dispatch(setAdminUneditedConceptSqlSets(new Map()));
+        } else {
+            dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
+        }
     }
 
     public render() {

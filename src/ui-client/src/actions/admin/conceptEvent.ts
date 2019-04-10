@@ -28,13 +28,13 @@ export interface AdminConceptEventAction {
  * Save or update a Concept Event, depending on
  * if it is preexisting or new.
  */
-export const saveAdminConcept = (ev: ConceptEvent) => {
+export const saveAdminConceptEvent = (ev: ConceptEvent) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
 
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
-            const newEv = ev.changed
+            const newEv = ev.unsaved
                 ? await createConceptEvent(state, ev)
                 : await updateConceptEvent(state, ev);
 

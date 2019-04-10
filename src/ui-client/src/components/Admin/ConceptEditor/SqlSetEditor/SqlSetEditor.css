@@ -255,3 +255,69 @@
 .sqlset-editor-text-emphasis {
     color: #1CA8DD;
 }
+
+/* Events */
+.concept-editor-concept-event-dropdown .dropdown-item {
+    margin-right: 70px;
+    padding: 6px 20px;
+    position: relative;
+}
+
+.concept-editor-concept-event-edit-container {
+    padding: 4px 8px;
+    position: relative;
+}
+
+.concept-editor-concept-event-edit-container > div > div {
+    width: 60%;
+}
+
+.concept-editor-concept-event-edit-container .leaf-input {
+    border: none !important;
+}
+
+.concept-editor-concept-event-delete, 
+.concept-editor-concept-event-edit, 
+.concept-editor-concept-event-edit-undo, 
+.concept-editor-concept-event-edit-done {
+    border-radius: 4px 8px;
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 8px 6px 0 0;
+    padding: 2px 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.concept-editor-concept-event-edit {
+    margin-right: 50px;
+}
+
+.concept-editor-concept-event-edit:hover {
+    color: rgb(28, 168, 221);
+}
+
+.concept-editor-concept-event-edit,
+.concept-editor-concept-event-delete {
+    margin-top: 6px;
+}
+
+.concept-editor-concept-event-delete:hover {
+    color: rgb(244, 67, 54);
+}
+
+.concept-editor-concept-event-edit-done {
+    color: rgb(28, 168, 221);
+    margin-right: 50px;
+}
+
+.concept-editor-concept-event-edit-done:hover {
+    background-color: rgb(240,240,240);
+}
+
+.concept-editor-concept-event-edit-undo:hover{
+    background-color: rgb(240,240,240);
+    color: rgb(28, 168, 221);
+}

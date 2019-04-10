@@ -27,7 +27,7 @@ export class TextArea extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { label, subLabel, locked, value, required } = this.props;
+        const { label, subLabel, locked, value, required, onClick } = this.props;
         const { valid } = this.state;
         const classes = [ 'leaf-input' ];
         let val = value || '';
@@ -38,6 +38,7 @@ export class TextArea extends React.PureComponent<Props,State> {
 
         return (
             <FormGroup>
+                {label &&
                 <Label>
                     {label}
                     {required &&
@@ -47,6 +48,7 @@ export class TextArea extends React.PureComponent<Props,State> {
                     <FormText color="muted">{subLabel}</FormText>
                     }
                 </Label>
+                }
                 <div>
                     <TextareaAutosize 
                         className={classes.join(' ')}
@@ -54,6 +56,7 @@ export class TextArea extends React.PureComponent<Props,State> {
                         maxRows={5}
                         onBlur={this.handleBlur}
                         onChange={this.handleChange}
+                        onClick={onClick}
                         onFocus={this.handleFocus}
                         onKeyDown={this.handleKeydown}
                         readOnly={locked}
@@ -87,7 +90,7 @@ export class TextArea extends React.PureComponent<Props,State> {
         if (focusToggle) { focusToggle(true); }
     }
 
-    private handleChange = (e: any) => {
+    private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const { changeHandler, propName, required } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);

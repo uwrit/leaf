@@ -37,6 +37,7 @@ export interface PropertyProps {
     label?: string;
     locked?: boolean;
     focusToggle?: (show: boolean) => void;
+    onClick?: (e: React.MouseEvent<HTMLElement>) => any;
     placeholder?: string;
     propName: string;
     required?: boolean;

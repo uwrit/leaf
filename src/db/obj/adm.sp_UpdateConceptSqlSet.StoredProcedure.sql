@@ -45,7 +45,7 @@ BEGIN
         EventId = @eventId,
         Updated = GETDATE(),
         UpdatedBy = @user
-    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent
+    OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent, inserted.EventId
     WHERE Id = @id;
 END
 
