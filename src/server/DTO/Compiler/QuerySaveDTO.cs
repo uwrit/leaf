@@ -16,29 +16,5 @@ namespace DTO.Compiler
         public int? Ver { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
-
-        IEnumerable<IPanelDTO> all;
-        public IEnumerable<IPanelDTO> All
-        {
-            get
-            {
-                if (all == null)
-                {
-                    all = this.MergeAll();
-                }
-                return all;
-            }
-        }
-
-        IEnumerable<IPanelDTO> IQueryDefinition.Panels
-        {
-            get => Panels;
-            set => Panels = value as IEnumerable<PanelDTO>;
-        }
-        IEnumerable<IPanelFilterDTO> IQueryDefinition.PanelFilters
-        {
-            get => PanelFilters;
-            set => PanelFilters = value as IEnumerable<PanelFilterDTO>;
-        }
     }
 }

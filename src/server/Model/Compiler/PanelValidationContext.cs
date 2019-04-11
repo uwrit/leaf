@@ -25,7 +25,7 @@ namespace Model.Compiler
         public PanelValidationContext(IQueryDefinition query, PreflightResources check)
         {
             PreflightCheck = check;
-            Requested = query.All;
+            Requested = query.All();
             Allowed = new Panel[] { };
         }
 

@@ -13,7 +13,7 @@ namespace Model.Extensions
 {
     public static class PanelExtensions
     {
-        public static HashSet<Guid> GetConceptIds(this IReadOnlyCollection<Panel> panels)
+        public static HashSet<Guid> GetConceptIds(this IEnumerable<Panel> panels)
         {
             return panels
                 .SelectMany(p => p.SubPanels)
@@ -22,7 +22,7 @@ namespace Model.Extensions
                 .ToHashSet();
         }
 
-        public static HashSet<Urn> GetConceptUniversalIds(this IReadOnlyCollection<Panel> panels)
+        public static HashSet<Urn> GetConceptUniversalIds(this IEnumerable<Panel> panels)
         {
             return panels
                 .SelectMany(p => p.SubPanels)
@@ -31,7 +31,7 @@ namespace Model.Extensions
                 .ToHashSet(new UrnEqualityComparer());
         }
 
-        public static IEnumerable<Concept> GetConcepts(this IReadOnlyCollection<Panel> panels)
+        public static IEnumerable<Concept> GetConcepts(this IEnumerable<Panel> panels)
         {
             return panels
                 .SelectMany(p => p.SubPanels)
@@ -39,7 +39,7 @@ namespace Model.Extensions
                 .Select(i => i.Concept);
         }
 
-        public static ResourceRefs GetResources(this IReadOnlyCollection<Panel> panels)
+        public static ResourceRefs GetResources(this IEnumerable<Panel> panels)
         {
             var items = panels
                 .SelectMany(p => p.SubPanels)

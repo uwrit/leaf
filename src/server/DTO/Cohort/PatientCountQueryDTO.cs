@@ -18,16 +18,13 @@ namespace DTO.Cohort
         public IEnumerable<PanelFilterDTO> PanelFilters { get; set; }
 
         IEnumerable<IPanelDTO> all;
-        public IEnumerable<IPanelDTO> All
+        IEnumerable<IPanelDTO> IQueryDefinition.All()
         {
-            get
+            if (all == null)
             {
-                if (all == null)
-                {
-                    all = this.MergeAll();
-                }
-                return all;
+                all = this.MergeAll();
             }
+            return all;
         }
 
         IEnumerable<IPanelDTO> IQueryDefinition.Panels

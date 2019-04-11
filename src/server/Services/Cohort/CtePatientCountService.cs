@@ -71,7 +71,7 @@ namespace Services.Cohort
             return patientIds;
         }
 
-        ISqlStatement GetCteQuery(IReadOnlyCollection<Panel> panels)
+        ISqlStatement GetCteQuery(IEnumerable<Panel> panels)
         {
             var query = compiler.BuildCteSql(panels);
             log.LogInformation("SqlStatement:{Sql}", query.SqlStatement);

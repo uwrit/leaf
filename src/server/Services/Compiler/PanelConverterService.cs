@@ -45,19 +45,16 @@ namespace Services.Compiler
         readonly IPreflightResourceReader preflightReader;
         readonly ILogger<PanelConverterService> log;
         readonly CompilerOptions compilerOptions;
-        readonly AppDbOptions appDbOptions;
 
         public PanelConverterService(
             IPreflightResourceReader preflightConceptReader,
             IUserContext userContext,
             IOptions<CompilerOptions> compilerOptions,
-            IOptions<AppDbOptions> appDbOptions,
             ILogger<PanelConverterService> logger)
         {
             preflightReader = preflightConceptReader;
             user = userContext;
             this.compilerOptions = compilerOptions.Value;
-            this.appDbOptions = appDbOptions.Value;
             log = logger;
         }
 
@@ -79,7 +76,7 @@ namespace Services.Compiler
 
         public async Task<PanelValidationContext> GetPanelsAsync(IQueryDefinition query)
         {
-            var resources = await GetPreflightResourcesAsync(query.All);
+            var resources = await GetPreflightResourcesAsync(query.All());
 
             if (!resources.Ok)
             {
@@ -89,18 +86,16 @@ namespace Services.Compiler
 
             var concepts = resources.Concepts(compilerOptions);
 
-            var panels = GetPanels(query.All, concepts);
+            var panels = GetPanels(query.All(), concepts);
 
             return new PanelValidationContext(query, resources, panels);
         }
 
-        // TODO(cspital) extract to own impl with no DTO dependencies?
-        public QueryDefinitionDTO LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
+        public void LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
-            var local = new QueryDefinitionDTO { Panels = definition.Panels as IEnumerable<PanelDTO>, PanelFilters = definition.PanelFilters as IEnumerable<PanelFilterDTO> };
             if (user.IsInstutional)
             {
-                return local;
+                return;
             }
 
             var map = new Dictionary<string, ResourceRef>(localQuery.Panels
@@ -127,8 +122,6 @@ namespace Services.Compiler
                     filter.Concept = new ConceptRefDTO { Id = replFilterConcept.Id, UniversalId = replFilterConcept.UniversalId };
                 }
             }
-
-            return local;
         }
 
         async Task<PreflightResources> GetPreflightResourcesAsync(IEnumerable<IPanelDTO> panels)

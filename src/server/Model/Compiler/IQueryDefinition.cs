@@ -13,6 +13,6 @@ namespace Model.Compiler
     {
         IEnumerable<IPanelDTO> Panels { get; set; }
         IEnumerable<IPanelFilterDTO> PanelFilters { get; set; }
-        IEnumerable<IPanelDTO> All { get; }
+        IEnumerable<IPanelDTO> All();
     }
 }
