@@ -11,7 +11,7 @@ namespace Model.Compiler
     public abstract class ShapedDatasetExecutionContext
     {
         public Shape Shape { get; }
-        public string CompiledQuery { get; set; } // TODO(cspital) revert to internal set when refac ok
+        public string CompiledQuery { get; internal set; }
 
         readonly List<QueryParameter> parameters;
         public IEnumerable<QueryParameter> Parameters => parameters;

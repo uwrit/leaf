@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace DTO.Cohort
 {
-    public class PatientCountQueryDTO : IQueryDefinition
+    public class PatientCountQueryDTO : IPatientCountQueryDTO
     {
         public string QueryId { get; set; }
         public IEnumerable<PanelDTO> Panels { get; set; }

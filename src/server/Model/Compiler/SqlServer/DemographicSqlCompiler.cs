@@ -10,42 +10,9 @@ using Model.Compiler;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using Services.Cohort;
 using Model.Cohort;
 
-/*
- * This needs to receive a CompilerOptions for the personid and encounterid fields.
- * Should return a context containing the DatasetQuery and the parameterized query.
- * The runner and anonymizer will need both to produce the correct dataset and enable guard rails re: types.
- */
-
-/*
- * Example Target Sql
-WITH cohort as
-(
-    select PersonId, Exported, case when Exported = 1 then 'abc' else NULL end as Salt
-    from LeafDB.app.Cohort
-    where QueryId = '9824433e-f36b-1410-86f1-00ffffffffff'
-)
-,dataset as
-(
-    SELECT person_id = p.person_id, addressPostalCode = l.zip, addressState = p.location_state, ethnicity = p.ethnicity, gender = CASE WHEN p.gender = 'F' THEN 'female' WHEN p.gender = 'M' THEN 'male' ELSE 'other' END, [language] = 'Unknown', maritalStatus = 'Unknown', race = p.race, religion = 'Unknown', isMarried = 0, isHispanic = CASE WHEN p.ethnicity_code = 38003563 THEN 1 ELSE 0 END, isDeceased = CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END, birthDate = p.birth_datetime, [name] = 'Unknown Unknown', mrn = 'abc12345' FROM v_person p JOIN person ps on p.person_id = ps.person_id LEFT JOIN [location] l on ps.location_id = l.location_id
-)
-,fields as
-(
-    select person_id, addressPostalCode, addressState, ethnicity, gender, [language], maritalStatus, race, religion, isMarried, isHispanic, isDeceased
-    from dataset d
-    where d.person_id in (
-        select PersonId
-        from cohort
-    )
-)
-select Exported, Salt, person_id, addressPostalCode, addressState, ethnicity, gender, [language], maritalStatus, race, religion, isMarried, isHispanic, isDeceased
-from fields
-left join cohort on fields.person_id = cohort.PersonId
- */
-
-namespace Services.Compiler.SqlServer
+namespace Model.Compiler.SqlServer
 {
     public class DemographicSqlCompiler : IDemographicSqlCompiler
     {

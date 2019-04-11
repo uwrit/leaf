@@ -7,12 +7,13 @@ using System;
 using System.Text;
 using System.Linq;
 using Model.Compiler;
+using Model.Compiler.SqlServer;
 using Model.Options;
 using Model.Extensions;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 
-namespace Services.Compiler.SqlServer
+namespace Model.Compiler.SqlServer
 {
     public class SqlServerCompiler : ISqlCompiler
     {

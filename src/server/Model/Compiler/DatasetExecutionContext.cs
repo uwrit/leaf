@@ -9,7 +9,7 @@ namespace Model.Compiler
 {
     public class DatasetExecutionContext : ShapedDatasetExecutionContext
     {
-        public Guid DatasetId { get; set; }
+        public Guid DatasetId { get; }
 
         public DatasetExecutionContext(Shape shape, QueryContext queryContext, Guid datasetId) : base(shape, queryContext)
         {

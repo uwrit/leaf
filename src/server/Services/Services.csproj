@@ -29,6 +29,5 @@
     <Folder Include="Tables\" />
     <Folder Include="Startup\" />
     <Folder Include="Authentication\" />
-    <Folder Include="Compiler\SqlServer\" />
   </ItemGroup>
 </Project>

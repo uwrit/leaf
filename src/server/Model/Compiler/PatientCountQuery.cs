@@ -14,4 +14,9 @@ namespace Model.Compiler
         public Guid? QueryId { get; set; }
         public IReadOnlyCollection<Panel> Panels { get; set; }
     }
+
+    public interface IPatientCountQueryDTO : IQueryDefinition
+    {
+        string QueryId { get; }
+    }
 }

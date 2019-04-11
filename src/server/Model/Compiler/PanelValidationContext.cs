@@ -5,14 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using DTO.Compiler;
-using Model.Compiler;
-using DTO.Cohort;
 using Model.Tagging;
 
-// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
-
-namespace Services.Compiler
+namespace Model.Compiler
 {
     public class PanelValidationContext
     {

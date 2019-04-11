@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class QuerySaveDTO : QueryDefinitionDTO, IQueryDefinition
+    public class QuerySaveDTO : QueryDefinitionDTO, IQuerySaveDTO
     {
         public string UniversalId { get; set; }
         public int? Ver { get; set; }

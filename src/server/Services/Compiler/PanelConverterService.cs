@@ -61,7 +61,7 @@ namespace Services.Compiler
             log = logger;
         }
 
-        public async Task<PanelValidationContext> GetPanelsAsync(PatientCountQueryDTO query, CancellationToken token)
+        public async Task<PanelValidationContext> GetPanelsAsync(IPatientCountQueryDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var validationContext = await GetPanelsAsync(query);
@@ -69,7 +69,7 @@ namespace Services.Compiler
             return validationContext;
         }
 
-        public async Task<PanelValidationContext> GetPanelsAsync(QuerySaveDTO query, CancellationToken token)
+        public async Task<PanelValidationContext> GetPanelsAsync(IQuerySaveDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var validationContext = await GetPanelsAsync(query);

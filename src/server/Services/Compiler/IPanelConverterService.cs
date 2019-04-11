@@ -13,15 +13,13 @@ using Model.Compiler;
 using Model.Options;
 using DTO.Cohort;
 
-// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
-
 namespace Services.Compiler
 {
     public interface IPanelConverterService
     {
         Task<PanelValidationContext> GetPanelsAsync(IQueryDefinition query);
-        Task<PanelValidationContext> GetPanelsAsync(PatientCountQueryDTO query, CancellationToken token);
-        Task<PanelValidationContext> GetPanelsAsync(QuerySaveDTO query, CancellationToken token);
+        Task<PanelValidationContext> GetPanelsAsync(IPatientCountQueryDTO query, CancellationToken token);
+        Task<PanelValidationContext> GetPanelsAsync(IQuerySaveDTO query, CancellationToken token);
         QueryDefinitionDTO LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery);
     }
 }

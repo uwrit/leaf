@@ -4,18 +4,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Model.Compiler;
-using Model.Cohort;
 
-// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
-
-namespace Services.Compiler
+namespace Model.Compiler
 {
     public interface IPanelValidator
     {
         PatientCountQuery Validate(PanelValidationContext ctx);
-
     }
 }
