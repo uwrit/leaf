@@ -15,28 +15,41 @@
     font-family: Roboto;
     font-size: 1.1rem;
     font-weight: 500;
-    marginz: 0 0 20px 20px;
+    margin: 0 0 20px 20px;
     opacity: 0.7;
-    overflow-x: hidden;
+    overflow: hidden;
     padding: 10px;
     position: absolute;
-    leftz: 0;
+    left: 0;
     transition: box-shadow 0.3s;
     z-index: 100;
+}
 
-    margin: 0 20px 20px 0;
-    right: 0;
+.help-needhelp {
+    display: inline-block;
+}
+
+.help-contact {
+    display: inline-block;
+    margin-left: -1000px;
+    opacity: 0;
+    transition: all 0.5s, opacity 1.5s;
 }
 
 .help-container:hover {
     border-color: rgb(220,220,220);
     box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3);
-    opacity: 1.0;
+    opacity: 1;
 }
 
 .help-container:hover svg {
-    fill: rgb(28,168,221);
+    fill: rgb(68, 194, 64);
     transform: scale(1.5);
+}
+
+.help-container:hover .help-contact {
+    margin-left: 0;
+    opacity: 1;
 }
 
 .help-icon-container {

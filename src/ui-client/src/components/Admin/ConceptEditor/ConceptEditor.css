@@ -194,7 +194,8 @@
     margin-bottom: 0;
 }
 
-.concept-editor-column-right .leaf-input {
+.concept-editor-column-right .leaf-input,
+.concept-editor-column-right .leaf-input:read-only {
     background-color: rgba(28, 168, 221, 0.07) !important;
     border-bottom-color: transparent !important;
     font-size: 1.1rem;

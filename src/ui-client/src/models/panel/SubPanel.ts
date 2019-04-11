@@ -23,14 +23,13 @@ export interface SubPanelDTO extends BaseSubPanel {
  }
 
 export interface SubPanel extends BaseSubPanel {
-    panelIndex: number;
-    id: string;
-    index: number;
-    includeSubPanel: boolean;
-    joinSequence: SubPanelJoinSequence;
-    minimumCount: number;
-    dateFilter: DateFilter;
     panelItems: PanelItem[];
+    joinSequenceEventType?: JoinSequenceEventType;
+}
+
+export interface JoinSequenceEventType {
+    id: number;
+    name: string;
 }
 
 export const subPanelToDto = (subpanel: SubPanel): SubPanelDTO => {

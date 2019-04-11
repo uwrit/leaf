@@ -36,7 +36,7 @@ import { SavedQuery } from '../models/Query';
 
 const ANYTIME = 'Anytime';
 
-export function defaultPanelState(): Panel[] {
+export const defaultPanelState = (): Panel[] => {
     const defaultPanels: Panel[] = [];
     const defaultDateFilter: DateBoundary = {
         display: ANYTIME,
@@ -181,6 +181,12 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
                     subPanelIndex: subpanel.index,
                     specializations: []
                 });
+
+                // Add the Concept Event type if the subpanel doesn't already
+                // have one, and the Concept does.
+                if (concept.eventTypeId && !subpanel.joinSequenceEventType) {
+                    subpanel.joinSequenceEventType = { id: concept.eventTypeId, name: concept.uiDisplayEventName! };
+                }
             }
 
             // Add a new subpanel if the current last subpanel now has at least 1 panel item
@@ -190,11 +196,15 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
         case REMOVE_PANEL_ITEM:
 
             // Remove the selected panel item
-            const piIndex: number = action.panelItemIndex!;
-            subpanel.panelItems.splice(piIndex, 1);
+            subpanel.panelItems.splice(action.panelItemIndex!, 1);
+            const hasPi = subpanel.panelItems.length > 0;
+
+            if (!hasPi) {
+                subpanel.joinSequenceEventType = undefined;
+            }
 
             // Reset indexes and remove empty subpanels
-            if (subpanel.panelItems.length === 0 && subpanel.index > 0) { 
+            if (!hasPi && subpanel.index > 0) { 
                 newpanels[action.panelIndex].subPanels.splice(subpanel.index, 1);
             }
             resetSubPanelIndexes(panel);

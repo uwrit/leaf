@@ -42,7 +42,8 @@ export const panelHasErrors = (): boolean => {
     const dateFilterErrors = document.querySelector('.panel-date-filtered .panel-item-not-encounter-based');
     const countFilterErrors = document.querySelector('.panel-count-filtered .panel-item-not-encounter-based');
     const seqFilterErrors = document.querySelector('.panel-sequential-join .panel-item-not-encounter-based');
-    if (dateFilterErrors || countFilterErrors || seqFilterErrors) {
+    const eventTypeErrors = document.querySelector('.panel-item-invalid-eventid');
+    if (dateFilterErrors || countFilterErrors || seqFilterErrors || eventTypeErrors) {
         return true;
     }
     return false;
