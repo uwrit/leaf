@@ -131,7 +131,7 @@ namespace Services.Compiler
             return local;
         }
 
-        async Task<PreflightResources> GetPreflightResourcesAsync(IReadOnlyCollection<PanelDTO> panels)
+        async Task<PreflightResources> GetPreflightResourcesAsync(IEnumerable<PanelDTO> panels)
         {
             var requested = panels.SelectMany(p => p.SubPanels)
                                   .SelectMany(s => s.PanelItems)
@@ -141,7 +141,7 @@ namespace Services.Compiler
             return await preflightReader.GetAsync(resources);
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, IEnumerable<Concept> concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, IEnumerable<Concept> concepts)
         {
             if (user.IsInstutional)
             {
@@ -152,7 +152,7 @@ namespace Services.Compiler
             return GetPanels(panels, feder);
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, LocalConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, LocalConceptMap concepts)
         {
             var converted = new List<Panel>();
 
@@ -165,7 +165,7 @@ namespace Services.Compiler
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IReadOnlyCollection<SubPanelDTO> dtos, LocalConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<SubPanelDTO> dtos, LocalConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
@@ -179,7 +179,7 @@ namespace Services.Compiler
             return subs;
         }
 
-        IReadOnlyCollection<PanelItem> GetPanelItems(IReadOnlyCollection<PanelItemDTO> dtos, LocalConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<PanelItemDTO> dtos, LocalConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
@@ -192,7 +192,7 @@ namespace Services.Compiler
             return items;
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, FederatedConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, FederatedConceptMap concepts)
         {
             var converted = new List<Panel>();
 
@@ -205,7 +205,7 @@ namespace Services.Compiler
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IReadOnlyCollection<SubPanelDTO> dtos, FederatedConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<SubPanelDTO> dtos, FederatedConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
@@ -219,7 +219,7 @@ namespace Services.Compiler
             return subs;
         }
 
-        IReadOnlyCollection<PanelItem> GetPanelItems(IReadOnlyCollection<PanelItemDTO> dtos, FederatedConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<PanelItemDTO> dtos, FederatedConceptMap concepts)
         {
             var items = new List<PanelItem>();
 

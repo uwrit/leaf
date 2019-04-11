@@ -32,7 +32,7 @@ namespace DTO.Compiler
             };
         }
 
-        public static SubPanel ToModel(this SubPanelDTO dto, IReadOnlyCollection<PanelItem> items)
+        public static SubPanel ToModel(this SubPanelDTO dto, IEnumerable<PanelItem> items)
         {
             return new SubPanel
             {

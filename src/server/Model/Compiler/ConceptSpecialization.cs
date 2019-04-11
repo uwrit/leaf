@@ -12,27 +12,4 @@ namespace Model.Compiler
     {
         public string SqlSetWhere { get; set; }
     }
-
-    public class BaseConceptSpecialization
-    {
-        public Guid Id { get; set; }
-        public SpecializationUrn UniversalId { get; set; }
-        public int SpecializationGroupId { get; set; }
-        public string UiDisplayText { get; set; }
-        public int OrderId { get; set; }
-
-        public BaseConceptSpecialization()
-        {
-
-        }
-
-        public BaseConceptSpecialization(ConceptSpecialization cs)
-        {
-            Id = cs.Id;
-            UniversalId = cs.UniversalId;
-            SpecializationGroupId = cs.SpecializationGroupId;
-            UiDisplayText = cs.UiDisplayText;
-            OrderId = cs.OrderId;
-        }
-    }
 }

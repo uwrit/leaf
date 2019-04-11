@@ -20,8 +20,8 @@ namespace Services.Compiler
         public QueryUrn UniversalId { get; set; }
 
         public PreflightResources PreflightCheck { get; set; }
-        public IReadOnlyCollection<PanelDTO> Requested { get; set; }
-        public IReadOnlyCollection<Panel> Allowed { get; set; }
+        public IEnumerable<PanelDTO> Requested { get; set; }
+        public IEnumerable<Panel> Allowed { get; set; }
 
         public bool PreflightPassed => PreflightCheck.Ok;
 
@@ -34,7 +34,7 @@ namespace Services.Compiler
             Allowed = new Panel[] { };
         }
 
-        public PanelValidationContext(IQueryDefinition query, PreflightResources check, IReadOnlyCollection<Panel> allowed) : this(query, check)
+        public PanelValidationContext(IQueryDefinition query, PreflightResources check, IEnumerable<Panel> allowed) : this(query, check)
         {
             Allowed = allowed;
         }

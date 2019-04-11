@@ -5,14 +5,16 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class PanelItemDTO : BasePanelItem
+    public class PanelItemDTO : BasePanelItem, IPanelItemDTO
     {
         public string Id { get; set; }
         public ResourceRef Resource { get; set; }
         public IEnumerable<ConceptSpecializationDTO> Specializations { get; set; }
+        IEnumerable<IConceptSpecializationDTO> IPanelItemDTO.Specializations { get => Specializations; }
     }
 }

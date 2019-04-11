@@ -12,6 +12,6 @@ namespace DTO.Compiler
     public class SubPanelDTO : BaseSubPanel
     {
         public string Id { get; set; }
-        public IReadOnlyCollection<PanelItemDTO> PanelItems { get; set; }
+        public IEnumerable<PanelItemDTO> PanelItems { get; set; }
     }
 }

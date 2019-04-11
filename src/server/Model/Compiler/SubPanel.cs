@@ -11,7 +11,7 @@ namespace Model.Compiler
 {
     public class SubPanel : BaseSubPanel
     {
-        public IReadOnlyCollection<PanelItem> PanelItems { get; set; }
+        public IEnumerable<PanelItem> PanelItems { get; set; }
 
         bool? hasNonEncounter;
         public bool HasNonEncounter
