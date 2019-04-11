@@ -6,9 +6,8 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
     // Represents readonly operations on a tree-like data structure.
     public interface IConceptTreeReader

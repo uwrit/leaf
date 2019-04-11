@@ -5,11 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 
-// TODO(cspital) START HERE WRITE CODE TO MARSHAL THIS TO A MODEL GRAPH
-
 namespace Services.Compiler
 {
-    public class QueryPreflightCheckResultRecord
+    class QueryPreflightCheckResultRecord
     {
         // Query that depends on concept
         public Guid? QueryId { get; set; }

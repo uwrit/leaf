@@ -6,11 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    class SqlValidator
+    public class SqlValidator
     {
         readonly IEnumerable<string> illegalOps;
 

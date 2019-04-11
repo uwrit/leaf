@@ -77,14 +77,14 @@ namespace Services.Compiler
             EventTypeId = c.EventTypeId;
         }
 
-        public Concept ToConcept(IEnumerable<ConceptSpecializationGroup> groups)
+        public Concept Concept(IEnumerable<ConceptSpecializationGroup> groups)
         {
-            var concept = ToConcept();
+            var concept = Concept();
             concept.SpecializationGroups = groups;
             return concept;
         }
 
-        public Concept ToConcept()
+        public Concept Concept()
         {
             return new Concept
             {

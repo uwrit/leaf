@@ -56,7 +56,7 @@ namespace Services.Compiler
 
                 ThrowIfInvalid(record);
 
-                return record.ToDemographicQuery();
+                return record.DemographicQuery();
             }
         }
 

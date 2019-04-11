@@ -22,8 +22,6 @@ namespace Services.Compiler
 {
     public class ConceptPreflightService : IConceptPreflightService
     {
-        const string queryInternal = @"app.sp_InternalConceptPreflightCheck";
-
         readonly IUserContext user;
         readonly ILogger<ConceptPreflightService> logger;
         readonly AppDbOptions dbOpts;
@@ -53,12 +51,17 @@ namespace Services.Compiler
                 await cn.OpenAsync();
 
                 return await cn.QueryAsync<ConceptPreflightCheckResult>(
-                    queryInternal,
+                    Sql.QueryInternal,
                     new { ids = ResourceIdTable.From(concepts.Select(c => c.Id.Value)), user = user.UUID, groups = GroupMembership.From(user) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOpts.DefaultTimeout
                 );
             }
+        }
+
+        static class Sql
+        {
+            public const string QueryInternal = @"app.sp_InternalConceptPreflightCheck";
         }
     }
 }

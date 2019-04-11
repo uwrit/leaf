@@ -5,11 +5,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
-using Model.Compiler;
 using System.Collections.Generic;
 using Model.Tagging;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
     public interface IQueryService
     {

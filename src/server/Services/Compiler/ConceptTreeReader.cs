@@ -27,7 +27,6 @@ namespace Services.Compiler
     /// </summary>
     public class ConceptTreeReader : IConceptTreeReader
     {
-        // TODO(cspital) may not need these anymore
         const string querySingle = @"app.sp_GetConceptById";
         const string queryMany = @"app.sp_GetConceptsByIds";
         const string queryManyUniversal = @"app.sp_GetConceptsByUIds";
@@ -49,7 +48,6 @@ namespace Services.Compiler
             log = logger;
         }
 
-        // TODO(cspital) change to accept ConceptRef, delegate to internal
         public async Task<Concept> GetAsync(Guid id)
         {
             log.LogInformation("Getting Concept. Id:{Id}", id);

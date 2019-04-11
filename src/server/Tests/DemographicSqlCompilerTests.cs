@@ -52,7 +52,7 @@ namespace Tests
             var executionCtx = compiler.BuildDemographicSql(compilerCtx, false);
 
             Assert.Contains(ShapedDatasetCompilerContext.QueryIdParam, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
+            Assert.Contains(executionCtx.Parameters, p => p.Name == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
         }
 
         [Fact]

@@ -17,6 +17,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using Model.Authorization;
 
+// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
+
 namespace Services.Compiler.SqlServer
 {
     using PanelItemMapping = Tuple<PanelItemDTO, PanelItem>;
@@ -178,13 +180,13 @@ namespace Services.Compiler.SqlServer
                 var actual = filter.Filter.Length;
                 if (actual < expected)
                 {
-                    log.LogWarning("Numeric Filter Misalignment: Not enough arguments for NumericFilterType:{Type}. Payload:{Payload}", filter.FilterType.ToString(), mapping.Item1);
+                    log.LogWarning("Numeric Filter Misalignment: Not enough arguments for NumericFilterType:{Type}. Payload:{@Payload}", filter.FilterType.ToString(), mapping.Item1);
                     throw new InvalidOperationException($"Numeric Filter Misalignment: Missing Numeric Arguments.");
                 }
 
                 if (actual > expected)
                 {
-                    log.LogWarning("Numeric Filter Misalignment: Too many arguments for NumericFilterType:{Type}. Payload:{Payload}", filter.FilterType.ToString(), mapping.Item1);
+                    log.LogWarning("Numeric Filter Misalignment: Too many arguments for NumericFilterType:{Type}. Payload:{@Payload}", filter.FilterType.ToString(), mapping.Item1);
                     throw new InvalidOperationException($"Numeric Filter Misalignment: Excessive Numeric Arguments.");
                 }
             }

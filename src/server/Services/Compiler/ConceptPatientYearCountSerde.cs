@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace Services.Compiler
 {
-    public static class ConceptPatientYearCountSerde
+    static class ConceptPatientYearCountSerde
     {
         public static IEnumerable<ConceptPatientYearCount> Deserialize(string json)
         {

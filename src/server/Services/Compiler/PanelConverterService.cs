@@ -94,6 +94,7 @@ namespace Services.Compiler
             return new PanelValidationContext(query, resources, panels);
         }
 
+        // TODO(cspital) extract to own impl with no DTO dependencies?
         public QueryDefinitionDTO LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
             var local = new QueryDefinitionDTO { Panels = definition.Panels, PanelFilters = definition.PanelFilters };

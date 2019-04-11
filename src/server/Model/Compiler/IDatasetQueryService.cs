@@ -3,20 +3,17 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    public interface IPreflightResourceReader : IPreflightConceptReader
+    public interface IDatasetQueryService
     {
-        Task<PreflightResources> GetAsync(ResourceRefs refs);
-    }
-
-    public interface IPreflightConceptReader
-    {
-        Task<PreflightConcepts> GetAsync(ConceptRef @ref);
-        Task<PreflightConcepts> GetAsync(HashSet<ConceptRef> ids);
+        Task<IEnumerable<DatasetQuery>> GetQueries();
+        Task<DatasetQuery> GetQuery(DatasetQueryRef datasetQueryRef);
+        Task<CompilerValidationContext<DatasetCompilerContext>> GetQueryCompilerContext(DatasetExecutionRequest request);
     }
 }

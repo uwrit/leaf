@@ -86,7 +86,7 @@ namespace Services.Compiler
                 );
 
                 var records = grid.Read<DatasetQueryRecord>();
-                var map = records.ToDictionary(d => d.Id.Value, d => d.ToDatasetQuery());
+                var map = records.ToDictionary(d => d.Id.Value, d => d.DatasetQuery());
                 var tags = grid.Read<DatasetQueryTag>();
                 foreach (var tag in tags)
                 {
@@ -149,7 +149,7 @@ namespace Services.Compiler
         {
             var queryCtx = gridReader.ReadFirstOrDefault<QueryContext>();
             var datasetQueryRecord = gridReader.ReadFirstOrDefault<DatasetQueryRecord>();
-            var datasetQuery = datasetQueryRecord.ToDatasetQuery();
+            var datasetQuery = datasetQueryRecord.DatasetQuery();
 
             return new DatasetCompilerContext
             {

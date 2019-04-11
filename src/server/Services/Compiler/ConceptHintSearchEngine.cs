@@ -28,9 +28,6 @@ namespace Services.Compiler
     /// </summary>
     public class ConceptHintSearchEngine : IConceptHintSearchEngine
     {
-        const string query = @"app.sp_GetConceptHintsBySearchTerms";
-        const string queryEquivalent = @"app.sp_GetGeneralEquivalenceMapping";
-
         readonly AppDbOptions opts;
         readonly IUserContext user;
         readonly ILogger<ConceptHintSearchEngine> log;
@@ -54,7 +51,7 @@ namespace Services.Compiler
                 await cn.OpenAsync();
 
                 var equivalent = await cn.QueryFirstOrDefaultAsync<ConceptEquivalentHint>(
-                    queryEquivalent,
+                    Sql.QueryEquivalent,
                     new
                     {
                         source = term,
@@ -80,7 +77,7 @@ namespace Services.Compiler
                 await cn.OpenAsync();
 
                 var records = await cn.QueryAsync<ConceptHintRecord>(
-                    query,
+                    Sql.Query,
                     new
                     {
                         terms = SearchTermTable.From(terms),
@@ -93,8 +90,14 @@ namespace Services.Compiler
                     commandType: CommandType.StoredProcedure
                 );
 
-                return records.Select(r => r.ToConceptHint());
+                return records.Select(r => r.ConceptHint());
             }
+        }
+
+        static class Sql
+        {
+            public const string Query = @"app.sp_GetConceptHintsBySearchTerms";
+            public const string QueryEquivalent = @"app.sp_GetGeneralEquivalenceMapping";
         }
     }
 }

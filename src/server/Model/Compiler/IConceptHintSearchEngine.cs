@@ -5,16 +5,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using System.Text;
+using System.Threading.Tasks;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    static class ConceptHintTokenSerde
+    public interface IConceptHintSearchEngine
     {
-        public static IEnumerable<string> Deserialize(string json)
-        {
-            return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<List<string>>(json);
-        }
+        Task<IEnumerable<ConceptHint>> SearchAsync(Guid? rootParentId, params string[] terms);
+        Task<ConceptEquivalentHint> SearchEquivalentAsync(string term);
     }
 }
