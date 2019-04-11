@@ -23,7 +23,7 @@ namespace Model.Compiler
             return new ConceptSpecialization
             {
                 Id = Id,
-                UniversalId = SpecializationUrn.From(UniversalId), // TODO(cspital) need null protection here
+                UniversalId = SpecializationUrn.From(UniversalId),
                 SqlSetWhere = SqlSetWhere,
                 UiDisplayText = UiDisplayText,
                 SpecializationGroupId = SpecializationGroupId,

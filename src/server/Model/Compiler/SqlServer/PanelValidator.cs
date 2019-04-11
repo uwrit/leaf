@@ -5,23 +5,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using DTO.Compiler;
 using Model.Compiler;
-using Model.Cohort;
-using Services.Authorization;
-using Services.Extensions;
-using System.Security.Claims;
 using System.Linq;
-using Newtonsoft.Json;
 using Model.Authorization;
 
-// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
-
-namespace Services.Compiler.SqlServer
+namespace Model.Compiler.SqlServer
 {
-    using PanelItemMapping = Tuple<PanelItemDTO, PanelItem>;
+    using PanelItemMapping = Tuple<IPanelItemDTO, PanelItem>;
 
     public class SqlServerPanelValidator : IPanelValidator
     {
@@ -145,7 +136,7 @@ namespace Services.Compiler.SqlServer
                 if (spec.matches.Count() != 1)
                 {
                     var message = $"SpecializationId: {spec.specialization.Id} or UniversalId: {spec.specialization.UniversalId} invalid";
-                    log.LogWarning("Specialization Misalignment: {Message}. Payload:{Payload}", message, mapping.Item1);
+                    log.LogWarning("Specialization Misalignment: {Message}. Payload:{@Payload}", message, mapping.Item1);
                     throw new InvalidOperationException($"Specialization Misalignment: {message}.");
                 }
             }
@@ -161,7 +152,7 @@ namespace Services.Compiler.SqlServer
 
             if (item.RecencyFilter == RecencyFilterType.None)
             {
-                log.LogWarning("Recency Filter Misalignment: No Recency Type Selected. Payload:{Payload}", mapping.Item1);
+                log.LogWarning("Recency Filter Misalignment: No Recency Type Selected. Payload:{@Payload}", mapping.Item1);
                 throw new InvalidOperationException($"Recency Filter Misalignment: No Recency Type Selected.");
             }
         }

@@ -11,23 +11,31 @@ using System.Linq;
 
 namespace DTO.Cohort
 {
-    public class PatientCountQueryDTO : IQueryDefinition
+    public class PatientCountQueryDTO : IPatientCountQueryDTO
     {
         public string QueryId { get; set; }
-        public IReadOnlyCollection<PanelDTO> Panels { get; set; }
-        public IReadOnlyCollection<PanelFilterDTO> PanelFilters { get; set; }
+        public IEnumerable<PanelDTO> Panels { get; set; }
+        public IEnumerable<PanelFilterDTO> PanelFilters { get; set; }
 
-        IReadOnlyCollection<PanelDTO> all;
-        public IReadOnlyCollection<PanelDTO> All
+        IEnumerable<IPanelDTO> all;
+        IEnumerable<IPanelDTO> IQueryDefinition.All()
         {
-            get
+            if (all == null)
             {
-                if (all == null)
-                {
-                    all = this.MergeAll();
-                }
-                return all;
+                all = this.MergeAll();
             }
+            return all;
+        }
+
+        IEnumerable<IPanelDTO> IQueryDefinition.Panels
+        {
+            get => Panels;
+            set => Panels = value as IEnumerable<PanelDTO>;
+        }
+        IEnumerable<IPanelFilterDTO> IQueryDefinition.PanelFilters
+        {
+            get => PanelFilters;
+            set => PanelFilters = value as IEnumerable<PanelFilterDTO>;
         }
     }
 }

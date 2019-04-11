@@ -12,7 +12,7 @@ namespace DTO.Compiler
 {
     public static class CompilerDTOExtensions
     {
-        public static PanelItem ToModel(this PanelItemDTO dto, Concept concept)
+        public static PanelItem PanelItem(this IPanelItemDTO dto, Concept concept)
         {
             return new PanelItem
             {
@@ -32,7 +32,7 @@ namespace DTO.Compiler
             };
         }
 
-        public static SubPanel ToModel(this SubPanelDTO dto, IReadOnlyCollection<PanelItem> items)
+        public static SubPanel SubPanel(this ISubPanelDTO dto, IEnumerable<PanelItem> items)
         {
             return new SubPanel
             {
@@ -46,7 +46,7 @@ namespace DTO.Compiler
             };
         }
 
-        public static Panel ToModel(this PanelDTO dto, ICollection<SubPanel> subs)
+        public static Panel Panel(this IPanelDTO dto, ICollection<SubPanel> subs)
         {
             return new Panel
             {

@@ -8,13 +8,14 @@ using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class PanelFilterDTO
+    public class PanelFilterDTO : IPanelFilterDTO
     {
         public int Id { get; set; }
         public ConceptRefDTO Concept { get; set; }
         public bool IsInclusion { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplayDescription { get; set; }
+        IConceptRefDTO IPanelFilterDTO.Concept { get => Concept; set => Concept = value as ConceptRefDTO; }
 
         public PanelFilterDTO()
         {

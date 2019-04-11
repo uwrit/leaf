@@ -9,9 +9,10 @@ using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class SubPanelDTO : BaseSubPanel
+    public class SubPanelDTO : BaseSubPanel, ISubPanelDTO
     {
         public string Id { get; set; }
-        public IReadOnlyCollection<PanelItemDTO> PanelItems { get; set; }
+        public IEnumerable<PanelItemDTO> PanelItems { get; set; }
+        IEnumerable<IPanelItemDTO> ISubPanelDTO.PanelItems => PanelItems;
     }
 }

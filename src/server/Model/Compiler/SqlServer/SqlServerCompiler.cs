@@ -7,12 +7,13 @@ using System;
 using System.Text;
 using System.Linq;
 using Model.Compiler;
+using Model.Compiler.SqlServer;
 using Model.Options;
 using Model.Extensions;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 
-namespace Services.Compiler.SqlServer
+namespace Model.Compiler.SqlServer
 {
     public class SqlServerCompiler : ISqlCompiler
     {
@@ -85,7 +86,7 @@ namespace Services.Compiler.SqlServer
         {
             var sqlBuilder = new StringBuilder();
             var fieldPersonId = compilerOptions.FieldPersonId;
-            var totalItems = panel.SubPanels.ElementAt(0).PanelItems.Count;
+            var totalItems = panel.SubPanels.ElementAt(0).PanelItems.Count();
             var showType = !showPersonId;
 
             for (var k = 0; k < totalItems; k++)
@@ -171,7 +172,7 @@ namespace Services.Compiler.SqlServer
                 }
                 panelSql.Append("(");
 
-                for (int j = 0; j < subPanel.PanelItems.Count; j++)
+                for (int j = 0; j < subPanel.PanelItems.Count(); j++)
                 {
                     var itemConfig = new PanelItemContext
                     {
@@ -193,7 +194,7 @@ namespace Services.Compiler.SqlServer
                     panelSql.Append(itemSql);
 
                     // Add UNION ALL if other panel items follow
-                    if ((j + 1) < subPanel.PanelItems.Count)
+                    if ((j + 1) < subPanel.PanelItems.Count())
                     {
                         panelSql.Append($" {Dialect.SQL_UNIONALL} ");
                     }

@@ -9,12 +9,14 @@ using System.Collections.Generic;
 
 namespace DTO.Compiler
 {
-    public class PanelDTO : BasePanel
+    public class PanelDTO : BasePanel, IPanelDTO
     {
         public string Id { get; set; }
-        public IReadOnlyCollection<SubPanelDTO> SubPanels { get; set; }
+        public IEnumerable<SubPanelDTO> SubPanels { get; set; }
 
-        public static PanelDTO FromPanelFilterDTO(PanelFilterDTO filter, int panelIndex)
+        IEnumerable<ISubPanelDTO> IPanelDTO.SubPanels => SubPanels;
+
+        public static PanelDTO FromPanelFilterDTO(IPanelFilterDTO filter, int panelIndex)
         {
             return new PanelDTO
             {

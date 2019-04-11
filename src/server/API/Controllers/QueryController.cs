@@ -106,7 +106,12 @@ namespace API.Controllers
                 var query = panelValidator.Validate(ctx);
 
                 cancelToken.ThrowIfCancellationRequested();
-                var definition = panelConverter.LocalizeDefinition(querySave, query);
+
+                if (!user.IsInstutional)
+                {
+                    panelConverter.LocalizeDefinition(querySave, query);
+                }
+
 
                 var toSave = new QuerySave
                 {
@@ -114,7 +119,7 @@ namespace API.Controllers
                     UniversalId = ctx.UniversalId,
                     Name = querySave.Name,
                     Category = querySave.Category,
-                    Definition = QueryDefinitionDTO.JSON(definition),
+                    Definition = QueryDefinitionDTO.JSON(querySave),
                     Resources = query.Panels.GetResources()
                 };
                 if (querySave.Ver.HasValue)

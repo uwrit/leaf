@@ -6,27 +6,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class QuerySaveDTO : QueryDefinitionDTO, IQueryDefinition
+    public class QuerySaveDTO : QueryDefinitionDTO, IQuerySaveDTO
     {
         public string UniversalId { get; set; }
         public int? Ver { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
-
-        IReadOnlyCollection<PanelDTO> all;
-        public IReadOnlyCollection<PanelDTO> All
-        {
-            get
-            {
-                if (all == null)
-                {
-                    all = this.MergeAll();
-                }
-                return all;
-            }
-        }
     }
 }

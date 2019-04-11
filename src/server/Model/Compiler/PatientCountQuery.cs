@@ -12,6 +12,11 @@ namespace Model.Compiler
     public class PatientCountQuery
     {
         public Guid? QueryId { get; set; }
-        public IReadOnlyCollection<Panel> Panels { get; set; }
+        public IEnumerable<Panel> Panels { get; set; }
+    }
+
+    public interface IPatientCountQueryDTO : IQueryDefinition
+    {
+        string QueryId { get; }
     }
 }

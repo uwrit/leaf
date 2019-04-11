@@ -29,4 +29,12 @@ namespace Model.Compiler
             Ver = ver;
         }
     }
+
+    public interface IQuerySaveDTO : IQueryDefinition
+    {
+        string UniversalId { get; set; }
+        int? Ver { get; set; }
+        string Name { get; set; }
+        string Category { get; set; }
+    }
 }

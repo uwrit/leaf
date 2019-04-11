@@ -5,16 +5,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
-// TODO(cspital) rename and generalize this
-
-namespace Model.Cohort
+namespace Model.Compiler
 {
-    public class PatientDataRow
+    public interface IQueryDefinition
     {
-        public int NetworkRespondentId { get; set; }
-        public string InstitutionName { get; set; }
-        public string[] Values { get; set; }
+        IEnumerable<IPanelDTO> Panels { get; set; }
+        IEnumerable<IPanelFilterDTO> PanelFilters { get; set; }
+        IEnumerable<IPanelDTO> All();
     }
 }

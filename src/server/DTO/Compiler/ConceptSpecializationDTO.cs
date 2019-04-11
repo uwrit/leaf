@@ -8,7 +8,7 @@ using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class ConceptSpecializationDTO : BaseConceptSpecialization
+    public class ConceptSpecializationDTO : BaseConceptSpecialization, IConceptSpecializationDTO
     {
         public new string UniversalId { get; set; }
 

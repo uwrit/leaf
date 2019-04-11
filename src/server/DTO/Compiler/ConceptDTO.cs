@@ -61,7 +61,7 @@ namespace DTO.Compiler
         }
     }
 
-    public class ConceptRefDTO
+    public class ConceptRefDTO : IConceptRefDTO
     {
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }

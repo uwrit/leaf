@@ -17,6 +17,7 @@ using Serilog.Events;
 using Serilog.Sinks.RollingFile;
 using Serilog.Formatting.Json;
 using Serilog.Extensions.Logging;
+using API.Options;
 
 namespace API
 {
@@ -34,7 +35,7 @@ namespace API
                 )
                 .WriteTo.RollingFile(
                     formatter: new JsonFormatter(),
-                    pathFormat: Path.Combine(Environment.GetEnvironmentVariable("SERILOG_DIR"), "leaf-api-{Date}.log"),
+                    pathFormat: Path.Combine(Environment.GetEnvironmentVariable(Config.Logging.Directory), Config.Logging.FileTemplate),
                     restrictedToMinimumLevel: LogEventLevel.Information,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();

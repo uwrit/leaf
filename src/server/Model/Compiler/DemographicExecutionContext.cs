@@ -9,7 +9,7 @@ namespace Model.Compiler
 {
     public sealed class DemographicExecutionContext : ShapedDatasetExecutionContext
     {
-        public IEnumerable<SchemaFieldSelector> FieldSelectors { get; set; } // TODO(cspital) revert to internal set when refac ok
+        public IEnumerable<SchemaFieldSelector> FieldSelectors { get; internal set; }
 
         public DemographicExecutionContext(Shape shape, QueryContext queryContext) : base(shape, queryContext)
         {

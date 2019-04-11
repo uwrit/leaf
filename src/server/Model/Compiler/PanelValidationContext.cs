@@ -5,14 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using DTO.Compiler;
-using Model.Compiler;
-using DTO.Cohort;
 using Model.Tagging;
 
-// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
-
-namespace Services.Compiler
+namespace Model.Compiler
 {
     public class PanelValidationContext
     {
@@ -20,8 +15,8 @@ namespace Services.Compiler
         public QueryUrn UniversalId { get; set; }
 
         public PreflightResources PreflightCheck { get; set; }
-        public IReadOnlyCollection<PanelDTO> Requested { get; set; }
-        public IReadOnlyCollection<Panel> Allowed { get; set; }
+        public IEnumerable<IPanelDTO> Requested { get; set; }
+        public IEnumerable<Panel> Allowed { get; set; }
 
         public bool PreflightPassed => PreflightCheck.Ok;
 
@@ -30,11 +25,11 @@ namespace Services.Compiler
         public PanelValidationContext(IQueryDefinition query, PreflightResources check)
         {
             PreflightCheck = check;
-            Requested = query.All;
+            Requested = query.All();
             Allowed = new Panel[] { };
         }
 
-        public PanelValidationContext(IQueryDefinition query, PreflightResources check, IReadOnlyCollection<Panel> allowed) : this(query, check)
+        public PanelValidationContext(IQueryDefinition query, PreflightResources check, IEnumerable<Panel> allowed) : this(query, check)
         {
             Allowed = allowed;
         }

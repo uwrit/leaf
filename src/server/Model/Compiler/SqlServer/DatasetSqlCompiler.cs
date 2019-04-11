@@ -12,10 +12,9 @@ using Model.Cohort;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using Services.Cohort;
 using System.Diagnostics.Contracts;
 
-namespace Services.Compiler.SqlServer
+namespace Model.Compiler.SqlServer
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {

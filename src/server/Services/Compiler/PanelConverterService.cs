@@ -5,22 +5,16 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using DTO.Compiler;
-using System.Security.Claims;
-using Services.Authorization;
-using Services.Compiler;
-using Services.Extensions;
-using Model.Compiler;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Options;
-using DTO.Cohort;
 using Model.Authorization;
+using Model.Compiler;
 using Model.Extensions;
-using Model.Tagging;
+using Model.Options;
 
 /*
  * This is the main point of conversion for all embeddable resources.
@@ -36,8 +30,8 @@ using Model.Tagging;
 
 namespace Services.Compiler
 {
-    using LocalConceptMap = Dictionary<Guid, Concept>;
     using FederatedConceptMap = Dictionary<string, Concept>;
+    using LocalConceptMap = Dictionary<Guid, Concept>;
 
     public class PanelConverterService : IPanelConverterService
     {
@@ -45,23 +39,20 @@ namespace Services.Compiler
         readonly IPreflightResourceReader preflightReader;
         readonly ILogger<PanelConverterService> log;
         readonly CompilerOptions compilerOptions;
-        readonly AppDbOptions appDbOptions;
 
         public PanelConverterService(
             IPreflightResourceReader preflightConceptReader,
             IUserContext userContext,
             IOptions<CompilerOptions> compilerOptions,
-            IOptions<AppDbOptions> appDbOptions,
             ILogger<PanelConverterService> logger)
         {
             preflightReader = preflightConceptReader;
             user = userContext;
             this.compilerOptions = compilerOptions.Value;
-            this.appDbOptions = appDbOptions.Value;
             log = logger;
         }
 
-        public async Task<PanelValidationContext> GetPanelsAsync(PatientCountQueryDTO query, CancellationToken token)
+        public async Task<PanelValidationContext> GetPanelsAsync(IPatientCountQueryDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var validationContext = await GetPanelsAsync(query);
@@ -69,7 +60,7 @@ namespace Services.Compiler
             return validationContext;
         }
 
-        public async Task<PanelValidationContext> GetPanelsAsync(QuerySaveDTO query, CancellationToken token)
+        public async Task<PanelValidationContext> GetPanelsAsync(IQuerySaveDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             var validationContext = await GetPanelsAsync(query);
@@ -79,7 +70,7 @@ namespace Services.Compiler
 
         public async Task<PanelValidationContext> GetPanelsAsync(IQueryDefinition query)
         {
-            var resources = await GetPreflightResourcesAsync(query.All);
+            var resources = await GetPreflightResourcesAsync(query.All());
 
             if (!resources.Ok)
             {
@@ -89,18 +80,16 @@ namespace Services.Compiler
 
             var concepts = resources.Concepts(compilerOptions);
 
-            var panels = GetPanels(query.All, concepts);
+            var panels = GetPanels(query.All(), concepts);
 
             return new PanelValidationContext(query, resources, panels);
         }
 
-        // TODO(cspital) extract to own impl with no DTO dependencies?
-        public QueryDefinitionDTO LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
+        public void LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
-            var local = new QueryDefinitionDTO { Panels = definition.Panels, PanelFilters = definition.PanelFilters };
             if (user.IsInstutional)
             {
-                return local;
+                return;
             }
 
             var map = new Dictionary<string, ResourceRef>(localQuery.Panels
@@ -124,14 +113,13 @@ namespace Services.Compiler
             {
                 if (map.TryGetValue(filter.Concept.UniversalId, out var replFilterConcept))
                 {
+                    // TODO(cspital) decouple this from DTO
                     filter.Concept = new ConceptRefDTO { Id = replFilterConcept.Id, UniversalId = replFilterConcept.UniversalId };
                 }
             }
-
-            return local;
         }
 
-        async Task<PreflightResources> GetPreflightResourcesAsync(IReadOnlyCollection<PanelDTO> panels)
+        async Task<PreflightResources> GetPreflightResourcesAsync(IEnumerable<IPanelDTO> panels)
         {
             var requested = panels.SelectMany(p => p.SubPanels)
                                   .SelectMany(s => s.PanelItems)
@@ -141,7 +129,7 @@ namespace Services.Compiler
             return await preflightReader.GetAsync(resources);
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, IEnumerable<Concept> concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, IEnumerable<Concept> concepts)
         {
             if (user.IsInstutional)
             {
@@ -152,80 +140,80 @@ namespace Services.Compiler
             return GetPanels(panels, feder);
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, LocalConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, LocalConceptMap concepts)
         {
             var converted = new List<Panel>();
 
             foreach (var paneldto in panels)
             {
                 var subs = GetSubPanels(paneldto.SubPanels, concepts);
-                converted.Add(paneldto.ToModel(subs));
+                converted.Add(paneldto.Panel(subs));
             }
 
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IReadOnlyCollection<SubPanelDTO> dtos, LocalConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, LocalConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
             foreach (var subdto in dtos)
             {
                 var items = GetPanelItems(subdto.PanelItems, concepts);
-                var sub = subdto.ToModel(items);
+                var sub = subdto.SubPanel(items);
                 subs.Add(sub);
             }
 
             return subs;
         }
 
-        IReadOnlyCollection<PanelItem> GetPanelItems(IReadOnlyCollection<PanelItemDTO> dtos, LocalConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, LocalConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
             foreach (var itemdto in dtos)
             {
-                var item = itemdto.ToModel(concepts[itemdto.Resource.Id.Value]);
+                var item = itemdto.PanelItem(concepts[itemdto.Resource.Id.Value]);
                 items.Add(item);
             }
 
             return items;
         }
 
-        IReadOnlyCollection<Panel> GetPanels(IReadOnlyCollection<PanelDTO> panels, FederatedConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, FederatedConceptMap concepts)
         {
             var converted = new List<Panel>();
 
             foreach (var paneldto in panels)
             {
                 var subs = GetSubPanels(paneldto.SubPanels, concepts);
-                converted.Add(paneldto.ToModel(subs));
+                converted.Add(paneldto.Panel(subs));
             }
 
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IReadOnlyCollection<SubPanelDTO> dtos, FederatedConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, FederatedConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
             foreach (var subdto in dtos)
             {
                 var items = GetPanelItems(subdto.PanelItems, concepts);
-                var sub = subdto.ToModel(items);
+                var sub = subdto.SubPanel(items);
                 subs.Add(sub);
             }
 
             return subs;
         }
 
-        IReadOnlyCollection<PanelItem> GetPanelItems(IReadOnlyCollection<PanelItemDTO> dtos, FederatedConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, FederatedConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
             foreach (var itemdto in dtos)
             {
-                var item = itemdto.ToModel(concepts[itemdto.Resource.UniversalId]);
+                var item = itemdto.PanelItem(concepts[itemdto.Resource.UniversalId]);
                 items.Add(item);
             }
 

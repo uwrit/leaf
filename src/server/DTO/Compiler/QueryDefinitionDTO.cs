@@ -7,15 +7,37 @@ using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using Model.Compiler;
 
 namespace DTO.Compiler
 {
-    public class QueryDefinitionDTO
+    public class QueryDefinitionDTO : IQueryDefinition
     {
-        public IReadOnlyCollection<PanelDTO> Panels { get; set; }
-        public IReadOnlyCollection<PanelFilterDTO> PanelFilters { get; set; }
+        public IEnumerable<PanelDTO> Panels { get; set; }
+        public IEnumerable<PanelFilterDTO> PanelFilters { get; set; }
 
-        public static string JSON(QueryDefinitionDTO dto)
+        IEnumerable<IPanelDTO> all;
+        public IEnumerable<IPanelDTO> All()
+        {
+            if (all == null)
+            {
+                all = this.MergeAll();
+            }
+            return all;
+        }
+
+        IEnumerable<IPanelDTO> IQueryDefinition.Panels
+        {
+            get => Panels;
+            set => Panels = value as IEnumerable<PanelDTO>;
+        }
+        IEnumerable<IPanelFilterDTO> IQueryDefinition.PanelFilters
+        {
+            get => PanelFilters;
+            set => PanelFilters = value as IEnumerable<PanelFilterDTO>;
+        }
+
+        public static string JSON(IQueryDefinition dto)
         {
             return JsonConvert.SerializeObject(dto, new JsonSerializerSettings
             {

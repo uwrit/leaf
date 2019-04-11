@@ -8,7 +8,6 @@ using System.Collections.Generic;
 
 namespace Model.Cohort
 {
-    // TODO(cspital) move to model
     public class PartialPatientCountContext
     {
         public HashSet<string> PatientIds { get; set; }
