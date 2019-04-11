@@ -7,18 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Threading.Tasks;
 using System.Linq;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
-using Services.Authorization;
-using System.Security.Claims;
-using Services.Extensions;
 using Services.Tables;
-using Model.Authorization;
 
 namespace Services.Compiler
 {

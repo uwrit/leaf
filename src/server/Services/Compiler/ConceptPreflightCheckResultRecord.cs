@@ -8,6 +8,8 @@ using DTO.Compiler;
 using Model.Compiler;
 using Model.Tagging;
 
+// TODO(cspital) decouple this from DTO
+
 namespace Services.Compiler
 {
     class ConceptPreflightCheckResultRecord : ConceptPreflightCheckResultDTO

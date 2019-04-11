@@ -5,22 +5,16 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 using DTO.Compiler;
-using System.Security.Claims;
-using Services.Authorization;
-using Services.Compiler;
-using Services.Extensions;
-using Model.Compiler;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Options;
-using DTO.Cohort;
 using Model.Authorization;
+using Model.Compiler;
 using Model.Extensions;
-using Model.Tagging;
+using Model.Options;
 
 /*
  * This is the main point of conversion for all embeddable resources.
@@ -36,8 +30,8 @@ using Model.Tagging;
 
 namespace Services.Compiler
 {
-    using LocalConceptMap = Dictionary<Guid, Concept>;
     using FederatedConceptMap = Dictionary<string, Concept>;
+    using LocalConceptMap = Dictionary<Guid, Concept>;
 
     public class PanelConverterService : IPanelConverterService
     {
@@ -119,6 +113,7 @@ namespace Services.Compiler
             {
                 if (map.TryGetValue(filter.Concept.UniversalId, out var replFilterConcept))
                 {
+                    // TODO(cspital) decouple this from DTO
                     filter.Concept = new ConceptRefDTO { Id = replFilterConcept.Id, UniversalId = replFilterConcept.UniversalId };
                 }
             }

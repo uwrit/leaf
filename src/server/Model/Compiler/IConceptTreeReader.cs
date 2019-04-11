@@ -12,7 +12,6 @@ namespace Model.Compiler
     // Represents readonly operations on a tree-like data structure.
     public interface IConceptTreeReader
     {
-        // TODO(cspital) may not need these anymore
         Task<Concept> GetAsync(Guid id);
         Task<IEnumerable<Concept>> GetAsync(HashSet<Guid> ids);
         Task<IEnumerable<Concept>> GetAsync(HashSet<string> universalIds);

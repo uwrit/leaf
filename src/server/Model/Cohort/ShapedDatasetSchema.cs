@@ -8,8 +8,6 @@ using Model.Compiler;
 using System.Collections.Generic;
 using System.Linq;
 
-// TODO(cspital) write tests for this, make sure fields get pruned correctly
-
 namespace Model.Cohort
 {
     public class ShapedDatasetSchema : Schema<BaseSchemaField>
