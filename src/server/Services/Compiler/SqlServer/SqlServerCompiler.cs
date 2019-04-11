@@ -219,20 +219,6 @@ namespace Services.Compiler.SqlServer
                         panelSql.Append("(");
                     }
 
-                    if (subPanel.HasNonEncounter || subPanel.HasNonEvent)
-                    {
-                        if (subPanel.JoinSequence.SequenceType != SequenceType.Event && subPanel.HasNonEncounter)
-                        {
-                            nonEncounterJoinLogic = $"{Dialect.SQL_OR} {Dialect.ALIAS_SUBQUERY}{k}.isEncounterBased = 0) ";
-                            panelSql.Append("(");
-                        }
-                        else if (subPanel.JoinSequence.SequenceType == SequenceType.Event && subPanel.HasNonEvent)
-                        {
-                            nonEventJoinLogic = $"{Dialect.SQL_OR} {Dialect.ALIAS_SUBQUERY}{k}.isEventBased = 0) ";
-                            panelSql.Append("(");
-                        }
-                    }
-
                     // If same encounter as previous SubPanel
                     if (subPanel.JoinSequence.SequenceType == SequenceType.Encounter)
                     {
@@ -245,8 +231,8 @@ namespace Services.Compiler.SqlServer
                     {
                         // A0.EventId = A1.EventId
                         panelSql.Append(
-                            $"{PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k - 1}", prevSub.PanelItems.ElementAt(0).Concept.SqlFieldEventId)} = " +
-                            $"{PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", firstItem.Concept.SqlFieldEventId)} {nonEventJoinLogic} ");
+                            $"{PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k - 1}", prevSub.PanelItems.ElementAt(0).Concept.SqlFieldEvent)} = " +
+                            $"{PrependSetAlias($"{Dialect.ALIAS_SUBQUERY}{k}", firstItem.Concept.SqlFieldEvent)} {nonEventJoinLogic} ");
                     }
 
                     // If +/- date in previous SubPanel
@@ -381,7 +367,7 @@ namespace Services.Compiler.SqlServer
                 var eventBasedGroup = "";
                 if (ctx.PanelItem.Concept.IsEventBased)
                 {
-                    eventBasedGroup = $", {PrependSetAlias(itemAlias, ctx.PanelItem.Concept.SqlFieldEventId)}";
+                    eventBasedGroup = $", {PrependSetAlias(itemAlias, ctx.PanelItem.Concept.SqlFieldEvent)}";
                 }
 
                 groupByColumns += encounterBasedGroup + eventBasedGroup;
@@ -392,14 +378,11 @@ namespace Services.Compiler.SqlServer
                 // encounter column
                 targetColumn += ", " + (ctx.PanelItem.Concept.IsEncounterBased ? itemAlias + "." + compilerOptions.FieldEncounterId : compilerOptions.FieldEncounterId + " = NULL");
 
-                // isEncounterBased
-                targetColumn += ", IsEncounterBased = " + (ctx.PanelItem.Concept.IsEncounterBased ? "1" : "0");
-
                 // event ID column
-                targetColumn += ", " + (ctx.PanelItem.Concept.IsEventBased ? PrependSetAlias(itemAlias, ctx.PanelItem.Concept.SqlFieldEventId) : "NullEventField = CONVERT(NVARCHAR(50),NULL)");
-
-                // isEventBased
-                targetColumn += ", IsEventBased = " + (ctx.PanelItem.Concept.IsEventBased ? "1" : "0");
+                if (ctx.PanelItem.Concept.IsEventBased)
+                {
+                    targetColumn += ", " + PrependSetAlias(itemAlias, ctx.PanelItem.Concept.SqlFieldEvent);
+                }
             }
 
             // begin sql stitching

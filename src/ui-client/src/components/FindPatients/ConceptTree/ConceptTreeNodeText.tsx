@@ -86,7 +86,18 @@ class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
                     <span className={`${c}-count`}>
                         <GoPerson className={`${c}-icon ${c}-icon-lgm`} />
                         {concept.uiDisplayPatientCount}
-                    </span>}
+                    </span>
+                    }
+                    {concept.eventTypeId &&
+                    <span className={`${c}-event-name`}>
+                        {concept.uiDisplayEventName}
+                        <span className={`${c}-event-info`}>
+                            <span>This Concept is a type of </span><span className={`${c}-emphasis`}>{concept.uiDisplayEventName}</span>
+                            <span>. You can use these to create special queries linked specifically by the </span>
+                            <span className={`${c}-emphasis`}> Same {concept.uiDisplayEventName}</span>.
+                        </span>
+                    </span>
+                    }
                 </div>
             )
         );

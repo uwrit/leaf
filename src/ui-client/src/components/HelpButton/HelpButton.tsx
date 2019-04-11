@@ -33,7 +33,9 @@ export default class HelpButton extends React.PureComponent<Props> {
                     <MdTagFaces />
                 </div>
                 <div className={`${c}-inner`}>
-                    <span>Need Help? <a href={`mailto:${email}`}>Contact a Leaf administrator</a></span>
+                    <div>
+                        <div className={`${c}-needhelp`}>Need Help?</div> <div className={`${c}-contact`}><a href={`mailto:${email}`}>Contact a Leaf administrator</a></div>
+                    </div>
                 </div>
             </div>
         )

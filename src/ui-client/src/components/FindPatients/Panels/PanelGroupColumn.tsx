@@ -63,7 +63,7 @@ class PanelGroupColumn extends React.Component<Props> {
                         header: "Query error",
                         body: 
                             (<div>
-                                <p>It looks like your query has an error. This is usually due to trying to filter a concept by dates or counts that doesn't have any dates (such as demographics).</p>
+                                <p>It looks like your query has an error. This may be due to trying to filter a Concept by dates or counts that doesn't have any dates (such as demographics).</p>
                                 <p>Double-check your query to make sure everything looks okay and try again.</p>
                             </div>),
                         show: true

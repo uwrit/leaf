@@ -29,7 +29,7 @@ interface State {
  */
 const joinSequenceTypes = new Map([
     [ SequenceType.Encounter, { display: 'In the Same Encounter', type: SequenceType.Encounter }],
-    [ SequenceType.Event, { display: 'In the Same Event', type: SequenceType.Event }],
+    [ SequenceType.Event, { display: 'In the Same', type: SequenceType.Event }],
     [ SequenceType.PlusMinus, { display: 'Within +/-', type: SequenceType.PlusMinus }],
     [ SequenceType.WithinFollowing, { display: 'In the Following', type: SequenceType.WithinFollowing }],
     [ SequenceType.AnytimeFollowing, { display: 'Anytime After', type: SequenceType.AnytimeFollowing }]
@@ -72,14 +72,14 @@ export default class SameSequenceDropdown extends React.PureComponent<Props, Sta
                         In the Same Encounter
                     </DropdownItem>
 
-                    {/* Same Event (hidden for now) */}
-                    {/*
+                    {/* Same Event */}
+                    {subPanel.joinSequenceEventType &&
                     <DropdownItem 
                         className={eventClasses}
-                        onClick={this.handleDropdownSelect}>
-                        In the Same Event
-                    </DropdownItem>*
-                    /}
+                        onClick={this.handleDropdownSelect.bind(null, SequenceType.Event)}>
+                        In the Same {subPanel.joinSequenceEventType.name}
+                    </DropdownItem>
+                    }
 
                     {/* Within +/- */}
                     <div 
@@ -141,18 +141,19 @@ export default class SameSequenceDropdown extends React.PureComponent<Props, Sta
      * (e.g., 'Within +/- 3 Days', 'In the Same Encounter').
      */
     private setDisplayText = () => {
+        const { subPanel } = this.props;
         const reg = /^\w/;
-        const sequence = this.props.subPanel.joinSequence; 
+        const sequence = subPanel.joinSequence; 
         const text = [ joinSequenceTypes.get(sequence.sequenceType)!.display ];
 
-        if (sequence.sequenceType === SequenceType.PlusMinus || 
-            sequence.sequenceType === SequenceType.WithinFollowing 
-        ) {
+        if (sequence.sequenceType === SequenceType.PlusMinus || sequence.sequenceType === SequenceType.WithinFollowing ) {
             text.push(`${sequence.increment === null ? 0 : sequence.increment} 
                 ${DateIncrementType[sequence.dateIncrementType]
                     .toString()
                     .toLowerCase()
                     .replace(reg, (c: string) => c.toUpperCase())}${sequence.increment === 1 ? '' : 's'}`);
+        } else if (sequence.sequenceType === SequenceType.Event) {
+            text.push(subPanel.joinSequenceEventType!.name);
         }
         return text.join(' ');
     }

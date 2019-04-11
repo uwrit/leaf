@@ -68,7 +68,7 @@ class SubPanel extends React.Component<Props> {
         // Set PanelItems and -or- objects
         for (let i = 0; i < totalPanelItems; i++) {
             panelItem = subPanel.panelItems[i];
-            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch}/>);
+            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch} subPanel={subPanel}/>);
 
             // Add -or- if necessary
             if (subPanel.panelItems[i+1] &&         // Followed by another panelItem

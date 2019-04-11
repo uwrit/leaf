@@ -295,6 +295,7 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
      */
     if (newParent.childrenIds) {
         newParent.childrenIds!.add(concept.id);
+        newParent.isOpen = true;
     } else {
         newParent.childrenIds = new Set([ concept.id ]);
     }

@@ -14,6 +14,7 @@ import { compose } from 'redux';
 import getDragPreview from '../../../utils/getDragPreview';
 import PanelItemNumericFilter from './PanelItemNumericFilter';
 import ConceptSpecializationGroup from './ConceptSpecializationGroup';
+import { SubPanel, SequenceType } from '../../../models/panel/SubPanel';
 
 interface DndProps {
     connectDragSource?: ConnectDragSource;
@@ -23,8 +24,9 @@ interface DndProps {
 }
 
 interface OwnProps {
-    panelItem: PanelItemModel;
     dispatch: any;
+    panelItem: PanelItemModel;
+    subPanel: SubPanel;
 }
 
 type Props = DndProps & OwnProps
@@ -61,6 +63,7 @@ const collect = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
 };
 
 export class PanelItem extends React.Component<Props> {
+    private className = 'panel-item';
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -77,19 +80,27 @@ export class PanelItem extends React.Component<Props> {
     }
     
     public render(): any {
-        const { connectDragSource, dispatch, panelItem } = this.props;
+        const { connectDragSource, dispatch, panelItem, subPanel } = this.props;
         const { concept, specializations } = panelItem;
-        const classes = [ 'panel-item' ]; 
+        const c = this.className;
+        const classes = [ c ]; 
+        const eventJoin = subPanel.joinSequenceEventType;
+        const eventId = panelItem.concept.eventTypeId;
+        const invalidEventId = 
+            eventJoin && 
+            subPanel.joinSequence.sequenceType === SequenceType.Event && 
+            eventJoin.id !== eventId;
         
         if (panelItem.hidden)          classes.push('hidden');
-        if (!concept.isEncounterBased) classes.push('panel-item-not-encounter-based'); 
-        else                           classes.push('panel-item-encounter-based');
+        if (invalidEventId)            classes.push(`${c}-invalid-eventid`);
+        if (!concept.isEncounterBased) classes.push(`${c}-not-encounter-based`); 
+        else                           classes.push(`${c}-encounter-based`);
 
         return (
             connectDragSource &&
             connectDragSource(
                 <div className={classes.join(' ')}>
-                    <span>{concept.uiDisplayText}</span>
+                    <span className={`${c}-text`}>{concept.uiDisplayText}</span>
                     {concept.isSpecializable && concept.specializationGroups &&
                      concept.specializationGroups.map((g) => (
                         <ConceptSpecializationGroup 
@@ -102,6 +113,12 @@ export class PanelItem extends React.Component<Props> {
                     ))}
                     {concept.isNumeric &&
                     <PanelItemNumericFilter panelItem={panelItem} dispatch={dispatch}/>
+                    }
+                    {invalidEventId &&
+                    <span className={`${c}-invalid-eventid-info`}>
+                        Whoops! This query is linked by <span className={`${c}-emphasis`}>{subPanel.joinSequenceEventType!.name}</span>
+                        , but this Concept doesn't seem to be the right type. Please fix this before running a query.
+                    </span>
                     }
                 </div>
             )

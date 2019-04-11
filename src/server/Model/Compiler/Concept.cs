@@ -26,7 +26,7 @@ namespace Model.Compiler
         public string SqlSetWhere { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldNumeric { get; set; }
-        public string SqlFieldEventId { get; set; }
+        public string SqlFieldEvent { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }

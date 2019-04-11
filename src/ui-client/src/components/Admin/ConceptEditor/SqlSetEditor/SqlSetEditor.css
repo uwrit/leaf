@@ -227,6 +227,14 @@
     margin-top: 15px;
 }
 
+.sqlset-editor-input-column:first-child .position-relative.form-group {
+    margin-top: 6px;
+}
+
+.sqlset-editor-input-container > .container {
+    margin-top: 4px;
+}
+
 /* Delete Specialization Group */
 .sqlset-editor-specializationgroup-delete {
     margin-top: -5px;

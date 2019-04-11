@@ -31,7 +31,7 @@ namespace Services.Compiler
         public string SqlSetWhere { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldNumeric { get; set; }
-        public string SqlFieldEventId { get; set; }
+        public string SqlFieldEvent { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }
@@ -64,7 +64,7 @@ namespace Services.Compiler
             SqlSetWhere = c.SqlSetWhere;
             SqlFieldDate = c.SqlFieldDate;
             SqlFieldNumeric = c.SqlFieldNumeric;
-            SqlFieldEventId = c.SqlFieldEventId;
+            SqlFieldEvent = c.SqlFieldEvent;
             UiDisplayName = c.UiDisplayName;
             UiDisplayText = c.UiDisplayText;
             UiDisplaySubtext = c.UiDisplaySubtext;
@@ -104,7 +104,7 @@ namespace Services.Compiler
                 SqlSetWhere = SqlSetWhere,
                 SqlFieldDate = SqlFieldDate,
                 SqlFieldNumeric = SqlFieldNumeric,
-                SqlFieldEventId = SqlFieldEventId,
+                SqlFieldEvent = SqlFieldEvent,
                 UiDisplayName = UiDisplayName,
                 UiDisplayText = UiDisplayText,
                 UiDisplaySubtext = UiDisplaySubtext,
