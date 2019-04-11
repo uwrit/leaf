@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace Services.Compiler
 {
-    public class DemographicQueryRecord
+    class DemographicQueryRecord
     {
         public string SqlStatement { get; set; }
 
@@ -20,7 +20,7 @@ namespace Services.Compiler
             SqlStatement = query.SqlStatement;
         }
 
-        public DemographicQuery ToDemographicQuery()
+        public DemographicQuery DemographicQuery()
         {
             return new DemographicQuery
             {

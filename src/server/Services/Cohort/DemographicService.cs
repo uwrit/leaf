@@ -55,7 +55,7 @@ namespace Services.Cohort
         async Task<PatientDemographicContext> ExecuteDemographicsAsync(DemographicExecutionContext context, CancellationToken token)
         {
             var sql = context.CompiledQuery;
-            var parameters = context.Parameters.ToArray();
+            var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
 
             using (var cn = new SqlConnection(opts.ConnectionString))

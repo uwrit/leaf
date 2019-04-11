@@ -4,12 +4,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    public interface IDatasetSqlCompiler
+    public class LeafPreflightException : ApplicationException
     {
-        DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext context);
+        public LeafPreflightException()
+        {
+        }
+
+        public LeafPreflightException(string message) : base(message)
+        {
+        }
+
+        public LeafPreflightException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
     }
 }

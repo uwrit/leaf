@@ -118,7 +118,7 @@ namespace Services.Compiler.SqlServer
                 return new DatasetDateFilter
                 {
                     Clause = clause,
-                    Parameters = new SqlParameter[] { new SqlParameter(lateParamName, now) }
+                    Parameters = new QueryParameter[] { new QueryParameter(lateParamName, now) }
                 };
             }
 
@@ -129,10 +129,10 @@ namespace Services.Compiler.SqlServer
                 return new DatasetDateFilter
                 {
                     Clause = clause,
-                    Parameters = new SqlParameter[]
+                    Parameters = new QueryParameter[]
                     {
-                        new SqlParameter(earlyParamName, early.Value),
-                        new SqlParameter(lateParamName, late.Value)
+                        new QueryParameter(earlyParamName, early.Value),
+                        new QueryParameter(lateParamName, late.Value)
                     }
                 };
             }
@@ -145,10 +145,10 @@ namespace Services.Compiler.SqlServer
                 return new DatasetDateFilter
                 {
                     Clause = clause,
-                    Parameters = new SqlParameter[]
+                    Parameters = new QueryParameter[]
                     {
-                        new SqlParameter(earlyParamName, early.Value),
-                        new SqlParameter(lateParamName, now)
+                        new QueryParameter(earlyParamName, early.Value),
+                        new QueryParameter(lateParamName, now)
                     }
                 };
             }
@@ -160,7 +160,7 @@ namespace Services.Compiler.SqlServer
                 return new DatasetDateFilter
                 {
                     Clause = clause,
-                    Parameters = new SqlParameter[] { new SqlParameter(lateParamName, late.Value) }
+                    Parameters = new QueryParameter[] { new QueryParameter(lateParamName, late.Value) }
                 };
             }
         }
@@ -209,6 +209,6 @@ namespace Services.Compiler.SqlServer
     class DatasetDateFilter
     {
         public string Clause { get; set; }
-        public ICollection<SqlParameter> Parameters { get; set; }
+        public ICollection<QueryParameter> Parameters { get; set; }
     }
 }

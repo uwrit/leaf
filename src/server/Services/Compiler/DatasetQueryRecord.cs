@@ -10,7 +10,7 @@ using Model.Tagging;
 
 namespace Services.Compiler
 {
-    public class DatasetQueryRecord
+    class DatasetQueryRecord
     {
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }
@@ -36,7 +36,7 @@ namespace Services.Compiler
             SqlStatement = dq.SqlStatement;
         }
 
-        public DatasetQuery ToDatasetQuery()
+        public DatasetQuery DatasetQuery()
         {
             return new DatasetQuery
             {
@@ -51,7 +51,7 @@ namespace Services.Compiler
         }
     }
 
-    public class DatasetQueryTag
+    class DatasetQueryTag
     {
         public Guid? Id { get; set; }
         public string Tag { get; set; }

@@ -4,22 +4,21 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Runtime.Serialization;
-
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    public class LeafPreflightException : ApplicationException
+    public class QueryParameter
     {
-        public LeafPreflightException()
+        public string Name { get; set; }
+        public object Value { get; set; }
+
+        public QueryParameter()
         {
         }
 
-        public LeafPreflightException(string message) : base(message)
+        public QueryParameter(string parameterName, object value)
         {
-        }
-
-        public LeafPreflightException(string message, Exception innerException) : base(message, innerException)
-        {
+            Name = parameterName;
+            Value = value;
         }
     }
 }

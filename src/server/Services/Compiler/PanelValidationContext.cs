@@ -10,6 +10,8 @@ using Model.Compiler;
 using DTO.Cohort;
 using Model.Tagging;
 
+// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
+
 namespace Services.Compiler
 {
     public class PanelValidationContext

@@ -12,7 +12,7 @@ namespace Services.Compiler
 {
     class ConceptPreflightCheckResultRecord : ConceptPreflightCheckResultDTO
     {
-        internal ConceptPreflightCheckResult ToConceptPreflightCheckResult()
+        public ConceptPreflightCheckResult ConceptPreflightCheckResult()
         {
             ConceptUrn.TryParse(UniversalId, out var urn);
             return new ConceptPreflightCheckResult

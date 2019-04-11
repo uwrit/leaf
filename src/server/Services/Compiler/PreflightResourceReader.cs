@@ -204,7 +204,7 @@ namespace Services.Compiler
 
             return new PreflightConcepts
             {
-                PreflightCheck = new ConceptPreflightCheck { Results = preflight.Select(p => p.ToConceptPreflightCheckResult()) },
+                PreflightCheck = new ConceptPreflightCheck { Results = preflight.Select(p => p.ConceptPreflightCheckResult()) },
                 Concepts = concepts?.ToArray()
             };
         }

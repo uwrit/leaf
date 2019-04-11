@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using Model.Compiler;
 using Model.Cohort;
 
+// TODO(cspital) this cannot be moved until we eliminate the dependency on the DTO project.
+
 namespace Services.Compiler
 {
     public interface IPanelValidator

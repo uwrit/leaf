@@ -4,11 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
-    class PanelItemContext
+    public class PanelItemContext
     {
         public PanelItem PanelItem { get; set; }
         public bool SubPanelHasNonEncounter { get; set; }

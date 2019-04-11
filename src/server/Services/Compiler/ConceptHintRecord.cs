@@ -10,12 +10,12 @@ using System.Text;
 
 namespace Services.Compiler
 {
-    public class ConceptHintRecord
+    class ConceptHintRecord
     {
         public Guid ConceptId { get; set; }
         public string JsonTokens { get; set; }
 
-        public ConceptHint ToConceptHint()
+        public ConceptHint ConceptHint()
         {
             return new ConceptHint
             {

@@ -4,19 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Data.SqlClient;
 using System.Collections.Generic;
-using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
     public abstract class ShapedDatasetExecutionContext
     {
         public Shape Shape { get; }
-        public string CompiledQuery { get; internal set; }
+        public string CompiledQuery { get; set; } // TODO(cspital) revert to internal set when refac ok
 
-        readonly List<SqlParameter> parameters;
-        public IEnumerable<SqlParameter> Parameters => parameters;
+        readonly List<QueryParameter> parameters;
+        public IEnumerable<QueryParameter> Parameters => parameters;
 
         public QueryContext QueryContext { get; }
 
@@ -24,25 +22,25 @@ namespace Services.Compiler
         {
             Shape = shape;
             QueryContext = queryContext;
-            parameters = new List<SqlParameter>();
+            parameters = new List<QueryParameter>();
         }
 
         public void AddParameter(string parameterName, DateTime value)
         {
-            parameters.Add(new SqlParameter(parameterName, value));
+            parameters.Add(new QueryParameter(parameterName, value));
         }
 
         public void AddParameter(string parameterName, Guid value)
         {
-            parameters.Add(new SqlParameter(parameterName, value));
+            parameters.Add(new QueryParameter(parameterName, value));
         }
 
-        public void AddParameter(SqlParameter parameter)
+        public void AddParameter(QueryParameter parameter)
         {
             parameters.Add(parameter);
         }
 
-        public void AddParameters(IEnumerable<SqlParameter> sqlParameters)
+        public void AddParameters(IEnumerable<QueryParameter> sqlParameters)
         {
             parameters.AddRange(sqlParameters);
         }

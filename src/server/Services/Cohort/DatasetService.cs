@@ -54,7 +54,7 @@ namespace Services.Cohort
         async Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token)
         {
             var sql = context.CompiledQuery;
-            var parameters = context.Parameters.ToArray();
+            var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
 
             using (var cn = new SqlConnection(opts.ConnectionString))

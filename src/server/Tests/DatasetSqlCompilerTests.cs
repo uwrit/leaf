@@ -64,7 +64,7 @@ namespace Tests
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ShapedDatasetCompilerContext.QueryIdParam, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
+            Assert.Contains(executionCtx.Parameters, p => p.Name == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
         }
 
         [Fact]
@@ -76,7 +76,7 @@ namespace Tests
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace Tests
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
         }
 
         [Fact]
@@ -100,8 +100,8 @@ namespace Tests
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@early");
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@early");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
         }
 
         [Fact]
@@ -113,8 +113,8 @@ namespace Tests
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@early");
-            Assert.Contains(executionCtx.Parameters, p => p.ParameterName == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@early");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
         }
 
         [Fact]

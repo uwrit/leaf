@@ -4,13 +4,28 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using Model.Compiler;
+using Services.Compiler;
 
 namespace Services.Extensions
 {
     public static class SqlServerExtensions
     {
+        public static SqlParameter[] SqlParameters(this ShapedDatasetExecutionContext ctx)
+        {
+            return ctx.Parameters.SqlParameters();
+        }
+
+        public static SqlParameter SqlParameter(this QueryParameter p) => new SqlParameter(p.Name, p.Value);
+
+        public static SqlParameter[] SqlParameters(this IEnumerable<QueryParameter> ps)
+        {
+            return ps.Select(p => p.SqlParameter()).ToArray();
+        }
+
         /// <summary>
         /// Parameterizes a query with an IN clause and a list of values.
         /// </summary>
