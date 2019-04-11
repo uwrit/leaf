@@ -20,7 +20,7 @@ namespace Services.Compiler
         public QueryUrn UniversalId { get; set; }
 
         public PreflightResources PreflightCheck { get; set; }
-        public IEnumerable<PanelDTO> Requested { get; set; }
+        public IEnumerable<IPanelDTO> Requested { get; set; }
         public IEnumerable<Panel> Allowed { get; set; }
 
         public bool PreflightPassed => PreflightCheck.Ok;

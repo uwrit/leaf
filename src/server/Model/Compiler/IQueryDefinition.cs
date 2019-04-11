@@ -6,15 +6,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Model.Compiler;
 
-namespace DTO.Compiler
+namespace Model.Compiler
 {
-    public class PanelItemDTO : BasePanelItem, IPanelItemDTO
+    public interface IQueryDefinition
     {
-        public string Id { get; set; }
-        public ResourceRef Resource { get; set; }
-        public IEnumerable<ConceptSpecializationDTO> Specializations { get; set; }
-        IEnumerable<IConceptSpecializationDTO> IPanelItemDTO.Specializations => Specializations;
+        IEnumerable<IPanelDTO> Panels { get; set; }
+        IEnumerable<IPanelFilterDTO> PanelFilters { get; set; }
+        IEnumerable<IPanelDTO> All { get; }
     }
 }

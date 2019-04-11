@@ -12,8 +12,8 @@ namespace DTO.Compiler
 {
     public class QueryDefinitionDTO
     {
-        public IReadOnlyCollection<PanelDTO> Panels { get; set; }
-        public IReadOnlyCollection<PanelFilterDTO> PanelFilters { get; set; }
+        public IEnumerable<PanelDTO> Panels { get; set; }
+        public IEnumerable<PanelFilterDTO> PanelFilters { get; set; }
 
         public static string JSON(QueryDefinitionDTO dto)
         {

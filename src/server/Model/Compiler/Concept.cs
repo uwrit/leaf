@@ -57,6 +57,14 @@ namespace Model.Compiler
         }
     }
 
+    public interface IConceptRefDTO
+    {
+        Guid? Id { get; set; }
+        string UniversalId { get; set; }
+
+        bool UseUniversalId { get; }
+    }
+
     public class ConceptRef
     {
         public Guid? Id { get; set; }

@@ -14,11 +14,11 @@ namespace DTO.Cohort
     public class PatientCountQueryDTO : IQueryDefinition
     {
         public string QueryId { get; set; }
-        public IReadOnlyCollection<PanelDTO> Panels { get; set; }
-        public IReadOnlyCollection<PanelFilterDTO> PanelFilters { get; set; }
+        public IEnumerable<PanelDTO> Panels { get; set; }
+        public IEnumerable<PanelFilterDTO> PanelFilters { get; set; }
 
-        IReadOnlyCollection<PanelDTO> all;
-        public IReadOnlyCollection<PanelDTO> All
+        IEnumerable<IPanelDTO> all;
+        public IEnumerable<IPanelDTO> All
         {
             get
             {
@@ -28,6 +28,17 @@ namespace DTO.Cohort
                 }
                 return all;
             }
+        }
+
+        IEnumerable<IPanelDTO> IQueryDefinition.Panels
+        {
+            get => Panels;
+            set => Panels = value as IEnumerable<PanelDTO>;
+        }
+        IEnumerable<IPanelFilterDTO> IQueryDefinition.PanelFilters
+        {
+            get => PanelFilters;
+            set => PanelFilters = value as IEnumerable<PanelFilterDTO>;
         }
     }
 }

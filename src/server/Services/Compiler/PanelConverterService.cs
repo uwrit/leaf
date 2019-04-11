@@ -97,7 +97,7 @@ namespace Services.Compiler
         // TODO(cspital) extract to own impl with no DTO dependencies?
         public QueryDefinitionDTO LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
-            var local = new QueryDefinitionDTO { Panels = definition.Panels, PanelFilters = definition.PanelFilters };
+            var local = new QueryDefinitionDTO { Panels = definition.Panels as IEnumerable<PanelDTO>, PanelFilters = definition.PanelFilters as IEnumerable<PanelFilterDTO> };
             if (user.IsInstutional)
             {
                 return local;
@@ -131,7 +131,7 @@ namespace Services.Compiler
             return local;
         }
 
-        async Task<PreflightResources> GetPreflightResourcesAsync(IEnumerable<PanelDTO> panels)
+        async Task<PreflightResources> GetPreflightResourcesAsync(IEnumerable<IPanelDTO> panels)
         {
             var requested = panels.SelectMany(p => p.SubPanels)
                                   .SelectMany(s => s.PanelItems)
@@ -141,7 +141,7 @@ namespace Services.Compiler
             return await preflightReader.GetAsync(resources);
         }
 
-        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, IEnumerable<Concept> concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, IEnumerable<Concept> concepts)
         {
             if (user.IsInstutional)
             {
@@ -152,80 +152,80 @@ namespace Services.Compiler
             return GetPanels(panels, feder);
         }
 
-        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, LocalConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, LocalConceptMap concepts)
         {
             var converted = new List<Panel>();
 
             foreach (var paneldto in panels)
             {
                 var subs = GetSubPanels(paneldto.SubPanels, concepts);
-                converted.Add(paneldto.ToModel(subs));
+                converted.Add(paneldto.Panel(subs));
             }
 
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IEnumerable<SubPanelDTO> dtos, LocalConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, LocalConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
             foreach (var subdto in dtos)
             {
                 var items = GetPanelItems(subdto.PanelItems, concepts);
-                var sub = subdto.ToModel(items);
+                var sub = subdto.SubPanel(items);
                 subs.Add(sub);
             }
 
             return subs;
         }
 
-        IEnumerable<PanelItem> GetPanelItems(IEnumerable<PanelItemDTO> dtos, LocalConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, LocalConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
             foreach (var itemdto in dtos)
             {
-                var item = itemdto.ToModel(concepts[itemdto.Resource.Id.Value]);
+                var item = itemdto.PanelItem(concepts[itemdto.Resource.Id.Value]);
                 items.Add(item);
             }
 
             return items;
         }
 
-        IEnumerable<Panel> GetPanels(IEnumerable<PanelDTO> panels, FederatedConceptMap concepts)
+        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, FederatedConceptMap concepts)
         {
             var converted = new List<Panel>();
 
             foreach (var paneldto in panels)
             {
                 var subs = GetSubPanels(paneldto.SubPanels, concepts);
-                converted.Add(paneldto.ToModel(subs));
+                converted.Add(paneldto.Panel(subs));
             }
 
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IEnumerable<SubPanelDTO> dtos, FederatedConceptMap concepts)
+        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, FederatedConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
             foreach (var subdto in dtos)
             {
                 var items = GetPanelItems(subdto.PanelItems, concepts);
-                var sub = subdto.ToModel(items);
+                var sub = subdto.SubPanel(items);
                 subs.Add(sub);
             }
 
             return subs;
         }
 
-        IEnumerable<PanelItem> GetPanelItems(IEnumerable<PanelItemDTO> dtos, FederatedConceptMap concepts)
+        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, FederatedConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
             foreach (var itemdto in dtos)
             {
-                var item = itemdto.ToModel(concepts[itemdto.Resource.UniversalId]);
+                var item = itemdto.PanelItem(concepts[itemdto.Resource.UniversalId]);
                 items.Add(item);
             }
 

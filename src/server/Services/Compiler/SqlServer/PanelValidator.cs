@@ -21,7 +21,7 @@ using Model.Authorization;
 
 namespace Services.Compiler.SqlServer
 {
-    using PanelItemMapping = Tuple<PanelItemDTO, PanelItem>;
+    using PanelItemMapping = Tuple<IPanelItemDTO, PanelItem>;
 
     public class SqlServerPanelValidator : IPanelValidator
     {
@@ -145,7 +145,7 @@ namespace Services.Compiler.SqlServer
                 if (spec.matches.Count() != 1)
                 {
                     var message = $"SpecializationId: {spec.specialization.Id} or UniversalId: {spec.specialization.UniversalId} invalid";
-                    log.LogWarning("Specialization Misalignment: {Message}. Payload:{Payload}", message, mapping.Item1);
+                    log.LogWarning("Specialization Misalignment: {Message}. Payload:{@Payload}", message, mapping.Item1);
                     throw new InvalidOperationException($"Specialization Misalignment: {message}.");
                 }
             }
@@ -161,7 +161,7 @@ namespace Services.Compiler.SqlServer
 
             if (item.RecencyFilter == RecencyFilterType.None)
             {
-                log.LogWarning("Recency Filter Misalignment: No Recency Type Selected. Payload:{Payload}", mapping.Item1);
+                log.LogWarning("Recency Filter Misalignment: No Recency Type Selected. Payload:{@Payload}", mapping.Item1);
                 throw new InvalidOperationException($"Recency Filter Misalignment: No Recency Type Selected.");
             }
         }

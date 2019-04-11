@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Model.Compiler;
 
 namespace DTO.Compiler
 {
@@ -16,8 +17,8 @@ namespace DTO.Compiler
         public string Name { get; set; }
         public string Category { get; set; }
 
-        IReadOnlyCollection<PanelDTO> all;
-        public IReadOnlyCollection<PanelDTO> All
+        IEnumerable<IPanelDTO> all;
+        public IEnumerable<IPanelDTO> All
         {
             get
             {
@@ -27,6 +28,17 @@ namespace DTO.Compiler
                 }
                 return all;
             }
+        }
+
+        IEnumerable<IPanelDTO> IQueryDefinition.Panels
+        {
+            get => Panels;
+            set => Panels = value as IEnumerable<PanelDTO>;
+        }
+        IEnumerable<IPanelFilterDTO> IQueryDefinition.PanelFilters
+        {
+            get => PanelFilters;
+            set => PanelFilters = value as IEnumerable<PanelFilterDTO>;
         }
     }
 }

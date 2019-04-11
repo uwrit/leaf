@@ -15,4 +15,13 @@ namespace Model.Compiler
         public string UiDisplayText { get; set; }
         public string UiDisplayDescription { get; set; }
     }
+
+    public interface IPanelFilterDTO
+    {
+        int Id { get; set; }
+        IConceptRefDTO Concept { get; set; }
+        bool IsInclusion { get; set; }
+        string UiDisplayText { get; set; }
+        string UiDisplayDescription { get; set; }
+    }
 }
