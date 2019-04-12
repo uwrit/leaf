@@ -16,13 +16,10 @@ namespace Model.Compiler.SqlServer
 
     public class SqlServerPanelValidator : IPanelValidator
     {
-        readonly IUserContext user;
         readonly ILogger<SqlServerPanelValidator> log;
 
-        public SqlServerPanelValidator(IUserContext userContext,
-                              ILogger<SqlServerPanelValidator> logger)
+        public SqlServerPanelValidator(ILogger<SqlServerPanelValidator> logger)
         {
-            user = userContext;
             log = logger;
         }
 

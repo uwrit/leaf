@@ -11,25 +11,33 @@ using System.Collections.Generic;
 
 namespace API.DTO.Cohort
 {
-    public class PatientCountDTO
+    public class CohortCountDTO
     {
         public string QueryId { get; set; }
         public PreflightCheckDTO Preflight { get; set; }
         public PatientCountResultDTO Result { get; set; }
 
-        public PatientCountDTO(PreflightResources preflight)
+        public CohortCountDTO(CohortCount cohort) : this(cohort.ValidationContext.PreflightCheck, cohort.Count)
+        {
+
+        }
+
+        public CohortCountDTO(PreflightResources preflight)
         {
             Preflight = new PreflightCheckDTO(preflight);
         }
 
-        public PatientCountDTO(PreflightResources preflight, PatientCount count) : this(preflight)
+        public CohortCountDTO(PreflightResources preflight, PatientCount count) : this(preflight)
         {
             QueryId = count.QueryId.ToString();
-            Result = new PatientCountResultDTO
+            if (count != null)
             {
-                Value = count.Value,
-                SqlStatements = count.SqlStatements
-            };
+                Result = new PatientCountResultDTO
+                {
+                    Value = count.Value,
+                    SqlStatements = count.SqlStatements
+                };
+            }
         }
     }
 }
