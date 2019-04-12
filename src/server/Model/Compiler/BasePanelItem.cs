@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Model.Compiler
 {
@@ -31,5 +32,28 @@ namespace Model.Compiler
         string Id { get; }
         ResourceRef Resource { get; set; }
         IEnumerable<IConceptSpecializationDTO> Specializations { get; }
+    }
+
+    public static class IPanelItemDTOExtensions
+    {
+        public static PanelItem PanelItem(this IPanelItemDTO dto, Concept concept)
+        {
+            return new PanelItem
+            {
+                Concept = concept,
+                NumericFilter = dto.NumericFilter,
+                RecencyFilter = dto.RecencyFilter,
+                Index = dto.Index,
+                SubPanelIndex = dto.SubPanelIndex,
+                PanelIndex = dto.PanelIndex,
+                Specializations = concept.SpecializationGroups != null && dto.Specializations != null ?
+                                  (from g in concept.SpecializationGroups
+                                   from s in g.Specializations
+                                   from d in dto.Specializations
+                                   where s.Id == d.Id || d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId
+                                   select s) : null
+
+            };
+        }
     }
 }

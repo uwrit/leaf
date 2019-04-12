@@ -12,53 +12,7 @@ namespace DTO.Compiler
 {
     public static class CompilerDTOExtensions
     {
-        public static PanelItem PanelItem(this IPanelItemDTO dto, Concept concept)
-        {
-            return new PanelItem
-            {
-                Concept = concept,
-                NumericFilter = dto.NumericFilter,
-                RecencyFilter = dto.RecencyFilter,
-                Index = dto.Index,
-                SubPanelIndex = dto.SubPanelIndex,
-                PanelIndex = dto.PanelIndex,
-                Specializations = concept.SpecializationGroups != null && dto.Specializations != null ?
-                                  (from g in concept.SpecializationGroups
-                                   from s in g.Specializations
-                                   from d in dto.Specializations
-                                   where s.Id == d.Id || d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId
-                                   select s) : null
-
-            };
-        }
-
-        public static SubPanel SubPanel(this ISubPanelDTO dto, IEnumerable<PanelItem> items)
-        {
-            return new SubPanel
-            {
-                PanelItems = items,
-                PanelIndex = dto.PanelIndex,
-                Index = dto.Index,
-                IncludeSubPanel = dto.IncludeSubPanel,
-                JoinSequence = dto.JoinSequence,
-                MinimumCount = dto.MinimumCount,
-                DateFilter = dto.DateFilter
-            };
-        }
-
-        public static Panel Panel(this IPanelDTO dto, ICollection<SubPanel> subs)
-        {
-            return new Panel
-            {
-                SubPanels = subs,
-                DateFilter = dto.DateFilter,
-                IncludePanel = dto.IncludePanel,
-                Domain = dto.Domain,
-                Index = dto.Index
-            };
-        }
-
-        public static IEnumerable<ConceptSpecializationGroupDTO> ToTransfer(this IEnumerable<ConceptSpecializationGroup> groups)
+        public static IEnumerable<ConceptSpecializationGroupDTO> ConceptSpecializationGroupDTOs(this IEnumerable<ConceptSpecializationGroup> groups)
         {
             return groups?.Select(g => new ConceptSpecializationGroupDTO(g));
         }

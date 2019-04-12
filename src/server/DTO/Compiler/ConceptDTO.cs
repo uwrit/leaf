@@ -47,7 +47,7 @@ namespace DTO.Compiler
             IsParent = c.IsParent;
             IsEncounterBased = c.IsEncounterBased;
             IsSpecializable = c.IsSpecializable;
-            SpecializationGroups = c.SpecializationGroups.ToTransfer();
+            SpecializationGroups = c.SpecializationGroups.ConceptSpecializationGroupDTOs();
             UiDisplayName = c.UiDisplayName;
             UiDisplayText = c.UiDisplayText;
             UiDisplaySubtext = c.UiDisplaySubtext;

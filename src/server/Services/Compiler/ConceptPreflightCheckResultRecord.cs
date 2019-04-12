@@ -4,16 +4,31 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using DTO.Compiler;
 using Model.Compiler;
 using Model.Tagging;
 
-// TODO(cspital) decouple this from DTO
-
 namespace Services.Compiler
 {
-    class ConceptPreflightCheckResultRecord : ConceptPreflightCheckResultDTO
+    class ConceptPreflightCheckResultRecord
     {
+        public Guid? Id { get; set; }
+        public string UniversalId { get; set; }
+        public bool IsPresent { get; set; }
+        public bool IsAuthorized { get; set; }
+
+        public ConceptPreflightCheckResultRecord()
+        {
+
+        }
+
+        public ConceptPreflightCheckResultRecord(ConceptPreflightCheckResult result)
+        {
+            Id = result.Id;
+            UniversalId = result.UniversalId?.ToString();
+            IsPresent = result.IsPresent;
+            IsAuthorized = result.IsAuthorized;
+        }
+
         public ConceptPreflightCheckResult ConceptPreflightCheckResult()
         {
             ConceptUrn.TryParse(UniversalId, out var urn);
@@ -24,15 +39,6 @@ namespace Services.Compiler
                 IsPresent = IsPresent,
                 IsAuthorized = IsAuthorized
             };
-        }
-
-        public ConceptPreflightCheckResultRecord()
-        {
-
-        }
-
-        public ConceptPreflightCheckResultRecord(ConceptPreflightCheckResult result) : base(result)
-        {
         }
     }
 }
