@@ -47,7 +47,7 @@ const decodeToken = (token: string): UserContext => {
  * Return the id token key to look for
  * to retrieve a user token.
  */
-export const getUserTokenAndContext = async (config: AuthConfig) => {
+export const getUserTokenAndContext = async (config: AuthConfig): Promise<UserContext> => {
     return new Promise( async (resolve, reject) => {
         const idTokenKey = getIdTokenKey(config);
         let token;

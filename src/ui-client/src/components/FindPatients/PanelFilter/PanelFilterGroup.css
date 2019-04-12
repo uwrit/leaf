@@ -66,6 +66,7 @@
 
 .panel-filter-selection-box {
     background-color: white;
+    border: 1px solid rgb(230,230,230);
     border-radius: 4px;
     box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
     color: rgb(100, 100, 100);
@@ -127,7 +128,7 @@
 } 
 
 .panel-filter-selection-row {
-    border-top: 1px solid rgb(240,240,240);
+    border-top: 1px solid rgb(230,230,230);
     font-size: 1rem;
     padding: 0;
 }
@@ -138,18 +139,20 @@
 }
 
 .panel-filter-selection-row-title {
-    font-size: 1.2rem;
+    color: rgb(28, 168, 221);
+    font-size: 1.1rem;
+    font-weight: 500;
     padding: 10px 0;
 }
 
 .panel-filter-selection-row-description-container {
-    margin-top: -8px;
+    margin-top: -10px;
     padding: 0 100px 0 0;
 }
 
 .panel-filter-selection-row-description {
     color: #acacac;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     padding: 0;
 }
 
