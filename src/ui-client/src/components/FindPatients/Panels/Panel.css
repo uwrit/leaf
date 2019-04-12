@@ -261,6 +261,7 @@
 
 /* Dropdown Menu */
 .dropdown-menu {
+    border: none !important;
     border-radius: 8px;
     box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
     opacity: 0;
