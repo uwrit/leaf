@@ -30,7 +30,7 @@ const setPanelFilterActiveStates = (state: PanelFilter[] = [], filters: PanelFil
 
     for (const filter of filters) {
         const i = copy.findIndex((f) => f.id === filter.id);
-        if (i !== undefined) {
+        if (i !== -1) {
             copy[i] = Object.assign({}, filter, { isActive: true });
         }
     }
