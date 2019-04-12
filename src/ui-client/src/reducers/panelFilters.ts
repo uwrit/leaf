@@ -13,9 +13,9 @@ export function defaultPanelFiltersState(): PanelFilter[] {
 }
 
 const togglePanelFilter = (state: PanelFilter[], filter: PanelFilter, isActive: boolean): PanelFilter[] => {
-    const newState = state.slice(0);
-    const i = newState.findIndex((f: PanelFilter) => f.concept.id === filter.concept.id);
-    newState[i].isActive = isActive;
+    const newState = state.slice();
+    const i = newState.findIndex((f: PanelFilter) => f === filter);
+    newState[i] = Object.assign({}, newState[i], { isActive });
     return newState;
 }
 

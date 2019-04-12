@@ -23,11 +23,11 @@ interface State {
     shouldShowFilterSelectionBox: boolean;
 }
 
-const className = 'panel-filter';
-const mouseOutBubbleUpMillisecondThreshold = 150;
-let lastMouseOutClickTime: number = 0;
-
 export default class PanelFilter extends React.PureComponent<Props, State> {
+    private className = 'panel-filter';
+    private mouseOutBubbleUpMillisecondThreshold = 150;
+    private lastMouseOutClickTime: number = 0;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -36,37 +36,48 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
     }
 
     public handleToggleClick = (e: any) => {
-        const timeSinceMouseOutClicked = (new Date().getTime() - lastMouseOutClickTime);
-        if (e.currentTarget === e.target && timeSinceMouseOutClicked > mouseOutBubbleUpMillisecondThreshold) {
+        const { shouldShowFilterSelectionBox } = this.state;
+        const timeSinceMouseOutClicked = (new Date().getTime() - this.lastMouseOutClickTime);
+
+        if (e.currentTarget === e.target && timeSinceMouseOutClicked > this.mouseOutBubbleUpMillisecondThreshold) {
             const domRect: DOMRect = e.target.getBoundingClientRect();
-            this.setState({ DOMRect: domRect, shouldShowFilterSelectionBox: !this.state.shouldShowFilterSelectionBox });
+            this.setState({ DOMRect: domRect, shouldShowFilterSelectionBox: !shouldShowFilterSelectionBox });
         }
     }
 
     public render() {
+        const { shouldShowFilterSelectionBox, DOMRect } = this.state;
+        const { filters } = this.props;
+        const c = this.className;
         
         return (
-            <div className={`${className}-container`}>
+            <div className={`${c}-container`}>
                 <span 
-                    className={`${className}-toggle`}
+                    className={`${c}-toggle`}
                     onClick={this.handleToggleClick}>
                         Limit to
-                    {this.state.shouldShowFilterSelectionBox &&
+                    {shouldShowFilterSelectionBox &&
                     <PopupBox
-                        parentDomRect={this.state.DOMRect!}
+                        parentDomRect={DOMRect!}
                         toggle={this.handleFilterSelectionBoxClose}>
-                        <div className={`${className}-selection-box`}>
-                            <div className={`${className}-selection-title`}>Limited to</div>
-                            <div className={`${className}-selection-body`}>
-                                {this.props.filters.map((f: PanelFilterModel, i: number) => {
+                        <div className={`${c}-selection-box`}>
+                            {/* <div className={`${c}-selection-title`}>Limited to</div> */}
+                            <div className={`${c}-selection-title`}>
+                                <p>
+                                    Enabling the options below allow you to add criteria to your query without 
+                                    dragging more Concepts over. These are just for convenience, and are completely optional.
+                                </p>
+                            </div>
+                            <div className={`${c}-selection-body`}>
+                                {filters.map((f: PanelFilterModel) => {
                                 return (
-                                    <div key={i}>
-                                        <div className={`${className}-selection-row`}>
-                                            <div className={`${className}-selection-row-title`}>{f.uiDisplayText}</div>
+                                    <div key={f.id}>
+                                        <div className={`${c}-selection-row`}>
+                                            <div className={`${c}-selection-row-title`}>{f.uiDisplayText}</div>
                                             <CheckboxSlider checked={f.isActive} onClick={this.handleSelectionBoxItemClick.bind(null, f)} />
                                         </div>
-                                        <div className={`${className}-selection-row-description-container`}>
-                                            <p className={`${className}-selection-row-description`}>{f.uiDisplayDescription}</p>
+                                        <div className={`${c}-selection-row-description-container`}>
+                                            <p className={`${c}-selection-row-description`}>{f.uiDisplayDescription}</p>
                                         </div>
                                     </div>
                                 )})}
@@ -75,12 +86,12 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
                     </PopupBox>
                     }
                 </span>
-                {this.props.filters
+                {filters
                     .filter((f: PanelFilterModel) => f.isActive)
-                    .map((f: PanelFilterModel, i: number) => (
+                    .map((f: PanelFilterModel) => (
                     <span 
-                        className={`${className}-item`}
-                        key={i} 
+                        className={`${c}-item`}
+                        key={f.id} 
                         onClick={this.handlePanelFilterItemClick.bind(null, f)}>
                         {f.uiDisplayText}
                     </span>
@@ -90,15 +101,17 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
     }
 
     private handleFilterSelectionBoxClose = () => {
-        lastMouseOutClickTime = new Date().getTime();
+        this.lastMouseOutClickTime = new Date().getTime();
         this.setState({ shouldShowFilterSelectionBox: false });
     }
 
     private handlePanelFilterItemClick = (filter: PanelFilterModel) => {
-        this.props.dispatch(togglePanelFilter(filter, false));
+        const { dispatch } = this.props;
+        dispatch(togglePanelFilter(filter, false));
     }
 
     private handleSelectionBoxItemClick = (filter: PanelFilterModel) => {
-        this.props.dispatch(togglePanelFilter(filter, !filter.isActive));
+        const { dispatch } = this.props;
+        dispatch(togglePanelFilter(filter, !filter.isActive));
     }
 }
