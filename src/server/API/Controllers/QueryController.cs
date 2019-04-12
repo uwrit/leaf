@@ -18,8 +18,8 @@ using Model.Authorization;
 using Model.Compiler;
 using Model.Extensions;
 using Services.Compiler;
-using DTO.Compiler;
-using DTO.Cohort;
+using API.DTO.Compiler;
+using API.DTO.Cohort;
 using Model.Tagging;
 using Services.Authorization;
 
