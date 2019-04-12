@@ -8,6 +8,7 @@
 import { PanelFilter } from '../models/panel/PanelFilter';
 
 export const TOGGLE_PANEL_FILTER = 'TOGGLE_PANEL_FILTER';
+export const SET_PANEL_FILTER_ACTIVE_STATES = 'SET_PANEL_FILTER_ACTIVE_STATES';
 export const SET_PANEL_FILTERS = 'SET_PANEL_FILTERS';
 
 export interface PanelFilterAction {
@@ -31,4 +32,11 @@ export const setPanelFilters = (filters: PanelFilter[]): PanelFilterAction => {
         filters,
         type: SET_PANEL_FILTERS
     };
+};
+
+export const setPanelFilterActiveStates = (filters: PanelFilter[]): PanelFilterAction => {
+    return {
+        filters,
+        type: SET_PANEL_FILTER_ACTIVE_STATES
+    }
 };

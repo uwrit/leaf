@@ -153,3 +153,12 @@
     font-size: 0.9rem;
     padding: 0;
 }
+
+.panel-filter-no-filters {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    color: rgb(120,120,120);
+    margin: 20px 0;
+    padding: 4px;
+    text-align: center;
+}

@@ -17,6 +17,7 @@ import { NetworkIdentity } from '../models/NetworkRespondent';
 import { mergeExtensionConcepts } from './concepts';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { resetPanels } from './panels';
+import { setPanelFilterActiveStates } from './panelFilter';
 
 export const REQUEST_SAVE_QUERY = 'REQUEST_SAVE_QUERY';
 export const FINISH_SAVE_QUERY = 'FINISH_SAVE_QUERY';
@@ -57,6 +58,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
             dispatch(setCurrentQuery(saved, true));
             dispatch(addSavedQuery(saved));
             dispatch(openSavedQuery(saved));
+            dispatch(setPanelFilterActiveStates(saved.panelFilters));
             dispatch(hideMyLeafModal());
         }
         catch (err) {

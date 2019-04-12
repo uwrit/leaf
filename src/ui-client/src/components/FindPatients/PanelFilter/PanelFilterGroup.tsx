@@ -61,7 +61,6 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
                         parentDomRect={DOMRect!}
                         toggle={this.handleFilterSelectionBoxClose}>
                         <div className={`${c}-selection-box`}>
-                            {/* <div className={`${c}-selection-title`}>Limited to</div> */}
                             <div className={`${c}-selection-title`}>
                                 <p>
                                     Enabling the options below allow you to add criteria to your query without 
@@ -69,6 +68,11 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
                                 </p>
                             </div>
                             <div className={`${c}-selection-body`}>
+                                {filters.length === 0 &&
+                                <div className={`${c}-no-filters`}>
+                                    It looks like your administrator hasn't added these yet!
+                                </div>
+                                }
                                 {filters.map((f: PanelFilterModel) => {
                                 return (
                                     <div key={f.id}>
