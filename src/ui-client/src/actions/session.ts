@@ -25,7 +25,7 @@ import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
-import { setPanelFilters } from './panelFilter';
+import { setPanelFilters, setPanelFilterActiveStates } from './panelFilter';
 import { addDatasets } from '../services/datasetSearchApi';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
@@ -222,7 +222,7 @@ const handleSessionReload = (dispatch: Dispatch<any>, state: AppState) => {
         const onClickYes = () => {
             dispatch(setCurrentQuery(prev.queries.current));
             dispatch(setPanels(prev.panels));
-            dispatch(setPanelFilters(prev.panelFilters));
+            dispatch(setPanelFilterActiveStates(prev.panelFilters));
         };
 
         if (diffMinutes < 60 * 8) {

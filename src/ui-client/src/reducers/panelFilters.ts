@@ -8,9 +8,7 @@
 import { PanelFilterAction, SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER, SET_PANEL_FILTER_ACTIVE_STATES } from '../actions/panelFilter';
 import { PanelFilter } from '../models/panel/PanelFilter';
 
-export function defaultPanelFiltersState(): PanelFilter[] {
-    return [];
-}
+export const defaultPanelFiltersState = (): PanelFilter[] => [];
 
 const togglePanelFilter = (state: PanelFilter[], filter: PanelFilter, isActive: boolean): PanelFilter[] => {
     const newState = state.slice();

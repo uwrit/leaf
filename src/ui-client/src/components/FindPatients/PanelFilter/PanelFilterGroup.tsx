@@ -63,8 +63,8 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
                         <div className={`${c}-selection-box`}>
                             <div className={`${c}-selection-title`}>
                                 <p>
-                                    Enabling the options below allow you to add criteria to your query without 
-                                    dragging more Concepts over. These are just for convenience, and are completely optional.
+                                    The options below allow you to add criteria to your query without 
+                                    dragging additional Concepts over. These are just for convenience, and are completely optional.
                                 </p>
                             </div>
                             <div className={`${c}-selection-body`}>
