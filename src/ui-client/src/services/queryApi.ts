@@ -147,10 +147,10 @@ export const loadSavedQuery = async (universalId: string, state: AppState): Prom
     const queryRaw = queryResp.data as SavedQueryRefDTO;
     const deser = await deserialize(queryRaw.definition, state) as SavedQueryDefinitionDTO;
     const query = { 
+        ...deser,
         ...queryRaw, 
         created: new Date(queryResp.data.created), 
-        updated: new Date(queryResp.data.updated),
-         ...deser 
+        updated: new Date(queryResp.data.updated)
     } as SavedQuery;
     return query;
 };
