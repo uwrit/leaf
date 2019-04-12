@@ -2,7 +2,7 @@
 
 When creating the database docker image, the `@@SERVERNAME` may not match the container name causing `scripts/leafdb.sh` to fail. To correct this issue:
 
-```
+```sql
 SELECT @@SERVERNAME
 
 EXEC sp_dropserver {server_name}

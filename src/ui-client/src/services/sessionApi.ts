@@ -12,6 +12,10 @@ import { HttpFactory } from './HttpFactory';
 import { AuthConfig } from '../models/Auth';
 import { getPanelItemCount } from '../utils/panelUtils';
 
+/*
+ * Decodes the session JWT to pull out server-sent
+ * info on whether user is an admin, token lifespan, etc.
+ */
 const decodeToken = (token: string): SessionContext => {
     const decoded: DecodedAccessToken = jwt_decode(token);
 
@@ -25,6 +29,9 @@ const decodeToken = (token: string): SessionContext => {
     return ctx;
 };
 
+/*
+ * Requests initial session token and submits user attestation.
+ */
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
     return new Promise( async (resolve, reject) => {
         const http = HttpFactory.authenticated(state.auth.userContext!.token);
@@ -40,6 +47,9 @@ export const getSessionTokenAndContext = async (state: AppState, attestation: At
     });
 };
 
+/*
+ * Requests, decodes, refreshes the current session token.
+ */
 export const refreshSessionTokenAndContext = (state: AppState) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -56,7 +66,7 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 };
 
 /*
- * Logout the user, falling back to current URI if none configured.
+ * Logs out the user, falling back to current URI if none configured.
  */
 export const logout = (config: AuthConfig) => {
     if (config && config.logoutUri) {
@@ -118,11 +128,16 @@ export const attemptLoginRetryIfPossible = () => {
     }
 };
 
+/*
+ * Creates a session object to place in Session Storage
+ * and allow the user to later reload most of app state if
+ * they are logged out.
+ */
 const getStoredSessionObject = (state: AppState): StoredSessionState => {
     return { 
         queries: state.queries,
         panels: state.panels,
-        panelFilters: state.panelFilters,
+        panelFilters: state.panelFilters.filter((f) => f.isActive),
         timestamp: new Date().getTime() / 1000
     };
 };

@@ -37,6 +37,11 @@
     background-color: rgba(28, 168, 221, 0.08);
 }
 
+.myleaf-saved-queries-row td:first-child {
+    color: #2196F3;
+    font-weight: 500;
+}
+
 .myleaf-saved-queries-row td {
     padding: 0 4px;
 }
@@ -49,7 +54,7 @@
 
 .myleaf-saved-queries-open:hover,
 .myleaf-saved-queries-delete:hover {
-    transform: scale(1.1);
+    transform: scale(1.07);
 }
 
 .myleaf-saved-queries-open {
