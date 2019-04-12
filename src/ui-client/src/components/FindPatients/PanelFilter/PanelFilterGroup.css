@@ -53,7 +53,7 @@
 }
 
 .panel-filter-item::after {
-    color: #337ab7;
+    color: rgb(28, 168, 221);
     content: 'AND';
     pointer-events: none;
     position: absolute;
@@ -106,7 +106,7 @@
 
 .panel-filter-selection-title {
     border-radius: inherit;
-    color: rgba(0,0,0,0.5);
+    color: rgb(120,120,120);
     font-size: 0.9rem;
     font-weight: 500;
     padding: 8px 20px;
