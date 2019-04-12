@@ -4868,6 +4868,7 @@ BEGIN
 			ON c.SqlSetId = s.Id
          LEFT JOIN app.ConceptEvent e
             ON s.EventId = e.Id
+               AND s.IsEventBased = 1
     WHERE EXISTS (SELECT 1 FROM @ids i WHERE c.Id = i.Id)
     ORDER BY c.UiDisplayRowOrder, c.UiDisplayName
 
