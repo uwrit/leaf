@@ -9,7 +9,7 @@ import { SavedQuery, SavedQueryRef, Query, QuerySaveResponseDTO, QueryDependent 
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';
-import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getQueriesAsConcepts, loadSavedQuery, hasRecursiveDependency } from '../services/queryApi';
+import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getQueriesAsConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { setNoClickModalState, showInfoModal, toggleSaveQueryPane, hideMyLeafModal, showConfirmationModal, setRoute } from './generalUi';
 import { NoClickModalStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
@@ -109,22 +109,7 @@ export const requestQuerySave = () => {
              * Save to home node.
              */
             const response = await saveQueryHomeNode(getState(), panels, panelFilters);
-            const savedRaw = response.data as QuerySaveResponseDTO;
-            // const saved = await loadSavedQuery(savedRaw.query.universalId, state);
-
-            // Clean up and move this to queryApi as a method
-            const saved: SavedQuery = {
-                category: state.queries.current.category,
-                count: state.cohort.networkCohorts.get(0)!.count.value,
-                created: state.queries.current.id ? state.queries.saved.get(state.queries.current.id)!.created : new Date(),
-                id: savedRaw.query.id,
-                name: state.queries.current.name,
-                owner: state.auth.userContext!.name + "@" + state.auth.userContext!.issuer,
-                panels: state.panels,
-                panelFilters: state.panelFilters,
-                universalId: savedRaw.query.universalId,
-                updated: new Date()
-            };
+            const saved = deriveSavedQuery(state, response.data);
 
             /*
              * Update current query in UI to this.

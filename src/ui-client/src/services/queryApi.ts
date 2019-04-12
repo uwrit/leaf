@@ -7,7 +7,7 @@
 
 import { AppState } from '../models/state/AppState';
 import { HttpFactory } from './HttpFactory';
-import { SavedQueryRef, SavedQuery, SavedQueryRefDTO, SavedQueryDefinitionDTO } from '../models/Query';
+import { SavedQueryRef, SavedQuery, SavedQueryRefDTO, SavedQueryDefinitionDTO, QuerySaveResponseDTO } from '../models/Query';
 import ExtensionConceptsWebWorker from '../providers/extensionConcepts/extensionConceptsWebWorker';
 import { PanelDTO, Panel } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
@@ -18,22 +18,34 @@ import moment from 'moment';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
-import { PanelItem } from '../models/panel/PanelItem';
 
 const worker = new ExtensionConceptsWebWorker();
 
+/*
+ * Requests all Saved Queries available to the user. Note
+ * that these are pointers to queries (i.e., they contain the UniversaliId),
+ * but not the logic that the queries are actually composed of (i.e., panels, Concepts, etc.)
+ */
 export const getSavedQueries = async (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.get('api/query');
 };
 
+/*
+ * Requests metadata about a Saved Query, as well as its
+ * 'context' - a JSON blob that can be parsed to
+ * derive panels and panel filters that form the query.
+ */
 export const getSavedQueryContext = async (state: AppState, universalId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.get(`/api/query/${universalId}`);
 };
 
+/*
+ * Requests a Query Save to home node.
+ */
 export const saveQueryHomeNode = async (state: AppState, panels: PanelDTO[], panelFilters: PanelFilter[] ) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
@@ -47,7 +59,15 @@ export const saveQueryHomeNode = async (state: AppState, panels: PanelDTO[], pan
     });
 };
 
-export const saveQueryFedNode = async (state: AppState, nr: NetworkIdentity, panels: PanelDTO[], panelFilters: PanelFilter[], queryId: string, universalId: string ) => {
+/*
+ * Requests a Query Save to a federated node. In this case,
+ * the UniversalId has already been recieved from home node,
+ * so that forms part of the request body.
+ */
+export const saveQueryFedNode = async (
+        state: AppState, nr: NetworkIdentity, panels: PanelDTO[], 
+        panelFilters: PanelFilter[], queryId: string, universalId: string 
+    ) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.post(`${nr.address}/api/query/${queryId}`, {
@@ -58,6 +78,9 @@ export const saveQueryFedNode = async (state: AppState, nr: NetworkIdentity, pan
     });
 };
 
+/*
+ * Requests a delete on the Saved Query to the server.
+ */
 export const deleteSavedQuery = async (state: AppState, nr: NetworkIdentity, query: SavedQueryRef, force: boolean) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
@@ -67,17 +90,35 @@ export const deleteSavedQuery = async (state: AppState, nr: NetworkIdentity, que
     });
 };
 
+/*
+ * Requests a preflight check on a given Saved Query.
+ * The purpose of the preflight is to confirm that there 
+ * are no permissions, etc. conflicts on any embedded queries
+ * or Concepts that form the query.
+ */
 export const preflightSavedQuery = async (state: AppState, resourceRef: ResourceRef) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.post(`/api/query/preflight`, resourceRef);
 };
 
+/*
+ * Requests a Saved Cohort tree be derived and 
+ * created from the worker. The return object is 
+ * merged with the Concept tree.
+ */
 export const getQueriesAsConcepts = async (queries: SavedQueryRef[]) => {
     const concepts = await worker.buildSavedCohortTree(queries);
     return concepts;
 };
 
+/*
+ * Deserializes a JSON string representing the Saved
+ * state as a DTO object on query save. This hydrates 
+ * panel and panel filter objects and validates that
+ * any embedded queries or Concepts are still available
+ * to the user.
+ */
 export const deserialize = async (queryDefJson: string, state: AppState) => {
     const deser = JSON.parse(queryDefJson);
 
@@ -130,6 +171,11 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
     return deser;
 };
 
+/*
+ * Handles date objects from server. If the year
+ * is < 1900, we know it represents a null date, so 
+ * returns current date, else the initial parsed date value.
+ */
 const handleDate = (dateStr?: any): Date => {
     let date = moment();
     if (dateStr) {
@@ -142,6 +188,10 @@ const handleDate = (dateStr?: any): Date => {
     return new Date();
 };
 
+/*
+ * Loads a Saved Query from the server and
+ * deserializes into a panels and panel filters.
+ */
 export const loadSavedQuery = async (universalId: string, state: AppState): Promise<SavedQuery> => {
     const queryResp = await getSavedQueryContext(state, universalId);
     const queryRaw = queryResp.data as SavedQueryRefDTO;
@@ -155,6 +205,11 @@ export const loadSavedQuery = async (universalId: string, state: AppState): Prom
     return query;
 };
 
+/*
+ * Detects whether the current panel array in state
+ * has a recursive dependency where one embedded query
+ * depends on itself or its depedents.
+ */
 export const hasRecursiveDependency = async (state: AppState): Promise<(string | null)> => {
     const curr = state.queries.current;
     const embedded = getEmbeddedQueries(state.panels);
@@ -170,4 +225,37 @@ export const hasRecursiveDependency = async (state: AppState): Promise<(string |
         }
     }
     return null;
+};
+
+/*
+ * Derives a SavedQuery object needed to populate the 'My Saved Queries'
+ * table. Called after a Save event.
+ */
+export const deriveSavedQuery = (state: AppState, response: QuerySaveResponseDTO): SavedQuery => {
+    const { queries, cohort, auth, panels, panelFilters } = state;
+    const currentUiQuery = queries.current;
+    const { name, issuer } = auth.userContext!;
+    const homeNodeCount = cohort.networkCohorts.get(0)!.count.value;
+    let created = new Date();
+
+    if (currentUiQuery.id) {
+        const saved = queries.saved.get(currentUiQuery.id);
+        if (saved) {
+            created = saved.created;
+        }
+    }
+
+    const saved: SavedQuery = {
+        category: currentUiQuery.category,
+        count: homeNodeCount,
+        created,
+        id: response.query.id,
+        name: currentUiQuery.name,
+        owner: `${name}@${issuer}`,
+        panels,
+        panelFilters,
+        universalId: response.query.universalId,
+        updated: new Date()
+    };
+    return saved;
 };
