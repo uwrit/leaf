@@ -1,11 +1,15 @@
 # Configuring the Leaf App Server
+The application server hosts the [Leaf REST API](https://github.com/uwrit/leaf/tree/master/src/server), and is the 
 
 ## Creating a JWT Signing Key
 ```bash
-openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem -out cert.pem -days 3650 -subj "//CN=urn:leaf:issuer:leaf.<your_institution>.edu"
+openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem \
+    -out cert.pem -days 3650 -subj \
+    "//CN=urn:leaf:issuer:leaf.<your_institution>.edu"
 ```
 ```bash
-openssl pkcs12 -in cert.pem -inkey key.pem -export -out leaf.pfx -password pass:<insertpass>
+openssl pkcs12 -in cert.pem -inkey key.pem \
+    -export -out leaf.pfx -password pass:<insertpass>
 ```
 
 ## Setting Environment Variables
@@ -14,8 +18,8 @@ These are relative to the path selected during key selection.
 LEAF_JWT_CERT=/.keys/leaf/cert.pem
 LEAF_JWT_KEY=/.keys/leaf/leaf.pfx
 LEAF_JWT_KEY_PW=<insertpass>
-LEAF_APP_DB=<LeafDB Connection String>
-LEAF_CLIN_DB=<Clinical DB Connection String>
+LEAF_APP_DB=<leaf_app_db_connection_string>
+LEAF_CLIN_DB=<clinical_db_connection_string>
 SERILOG_DIR=/var/log/leaf
 ```
 Note that the connection string variables `LEAF_APP_DB` and `LEAF_CLIN_DB` should be of the form:
