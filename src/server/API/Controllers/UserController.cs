@@ -19,7 +19,7 @@ using Model.Network;
 using Services;
 using Services.Authorization;
 using API.Jwt;
-using DTO.User;
+using API.DTO.User;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers

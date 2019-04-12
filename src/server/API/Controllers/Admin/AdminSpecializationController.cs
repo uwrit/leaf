@@ -14,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Services.Admin;
 using Model.Admin;
-using DTO.Admin;
+using API.DTO.Admin;
 using Services;
 
 namespace API.Controllers.Admin

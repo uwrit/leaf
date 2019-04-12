@@ -15,7 +15,7 @@ using Model.Authorization;
 using Services.Admin;
 using Model.Admin;
 using Services;
-using DTO.Admin;
+using API.DTO.Admin;
 
 namespace API.Controllers.Admin
 {

@@ -33,4 +33,21 @@ namespace Model.Compiler
         string Id { get; }
         IEnumerable<IPanelItemDTO> PanelItems { get; }
     }
+
+    public static class ISubPanelDTOExtensions
+    {
+        public static SubPanel SubPanel(this ISubPanelDTO dto, IEnumerable<PanelItem> items)
+        {
+            return new SubPanel
+            {
+                PanelItems = items,
+                PanelIndex = dto.PanelIndex,
+                Index = dto.Index,
+                IncludeSubPanel = dto.IncludeSubPanel,
+                JoinSequence = dto.JoinSequence,
+                MinimumCount = dto.MinimumCount,
+                DateFilter = dto.DateFilter
+            };
+        }
+    }
 }

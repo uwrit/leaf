@@ -29,4 +29,19 @@ namespace Model.Compiler
         string Id { get; }
         IEnumerable<ISubPanelDTO> SubPanels { get; }
     }
+
+    public static class IPanelDTOExtensions
+    {
+        public static Panel Panel(this IPanelDTO dto, ICollection<SubPanel> subs)
+        {
+            return new Panel
+            {
+                SubPanels = subs,
+                DateFilter = dto.DateFilter,
+                IncludePanel = dto.IncludePanel,
+                Domain = dto.Domain,
+                Index = dto.Index
+            };
+        }
+    }
 }

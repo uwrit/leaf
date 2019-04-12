@@ -107,6 +107,14 @@ namespace API.Options
             services.AddTransient<IQueryService, QueryService>();
 
             services.AddAdminServices();
+            services.AddModel();
+
+            return services;
+        }
+
+        static IServiceCollection AddModel(this IServiceCollection services)
+        {
+            services.AddTransient<CohortCounter>();
 
             return services;
         }

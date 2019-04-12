@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
-using DTO.Cohort;
-using DTO.Compiler;
+using API.DTO.Cohort;
+using API.DTO.Compiler;
 using Services;
 using Services.Compiler;
 using Services.Cohort;
@@ -30,37 +30,29 @@ namespace API.Controllers
     public class CohortController : Controller
     {
         readonly ILogger<CohortController> log;
-        readonly IUserContext user;
 
-        public CohortController(ILogger<CohortController> logger, IUserContext userContext)
+        public CohortController(ILogger<CohortController> logger)
         {
             log = logger;
-            user = userContext;
         }
 
         [HttpPost("count")]
-        public async Task<ActionResult<PatientCountDTO>> Count(
+        public async Task<ActionResult<CohortCountDTO>> Count(
             [FromBody] PatientCountQueryDTO patientCountQuery,
-            [FromServices] IPanelConverterService panelConverter,
-            [FromServices] IPanelValidator panelValidator,
-            [FromServices] IPatientCountService patientCountService,
+            [FromServices] CohortCounter counter,
             CancellationToken cancelToken
         )
         {
             try
             {
-                var ctx = await panelConverter.GetPanelsAsync(patientCountQuery, cancelToken);
-                if (!ctx.PreflightPassed)
+                var cohort = await counter.Count(patientCountQuery, cancelToken);
+                var resp = new CohortCountDTO(cohort);
+                if (!cohort.ValidationContext.PreflightPassed)
                 {
-                    var preflight = new PatientCountDTO(ctx.PreflightCheck);
-                    return BadRequest(preflight);
+                    return BadRequest(resp);
                 }
 
-                var query = panelValidator.Validate(ctx);
-                var patientCount = await patientCountService.GetPatientCountAsync(query, cancelToken);
-                var dto = new PatientCountDTO(ctx.PreflightCheck, patientCount);
-
-                return Ok(dto);
+                return Ok(resp);
             }
             catch (OperationCanceledException)
             {

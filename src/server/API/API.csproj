@@ -16,6 +16,13 @@
     <Folder Include="Jwt\" />
     <Folder Include="Authorization\" />
     <Folder Include="Jobs\" />
+    <Folder Include="DTO\" />
+    <Folder Include="DTO\Admin\" />
+    <Folder Include="DTO\Cohort\" />
+    <Folder Include="DTO\Compiler\" />
+    <Folder Include="DTO\Export\" />
+    <Folder Include="DTO\Network\" />
+    <Folder Include="DTO\User\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />
@@ -32,6 +39,5 @@
   <ItemGroup>
     <ProjectReference Include="..\Model\Model.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
-    <ProjectReference Include="..\DTO\DTO.csproj" />
   </ItemGroup>
 </Project>

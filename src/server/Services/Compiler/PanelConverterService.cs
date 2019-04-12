@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DTO.Compiler;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
@@ -113,8 +112,8 @@ namespace Services.Compiler
             {
                 if (map.TryGetValue(filter.Concept.UniversalId, out var replFilterConcept))
                 {
-                    // TODO(cspital) decouple this from DTO
-                    filter.Concept = new ConceptRefDTO { Id = replFilterConcept.Id, UniversalId = replFilterConcept.UniversalId };
+                    filter.Concept.Id = replFilterConcept.Id;
+                    filter.Concept.UniversalId = replFilterConcept.UniversalId;
                 }
             }
         }
