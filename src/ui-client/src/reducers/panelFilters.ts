@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PanelFilterAction, SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
+import { PanelFilterAction, SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER, SET_PANEL_FILTER_ACTIVE_STATES } from '../actions/panelFilter';
 import { PanelFilter } from '../models/panel/PanelFilter';
 
 export function defaultPanelFiltersState(): PanelFilter[] {
@@ -13,16 +13,29 @@ export function defaultPanelFiltersState(): PanelFilter[] {
 }
 
 const togglePanelFilter = (state: PanelFilter[], filter: PanelFilter, isActive: boolean): PanelFilter[] => {
-    const newState = state.slice(0);
-    const i = newState.findIndex((f: PanelFilter) => f.concept.id === filter.concept.id);
-    newState[i].isActive = isActive;
+    const newState = state.slice();
+    const i = newState.findIndex((f: PanelFilter) => f.id === filter.id);
+    newState[i] = Object.assign({}, newState[i], { isActive });
     return newState;
-}
+};
 
 const setPanelFilters = (state: PanelFilter[] = [], filters: PanelFilter[]) => {
     filters.forEach((pf: PanelFilter) => pf.isActive = false);
     return filters;
-}
+};
+
+const setPanelFilterActiveStates = (state: PanelFilter[] = [], filters: PanelFilter[]) => {
+    const copy = state.slice();
+    copy.forEach((f) => f.isActive = false)
+
+    for (const filter of filters) {
+        const i = copy.findIndex((f) => f.id === filter.id);
+        if (i !== -1) {
+            copy[i] = Object.assign({}, filter, { isActive: true });
+        }
+    }
+    return copy;
+};
 
 export const panelFilters = (state: PanelFilter[] = defaultPanelFiltersState(), action: PanelFilterAction): PanelFilter[] => {
     switch (action.type) {
@@ -30,7 +43,9 @@ export const panelFilters = (state: PanelFilter[] = defaultPanelFiltersState(), 
             return togglePanelFilter(state, action.filter!, action.isActive!)
         case SET_PANEL_FILTERS:
             return setPanelFilters(state, action.filters!);
+        case SET_PANEL_FILTER_ACTIVE_STATES:
+            return setPanelFilterActiveStates(state, action.filters!);
         default:
             return state;
-    }
-}
+    };
+};
