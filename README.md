@@ -23,7 +23,7 @@ See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
 
 ## Getting Started
 * [How Leaf can help accomplish research](https://github.com/uwrit/leaf/wiki#how-can-leaf-help-with-research)
-* [Leaf Architecture](https://github.com/uwrit/leaf/tree/master/docs/deploy#architecture)
+* [Architecture](https://github.com/uwrit/leaf/tree/master/docs/deploy#architecture)
 * [Installation](https://github.com/uwrit/leaf/tree/master/docs/deploy#installation-steps)
 
 ## Can I use Leaf now?
