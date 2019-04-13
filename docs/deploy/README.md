@@ -32,7 +32,7 @@ One powerful feature of Leaf is the ability to federate user queries to multiple
 
 > Networking with other Leaf instances is a **completely optional** functionality. Deploying locally and querying only your institution's data is perfectly fine.
 
-Learn how to network multiple Leaf instances [here](https://github.com/uwrit/leaf/tree/master/docs/deploy/fed/README.md)
+[Learn how to network multiple Leaf instances](https://github.com/uwrit/leaf/tree/master/docs/deploy/fed/README.md)
 
 ![Multi Instance](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/multi_instance_no_header.png "Multi Instance")
 
