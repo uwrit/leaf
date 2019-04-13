@@ -28,6 +28,3 @@ See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
 
 ## Can I use Leaf now?
 Sure! Leaf is in active development and will evolve as development continues and features are added.
-
-## Is Leaf an acronym?
-No, Leaf is not an acronym.
