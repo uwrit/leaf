@@ -13,6 +13,8 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
     - [Leaf application database](https://github.com/uwrit/leaf/blob/master/src/db/build/LeafDB.sql). Note that this *must* be the same server the clinical database ↑ is deployed to.
     - [UMLS database](https://www.nlm.nih.gov/research/umls/) (optional). This can be used to script out creation of Leaf Concepts related to diagnoses, procedures, etc. See examples at https://github.com/uwrit/leaf-scripts. Note that you [must agree to and maintain a current UMLS license](https://www.nlm.nih.gov/databases/umls.html) for this step.
 
+![Single Instance](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/single_instance.png "Single Instance") 
+
 > If you'd like to develop or experiment with Leaf on your local computer (with no users but yourself), you can of course clone the repo and run a Leaf dev instance locally without the above setup.
 
 ## Getting Started
@@ -24,3 +26,8 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
     - [Configuring the appsettings.json file](https://github.com/uwrit/leaf/tree/master/docs/deploy/app/README.md#configuring-the-appsettingsjson-file)
 3) Database server
     - [Installing the Leaf application database](https://github.com/uwrit/leaf/tree/master/docs/deploy/db/README.md#installing-the-leaf-application-database)
+    
+## Networking Multiple Leaf instances
+One powerful feature of Leaf is the ability to federate user queries to multiple Leaf instances, even if those using different data models. This enables institutions to securely compare patient populations in a de-identified fashion. An example of this functionality can be found at https://www.youtube.com/watch?v=ZuKKC7B8mHI. 
+
+![Multi Instance](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/multi_instance.png "Multi Instance") 
