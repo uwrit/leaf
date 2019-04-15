@@ -9,7 +9,7 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
     - [.NET Core Runtime](https://dotnet.microsoft.com/download) installed.
     - Note that this *can* be the same server as the web server, though ideally they should be separate depending on hardware, relative load, and number of users.
 3) **Database Server**, with
-    - The clinical database you'd like to point Leaf at (e.g. [OMOP](https://www.ohdsi.org/data-standardization/the-common-data-model/)) deployed in [MS SQL Server](https://www.microsoft.com/en-us/sql-server/default.aspx) (2017+).
+    - The clinical database you'd like to point Leaf at deployed in [MS SQL Server](https://www.microsoft.com/en-us/sql-server/default.aspx) (2014+).
     - [Leaf application database](https://github.com/uwrit/leaf/blob/master/src/db/build/LeafDB.sql). Note that this *must* be the same server the clinical database ↑ is deployed to.
     - [UMLS database](https://www.nlm.nih.gov/research/umls/) (optional). This can be used to script out creation of Leaf Concepts related to diagnoses, procedures, etc. See examples at https://github.com/uwrit/leaf-scripts. Note that you [must agree to and maintain a current UMLS license](https://www.nlm.nih.gov/databases/umls.html) for this step.
 
@@ -20,6 +20,7 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
 ## Installation Steps
 1) Web Server
     - [Setting up Apache](https://github.com/uwrit/leaf/tree/master/docs/deploy/web/apache/README.md) or [IIS](https://github.com/uwrit/leaf/tree/master/docs/deploy/web/iis/README.md)
+    - [Building and deploying the client application](https://github.com/uwrit/leaf/tree/master/docs/deploy/web/client/README.md)
 2) Application Server
     - [Creating a JWT Signing Key](https://github.com/uwrit/leaf/tree/master/docs/deploy/app/README.md#creating-a-jwt-signing-key)
     - [Setting Environment Variables](https://github.com/uwrit/leaf/tree/master/docs/deploy/app/README.md#setting-environment-variables)
