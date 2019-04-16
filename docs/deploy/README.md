@@ -27,11 +27,13 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
     - [Configuring the appsettings.json file](https://github.com/uwrit/leaf/tree/master/docs/deploy/app/README.md#configuring-the-appsettingsjson-file)
 3) Database server
     - [Installing the Leaf application database](https://github.com/uwrit/leaf/tree/master/docs/deploy/db/README.md#installing-the-leaf-application-database)
+
+After you have completed these steps, get started [creating Concepts for your clinical database](https://github.com/uwrit/leaf/tree/master/docs/admin/concept/README.md)
     
 ## Networking Multiple Leaf instances
 One powerful feature of Leaf is the ability to federate user queries to multiple Leaf instances, even those using different data models. This enables institutions to securely compare patient populations in a de-identified fashion. An example of this functionality can be found at https://www.youtube.com/watch?v=ZuKKC7B8mHI. 
 
-> Networking with other Leaf instances is **completely optional** functionality. Deploying locally and querying only your institution's data is perfectly fine.
+> Networking with other Leaf instances is **completely optional**. Deploying locally and querying only your institution's data is perfectly fine.
 
 [Learn how to network multiple Leaf instances](https://github.com/uwrit/leaf/tree/master/docs/deploy/fed/README.md)
 

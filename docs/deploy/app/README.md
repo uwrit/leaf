@@ -74,14 +74,14 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
 - [Compiler](#compiler)
   - [Alias](#alias): `"@"`
   - [SetPerson](#setperson): `"dbo.person_table`"
-  - [SetEncounter](#setencounter): `"dbo.enc_table"`
+  - [SetEncounter](#setencounter): `"dbo.encounter_table"`
   - [FieldPersonId](#fieldpersonid): `"person_id"`
   - [FieldEncounterId](#fieldencounterid): `"encounter_id"`
   - [FieldEncounterAdmitDate](#fieldencounteradmitdate): `"encounter_admit_date"`
   - [FieldEncounterDischargeDate](#fieldencounterdischargedate): `"encounter_discharge_date"`
 - [Cohort](#cohort)
-  - [SetCohort](#setcohort): `app.Cohort`
-  - [FieldCohortPersonId](#fieldcohortpersonid): `PersonId`
+  - [SetCohort](#setcohort): `"app.Cohort"`
+  - [FieldCohortPersonId](#fieldcohortpersonid): `"PersonId"`
   - [RowLimit](#rowlimit): `200000`
   - [ExportLimit](#exportlimit): `5000`
 - [Export](#export)
@@ -104,7 +104,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
 ## JWT
 Properties relating to Leaf-issued JavaScript Web tokens (JWTs).
 ### SigningKey
-Environment Variable which points to the path [for the JWT signing key]((#creating-a-jwt-signing-key). This should be `LEAF_JWT_KEY`.
+Environment Variable which points to the path [for the JWT signing key](#creating-a-jwt-signing-key). This should be `LEAF_JWT_KEY`.
 ### Password
 Environment Variable which stores the password for the JWT signing key. This should be `LEAF_JWT_KEY_PW`.
 ### Certificate
@@ -151,22 +151,68 @@ Default timeout length in seconds for clinical queries. Depending on a variety o
 ##### Admin
 
 ## Compiler
-Properties relating to the Leaf SQL Compiler. Note that the explanataions below provide suggestions for OMOP and i2b2 clinical databases for convenience but are not limited to a particular data model.
+Properties relating to the Leaf SQL Compiler. If you are using common data models such as OMOP or i2b2, feel free to simply use the below templates:
+
+OMOP v5:
+```javascript
+"Compiler": {
+  "Alias": "@",
+  "SetPerson": "dbo.person",
+  "SetEncounter": "dbo.visit_occurrence",
+  "FieldPersonId": "person_id",
+  "FieldEncounterId": "visit_occurrence_id",
+  "FieldEncounterAdmitDate": "visit_start_date",
+  "FieldEncounterDischargeDate": "visit_end_date"
+}
+```
+
+i2b2:
+```javascript
+"Compiler": {
+  "Alias": "@",
+  "SetPerson": "dbo.PATIENT_DIMENSION",
+  "SetEncounter": "dbo.VISIT_DIMENSION",
+  "FieldPersonId": "PATIENT_NUM",
+  "FieldEncounterId": "ENCOUNTER_NUM",
+  "FieldEncounterAdmitDate": "START_DATE",
+  "FieldEncounterDischargeDate": "END_DATE"
+}
+```
+
+### Alias
+The global character that acts as a indicator for inserting an alias for a `SQL Set`. Typically the `@` character is used. 
+
+Why is this needed? Consider the `SQL` statement:
+
+```sql
+SELECT E.*
+FROM dbo.Person AS P
+     INNER JOIN dbo.Encounter AS E
+        ON P.PersonId = E.PersonId
+WHERE PersonId = 123        
+```
+This would return an error because `PersonId` in the `WHERE` clause could be from either `dbo.Person` or `dbo.Encounter`. To solve this example, we could simply change this to `WHERE P.PersonId = 123`, with `P.` preceding `PersonId`.
+
+Because Leaf writes highly variable `SQL`, it needs a hint of where to insert aliases for a given `SQL Set` to ensure errors like the above do not happen. An example of these using the `@` character could be a date field, `@.observation_date`, or a `WHERE` clause, `@.lab_type = 'WBC'`. Note that in both cases the `@` character acts as a placeholder and would be replaced at runtime with a real alias.
 ### SetPerson
 The primary SQL table or view that has **one row per patient**, typically containing demographic information.
 ### SetEncounter
 The primary SQL table or view that has **one row per encounter**, typically containing information such as the visit type and admit and discharge dates.
 ### FieldPersonId
-The SQL field that must be present on every SQL object Leaf will query, and represents a field for unique identifiers for the patient. For standard data models such as OMOP this would be `person_id`, or in i2b2, `PATIENT_NUM`.
+The SQL field that must be present on every SQL object Leaf will query and contains unique identifiers for patients in the database.
 ### FieldEncounterId
-The SQL field that must be present on every SQL object Leaf will query which has a one-to-many relationship to patients such that patients can have many over time. This field represents unique identifiers for encounters. For standard data models such as OMOP this would be `visit_occurrence_id`, or in i2b2, `ENCOUNTER_NUM`.
+The SQL field that must be present on every SQL object Leaf will query which has a one-to-many relationship to patients, such that patients can have many over time. This field represents unique identifiers for encounters.
 ### FieldEncounterAdmitDate
-The SQL field that represents the admission date and time for a given encounter. This field should be present on the table or view defined in [SetEncounter](#setencounter). For standard data models such as OMOP this would be `visit_start_date`, or in i2b2, `START_DATE`.
+The SQL field that represents the admission date and time for a given encounter. This field should be present on the table or view defined in [SetEncounter](#setencounter).
 ### FieldEncounterDischargeDate
-The SQL field that represents the discharge date and time for a given encounter. This field should be present on the table or view defined in [SetEncounter](#setencounter). For standard data models such as OMOP this would be `visit_end_date`, or in i2b2, `END_DATE`.
+The SQL field that represents the discharge date and time for a given encounter. This field should be present on the table or view defined in [SetEncounter](#setencounter).
 
 ## Cohort
 Properties relating to the Leaf application patient cache.
+### SetCohort
+The Leaf application database's patient ID cache table. This should be set to `app.Cohort`.
+### FieldCohortPersonId
+The Leaf application database's patient ID field. This should be set to `PersonId`.
 ### RowLimit
 The maximum number of patients that Leaf will cache upon running a cohort definition query. If a given query returns more unique patients than this value, Leaf will simply return the count and the user will not be able to see visualization information or row-level data.
 ### ExportLimit
@@ -181,7 +227,7 @@ The absolute path to a given REDCap instance's root API path, such as `https://r
 #### BatchSize
 The number of rows of data per API request that Leaf will export to REDCap. This number should be relatively low, such as 10, and is used to give feedback to users as to progress and estimated time remaining.
 #### RowLimit
-The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number but will be prevented from exporting if this is exceeded. This is designed to prevent the export of larger datasets than REDCap is designed to manage.
+The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number if users are simply viewing the `Patient List`, but they will be prevented from exporting. This is designed to prevent the export of larger datasets than REDCap is designed to manage.
 #### Scope
 The scoped identity for the REDCap instance that will be exported to. This is typically the `u.<insitution>.edu` in `sally_johnson@u.<institution>.edu`. When assigning user permissions via the REDCap API, Leaf will prepend the current user name (e.g. `sally_johnson`) to this value.
 #### SuperToken
