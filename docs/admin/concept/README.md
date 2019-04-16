@@ -1,6 +1,6 @@
 ## The building blocks of Leaf: Concepts
 * [Introduction](#introduction)
-* [Creating Concepts with the Admin Panel](#creating-`Concepts`-with-the-admin-panel)
+* [Creating Concepts using the Admin Panel](#creating-concepts-using-the-admin-panel)
 
 ## Introduction
 Leaf is a `SQL` writing and execution engine. While it is designed to be fun and intuitive for users, ultimately Leaf's most important job is to reliably and flexibly construct `SQL` queries. 
@@ -48,7 +48,7 @@ Great - we've now provided the perhaps the most important information to help Le
 
 Next, we'll move on to creating `Concepts`: the building blocks of Leaf queries.
 
-## Creating Concepts with the Admin Panel
+## Creating Concepts using the Admin Panel
 Let's create our first Concept. Open up the Leaf client in your web browser. We'll continue with the two example tables earlier, but feel free to use real table or view names in your clinical database.
 
 > This step assumes you've already followed the [Leaf deployment guide](https://github.com/uwrit/leaf/tree/master/docs/deploy) and set up appropriate web, application, and database servers. If you haven't, start there first.
