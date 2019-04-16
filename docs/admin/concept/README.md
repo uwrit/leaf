@@ -53,26 +53,24 @@ Let's create our first Concept. Open up the Leaf client in your web browser. We'
 
 > This step assumes you've already followed the [Leaf deployment guide](https://github.com/uwrit/leaf/tree/master/docs/deploy) and set up appropriate web, application, and database servers. If you haven't, start there first.
 
-You can skip through the attestation screen and simply select Research -> No -> De-identified - these settings won't affect Concept creation. When you first log in, your screen should look something like this:
+Select `Research` -> `No` -> `De-identified`. When you first log in, your screen should look something like this:
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/no_concepts.png"/></p>
 
-We haven't configured any `Concepts` yet, so this is expected. Click `Admin` on the left sidebar.
+Click `Admin` on the left sidebar.
 
-> If you don't see the `Admin` tab, you have likely not configured your [admin group correctly, or are not in the group yet](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#admin).
+> If you don't see the `Admin` tab, make sure you have configured your [admin group correctly](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#admin).
 
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/create_concept_sql_set.png"/></p>
+Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts. In this case, we only have two tables, `Patient` and `Encounter`. Let's add both as `SQL Sets`.
 
-You should see a screen like this. Click `creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of `Concepts`. In this case, we only have two tables, `Patient` and `Encounter`. Let's add both as `SQL Sets`.
+Let's add our first table. Under `SQL FROM`, enter `"dbo.Patient"`. There are a few other configuration options you may see, but don't worry about those yet.
 
-Enter `"dbo.Patient"` under `SQL FROM`. There are a few other configuration options you may see, but don't worry about those yet. That's it for `Patient`!
+Next we need to create another `SQL Set` for `Encounter`, so click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field we configured in the earlier on this table, as well as a date field.
 
-Next, click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the box that says `Has Encounters`, which is an indication that Leaf should expect the `EncounterId` field we configured in the [introduction](#introduction) on this table, as well as a date field.
-
-Under `Date Field`, fill in `"@.AdmitDate"`, which you'll recall is the first field that is a type of date in the `Encounter` table. Don't forget to prepend the alias placeholder `"@."` before the field name. The `Date Field` we've added will be used later if users choose to filter a `Concept` using this `SQL Set` by dates (e.g., the past 6 months).
+Under `Date Field`, fill in `"@.AdmitDate"`, which you'll recall is the first date field on the `Encounter` table. Don't forget to prepend the alias placeholder `"@."` before the field name. The `Date Field` we've added will be used later if users choose to filter a Concept using this `SQL Set` by dates (e.g., the past 6 months).
 
 Your screen should look like this:
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/unsaved_sql_sets.png"/></p>
 
-Click `Save` at the top. Great! Now we are ready to make a few `Concepts` that use our `Patient` and `Encounter` tables. Click `Back to Concept Editor` in the upper-right, then `+ Create New Concept` at the top.
+Click `Save` at the top. Now we are ready to make a few Concepts that use our `Patient` and `Encounter` tables. Click `Back to Concept Editor` in the upper-right, then `+ Create New Concept` at the top.
