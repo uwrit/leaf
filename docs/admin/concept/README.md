@@ -63,7 +63,7 @@ Click `Admin` on the left sidebar.
 
 Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts. In this case, we only have two tables, `Patient` and `Encounter`. Let's add both as `SQL Sets`.
 
-Let's add our first table. Under `SQL FROM`, enter `"dbo.Patient"`. There are a few other configuration options you may see, but don't worry about those yet.
+You should see a single white box near the top. Under `SQL FROM`, enter `"dbo.Patient"`. There are a few other configuration options you may see, but don't worry about those yet.
 
 Next we need to create another `SQL Set` for `Encounter`, so click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field we configured in the earlier on this table, as well as a date field.
 
