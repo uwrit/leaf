@@ -50,7 +50,7 @@ Let's break it down:
 * **SetEncounter** is the name of the primary table for encounter information, with one row per encounter. We'll use our `Encounter` table.
 * **FieldPersonId** is the name of the `SQL` field that appears in all tables or views we'd like to query and represents unique identifiers for patients. The field `PatientId` appears in both tables and contains identifiers for patients, so we'll choose that.
 * **FieldEncounterId** is the name of the field that represents visit identifiers, so we'll use `EncounterId`.
-* **FieldEncounterAdmitDate** and `FieldEncounterDischargeDate` are (perhaps unsurprisingly) the names of fields indicating encounter admission and discharge date times. `AdmitDate` and `DischargeDate` seem to fit the bill, so we'll use those.
+* **FieldEncounterAdmitDate** and **FieldEncounterDischargeDate** are (perhaps unsurprisingly) the names of fields indicating encounter admission and discharge date times. `AdmitDate` and `DischargeDate` seem to fit the bill, so we'll use those.
 
 </br>
 
@@ -93,7 +93,7 @@ You should see a single white box near the top. Under `SQL FROM`, enter `"dbo.Pa
 
 </br>
 
-Next we need to create another `SQL Set` for `Encounter`, so click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field we configured in the earlier on this table, as well as a date field.
+Next we need to create another `SQL Set` for `Encounter`, so click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
 
 </br>
 
