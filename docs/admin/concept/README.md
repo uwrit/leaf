@@ -22,7 +22,7 @@ And `Encounter` looks like this:
 | A         | 456         | Inpatient  | 2001-7-8   | 2001-7-11     |
 | B         | 789         | Outpatient | 1997-12-10 | 1997-12-10    |
 
-Pretty simple. Let's start by configuring [Leaf's SQL compiler](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler), the configuration of which is stored as a `JSON` object:
+Pretty simple. Let's start by configuring Leaf's SQL compiler ([see details](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), the configuration of which is stored as a `JSON` object:
 
 ```javascript
 "Compiler": {
@@ -55,13 +55,13 @@ Let's create our first Concept. Open up the Leaf client in your web browser. We'
 
 You can skip through the attestation screen and simply select Research -> No -> De-identified - these settings won't affect Concept creation. When you first log in, your screen should look something like this:
 
-![No `Concepts`](https://github.com/uwrit/leaf/tree/master/docs/admin/images/no_`Concepts`.png)
+![No `Concepts`](https://github.com/uwrit/leaf/blob/master/docs/admin/images/no_concepts.png)
 
 We haven't configured any `Concepts` yet, so this is expected. Click `Admin` on the left sidebar.
 
 > If you don't see the `Admin` tab, you have likely not configured your [admin group correctly, or are not in the group yet](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#admin).
 
-![Create SQL Set](https://github.com/uwrit/leaf/tree/master/docs/admin/images/create)concept_sql_set.png)
+![Create SQL Set](https://github.com/uwrit/leaf/blob/master/docs/admin/images/create_concept_sql_set.png)
 
 You should see a screen like this. Click `creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of `Concepts`. In this case, we only have two tables, `Patient` and `Encounter`. Let's add both as `SQL Sets`.
 
@@ -73,6 +73,6 @@ Under `Date Field`, fill in `"@.AdmitDate"`, which you'll recall is the first fi
 
 Your screen should look like this:
 
-![Unsaved SQL Sets](https://github.com/uwrit/leaf/tree/master/docs/admin/images/unsaved_sql_sets.png)
+![Unsaved SQL Sets](https://github.com/uwrit/leaf/blob/master/docs/admin/images/unsaved_sql_sets.png)
 
-Click `Save` at the top. Great! Now we are ready to make a few `Concepts` that use our `Patient` and `Encounter` tables. Click `Back to Concept Editor` in the upper-right. Click `+ Create New Concept` at the top.
+Click `Save` at the top. Great! Now we are ready to make a few `Concepts` that use our `Patient` and `Encounter` tables. Click `Back to Concept Editor` in the upper-right, then `+ Create New Concept` at the top.
