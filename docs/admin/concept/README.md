@@ -44,9 +44,9 @@ Let's break it down:
 * `FieldEncounterId` is the name of the field that represents visit identifiers, so we'll use `EncounterId`.
 * `FieldEncounterAdmitDate` and `FieldEncounterDischargeDate` are (perhaps unsurprisingly) the names of fields indicating encounter admission and discharge date times. `AdmitDate` and `DischargeDate` seem to fit the bill, so we'll use those.
 
-Great - we've now provided the perhaps the most important information to help Leaf understand the basic structure of our clinical database. Note that these values are expected to be consistent and configured only once.
+Great - we've now provided the most important information to help Leaf understand the basic structure of our clinical database. Note that these values are expected to be consistent and configured only once.
 
-Next, we'll move on to creating `Concepts`: the building blocks of Leaf queries.
+Next, we'll move on to creating Concepts, the building blocks of Leaf queries.
 
 ## Creating Concepts using the Admin Panel
 Let's create our first Concept. Open up the Leaf client in your web browser. We'll continue with the two example tables earlier, but feel free to use real table or view names in your clinical database.
