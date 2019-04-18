@@ -3,8 +3,31 @@ The application server hosts the [Leaf REST API](https://github.com/uwrit/leaf/t
 
 The API is written in C# and .NET Core, and can run in either Linux or Windows environments.
 
-## Build
-TODO
+## Building the API
+There are a variety of ways to build the API, the `dotnet` CLI tool supports both self-contained builds, as well as runtime dependent targets. Although .NET Core is cross-platform, some targets have some quirks that should be called out. If you're curious, you can review the build.sh script in the project's root directory. Self-contained builds produce an executable and embeds the entire .NET runtime in the build artifacts, this results in a much larger deployment payload but removes the need to install the .NET Core runtime on your target machine. Conversely, runtime dependent builds assume that the .NET Core runtime will be installed on your target machine and only includes the application and it's 3rd party dependencies in the artifact folder.
+
+### Windows
+Windows fully supports both self-contained builds as well as runtime dependent builds.
+
+Self-contained:
+```bash
+dotnet publish -c Release -r win-x64 -o <output_dir>
+```
+Runtime dependent:
+```bash
+dotnet publish -c Release -o <output_dir>
+```
+### Red Hat Enterprise Linux (RHEL)/CentOS
+RHEL7 and Cent7 only support runtime dependent builds and require.
+
+On RHEL7 or Cent7 with .NET Core installed:
+```bash
+dotnet publish -c Release -o <output_dir>
+```
+On Windows/MacOS building for RHEL/Cent:
+```bash
+dotnet publish -c Release -o <output_dir> -r rhel.7-x64 --self-contained false /p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App
+```
 
 ## Installation
 1) [Creating a JWT Signing Key](#creating-a-jwt-signing-key)
@@ -67,13 +90,12 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
     - [HeadersMapping](#headersmapping)
       - [Entitlements](#entitlements)
         - [Name](#name): `"gws_groups"`
-        - [IsMulti](#ismulti): `true`
         - [Delimiter](#delimeter):`";"`
-    - [RoleMapping](#rolemapping)
-      - [User](#user): `"urn:mace:<your_institution>.edu:groups:<user_group>"`
-      - [Super](#super): `"urn:mace:<your_institution>.edu:groups:<super_user_group>"`
-      - [Identified](#identified): `"urn:mace:<your_institution>.edu:groups:<user_group_that_can_see_phi>"`
-      - [Admin](#admin): `"urn:mace:<your_institution>.edu:groups:<admin_group>"`
+    - [RoleMapping](#rolemapping) 
+      - [User](#user): `"urn:mace:uw:groups:uw_rit_leaf_users"`
+      - [Super](#super): `"urn:mace:uw:groups:uw_rit_leaf_supers"`
+      - [Identified](#identified): `"urn:mace:uw:groups:uw_rit_leaf_phis"`
+      - [Admin](#admin): `"urn:mace:uw:groups:uw_rit_leaf_admins"`
 - [Compiler](#compiler)
   - [Alias](#alias): `"@"`
   - [SetPerson](#setperson): `"dbo.person_table`"
@@ -113,8 +135,7 @@ Environment Variable which stores the password for the JWT signing key. This sho
 ### Certificate
 Environment Variable which points to the path of the `cert/pem` file. This should be `LEAF_JWT_CERT`.
 ### Issuer
-The `Issuer` is a global identifier in a Leaf instance that represents the origin of a JWT, and should be unique. The recommended practice for this is `leaf.<your_institution>.edu`, where `your_institution.edu` is a unique domain name. This is a suggested practice though, as this simply needs to be a globally unique string 200 characters or less.
-
+The `Issuer` is a global identifier in a Leaf instance that represents the origin of a JWT, and should be unique. The recommended practice for this is `leaf.<your_institution>.edu`, where `<your_institution>.edu` is a unique domain name. This is a suggested practice though, as this simply needs to be a globally unique string 200 characters or less.
 ## DB
 Properties relating to the Leaf application and clinical databases.
 ### App
@@ -129,30 +150,73 @@ Properties relating to the clinical database that Leaf is to query.
 Environment Variable which contains the connection string for the clinical database. This should be `LEAF_CLIN_DB`.
 #### DefaultTimeout
 Default timeout length in seconds for clinical queries. Depending on a variety of factors, certain queries may be longer-running and thus this should be relatively high, such as 120 to 180 seconds.
-
 ## Authentication
+```javascript
+"Authentication": {
+  "Mechanism": "SAML2",
+  "SessionTimeoutMinutes": 480,
+  "InactivityTimeoutMinutes": 20,
+  "LogoutURI": "<your config specific fully qualified logout URI>",
+  "SAML2": {
+    "Headers": {
+      "ScopedIdentity": "eppn"
+    }
+  }
+}
+```
 ### Mechanism
+Either `SAML2` or `UNSECURED`.
+- Choose `SAML2` in all non-development environments.
+- Choose `UNSECURED` only in development settings.
 ### SessionTimeoutMinutes
+This should be functionally equivalent to the Service Provider's configured `Sessions.lifetime` value. 28800 seconds would translate to 480 minutes.
 ### InactivityTimeoutMinutes
+This should be functionally equivalent to the Service Provider's configured `Sessions.timeout` value. 3600 seconds would translate to 60 minutes.
 ### LogoutURI
+This value is highly dependent on your specific Shibboleth configuration. Please read the [official documentation](https://wiki.shibboleth.net/confluence/display/SP3/Logout), additionally [NC State's documentation](https://docs.shib.ncsu.edu/docs/logout.html) provides excellent examples to follow.
 ### SAML2
+Configures the SAML2 authentication integration layer.
 #### Headers
+Configures how authentication payload should be extracted from the request headers.
 #### ScopedIdentity
-
+Configures how the scoped identity header key will look.
 ## Authorization
+```javascript
+"Authorization": {
+  "Mechanism": "SAML2",
+  "SAML2": {
+    "HeadersMapping": {
+      "Entitlements": {
+        "Name": "gws-groups",
+        "Delimiter": ";"
+      }
+    },
+    "RolesMapping": {
+      "User": "urn:mace:users",
+      "Super": "urn:mace:supers",
+      "Identified": "urn:mace:phi",
+      "Admin": "urn:mace:sudos"
+    }
+  }
+}
+```
 ### Mechanism
+Either `SAML2`, `ACTIVEDIRECTORY`, or `UNSECURED`.
+- Choose `SAML2` if a user's group memberships will arrive from the IdP.
+- Choose `ACTIVEDIRECTORY` if Leaf should go source group membership directly from an Active Directory instance.
+- `UNSECURED` is only to be used in development settings.`
 ### SAML2
+Configures the SAML2 authorization integration layer.
 #### HeadersMapping
+Configures how the entitlement payload should be extracted from the request headers.
 ##### Entitlements
+Configures how the entitlement header will look.
 ###### Name
-###### IsMulti
+Configures the header key to look for.
 ###### Delimeter
+Configures the character or string used to delimit the list of groups.
 #### RoleMapping
-##### User
-##### Super
-##### Identified
-##### Admin
-
+Configures how groups are mapped to Leaf roles. All roles are required to be mapped, even if they map to the same groups. For example, you may wish for all super users to be admins, in that case you may map those roles to the same group.
 ## Compiler
 Properties relating to the Leaf SQL Compiler. If you are using common data models such as OMOP or i2b2, feel free to simply use the below templates:
 
