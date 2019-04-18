@@ -3,6 +3,9 @@ The application server hosts the [Leaf REST API](https://github.com/uwrit/leaf/t
 
 The API is written in C# and .NET Core, and can run in either Linux or Windows environments.
 
+## Build
+TODO
+
 ## Installation
 1) [Creating a JWT Signing Key](#creating-a-jwt-signing-key)
 2) [Setting Environment Variables](#setting-environment-variables)
