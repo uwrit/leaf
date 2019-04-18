@@ -14,3 +14,5 @@
     </rewrite>
    ```
    - Note: Do NOT name the API application "api", this will cause the rewrite rule to apply recursively until the request fails. At UW we name the backing application "leafapi".
+
+TODO(cspital) add shibboleth configuration link
