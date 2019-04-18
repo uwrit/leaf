@@ -13,7 +13,7 @@ The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt
 ```bash
 openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem \
     -out cert.pem -days 3650 -subj \
-    "//CN=urn:leaf:issuer:leaf.<your_institution>.edu"
+    "//CN=urn:leaf:issuer:leaf.<your_institution>.<tld>"
 ```
 ```bash
 openssl pkcs12 -in cert.pem -inkey key.pem \
