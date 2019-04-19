@@ -7,13 +7,18 @@
 3) Install [Shibboleth Service Provider 3](https://wiki.shibboleth.net/confluence/display/SP3/Install+on+Windows#InstallonWindows-Installation)
    - Check `Configure IIS7 Module` box during installation.
 4) Create an Application pool to run the site and API.
-![App Pool Example](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_app_pool.png "App Pool Example")
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_app_pool.png" /></p>
+
 5) Create the website to host the Leaf browser application.
-![Site Example](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_website.png "Site Example")
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_website.png" /></p>
+
 6) Create an application behind the site to host the API.
-![API Example](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_api.png "API Example")
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_api.png" /></p>
+
    - Note: Do NOT name the API application "api", this will cause the rewrite rule to apply recursively until the request fails. At UW we name the backing application "leafapi".
-7) Create a URL rewrite rule on the site with the following template.![Rewrite URL UI Example](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_url_rewrite.png "Rewrite URL UI Example")
+7) Create a URL rewrite rule on the site with the following template.
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_url_rewrite.png" /></p>
+
 ```xml
 <system.webServer>
     ...additional configuration

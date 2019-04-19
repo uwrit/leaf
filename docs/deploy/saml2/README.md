@@ -21,6 +21,8 @@ For example:
 
 ## Service Providers (SP)
 There are multiple implementations of the Service Provider role in the SAML2 protocol, we have only ever used Shibboleth and as such will refer to that in the following documentation.
+- [Shibboleth SP Installation Media](https://shibboleth.net/downloads/service-provider/latest)
+- [Shibboleth SP Installation Documentation](https://wiki.shibboleth.net/confluence/display/SP3/Installation)
 
 ## Route Protection Setup
 There are only two routes that _must_ be protected by the SAML2 Service Provider (SP), all other routes are protected by requiring a JWT that can only be generated from a SAML2 SP protected endpoint.
