@@ -25,6 +25,7 @@ See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
 * [How Leaf can help accomplish research](https://github.com/uwrit/leaf/wiki#how-can-leaf-help-with-research)
 * [Architecture](https://github.com/uwrit/leaf/tree/master/docs/deploy#architecture)
 * [Installation](https://github.com/uwrit/leaf/tree/master/docs/deploy#installation-steps)
+* [The Building Blocks of Leaf: Concepts](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/README.md#the-building-blocks-of-leaf-concepts)
 
 ## Can I use Leaf now?
 Sure! Leaf is in active development and will evolve as development continues and features are added.
