@@ -57,8 +57,7 @@ SELECT
   , o.care_site_id
   , visit_type_code = c_visit.concept_code
 FROM dbo.visit_occurrence AS o 
-	 LEFT JOIN dbo.concept AS c_visit 
-		ON o.visit_concept_id = c_visit.concept_id
+     LEFT JOIN dbo.concept AS c_visit ON o.visit_concept_id = c_visit.concept_id
 ```
 
 | person_id | visit_occurrence_id | visit_start_date | visit_end_date | care_site_id | visit_type_code |
