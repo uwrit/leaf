@@ -69,7 +69,7 @@ export class MainEditor extends React.PureComponent<Props> {
                 <div className={`${c}-start`}>
                     <p>Hi there! It looks like you need to create Concepts to connect to your clinical data.</p>
                     <p>
-                        Start by <a onClick={this.handleCreateSqlSetClick}>creating a Concept SQL Set</a>
+                        <a onClick={this.handleCreateSqlSetClick}>Start by creating a Concept SQL Set</a>
                         , which is a SQL table, view, or subquery which your Concepts can point to.
                     </p>
                 </div>

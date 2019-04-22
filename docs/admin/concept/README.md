@@ -3,21 +3,21 @@
 * [Creating Concepts using the Admin Panel](#creating-concepts-using-the-admin-panel)
 
 ## Introduction
-Leaf is a SQL writing and execution engine. While it is designed to be fun and intuitive for users, ultimately Leaf's most important job is to reliably and flexibly construct SQL queries. 
+Leaf is a SQL writing and execution engine. While it is designed to be fun and intuitive for users, ultimately Leaf's most important job is to reliably and flexibly construct SQL queries using a few simple but powerful configuration rules. 
 
-Leaf works using a few simple but powerful configuration rules. Let's start with an example. We'll use an [OMOP](https://www.ohdsi.org/data-standardization/the-common-data-model/) database for this example, though the steps can be applied to any particular data model. We'll focus on using the `person` table in our OMOP database.
+Let's start with an example. We'll use an [OMOP](https://www.ohdsi.org/data-standardization/the-common-data-model/) v5 database for this example, though these steps can be applied to any particular data model. We'll focus on using the `person` table (via a `view`) and `visit_occurrence` table in our OMOP database.
 
 The goals are:
 1) Configure the Leaf SQL compiler.
-2) Create a Leaf SQL Set for the `v_person` view.
-3) Create 3 Concepts that query demographic data found in `person`.
+2) Create Leaf SQL Sets for the `v_person` view and `visit_occurrence` table.
+3) Create 3 Concepts using the SQL Sets.
 
 ## Configuring the SQL compiler
-Every Leaf instance assumes that there is a single, consistent field that represents patient identifiers. In OMOP databases this is the `person_id` field, which can be found on nearly any table with patient data. Likewise, Leaf assumes that longitudinal tables in your database will have a consistent field representing encounter identifiers. IN OMOP this is the `visit_occurrence_id` field.
+Every Leaf instance assumes that there is a single, consistent field that represents patient identifiers. In OMOP databases this is the `person_id` field, which can be found on nearly any table with patient data. Likewise, Leaf assumes that longitudinal tables in the database will have a consistent field representing encounter identifiers. In OMOP this is the `visit_occurrence_id` field.
 
-Before starting, let's create a SQL `view` called `v_person` to make the `person` table simpler to query. This example is specific to OMOP but the approach works for other models as well. Note that this is *optional* but used for convenience and illustrative purposes.
+Before starting, let's create two SQL `views` called `v_person` to make the `person` and `visit_occurrence` tables simpler to query. This example is specific to OMOP but the approach works for other models as well. Note that pointing Leaf at views is completely *optional* and demonstrated here for convenience and illustrative purposes.
 
-Our `v_person` `view` looks like this:
+Our `v_person` `view` is defined like this:
 
 ```sql
 SELECT
@@ -39,19 +39,30 @@ FROM dbo.PERSON AS p
 | A         | 1990-1-1       | F      | Black or African American  | Not Hispanic or Latino | NY
 | B         | 1945-2-2       | M      | Asian or Pacific Islander  | Not Hispanic or Latino | OR
 
-Pretty simple. Let's start by configuring Leaf's SQL compiler ([see details](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), the configuration of which is stored as a `JSON` object:
+The `visit_occurrence` `view` is defined like this:
 
-```javascript
-"Compiler": {
-  "Alias": "@",
-  "SetPerson": "dbo.v_person",
-  "SetEncounter": "dbo.visit_occurrence",
-  "FieldPersonId": "person_id",
-  "FieldEncounterId": "visit_occcurrence_id",
-  "FieldEncounterAdmitDate": "visit_start_date",
-  "FieldEncounterDischargeDate": "visit_end_date"
-}
+```sql
+SELECT 
+	person_id
+  , visit_occurrence_id
+  , o.visit_start_date
+  , o.visit_end_date
+  , o.care_site_id
+  , visit_type_code = c_visit.concept_code
+FROM dbo.visit_occurrence AS o 
+	 LEFT JOIN dbo.concept AS c_visit 
+		ON o.visit_concept_id = c_visit.concept_id
 ```
+
+| person_id | visit_occurrence_id | visit_start_date | visit_end_date | care_site_id | visit_type_code |
+| --------- | ------------------- | ---------------- | ---------------| ------------ | --------------- | 
+| A         | 123                 | 2011-01-01       | 2011-01-01     | site1        | OP              | 
+| A         | 456                 | 2015-05-28       | 2015-06-07     | site1        | IP              |
+| B         | 789                 | 2014-09-01       | 2014-09-01     | site2        | ED              |
+
+Pretty simple. After creating the views in the database, let's start by configuring Leaf's SQL compiler ([see details](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), the configuration of which is stored in `/src/server/API/appsettings.json`:
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/configure_json.gif"/></p>
 
 Let's break it down:
 * **Alias** acts as a indicator to Leaf to insert an alias in a `SQL` statement wherever this character(s) is found (more on that in a bit). We'll set this to `"@"` for simplicity and readability, and because it is commonly used in many Leaf configurations.
@@ -70,30 +81,22 @@ Let's create a Leaf `SQL Set` representing the new `view`, `v_person`. Open up t
 
 > This step assumes you've already followed the [Leaf deployment guide](https://github.com/uwrit/leaf/tree/master/docs/deploy) and set up appropriate web, application, and database servers. If you haven't, start there first.
 
-Select `Research` -> `No` -> `De-identified`. When you first log in, your screen should look something like this:
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/login.gif"/></p>
 
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/no_concepts.png"/></p>
+Select `Research` -> `No` -> `De-identified`.
 
 Click `Admin` on the left sidebar.
 
 > If you don't see the `Admin` tab, make sure you have configured your [admin group correctly](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#admin).
 
-Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts.
+Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts and provide their `FROM` clauses.
 
-You should see a single white box near the top. Under `SQL FROM`, enter `"dbo.Patient"`. There are a few other configuration options you may see, but don't worry about those yet.
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/sqlsets.gif"/></p>
 
-Next we need to create another `SQL Set` for `Encounter`, so click `+ Create New SQL Set` and fill in `"dbo.Encounter"` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
+You should see a single white box near the top. Under `SQL FROM`, enter `dbo.v_person`.
 
-</br>
+Next, create another `SQL Set` for `dbo.v_visit_occurrence`. Click `+ Create New SQL Set` and fill in `dbo.visit_occurrence_id` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
 
-Under `Date Field`, fill in `"@.AdmitDate"`, which you'll recall is the first date field on the `Encounter` table. Don't forget to prepend the alias placeholder `"@."` before the field name. The `Date Field` we've added will be used later if users choose to filter a Concept using this `SQL Set` by dates (e.g., the past 6 months).
-
-</br>
-
-Your screen should look like this:
-
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/unsaved_sql_sets.png"/></p>
-
-</br>
+Under `Date Field`, fill in `@.`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name. The `Date Field` we've added will be used later if users choose to filter a Concept using this `SQL Set` by dates (e.g., the past 6 months).
 
 Click `Save` at the top. Now we are ready to make a few Concepts that use our `Patient` and `Encounter` tables. Click `Back to Concept Editor` in the upper-right, then `+ Create New Concept` at the top.
