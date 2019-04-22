@@ -7,27 +7,60 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Model.Compiler;
+using Model.Authorization;
+using Microsoft.Extensions.Logging;
+using Model.Validation;
 
 namespace Model.Cohort
 {
+    /// <summary>
+    /// Encapsulates Leaf's cohort counting use case.
+    /// </summary>
+    /// <remarks>
+    /// Required services throw exceptions that bubble up.
+    /// </remarks>
     public class CohortCounter
     {
         readonly IPanelConverterService converter;
         readonly IPanelValidator validator;
-        readonly IPatientCountService counter;
+        readonly IPatientCohortService counter;
+        readonly ICohortCacheService cohortCache;
+        readonly IUserContext user;
+        readonly ILogger<CohortCounter> log;
 
         public CohortCounter(IPanelConverterService converter,
             IPanelValidator validator,
-            IPatientCountService counter)
+            IPatientCohortService counter,
+            ICohortCacheService cohortCache,
+            IUserContext user,
+            ILogger<CohortCounter> log)
         {
             this.converter = converter;
             this.validator = validator;
             this.counter = counter;
+            this.cohortCache = cohortCache;
+            this.user = user;
+            this.log = log;
         }
 
-        public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken cancelToken)
+        /// <summary>
+        /// Provide a count of patients in the specified query.
+        /// Converts the query into a local validation context.
+        /// Validates the resulting context to ensure sensible construction.
+        /// Obtains the cohort of unique patient IDs.
+        /// Caches those patient IDs.
+        /// </summary>
+        /// <returns><see cref="CohortCount">The count of patients in the cohort.</see></returns>
+        /// <param name="queryDTO">Abstract query representation.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <exception cref="OperationCanceledException"/>
+        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="ArgumentNullException"/>
+        public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
-            var ctx = await converter.GetPanelsAsync(queryDTO, cancelToken);
+            Ensure.NotNull(queryDTO, nameof(queryDTO));
+
+            var ctx = await converter.GetPanelsAsync(queryDTO, token);
             if (!ctx.PreflightPassed)
             {
                 return new CohortCount
@@ -37,12 +70,23 @@ namespace Model.Cohort
             }
 
             var query = validator.Validate(ctx);
-            var patientCount = await counter.GetPatientCountAsync(query, cancelToken);
+            var cohort = await counter.GetPatientCohortAsync(query, token);
+
+            token.ThrowIfCancellationRequested();
+
+            log.LogInformation("Caching unsaved cohort.");
+            var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
+            log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
 
             return new CohortCount
             {
                 ValidationContext = ctx,
-                Count = patientCount
+                Count = new PatientCount
+                {
+                    QueryId = qid,
+                    Value = cohort.Count,
+                    SqlStatements = cohort.SqlStatements
+                }
             };
         }
     }

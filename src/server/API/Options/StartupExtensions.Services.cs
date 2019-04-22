@@ -90,7 +90,7 @@ namespace API.Options
             services.AddTransient<IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<IPreflightResourceReader, PreflightResourceReader>();
 
-            services.AddTransient<IPatientCountService, CtePatientCountService>();
+            services.AddTransient<IPatientCohortService, CtePatientCohortService>();
 
             services.AddSingleton<PatientCountAggregator>();
 
@@ -115,6 +115,7 @@ namespace API.Options
         static IServiceCollection AddModel(this IServiceCollection services)
         {
             services.AddTransient<CohortCounter>();
+            services.AddTransient<DemographicProvider>();
 
             return services;
         }

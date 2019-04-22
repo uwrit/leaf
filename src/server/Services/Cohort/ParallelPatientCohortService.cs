@@ -25,17 +25,15 @@ using Model.Authorization;
 
 namespace Services.Cohort
 {
-    public class ParallelPatientCountService : PatientCountService
+    public class ParallelPatientCohortService : PatientCohortService
     {
         readonly PatientCountAggregator patientCountAggregator;
 
-        public ParallelPatientCountService(
+        public ParallelPatientCohortService(
             ISqlCompiler compiler,
-            ICohortCacheService cohortCacheService,
             PatientCountAggregator patientCountAggregator,
-            IUserContext userContext,
             IOptions<ClinDbOptions> clinOpts,
-            ILogger<PatientCountService> logger) : base(compiler, cohortCacheService, userContext, clinOpts, logger)
+            ILogger<PatientCohortService> logger) : base(compiler, clinOpts, logger)
         {
             this.patientCountAggregator = patientCountAggregator;
         }

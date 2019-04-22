@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Compiler;
 using Model.Extensions;
 using Model.Options;
 
@@ -27,7 +26,7 @@ using Model.Options;
  * 
  */
 
-namespace Services.Compiler
+namespace Model.Compiler
 {
     using FederatedConceptMap = Dictionary<string, Concept>;
     using LocalConceptMap = Dictionary<Guid, Concept>;
