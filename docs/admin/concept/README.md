@@ -66,7 +66,7 @@ FROM dbo.visit_occurrence AS o
 | A         | 456                 | 2015-05-28       | 2015-06-07     | site1        | IP              |
 | B         | 789                 | 2014-09-01       | 2014-09-01     | site2        | ED              |
 
-Pretty simple. After creating the views in the database, let's start by configuring Leaf's [SQL compiler configuration](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), which is stored in `/src/server/API/appsettings.json`:
+Pretty simple. After creating the views in the database, let's start by configuring Leaf's [SQL compiler configuration](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler), which is stored in `/src/server/API/appsettings.json`:
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/configure_json.gif"/></p>
 
@@ -221,6 +221,6 @@ If you were able to successfully make the Concepts in this tutorial, congratulat
 
 Concepts can be extremely flexible and we've only scratched the surface of their functionality. If you'd like to learn more, head over to the [Concept Creation Details](https://github.com/uwrit/leaf/blob/master/docs/admin/concept-advanced/README.md) section.
 
-As you were creating Concepts for your database, you may have found yourself thinking that it requires a change in perspective in thinking about how you as a developer would query a clinical database versus how best to represent Concepts to users. 
+As you were creating Concepts for your database, you may have found yourself thinking that it requires a change in perspective in how you as a developer would query a clinical database versus how best to represent Concepts to users. 
 
 We've found that this is just as much an art as a science, and it's ultimately an iterative process, so don't worry about getting it perfect the first time.
