@@ -101,9 +101,9 @@ We want to allow users to query Concepts using our two new views, `v_person` and
 
 4) You should see a single white box near the top. Under `SQL FROM`, enter `dbo.v_person`.
 
-5) Next, create another `SQL Set` for `dbo.v_visit_occurrence`. Click `+ Create New SQL Set` and fill in `dbo.visit_occurrence_id` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
+5) Next, create another `SQL Set`. Click `+ Create New SQL Set` and fill in `dbo.v_visit_occurrence` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
 
-6) Under `Date Field`, fill in `@.visit_start_date`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name.
+6) Under `Date Field`, fill in `@.visit_start_date`, which you'll recall is the first date field on the `v_visit_occurrence` view. Don't forget to prepend the alias placeholder `@.` before the field name.
 
 7) Click `Save` at the top. Now we are ready to make a few Concepts that use our `v_person` and `v_visit_occurrence` views. 
 
