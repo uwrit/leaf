@@ -4,8 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +13,8 @@ using Microsoft.Extensions.Logging;
 using API.DTO.Cohort;
 using API.DTO.Compiler;
 using Services;
-using Services.Compiler;
-using Services.Cohort;
-using Services.Authorization;
 using Model.Cohort;
 using Model.Authorization;
-using Model.Extensions;
 using Model.Compiler;
 
 namespace API.Controllers
@@ -74,36 +68,23 @@ namespace API.Controllers
         [HttpGet("{queryid}/demographics")]
         public async Task<ActionResult<Demographic>> Demographics(
             string queryid,
-            [FromServices] IDemographicQueryService queryService,
-            [FromServices] IDemographicService demographicService,
-            CancellationToken cancelToken
-        )
+            [FromServices] DemographicProvider provider,
+            CancellationToken cancelToken)
         {
             try
             {
                 var queryRef = new QueryRef(queryid);
-                var validationContext = await queryService.GetDemographicQueryCompilerContext(queryRef);
-                if (validationContext.State != CompilerContextState.Ok)
+                var result = await provider.Demographics(queryRef, cancelToken);
+                if (result.ValidationContext.State != CompilerContextState.Ok)
                 {
-                    return NotFound(new CompilerErrorDTO(validationContext.State));
+                    return NotFound(new CompilerErrorDTO(result.ValidationContext.State));
                 }
 
-                cancelToken.ThrowIfCancellationRequested();
-
-                var ctx = await demographicService.GetDemographicsAsync(validationContext.Context, cancelToken);
-                var stats = new DemographicAggregator(ctx).Aggregate();
-
-                var demographics = new Demographic
-                {
-                    Patients = ctx.Exported,
-                    Statistics = stats
-                };
-
-                return Ok(demographics);
+                return Ok(result.Demographics);
             }
             catch (FormatException fe)
             {
-                log.LogWarning("Malformed query identifiers. Error:{Error}", fe.Message);
+                log.LogWarning("Malformed query identifiers. QueryId:{QueryID} Error:{Error}", queryid, fe.Message);
                 return BadRequest("QueryID is malformed.");
             }
             catch (OperationCanceledException)

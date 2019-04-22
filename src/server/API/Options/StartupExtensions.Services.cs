@@ -115,6 +115,7 @@ namespace API.Options
         static IServiceCollection AddModel(this IServiceCollection services)
         {
             services.AddTransient<CohortCounter>();
+            services.AddTransient<DemographicProvider>();
 
             return services;
         }

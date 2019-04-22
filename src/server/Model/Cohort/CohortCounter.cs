@@ -9,9 +9,16 @@ using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Authorization;
 using Microsoft.Extensions.Logging;
+using Model.Validation;
 
 namespace Model.Cohort
 {
+    /// <summary>
+    /// Encapsulates Leaf's cohort counting use case.
+    /// </summary>
+    /// <remarks>
+    /// Required services throw exceptions that bubble up.
+    /// </remarks>
     public class CohortCounter
     {
         readonly IPanelConverterService converter;
@@ -36,8 +43,23 @@ namespace Model.Cohort
             this.log = log;
         }
 
+        /// <summary>
+        /// Provide a count of patients in the specified query.
+        /// Converts the query into a local validation context.
+        /// Validates the resulting context to ensure sensible construction.
+        /// Obtains the cohort of unique patient IDs.
+        /// Caches those patient IDs.
+        /// </summary>
+        /// <returns><see cref="CohortCount">The count of patients in the cohort.</see></returns>
+        /// <param name="queryDTO">Abstract query representation.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <exception cref="OperationCanceledException"/>
+        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="ArgumentNullException"/>
         public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
+            Ensure.NotNull(queryDTO, nameof(queryDTO));
+
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
             if (!ctx.PreflightPassed)
             {
