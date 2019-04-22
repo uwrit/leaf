@@ -89,25 +89,25 @@ We want to allow users to query Concepts using our two new views, `v_person` and
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/login.gif"/></p>
 
-Select `Research` -> `No` -> `De-identified`.
+1) Select `Research` -> `No` -> `De-identified`.
 
-Click `Admin` on the left sidebar.
+2) Click `Admin` on the left sidebar.
 
 > If you don't see the `Admin` tab, make sure you have configured your [admin group correctly](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#admin).
 
-Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts and provide their `FROM` clauses.
+3) Click `Start by creating a Concept SQL Set`. `SQL Sets` are the SQL tables, views, or subqueries that are the foundation of Concepts and provide their `FROM` clauses.
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/sqlsets.gif"/></p>
 
-You should see a single white box near the top. Under `SQL FROM`, enter `dbo.v_person`.
+4) You should see a single white box near the top. Under `SQL FROM`, enter `dbo.v_person`.
 
-Next, create another `SQL Set` for `dbo.v_visit_occurrence`. 
+5) Next, create another `SQL Set` for `dbo.v_visit_occurrence`. Click `+ Create New SQL Set` and fill in `dbo.visit_occurrence_id` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
 
-Click `+ Create New SQL Set` and fill in `dbo.visit_occurrence_id` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
+6) Under `Date Field`, fill in `@.visit_start_date`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name.
 
-Under `Date Field`, fill in `@.`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name.
+7) Click `Save` at the top. Now we are ready to make a few Concepts that use our `v_person` and `v_visit_occurrence` views. 
 
-Click `Save` at the top. Now we are ready to make a few Concepts that use our `v_person` and `v_visit_occurrence` views. Click `Back to Concept Editor` in the upper-right.
+8) Click `Back to Concept Editor` in the upper-right.
 
 ## Creating Concepts
 We've successfully created `SQL Sets` for our views, so we can now create Concepts that users can interact with.
@@ -129,11 +129,11 @@ Click `Back to Concept Editor`, then `+Create New Concept`.
 ### Demographics
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_demographics.gif"/></p>
 
-Under `Name`, fill in `"Demographics"`. This will be the text that users see in the Concept tree.
+1) Under `Name`, fill in `"Demographics"`. This will be the text that users see in the Concept tree.
 
-Go down to `Full Text` and enter `Have demographics`. Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
+2) Go down to `Full Text` and enter `Have demographics`. Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
 
-Lastly, under the `SQL` section make sure the `Table, View, or Subquery` box shows `dbo.v_person` and the  `WHERE Clause` field is empty. Click `Save` at the top.
+3) Lastly, under the `SQL` section make sure the `Table, View, or Subquery` box shows `dbo.v_person` and the  `WHERE Clause` field is empty. Click `Save` at the top.
 
 As you may have noticed, this Concept is intended to simply serve as a hierachical container for Concepts under it related to Demographics. By itself it will likely not be very useful to users, and if they were to drag it over the query would be something simple like `SELECT person_id FROM dbo.v_person`, in other words all patients in the table.
 
@@ -142,11 +142,11 @@ Next let's create the `Gender` Concept, which will appear under `Demographics`. 
 ### Gender
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_gender.gif"/></p>
 
-Under `Name`, fill in `Gender`, and under `Full Text`, fill in `Identify with a gender`. 
+1) Under `Name`, fill in `Gender`, and under `Full Text`, fill in `Identify with a gender`. 
 
-We want this Concept to appear beneath `Demographics`, so drag the new Concept *into* it in order set `Demographics` as the parent Concept.
+2) We want this Concept to appear beneath `Demographics`, so drag the new Concept *into* it in order set `Demographics` as the parent Concept.
 
-Finally, as this Concept represents data about patient gender, users presumably would expect that patients without this data should be excluded. Under `SQL` -> `WHERE Clause` enter `@.gender IS NOT NULL`.
+3) Finally, as this Concept represents data about patient gender, users presumably would expect that patients without this data should be excluded. Under `SQL` -> `WHERE Clause` enter `@.gender IS NOT NULL`.
 
 Click `Save`. Repeat the process for the final two demographic Concepts, `Female` and `Male`, with the following data:
 
@@ -172,9 +172,9 @@ Click `Save`. Repeat the process for the final two demographic Concepts, `Female
 
 Before proceeding to create our `Encounters` Concepts, let's take a moment to confirm our `Demographics` Concepts are working as expected by running a quick query to see how many female patients are in our database.
 
-Click the `Find Patients` tab in the upper-left and drag `Female` over to the first panel.
+1) Click the `Find Patients` tab in the upper-left and drag `Female` over to the first panel.
 
-Click `Run Query`. If you see a count of patients (assuming your database has female patients), great! You can even click `(i)` -> `show detail` -> `SQL` to see the query Leaf created using the new Concept. Success!
+2) Click `Run Query`. If you see a count of patients (assuming your database has female patients), great! You can even click `(i)` -> `show detail` -> `SQL` to see the query Leaf created using the new Concept. Success!
 
 > If your query didn't work (you'll get a modal window notifying you there was an error), check the Leaf logs to see if there were any syntax or other errors in the query
 
