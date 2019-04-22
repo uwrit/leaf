@@ -25,14 +25,12 @@ using Model.Authorization;
 
 namespace Services.Cohort
 {
-    public class CtePatientCountService : PatientCountService
+    public class CtePatientCohortService : PatientCohortService
     {
-        public CtePatientCountService(
+        public CtePatientCohortService(
             ISqlCompiler compiler,
-            ICohortCacheService cohortCacheService,
-            IUserContext userContext,
             IOptions<ClinDbOptions> clinOpts,
-            ILogger<PatientCountService> logger) : base(compiler, cohortCacheService, userContext, clinOpts, logger)
+            ILogger<PatientCohortService> logger) : base(compiler, clinOpts, logger)
         {
         }
 

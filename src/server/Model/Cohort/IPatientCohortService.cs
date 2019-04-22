@@ -11,8 +11,8 @@ using Model.Compiler;
 
 namespace Model.Cohort
 {
-    public interface IPatientCountService
+    public interface IPatientCohortService
     {
-        Task<PatientCount> GetPatientCountAsync(PatientCountQuery query, CancellationToken token);
+        Task<PatientCohort> GetPatientCohortAsync(PatientCountQuery query, CancellationToken token);
     }
 }

@@ -7,6 +7,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Model.Compiler;
+using Model.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Model.Cohort
 {
@@ -14,20 +16,29 @@ namespace Model.Cohort
     {
         readonly IPanelConverterService converter;
         readonly IPanelValidator validator;
-        readonly IPatientCountService counter;
+        readonly IPatientCohortService counter;
+        readonly ICohortCacheService cohortCache;
+        readonly IUserContext user;
+        readonly ILogger<CohortCounter> log;
 
         public CohortCounter(IPanelConverterService converter,
             IPanelValidator validator,
-            IPatientCountService counter)
+            IPatientCohortService counter,
+            ICohortCacheService cohortCache,
+            IUserContext user,
+            ILogger<CohortCounter> log)
         {
             this.converter = converter;
             this.validator = validator;
             this.counter = counter;
+            this.cohortCache = cohortCache;
+            this.user = user;
+            this.log = log;
         }
 
-        public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken cancelToken)
+        public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
-            var ctx = await converter.GetPanelsAsync(queryDTO, cancelToken);
+            var ctx = await converter.GetPanelsAsync(queryDTO, token);
             if (!ctx.PreflightPassed)
             {
                 return new CohortCount
@@ -37,12 +48,23 @@ namespace Model.Cohort
             }
 
             var query = validator.Validate(ctx);
-            var patientCount = await counter.GetPatientCountAsync(query, cancelToken);
+            var cohort = await counter.GetPatientCohortAsync(query, token);
+
+            token.ThrowIfCancellationRequested();
+
+            log.LogInformation("Caching unsaved cohort.");
+            var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
+            log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
 
             return new CohortCount
             {
                 ValidationContext = ctx,
-                Count = patientCount
+                Count = new PatientCount
+                {
+                    QueryId = qid,
+                    Value = cohort.Count,
+                    SqlStatements = cohort.SqlStatements
+                }
             };
         }
     }
