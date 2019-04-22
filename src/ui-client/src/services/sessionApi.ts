@@ -9,7 +9,7 @@ import jwt_decode from 'jwt-decode';
 import { AppState } from '../models/state/AppState';
 import { AccessTokenDTO, Attestation, DecodedAccessToken, SessionContext, StoredSessionState } from '../models/Session';
 import { HttpFactory } from './HttpFactory';
-import { AuthConfig } from '../models/Auth';
+import { AuthConfig, LogoutDTO } from '../models/Auth';
 import { getPanelItemCount } from '../utils/panelUtils';
 
 /*
@@ -66,15 +66,18 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 };
 
 /*
- * Logs out the user, falling back to current URI if none configured.
+ * Tells the server to blacklist this token, as the uses is logging out.
  */
-export const logout = (config: AuthConfig) => {
-    if (config && config.logoutUri) {
-        window.location = (config.logoutUri as any);
+export const logoutToken = async (state: AppState): Promise<LogoutDTO | undefined> => {
+    try {
+        const http = HttpFactory.authenticated(state.auth.userContext!.token);
+        const request = http.post('api/user/logout');
+        const response = await request;
+        return response.data as LogoutDTO;
+    } catch (err) {
+        console.log(err);
     }
-    else {
-        window.location = window.location;
-    }
+    return;
 };
 
 /*

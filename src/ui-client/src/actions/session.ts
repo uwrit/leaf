@@ -14,7 +14,7 @@ import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndRespondents, fetchRespondentIdentity } from '../services/networkRespondentsApi';
 import { getExportOptions } from '../services/redcapApi';
-import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession } from '../services/sessionApi';
+import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutToken } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
@@ -27,6 +27,7 @@ import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
 import { setPanelFilters, setPanelFilterActiveStates } from './panelFilter';
 import { addDatasets } from '../services/datasetSearchApi';
+import { AuthMechanismType } from '../models/Auth';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -169,6 +170,32 @@ export const saveSessionAndLogout = () => {
         saveSessionAndForceReLogin(getState());
     };
 };
+
+/*
+ * Logs the user out and redirects to the designated logoutURI. If using in a 
+ * secured mode, notifies the server to blacklist the current session token as well.
+ */
+export const logout = () => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const state = getState();
+        const config = state.auth.config!;
+        let logoutUri = config.logoutUri;
+
+        if (config.mechanism !== AuthMechanismType.Unsecured) {
+            const loggedOut = await logoutToken(getState());
+            if (loggedOut) {
+                logoutUri = loggedOut.logoutURI;
+            }
+        }
+
+        if (logoutUri) {
+            window.location = (logoutUri as any);
+        }
+        else {
+            window.location = window.location;
+        }
+    };
+}
 
 // Synchronous
 export const errorAttestation = (error: boolean): SessionAction => {
