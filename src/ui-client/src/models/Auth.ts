@@ -41,6 +41,10 @@ export interface IdTokenDTO {
     idToken: string;
 }
 
+export interface LogoutDTO {
+    logoutURI: string;
+}
+
 export interface DecodedIdToken {
     'aud': string;
     'auth-type': string;

@@ -27,9 +27,9 @@ import { SavedQueriesState } from '../../models/Query';
 import { setCurrentQuery, setRunAfterSave } from '../../actions/queries';
 import { PanelFilter } from '../../models/panel/PanelFilter';
 import { getPanelItemCount } from '../../utils/panelUtils';
-import { logout } from '../../services/sessionApi';
 import { FaDatabase, FaChevronDown } from 'react-icons/fa';
 import './Header.css';
+import { logout } from '../../actions/session';
 
 interface OwnProps {}
 interface StateProps {
@@ -194,7 +194,7 @@ class Header extends React.PureComponent<Props> {
             body: 'Are you sure you want to log out?',
             header: 'Log out',
             onClickNo: () => { return; },
-            onClickYes: () => { logout(auth) },
+            onClickYes: () => { dispatch(logout()); },
             show: true,
             noButtonText: 'No',
             yesButtonText: 'Yes, log me out'
