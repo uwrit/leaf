@@ -12,17 +12,17 @@
 ## Introduction
 Leaf is a SQL writing and execution engine. While it is designed to be fun and intuitive for users, ultimately Leaf's most important job is to reliably and flexibly construct SQL queries using a few simple but powerful configuration rules. 
 
-Let's start with an example. We'll use an [OMOP](https://www.ohdsi.org/data-standardization/the-common-data-model/) v5 database for this example, though these steps can be applied to any particular data model. We'll focus on using the `person` table (via a view) and `visit_occurrence` table in our OMOP database.
+Let's start with an example. We'll use an [OMOP](https://www.ohdsi.org/data-standardization/the-common-data-model/) v5 database for this example, though these steps can be applied to any particular data model. We'll focus on using the `person` and `visit_occurrence` tables via views in our OMOP database.
 
 The goals are:
 1) Configure the Leaf SQL compiler.
-2) Create Leaf SQL Sets for the `v_person` view and `visit_occurrence` table.
-3) Create 4 Concepts which query our clinical database.
+2) Create Leaf SQL Sets for the `v_person` and `v_visit_occurrence` views.
+3) Create basic demographics and encounter Concepts which query our clinical database.
 
 ## Configuring the SQL compiler
 Every Leaf instance assumes that there is a single, consistent field that represents patient identifiers. In OMOP databases this is the `person_id` field, which can be found on nearly any table with patient data. Likewise, Leaf assumes that longitudinal tables in the database will have a consistent field representing encounter identifiers. In OMOP this is the `visit_occurrence_id` field.
 
-Before starting, let's create two SQL views called `v_person` to make the `person` and `visit_occurrence` tables simpler to query. This example is specific to OMOP but the approach works for other models as well. Note that pointing Leaf at views is completely *optional* and demonstrated here for convenience and illustrative purposes.
+Before starting, let's create two SQL views called `v_person` and `v_visit_occurrence` to make the `person` and `visit_occurrence` tables simpler to query. This example is specific to OMOP but the approach works for other models as well. Note that pointing Leaf at views is completely *optional* and demonstrated here for convenience and illustrative purposes.
 
 Our `v_person` view is defined like this:
 
@@ -67,7 +67,7 @@ FROM dbo.visit_occurrence AS o
 | A         | 456                 | 2015-05-28       | 2015-06-07     | site1        | IP              |
 | B         | 789                 | 2014-09-01       | 2014-09-01     | site2        | ED              |
 
-Pretty simple. After creating the views in the database, let's start by configuring Leaf's SQL compiler ([see details](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), the configuration of which is stored in `/src/server/API/appsettings.json`:
+Pretty simple. After creating the views in the database, let's start by configuring Leaf's [SQL compiler configuration](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#compiler)), which is stored in `/src/server/API/appsettings.json`:
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/configure_json.gif"/></p>
 
@@ -106,7 +106,7 @@ Next, create another `SQL Set` for `dbo.v_visit_occurrence`.
 
 Click `+ Create New SQL Set` and fill in `dbo.visit_occurrence_id` under `SQL FROM`. Also, check the `Has Encounters` box. This indicates that Leaf should expect to find the `EncounterId` field and a date field on this table.
 
-Under `Date Field`, fill in `@.`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name. The `Date Field` we've added will be used later if users choose to filter a Concept using this `SQL Set` by dates (e.g., the past 6 months).
+Under `Date Field`, fill in `@.`, which you'll recall is the first date field on the `v_visit_occurrence` `view`. Don't forget to prepend the alias placeholder `@.` before the field name.
 
 Click `Save` at the top. Now we are ready to make a few Concepts that use our `v_person` and `v_visit_occurrence` views. Click `Back to Concept Editor` in the upper-right.
 
@@ -132,14 +132,15 @@ Click `Back to Concept Editor`, then `+Create New Concept`.
 
 Under `Name`, fill in `"Demographics"`. This will be the text that users see in the Concept tree.
 
-Go down to `Full Text` and enter `"Have demographics"`. Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
+Go down to `Full Text` and enter `Have demographics`. Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
 
-Lastly, under `SQL` make sure the `Table, View, or Subquery` box shows `dbo.v_person` and the  `WHERE Clause` field is empty. Click `Save` at the top.
+Lastly, under the `SQL` section make sure the `Table, View, or Subquery` box shows `dbo.v_person` and the  `WHERE Clause` field is empty. Click `Save` at the top.
 
 As you may have noticed, this Concept is intended to simply serve as a hierachical container for Concepts under it related to Demographics. By itself it will likely not be very useful to users, and if they were to drag it over the query would be something simple like `SELECT person_id FROM dbo.v_person`, in other words all patients in the table.
 
 Next let's create the `Gender` Concept, which will appear under `Demographics`. Click `+Create New Concept` at the top.
 
+### Gender
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_gender.gif"/></p>
 
 Under `Name`, fill in `Gender`, and under `Full Text`, fill in `Identify with a gender`. 
@@ -170,7 +171,7 @@ Click `Save`. Repeat the process for the final two demographic Concepts, `Female
 ### Road test
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_firstquery.gif"/></p>
 
-Before proceeding to create our `Encounter` Concepts, let's take a moment to confirm our `Demographics` Concepts are working as expected by running a quick query to see how many female patients are in our database.
+Before proceeding to create our `Encounters` Concepts, let's take a moment to confirm our `Demographics` Concepts are working as expected by running a quick query to see how many female patients are in our database.
 
 Click the `Find Patients` tab in the upper-left and drag `Female` over to the first panel.
 
