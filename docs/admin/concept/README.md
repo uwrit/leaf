@@ -1,4 +1,4 @@
-## The building blocks of Leaf: Concepts
+## The Building Blocks of Leaf: Concepts
 - [Introduction](#introduction)
 - [Configuring the SQL compiler](#configuring-the-sql-compiler)
 - [Creating SQL Sets](#creating-sql-sets)
@@ -34,7 +34,7 @@ SELECT
   , race             = c_race.concept_name
   , ethnicity        = c_ethnicity.concept_name
   , location_state   = loc.state
-FROM dbo.PERSON AS p
+FROM dbo.person AS p
      LEFT JOIN dbo.concept AS c_gender ON p.gender_concept_id = c_gender.concept_id 
      LEFT JOIN dbo.concept AS c_race ON p.race_concept_id = c_race.concept_id 
      LEFT JOIN dbo.concept AS c_ethnicity ON p.ethnicity_concept_id = c_ethnicity.concept_id
