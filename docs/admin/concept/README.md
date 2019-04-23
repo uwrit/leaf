@@ -219,7 +219,7 @@ And that's it!
 ## Final thoughts
 If you were able to successfully make the Concepts in this tutorial, congratulations! Hopefully this was helpful and intuitive enough for you to get started making your clinical database accessible and intuitive for your users as well. 
 
-Concepts can be extremely flexible and we've only scratched the surface of their functionality. If you'd like to learn more, head over to the [Concept Creation Details](https://github.com/uwrit/leaf/blob/master/docs/admin/concept-advanced/README.md) section.
+Concepts can be extremely flexible and we've only scratched the surface of their functionality. If you'd like to learn more or have questions, head over to the [Concept Reference](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md) page.
 
 As you were creating Concepts for your database, you may have found yourself thinking that it requires a change in perspective in how you as a developer would query a clinical database versus how best to represent Concepts to users. 
 
