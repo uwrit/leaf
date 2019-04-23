@@ -165,7 +165,7 @@ Click `Save`. Repeat the process for the final two demographic Concepts, `Female
         - Table, View, or Subquery: `dbo.v_person`
         - WHERE Clause: `@.gender = 'M'`
 
-> In reality people don't necessarily identify as female or male, and clinical databases will often reflect this. Female and male here are used simply for demonstrative purposes.
+> In reality people don't necessarily identify with gender binaries of female or male, and clinical databases will often reflect this. Female and male here are used simply for demonstrative purposes.
 
 ### Road test
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_firstquery.gif"/></p>
