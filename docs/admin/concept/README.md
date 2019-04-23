@@ -50,8 +50,8 @@ The `v_visit_occurrence` view is defined like this:
 
 ```sql
 SELECT 
-    person_id
-  , visit_occurrence_id
+    o.person_id
+  , o.visit_occurrence_id
   , o.visit_start_date
   , o.visit_end_date
   , o.care_site_id
@@ -71,8 +71,8 @@ Pretty simple. After creating the views in the database, let's start by configur
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/configure_json.gif"/></p>
 
 Let's break it down:
-* **Alias** acts as a indicator to Leaf to insert an alias in a `SQL` statement wherever this character(s) is found (more on that in a bit). We'll set this to `"@"` for simplicity and readability, and because it is commonly used in many Leaf configurations.
-* **SetPerson** tells Leaf the name of the table that contains one row per patient, typically demographic information. In this example we'll use the `v_person` view we just created. Note that we prepend `"dbo."`, which stands for `"database object"` and is used in SQL Server to denote a `schema` and must precede the table/view name in `SQL` queries.
+* **Alias** acts as a indicator to Leaf to insert an alias in a SQL statement wherever this character(s) is found (more on that in a bit). We'll set this to `@` for simplicity and readability, and because it is commonly used in many Leaf configurations.
+* **SetPerson** tells Leaf the name of the table that contains one row per patient, typically demographic information. In this example we'll use the `v_person` view we just created. Note that we prepend `dbo.`, which stands for "database object" and is used in SQL Server to denote a `schema` and must precede the table/view name in SQL queries.
 * **SetEncounter** is the name of the primary table for encounter information, with one row per encounter. We'll use the `v_visit_occurrence` view.
 * **FieldPersonId** is the name of the SQL field that appears in all tables or views we'd like to query and represents unique identifiers for patients. The field `person_id` contains identifiers for patients and appears in all tables which link to a patient, so we'll choose that.
 * **FieldEncounterId** is the name of the field that represents visit identifiers, so we'll use `visit_occurrence_id`.
@@ -129,20 +129,20 @@ Click `Back to Concept Editor`, then `+Create New Concept`.
 ### Demographics
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_demographics.gif"/></p>
 
-1) Under `Name`, fill in `"Demographics"`. This will be the text that users see in the Concept tree.
+1) Under `Name`, fill in "Demographics". This will be the text that users see in the Concept tree.
 
-2) Go down to `Full Text` and enter `Have demographics`. Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
+2) Go down to `Full Text` and enter "Have demographics". Users will see this text if dragged over to create a query. Why is `Full Text` different than `Name`? The intent here is to make the query as descriptive as possible in something approximating an English sentence.
 
 3) Lastly, under the `SQL` section make sure the `Table, View, or Subquery` box shows `dbo.v_person` and the  `WHERE Clause` field is empty. Click `Save` at the top.
 
-As you may have noticed, this Concept is intended to simply serve as a hierachical container for Concepts under it related to Demographics. By itself it will likely not be very useful to users, and if they were to drag it over the query would be something simple like `SELECT person_id FROM dbo.v_person`, in other words all patients in the table.
+As you may have noticed, this Concept is intended to simply serve as a hierachical container for Concepts under it related to Demographics. By itself it will likely not be very useful to users, and if they were to drag it over the query would be something simple like `SELECT person_id FROM dbo.v_person`, in other words, all patients in the table.
 
 Next let's create the `Gender` Concept, which will appear under `Demographics`. Click `+Create New Concept` at the top.
 
 ### Gender
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_gender.gif"/></p>
 
-1) Under `Name`, fill in `Gender`, and under `Full Text`, fill in `Identify with a gender`. 
+1) Under `Name`, fill in "Gender", and under `Full Text`, fill in "Identify with a gender". 
 
 2) We want this Concept to appear beneath `Demographics`, so drag the new Concept *into* it in order set `Demographics` as the parent Concept.
 
@@ -181,7 +181,7 @@ Before proceeding to create our `Encounters` Concepts, let's take a moment to co
 ### Encounters
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_encounters.gif"/></p>
 
-Now that you're hopefully getting the hang of creating Concepts, let's finish by creating `Encounter` Concepts so users can query information by encounter types.
+Now that you're hopefully getting the hang of creating Concepts, let's finish by creating `Encounters` Concepts so users can query information by encounter types.
 
 Remember that the structure should look like this:
 ```
@@ -198,7 +198,7 @@ The field-level information for each Concept is (making sure to nest `Inpatient`
         - Full text: `Had an encounter`
     - SQL
         - Table, View, or Subquery: `dbo.v_visit_occurrence`
-        - WHERE Clause: ``
+        - WHERE Clause:
 - Inpatient
     - General Display
         - Name: `Inpatient`
