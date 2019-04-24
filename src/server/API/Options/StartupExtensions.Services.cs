@@ -116,6 +116,7 @@ namespace API.Options
         {
             services.AddTransient<CohortCounter>();
             services.AddTransient<DemographicProvider>();
+            services.AddTransient<DatasetProvider>();
 
             return services;
         }

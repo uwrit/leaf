@@ -34,7 +34,7 @@ namespace Model.Cohort
         /// <summary>
         /// Retrieves the demographics for patients in the specified query.
         /// </summary>
-        /// <returns>A demographic result, which, if the request was valid, contains the demographics. <see cref="Result"/></returns>
+        /// <returns>A demographic result, which, if the request was valid, contains the demographics.</returns>
         /// <param name="query">Query reference value.</param>
         /// <param name="token">Cancellation token.</param>
         /// <exception cref="OperationCanceledException"/>
@@ -46,7 +46,7 @@ namespace Model.Cohort
             var result = new Result();
 
             var validationContext = await queryService.GetDemographicQueryCompilerContext(query);
-            result.ValidationContext = validationContext;
+            result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
                 return result;
@@ -67,7 +67,7 @@ namespace Model.Cohort
         // DemographicProvider associated Result type.
         public class Result
         {
-            public CompilerValidationContext<DemographicCompilerContext> ValidationContext { get; internal set; }
+            public CompilerValidationContext<DemographicCompilerContext> Context { get; internal set; }
             public Demographic Demographics { get; internal set; }
         }
     }
