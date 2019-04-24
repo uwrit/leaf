@@ -25,5 +25,9 @@ namespace API.DTO.Cohort
             Schema = new DatasetResultSchemaDTO(dataset.Schema);
             Results = dataset.Results;
         }
+
+        public DatasetDTO(DatasetProvider.Result result): this(result.Dataset)
+        {
+        }
     }
 }

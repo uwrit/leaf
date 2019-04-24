@@ -17,7 +17,7 @@ namespace API.DTO.Cohort
         public PreflightCheckDTO Preflight { get; set; }
         public PatientCountResultDTO Result { get; set; }
 
-        public CohortCountDTO(CohortCount cohort) : this(cohort.ValidationContext.PreflightCheck, cohort.Count)
+        public CohortCountDTO(CohortCounter.Result cohort) : this(cohort.ValidationContext.PreflightCheck, cohort.Count)
         {
 
         }

@@ -56,14 +56,14 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="InvalidOperationException"/>
         /// <exception cref="ArgumentNullException"/>
-        public async Task<CohortCount> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
+        public async Task<Result> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
             Ensure.NotNull(queryDTO, nameof(queryDTO));
 
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
             if (!ctx.PreflightPassed)
             {
-                return new CohortCount
+                return new Result
                 {
                     ValidationContext = ctx
                 };
@@ -78,7 +78,7 @@ namespace Model.Cohort
             var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
             log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
 
-            return new CohortCount
+            return new Result
             {
                 ValidationContext = ctx,
                 Count = new PatientCount
@@ -89,11 +89,11 @@ namespace Model.Cohort
                 }
             };
         }
-    }
 
-    public class CohortCount
-    {
-        public PanelValidationContext ValidationContext { get; internal set; }
-        public PatientCount Count { get; internal set; }
+        public class Result
+        {
+            public PanelValidationContext ValidationContext { get; internal set; }
+            public PatientCount Count { get; internal set; }
+        }
     }
 }

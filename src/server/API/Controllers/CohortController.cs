@@ -75,9 +75,9 @@ namespace API.Controllers
             {
                 var queryRef = new QueryRef(queryid);
                 var result = await provider.Demographics(queryRef, cancelToken);
-                if (result.ValidationContext.State != CompilerContextState.Ok)
+                if (result.Context.State != CompilerContextState.Ok)
                 {
-                    return NotFound(new CompilerErrorDTO(result.ValidationContext.State));
+                    return NotFound(new CompilerErrorDTO(result.Context.State));
                 }
 
                 return Ok(result.Demographics);
@@ -114,8 +114,7 @@ namespace API.Controllers
             [FromQuery] Shape shape,
             [FromQuery] long? early,
             [FromQuery] long? late,
-            [FromServices] IDatasetQueryService queryService,
-            [FromServices] IDatasetService datasetService,
+            [FromServices] DatasetProvider provider,
             CancellationToken cancelToken
         )
         {
@@ -123,28 +122,24 @@ namespace API.Controllers
             {
                 var queryref = new QueryRef(queryid);
                 var datasetref = new DatasetQueryRef(datasetid, shape);
-                var request = new DatasetExecutionRequest(queryref, datasetref, early, late);
 
-                var validationContext = await queryService.GetQueryCompilerContext(request);
+                var result = await provider.Dataset(queryref, datasetref, cancelToken, early, late);
 
-                if (validationContext.State != CompilerContextState.Ok)
+                switch (result.Context.State)
                 {
-                    if (validationContext.State == CompilerContextState.DatasetShapeMismatch)
-                    {
-                        return BadRequest(new CompilerErrorDTO(validationContext.State));
-                    }
-                    return NotFound(new CompilerErrorDTO(validationContext.State));
+                    case CompilerContextState.DatasetShapeMismatch:
+                        return BadRequest(new CompilerErrorDTO(result.Context.State));
+                    case CompilerContextState.DatasetNotFound:
+                    case CompilerContextState.QueryNotFound:
+                        return NotFound(new CompilerErrorDTO(result.Context.State));
                 }
 
-                cancelToken.ThrowIfCancellationRequested();
-
-                var result = await datasetService.GetDatasetAsync(validationContext.Context, cancelToken);
-                return Ok(new DatasetDTO(result));
+                return Ok(new DatasetDTO(result.Dataset));
             }
             catch (FormatException fe)
             {
                 log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
-                return StatusCode(StatusCodes.Status400BadRequest);
+                return BadRequest();
             }
             catch (LeafPreflightException lpe)
             {
