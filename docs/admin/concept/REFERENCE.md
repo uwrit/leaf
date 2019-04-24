@@ -65,9 +65,10 @@ For example, imagine we have a `dbo.diagnosis` table that looks like this:
 | B         | 456          | 2005-08-10  | ICD10      | T02.5     | radiology | secondary |
 | B         | 789          | 2011-06-22  | ICD10      | A15.5     | charges   | primary   |
 
-Naturally, we would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
-
+### The Problem
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown1.png"/></p>
+
+We would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
 
 But what if users wanted to specify that the diagnosis must come from a specific source, such as `billing` or `radiology`?
 
@@ -85,13 +86,13 @@ What if we then wanted to also allow users to specify whether the diagnosis was 
 
 We could simply add these as additional child Concepts, though users wouldn't be able to find patients who had this as the `primary` diagnosis **and** from `billing`.
 
-Alternatively, we could create `primary` and `secondary` child Concepts under every `billing`, `radiology`, and `charges` Concept:
+Alternatively, we could create `primary` and `secondary` child Concepts under **every** `billing`, `radiology`, and `charges` Concept:
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown5.png"/></p>
 
 Yikes. This creates a Cartesian product of all diagnosis source and primary/secondary types **for every diagnosis Concept**. This is likely to be both confusing for users and wasteful in visual space (in the UI) and database storage.
 
-Enter dropdowns:
+### Dropdowns to the Rescue
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown6.gif"/></p>
 
@@ -130,5 +131,24 @@ To enable a dropdown for a Concept:
 Users will now see the dropdown options when they drag over the Concept.
 
 ## Restricting Access
+Certain Concepts may represent sensitive data which you need to restrict access to, such as financial data.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_constraint.gif"/></p>
+
+To constrain access to certain users or groups:
+
+1) In the `Admin` screen, create a new Concept or click an existing Concept to edit.
+
+2) Scroll down to `Access Restrictions` and click `+Add New Restriction`.
+
+3) Select whether you'd like to give a specific `User` access or a `Group`.
+
+4) Enter the `User` or `Group` name, making sure to include the Leaf [Issuer](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#issuer) after the user name.
+
+Note that:
+
+* **All child and descendent Concepts beneath the restricted Concept inherit the restriction**.
+* **If there are multiple restrictions, users need to meet only *one* of them in order to access the Concept**.
+
 ## Universal IDs
 ## Creating Concepts by SQL Scripts
