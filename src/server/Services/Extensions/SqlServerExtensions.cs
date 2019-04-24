@@ -9,11 +9,21 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using Model.Compiler;
 using Services.Compiler;
+using Model.Validation;
 
 namespace Services.Extensions
 {
     public static class SqlServerExtensions
     {
+        /// <summary>
+        /// Maps and wraps <see cref="SqlException"/> in a <see cref="LeafDbException"/> and throws if ErrorCode is in <see cref="LeafSqlError"/>
+        /// </summary>
+        /// <param name="se">SqlException.</param>
+        public static void MapThrow(this SqlException se)
+        {
+            DbError.ThrowFrom(se);
+        }
+
         public static SqlParameter[] SqlParameters(this ShapedDatasetExecutionContext ctx)
         {
             return ctx.Parameters.SqlParameters();

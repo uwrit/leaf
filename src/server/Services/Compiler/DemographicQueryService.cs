@@ -7,13 +7,13 @@ using System;
 using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Options;
-using Services.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Services.Tables;
+using Services.Extensions;
 using Model.Authorization;
 
 namespace Services.Compiler
@@ -77,7 +77,7 @@ namespace Services.Compiler
             catch (SqlException se)
             {
                 log.LogError("Could not get demographic query context. Query:{@QueryRef} Code:{Code} Error:{Error}", queryRef, se.ErrorCode, se.Message);
-                LeafDbException.ThrowFrom(se);
+                se.MapThrow();
                 throw;
             }
         }

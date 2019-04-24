@@ -16,6 +16,7 @@ using Services;
 using Model.Cohort;
 using Model.Authorization;
 using Model.Compiler;
+using Model.Validation;
 
 namespace API.Controllers
 {

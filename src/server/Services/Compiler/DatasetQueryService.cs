@@ -58,7 +58,7 @@ namespace Services.Compiler
             catch (SqlException se)
             {
                 log.LogError("Could not get dataset query context. Context:{@Context} Code:{Code} Error:{Error}", request, se.ErrorCode, se.Message);
-                LeafDbException.ThrowFrom(se);
+                se.MapThrow();
                 throw;
             }
         }

@@ -17,6 +17,7 @@ using Model.Compiler;
 using Model.Options;
 using Model.Tagging;
 using Services.Tables;
+using Services.Extensions;
 
 namespace Services.Compiler
 {
@@ -67,7 +68,7 @@ namespace Services.Compiler
                 catch (SqlException se)
                 {
                     logger.LogError("Could not delete query. Query:{Query} Code:{Code} Error:{Error}", uid.ToString(), se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -133,7 +134,7 @@ namespace Services.Compiler
                 catch (SqlException se)
                 {
                     logger.LogError("Could not get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", uid, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -187,7 +188,7 @@ namespace Services.Compiler
             catch (SqlException se)
             {
                 logger.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", query, se.ErrorCode, se.Message);
-                LeafDbException.ThrowFrom(se);
+                se.MapThrow();
                 throw;
             }
         }
@@ -231,7 +232,7 @@ namespace Services.Compiler
             catch (SqlException se)
             {
                 logger.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", query, se.ErrorCode, se.Message);
-                LeafDbException.ThrowFrom(se);
+                se.MapThrow();
                 throw;
             }
         }

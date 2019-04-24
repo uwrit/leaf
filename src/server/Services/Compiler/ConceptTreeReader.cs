@@ -75,7 +75,7 @@ namespace Services.Compiler
                 catch (SqlException se)
                 {
                     log.LogError("Could not get concept by Id. Id:{Id} Error:{Error}", id, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -156,7 +156,7 @@ namespace Services.Compiler
                 catch (SqlException se)
                 {
                     log.LogError("Could not get child concepts. ParentId:{ParentId} Error:{Error}", parentId, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -189,7 +189,7 @@ namespace Services.Compiler
                 catch (SqlException se)
                 {
                     log.LogError("Could not get rooted concepts of children ids {Ids}. Error:{Error}", ids, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }

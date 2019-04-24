@@ -17,6 +17,7 @@ using Services.Cohort;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Extensions;
+using Model.Validation;
 using Services.Compiler;
 using API.DTO.Compiler;
 using API.DTO.Cohort;
