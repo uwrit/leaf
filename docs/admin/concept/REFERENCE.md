@@ -10,7 +10,7 @@
 
 ## Name, Subtext, and Full Text
 Textual descriptions of Concepts are critical to making information about them clear to users. Leaf Concepts have three primary fields for describing information about them:
-*(These )*
+(*Concept fields referenced here are stored in the `app.Concept` database table unless otherwise noted*)
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_name.png"/></p>
 
@@ -26,7 +26,7 @@ Tooltips are a bit of a misnomer, as they are actually shown when the user click
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_tooltip.png"/></p>
 
-In any case, the `Tooltip` text can be used to provide detailed information to users about the data the Concept represents, but may be too long to put in the `Name` or `Subtext`. This is stored in the database as `UiDisplayTooltip`.
+`Tooltip` text can be used to provide detailed information to users about the data the Concept represents, but may be too long to put in the `Name` or `Subtext`. The text can be seen in the above example in the `Sources: Epic Clarity...` information. This is stored in the database as `UiDisplayTooltip`.
 
 ## Patient Count
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_patientcount.png"/></p>
@@ -55,6 +55,31 @@ Use numeric filters to allow users to query based on a numeric value in your dat
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_numeric2.gif"/></p>
 
 ## Adding Dropdowns
+Dropdowns (also known as Concept *specializations*) allow users to optionally specify additional logic about a Concept to include in a query.
+
+For example, imagine we have a `Diagnosis` table that looks like this:
+
+| person_id | coding_sys | diag_code | source    | type      |
+| --------- | ---------- | --------- | --------- | --------- |
+| A         | ICD10      | E11.2     | billing   | primary   |
+| B         | ICD10      | T02.5     | radiology | secondary |
+| C         | ICD10      | A15.5     | charges   | primary   |
+
+Naturally, we would probably create a Concept tree with a root `Diagnosis` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
+
+PICTURE
+
+What if users wanted to specify that the diagnosis must come from a specific source, such as`Billing` or `Radiology`?
+
+We could of course create child Concepts under every diagnosis code Concept, with each child representing patients who had the diagnosis from that source:
+
+PICTURE
+
+This works to a certain extent, though with every additional diagnosis source, we've double the number of diagnosis Concepts, and this solution may or may not be intuitive for users.
+
+What if we then wanted to also allow users to specify whether the diagnosis was `primary` or `secondary`?
+
+
 ## Restricting Access
 ## Universal IDs
 ## Creating Concepts by SQL Scripts
