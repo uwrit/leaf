@@ -220,14 +220,14 @@ And that's it!
 If you were able to successfully make the Concepts in this tutorial, congratulations! Hopefully this was helpful and intuitive enough for you to get started making your clinical database accessible and intuitive for your users as well. 
 
 Concepts can be extremely flexible and we've only scratched the surface of their functionality. If you'd like to learn more or have questions, head over to the [Concept Reference](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md) page or jump to a section below:
-- [Name, Subtext, and Full Text](#name-subtext-and-full-text)
-- [Tooltips](#tooltips)
-- [Patient Count](#patient-count)
-- [Numeric Filters](#numeric-filters)
-- [Adding Dropdowns](#adding-dropdowns)
-- [Restricting Access](#restricting-access)
-- [Universal IDs](#universal-ids)
-- [Creating Concepts by SQL Scripts](#creating-concepts-by-sql-scripts)
+- [Name, Subtext, and Full Text](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#name-subtext-and-full-text)
+- [Tooltips](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#tooltips)
+- [Patient Count](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#patient-count)
+- [Numeric Filters](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#numeric-filters)
+- [Adding Dropdowns](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#adding-dropdowns)
+- [Restricting Access](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#restricting-access)
+- [Universal IDs](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#universal-ids)
+- [Creating Concepts by SQL Scripts](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/REFERENCE.md#creating-concepts-by-sql-scripts)
 
 As you were creating Concepts for your database, you may have found yourself thinking that it requires a change in perspective in how you as a developer would query a clinical database versus how best to represent Concepts to users. 
 
