@@ -1,4 +1,4 @@
-## The Building Blocks of Leaf: Concepts
+# The Building Blocks of Leaf: Concepts
 - [Introduction](#introduction)
 - [Configuring the SQL compiler](#configuring-the-sql-compiler)
 - [Creating SQL Sets](#creating-sql-sets)

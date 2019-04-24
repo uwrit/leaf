@@ -1,4 +1,4 @@
-## Concept Reference
+# Concept Reference
 - [Name, Subtext, and Full Text](#name-subtext-and-full-text)
 - [Tooltips](#tooltips)
 - [Patient Count](#patient-count)
@@ -65,9 +65,9 @@ For example, imagine we have a `dbo.diagnosis` table that looks like this:
 | B         | 456          | 2005-08-10  | ICD10      | T02.5     | radiology | secondary |
 | B         | 789          | 2011-06-22  | ICD10      | A15.5     | charges   | primary   |
 
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown1.png"/></p>
-
 We would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown1.png"/></p>
 
 ### Problem 1
 **What if users wanted to specify that the diagnosis must come from a specific source, such as `billing` or `radiology`?**
@@ -76,7 +76,7 @@ One approach to solve this would be to create child Concepts under **every** dia
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown3.png"/></p>
 
-This works to a certain extent, though with every additional diagnosis source, we've doubled the number of diagnosis Concepts. Given that there are roughly 68,000 ICD-10 codes as of this writing (not including their parent Concepts which represent ranges of codes), adding child Concepts for just the three example sources above, `billing`, `radiology`, and `charges` will add over 200,000 Concepts to our tree. Just as importantly, this solution may not necessarily be intuitive for users.
+This works to a certain extent, though with every additional diagnosis source, we've doubled the number of diagnosis Concepts. Given that there are roughly 68,000 ICD-10 diagnosis codes as of this writing (not including their parent Concepts which represent ranges of codes), adding child Concepts for just the three example sources above, `billing`, `radiology`, and `charges` will add over 200,000 Concepts to our tree. Just as importantly, this solution may not necessarily be intuitive for users.
 
 ### Problem 2
 **What if we then wanted to also allow users to specify whether the diagnosis was `primary` or `secondary`?**
@@ -89,16 +89,15 @@ Alternatively, we could create `primary` and `secondary` child Concepts under **
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown5.png"/></p>
 
-Yikes. This creates a Cartesian product of all diagnosis source and primary/secondary types **for every diagnosis Concept**. This is likely to be both confusing for users and wasteful in visual space (in the UI) and database storage.
+Yikes. This creates a Cartesian product of all diagnosis sources and primary/secondary types **for every diagnosis Concept**. This is likely to be both confusing for users and wasteful in visual space (in the UI) and database storage.
 
 ### Dropdowns to the Rescue
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown6.gif"/></p>
 
 Dropdowns allow users to make the Concept logic more granular if they choose to, and do so in a visually intuitive way.
 
+### Creating Dropdowns
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown7.gif"/></p>
-
-To create a dropdown:
 
 1) Go to the `Admin` tab and click on any Concept. Under `SQL`, click `Table, View, or Subquery` -> `Manage SQL Sets`.
 
@@ -112,9 +111,8 @@ To create a dropdown:
 
 Because dropdowns are tied to `SQL Sets`, every Concept that uses that `SQL Set` is able to enable the dropdown as well, allowing dropdowns to be easily reused across many Concepts.
 
+### Enabling Dropdowns for a Concept
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown8.gif"/></p>
-
-To enable a dropdown for a Concept:
 
 1) After creating the dropdowns, in the `Admin` screen click the Concept you'd like to enable dropdowns for.
 
@@ -159,9 +157,9 @@ Federated queries work by mapping the requesting user's local Concepts to the fe
 ### Mapping UniversalIds at Query Execution
 Assuming multiple Leaf instances have exchanged certificates and are mutually discoverable, user queries can be federated if:
 
-**1) Every Concept involved in the user's query has a `UniversalId`, and**
+1) Every Concept involved in the user's query has a `UniversalId`, and
 
-**2) All federated Leaf instances have Concepts that match the `UniversalIds` used in the query.**
+2) All federated Leaf instances have Concepts that match the `UniversalIds` used in the query.
 
 Because `UniversalIds` themselves are data-model agnostic and are simply a pointer to an arbitrary Concept, this functionality works even if federated Leaf instances use different data models (see here for a working demonstration https://www.youtube.com/watch?v=ZuKKC7B8mHI).
 
@@ -184,10 +182,10 @@ Note that these are simply examples, and you are free to define `UniversalIds` a
 
 You can find `UniversalIds` in the `Admin` panel under `Identifiers` -> `UniversalId`. 
 
-> You don't need to preface `UniversalIds` "urn:leaf:concept:" yourself in the `Admin` panel, as Leaf will handle that for you.
+> You don't need to preface `UniversalIds` with "urn:leaf:concept:" yourself, as Leaf will handle that for you.
 
 ### Univeral IDs in dropdowns
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_specialization_universalid.png"/></p>
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_specialization_universalid.gif"/></p>
 
 Note that [dropdown options](#dropdowns-to-the-rescue) also use `UniversalIds` using the naming convention "urn:leaf:specialization:". If you are federating queries across multiple instances, **make sure dropdowns similarly have `UniversalIds` defined**.
 
@@ -196,7 +194,7 @@ There are inevitably scenarios where although you are federating your queries wi
 
 Good news: That's okay!
 
-**Leaf expects that not all clinical databases will have identical data and Concepts, and you shouldn't need to hide data from your users simply because other institutions don't have the same data.**
+**Leaf expects that not all clinical databases will be identical, and you shouldn't need to hide Concepts from your users simply because other institutions don't have the same data.**
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_no_universalid.png"/></p>
 
