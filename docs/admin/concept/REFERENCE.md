@@ -152,10 +152,20 @@ Note that:
 ## Universal IDs
 Universal IDs allow users to query multiple Leaf instances in a federated fashion (see [Networking Multiple Leaf instances](https://github.com/uwrit/leaf/blob/master/docs/deploy/fed/README.md) to learn how this works).
 
+> If you are only planning to query Concepts locally at your institution, you don't need to worry about setting `UniversalIds`.
+
 Federated queries work by mapping the requesting user's local Concepts to the federated node's Concepts by `UniversalId`. `UniversalIds` are defined using the [URN Syntax](https://tools.ietf.org/html/rfc2141).
 
-In other words, when a user creates a query, if every Concept involved in the query has a `UniversalId` and all federated nodes have Concepts that match the `UniversalId`, the query can be mapped and executed at all nodes, even if each Leaf instance is using a different data model.
+### Mapping UniversalIds at Query Execution
+Assuming multiple Leaf instances have exchanged certificates and are mutually discoverable, user queries can be federated if:
 
+1) Every Concept involved in the user's query has a `UniversalId`, and
+
+2) All federated Leaf instances have Concepts that match the `UniversalIds` used in the query. 
+
+Because `UniversalIds` themselves are data-model agnostic and are simply a pointer to an arbitrary Concept, this functionality works even if federated Leaf instances use different data models (see here for a working demonstration https://www.youtube.com/watch?v=ZuKKC7B8mHI).
+
+### Naming Conventions
 For example, a Concept representing Outpatient encounters could be defined with the `UniversalId`:
 
 ```
@@ -174,8 +184,20 @@ Note that these are simply examples, and you are free to define `UniversalIds` a
 
 You can find `UniversalIds` in the `Admin` panel under `Identifiers` -> `UniversalId`. Note that you don't need to preface "urn:leaf:concept:" yourself in the UI, as Leaf will handle that for you. `UniversalIds` are stored in the database as `UniversalId`.
 
+### UniveralIds in dropdowns
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_specialization_universalid.png"/></p>
 
-Note that [dropdown options](#dropdowns-to-the-rescue) also use `UniversalIds` using the naming convention "urn:leaf:specialization:".
+Note that [dropdown options](#dropdowns-to-the-rescue) also use `UniversalIds` using the naming convention "urn:leaf:specialization:". If you are federating queries across multiple instances, **make sure dropdowns similarly have `UniversalIds` defined**.
+
+### Concepts without UniversalIds
+There are inevitably scenarios where although you are federating your queries with other institutions, you still want to expose certain Concepts to your users that are unique to your local database and not expected to be found elsewhere.
+
+Good news: That's okay!
+
+**Leaf expects that not all clinical databases will have identical data and Concepts, and you shouldn't need to hide data from your users simply because other institutions don't have the same data.**
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_specialization_no_universalid.png"/></p>
+
+If a user uses one or more Concepts that are "local only" and don't have `UniversalIds`, Leaf will let them know which institutions weren't able to run the query.
 
 ## Creating Concepts by SQL Scripts
