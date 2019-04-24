@@ -57,28 +57,77 @@ Use numeric filters to allow users to query based on a numeric value in your dat
 ## Adding Dropdowns
 Dropdowns (also known as Concept *specializations*) allow users to optionally specify additional logic about a Concept to include in a query.
 
-For example, imagine we have a `Diagnosis` table that looks like this:
+For example, imagine we have a `dbo.diagnosis` table that looks like this:
 
-| person_id | coding_sys | diag_code | source    | type      |
-| --------- | ---------- | --------- | --------- | --------- |
-| A         | ICD10      | E11.2     | billing   | primary   |
-| B         | ICD10      | T02.5     | radiology | secondary |
-| C         | ICD10      | A15.5     | charges   | primary   |
+| person_id | encounter_id | diag_date   | coding_sys | diag_code | source    | type      |
+| --------- | ------------ | ----------- | ---------- | --------- | --------- | --------- |
+| A         | 123          | 2009-01-01  | ICD10      | E11.2     | billing   | primary   |
+| B         | 456          | 2005-08-10  | ICD10      | T02.5     | radiology | secondary |
+| B         | 789          | 2011-06-22  | ICD10      | A15.5     | charges   | primary   |
 
-Naturally, we would probably create a Concept tree with a root `Diagnosis` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
+Naturally, we would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
 
-PICTURE
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown1.png"/></p>
 
-What if users wanted to specify that the diagnosis must come from a specific source, such as`Billing` or `Radiology`?
+But what if users wanted to specify that the diagnosis must come from a specific source, such as `billing` or `radiology`?
 
-We could of course create child Concepts under every diagnosis code Concept, with each child representing patients who had the diagnosis from that source:
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown2.gif"/></p>
 
-PICTURE
+One approach to solve this would be to create child Concepts under **every** diagnosis Concept, with each child representing a diagnosis from a particular source:
 
-This works to a certain extent, though with every additional diagnosis source, we've double the number of diagnosis Concepts, and this solution may or may not be intuitive for users.
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown3.png"/></p>
+
+This works to a certain extent, though with every additional diagnosis source, we've doubled the number of diagnosis Concepts. Given that there are roughly 68,000 ICD-10 codes as of this writing (not including their parent Concepts which represent ranges of codes), adding child Concepts for just the three example sources above, `billing`, `radiology`, and `charges` will add over 200,000 Concepts to our tree. Just as importantly, this solution may not necessarily be intuitive for users.
 
 What if we then wanted to also allow users to specify whether the diagnosis was `primary` or `secondary`?
 
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown4.png"/></p>
+
+We could simply add these as additional child Concepts, though users wouldn't be able to find patients who had this as the `primary` diagnosis **and** from `billing`.
+
+Alternatively, we could create `primary` and `secondary` child Concepts under every `billing`, `radiology`, and `charges` Concept:
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown5.png"/></p>
+
+Yikes. This creates a Cartesian product of all diagnosis source and primary/secondary types **for every diagnosis Concept**. This is likely to be both confusing for users and wasteful in visual space (in the UI) and database storage.
+
+Enter dropdowns:
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown6.gif"/></p>
+
+Dropdowns allow users to make the Concept logic more granular if they choose to, and do so in a visually intuitive way.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown7.gif"/></p>
+
+To create a dropdown:
+
+1) Go to the `Admin` tab and click on any Concept. Under `SQL`, click `Table, View, or Subquery` -> `Manage SQL Sets`.
+
+2) Under the `SQL Set` you'd like to add a dropdown to, click `+Add New Dropdown` in the lower-left.
+
+3) Under `Default Text`, add the text that should be shown if the user hasn't selected a dropdown option.
+
+4) For each option you'd like to add, click `+Add Dropdown Option` and enter the `Text` that should be shown, as well as the `SQL WHERE` clause that should be appended to the Concept SQL if the user selects the option.
+
+5) Click `Save` at the top.
+
+Because dropdowns are tied to `SQL Sets`, every Concept that uses that `SQL Set` is able to enable the dropdown as well, allowing dropdowns to be easily reused across many Concepts.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown8.gif"/></p>
+
+To enable a dropdown for a Concept:
+
+1) After creating the dropdowns, in the `Admin` screen click the Concept you'd like to enable dropdowns for.
+
+2) Under `Configuration`, make sure `Allow Dropdowns` is set to `true`.
+
+3) Under `Dropdowns`, click each dropdown you'd like to enable. Enabled dropdowns will turn green and say "enabled!".
+
+> If you don't see any dropdowns available, under `SQL` make sure the Concept is using the same `SQL Set` as the dropdowns.
+
+4) Click `Save` at the top.
+
+Users will now see the dropdown options when they drag over the Concept.
 
 ## Restricting Access
 ## Universal IDs
