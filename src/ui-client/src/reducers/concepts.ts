@@ -225,7 +225,8 @@ const removeExtensionConcept = (state: ConceptsState, extensionConcept: Concept)
 const setSelectedConcept = (state: ConceptsState, concept: Concept): ConceptsState => {
     state.allowRerender.add(state.selectedId);
     state.allowRerender.add(concept.id);
-    return Object.assign({}, state, { selectedId: concept.id });
+    const newId = concept.id;
+    return Object.assign({}, state, { selectedId: newId });
 };
 
 const createConcept = (state: ConceptsState, concept: Concept): ConceptsState => {

@@ -43,7 +43,8 @@ export const createAdminConcept = async (state: AppState, concept: Concept) => {
         ...concept, 
         id: null,
         isRoot: !concept.parentId,
-        rootId: concept.id === concept.rootId ? null : concept.rootId
+        rootId: (concept.id === concept.rootId ? null : concept.rootId),
+        constraints: concept.constraints.map((c) => ({ ...c, conceptId: null }))
     });
     return resp.data as Concept;
 };
