@@ -37,6 +37,7 @@ namespace Model.Cohort
         /// <returns>A demographic result, which, if the request was valid, contains the demographics.</returns>
         /// <param name="query">Query reference value.</param>
         /// <param name="token">Cancellation token.</param>
+        /// <exception cref="LeafDbException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>

@@ -41,6 +41,7 @@ namespace Model.Cohort
         /// <param name="early">Early time bound.</param>
         /// <param name="late">Late time bound.</param>
         /// <exception cref="LeafPreflightException"/>
+        /// <exception cref="LeafDbException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>

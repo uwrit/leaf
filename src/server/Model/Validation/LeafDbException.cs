@@ -4,10 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Data.SqlClient;
 
-namespace Services
+namespace Model.Validation
 {
+    /// <summary>
+    /// Indicates that the database threw a Leaf specific error.
+    /// Leaf databases MUST use and throw error codes specified in <see cref ="LeafSqlError"/> to use this.
+    /// </summary>
+    /// <remarks>
+    /// This exception is used to allow stored procedures in Leaf's application database to return HTTP StatusCode like constructs.
+    /// </remarks>
     public class LeafDbException : ApplicationException
     {
         public LeafSqlError ErrorCode { get; private set; }
@@ -33,20 +39,17 @@ namespace Services
         {
             ErrorCode = code;
         }
+    }
 
-        public static void ThrowFrom(SqlException se)
-        {
-            switch (se.ErrorCode)
-            {
-                case (int)LeafSqlError.BadArgument:
-                    throw new LeafDbException(LeafSqlError.BadArgument, se.Message, se);
-                case (int)LeafSqlError.Forbidden:
-                    throw new LeafDbException(LeafSqlError.Forbidden, se.Message, se);
-                case (int)LeafSqlError.NotFound:
-                    throw new LeafDbException(LeafSqlError.NotFound, se.Message, se);
-                case (int)LeafSqlError.Conflict:
-                    throw new LeafDbException(LeafSqlError.Conflict, se.Message, se);
-            }
-        }
+    /// <summary>
+    /// All valid error codes thrown from the database that can be mapped to a <see cref="LeafDbException"/>.ErrorCode.
+    /// </summary>
+    public enum LeafSqlError
+    {
+        None = 70_000,
+        BadArgument = 70_400,
+        Forbidden = 70_403,
+        NotFound = 70_404,
+        Conflict = 70_409
     }
 }

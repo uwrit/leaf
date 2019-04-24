@@ -13,7 +13,7 @@ using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Services.Authorization;
+using Services.Extensions;
 using Model.Authorization;
 
 namespace Services.Admin
@@ -63,7 +63,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not create ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -90,7 +90,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not delete ConceptSqlSet. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -139,7 +139,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not update ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }

@@ -16,6 +16,7 @@ using Model.Authorization;
 using Model.Compiler;
 using Services.Compiler;
 using API.DTO.Compiler;
+using Model.Validation;
 
 namespace API.Controllers
 {

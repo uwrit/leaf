@@ -14,7 +14,7 @@ using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Services.Authorization;
+using Services.Extensions;
 using System.Linq;
 using Model.Authorization;
 
@@ -65,7 +65,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not create Specialization. Specialization:{@Specialization} Code:{Code} Error:{Error}", spec, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }
@@ -107,7 +107,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not fetch Specializations. SpecializationGroupId:{SpecializationGroupId} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
 
@@ -142,7 +142,7 @@ namespace Services.Admin
                 catch (SqlException se)
                 {
                     logger.LogError("Could not update Specialization:{@Specialization}. Code:{Code} Error:{Error}", spec, se.ErrorCode, se.Message);
-                    LeafDbException.ThrowFrom(se);
+                    se.MapThrow();
                     throw;
                 }
             }

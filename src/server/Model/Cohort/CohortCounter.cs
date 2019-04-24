@@ -56,6 +56,7 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="InvalidOperationException"/>
         /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="LeafDbException"/>
         public async Task<Result> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
             Ensure.NotNull(queryDTO, nameof(queryDTO));
