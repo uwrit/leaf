@@ -34,6 +34,7 @@ export interface SectionProps {
 
 export interface PropertyProps {
     changeHandler: (val: any, propName: string) => any;
+    className?: string;
     label?: string;
     locked?: boolean;
     focusToggle?: (show: boolean) => void;

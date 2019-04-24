@@ -16,12 +16,16 @@ interface Props {
 }
 
 export class Identifiers extends React.PureComponent<Props> {
+    private uidBase = 'urn:leaf:concept:';
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
         const { changeHandler, adminConcept } = this.props.data;
+        const uid = adminConcept && adminConcept.universalId
+            ? adminConcept.universalId.replace(this.uidBase,'')
+            : '';
         return (
             <Section header='Identifiers'>
                 <TextArea 
@@ -37,7 +41,7 @@ export class Identifiers extends React.PureComponent<Props> {
                     label='Root Id' subLabel='Root (top-most) ancestor Id for the Concept.'
                 />
                 <TextArea
-                    changeHandler={changeHandler} propName={'universalId'} value={adminConcept!.universalId} 
+                    changeHandler={this.handleUniversalIdChange} propName={'universalId'} value={uid} className={"concept-editor-concept-universalid"}
                     label='Universal Id' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.'
                 />
                 <TextArea 
@@ -50,5 +54,16 @@ export class Identifiers extends React.PureComponent<Props> {
                 />
             </Section>
         );
+    }
+
+    private handleUniversalIdChange = (val: any, propName: string) => {
+        const { changeHandler } = this.props.data;
+        let value = val;
+        if (value && !value.startsWith(this.uidBase)) {
+            value = this.uidBase + val;
+        } else if (!value || value === this.uidBase) {
+            value = null;
+        }
+        changeHandler(value, propName);
     }
 };
