@@ -27,7 +27,7 @@ export class TextArea extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { label, subLabel, locked, value, required, onClick } = this.props;
+        const { className, label, subLabel, locked, value, required, onClick } = this.props;
         const { valid } = this.state;
         const classes = [ 'leaf-input' ];
         let val = value || '';
@@ -49,7 +49,7 @@ export class TextArea extends React.PureComponent<Props,State> {
                     }
                 </Label>
                 }
-                <div>
+                <div className={className}>
                     <TextareaAutosize 
                         className={classes.join(' ')}
                         minRows={1}

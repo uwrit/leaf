@@ -21,6 +21,7 @@ interface Props {
 }
 
 export class SpecializationDropdownOption extends React.PureComponent<Props> {
+    private uidBase = 'urn:leaf:specialization:';
     private className = 'sqlset-editor';
     constructor(props: Props) {
         super(props);
@@ -30,6 +31,9 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
         const { specialization } = this.props;
         const unsaved = specialization.unsaved || specialization.changed;
         const c = this.className;
+        const uid = specialization.universalId
+            ? specialization.universalId.replace(this.uidBase,'')
+            : '';
         return (
             <Container>
                 <Row className={`${c}-specializationgroup-specialization ${unsaved ? 'unsaved' : ''}`} key={specialization.id}>
@@ -41,9 +45,8 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
                     {/* UniversalId */}
                     <Col className={`${c}-input-container`} md={4}>
-
-                        <Input
-                            changeHandler={this.handleDropdownOptionEdit} propName={'universalId'} value={specialization.universalId}
+                        <TextArea
+                            changeHandler={this.handleUniversalIdChange} propName={'universalId'} value={uid} className={`${c}-specialization-universalid`}
                         />
                     </Col>
 
@@ -69,6 +72,16 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                 </Row>
             </Container>
         );
+    }
+
+    private handleUniversalIdChange = (val: any, propName: string) => {
+        let value = val;
+        if (value && !value.startsWith(this.uidBase)) {
+            value = this.uidBase + val;
+        } else if (!value || value === this.uidBase) {
+            value = null;
+        }
+        this.handleDropdownOptionEdit(value, propName);
     }
 
     private handleDropdownOptionEdit = (val: any, propName: string) => {

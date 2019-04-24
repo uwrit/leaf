@@ -65,14 +65,12 @@ For example, imagine we have a `dbo.diagnosis` table that looks like this:
 | B         | 456          | 2005-08-10  | ICD10      | T02.5     | radiology | secondary |
 | B         | 789          | 2011-06-22  | ICD10      | A15.5     | charges   | primary   |
 
-### The Problem
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown1.png"/></p>
 
-We would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus:
+We would probably create a Concept tree with a root `Diagnoses` Concept using the ICD10 hierarchy to allow users to run queries to find patients with certain diagnosis codes, such as type 2 diabetes mellitus.
 
-But what if users wanted to specify that the diagnosis must come from a specific source, such as `billing` or `radiology`?
-
-<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown2.gif"/></p>
+### Problem 1
+**What if users wanted to specify that the diagnosis must come from a specific source, such as `billing` or `radiology`?**
 
 One approach to solve this would be to create child Concepts under **every** diagnosis Concept, with each child representing a diagnosis from a particular source:
 
@@ -80,7 +78,8 @@ One approach to solve this would be to create child Concepts under **every** dia
 
 This works to a certain extent, though with every additional diagnosis source, we've doubled the number of diagnosis Concepts. Given that there are roughly 68,000 ICD-10 codes as of this writing (not including their parent Concepts which represent ranges of codes), adding child Concepts for just the three example sources above, `billing`, `radiology`, and `charges` will add over 200,000 Concepts to our tree. Just as importantly, this solution may not necessarily be intuitive for users.
 
-What if we then wanted to also allow users to specify whether the diagnosis was `primary` or `secondary`?
+### Problem 2
+**What if we then wanted to also allow users to specify whether the diagnosis was `primary` or `secondary`?**
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown4.png"/></p>
 
@@ -93,7 +92,6 @@ Alternatively, we could create `primary` and `secondary` child Concepts under **
 Yikes. This creates a Cartesian product of all diagnosis source and primary/secondary types **for every diagnosis Concept**. This is likely to be both confusing for users and wasteful in visual space (in the UI) and database storage.
 
 ### Dropdowns to the Rescue
-
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_dropdown6.gif"/></p>
 
 Dropdowns allow users to make the Concept logic more granular if they choose to, and do so in a visually intuitive way.
@@ -135,7 +133,7 @@ Certain Concepts may represent sensitive data which you need to restrict access 
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_constraint.gif"/></p>
 
-To constrain access to certain users or groups:
+To restrict access to certain users or groups:
 
 1) In the `Admin` screen, create a new Concept or click an existing Concept to edit.
 
@@ -147,8 +145,37 @@ To constrain access to certain users or groups:
 
 Note that:
 
-* **All child and descendent Concepts beneath the restricted Concept inherit the restriction**.
-* **If there are multiple restrictions, users need to meet only *one* of them in order to access the Concept**.
+- **All child and descendent Concepts beneath the restricted Concept inherit the restriction.**
+- **If there are multiple restrictions, users need to meet only *one* of them in order to access the Concept.**
+- **Admins can always see all Concepts, whether restricted or not.** 
 
 ## Universal IDs
+Universal IDs allow users to query multiple Leaf instances in a federated fashion (see [Networking Multiple Leaf instances](https://github.com/uwrit/leaf/blob/master/docs/deploy/fed/README.md) to learn how this works).
+
+Federated queries work by mapping the requesting user's local Concepts to the federated node's Concepts by `UniversalId`. `UniversalIds` are defined using the [URN Syntax](https://tools.ietf.org/html/rfc2141).
+
+In other words, when a user creates a query, if every Concept involved in the query has a `UniversalId` and all federated nodes have Concepts that match the `UniversalId`, the query can be mapped and executed at all nodes, even if each Leaf instance is using a different data model.
+
+For example, a Concept representing Outpatient encounters could be defined with the `UniversalId`:
+
+```
+urn:leaf:concept:encounter:type=outpatient
+```
+
+Or a Concept representing diagnosis codes for hypertension in pregnancy in ICD-10 could be:
+
+```
+urn:leaf:concept:diagnosis:coding=icd10&code=O13.9
+```
+
+Note that these are simply examples, and you are free to define `UniversalIds` as you'd like. Perhaps the most important point though is to be sure that the `UniversalId` naming conventions for your Leaf instance and any other Leaf instances match exactly.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_universalid.png"/></p>
+
+You can find `UniversalIds` in the `Admin` panel under `Identifiers` -> `UniversalId`. Note that you don't need to preface "urn:leaf:concept:" yourself in the UI, as Leaf will handle that for you. `UniversalIds` are stored in the database as `UniversalId`.
+
+<p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_specialization_universalid.png"/></p>
+
+Note that [dropdown options](#dropdowns-to-the-rescue) also use `UniversalIds` using the naming convention "urn:leaf:specialization:".
+
 ## Creating Concepts by SQL Scripts

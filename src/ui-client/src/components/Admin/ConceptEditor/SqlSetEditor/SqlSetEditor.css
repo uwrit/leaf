@@ -227,12 +227,33 @@
     margin-top: 15px;
 }
 
+.sqlset-editor-input-container.col-md-4 {
+    padding: 4px 8px;
+}
+
 .sqlset-editor-input-column:first-child .position-relative.form-group {
     margin-top: 6px;
 }
 
 .sqlset-editor-input-container > .container {
     margin-top: 4px;
+}
+
+
+.sqlset-editor-specialization-universalid {
+    margin-left: 135px;
+}
+
+.sqlset-editor-specialization-universalid::after {
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    content: 'urn:leaf:specialization:';
+    font-size: 0.85rem;
+    left: 0;
+    margin-top: 4px;
+    padding: 4px 8px;
+    position: absolute;
 }
 
 /* Delete Specialization Group */

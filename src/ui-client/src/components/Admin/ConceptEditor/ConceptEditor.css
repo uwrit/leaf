@@ -419,3 +419,19 @@
     border-radius: 4px;
     padding: 2px 4px;
 }
+
+.concept-editor-concept-universalid {
+    margin-left: 110px;
+}
+
+.concept-editor-concept-universalid::after {
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    content: 'urn:leaf:concept:';
+    font-size: 0.9rem;
+    left: 0;
+    margin-top: 3px;
+    padding: 4px 8px;
+    position: absolute;
+}
