@@ -14,7 +14,13 @@ export function defaultRespondentsState(): NetworkRespondentMap {
 
 function setRespondents(state: NetworkRespondentMap, eps: NetworkIdentity[]): NetworkRespondentMap {
     const newState = new Map<number, NetworkIdentity>();
-    eps!.forEach(e => newState.set(e.id, e));
+    eps!.forEach(e => {
+        // Leaflet expect longitudes to be negative
+        if (e.longitude > 0) {
+            e.longitude = -e.longitude;
+        }
+        newState.set(e.id, e)
+    });
     return newState;
 }
 
