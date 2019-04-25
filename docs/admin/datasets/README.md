@@ -1,6 +1,7 @@
 # Datasets
 - [Introduction](#introduction)
 - [Basic Demographics](#basic-demographics)
+- [Adding Datasets](#adding-datasets)
 
 ## Introduction
 At a high level, Leaf aims to do two things:

@@ -155,7 +155,7 @@ Universal IDs allow users to query multiple Leaf instances in a federated fashio
 Federated queries work by mapping the requesting user's local Concepts to the federated node's Concepts by `UniversalId`. `UniversalIds` are defined using the [URN Syntax](https://tools.ietf.org/html/rfc2141).
 
 ### Mapping UniversalIds at Query Execution
-Assuming multiple Leaf instances have exchanged certificates and are mutually discoverable, user queries can be federated if:
+Assuming multiple Leaf instances have exchanged certificates, user queries can be federated if:
 
 1) Every Concept involved in the user's query has a `UniversalId`, and
 
