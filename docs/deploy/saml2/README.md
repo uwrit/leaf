@@ -46,9 +46,8 @@ IIS requires a specific ISAPI element within the InProcess element. Additionally
 ### Apache
 There is no extra Shibboleth Service Provider configuration required to interoperate with Apache.
 
-
 ### ADFS
-Shibboleth Service Provider 3 can be configured to work with ADFS. However, it requires a couple extensions bundled with the installation. The extensions are loaded into the OutOfProcess and InProcess elements via the Extensions element. A prototype ADFS configuration looks like:
+Shibboleth Service Provider 3 can be configured to work with ADFS. However, it requires a couple extensions bundled with the installation. The extensions are loaded into the OutOfProcess and InProcess elements via the Extensions element. A prototypical ADFS configuration looks like:
 ```xml
 <OutOfProcess tranLogFormat="%u|%s|%IDP|%i|%ac|%t|%attr|%n|%b|%E|%S|%SS|%L|%UA|%a">
     <Extensions>
@@ -69,6 +68,7 @@ There is no extra Shibboleth Service Provider configuration required to interope
 
 ## Examples
 ### IIS/ADFS
+shibboleth2.xml
 ```xml
 <SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
     xmlns:conf="urn:mace:shibboleth:3.0:native:sp:config"
@@ -97,13 +97,15 @@ There is no extra Shibboleth Service Provider configuration required to interope
     </RequestMapper>
 
     <ApplicationDefaults entityID="https://<server>.<subdomain>.<institution>.<tld>/shibboleth"
-        REMOTE_USER="eppn"
+        REMOTE_USER="nameID"
         cipherSuites="DEFAULT:!EXP:!LOW:!aNULL:!eNULL:!DES:!IDEA:!SEED:!RC4:!3DES:!kRSA:!SSLv2:!SSLv3:!TLSv1:!TLSv1.1">
         
         <Sessions lifetime="28800" timeout="3600" relayState="ss:mem"
                   checkAddress="false" handlerSSL="true" cookieProps="https">
 
-            <SSO>ADFS</SSO>
+            <SSO id="<idp_abbreviation>" isDefault="true" entityID="<idp_entityID>">
+                SAML2
+            </SSO>
 
             <!-- local-only logout. -->
             <Logout>Local</Logout>
@@ -130,7 +132,7 @@ There is no extra Shibboleth Service Provider configuration required to interope
 
         <!-- Example of remotely supplied batch of signed metadata. -->
         <MetadataProvider type="XML" validate="true"
-	            url="<IdP provided URL to metadata>"
+	            url="<idp_metadata_url>"
               backingFilePath="federation-metadata.xml" maxRefreshDelay="7200">
         </MetadataProvider>
 
@@ -145,7 +147,6 @@ There is no extra Shibboleth Service Provider configuration required to interope
             key="sp-signing-key.pem" certificate="sp-signing-cert.pem"/>
         <CredentialResolver type="File" use="encryption"
             key="sp-encrypt-key.pem" certificate="sp-encrypt-cert.pem"/>
-        
     </ApplicationDefaults>
     
     <!-- Policies that determine how to process and authenticate runtime messages. -->
@@ -157,7 +158,17 @@ There is no extra Shibboleth Service Provider configuration required to interope
 </SPConfig>
 ```
 
+attribute-map.xml
+```xml
+<Attributes xmlns="urn:mace:shibboleth:2.0:attribute-map" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Attribute name="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified" id="nameID"/>
+    <Attribute name="http://schemas.microsoft.com/ws/2008/06/identity/claims/role" id="groups" />
+</Attributes>
+```
+The above example could be highly variable depending on your ADFS IdP set up, and how your relying party's claims are configured.
+
 ### Apache/Shibboleth
+shibboleth2.xml
 ```xml
 <SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
     xmlns:conf="urn:mace:shibboleth:3.0:native:sp:config"
