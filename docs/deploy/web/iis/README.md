@@ -19,6 +19,8 @@
 7) Create a URL rewrite rule on the site with the following template.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_url_rewrite.png" /></p>
 
+web.config
+
 ```xml
 <system.webServer>
     ...additional configuration
