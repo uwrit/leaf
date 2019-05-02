@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[PanelFilter]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  Table [app].[PanelFilter]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,7 +17,7 @@ CREATE TABLE [app].[PanelFilter](
 	[UiDisplayText] [nvarchar](1000) NULL,
 	[UiDisplayDescription] [nvarchar](4000) NULL,
 	[LastChanged] [datetime] NULL,
-	[ChangedBy] [nvarchar](200) NOT NULL,
+	[ChangedBy] [nvarchar](1000) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

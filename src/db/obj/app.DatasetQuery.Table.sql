@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[DatasetQuery]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  Table [app].[DatasetQuery]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,9 +19,9 @@ CREATE TABLE [app].[DatasetQuery](
 	[Description] [nvarchar](max) NULL,
 	[SqlStatement] [nvarchar](4000) NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -30,7 +30,7 @@ PRIMARY KEY CLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 5/2/19 11:58:02 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
 (
 	[Name] ASC
@@ -38,7 +38,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQue
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 5/2/19 11:58:02 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
 	[UniversalId] ASC
