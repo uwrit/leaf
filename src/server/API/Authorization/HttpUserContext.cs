@@ -37,7 +37,7 @@ namespace API.Authorization
                 if (groups == null)
                 {
                     var gs = user.FindAll(c => c.Type == Group.Key);
-                    groups = gs.Select(g => g.Value).ToArray();
+                    groups = gs.Select(g => $"{g.Value}@{Issuer}").ToArray();
                 }
                 return groups;
             }
@@ -59,16 +59,16 @@ namespace API.Authorization
 
         public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstutional;
 
-        string username;
-        string Username
+        string identity;
+        string Identity
         {
             get
             {
-                if (username == null)
+                if (identity == null)
                 {
-                    username = user?.Identity?.Name;
+                    identity = user?.Identity?.Name;
                 }
-                return username;
+                return identity;
             }
         }
 
@@ -92,11 +92,11 @@ namespace API.Authorization
             {
                 if (uuid == null)
                 {
-                    var i = Issuer;
-                    var u = Username;
-                    if (u != null && i != null)
+                    var issu = Issuer;
+                    var id = Identity;
+                    if (id != null && issu != null)
                     {
-                        uuid = $"{u}@{i}";
+                        uuid = $"{id}@{issu}";
                     }
                 }
                 return uuid;

@@ -113,7 +113,7 @@ GO
 CREATE TYPE [app].[UniversalId] FROM [nvarchar](200) NOT NULL
 GO
 /****** Object:  UserDefinedDataType [auth].[User]    Script Date: 4/8/19 2:27:08 PM ******/
-CREATE TYPE [auth].[User] FROM [nvarchar](200) NOT NULL
+CREATE TYPE [auth].[User] FROM [nvarchar](1000) NOT NULL
 GO
 /****** Object:  UserDefinedDataType [network].[Issuer]    Script Date: 4/8/19 2:27:08 PM ******/
 CREATE TYPE [network].[Issuer] FROM [nvarchar](200) NOT NULL
@@ -211,19 +211,19 @@ GO
 /****** Object:  UserDefinedTableType [auth].[Authorizations]    Script Date: 4/8/19 2:27:08 PM ******/
 CREATE TYPE [auth].[Authorizations] AS TABLE(
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL
+	[ConstraintValue] [nvarchar](1000) NOT NULL
 )
 GO
 /****** Object:  UserDefinedTableType [auth].[ConceptConstraintTable]    Script Date: 4/8/19 2:27:08 PM ******/
 CREATE TYPE [auth].[ConceptConstraintTable] AS TABLE(
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL
+	[ConstraintValue] [nvarchar](1000) NOT NULL
 )
 GO
 /****** Object:  UserDefinedTableType [auth].[GroupMembership]    Script Date: 4/8/19 2:27:08 PM ******/
 CREATE TYPE [auth].[GroupMembership] AS TABLE(
-	[Group] [nvarchar](100) NOT NULL
+	[Group] [nvarchar](1000) NOT NULL
 )
 GO
 /****** Object:  UserDefinedTableType [rela].[ConceptSpecializationGroupTable]    Script Date: 4/8/19 2:27:08 PM ******/
@@ -665,9 +665,9 @@ CREATE TABLE [app].[ConceptEvent](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[UiDisplayEventName] [nvarchar](50) NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_ConceptSqlEvent] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -720,9 +720,9 @@ CREATE TABLE [app].[ConceptSqlSet](
 	[SqlFieldDate] [nvarchar](1000) NULL,
 	[SqlFieldEvent] [nvarchar](400) NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
 	[EventId] [int] NULL,
  CONSTRAINT [PK_ConceptSqlSet] PRIMARY KEY CLUSTERED 
 (
@@ -759,9 +759,9 @@ CREATE TABLE [app].[DatasetQuery](
 	[Description] [nvarchar](max) NULL,
 	[SqlStatement] [nvarchar](4000) NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -808,7 +808,7 @@ CREATE TABLE [app].[DemographicQuery](
 	[SqlStatement] [nvarchar](4000) NOT NULL,
 	[Shape] [int] NOT NULL,
 	[LastChanged] [datetime] NOT NULL,
-	[ChangedBy] [nvarchar](200) NOT NULL,
+	[ChangedBy] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_DemographicQuery] PRIMARY KEY CLUSTERED 
 (
 	[Lock] ASC
@@ -863,7 +863,7 @@ CREATE TABLE [app].[PanelFilter](
 	[UiDisplayText] [nvarchar](1000) NULL,
 	[UiDisplayDescription] [nvarchar](4000) NULL,
 	[LastChanged] [datetime] NULL,
-	[ChangedBy] [nvarchar](200) NOT NULL,
+	[ChangedBy] [nvarchar](1000) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -879,7 +879,7 @@ CREATE TABLE [app].[Query](
 	[Id] [uniqueidentifier] NOT NULL,
 	[Pepper] [uniqueidentifier] NOT NULL,
 	[Nonce] [uniqueidentifier] NULL,
-	[Owner] [nvarchar](200) NOT NULL,
+	[Owner] [nvarchar](1000) NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[UniversalId] [nvarchar](200) NULL,
 	[Name] [nvarchar](200) NULL,
@@ -934,7 +934,7 @@ CREATE TABLE [app].[SpecializationGroup](
 	[SqlSetId] [int] NOT NULL,
 	[UiDefaultText] [nvarchar](100) NOT NULL,
 	[LastChanged] [datetime] NULL,
-	[ChangedBy] [nvarchar](200) NULL,
+	[ChangedBy] [nvarchar](1000) NULL,
  CONSTRAINT [PK_SpecializationGroup] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -949,7 +949,7 @@ GO
 CREATE TABLE [auth].[ConceptConstraint](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL,
+	[ConstraintValue] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_ConceptConstraint_1] PRIMARY KEY CLUSTERED 
 (
 	[ConceptId] ASC,
@@ -980,7 +980,7 @@ GO
 CREATE TABLE [auth].[DatasetQueryConstraint](
 	[DatasetQueryId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL,
+	[ConstraintValue] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_DatasetQueryConstraint] PRIMARY KEY CLUSTERED 
 (
 	[DatasetQueryId] ASC,
@@ -1013,7 +1013,7 @@ GO
 CREATE TABLE [auth].[QueryConstraint](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL,
+	[ConstraintValue] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_QueryConstraint_1] PRIMARY KEY CLUSTERED 
 (
 	[QueryId] ASC,
@@ -1786,7 +1786,7 @@ BEGIN
         Id uniqueidentifier,
         UniversalId nvarchar(200) null,
         [Name] nvarchar(200) null,
-        [Owner] nvarchar(200) not null
+        [Owner] nvarchar(1000) not null
     );
     INSERT INTO @queries
     SELECT q.Id, q.UniversalId, q.[Name], q.[Owner]
@@ -2771,7 +2771,7 @@ BEGIN
     SET NOCOUNT ON
 
     DECLARE @qid UNIQUEIDENTIFIER;
-    DECLARE @owner nvarchar(200);
+    DECLARE @owner nvarchar(1000);
 
     -- Ensure an Atomic Operation as there are many steps here
     BEGIN TRAN;
@@ -2793,7 +2793,7 @@ BEGIN
     -- query found but not owned
     IF (@owner != @user)
     BEGIN;
-        DECLARE @security nvarchar(200) = @user + ' cannot delete query ' + cast(@qid as nvarchar(50));
+        DECLARE @security nvarchar(1000) = @user + ' cannot delete query ' + cast(@qid as nvarchar(50));
         THROW 70403, @security, 1;
     END;
 
@@ -2849,7 +2849,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- make sure the user is the owner of the query and the query exists
-    DECLARE @id UNIQUEIDENTIFIER, @owner nvarchar(200);
+    DECLARE @id UNIQUEIDENTIFIER, @owner nvarchar(1000);
     SELECT @id = Id, @owner = [Owner] FROM app.Query WHERE UniversalId = @uid;
     IF (@id IS NULL)
     BEGIN;
@@ -2869,7 +2869,7 @@ BEGIN
         QueryId UNIQUEIDENTIFIER,
         QueryUniversalId app.UniversalId,
         [QueryName] NVARCHAR(200),
-        [Owner] NVARCHAR(200),
+        [Owner] NVARCHAR(1000),
         DependsOn UNIQUEIDENTIFIER
     );
     with cte (Lvl, QueryId, DependsOn) as (
@@ -4699,7 +4699,7 @@ BEGIN
         UniversalId nvarchar(200) NOT NULL,
         [Name] nvarchar(400) NULL,
         [Category] nvarchar(400) NULL,
-        [Owner] nvarchar(50) NOT NULL,
+        [Owner] nvarchar(1000) NOT NULL,
         Created datetime NOT NULL,
         [Definition] app.QueryDefinitionJson,
         Updated datetime not null,
@@ -5163,7 +5163,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- ensure saving user is the owner of the query
-    DECLARE @owner NVARCHAR(200), @qid UNIQUEIDENTIFIER;
+    DECLARE @owner NVARCHAR(1000), @qid UNIQUEIDENTIFIER;
 
     SELECT @qid = Id, @owner = [Owner]
     FROM app.Query
@@ -5235,7 +5235,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- ensure saving user is the owner of the query
-    DECLARE @owner NVARCHAR(200), @qid UNIQUEIDENTIFIER;
+    DECLARE @owner NVARCHAR(1000), @qid UNIQUEIDENTIFIER;
 
     SELECT @qid = Id, @owner = [Owner]
     FROM app.Query
@@ -5254,7 +5254,7 @@ BEGIN
     END;
 
     -- determine if urn exists already
-    DECLARE @oldowner NVARCHAR(200), @oldqid UNIQUEIDENTIFIER, @oldver int;
+    DECLARE @oldowner NVARCHAR(1000), @oldqid UNIQUEIDENTIFIER, @oldver int;
 
     BEGIN TRAN;
     BEGIN TRY
