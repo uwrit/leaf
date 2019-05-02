@@ -22,7 +22,7 @@ namespace API.Authorization
             return new Entitlement
             {
                 Mask = RoleMask.User | RoleMask.Admin | RoleMask.Super | RoleMask.CanIdentify,
-                Groups = new string[] { }
+                Groups = new string[] { "urn:leaf:localhost:groups:random_group" }
             };
         }
     }

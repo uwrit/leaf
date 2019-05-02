@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_DeleteCachedUnsavedQueryByNonce]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  StoredProcedure [app].[sp_DeleteCachedUnsavedQueryByNonce]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,7 +24,7 @@ BEGIN
     SET NOCOUNT ON
 
     DECLARE @qid UNIQUEIDENTIFIER;
-    DECLARE @owner nvarchar(200);
+    DECLARE @owner nvarchar(1000);
 
     -- Ensure an Atomic Operation as there are many steps here
     BEGIN TRAN;
@@ -46,7 +46,7 @@ BEGIN
     -- query found but not owned
     IF (@owner != @user)
     BEGIN;
-        DECLARE @security nvarchar(200) = @user + ' cannot delete query ' + cast(@qid as nvarchar(50));
+        DECLARE @security nvarchar(1000) = @user + ' cannot delete query ' + cast(@qid as nvarchar(50));
         THROW 70403, @security, 1;
     END;
 

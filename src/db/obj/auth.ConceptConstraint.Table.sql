@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [auth].[ConceptConstraint]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  Table [auth].[ConceptConstraint]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -13,7 +13,7 @@ GO
 CREATE TABLE [auth].[ConceptConstraint](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](200) NOT NULL,
+	[ConstraintValue] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_ConceptConstraint_1] PRIMARY KEY CLUSTERED 
 (
 	[ConceptId] ASC,

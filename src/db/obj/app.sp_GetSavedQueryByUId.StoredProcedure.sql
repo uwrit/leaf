@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -35,7 +35,7 @@ BEGIN
         UniversalId nvarchar(200) NOT NULL,
         [Name] nvarchar(400) NULL,
         [Category] nvarchar(400) NULL,
-        [Owner] nvarchar(50) NOT NULL,
+        [Owner] nvarchar(1000) NOT NULL,
         Created datetime NOT NULL,
         [Definition] app.QueryDefinitionJson,
         Updated datetime not null,

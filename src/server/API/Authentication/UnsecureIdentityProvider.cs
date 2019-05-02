@@ -13,19 +13,12 @@ namespace API.Authentication
 {
     public class UnsecureIdentityProvider : IFederatedIdentityProvider
     {
-        readonly JwtVerifyingOptions jwtVerifyingOptions;
-
-        public UnsecureIdentityProvider(IOptions<JwtVerifyingOptions> jwtOptions)
-        {
-            jwtVerifyingOptions = jwtOptions.Value;
-        }
-
         public IScopedIdentity GetIdentity(HttpContext context)
         {
             return new UnsecureScopedIdentity
             {
                 Identity = "admin",
-                Scope = jwtVerifyingOptions.Issuer
+                Scope = "localhost"
             };
         }
     }

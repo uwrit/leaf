@@ -68,10 +68,9 @@ namespace API.Jwt
             }
 
             var idNonce = Guid.NewGuid().ToString();
-
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, identity.Identity),
+                new Claim(ClaimTypes.Name, identity.ScopedIdentity),
                 IssuedAt,
                 new Claim(JwtRegisteredClaimNames.Aud, jwtOptions.Issuer),
                 new Claim(TokenType.Key, TokenType.Id),

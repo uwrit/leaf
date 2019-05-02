@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: 4/8/19 2:27:20 PM ******/
+/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: 5/2/19 11:58:02 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -25,7 +25,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- make sure the user is the owner of the query and the query exists
-    DECLARE @id UNIQUEIDENTIFIER, @owner nvarchar(200);
+    DECLARE @id UNIQUEIDENTIFIER, @owner nvarchar(1000);
     SELECT @id = Id, @owner = [Owner] FROM app.Query WHERE UniversalId = @uid;
     IF (@id IS NULL)
     BEGIN;
@@ -45,7 +45,7 @@ BEGIN
         QueryId UNIQUEIDENTIFIER,
         QueryUniversalId app.UniversalId,
         [QueryName] NVARCHAR(200),
-        [Owner] NVARCHAR(200),
+        [Owner] NVARCHAR(1000),
         DependsOn UNIQUEIDENTIFIER
     );
     with cte (Lvl, QueryId, DependsOn) as (
