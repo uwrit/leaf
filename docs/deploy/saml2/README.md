@@ -68,6 +68,8 @@ There is no extra Shibboleth Service Provider configuration required to interope
 
 ## Examples
 ### IIS/ADFS
+Configure Shibboleth SP3 with IIS and ADFS 3.0.
+
 shibboleth2.xml
 ```xml
 <SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
@@ -168,6 +170,8 @@ attribute-map.xml
 The above example could be highly variable depending on your ADFS IdP set up, and how your relying party's claims are configured.
 
 ### Apache/Shibboleth
+Configure Shibboleth SP3 with Apache and Shibboleth IdP. This example uses InCommon Federation metadata, but would only allow authentication by the specified IdP.
+
 shibboleth2.xml
 ```xml
 <SPConfig xmlns="urn:mace:shibboleth:3.0:native:sp:config"
