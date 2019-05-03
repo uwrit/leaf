@@ -4,13 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 
-namespace Model.Compiler
+namespace Model.Schema
 {
-    public class ConceptHint
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = false)]
+    public class FieldAttribute : Attribute
     {
-        public Guid ConceptId { get; set; }
-        public IEnumerable<string> Tokens { get; set; }
+        public string Name;
+        public LeafType Type;
+
+        public bool Required;
+        public bool Phi;
+        public bool Mask;
     }
 }

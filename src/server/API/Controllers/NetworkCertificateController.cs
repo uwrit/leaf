@@ -31,14 +31,11 @@ namespace API.Controllers
     public class NetworkCertificateController : Controller
     {
         readonly JwtVerifyingOptions options;
-        readonly IServerContext server;
 
         public NetworkCertificateController(
-            IOptions<JwtVerifyingOptions> opts,
-            IServerContext serverContext)
+            IOptions<JwtVerifyingOptions> opts)
         {
             options = opts.Value;
-            server = serverContext;
         }
 
         [HttpGet]

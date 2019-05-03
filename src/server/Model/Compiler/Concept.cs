@@ -62,7 +62,7 @@ namespace Model.Compiler
         Guid? Id { get; set; }
         string UniversalId { get; set; }
 
-        bool UseUniversalId { get; }
+        bool UseUniversalId();
     }
 
     public class ConceptRef

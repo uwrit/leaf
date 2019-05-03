@@ -9,6 +9,7 @@ using Xunit;
 using Model.Compiler;
 using Model.Cohort;
 using Tests.Mock.Models;
+using Model.Schema;
 
 namespace Tests
 {

@@ -4,19 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Model.Compiler
+namespace Model.Search
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
-    public class SchemaAttribute : Attribute
+    public interface IConceptHintSearchService
     {
-        public Shape Shape;
-
-        public SchemaAttribute() { }
-
-        public SchemaAttribute(Shape shape)
-        {
-            Shape = shape;
-        }
+        Task<IEnumerable<ConceptHint>> SearchAsync(Guid? rootParentId, params string[] terms);
+        Task<ConceptEquivalentHint> SearchEquivalentAsync(string term);
     }
 }

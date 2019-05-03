@@ -6,6 +6,7 @@
 using System;
 using Model.Compiler;
 using Model.Cohort;
+using Model.Schema;
 
 namespace Tests.Mock.Models
 {

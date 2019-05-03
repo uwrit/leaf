@@ -56,7 +56,7 @@ namespace Model.Compiler
         }
     }
 
-    public class ResourceRef
+    public class ResourceRef : IConceptRefDTO
     {
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }

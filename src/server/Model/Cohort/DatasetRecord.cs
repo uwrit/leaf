@@ -6,6 +6,7 @@
 using System;
 using Model.Anonymization;
 using Model.Compiler;
+using Model.Schema;
 
 namespace Model.Cohort
 {

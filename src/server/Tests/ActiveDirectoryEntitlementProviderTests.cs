@@ -39,10 +39,7 @@ namespace Tests
             });
         }
 
-        static IScopedIdentity GetUserContext(string id)
-        {
-            return new SAML2ScopedIdentity(id);
-        }
+        static IScopedIdentity GetUserContext(string id) => new SAML2ScopedIdentity(id);
 
         [Fact]
         public void GetEntitlement_Should_Return_Entitlement_Ok()

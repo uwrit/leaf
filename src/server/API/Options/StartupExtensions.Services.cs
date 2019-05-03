@@ -15,7 +15,6 @@ using Model.Network;
 using Model.Options;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
-using Services;
 using Services.Authorization;
 using Services.Authentication;
 using API.Jwt;
@@ -23,12 +22,14 @@ using Services.Network;
 using Services.Compiler;
 using Services.Cohort;
 using Services.Export;
+using Services.Search;
 using Services.Admin;
 using Model.Cohort;
 using Model.Authorization;
 using Model.Authentication;
 using Model.Admin;
 using Model.Export;
+using Model.Search;
 using API.Authorization;
 using API.Authentication;
 using API.Jobs;
@@ -83,7 +84,7 @@ namespace API.Options
                 services.AddHostedService<BackgroundCertificateSynchronizer>();
             }
 
-            services.AddTransient<IConceptHintSearchEngine, ConceptHintSearchEngine>();
+            services.AddTransient<IConceptHintSearchService, ConceptHintSearchService>();
 
             services.AddTransient<IConceptTreeReader, ConceptTreeReader>();
 

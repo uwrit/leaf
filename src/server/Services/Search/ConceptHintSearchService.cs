@@ -13,23 +13,24 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Compiler;
+using Model.Search;
 using Model.Options;
 using Services.Tables;
+using Newtonsoft.Json;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     /// <summary>
     /// User aware concept hint search engine.
     /// Implements ISearch for ConceptHint.
     /// </summary>
-    public class ConceptHintSearchEngine : IConceptHintSearchEngine
+    public class ConceptHintSearchService : IConceptHintSearchService
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;
-        readonly ILogger<ConceptHintSearchEngine> log;
+        readonly ILogger<ConceptHintSearchService> log;
 
-        public ConceptHintSearchEngine(IOptions<AppDbOptions> dbOptions, IUserContext userContext, ILogger<ConceptHintSearchEngine> logger)
+        public ConceptHintSearchService(IOptions<AppDbOptions> dbOptions, IUserContext userContext, ILogger<ConceptHintSearchService> logger)
         {
             opts = dbOptions.Value;
             log = logger;
@@ -95,6 +96,29 @@ namespace Services.Compiler
         {
             public const string Query = @"app.sp_GetConceptHintsBySearchTerms";
             public const string QueryEquivalent = @"app.sp_GetGeneralEquivalenceMapping";
+        }
+    }
+
+    class ConceptHintRecord
+    {
+        public Guid ConceptId { get; set; }
+        public string JsonTokens { get; set; }
+
+        public ConceptHint ConceptHint()
+        {
+            return new ConceptHint
+            {
+                ConceptId = ConceptId,
+                Tokens = ConceptHintTokenSerde.Deserialize(JsonTokens)
+            };
+        }
+    }
+
+    static class ConceptHintTokenSerde
+    {
+        public static IEnumerable<string> Deserialize(string json)
+        {
+            return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<List<string>>(json);
         }
     }
 }

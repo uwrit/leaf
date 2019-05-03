@@ -4,12 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using Model.Compiler;
 using System.Reflection;
 using Model.Extensions;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
+using Model.Schema;
 
 namespace Model.Anonymization
 {
@@ -77,7 +78,19 @@ namespace Model.Anonymization
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
-        static void FuzzString(object record, PropertyInfo prop, Guid salt, Guid pepper)
+
+
+        protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
+        {
+            { typeof(string), Fuzzer.String },
+            { typeof(DateTime), Fuzzer.DateTime },
+            { typeof(DateTime?), Fuzzer.NullableDateTime },
+        };
+    }
+
+    static class Fuzzer
+    {
+        public static readonly Actor String = (record, prop, salt, pepper) =>
         {
             var p = pepper.ToString();
             var s = salt.ToString();
@@ -86,18 +99,18 @@ namespace Model.Anonymization
             var composite = p + s + value;
 
             prop.SetValue(record, composite.GetConsistentHashCode().ToString());
-        }
+        };
 
-        static void FuzzDateTime(object record, PropertyInfo prop, Guid salt, Guid pepper)
+        public static readonly Actor DateTime = (record, prop, salt, pepper) =>
         {
             var rand = new Random(salt.GetHashCode());
             var value = (DateTime)prop.GetValue(record);
             var shift = rand.Next(-1000, 1000);
 
             prop.SetValue(record, value.AddHours(shift));
-        }
+        };
 
-        static void FuzzNullableDateTime(object record, PropertyInfo prop, Guid salt, Guid pepper)
+        public static readonly Actor NullableDateTime = (record, prop, salt, pepper) =>
         {
             var rand = new Random(salt.GetHashCode());
             var value = (DateTime?)prop.GetValue(record);
@@ -107,13 +120,6 @@ namespace Model.Anonymization
                 var shift = rand.Next(-1000, 1000);
                 prop.SetValue(record, value.Value.AddHours(shift));
             }
-        }
-
-        protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
-        {
-            { typeof(string), FuzzString },
-            { typeof(DateTime), FuzzDateTime },
-            { typeof(DateTime?), FuzzNullableDateTime },
         };
     }
 

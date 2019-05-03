@@ -111,8 +111,7 @@ namespace Model.Compiler
             {
                 if (map.TryGetValue(filter.Concept.UniversalId, out var replFilterConcept))
                 {
-                    filter.Concept.Id = replFilterConcept.Id;
-                    filter.Concept.UniversalId = replFilterConcept.UniversalId;
+                    filter.Concept = replFilterConcept;
                 }
             }
         }

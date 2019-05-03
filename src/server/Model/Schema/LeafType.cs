@@ -6,7 +6,7 @@
 using System;
 using System.Data.Common;
 
-namespace Model.Compiler
+namespace Model.Schema
 {
     public static class SqlServerFieldType
     {

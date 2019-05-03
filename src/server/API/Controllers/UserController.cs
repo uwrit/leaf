@@ -99,7 +99,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError("Could not produce access token.", e.ToString());
+                logger.LogError("Could not produce access token. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -126,7 +126,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError("Could not refresh access token.", e.ToString());
+                logger.LogError("Could not refresh access token. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -168,7 +168,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError("Could not logout user. {Error}", e.ToString());
+                logger.LogError("Could not logout user. Error:{Error}", e.ToString());
             }
 
             return Ok(new LogoutDTO { LogoutURI = authenticationOptions.LogoutURI?.AbsoluteUri });
