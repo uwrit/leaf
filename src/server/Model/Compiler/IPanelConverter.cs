@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Model.Compiler
 {
-    public interface IPanelConverterService
+    public interface IPanelConverter
     {
         Task<PanelValidationContext> GetPanelsAsync(IQueryDefinition query);
         Task<PanelValidationContext> GetPanelsAsync(IPatientCountQueryDTO query, CancellationToken token);

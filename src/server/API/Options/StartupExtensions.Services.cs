@@ -59,7 +59,7 @@ namespace API.Options
 
             services.AddTransient<INetworkValidator, NetworkValidator>();
 
-            services.AddTransient<IPanelConverterService, PanelConverterService>();
+            services.AddTransient<IPanelConverter, PanelConverter>();
 
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
 

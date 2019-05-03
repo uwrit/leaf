@@ -31,18 +31,18 @@ namespace Model.Compiler
     using FederatedConceptMap = Dictionary<string, Concept>;
     using LocalConceptMap = Dictionary<Guid, Concept>;
 
-    public class PanelConverterService : IPanelConverterService
+    public class PanelConverter : IPanelConverter
     {
         readonly IUserContext user;
         readonly IPreflightResourceReader preflightReader;
-        readonly ILogger<PanelConverterService> log;
+        readonly ILogger<PanelConverter> log;
         readonly CompilerOptions compilerOptions;
 
-        public PanelConverterService(
+        public PanelConverter(
             IPreflightResourceReader preflightConceptReader,
             IUserContext userContext,
             IOptions<CompilerOptions> compilerOptions,
-            ILogger<PanelConverterService> logger)
+            ILogger<PanelConverter> logger)
         {
             preflightReader = preflightConceptReader;
             user = userContext;
