@@ -86,7 +86,7 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
-            [FromServices] IPanelConverterService panelConverter,
+            [FromServices] IPanelConverter panelConverter,
             [FromServices] IPanelValidator panelValidator,
             CancellationToken cancelToken
         )

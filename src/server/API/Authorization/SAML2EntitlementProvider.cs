@@ -18,7 +18,6 @@ namespace API.Authorization
 {
     public class SAML2EntitlementProvider : IFederatedEntitlementProvider
     {
-
         readonly SAML2AuthorizationOptions options;
 
         public SAML2EntitlementProvider(IOptions<SAML2AuthorizationOptions> saml)
