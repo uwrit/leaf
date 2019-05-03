@@ -8,7 +8,8 @@ using System.Reflection;
 using Xunit;
 using Model.Cohort;
 using Model.Anonymization;
-using Model.Compiler; // field and schema should be moved somewhere else
+using Model.Compiler;
+using Model.Schema;
 
 namespace Tests
 {

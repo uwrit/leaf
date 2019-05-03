@@ -6,20 +6,18 @@
 using System;
 using Model.Compiler;
 
-namespace Services.Compiler
+namespace Model.Schema
 {
-    class ConceptHintRecord
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    public class SchemaAttribute : Attribute
     {
-        public Guid ConceptId { get; set; }
-        public string JsonTokens { get; set; }
+        public Shape Shape;
 
-        public ConceptHint ConceptHint()
+        public SchemaAttribute() { }
+
+        public SchemaAttribute(Shape shape)
         {
-            return new ConceptHint
-            {
-                ConceptId = ConceptId,
-                Tokens = ConceptHintTokenSerde.Deserialize(JsonTokens)
-            };
+            Shape = shape;
         }
     }
 }

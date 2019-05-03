@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Data.Common;
+using Model.Schema;
 
 namespace Model.Compiler
 {

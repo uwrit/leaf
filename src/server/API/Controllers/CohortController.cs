@@ -6,15 +6,14 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 using API.DTO.Cohort;
 using API.DTO.Compiler;
-using Services;
-using Model.Cohort;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Model.Authorization;
+using Model.Cohort;
 using Model.Compiler;
 using Model.Validation;
 
@@ -35,8 +34,7 @@ namespace API.Controllers
         public async Task<ActionResult<CohortCountDTO>> Count(
             [FromBody] PatientCountQueryDTO patientCountQuery,
             [FromServices] CohortCounter counter,
-            CancellationToken cancelToken
-        )
+            CancellationToken cancelToken)
         {
             try
             {
@@ -48,6 +46,11 @@ namespace API.Controllers
                 }
 
                 return Ok(resp);
+            }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.ToString());
+                return BadRequest();
             }
             catch (OperationCanceledException)
             {
@@ -83,6 +86,11 @@ namespace API.Controllers
 
                 return Ok(result.Demographics);
             }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.ToString());
+                return BadRequest();
+            }
             catch (FormatException fe)
             {
                 log.LogWarning("Malformed query identifiers. QueryId:{QueryID} Error:{Error}", queryid, fe.Message);
@@ -116,8 +124,7 @@ namespace API.Controllers
             [FromQuery] long? early,
             [FromQuery] long? late,
             [FromServices] DatasetProvider provider,
-            CancellationToken cancelToken
-        )
+            CancellationToken cancelToken)
         {
             try
             {

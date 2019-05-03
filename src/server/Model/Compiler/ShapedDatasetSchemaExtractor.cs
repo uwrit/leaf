@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Data.Common;
 using Model.Cohort;
+using Model.Schema;
 
 namespace Model.Compiler
 {

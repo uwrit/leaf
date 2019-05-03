@@ -7,15 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using API.DTO.Compiler;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Services;
 using Model.Authorization;
 using Model.Compiler;
-using Services.Compiler;
-using API.DTO.Compiler;
+using Model.Search;
 using Model.Validation;
 
 namespace API.Controllers
@@ -36,10 +35,9 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptHint>>> SearchHints(
             [FromQuery] Guid? rootParentId,
             [FromQuery] string term,
-            [FromServices] IConceptHintSearchEngine searchEngine
+            [FromServices] IConceptHintSearchService searchEngine
         )
         {
-            log.LogInformation("Searching Concepts By Term:{Term}", term);
             try
             {
                 var terms = term.Split(' ');
@@ -56,10 +54,9 @@ namespace API.Controllers
         [HttpGet("search/equivalent")]
         public async Task<ActionResult<ConceptEquivalentHint>> SearchEquivalent(
             string term,
-            [FromServices] IConceptHintSearchEngine searchEngine
+            [FromServices] IConceptHintSearchService searchEngine
         )
         {
-            log.LogInformation("Searching Equivalent Concept Codes By Term:{Term}", term);
             try
             {
                 var hints = await searchEngine.SearchEquivalentAsync(term);
@@ -93,7 +90,7 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ConceptTreeDTO>> Get([FromServices] IConceptTreeReader conceptReader)
+        public async Task<ActionResult<ConceptTreeDTO>> GetTreeTop([FromServices] IConceptTreeReader conceptReader)
         {
             try
             {
@@ -181,7 +178,6 @@ namespace API.Controllers
             string uid,
             [FromServices] IPreflightConceptReader preflightReader)
         {
-            log.LogInformation("Preflight check universal concept. UId:{UId}", uid);
             try
             {
                 var @ref = new ConceptRef(uid);
