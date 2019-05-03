@@ -27,24 +27,24 @@ The fields in `Basic Demographics` represent a denormalized combination of the F
 
 The expected columns are:
 
-| Name              | SqlType   |                               |
-| ----------------- | --------- |----------------------------------
-| person_id         | nvarchar  |                               | 
-| addressPostalCode | nvarchar  |                               | 
-| addressState      | nvarchar  |                               |
-| birthDate         | datetime  |                               |
-| deceasedDateTime  | datetime  |                               |
-| ethnicity         | nvarchar  |                               |
-| gender            | nvarchar  |                               |
-| deceasedBoolean   | bit       |                               |
-| hispanicBoolean   | bit       |                               |
-| marriedBoolean    | bit       |                               |
-| language          | nvarchar  |                               |
-| maritalStatus     | nvarchar  |                               |
-| mrn               | nvarchar  |                               |
-| name              | nvarchar  |                               |
-| race              | nvarchar  |                               |
-| religion          | nvarchar  |                               |
+| Name              | SqlType   | 
+| ----------------- | --------- |
+| person_id         | nvarchar  |
+| addressPostalCode | nvarchar  |
+| addressState      | nvarchar  |
+| birthDate         | datetime  |
+| deceasedDateTime  | datetime  |
+| ethnicity         | nvarchar  |
+| gender            | nvarchar  |
+| deceasedBoolean   | bit       |
+| hispanicBoolean   | bit       |
+| marriedBoolean    | bit       |
+| language          | nvarchar  |
+| maritalStatus     | nvarchar  |
+| mrn               | nvarchar  |
+| name              | nvarchar  |
+| race              | nvarchar  |
+| religion          | nvarchar  |
 
 ### Key Points
 - All columns are **required**. Leaf will automatically date-shift, calculate ages, and remove the HIPAA identified columns (`mrn` and `name`) depending on if the user is in `Identified` or `De-identified` mode.
@@ -65,16 +65,16 @@ SELECT
   , birthDate = p.birth_datetime
   , deceasedDateTime = p.death_date
   , ethnicity = p.ethnicity
-  , gender = CASE WHEN p.gender = ''F'' THEN ''female'' WHEN p.gender = ''M'' THEN ''male'' ELSE ''other'' END
-  , [language] = ''Unknown''
-  , maritalStatus = ''Unknown''
+  , gender = CASE WHEN p.gender = 'F' THEN 'female' WHEN p.gender = 'M' THEN 'male' ELSE 'other' END
+  , [language] = 'Unknown'
+  , maritalStatus = 'Unknown'
   , marriedBoolean = CAST(0 AS BIT)
   , hispanicBoolean = CAST(CASE WHEN p.ethnicity_code = 38003563 THEN 1 ELSE 0 END AS BIT)
-  , deceasedBoolean = cast(CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END AS BIT)
-  , [name] = ''Unknown Unknown''
-  , mrn = ''Unknown'' 
+  , deceasedBoolean = CAST(CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END AS BIT)
+  , [name] = 'Unknown Unknown'
+  , mrn = 'Unknown'
   , race = p.race
-  , religion = ''Unknown''
+  , religion = 'Unknown'
 FROM v_person p 
      LEFT JOIN [location] l ON p.location_id = l.location_id
 ```
@@ -99,7 +99,7 @@ VALUES
     , maritalStatus = ''Unknown''
     , marriedBoolean = CAST(0 AS BIT)
     , hispanicBoolean = CAST(CASE WHEN p.ethnicity_code = 38003563 THEN 1 ELSE 0 END AS BIT)
-    , deceasedBoolean = cast(CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END AS BIT)
+    , deceasedBoolean = CAST(CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END AS BIT)
     , [name] = ''Unknown Unknown''
     , mrn = ''Unknown'' 
     , race = p.race
@@ -112,4 +112,4 @@ VALUES
 )
 ```
 
-Note that the `Shape` field in Leaf happens to be value "3", so it needs to be hard-coded here.
+Note that the `Shape` field in Leaf happens to be value `3`, so it needs to be hard-coded here.
