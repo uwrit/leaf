@@ -66,7 +66,7 @@ namespace API.DTO.Compiler
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }
 
-        public bool UseUniversalId => !string.IsNullOrWhiteSpace(UniversalId);
+        public bool UseUniversalId() => !string.IsNullOrWhiteSpace(UniversalId);
 
         public ConceptRefDTO()
         {
