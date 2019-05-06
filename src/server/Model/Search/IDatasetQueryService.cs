@@ -4,17 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Collections.Generic;
-using Model.Tagging;
+using System.Threading.Tasks;
+using Model.Compiler;
 
-namespace Model.Compiler
+namespace Model.Search
 {
-    public interface IQueryService
+    public interface IDatasetQueryService
     {
-        Task<IEnumerable<BaseQuery>> GetQueries();
-        Task<Query> GetQuery(QueryUrn uid);
-        Task<QuerySaveResult> Save(QuerySave query);
-        Task<QueryDeleteResult> Delete(QueryUrn uid, bool force);
+        Task<IEnumerable<DatasetQuery>> GetQueries();
+        Task<CompilerValidationContext<DatasetCompilerContext>> GetQueryCompilerContext(DatasetExecutionRequest request);
     }
 }

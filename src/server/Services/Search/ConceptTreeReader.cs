@@ -12,14 +12,14 @@ using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
-using Services.Authorization;
+using Model.Search;
 using Services.Extensions;
 using Services.Tables;
-using Model.Authorization;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     /// <summary>
     /// User aware database reader for Concepts.
@@ -50,7 +50,6 @@ namespace Services.Compiler
 
         public async Task<Concept> GetAsync(Guid id)
         {
-            log.LogInformation("Getting Concept. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -83,7 +82,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<Guid> ids)
         {
-            log.LogInformation("Getting Concepts. Ids:{Ids}", ids);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -107,7 +105,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<string> universalIds)
         {
-            log.LogInformation("Getting Universal Concepts. UIds:{UIds}", universalIds);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -131,7 +128,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetChildrenAsync(Guid parentId)
         {
-            log.LogInformation("Getting child concepts. ParentId:{ParentId}", parentId);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -164,7 +160,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetWithParentsAsync(HashSet<Guid> ids)
         {
-            log.LogInformation("Getting parent concepts for Ids:{Ids}", ids);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -197,7 +192,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetWithParentsBySearchTermAsync(Guid? rootId, string[] terms)
         {
-            log.LogInformation("Getting parent concepts by Search Terms:{terms}", terms);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -222,8 +216,6 @@ namespace Services.Compiler
 
         public async Task<IEnumerable<Concept>> GetRootsAsync()
         {
-            log.LogInformation("Getting root Concepts");
-
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -241,8 +233,6 @@ namespace Services.Compiler
 
         public async Task<ConceptTree> GetTreetopAsync()
         {
-            log.LogInformation("Getting root Concepts and PanelFilters");
-
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();

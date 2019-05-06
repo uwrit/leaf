@@ -3,36 +3,33 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-using System.Linq;
+using API.Authentication;
+using API.Authorization;
+using API.Jobs;
+using API.Jwt;
+using API.Middleware.Federation;
+using API.Middleware.Logging;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using API.Middleware.Federation;
-using API.Middleware.Logging;
-using Model.Network;
-using Model.Options;
+using Model.Admin;
+using Model.Authentication;
+using Model.Authorization;
+using Model.Cohort;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
-using Services.Authorization;
+using Model.Export;
+using Model.Network;
+using Model.Options;
+using Model.Search;
+using Services.Admin;
 using Services.Authentication;
-using API.Jwt;
-using Services.Network;
-using Services.Compiler;
+using Services.Authorization;
 using Services.Cohort;
 using Services.Export;
+using Services.Network;
 using Services.Search;
-using Services.Admin;
-using Model.Cohort;
-using Model.Authorization;
-using Model.Authentication;
-using Model.Admin;
-using Model.Export;
-using Model.Search;
-using API.Authorization;
-using API.Authentication;
-using API.Jobs;
 
 namespace API.Options
 {
@@ -59,8 +56,6 @@ namespace API.Options
             services.AddIAMServices();
 
             services.AddTransient<INetworkValidator, NetworkValidator>();
-
-            services.AddTransient<IPanelConverter, PanelConverter>();
 
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
 
@@ -119,6 +114,8 @@ namespace API.Options
             services.AddTransient<DemographicProvider>();
             services.AddTransient<DatasetProvider>();
             services.AddTransient<ConceptHintSearcher>();
+            services.AddTransient<ConceptTreeSearcher>();
+            services.AddTransient<PanelConverter>();
 
             return services;
         }

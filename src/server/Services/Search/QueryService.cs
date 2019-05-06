@@ -18,8 +18,11 @@ using Model.Options;
 using Model.Tagging;
 using Services.Tables;
 using Services.Extensions;
+using Model.Search;
 
-namespace Services.Compiler
+// TODO(cspital) where does this belong, definitely NOT part of compiler
+
+namespace Services.Search
 {
     public class QueryService : IQueryService
     {

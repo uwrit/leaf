@@ -8,7 +8,7 @@ using Model.Cohort;
 using Model.Compiler;
 using Model.Tagging;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     class DatasetQueryRecord
     {

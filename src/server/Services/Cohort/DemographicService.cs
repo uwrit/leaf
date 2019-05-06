@@ -4,22 +4,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Services.Compiler;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Anonymization;
+using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Options;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using Services.Authorization;
-using System.Data.SqlClient;
 using Services.Extensions;
-using Model.Anonymization;
-using Model.Authorization;
 
 namespace Services.Cohort
 {

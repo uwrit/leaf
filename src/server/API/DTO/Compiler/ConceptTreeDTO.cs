@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using Model.Compiler;
 using System.Collections.Generic;
+using Model.Search;
 
 namespace API.DTO.Compiler
 {

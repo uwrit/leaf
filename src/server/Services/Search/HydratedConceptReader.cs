@@ -8,10 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using Model.Compiler;
+using Model.Search;
 
-namespace Services.Compiler
+namespace Services.Search
 {
-    static class HydratedConceptReader
+    public static class HydratedConceptReader
     {
         public static IEnumerable<Concept> Read(SqlMapper.GridReader grid)
         {

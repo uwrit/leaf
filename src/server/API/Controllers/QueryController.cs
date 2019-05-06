@@ -8,21 +8,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using API.DTO.Compiler;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Services;
-using Services.Cohort;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Extensions;
-using Model.Validation;
-using Services.Compiler;
-using API.DTO.Compiler;
-using API.DTO.Cohort;
+using Model.Search;
 using Model.Tagging;
-using Services.Authorization;
+using Model.Validation;
 
 namespace API.Controllers
 {
@@ -86,7 +82,7 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
-            [FromServices] IPanelConverter panelConverter,
+            [FromServices] PanelConverter panelConverter,
             [FromServices] IPanelValidator panelValidator,
             CancellationToken cancelToken
         )

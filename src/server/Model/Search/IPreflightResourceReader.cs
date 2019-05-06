@@ -5,8 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Model.Compiler;
 
-namespace Model.Compiler
+namespace Model.Search
 {
     public interface IPreflightResourceReader : IPreflightConceptReader
     {

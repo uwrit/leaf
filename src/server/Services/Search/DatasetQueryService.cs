@@ -18,8 +18,9 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Model.Authorization;
 using Services.Tables;
+using Model.Search;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     using Hydrator = Func<DatasetExecutionRequest, Task<DatasetCompilerContext>>;
 
@@ -61,14 +62,6 @@ namespace Services.Compiler
                 se.MapThrow();
                 throw;
             }
-        }
-
-        [Obsolete("Do not use yet.", true)]
-        public Task<DatasetQuery> GetQuery(DatasetQueryRef datasetQueryRef)
-        {
-            log.LogInformation("Getting dataset query. Ref:{@Ref}", datasetQueryRef);
-
-            throw new NotImplementedException();
         }
 
         public async Task<IEnumerable<DatasetQuery>> GetQueries()

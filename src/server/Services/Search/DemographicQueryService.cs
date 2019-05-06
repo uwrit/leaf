@@ -15,8 +15,9 @@ using Dapper;
 using Services.Tables;
 using Services.Extensions;
 using Model.Authorization;
+using Model.Search;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     using Hydrator = Func<QueryRef, Task<DemographicCompilerContext>>;
 

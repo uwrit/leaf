@@ -4,13 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Model.Compiler;
 
-namespace Model.Compiler
+namespace Model.Search
 {
-    public interface IConceptPreflightService
+    public interface IDemographicQueryService
     {
-        Task<IEnumerable<ConceptPreflightCheckResult>> CheckAsync(IEnumerable<ConceptRef> concepts);
+        Task<DemographicQuery> GetDemographicQueryAsync();
+        Task<CompilerValidationContext<DemographicCompilerContext>> GetDemographicQueryCompilerContext(QueryRef queryRef);
+        Task<DemographicQuery> UpdateDemographicQueryAsync(DemographicQuery query);
     }
 }

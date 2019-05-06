@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Model.Compiler;
 using Model.Tagging;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     /// <summary>
     /// Represents a row in the app.Concept table.
