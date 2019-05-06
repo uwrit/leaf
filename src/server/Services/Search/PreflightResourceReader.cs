@@ -4,23 +4,22 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Model.Options;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Services.Authorization;
-using Model.Compiler;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using System.Linq;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Authorization;
+using Model.Compiler;
+using Model.Options;
+using Model.Search;
 using Model.Tagging;
 using Services.Tables;
-using Model.Authorization;
-using Services.Search;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     public class PreflightResourceReader : IPreflightResourceReader
     {

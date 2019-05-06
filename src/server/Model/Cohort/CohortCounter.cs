@@ -21,14 +21,14 @@ namespace Model.Cohort
     /// </remarks>
     public class CohortCounter
     {
-        readonly IPanelConverter converter;
+        readonly PanelConverter converter;
         readonly IPanelValidator validator;
         readonly IPatientCohortService counter;
         readonly ICohortCacheService cohortCache;
         readonly IUserContext user;
         readonly ILogger<CohortCounter> log;
 
-        public CohortCounter(IPanelConverter converter,
+        public CohortCounter(PanelConverter converter,
             IPanelValidator validator,
             IPatientCohortService counter,
             ICohortCacheService cohortCache,

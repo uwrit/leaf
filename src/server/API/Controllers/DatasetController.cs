@@ -6,21 +6,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using API.DTO.Cohort;
 using API.DTO.Compiler;
-using Services.Compiler;
-using Services.Cohort;
-using Services.Authorization;
-using Model.Cohort;
-using Model.Compiler;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Model.Authorization;
-using Model.Extensions;
+using Model.Cohort;
+using Model.Search;
 
 namespace API.Controllers
 {

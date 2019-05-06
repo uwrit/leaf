@@ -13,17 +13,12 @@ using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Extensions;
 using Model.Options;
+using Model.Search;
 
 /*
  * This is the main point of conversion for all embeddable resources.
  * Regardless of the fact that resource references come in, only concepts are allowed out.
  * This probably means there is a substantial refactor of this implementation ahead.
- * 
- * Steps:
- * 1. write the bucketing code for digesting an enumerable of resourcerefs.
- *    a. if UseUniversalId == false, must be assumed to be a concept.
- *    b. pass to Urn.TryParse and assess output type.
- * 
  */
 
 namespace Model.Compiler
@@ -31,7 +26,7 @@ namespace Model.Compiler
     using FederatedConceptMap = Dictionary<string, Concept>;
     using LocalConceptMap = Dictionary<Guid, Concept>;
 
-    public class PanelConverter : IPanelConverter
+    public class PanelConverter
     {
         readonly IUserContext user;
         readonly IPreflightResourceReader preflightReader;

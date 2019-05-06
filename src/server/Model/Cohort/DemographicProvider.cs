@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Model.Compiler;
+using Model.Search;
 using Model.Validation;
 
 namespace Model.Cohort

@@ -7,7 +7,7 @@ using System;
 using Model.Compiler;
 using Model.Tagging;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     class ConceptPreflightCheckResultRecord
     {

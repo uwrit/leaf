@@ -5,13 +5,17 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Model.Tagging;
+using Model.Compiler;
 
-namespace Model.Compiler
+namespace Model.Search
 {
-    public interface IDemographicQueryService
+    public interface IQueryService
     {
-        Task<DemographicQuery> GetDemographicQueryAsync();
-        Task<CompilerValidationContext<DemographicCompilerContext>> GetDemographicQueryCompilerContext(QueryRef queryRef);
-        Task<DemographicQuery> UpdateDemographicQueryAsync(DemographicQuery query);
+        Task<IEnumerable<BaseQuery>> GetQueries();
+        Task<Query> GetQuery(QueryUrn uid);
+        Task<QuerySaveResult> Save(QuerySave query);
+        Task<QueryDeleteResult> Delete(QueryUrn uid, bool force);
     }
 }
