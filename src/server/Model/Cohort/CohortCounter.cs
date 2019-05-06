@@ -50,7 +50,7 @@ namespace Model.Cohort
         /// Obtains the cohort of unique patient IDs.
         /// Caches those patient IDs.
         /// </summary>
-        /// <returns><see cref="CohortCount">The count of patients in the cohort.</see></returns>
+        /// <returns><see cref="Result">The count of patients in the cohort.</see></returns>
         /// <param name="queryDTO">Abstract query representation.</param>
         /// <param name="token">Cancellation token.</param>
         /// <exception cref="OperationCanceledException"/>

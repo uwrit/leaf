@@ -10,6 +10,12 @@ using Model.Validation;
 
 namespace Model.Search
 {
+    /// <summary>
+    /// Encapsulates Leaf's search and auto-complete use cases.
+    /// </summary>
+    /// <remarks>
+    /// Required services throw exceptions that bubble up.
+    /// </remarks>
     public class ConceptHintSearcher
     {
         readonly IConceptHintSearchService searcher;
@@ -19,16 +25,31 @@ namespace Model.Search
             searcher = searchService;
         }
 
-        public async Task<IEnumerable<ConceptHint>> HintsAsync(Guid? root, string term)
+        /// <summary>
+        /// Provide hints for potential auto-complete targets.
+        /// </summary>
+        /// <returns>Hints.</returns>
+        /// <param name="root">Optional root id to search within.</param>
+        /// <param name="term">Search term to provide hints for.</param>
+        /// <exception cref="ArgumentNullException"/>
+        public async Task<IEnumerable<ConceptHint>> GetHintsAsync(Guid? root, string term)
         {
             Ensure.NotNull(term, nameof(term));
+
             var terms = term.Split(' ');
             return await searcher.HintsAsync(root, terms);
         }
 
-        public async Task<ConceptEquivalentHint> SynonymAsync(string term)
+        /// <summary>
+        /// Provide synonyms for a given search term.
+        /// </summary>
+        /// <returns>Synonym.</returns>
+        /// <param name="term">Term.</param>
+        /// <exception cref="ArgumentNullException"/>
+        public async Task<ConceptEquivalentHint> GetSynonymAsync(string term)
         {
             Ensure.NotNull(term, nameof(term));
+
             return await searcher.SynonymAsync(term);
         }
     }

@@ -40,7 +40,7 @@ namespace API.Controllers
         {
             try
             {
-                var hints = await searchEngine.HintsAsync(rootParentId, term);
+                var hints = await searchEngine.GetHintsAsync(rootParentId, term);
                 return Ok(hints);
             }
             catch (ArgumentNullException ane)
@@ -63,7 +63,7 @@ namespace API.Controllers
         {
             try
             {
-                var hints = await searchEngine.SynonymAsync(term);
+                var hints = await searchEngine.GetSynonymAsync(term);
                 return Ok(hints);
             }
             catch (ArgumentNullException ane)

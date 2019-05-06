@@ -9,7 +9,6 @@ using System.Collections.Generic;
 
 namespace Model.Compiler
 {
-    // Represents readonly operations on a tree-like data structure.
     public interface IConceptTreeReader
     {
         Task<Concept> GetAsync(Guid id);
