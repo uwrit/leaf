@@ -35,14 +35,18 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptHint>>> SearchHints(
             [FromQuery] Guid? rootParentId,
             [FromQuery] string term,
-            [FromServices] IConceptHintSearchService searchEngine
+            [FromServices] ConceptHintSearcher searchEngine
         )
         {
             try
             {
-                var terms = term.Split(' ');
-                var hints = await searchEngine.SearchAsync(rootParentId, terms);
+                var hints = await searchEngine.GetHintsAsync(rootParentId, term);
                 return Ok(hints);
+            }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
+                return BadRequest();
             }
             catch (Exception ex)
             {
@@ -54,13 +58,18 @@ namespace API.Controllers
         [HttpGet("search/equivalent")]
         public async Task<ActionResult<ConceptEquivalentHint>> SearchEquivalent(
             string term,
-            [FromServices] IConceptHintSearchService searchEngine
+            [FromServices] ConceptHintSearcher searchEngine
         )
         {
             try
             {
-                var hints = await searchEngine.SearchEquivalentAsync(term);
+                var hints = await searchEngine.GetSynonymAsync(term);
                 return Ok(hints);
+            }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
+                return BadRequest();
             }
             catch (Exception ex)
             {

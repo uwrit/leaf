@@ -11,7 +11,7 @@ namespace Model.Search
 {
     public interface IConceptHintSearchService
     {
-        Task<IEnumerable<ConceptHint>> SearchAsync(Guid? rootParentId, params string[] terms);
-        Task<ConceptEquivalentHint> SearchEquivalentAsync(string term);
+        Task<IEnumerable<ConceptHint>> HintsAsync(Guid? rootParentId, params string[] terms);
+        Task<ConceptEquivalentHint> SynonymAsync(string term);
     }
 }

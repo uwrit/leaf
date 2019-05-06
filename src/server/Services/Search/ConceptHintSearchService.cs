@@ -10,13 +10,12 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Search;
 using Model.Options;
-using Services.Tables;
+using Model.Search;
 using Newtonsoft.Json;
+using Services.Tables;
 
 namespace Services.Search
 {
@@ -28,12 +27,10 @@ namespace Services.Search
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;
-        readonly ILogger<ConceptHintSearchService> log;
 
-        public ConceptHintSearchService(IOptions<AppDbOptions> dbOptions, IUserContext userContext, ILogger<ConceptHintSearchService> logger)
+        public ConceptHintSearchService(IOptions<AppDbOptions> dbOptions, IUserContext userContext)
         {
             opts = dbOptions.Value;
-            log = logger;
             user = userContext;
         }
 
@@ -42,7 +39,7 @@ namespace Services.Search
         /// </summary>
         /// <returns>A possible equivalent code to that entered</returns>
         /// <param name="term">Search term.</param>
-        public async Task<ConceptEquivalentHint> SearchEquivalentAsync(string term)
+        public async Task<ConceptEquivalentHint> SynonymAsync(string term)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -68,7 +65,7 @@ namespace Services.Search
         /// <returns>Collection of concepts that match the search terms</returns>
         /// <param name="rootId">Root parent identifier.</param>
         /// <param name="terms">Search terms.</param>
-        public async Task<IEnumerable<ConceptHint>> SearchAsync(Guid? rootId, params string[] terms)
+        public async Task<IEnumerable<ConceptHint>> HintsAsync(Guid? rootId, params string[] terms)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
