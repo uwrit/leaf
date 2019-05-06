@@ -18,6 +18,7 @@ using System.Linq;
 using Model.Tagging;
 using Services.Tables;
 using Model.Authorization;
+using Services.Search;
 
 namespace Services.Compiler
 {

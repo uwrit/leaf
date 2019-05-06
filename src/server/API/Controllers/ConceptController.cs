@@ -82,14 +82,18 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptDTO>>> SearchParents(
             [FromQuery] string searchTerm,
             [FromQuery] Guid? rootId,
-            [FromServices] IConceptTreeReader conceptReader)
+            [FromServices] ConceptTreeSearcher searcher)
         {
             try
             {
-                var terms = searchTerm.Split(' ');
-                var concepts = await conceptReader.GetWithParentsBySearchTermAsync(rootId, terms);
+                var ancestry = await searcher.GetAncestryBySearchTermAsync(rootId, searchTerm);
 
-                return Ok(concepts.Select(c => new ConceptDTO(c)));
+                return Ok(ancestry.Select(c => new ConceptDTO(c)));
+            }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
+                return BadRequest();
             }
             catch (Exception ex)
             {
@@ -99,28 +103,31 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ConceptTreeDTO>> GetTreeTop([FromServices] IConceptTreeReader conceptReader)
+        public async Task<ActionResult<ConceptTreeDTO>> GetTreeTop(
+            [FromServices] ConceptTreeSearcher searcher)
         {
             try
             {
-                var tree = await conceptReader.GetTreetopAsync();
+                var tree = await searcher.GetTreetopAsync();
                 var dto = new ConceptTreeDTO(tree);
                 return Ok(dto);
             }
             catch (Exception e)
             {
-                log.LogError("Could not retrieve ConceptTree. Error:{Error}", e.ToString());
+                log.LogError("Could not retrieve concept treetop. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
 
         [HttpGet("{ident}")]
-        public async Task<ActionResult<ConceptDTO>> Single(Guid ident, [FromServices] IConceptTreeReader conceptReader)
+        public async Task<ActionResult<ConceptDTO>> Single(
+            Guid ident,
+            [FromServices] ConceptTreeSearcher searcher)
         {
             try
             {
-                var concept = await conceptReader.GetAsync(ident);
+                var concept = await searcher.GetAsync(ident);
                 if (concept == null)
                 {
                     return NotFound();
@@ -141,11 +148,13 @@ namespace API.Controllers
         }
 
         [HttpGet("{ident}/children")]
-        public async Task<ActionResult<IEnumerable<ConceptDTO>>> Children(Guid ident, [FromServices] IConceptTreeReader conceptReader)
+        public async Task<ActionResult<IEnumerable<ConceptDTO>>> Children(
+            Guid ident,
+            [FromServices] ConceptTreeSearcher searcher)
         {
             try
             {
-                var children = await conceptReader.GetChildrenAsync(ident);
+                var children = await searcher.GetChildrenAsync(ident);
                 var dtos = children.Select(c => new ConceptDTO(c));
                 return Ok(dtos);
             }
@@ -163,17 +172,22 @@ namespace API.Controllers
         [HttpGet("parents")]
         public async Task<ActionResult<ConceptParentsDTO>> Parents(
             [FromQuery] HashSet<Guid> idents,
-            [FromServices] IConceptTreeReader conceptReader)
+            [FromServices] ConceptTreeSearcher searcher)
         {
             try
             {
-                var concepts = await conceptReader.GetWithParentsAsync(idents);
+                var concepts = await searcher.GetAncestryAsync(idents);
                 var dto = new ConceptParentsDTO
                 {
                     Concepts = concepts.Select(c => new ConceptDTO(c))
                 };
 
                 return Ok(dto);
+            }
+            catch (ArgumentNullException ane)
+            {
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
+                return BadRequest();
             }
             catch (Exception ex)
             {

@@ -190,15 +190,18 @@ namespace API.Options
                 opts.SessionTimeoutMinutes = auth.SessionTimeoutMinutes;
                 opts.InactiveTimeoutMinutes = auth.InactiveTimeoutMinutes;
                 opts.LogoutURI = auth.LogoutURI;
-
             });
 
             switch (auth.Mechanism)
             {
                 case AuthenticationMechanism.Unsecured:
                     var log = services.BuildServiceProvider().GetRequiredService<ILogger<Startup>>();
-                    log.LogCritical("UNSECURED authentication detected, Leaf is not secured by authentication or authorization!");
+                    log.LogCritical("UNSECURED authentication detected, Leaf is not secured by authentication!");
+#if DEBUG
                     break;
+#else
+                    throw new LeafConfigurationException("Do not run UNSECURED authentication in non-development environments!");
+#endif
 
                 case AuthenticationMechanism.Saml2:
                     if (!config.TryBind<SAML2AuthenticationOptions>(Config.Authentication.SAML2, out var saml2))

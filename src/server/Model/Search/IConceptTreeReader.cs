@@ -6,8 +6,9 @@
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Model.Compiler;
 
-namespace Model.Compiler
+namespace Model.Search
 {
     public interface IConceptTreeReader
     {

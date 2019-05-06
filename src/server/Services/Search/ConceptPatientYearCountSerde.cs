@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Model.Compiler;
 
-namespace Services.Compiler
+namespace Services.Search
 {
     static class ConceptPatientYearCountSerde
     {

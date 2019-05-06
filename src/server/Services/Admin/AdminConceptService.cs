@@ -19,6 +19,7 @@ using Services.Compiler;
 using System.Linq;
 using Model.Authorization;
 using Services.Extensions;
+using Services.Search;
 
 namespace Services.Admin
 {
