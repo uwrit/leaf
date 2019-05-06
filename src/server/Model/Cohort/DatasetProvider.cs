@@ -20,7 +20,7 @@ namespace Model.Cohort
     /// </remarks>
     public class DatasetProvider
     {
-        readonly IDatasetQueryService queryService;
+        readonly IDatasetQueryService queryService; // TODO(cspital) swap over to model type
         readonly IDatasetService datasetService;
 
         public DatasetProvider(IDatasetQueryService queryService,

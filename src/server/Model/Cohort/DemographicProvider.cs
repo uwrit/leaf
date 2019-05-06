@@ -20,7 +20,7 @@ namespace Model.Cohort
     /// </remarks>
     public class DemographicProvider
     {
-        readonly IDemographicQueryService queryService;
+        readonly IDemographicQueryService queryService; // TODO(cspital) swap over to model type
         readonly IDemographicService demographicService;
 
         public DemographicProvider(IDemographicQueryService queryService,
