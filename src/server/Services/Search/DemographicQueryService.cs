@@ -17,6 +17,9 @@ using Services.Extensions;
 using Model.Authorization;
 using Model.Search;
 
+// NOTE(cspital) this service does too much, blow it up and reduce it to the 2 hydrator types as call sites.
+// adding the context should happen at the inevitable model layer for this use case.
+
 namespace Services.Search
 {
     using Hydrator = Func<QueryRef, Task<DemographicCompilerContext>>;
@@ -42,6 +45,7 @@ namespace Services.Search
             log = logger;
         }
 
+        // TODO(cspital) move this to admin service
         public async Task<DemographicQuery> GetDemographicQueryAsync()
         {
             log.LogInformation("Getting DemographicQuery");
@@ -157,6 +161,7 @@ namespace Services.Search
             }
         }
 
+        // TODO(cspital) move this to admin service
         public async Task<DemographicQuery> UpdateDemographicQueryAsync(DemographicQuery query)
         {
             log.LogInformation("Updating DemographicQuery SqlStatement:{SqlStatement}", query.SqlStatement);
@@ -180,6 +185,7 @@ namespace Services.Search
             }
         }
 
+        // TODO(cspital) delete this
         void ThrowIfInvalid(DemographicQueryRecord record)
         {
             if (record == null)

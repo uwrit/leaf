@@ -4,21 +4,23 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Threading.Tasks;
 using Dapper;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
-using Services.Authorization;
-using Services.Extensions;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using Model.Authorization;
-using Services.Tables;
 using Model.Search;
+using Services.Extensions;
+using Services.Tables;
+
+// NOTE(cspital) this service does too much, blow it up and reduce it to the 4 hydrator types as call sites.
+// adding the context should happen at the inevitable model layer for this use case.
 
 namespace Services.Search
 {

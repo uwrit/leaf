@@ -116,6 +116,7 @@ namespace API.Options
             services.AddTransient<ConceptHintSearcher>();
             services.AddTransient<ConceptTreeSearcher>();
             services.AddTransient<PanelConverter>();
+            services.AddTransient<PreflightResourceChecker>();
 
             return services;
         }

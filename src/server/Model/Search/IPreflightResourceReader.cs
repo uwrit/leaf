@@ -6,17 +6,22 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model.Compiler;
+using Model.Tagging;
+using System;
 
 namespace Model.Search
 {
     public interface IPreflightResourceReader : IPreflightConceptReader
     {
-        Task<PreflightResources> GetAsync(ResourceRefs refs);
+        Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs);
+        Task<PreflightResources> GetResourcesByUniversalIdsAsync(ResourceRefs refs);
     }
 
     public interface IPreflightConceptReader
     {
-        Task<PreflightConcepts> GetAsync(ConceptRef @ref);
-        Task<PreflightConcepts> GetAsync(HashSet<ConceptRef> ids);
+        Task<PreflightConcepts> GetConceptsByIdAsync(Guid id);
+        Task<PreflightConcepts> GetConceptsByUniversalIdAsync(Urn uid);
+        Task<PreflightConcepts> GetConceptsByIdsAsync(HashSet<Guid> ids);
+        Task<PreflightConcepts> GetConceptsByUniversalIdsAsync(HashSet<string> uids);
     }
 }
