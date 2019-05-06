@@ -25,135 +25,118 @@ namespace Services.Search
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;
-        readonly ILogger<PreflightResourceReader> log;
 
         public PreflightResourceReader(
             IOptions<AppDbOptions> options,
-            IUserContext userContext,
-            ILogger<PreflightResourceReader> logger)
+            IUserContext userContext)
         {
             opts = options.Value;
             user = userContext;
-            log = logger;
         }
 
-        public async Task<PreflightResources> GetAsync(ResourceRefs refs)
+        public async Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs)
         {
-            log.LogInformation("Getting preflight resource check. Refs:{@Refs}", refs);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                if (user.IsInstutional)
-                {
-                    return await GetByIdsAsync(cn, refs);
-                }
-                return await GetByUIdsAsync(cn, refs);
-            }
-        }
-
-        async Task<PreflightResources> GetByIdsAsync(SqlConnection cn, ResourceRefs refs)
-        {
-            var qids = refs.Queries.Select(q => q.Id.Value);
-            var cids = refs.Concepts.Select(c => c.Id.Value);
-            var grid = await cn.QueryMultipleAsync(
-                ResourcePreflightSql.byIds,
-                new { qids = ResourceIdTable.From(qids), cids = ResourceIdTable.From(cids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                commandTimeout: opts.DefaultTimeout,
-                commandType: CommandType.StoredProcedure
-            );
-
-            return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
-        }
-
-        async Task<PreflightResources> GetByUIdsAsync(SqlConnection cn, ResourceRefs refs)
-        {
-            var quids = refs.Queries.Select(q => q.UniversalId.ToString()).ToHashSet();
-            var cuids = refs.Concepts.Select(q => q.UniversalId.ToString()).ToHashSet();
-            var grid = await cn.QueryMultipleAsync(
-                ResourcePreflightSql.byUIds,
-                new { quids = ResourceUniversalIdTable.From(quids), cuids = ResourceUniversalIdTable.From(cuids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                commandTimeout: opts.DefaultTimeout,
-                commandType: CommandType.StoredProcedure
-            );
-
-            return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
-        }
-
-
-        public async Task<PreflightConcepts> GetAsync(ConceptRef @ref)
-        {
-            log.LogInformation("Getting preflight concept check. Ref:{@Ref}", @ref);
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-                if (user.IsInstutional)
-                {
-                    return await GetByIdAsync(cn, @ref.Id.Value);
-                }
-                return await GetByUIdAsync(cn, @ref.UniversalId.ToString());
-            }
-        }
-
-        async Task<PreflightConcepts> GetByIdAsync(SqlConnection cn, Guid conceptId)
-        {
-            var grid = await cn.QueryMultipleAsync(
-                ConceptPreflightSql.singleId,
-                new { id = conceptId, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                commandTimeout: opts.DefaultTimeout,
-                commandType: CommandType.StoredProcedure
-            );
-            return PreflightReader.ReadConcepts(grid);
-        }
-
-        async Task<PreflightConcepts> GetByUIdAsync(SqlConnection cn, string conceptUid)
-        {
-            var grid = await cn.QueryMultipleAsync(
-                ConceptPreflightSql.singleUId,
-                new { uid = conceptUid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                commandTimeout: opts.DefaultTimeout,
-                commandType: CommandType.StoredProcedure
-            );
-            return PreflightReader.ReadConcepts(grid);
-        }
-
-        public async Task<PreflightConcepts> GetAsync(HashSet<ConceptRef> refs)
-        {
-            log.LogInformation("Getting preflight check concepts. Refs:{@Refs}", refs);
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                if (user.IsInstutional)
-                {
-                    return await GetByIdsAsync(cn, refs.Select(r => r.Id.Value).ToHashSet());
-                }
-                return await GetByUIdsAsync(cn, refs.Select(r => r.UniversalId.ToString()).ToHashSet());
-            }
-        }
-
-        async Task<PreflightConcepts> GetByIdsAsync(SqlConnection cn, HashSet<Guid> conceptIds)
-        {
-            var grid = await cn.QueryMultipleAsync(
-                    ConceptPreflightSql.manyIds,
-                    new { ids = ResourceIdTable.From(conceptIds), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                var qids = refs.Queries.Select(q => q.Id.Value);
+                var cids = refs.Concepts.Select(c => c.Id.Value);
+                var grid = await cn.QueryMultipleAsync(
+                    ResourcePreflightSql.byIds,
+                    new { qids = ResourceIdTable.From(qids), cids = ResourceIdTable.From(cids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-            return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
+            }
         }
 
-        async Task<PreflightConcepts> GetByUIdsAsync(SqlConnection cn, HashSet<string> conceptUids)
+        public async Task<PreflightResources> GetResourcesByUniversalIdsAsync(ResourceRefs refs)
         {
-            var grid = await cn.QueryMultipleAsync(
-                    ConceptPreflightSql.manyUIds,
-                    new { uids = ResourceUniversalIdTable.From(conceptUids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var quids = refs.Queries.Select(q => q.UniversalId.ToString()).ToHashSet();
+                var cuids = refs.Concepts.Select(q => q.UniversalId.ToString()).ToHashSet();
+                var grid = await cn.QueryMultipleAsync(
+                    ResourcePreflightSql.byUIds,
+                    new { quids = ResourceUniversalIdTable.From(quids), cuids = ResourceUniversalIdTable.From(cuids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-            return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
+            }
+        }
+
+        public async Task<PreflightConcepts> GetConceptsByIdAsync(Guid conceptId)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                    ConceptPreflightSql.singleId,
+                    new { id = conceptId, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    commandTimeout: opts.DefaultTimeout,
+                    commandType: CommandType.StoredProcedure
+                );
+                return PreflightReader.ReadConcepts(grid);
+            }
+        }
+
+        public async Task<PreflightConcepts> GetConceptsByUniversalIdAsync(Urn universalId)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var conceptId = universalId.ToString();
+                var grid = await cn.QueryMultipleAsync(
+                    ConceptPreflightSql.singleId,
+                    new { id = conceptId, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    commandTimeout: opts.DefaultTimeout,
+                    commandType: CommandType.StoredProcedure
+                );
+                return PreflightReader.ReadConcepts(grid);
+            }
+        }
+
+        public async Task<PreflightConcepts> GetConceptsByIdsAsync(HashSet<Guid> conceptIds)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                        ConceptPreflightSql.manyIds,
+                        new { ids = ResourceIdTable.From(conceptIds), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                        commandTimeout: opts.DefaultTimeout,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                return PreflightReader.ReadConcepts(grid);
+            }
+        }
+
+        public async Task<PreflightConcepts> GetConceptsByUniversalIdsAsync(HashSet<string> conceptUids)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                        ConceptPreflightSql.manyUIds,
+                        new { uids = ResourceUniversalIdTable.From(conceptUids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                        commandTimeout: opts.DefaultTimeout,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                return PreflightReader.ReadConcepts(grid);
+            }
         }
 
         static class ConceptPreflightSql

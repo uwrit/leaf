@@ -199,14 +199,13 @@ namespace API.Controllers
         [HttpPost("{uid}/preflight")]
         public async Task<ActionResult> Preflight(
             string uid,
-            [FromServices] IPreflightConceptReader preflightReader)
+            [FromServices] PreflightResourceChecker preflight)
         {
             try
             {
                 var @ref = new ConceptRef(uid);
-                var preflight = await preflightReader.GetAsync(@ref);
-                log.LogInformation("Preflight check universal concept result. UId:{UId} Result:{@Result}", uid, preflight.PreflightCheck);
-                var check = new ConceptPreflightCheckDTO(preflight.PreflightCheck);
+                var result = await preflight.GetConceptsAsync(@ref);
+                var check = new ConceptPreflightCheckDTO(result.PreflightCheck);
                 return Ok(check);
             }
             catch (FormatException fe)

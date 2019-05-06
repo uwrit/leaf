@@ -196,22 +196,16 @@ namespace API.Controllers
             }
         }
 
-        //[HttpPut("{ident}/share")]
-        //public ActionResult Share(string ident, [FromBody] PatientCountQueryDTO query)
-        //{
-        //    return NotFound();
-        //}
-
         [Authorize(Policy = Access.Institutional)]
         [HttpPost("preflight")]
         public async Task<ActionResult<PreflightCheckDTO>> Preflight(
             [FromBody] ResourceRef resourceRef,
-            [FromServices] IPreflightResourceReader preflightReader)
+            [FromServices] PreflightResourceChecker preflight)
         {
             try
             {
                 var refs = new ResourceRefs(new ResourceRef[] { resourceRef });
-                var preflightResources = await preflightReader.GetAsync(refs);
+                var preflightResources = await preflight.GetResourcesAsync(refs);
                 return Ok(new PreflightCheckDTO(preflightResources));
             }
             catch (LeafDbException lde)

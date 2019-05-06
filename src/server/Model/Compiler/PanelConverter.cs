@@ -29,17 +29,17 @@ namespace Model.Compiler
     public class PanelConverter
     {
         readonly IUserContext user;
-        readonly IPreflightResourceReader preflightReader;
+        readonly PreflightResourceChecker preflightSearch;
         readonly ILogger<PanelConverter> log;
         readonly CompilerOptions compilerOptions;
 
         public PanelConverter(
-            IPreflightResourceReader preflightConceptReader,
+            PreflightResourceChecker preflightSearch,
             IUserContext userContext,
             IOptions<CompilerOptions> compilerOptions,
             ILogger<PanelConverter> logger)
         {
-            preflightReader = preflightConceptReader;
+            this.preflightSearch = preflightSearch;
             user = userContext;
             this.compilerOptions = compilerOptions.Value;
             log = logger;
@@ -118,7 +118,7 @@ namespace Model.Compiler
                                   .Select(i => i.Resource);
             var resources = new ResourceRefs(requested);
 
-            return await preflightReader.GetAsync(resources);
+            return await preflightSearch.GetResourcesAsync(resources);
         }
 
         IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, IEnumerable<Concept> concepts)
