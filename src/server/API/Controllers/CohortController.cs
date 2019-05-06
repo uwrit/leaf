@@ -49,7 +49,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException ane)
             {
-                log.LogError("Missing argument. Error:{Error}", ane.ToString());
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
                 return BadRequest();
             }
             catch (OperationCanceledException)
@@ -88,7 +88,7 @@ namespace API.Controllers
             }
             catch (ArgumentNullException ane)
             {
-                log.LogError("Missing argument. Error:{Error}", ane.ToString());
+                log.LogError("Missing argument. Error:{Error}", ane.Message);
                 return BadRequest();
             }
             catch (FormatException fe)

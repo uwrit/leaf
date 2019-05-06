@@ -6,10 +6,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Model.Validation;
 
 namespace Model.Search
 {
-
     public class ConceptHintSearcher
     {
         readonly IConceptHintSearchService searcher;
@@ -19,14 +19,17 @@ namespace Model.Search
             searcher = searchService;
         }
 
-        public async Task<IEnumerable<ConceptHint>> HintsAsync(Guid? root, params string[] terms)
+        public async Task<IEnumerable<ConceptHint>> HintsAsync(Guid? root, string term)
         {
-            throw new NotImplementedException();
+            Ensure.NotNull(term, nameof(term));
+            var terms = term.Split(' ');
+            return await searcher.HintsAsync(root, terms);
         }
 
         public async Task<ConceptEquivalentHint> SynonymAsync(string term)
         {
-            throw new NotImplementedException();
+            Ensure.NotNull(term, nameof(term));
+            return await searcher.SynonymAsync(term);
         }
     }
 }
