@@ -14,7 +14,7 @@ Though you should probably take into consideration storage and so on first. The 
 
 ## Defining the instance Name, Description, and Colorset
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/identity.gif"/></p>
-It's important to give users both an understanding of the database(s) to give some context, even more so if you are querying multiple Leaf instances.
+It's important to give users an understanding of the database(s) to give some context, and even more so if you are querying multiple Leaf instances.
 
 To set the name, abbreviate, description, and colors used to represent your institution, you must insert a record into the `network.Identity` table.
 
@@ -22,11 +22,12 @@ For example:
 
 ```sql
 INSERT INTO [network].[Identity]
-  SELECT 
-	[Lock] = 'X'
+SELECT 
+    [Lock] = 'X'
    ,[Name] = 'University of Example'
    ,[Abbreviation] = 'UE'
-   ,[Description] = 'The University of Example Medical Center is a large medical system representing two hospitals and over 400 regional clinics.'
+   ,[Description] = 'The University of Example Medical Center is a large medical system representing two hospitals' +
+   		    'and over 400 regional clinics.'
    ,[TotalPatients] = 2200000
    ,[Latitude] = 47.6062
    ,[Longitude] = 122.3321
