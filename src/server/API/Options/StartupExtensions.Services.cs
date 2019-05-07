@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Model;
 using Model.Admin;
 using Model.Authentication;
 using Model.Authorization;
@@ -98,26 +99,7 @@ namespace API.Options
             services.AddTransient<IQueryService, QueryService>();
 
             services.AddAdminServices();
-            services.AddModel();
-
-            return services;
-        }
-
-        // TODO(cspital) move into model
-        static IServiceCollection AddModel(this IServiceCollection services)
-        {
-            services.AddTransient<NetworkValidator>();
-            services.AddTransient<PanelValidator>();
-            services.AddSingleton<PatientCountAggregator>();
-            services.AddTransient<CohortCounter>();
-            services.AddTransient<DemographicProvider>();
-            services.AddTransient<DatasetProvider>();
-            services.AddTransient<ConceptHintSearcher>();
-            services.AddTransient<ConceptTreeSearcher>();
-            services.AddTransient<PanelConverter>();
-            services.AddTransient<PreflightResourceChecker>();
-            services.AddTransient<DemographicCompilerValidationContextProvider>();
-            services.AddTransient<DatasetCompilerValidationContextProvider>();
+            services.RegisterLeafCore();
 
             return services;
         }
