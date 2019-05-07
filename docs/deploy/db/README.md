@@ -14,9 +14,9 @@ Though you should probably take into consideration storage and so on first. The 
 
 ## Defining the instance Name, Description, and Colorset
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/identity.gif"/></p>
-It's important to give users an understanding of the database(s) to give some context, and even more so if you are querying multiple Leaf instances.
+It's important to give users an understanding of the database(s) to give some context, and even more so if you are querying multiple Leaf instances and need to appropriately identify your database to local and outside users.
 
-To set the name, abbreviate, description, and colors used to represent your institution, you must insert a record into the `network.Identity` table.
+To set the name, abbreviate, description, and colors used to represent your institution, insert a record into the `network.Identity` table.
 
 For example:
 
