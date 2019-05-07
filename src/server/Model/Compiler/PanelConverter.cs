@@ -26,6 +26,9 @@ namespace Model.Compiler
     using FederatedConceptMap = Dictionary<string, Concept>;
     using LocalConceptMap = Dictionary<Guid, Concept>;
 
+    /// <summary>
+    /// Encapsulates Leaf's workflow for converting stub AST to fully hydrated AST, as well as localizing federated query definition.
+    /// </summary>
     public class PanelConverter
     {
         readonly IUserContext user;
@@ -45,6 +48,13 @@ namespace Model.Compiler
             log = logger;
         }
 
+        /// <summary>
+        /// Converts stub AST query definition into local, fully hydrated AST.
+        /// The returned AST is unvalidated, and has a QueryId property set if the incoming query has one.
+        /// </summary>
+        /// <returns>The panels async.</returns>
+        /// <param name="query">Stub AST query definition.</param>
+        /// <param name="token">Cancellation token.</param>
         public async Task<PanelValidationContext> GetPanelsAsync(IPatientCountQueryDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -53,6 +63,13 @@ namespace Model.Compiler
             return validationContext;
         }
 
+        /// <summary>
+        /// Converts stub AST query definition into local, fully hydrated AST.
+        /// The returned AST is unvalidated, and has a UniversalId property set if the incoming query has one.
+        /// </summary>
+        /// <returns>The panels async.</returns>
+        /// <param name="query">Stub AST query definition.</param>
+        /// <param name="token">Cancellation token.</param>
         public async Task<PanelValidationContext> GetPanelsAsync(IQuerySaveDTO query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
@@ -61,6 +78,12 @@ namespace Model.Compiler
             return validationContext;
         }
 
+        /// <summary>
+        /// Converts stub AST query definition into local, fully hydrated AST.
+        /// The returned AST is unvalidated.
+        /// </summary>
+        /// <returns>The panels async.</returns>
+        /// <param name="query">Stub AST query definition.</param>
         public async Task<PanelValidationContext> GetPanelsAsync(IQueryDefinition query)
         {
             var resources = await GetPreflightResourcesAsync(query.All());
@@ -78,6 +101,11 @@ namespace Model.Compiler
             return new PanelValidationContext(query, resources, panels);
         }
 
+        /// <summary>
+        /// Overwrites the <paramref name="definition"/> resource references to local references from <paramref name="localQuery"/>.
+        /// </summary>
+        /// <param name="definition">Stub AST query definition.</param>
+        /// <param name="localQuery">Local query.</param>
         public void LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
             if (user.IsInstutional)

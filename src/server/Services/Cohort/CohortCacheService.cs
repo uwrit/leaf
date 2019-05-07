@@ -22,7 +22,7 @@ using Model.Authorization;
 
 namespace Services.Cohort
 {
-    public class CohortCacheService : ICohortCacheService
+    public class CohortCacheService : CohortCounter.ICohortCacheService
     {
         const string queryCreateUnsaved = "app.sp_CreateCachedUnsavedQuery";
         const string queryDeleteUnsavedNonce = "app.sp_DeleteCachedUnsavedQuery";

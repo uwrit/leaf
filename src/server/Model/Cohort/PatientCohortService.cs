@@ -13,7 +13,7 @@ using Model.Options;
 
 namespace Model.Cohort
 {
-    public abstract class PatientCohortService : IPatientCohortService
+    public abstract class PatientCohortService : CohortCounter.IPatientCohortService
     {
         protected readonly ISqlCompiler compiler;
         protected readonly ClinDbOptions clinDbOptions;

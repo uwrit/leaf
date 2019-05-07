@@ -6,11 +6,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Model.Compiler;
-using Model.Search;
-using Model.Validation;
-using Model.Authorization;
 using Microsoft.Extensions.Logging;
+using Model.Authorization;
+using Model.Compiler;
+using Model.Validation;
 
 namespace Model.Cohort
 {
@@ -22,6 +21,13 @@ namespace Model.Cohort
     /// </remarks>
     public class DemographicProvider
     {
+        public interface IDemographicsExecutor
+        {
+            Task<PatientDemographicContext> ExecuteDemographicsAsync(
+                DemographicExecutionContext context,
+                CancellationToken token);
+        }
+
         readonly DemographicCompilerValidationContextProvider contextProvider;
         readonly IDemographicSqlCompiler compiler;
         readonly IDemographicsExecutor executor;
@@ -48,10 +54,11 @@ namespace Model.Cohort
         /// <returns>A demographic result, which, if the request was valid, contains the demographics.</returns>
         /// <param name="query">Query reference value.</param>
         /// <param name="token">Cancellation token.</param>
-        /// <exception cref="LeafDbException"/>
+        /// <exception cref="LeafRPCException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> GetDemographicsAsync(QueryRef query, CancellationToken token)
         {
             Ensure.NotNull(query, nameof(query));

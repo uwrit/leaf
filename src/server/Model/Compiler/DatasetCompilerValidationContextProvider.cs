@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Model.Compiler
 {
+    /// <summary>
+    /// Dataset compiler validation context provider.
+    /// </summary>
     public class DatasetCompilerValidationContextProvider
     {
         public interface ICompilerContextProvider
@@ -29,6 +32,13 @@ namespace Model.Compiler
             this.log = log;
         }
 
+        /// <summary>
+        /// Get the <see cref="DatasetCompilerContext"/> from the provider, validates it's state, and wraps it in <see cref="CompilerValidationContext{DatasetCompilerContext}"/>.
+        /// </summary>
+        /// <returns>The compiler validation context.</returns>
+        /// <param name="request">Execution request.</param>
+        /// <exception cref="Validation.LeafRPCException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<CompilerValidationContext<DatasetCompilerContext>> GetCompilerContextAsync(DatasetExecutionRequest request)
         {
             log.LogInformation("Getting dataset query compiler context. Request:{@Request}", request);

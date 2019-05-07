@@ -21,7 +21,7 @@ using Services.Tables;
 
 namespace Services.Search
 {
-    public class PreflightResourceReader : IPreflightResourceReader
+    public class PreflightResourceReader : PreflightResourceChecker.IPreflightResourceReader
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;

@@ -9,16 +9,17 @@ using System.Data.SqlClient;
 using System.Linq;
 using Model.Compiler;
 using Model.Validation;
+using System.Data.Common;
 
 namespace Services.Extensions
 {
     public static class SqlServerExtensions
     {
         /// <summary>
-        /// Maps and wraps <see cref="SqlException"/> in a <see cref="LeafDbException"/> and throws if ErrorCode is in <see cref="LeafSqlError"/>
+        /// Maps and wraps <see cref="SqlException"/> in a <see cref="LeafRPCException"/> and throws if ErrorCode is in <see cref="LeafErrorCode"/>
         /// </summary>
         /// <param name="se">SqlException.</param>
-        public static void MapThrow(this SqlException se)
+        public static void MapThrow(this DbException se)
         {
             DbError.ThrowFrom(se);
         }

@@ -81,7 +81,7 @@ namespace API.Controllers.Admin
                 logger.LogError("Malformed SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From(fe.Message));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -124,7 +124,7 @@ namespace API.Controllers.Admin
                 logger.LogError("Malformed SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From(fe.Message));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -147,7 +147,7 @@ namespace API.Controllers.Admin
                 }
                 return Ok();
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }

@@ -30,11 +30,11 @@ namespace API.Controllers
         [Authorize(Policy = Access.Institutional)]
         [Authorize(Policy = TokenType.Access)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DatasetQueryDTO>>> Get([FromServices] IDatasetQueryService queryService)
+        public async Task<ActionResult<IEnumerable<DatasetQueryDTO>>> Get([FromServices] DatasetQueryProvider provider)
         {
             try
             {
-                var queries = await queryService.GetAsync();
+                var queries = await provider.GetQueriesAsync();
                 var dtos = queries.Select(q => new DatasetQueryDTO(q));
                 return Ok(dtos);
             }

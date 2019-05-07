@@ -71,7 +71,7 @@ namespace API.Controllers.Admin
                 }
                 return Ok(updated);
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -99,7 +99,7 @@ namespace API.Controllers.Admin
                 var created = await evService.Create(conceptEvent);
                 return Ok(created);
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }

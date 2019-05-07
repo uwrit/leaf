@@ -67,7 +67,7 @@ namespace API.Controllers
                 }
                 return Ok(new QueryDTO(query));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode);
             }
@@ -154,7 +154,7 @@ namespace API.Controllers
                 log.LogInformation("Request cancelled.");
                 return NoContent();
             }
-            catch (LeafDbException lde)
+            catch (LeafRPCException lde)
             {
                 return StatusCode(lde.StatusCode);
             }
@@ -185,7 +185,7 @@ namespace API.Controllers
                 log.LogError("Malformed query identifer. UniversalId:{UniversalId} Error:{Error}", ident, fe.Message);
                 return BadRequest();
             }
-            catch (LeafDbException lde)
+            catch (LeafRPCException lde)
             {
                 return StatusCode(lde.StatusCode);
             }
@@ -208,7 +208,7 @@ namespace API.Controllers
                 var preflightResources = await preflight.GetResourcesAsync(refs);
                 return Ok(new PreflightCheckDTO(preflightResources));
             }
-            catch (LeafDbException lde)
+            catch (LeafRPCException lde)
             {
                 return StatusCode(lde.StatusCode);
             }
