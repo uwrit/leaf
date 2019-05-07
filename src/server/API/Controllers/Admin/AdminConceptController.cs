@@ -64,7 +64,7 @@ namespace API.Controllers.Admin
                 var updated = await cService.Update(c);
                 return Ok(new ConceptDTO(updated));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -89,7 +89,7 @@ namespace API.Controllers.Admin
                 var updated = await cService.Create(c);
                 return Ok(new ConceptDTO(updated));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -112,7 +112,7 @@ namespace API.Controllers.Admin
                 }
                 return Ok();
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }

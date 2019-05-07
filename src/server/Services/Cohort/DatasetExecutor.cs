@@ -20,7 +20,7 @@ using Services.Extensions;
 
 namespace Services.Cohort
 {
-    public class DatasetExecutor : IDatasetExecutor
+    public class DatasetExecutor : DatasetProvider.IDatasetExecutor
     {
         readonly IUserContext user;
         readonly ILogger<DatasetExecutor> log;

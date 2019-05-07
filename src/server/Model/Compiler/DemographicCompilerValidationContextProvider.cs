@@ -3,14 +3,14 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Search;
 using Microsoft.Extensions.Logging;
 
 namespace Model.Compiler
 {
+    /// <summary>
+    /// Demographic compiler validation context provider.
+    /// </summary>
     public class DemographicCompilerValidationContextProvider
     {
         public interface ICompilerContextProvider
@@ -29,6 +29,13 @@ namespace Model.Compiler
             this.log = log;
         }
 
+        /// <summary>
+        /// Get the <see cref="DemographicCompilerContext"/> from the provider, validates it's state, and wraps it in <see cref="CompilerValidationContext{DemographicCompilerContext}"/>.
+        /// </summary>
+        /// <returns>The compiler validation context.</returns>
+        /// <param name="qr">Query reference.</param>
+        /// <exception cref="Validation.LeafRPCException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<CompilerValidationContext<DemographicCompilerContext>> GetCompilerContextAsync(QueryRef qr)
         {
             log.LogInformation("Getting DemographicQueryCompilerContext. QueryRef:{@QueryRef}", qr);

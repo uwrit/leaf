@@ -25,7 +25,7 @@ namespace Services.Search
     /// User aware database reader for Concepts.
     /// Provides readonly operations for the concept tree in the database.
     /// </summary>
-    public class ConceptTreeReader : IConceptTreeReader
+    public class ConceptTreeReader : ConceptTreeSearcher.IConceptTreeReader
     {
         const string querySingle = @"app.sp_GetConceptById";
         const string queryMany = @"app.sp_GetConceptsByIds";

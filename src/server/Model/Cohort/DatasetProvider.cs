@@ -21,6 +21,11 @@ namespace Model.Cohort
     /// </remarks>
     public class DatasetProvider
     {
+        public interface IDatasetExecutor
+        {
+            Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token);
+        }
+
         readonly DatasetCompilerValidationContextProvider contextProvider;
         readonly IDatasetSqlCompiler compiler;
         readonly IDatasetExecutor executor;
@@ -48,10 +53,11 @@ namespace Model.Cohort
         /// <param name="early">Early time bound.</param>
         /// <param name="late">Late time bound.</param>
         /// <exception cref="LeafPreflightException"/>
-        /// <exception cref="LeafDbException"/>
+        /// <exception cref="LeafRPCException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null)
         {
             Ensure.NotNull(query, nameof(query));

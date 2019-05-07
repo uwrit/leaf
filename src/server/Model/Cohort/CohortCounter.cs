@@ -21,6 +21,16 @@ namespace Model.Cohort
     /// </remarks>
     public class CohortCounter
     {
+        public interface IPatientCohortService
+        {
+            Task<PatientCohort> GetPatientCohortAsync(PatientCountQuery query, CancellationToken token);
+        }
+
+        public interface ICohortCacheService
+        {
+            Task<Guid> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user);
+        }
+
         readonly PanelConverter converter;
         readonly PanelValidator validator;
         readonly IPatientCohortService counter;
@@ -56,7 +66,8 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="InvalidOperationException"/>
         /// <exception cref="ArgumentNullException"/>
-        /// <exception cref="LeafDbException"/>
+        /// <exception cref="LeafRPCException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
             Ensure.NotNull(queryDTO, nameof(queryDTO));

@@ -23,7 +23,7 @@ namespace Services.Search
     /// User aware concept hint search engine.
     /// Implements ISearch for ConceptHint.
     /// </summary>
-    public class ConceptHintSearchService : IConceptHintSearchService
+    public class ConceptHintSearchService : ConceptHintSearcher.IConceptHintSearchService
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;

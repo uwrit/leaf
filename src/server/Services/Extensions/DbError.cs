@@ -4,25 +4,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Data.SqlClient;
+using System.Data.Common;
 using Model.Validation;
 
 namespace Services.Extensions
 {
     internal static class DbError
     {
-        internal static void ThrowFrom(SqlException se)
+        internal static void ThrowFrom(DbException se)
         {
             switch (se.ErrorCode)
             {
-                case (int)LeafSqlError.BadArgument:
-                    throw new LeafDbException(LeafSqlError.BadArgument, se.Message, se);
-                case (int)LeafSqlError.Forbidden:
-                    throw new LeafDbException(LeafSqlError.Forbidden, se.Message, se);
-                case (int)LeafSqlError.NotFound:
-                    throw new LeafDbException(LeafSqlError.NotFound, se.Message, se);
-                case (int)LeafSqlError.Conflict:
-                    throw new LeafDbException(LeafSqlError.Conflict, se.Message, se);
+                case (int)LeafErrorCode.BadArgument:
+                    throw new LeafRPCException(LeafErrorCode.BadArgument, se.Message, se);
+                case (int)LeafErrorCode.Forbidden:
+                    throw new LeafRPCException(LeafErrorCode.Forbidden, se.Message, se);
+                case (int)LeafErrorCode.NotFound:
+                    throw new LeafRPCException(LeafErrorCode.NotFound, se.Message, se);
+                case (int)LeafErrorCode.Conflict:
+                    throw new LeafRPCException(LeafErrorCode.Conflict, se.Message, se);
             }
         }
     }

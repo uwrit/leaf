@@ -101,7 +101,7 @@ namespace API.Controllers
                 log.LogInformation("Request cancelled. QueryID:{QueryID}", queryid);
                 return NoContent();
             }
-            catch (LeafDbException lde)
+            catch (LeafRPCException lde)
             {
                 return StatusCode(lde.StatusCode);
             }
@@ -159,7 +159,7 @@ namespace API.Controllers
                 log.LogInformation("Request cancelled. QueryID:{QueryID} DatasetId:{DatasetId}", queryid, datasetid);
                 return NoContent();
             }
-            catch (LeafDbException lde)
+            catch (LeafRPCException lde)
             {
                 return StatusCode(lde.StatusCode);
             }

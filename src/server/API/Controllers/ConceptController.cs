@@ -136,7 +136,7 @@ namespace API.Controllers
                 var dto = new ConceptDTO(concept);
                 return Ok(dto);
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode);
             }
@@ -158,7 +158,7 @@ namespace API.Controllers
                 var dtos = children.Select(c => new ConceptDTO(c));
                 return Ok(dtos);
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode);
             }

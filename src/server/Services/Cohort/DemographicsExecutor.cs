@@ -20,7 +20,7 @@ using Services.Extensions;
 
 namespace Services.Cohort
 {
-    public class DemographicsExecutor : IDemographicsExecutor
+    public class DemographicsExecutor : DemographicProvider.IDemographicsExecutor
     {
         readonly IUserContext user;
         readonly ILogger<DemographicsExecutor> log;

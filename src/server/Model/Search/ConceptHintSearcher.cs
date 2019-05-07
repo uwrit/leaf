@@ -18,6 +18,12 @@ namespace Model.Search
     /// </remarks>
     public class ConceptHintSearcher
     {
+        public interface IConceptHintSearchService
+        {
+            Task<IEnumerable<ConceptHint>> HintsAsync(Guid? rootParentId, params string[] terms);
+            Task<ConceptEquivalentHint> SynonymAsync(string term);
+        }
+
         readonly IConceptHintSearchService searcher;
 
         public ConceptHintSearcher(IConceptHintSearchService searchService)
@@ -32,6 +38,7 @@ namespace Model.Search
         /// <param name="root">Optional root id to search within.</param>
         /// <param name="term">Search term to provide hints for.</param>
         /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<IEnumerable<ConceptHint>> GetHintsAsync(Guid? root, string term)
         {
             Ensure.NotNull(term, nameof(term));
@@ -46,6 +53,7 @@ namespace Model.Search
         /// <returns>Synonym.</returns>
         /// <param name="term">Term.</param>
         /// <exception cref="ArgumentNullException"/>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<ConceptEquivalentHint> GetSynonymAsync(string term)
         {
             Ensure.NotNull(term, nameof(term));

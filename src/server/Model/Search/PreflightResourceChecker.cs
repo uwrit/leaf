@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Model.Compiler;
 using Model.Authorization;
 using System.Linq;
+using Model.Tagging;
 
 namespace Model.Search
 {
@@ -21,6 +22,20 @@ namespace Model.Search
     /// </remarks>
     public class PreflightResourceChecker
     {
+        public interface IPreflightResourceReader : IPreflightConceptReader
+        {
+            Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs);
+            Task<PreflightResources> GetResourcesByUniversalIdsAsync(ResourceRefs refs);
+        }
+
+        public interface IPreflightConceptReader
+        {
+            Task<PreflightConcepts> GetConceptsByIdAsync(Guid id);
+            Task<PreflightConcepts> GetConceptsByUniversalIdAsync(Urn uid);
+            Task<PreflightConcepts> GetConceptsByIdsAsync(HashSet<Guid> ids);
+            Task<PreflightConcepts> GetConceptsByUniversalIdsAsync(HashSet<string> uids);
+        }
+
         readonly IPreflightResourceReader reader;
         readonly ILogger<PreflightResourceChecker> log;
         readonly IUserContext user;
@@ -40,6 +55,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>Preflight check results, which contains the actual concepts if the check passed.</returns>
         /// <param name="cr">Concept reference.</param>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<PreflightConcepts> GetConceptsAsync(ConceptRef cr)
         {
             log.LogInformation("Getting preflight concept check. Ref:{@Ref}", cr);
@@ -55,6 +71,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>Preflight check results, which contains the actual concepts if the check passed.</returns>
         /// <param name="crs">Concept references.</param>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<PreflightConcepts> GetConceptsAsync(HashSet<ConceptRef> crs)
         {
             log.LogInformation("Getting preflight check concepts. Refs:{@Refs}", crs);
@@ -70,6 +87,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>Preflight check results, which contains the actual resources if the check passed.</returns>
         /// <param name="refs">Resource references.</param>
+        /// <exception cref="System.Data.Common.DbException"/>
         public async Task<PreflightResources> GetResourcesAsync(ResourceRefs refs)
         {
             log.LogInformation("Getting preflight resource check. Refs:{@Refs}", refs);

@@ -70,7 +70,7 @@ namespace API.Controllers.Admin
                 logger.LogError("Malformed Specialization:{@Specialization} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From("Malformed Specialization.UniversalId."));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
@@ -112,7 +112,7 @@ namespace API.Controllers.Admin
                 logger.LogError("Malformed Specialization:{@Specialization} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From("Malformed Specialization.UniversalId."));
             }
-            catch (LeafDbException le)
+            catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }

@@ -76,25 +76,25 @@ namespace API.Options
                 services.AddHostedService<BackgroundCertificateSynchronizer>();
             }
 
-            services.AddTransient<IConceptHintSearchService, ConceptHintSearchService>();
+            services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
 
-            services.AddTransient<IConceptTreeReader, ConceptTreeReader>();
+            services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
 
-            services.AddTransient<IPreflightConceptReader, PreflightResourceReader>();
-            services.AddTransient<IPreflightResourceReader, PreflightResourceReader>();
+            services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
+            services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
 
-            services.AddTransient<IPatientCohortService, CtePatientCohortService>();
+            services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
 
-            services.AddTransient<ICohortCacheService, CohortCacheService>();
+            services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
-            services.AddTransient<IDemographicsExecutor, DemographicsExecutor>();
+            services.AddTransient<DemographicProvider.IDemographicsExecutor, DemographicsExecutor>();
 
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
             services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
-            services.AddTransient<IDatasetQueryService, DatasetQueryService>();
-            services.AddTransient<IDatasetExecutor, DatasetExecutor>();
+            services.AddTransient<IDatasetQueryFetcher, DatasetQueryFetcher>();
+            services.AddTransient<DatasetProvider.IDatasetExecutor, DatasetExecutor>();
 
             services.AddTransient<IQueryService, QueryService>();
 

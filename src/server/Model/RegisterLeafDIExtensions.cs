@@ -27,6 +27,7 @@ namespace Model
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DemographicCompilerValidationContextProvider>();
             services.AddTransient<DatasetCompilerValidationContextProvider>();
+            services.AddTransient<DatasetQueryProvider>();
 
             return services;
         }

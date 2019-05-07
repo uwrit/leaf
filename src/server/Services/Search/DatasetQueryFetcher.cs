@@ -19,30 +19,26 @@ using Model.Search;
 using Services.Extensions;
 using Services.Tables;
 
-// NOTE(cspital) this service does too much, blow it up and reduce it to the 4 hydrator types as call sites.
-// adding the context should happen at the inevitable model layer for this use case.
-
 namespace Services.Search
 {
-    public class DatasetQueryService : IDatasetQueryService
+    public class DatasetQueryFetcher : IDatasetQueryFetcher
     {
         readonly IUserContext user;
-        readonly ILogger<DatasetQueryService> log;
+        readonly ILogger<DatasetQueryFetcher> log;
         readonly AppDbOptions opts;
 
-        public DatasetQueryService(
+        public DatasetQueryFetcher(
             IUserContext userContext,
             IOptions<AppDbOptions> dbOptions,
-            ILogger<DatasetQueryService> logger)
+            ILogger<DatasetQueryFetcher> logger)
         {
             user = userContext;
             log = logger;
             opts = dbOptions.Value;
         }
 
-        public async Task<IEnumerable<DatasetQuery>> GetAsync()
+        public async Task<IEnumerable<DatasetQuery>> GetDatasetQueriesAsync()
         {
-            log.LogInformation("Getting dataset queries.");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
