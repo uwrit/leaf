@@ -13,7 +13,6 @@ namespace Model.Search
 {
     public interface IDatasetQueryService
     {
-        Task<IEnumerable<DatasetQuery>> GetQueries();
-        Task<CompilerValidationContext<DatasetCompilerContext>> GetQueryCompilerContext(DatasetExecutionRequest request);
+        Task<IEnumerable<DatasetQuery>> GetAsync();
     }
 }

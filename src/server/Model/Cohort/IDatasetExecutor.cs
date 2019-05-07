@@ -10,8 +10,8 @@ using Model.Compiler;
 
 namespace Model.Cohort
 {
-    public interface IDatasetService
+    public interface IDatasetExecutor
     {
-        Task<Dataset> GetDatasetAsync(DatasetCompilerContext context, CancellationToken token);
+        Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token);
     }
 }

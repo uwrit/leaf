@@ -83,7 +83,7 @@ namespace API.Controllers
             string id,
             [FromBody] QuerySaveDTO querySave,
             [FromServices] PanelConverter panelConverter,
-            [FromServices] IPanelValidator panelValidator,
+            [FromServices] PanelValidator panelValidator,
             CancellationToken cancelToken
         )
         {

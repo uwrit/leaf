@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Search;
 using Model.Validation;
+using Model.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Model.Cohort
 {
@@ -20,14 +22,24 @@ namespace Model.Cohort
     /// </remarks>
     public class DemographicProvider
     {
-        readonly IDemographicQueryService queryService;
-        readonly IDemographicService demographicService;
+        readonly DemographicCompilerValidationContextProvider contextProvider;
+        readonly IDemographicSqlCompiler compiler;
+        readonly IDemographicsExecutor executor;
+        readonly IUserContext user;
+        readonly ILogger<DemographicProvider> log;
 
-        public DemographicProvider(IDemographicQueryService queryService,
-            IDemographicService demographicService)
+        public DemographicProvider(
+            IUserContext user,
+            DemographicCompilerValidationContextProvider contextProvider,
+            IDemographicSqlCompiler compiler,
+            IDemographicsExecutor executor,
+            ILogger<DemographicProvider> log)
         {
-            this.queryService = queryService;
-            this.demographicService = demographicService;
+            this.user = user;
+            this.contextProvider = contextProvider;
+            this.compiler = compiler;
+            this.executor = executor;
+            this.log = log;
         }
 
         /// <summary>
@@ -40,19 +52,24 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
-        public async Task<Result> Demographics(QueryRef query, CancellationToken token)
+        public async Task<Result> GetDemographicsAsync(QueryRef query, CancellationToken token)
         {
             Ensure.NotNull(query, nameof(query));
             var result = new Result();
 
-            var validationContext = await queryService.GetDemographicQueryCompilerContext(query);
+            var validationContext = await contextProvider.GetCompilerContextAsync(query);
             result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
                 return result;
             }
 
-            var ctx = await demographicService.GetDemographicsAsync(validationContext.Context, token);
+            token.ThrowIfCancellationRequested();
+
+            var exeContext = compiler.BuildDemographicSql(validationContext.Context, user.Anonymize());
+            log.LogInformation("Compiled Demographic Execution Context. Context:{@Context}", exeContext);
+
+            var ctx = await executor.ExecuteDemographicsAsync(exeContext, token);
             var stats = new DemographicAggregator(ctx).Aggregate();
 
             result.Demographics = new Demographic

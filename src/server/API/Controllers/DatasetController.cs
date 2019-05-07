@@ -34,7 +34,7 @@ namespace API.Controllers
         {
             try
             {
-                var queries = await queryService.GetQueries();
+                var queries = await queryService.GetAsync();
                 var dtos = queries.Select(q => new DatasetQueryDTO(q));
                 return Ok(dtos);
             }

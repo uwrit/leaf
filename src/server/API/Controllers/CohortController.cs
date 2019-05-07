@@ -78,7 +78,7 @@ namespace API.Controllers
             try
             {
                 var queryRef = new QueryRef(queryid);
-                var result = await provider.Demographics(queryRef, cancelToken);
+                var result = await provider.GetDemographicsAsync(queryRef, cancelToken);
                 if (result.Context.State != CompilerContextState.Ok)
                 {
                     return NotFound(new CompilerErrorDTO(result.Context.State));
@@ -131,7 +131,7 @@ namespace API.Controllers
                 var queryref = new QueryRef(queryid);
                 var datasetref = new DatasetQueryRef(datasetid, shape);
 
-                var result = await provider.Dataset(queryref, datasetref, cancelToken, early, late);
+                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late);
 
                 switch (result.Context.State)
                 {

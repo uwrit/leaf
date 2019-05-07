@@ -17,67 +17,37 @@ using Services.Extensions;
 using Model.Authorization;
 using Model.Search;
 
-// NOTE(cspital) this service does too much, blow it up and reduce it to the 2 hydrator types as call sites.
-// adding the context should happen at the inevitable model layer for this use case.
-
 namespace Services.Search
 {
     using Hydrator = Func<QueryRef, Task<DemographicCompilerContext>>;
 
-    public class DemographicQueryService : IDemographicQueryService
+    public class DemographicCompilerContextProvider : DemographicCompilerValidationContextProvider.ICompilerContextProvider
     {
-        const string queryGet = @"app.sp_GetDemographicQuery";
         const string contextById = @"app.sp_GetDemographicContextById";
         const string contextByUId = @"app.sp_GetDemographicContextByUId";
-        const string queryUpdate = @"app.sp_UpdateDemographicQuery";
 
         readonly IUserContext user;
         readonly AppDbOptions opts;
-        readonly ILogger<DemographicQueryService> log;
+        readonly ILogger<DemographicCompilerContextProvider> log;
 
-        public DemographicQueryService(
+        public DemographicCompilerContextProvider(
             IUserContext userContext,
             IOptions<AppDbOptions> options,
-            ILogger<DemographicQueryService> logger)
+            ILogger<DemographicCompilerContextProvider> logger)
         {
             user = userContext;
             opts = options.Value;
             log = logger;
         }
 
-        // TODO(cspital) move this to admin service
-        public async Task<DemographicQuery> GetDemographicQueryAsync()
-        {
-            log.LogInformation("Getting DemographicQuery");
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                var record = await cn.QuerySingleOrDefaultAsync<DemographicQueryRecord>(
-                    queryGet,
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                ThrowIfInvalid(record);
-
-                return record.DemographicQuery();
-            }
-        }
-
-        public async Task<CompilerValidationContext<DemographicCompilerContext>> GetDemographicQueryCompilerContext(QueryRef queryRef)
+        public async Task<DemographicCompilerContext> GetCompilerContextAsync(QueryRef queryRef)
         {
             log.LogInformation("Getting DemographicQueryCompilerContext. QueryRef:{@QueryRef}", queryRef);
             var hydrator = GetContextHydrator(queryRef);
             try
             {
                 var context = await hydrator(queryRef);
-                var state = GetContextState(context);
-                return new CompilerValidationContext<DemographicCompilerContext>
-                {
-                    Context = context,
-                    State = state
-                };
+                return context;
             }
             catch (SqlException se)
             {
@@ -85,21 +55,6 @@ namespace Services.Search
                 se.MapThrow();
                 throw;
             }
-        }
-
-        CompilerContextState GetContextState(DemographicCompilerContext context)
-        {
-            if (context.DemographicQuery == null || string.IsNullOrWhiteSpace(context.DemographicQuery.SqlStatement))
-            {
-                log.LogError("No demographic query configured in Leaf database.");
-                return CompilerContextState.DatasetNotFound;
-            }
-            if (!context.QueryContext.Found)
-            {
-                log.LogWarning("Incomplete demographic compiler context. Context:{@Context}", context);
-                return CompilerContextState.QueryNotFound;
-            }
-            return CompilerContextState.Ok;
         }
 
         Hydrator GetContextHydrator(QueryRef queryRef)
@@ -158,44 +113,6 @@ namespace Services.Search
                 );
 
                 return ReadContextGrid(grid);
-            }
-        }
-
-        // TODO(cspital) move this to admin service
-        public async Task<DemographicQuery> UpdateDemographicQueryAsync(DemographicQuery query)
-        {
-            log.LogInformation("Updating DemographicQuery SqlStatement:{SqlStatement}", query.SqlStatement);
-
-            var record = new DemographicQueryRecord(query);
-
-            ThrowIfInvalid(record);
-
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                await cn.ExecuteAsync(
-                    queryUpdate,
-                    new { sql = record.SqlStatement, user = user.UUID },
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                return query;
-            }
-        }
-
-        // TODO(cspital) delete this
-        void ThrowIfInvalid(DemographicQueryRecord record)
-        {
-            if (record == null)
-            {
-                throw new InvalidOperationException("The app.DemographicQuery record is missing");
-            }
-
-            if (string.IsNullOrWhiteSpace(record.SqlStatement))
-            {
-                throw new InvalidOperationException("app.DemographicQuery.SqlStatement is empty");
             }
         }
     }

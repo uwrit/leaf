@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Search;
 using Model.Validation;
+using Microsoft.Extensions.Logging;
 
 namespace Model.Cohort
 {
@@ -20,14 +21,21 @@ namespace Model.Cohort
     /// </remarks>
     public class DatasetProvider
     {
-        readonly IDatasetQueryService queryService;
-        readonly IDatasetService datasetService;
+        readonly DatasetCompilerValidationContextProvider contextProvider;
+        readonly IDatasetSqlCompiler compiler;
+        readonly IDatasetExecutor executor;
+        readonly ILogger<DatasetProvider> log;
 
-        public DatasetProvider(IDatasetQueryService queryService,
-            IDatasetService datasetService)
+        public DatasetProvider(
+            DatasetCompilerValidationContextProvider contextProvider,
+            IDatasetSqlCompiler compiler,
+            IDatasetExecutor datasetService,
+            ILogger<DatasetProvider> log)
         {
-            this.queryService = queryService;
-            this.datasetService = datasetService;
+            this.contextProvider = contextProvider;
+            this.compiler = compiler;
+            this.executor = datasetService;
+            this.log = log;
         }
 
         /// <summary>
@@ -44,7 +52,7 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
-        public async Task<Result> Dataset(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null)
+        public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null)
         {
             Ensure.NotNull(query, nameof(query));
             Ensure.NotNull(datasetQuery, nameof(datasetQuery));
@@ -52,17 +60,19 @@ namespace Model.Cohort
             var request = new DatasetExecutionRequest(query, datasetQuery, early, late);
             var result = new Result();
 
-            var ctx = await queryService.GetQueryCompilerContext(request);
-            result.Context = ctx;
-
-            if (ctx.State != CompilerContextState.Ok)
+            var validationContext = await contextProvider.GetCompilerContextAsync(request);
+            result.Context = validationContext;
+            if (validationContext.State != CompilerContextState.Ok)
             {
                 return result;
             }
 
             cancel.ThrowIfCancellationRequested();
 
-            var data = await datasetService.GetDatasetAsync(ctx.Context, cancel);
+            var exeContext = compiler.BuildDatasetSql(validationContext.Context);
+            log.LogInformation("Compiled Dataset Execution Context. Context:{@Context}", exeContext);
+
+            var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
             result.Dataset = data;
 
             return result;

@@ -29,12 +29,12 @@ namespace Services.Network
         const string queryUpdate = "network.sp_UpdateEndpoint";
 
         readonly AppDbOptions opts;
-        readonly INetworkValidator validator;
+        readonly NetworkValidator validator;
         readonly ILogger<NetworkEndpointService> log;
 
         public NetworkEndpointService(
             IOptions<AppDbOptions> dbOptions,
-            INetworkValidator networkValidator,
+            NetworkValidator networkValidator,
             ILogger<NetworkEndpointService> logger)
         {
             opts = dbOptions.Value;

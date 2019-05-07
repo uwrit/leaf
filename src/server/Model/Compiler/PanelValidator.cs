@@ -10,15 +10,16 @@ using Model.Compiler;
 using System.Linq;
 using Model.Authorization;
 
-namespace Model.Compiler.SqlServer
+
+namespace Model.Compiler
 {
     using PanelItemMapping = Tuple<IPanelItemDTO, PanelItem>;
 
-    public class SqlServerPanelValidator : IPanelValidator
+    public class PanelValidator
     {
-        readonly ILogger<SqlServerPanelValidator> log;
+        readonly ILogger<PanelValidator> log;
 
-        public SqlServerPanelValidator(ILogger<SqlServerPanelValidator> logger)
+        public PanelValidator(ILogger<PanelValidator> logger)
         {
             log = logger;
         }

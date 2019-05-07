@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Model;
 using Model.Admin;
 using Model.Authentication;
 using Model.Authorization;
@@ -55,11 +56,7 @@ namespace API.Options
 
             services.AddIAMServices();
 
-            services.AddTransient<INetworkValidator, NetworkValidator>();
-
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
-
-            services.AddTransient<IPanelValidator, SqlServerPanelValidator>();
 
             services.AddTransient<INetworkEndpointService, NetworkEndpointService>();
 
@@ -88,35 +85,21 @@ namespace API.Options
 
             services.AddTransient<IPatientCohortService, CtePatientCohortService>();
 
-            services.AddSingleton<PatientCountAggregator>();
-
             services.AddTransient<ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
-            services.AddTransient<IDemographicQueryService, DemographicQueryService>();
-            services.AddTransient<IDemographicService, DemographicService>();
+            services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
+            services.AddTransient<IDemographicsExecutor, DemographicsExecutor>();
 
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
+            services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryService, DatasetQueryService>();
-            services.AddTransient<IDatasetService, DatasetService>();
+            services.AddTransient<IDatasetExecutor, DatasetExecutor>();
 
             services.AddTransient<IQueryService, QueryService>();
 
             services.AddAdminServices();
-            services.AddModel();
-
-            return services;
-        }
-
-        static IServiceCollection AddModel(this IServiceCollection services)
-        {
-            services.AddTransient<CohortCounter>();
-            services.AddTransient<DemographicProvider>();
-            services.AddTransient<DatasetProvider>();
-            services.AddTransient<ConceptHintSearcher>();
-            services.AddTransient<ConceptTreeSearcher>();
-            services.AddTransient<PanelConverter>();
-            services.AddTransient<PreflightResourceChecker>();
+            services.RegisterLeafCore();
 
             return services;
         }
