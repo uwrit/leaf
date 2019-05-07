@@ -24,7 +24,7 @@ namespace Model.Cohort
     {
         readonly DemographicCompilerValidationContextProvider contextProvider;
         readonly IDemographicSqlCompiler compiler;
-        readonly IDemographicsExecutor demographicService;
+        readonly IDemographicsExecutor executor;
         readonly IUserContext user;
         readonly ILogger<DemographicProvider> log;
 
@@ -32,13 +32,13 @@ namespace Model.Cohort
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
             IDemographicSqlCompiler compiler,
-            IDemographicsExecutor demographicService,
+            IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
         {
             this.user = user;
             this.contextProvider = contextProvider;
             this.compiler = compiler;
-            this.demographicService = demographicService;
+            this.executor = executor;
             this.log = log;
         }
 
@@ -52,7 +52,7 @@ namespace Model.Cohort
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
-        public async Task<Result> Demographics(QueryRef query, CancellationToken token)
+        public async Task<Result> GetDemographicsAsync(QueryRef query, CancellationToken token)
         {
             Ensure.NotNull(query, nameof(query));
             var result = new Result();
@@ -64,10 +64,12 @@ namespace Model.Cohort
                 return result;
             }
 
+            token.ThrowIfCancellationRequested();
+
             var exeContext = compiler.BuildDemographicSql(validationContext.Context, user.Anonymize());
             log.LogInformation("Compiled Demographic Execution Context. Context:{@Context}", exeContext);
 
-            var ctx = await demographicService.ExecuteDemographicsAsync(exeContext, token);
+            var ctx = await executor.ExecuteDemographicsAsync(exeContext, token);
             var stats = new DemographicAggregator(ctx).Aggregate();
 
             result.Demographics = new Demographic

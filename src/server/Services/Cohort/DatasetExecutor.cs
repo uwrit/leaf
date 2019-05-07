@@ -20,36 +20,23 @@ using Services.Extensions;
 
 namespace Services.Cohort
 {
-    public class DatasetService : IDatasetService
+    public class DatasetExecutor : IDatasetExecutor
     {
-        readonly IDatasetSqlCompiler compiler;
         readonly IUserContext user;
-        readonly ILogger<DatasetService> log;
+        readonly ILogger<DatasetExecutor> log;
         readonly ClinDbOptions opts;
 
-        public DatasetService(
-            IDatasetSqlCompiler compiler,
+        public DatasetExecutor(
             IUserContext userContext,
-            ILogger<DatasetService> log,
+            ILogger<DatasetExecutor> log,
             IOptions<ClinDbOptions> opts)
         {
-            this.compiler = compiler;
             this.user = userContext;
             this.log = log;
             this.opts = opts.Value;
         }
 
-        public async Task<Dataset> GetDatasetAsync(DatasetCompilerContext context, CancellationToken token)
-        {
-            var executionCtx = compiler.BuildDatasetSql(context);
-
-            var dataset = await ExecuteDatasetAsync(executionCtx, token);
-            log.LogInformation("Compiled Dataset Execution Context. Context:{@Context}", executionCtx);
-
-            return dataset;
-        }
-
-        async Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token)
+        public async Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token)
         {
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();

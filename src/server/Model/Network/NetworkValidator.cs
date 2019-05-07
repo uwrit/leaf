@@ -11,7 +11,7 @@ using Model.Options;
 
 namespace Model.Network
 {
-    public class NetworkValidator : INetworkValidator
+    public class NetworkValidator
     {
         readonly NetworkValidationOptions options;
 

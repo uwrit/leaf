@@ -55,11 +55,7 @@ namespace API.Options
 
             services.AddIAMServices();
 
-            services.AddTransient<INetworkValidator, NetworkValidator>();
-
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
-
-            services.AddTransient<IPanelValidator, SqlServerPanelValidator>();
 
             services.AddTransient<INetworkEndpointService, NetworkEndpointService>();
 
@@ -88,8 +84,6 @@ namespace API.Options
 
             services.AddTransient<IPatientCohortService, CtePatientCohortService>();
 
-            services.AddSingleton<PatientCountAggregator>();
-
             services.AddTransient<ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
@@ -97,8 +91,9 @@ namespace API.Options
             services.AddTransient<IDemographicsExecutor, DemographicsExecutor>();
 
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
+            services.AddTransient<IDatasetCompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryService, DatasetQueryService>();
-            services.AddTransient<IDatasetService, DatasetService>();
+            services.AddTransient<IDatasetExecutor, DatasetExecutor>();
 
             services.AddTransient<IQueryService, QueryService>();
 
@@ -111,6 +106,9 @@ namespace API.Options
         // TODO(cspital) move into model
         static IServiceCollection AddModel(this IServiceCollection services)
         {
+            services.AddTransient<NetworkValidator>();
+            services.AddTransient<PanelValidator>();
+            services.AddSingleton<PatientCountAggregator>();
             services.AddTransient<CohortCounter>();
             services.AddTransient<DemographicProvider>();
             services.AddTransient<DatasetProvider>();
@@ -119,6 +117,7 @@ namespace API.Options
             services.AddTransient<PanelConverter>();
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DemographicCompilerValidationContextProvider>();
+            services.AddTransient<DatasetCompilerValidationContextProvider>();
 
             return services;
         }
