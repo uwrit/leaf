@@ -13,11 +13,16 @@ namespace Model.Compiler
 {
     public class DemographicCompilerValidationContextProvider
     {
-        readonly IDemographicCompilerContextProvider contextProvider;
+        public interface ICompilerContextProvider
+        {
+            Task<DemographicCompilerContext> GetCompilerContextAsync(QueryRef queryRef);
+        }
+
+        readonly ICompilerContextProvider contextProvider;
         readonly ILogger<DemographicCompilerValidationContextProvider> log;
 
         public DemographicCompilerValidationContextProvider(
-            IDemographicCompilerContextProvider contextProvider,
+            ICompilerContextProvider contextProvider,
             ILogger<DemographicCompilerValidationContextProvider> log)
         {
             this.contextProvider = contextProvider;

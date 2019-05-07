@@ -21,7 +21,7 @@ namespace Services.Search
 {
     using Hydrator = Func<DatasetExecutionRequest, Task<DatasetCompilerContext>>;
 
-    public class DatasetCompilerContextProvider : IDatasetCompilerContextProvider
+    public class DatasetCompilerContextProvider : DatasetCompilerValidationContextProvider.ICompilerContextProvider
     {
         readonly IUserContext user;
         readonly ILogger<DatasetCompilerContextProvider> log;

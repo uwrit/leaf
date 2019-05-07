@@ -21,7 +21,7 @@ namespace Services.Search
 {
     using Hydrator = Func<QueryRef, Task<DemographicCompilerContext>>;
 
-    public class DemographicCompilerContextProvider : IDemographicCompilerContextProvider
+    public class DemographicCompilerContextProvider : DemographicCompilerValidationContextProvider.ICompilerContextProvider
     {
         const string contextById = @"app.sp_GetDemographicContextById";
         const string contextByUId = @"app.sp_GetDemographicContextByUId";

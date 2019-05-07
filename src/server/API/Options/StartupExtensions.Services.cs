@@ -87,11 +87,11 @@ namespace API.Options
             services.AddTransient<ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
-            services.AddTransient<IDemographicCompilerContextProvider, DemographicCompilerContextProvider>();
+            services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
             services.AddTransient<IDemographicsExecutor, DemographicsExecutor>();
 
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
-            services.AddTransient<IDatasetCompilerContextProvider, DatasetCompilerContextProvider>();
+            services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryService, DatasetQueryService>();
             services.AddTransient<IDatasetExecutor, DatasetExecutor>();
 

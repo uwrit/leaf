@@ -13,11 +13,16 @@ namespace Model.Compiler
 {
     public class DatasetCompilerValidationContextProvider
     {
-        readonly IDatasetCompilerContextProvider contextProvider;
+        public interface ICompilerContextProvider
+        {
+            Task<DatasetCompilerContext> GetCompilerContextAsync(DatasetExecutionRequest request);
+        }
+
+        readonly ICompilerContextProvider contextProvider;
         readonly ILogger<DatasetCompilerValidationContextProvider> log;
 
         public DatasetCompilerValidationContextProvider(
-            IDatasetCompilerContextProvider contextProvider,
+            ICompilerContextProvider contextProvider,
             ILogger<DatasetCompilerValidationContextProvider> log)
         {
             this.contextProvider = contextProvider;
