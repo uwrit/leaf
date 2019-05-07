@@ -93,8 +93,8 @@ namespace API.Options
             services.AddTransient<ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
-            services.AddTransient<IDemographicQueryService, DemographicQueryService>();
-            services.AddTransient<IDemographicService, DemographicService>();
+            services.AddTransient<IDemographicCompilerContextProvider, DemographicCompilerContextProvider>();
+            services.AddTransient<IDemographicsExecutor, DemographicsExecutor>();
 
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
             services.AddTransient<IDatasetQueryService, DatasetQueryService>();
@@ -108,6 +108,7 @@ namespace API.Options
             return services;
         }
 
+        // TODO(cspital) move into model
         static IServiceCollection AddModel(this IServiceCollection services)
         {
             services.AddTransient<CohortCounter>();
@@ -117,6 +118,7 @@ namespace API.Options
             services.AddTransient<ConceptTreeSearcher>();
             services.AddTransient<PanelConverter>();
             services.AddTransient<PreflightResourceChecker>();
+            services.AddTransient<DemographicCompilerValidationContextProvider>();
 
             return services;
         }

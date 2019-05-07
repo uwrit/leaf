@@ -15,7 +15,7 @@ namespace Model.Compiler
         public const string QueryIdParam = "@queryid";
     }
 
-    public class DatasetCompilerContext : ShapedDatasetCompilerContext
+    public sealed class DatasetCompilerContext : ShapedDatasetCompilerContext
     {
         public DatasetQuery DatasetQuery { get; set; }
         public DateTime? EarlyBound { get; set; }
@@ -24,7 +24,7 @@ namespace Model.Compiler
         public override Shape Shape => DatasetQuery.Shape;
     }
 
-    public class DemographicCompilerContext : ShapedDatasetCompilerContext
+    public sealed class DemographicCompilerContext : ShapedDatasetCompilerContext
     {
         public override Shape Shape => Shape.Demographic;
         public DemographicQuery DemographicQuery { get; set; }
@@ -32,7 +32,23 @@ namespace Model.Compiler
 
     public class CompilerValidationContext<T> where T : ShapedDatasetCompilerContext
     {
-        public T Context { get; set; }
+        T _context;
+        public T Context
+        {
+            get
+            {
+                if (State != CompilerContextState.Ok)
+                {
+                    return null;
+                }
+                return _context;
+            }
+
+            set
+            {
+                _context = value;
+            }
+        }
         public CompilerContextState State { get; set; }
     }
 }

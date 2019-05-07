@@ -16,4 +16,9 @@ namespace Model.Search
         Task<IEnumerable<DatasetQuery>> GetQueries();
         Task<CompilerValidationContext<DatasetCompilerContext>> GetQueryCompilerContext(DatasetExecutionRequest request);
     }
+
+    public interface IDatasetCompilerContextService
+    {
+        Task<DatasetCompilerContext> GetCompilerContextAsync(DatasetExecutionContext request);
+    }
 }

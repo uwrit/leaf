@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Search;
 using Model.Validation;
+using Model.Authorization;
+using Microsoft.Extensions.Logging;
 
 namespace Model.Cohort
 {
@@ -20,14 +22,24 @@ namespace Model.Cohort
     /// </remarks>
     public class DemographicProvider
     {
-        readonly IDemographicQueryService queryService; // TODO(cspital) swap over to model type
-        readonly IDemographicService demographicService;
+        readonly DemographicCompilerValidationContextProvider contextProvider;
+        readonly IDemographicSqlCompiler compiler;
+        readonly IDemographicsExecutor demographicService;
+        readonly IUserContext user;
+        readonly ILogger<DemographicProvider> log;
 
-        public DemographicProvider(IDemographicQueryService queryService,
-            IDemographicService demographicService)
+        public DemographicProvider(
+            IUserContext user,
+            DemographicCompilerValidationContextProvider contextProvider,
+            IDemographicSqlCompiler compiler,
+            IDemographicsExecutor demographicService,
+            ILogger<DemographicProvider> log)
         {
-            this.queryService = queryService;
+            this.user = user;
+            this.contextProvider = contextProvider;
+            this.compiler = compiler;
             this.demographicService = demographicService;
+            this.log = log;
         }
 
         /// <summary>
@@ -45,14 +57,17 @@ namespace Model.Cohort
             Ensure.NotNull(query, nameof(query));
             var result = new Result();
 
-            var validationContext = await queryService.GetDemographicQueryCompilerContext(query);
+            var validationContext = await contextProvider.GetCompilerContextAsync(query);
             result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
                 return result;
             }
 
-            var ctx = await demographicService.GetDemographicsAsync(validationContext.Context, token);
+            var exeContext = compiler.BuildDemographicSql(validationContext.Context, user.Anonymize());
+            log.LogInformation("Compiled Demographic Execution Context. Context:{@Context}", exeContext);
+
+            var ctx = await demographicService.ExecuteDemographicsAsync(exeContext, token);
             var stats = new DemographicAggregator(ctx).Aggregate();
 
             result.Demographics = new Demographic

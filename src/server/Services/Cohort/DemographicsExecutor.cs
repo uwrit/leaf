@@ -20,36 +20,23 @@ using Services.Extensions;
 
 namespace Services.Cohort
 {
-    public class DemographicService : IDemographicService
+    public class DemographicsExecutor : IDemographicsExecutor
     {
-        readonly IDemographicSqlCompiler compiler;
         readonly IUserContext user;
-        readonly ILogger<DemographicService> log;
+        readonly ILogger<DemographicsExecutor> log;
         readonly ClinDbOptions opts;
 
-        public DemographicService(
-            IDemographicSqlCompiler compiler,
+        public DemographicsExecutor(
             IUserContext userContext,
-            ILogger<DemographicService> log,
+            ILogger<DemographicsExecutor> log,
             IOptions<ClinDbOptions> opts)
         {
-            this.compiler = compiler;
             this.log = log;
             this.opts = opts.Value;
             user = userContext;
         }
 
-        public async Task<PatientDemographicContext> GetDemographicsAsync(DemographicCompilerContext context, CancellationToken token)
-        {
-            var exeContext = compiler.BuildDemographicSql(context, user.Anonymize());
-
-            log.LogInformation("Compiled Demographic Execution Context. Context:{@Context}", exeContext);
-            var demographic = await ExecuteDemographicsAsync(exeContext, token);
-
-            return demographic;
-        }
-
-        async Task<PatientDemographicContext> ExecuteDemographicsAsync(DemographicExecutionContext context, CancellationToken token)
+        public async Task<PatientDemographicContext> ExecuteDemographicsAsync(DemographicExecutionContext context, CancellationToken token)
         {
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();

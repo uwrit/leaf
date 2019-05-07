@@ -9,10 +9,8 @@ using Model.Compiler;
 
 namespace Model.Search
 {
-    public interface IDemographicQueryService
+    public interface IDemographicCompilerContextProvider
     {
-        Task<DemographicQuery> GetDemographicQueryAsync();
-        Task<CompilerValidationContext<DemographicCompilerContext>> GetDemographicQueryCompilerContext(QueryRef queryRef);
-        Task<DemographicQuery> UpdateDemographicQueryAsync(DemographicQuery query);
+        Task<DemographicCompilerContext> GetCompilerContextAsync(QueryRef queryRef);
     }
 }

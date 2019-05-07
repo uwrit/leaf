@@ -11,10 +11,10 @@ using Model.Compiler;
 
 namespace Model.Cohort
 {
-    public interface IDemographicService
+    public interface IDemographicsExecutor
     {
-        Task<PatientDemographicContext> GetDemographicsAsync(
-            DemographicCompilerContext context,
+        Task<PatientDemographicContext> ExecuteDemographicsAsync(
+            DemographicExecutionContext context,
             CancellationToken token);
     }
 }
