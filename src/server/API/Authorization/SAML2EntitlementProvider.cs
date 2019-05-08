@@ -71,7 +71,7 @@ namespace API.Authorization
 
             if (asserts.Contains(roleMapping.Identified))
             {
-                mask |= RoleMask.CanIdentify;
+                mask |= RoleMask.Identified;
             }
 
             return mask;

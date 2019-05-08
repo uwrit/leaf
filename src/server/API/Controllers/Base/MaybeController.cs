@@ -23,16 +23,16 @@ namespace API.Controllers.Base
         /// <summary>
         /// Any set of options that can be boiled down to enabled/disabled.
         /// </summary>
-        protected readonly T options;
+        protected readonly T maybeOpts;
 
         public MaybeController(IOptions<T> opts)
         {
-            options = opts.Value;
+            maybeOpts = opts.Value;
         }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {
-            if (!options.Enabled)
+            if (!maybeOpts.Enabled)
             {
                 context.Result = NotFound();
             }

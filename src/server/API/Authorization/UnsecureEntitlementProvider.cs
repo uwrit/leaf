@@ -21,7 +21,7 @@ namespace API.Authorization
         {
             return new Entitlement
             {
-                Mask = RoleMask.User | RoleMask.Admin | RoleMask.Super | RoleMask.CanIdentify,
+                Mask = RoleMask.User | RoleMask.Admin | RoleMask.Super | RoleMask.Identified,
                 Groups = new string[] { "urn:leaf:localhost:groups:random_group" }
             };
         }

@@ -71,7 +71,7 @@ namespace Tests
             Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
             Assert.True(entitlement.Mask.HasFlag(RoleMask.Admin));
             Assert.False(entitlement.Mask.HasFlag(RoleMask.Super));
-            Assert.False(entitlement.Mask.HasFlag(RoleMask.CanIdentify));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.Identified));
         }
 
         [Fact]
@@ -99,7 +99,7 @@ namespace Tests
             Assert.True(entitlement.Mask.HasFlag(RoleMask.User));
             Assert.False(entitlement.Mask.HasFlag(RoleMask.Admin));
             Assert.False(entitlement.Mask.HasFlag(RoleMask.Super));
-            Assert.False(entitlement.Mask.HasFlag(RoleMask.CanIdentify));
+            Assert.False(entitlement.Mask.HasFlag(RoleMask.Identified));
         }
 
         [Fact]
