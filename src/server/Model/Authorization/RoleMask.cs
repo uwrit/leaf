@@ -16,6 +16,6 @@ namespace Model.Authorization
         User = 1 << 0,
         Admin = 1 << 1,
         Super = 1 << 2,
-        CanIdentify = 1 << 3
+        Identified = 1 << 3
     }
 }

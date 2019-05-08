@@ -180,7 +180,7 @@ namespace API.Jwt
                 claims.Add(new Claim(ClaimTypes.Role, Role.Super));
             }
 
-            if (mask.HasFlag(RoleMask.CanIdentify))
+            if (mask.HasFlag(RoleMask.Identified))
             {
                 claims.Add(new Claim(ClaimTypes.Role, Role.Phi));
             }

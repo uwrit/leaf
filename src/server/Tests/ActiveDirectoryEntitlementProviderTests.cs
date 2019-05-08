@@ -55,7 +55,7 @@ namespace Tests
             Assert.Contains(e.Groups, g => g == "surgery");
             Assert.True(1 == e.Groups.Count());
             Assert.True(e.Mask.HasFlag(RoleMask.User));
-            Assert.True(e.Mask.HasFlag(RoleMask.CanIdentify));
+            Assert.True(e.Mask.HasFlag(RoleMask.Identified));
             Assert.False(e.Mask.HasFlag(RoleMask.Admin));
             Assert.False(e.Mask.HasFlag(RoleMask.Super));
         }

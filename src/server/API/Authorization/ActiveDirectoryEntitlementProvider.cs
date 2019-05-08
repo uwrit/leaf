@@ -65,7 +65,7 @@ namespace API.Authorization
 
             if (groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
             {
-                mask |= RoleMask.CanIdentify;
+                mask |= RoleMask.Identified;
             }
 
             return mask;
