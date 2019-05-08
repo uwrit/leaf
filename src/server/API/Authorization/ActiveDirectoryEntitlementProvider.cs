@@ -48,22 +48,22 @@ namespace API.Authorization
         {
             var mask = RoleMask.None;
 
-            if (groups.Any(g => g.Equals(roles.User, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.User) && groups.Any(g => g.Equals(roles.User, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.User;
             }
 
-            if (groups.Any(g => g.Equals(roles.Admin, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Admin) && groups.Any(g => g.Equals(roles.Admin, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Admin;
             }
 
-            if (groups.Any(g => g.Equals(roles.Super, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Super) && groups.Any(g => g.Equals(roles.Super, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Super;
             }
 
-            if (groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Identified) && groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Identified;
             }

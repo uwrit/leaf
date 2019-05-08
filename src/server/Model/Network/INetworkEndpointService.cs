@@ -7,14 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+// TODO(cspital) migrate update to future admin service
+
 namespace Model.Network
 {
     public interface INetworkEndpointService
     {
-        Task<NetworkEndpoint> CreateAsync(NetworkEndpoint endpoint);
         Task<IEnumerable<NetworkEndpoint>> AllAsync();
         Task UpdateAsync(NetworkEndpoint endpoint);
-        Task DeleteAsync(NetworkEndpoint endpoint);
         Task<NetworkIdentityEndpoints> AllWithIdentityAsync();
         Task<NetworkIdentity> GetIdentityAsync();
     }

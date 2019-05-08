@@ -51,25 +51,25 @@ namespace API.Authorization
 
         RoleMask GetMask(IEnumerable<string> asserts)
         {
-            var roleMapping = options.RolesMapping;
+            var roles = options.RolesMapping;
             var mask = RoleMask.None;
 
-            if (asserts.Contains(roleMapping.User))
+            if (!string.IsNullOrWhiteSpace(roles.User) && asserts.Contains(roles.User))
             {
                 mask |= RoleMask.User;
             }
 
-            if (asserts.Contains(roleMapping.Admin))
+            if (!string.IsNullOrWhiteSpace(roles.Admin) && asserts.Contains(roles.Admin))
             {
                 mask |= RoleMask.Admin;
             }
 
-            if (asserts.Contains(roleMapping.Super))
+            if (!string.IsNullOrWhiteSpace(roles.Super) && asserts.Contains(roles.Super))
             {
                 mask |= RoleMask.Super;
             }
 
-            if (asserts.Contains(roleMapping.Identified))
+            if (!string.IsNullOrWhiteSpace(roles.Identified) && asserts.Contains(roles.Identified))
             {
                 mask |= RoleMask.Identified;
             }
