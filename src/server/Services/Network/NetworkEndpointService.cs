@@ -84,64 +84,6 @@ namespace Services.Network
             }
         }
 
-        public async Task<NetworkEndpoint> CreateAsync(NetworkEndpoint item)
-        {
-            validator.Validate(item);
-
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                var id = cn.ExecuteScalar<int>(
-                    queryCreate,
-                    new
-                    {
-                        name = item.Name,
-                        address = item.Address.AbsoluteUri,
-                        issuer = item.Issuer,
-                        keyid = item.KeyId,
-                        certificate = item.Certificate
-                    },
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                var created = new NetworkEndpoint
-                {
-                    Id = id,
-                    Name = item.Name,
-                    Address = item.Address,
-                    Issuer = item.Issuer,
-                    KeyId = item.KeyId,
-                    Certificate = item.Certificate
-                };
-
-                log.LogInformation("Created NetworkEndpoint. Endpoint:{@Endpoint}", created);
-
-                return created;
-            }
-        }
-
-        public async Task DeleteAsync(NetworkEndpoint item)
-        {
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                await cn.ExecuteAsync(
-                    queryDelete,
-                    new
-                    {
-                        id = item.Id
-                    },
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                log.LogInformation("Deleted NetworkEndpoint. Endpoint:{@Endpoint}", item);
-            }
-        }
-
         public async Task<NetworkIdentity> GetIdentityAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -216,6 +158,10 @@ namespace Services.Network
         public string KeyId { get; set; }
 
         public string Certificate { get; set; }
+
+        public bool IsInterrogator { get; set; }
+
+        public bool IsResponder { get; set; }
 
         public NetworkEndpointRecord()
         {

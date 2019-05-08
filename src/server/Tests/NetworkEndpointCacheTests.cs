@@ -19,8 +19,8 @@ namespace Tests
         {
             return new NetworkEndpointCache(new NetworkEndpoint[]
             {
-                new NetworkEndpoint { Id = 1, Issuer = "leaf.entity1.tld" },
-                new NetworkEndpoint { Id = 2, Issuer = "leaf.entity2.tld" }
+                new NetworkEndpoint { Id = 1, Issuer = "leaf.entity1.tld", IsResponder = true, IsInterrogator = false },
+                new NetworkEndpoint { Id = 2, Issuer = "leaf.entity2.tld", IsResponder = false, IsInterrogator = true }
             });
         }
         [Fact]
@@ -36,11 +36,11 @@ namespace Tests
         }
 
         [Fact]
-        public void Get_Should_Return_Correct_Ok()
+        public void GetOrDefault_Should_Return_Correct_Ok()
         {
             var cache = Cache();
 
-            var one = cache.Get("leaf.entity1.tld");
+            var one = cache.GetOrDefault("leaf.entity1.tld");
 
             Assert.NotNull(one);
         }
@@ -59,18 +59,18 @@ namespace Tests
 
             var all = cache.All();
             Assert.True(all.Count() == 3);
-            Assert.Null(cache.Get("leaf.entity1.tld"));
+            Assert.Null(cache.GetOrDefault("leaf.entity1.tld"));
         }
 
         [Fact]
-        public void Pop_Should_Return_And_Remove()
+        public void PopOrDefault_Should_Return_And_Remove()
         {
             var cache = Cache();
 
-            var one = cache.Pop("leaf.entity1.tld");
+            var one = cache.PopOrDefault("leaf.entity1.tld");
 
             Assert.NotNull(one);
-            Assert.Null(cache.Get("leaf.entity1.tld"));
+            Assert.Null(cache.GetOrDefault("leaf.entity1.tld"));
         }
 
         [Fact]
@@ -80,11 +80,11 @@ namespace Tests
 
             cache.Put(new NetworkEndpoint { Id = 1, Issuer = "leaf.entity1.tld", Name = "Hello" });
 
-            var hello = cache.Get("leaf.entity1.tld");
+            var hello = cache.GetOrDefault("leaf.entity1.tld");
 
             Assert.NotNull(hello);
             Assert.Equal("Hello", hello.Name);
-            Assert.True(cache.All().Count() == 2);
+            Assert.True(cache.Count() == 2);
         }
 
         [Fact]
@@ -94,7 +94,67 @@ namespace Tests
 
             cache.Put(new NetworkEndpoint { Id = 3, Issuer = "leaf.entity3.tld" });
 
-            Assert.True(cache.All().Count() == 3);
+            Assert.True(cache.Count() == 3);
+        }
+
+        [Fact]
+        public void RespondentCacheReader_GetOrDefault_Should_Return_Endpoint_If_Responder()
+        {
+            var reader = new NetworkResponderCacheReader(Cache());
+
+            var endpoint = reader.GetResponderOrDefault("leaf.entity1.tld");
+
+            Assert.NotNull(endpoint);
+        }
+
+        [Fact]
+        public void RespondentCacheReader_GetOrDefault_Should_Return_Null_If_Not_Responder()
+        {
+            var reader = new NetworkResponderCacheReader(Cache());
+
+            var endpoint = reader.GetResponderOrDefault("leaf.entity2.tld");
+
+            Assert.Null(endpoint);
+        }
+
+        [Fact]
+        public void RespondentCacheReader_All_Should_Only_Return_Responders()
+        {
+            var reader = new NetworkResponderCacheReader(Cache());
+
+            var all = reader.Responders();
+
+            Assert.All(all, e => Assert.True(e.IsResponder));
+        }
+
+        [Fact]
+        public void InterrogatorCacheReader_GetOrDefault_Should_Return_Endpoint_If_Interrogator()
+        {
+            var reader = new NetworkInterrogatorCacheReader(Cache());
+
+            var endpoint = reader.GetInterrogatorOrDefault("leaf.entity2.tld");
+
+            Assert.NotNull(endpoint);
+        }
+
+        [Fact]
+        public void InterrogatorCacheReader_GetOrDefault_Should_Return_Null_If_Not_Interrogator()
+        {
+            var reader = new NetworkInterrogatorCacheReader(Cache());
+
+            var endpoint = reader.GetInterrogatorOrDefault("leaf.entity1.tld");
+
+            Assert.Null(endpoint);
+        }
+
+        [Fact]
+        public void InterrogatorCacheReader_All_Should_Only_Return_Interrogators()
+        {
+            var reader = new NetworkInterrogatorCacheReader(Cache());
+
+            var all = reader.Interrogators();
+
+            Assert.All(all, e => Assert.True(e.IsInterrogator));
         }
     }
 }

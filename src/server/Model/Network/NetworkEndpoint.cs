@@ -15,5 +15,7 @@ namespace Model.Network
         public string Issuer { get; set; }
         public string KeyId { get; set; }
         public byte[] Certificate { get; set; }
+        public bool IsInterrogator { get; set; }
+        public bool IsResponder { get; set; }
     }
 }

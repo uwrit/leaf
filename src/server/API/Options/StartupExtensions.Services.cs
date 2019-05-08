@@ -124,6 +124,8 @@ namespace API.Options
 
                 return new NetworkEndpointCache(initial);
             });
+            services.AddSingleton<INetworkResponderCacheReader, NetworkResponderCacheReader>();
+            services.AddSingleton<INetworkInterrogatorCacheReader, NetworkInterrogatorCacheReader>();
 
             return services;
         }

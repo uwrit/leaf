@@ -19,13 +19,13 @@ namespace API.Jwt
     public class JwtKeyResolver : IJwtKeyResolver
     {
         readonly JwtVerifyingOptions jwtOpts;
-        readonly INetworkEndpointCache cache;
+        readonly INetworkInterrogatorCacheReader cache;
         readonly NetworkEndpointConcurrentQueueSet refresh;
         readonly ILogger<JwtKeyResolver> log;
 
         public JwtKeyResolver(
             IOptions<JwtVerifyingOptions> options,
-            INetworkEndpointCache cache,
+            INetworkInterrogatorCacheReader cache,
             NetworkEndpointConcurrentQueueSet refresh,
             ILogger<JwtKeyResolver> logger)
         {
@@ -51,7 +51,7 @@ namespace API.Jwt
                 return new SecurityKey[] { new X509SecurityKey(new X509Certificate2(jwtOpts.Certificate)) };
             }
 
-            var ne = cache.Get(securityToken.Issuer);
+            var ne = cache.GetInterrogatorOrDefault(securityToken.Issuer);
             if (ne.KeyId == kid)
             {
                 return new SecurityKey[] { new X509SecurityKey(new X509Certificate2(ne.Certificate)) };

@@ -24,10 +24,10 @@ namespace API.Options
         {
             var sp = services.BuildServiceProvider();
             var jwtOpts = sp.GetService<IOptions<JwtVerifyingOptions>>().Value;
-            var cache = sp.GetService<INetworkEndpointCache>();
+            var cache = sp.GetService<INetworkInterrogatorCacheReader>();
             var resolver = sp.GetService<IJwtKeyResolver>();
 
-            var issuers = cache.All().Select(ne => ne.Issuer).ToList();
+            var issuers = cache.Interrogators().Select(ne => ne.Issuer).ToList();
             issuers.Add(jwtOpts.Issuer);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

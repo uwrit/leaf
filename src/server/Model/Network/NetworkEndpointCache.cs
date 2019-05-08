@@ -10,14 +10,23 @@ using Model.Collections;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
+using System.Collections;
 
 namespace Model.Network
 {
-    using Issuer = String;
+    public interface INetworkEndpointCache: IEnumerable<NetworkEndpoint>
+    {
+        IEnumerable<NetworkEndpoint> All();
+        NetworkEndpoint GetOrDefault(string issuer);
+        void Overwrite(IEnumerable<NetworkEndpoint> endpoints);
+        NetworkEndpoint PopOrDefault(string issuer);
+        void Put(NetworkEndpoint endpoint);
+        void Put(IEnumerable<NetworkEndpoint> endpoints);
+    }
 
     public class NetworkEndpointCache : INetworkEndpointCache
     {
-        Dictionary<Issuer, NetworkEndpoint> store;
+        Dictionary<string, NetworkEndpoint> store;
         readonly ReaderWriterLockSlim sync;
 
         public NetworkEndpointCache(IEnumerable<NetworkEndpoint> initial)
@@ -34,7 +43,7 @@ namespace Model.Network
             return all;
         }
 
-        public NetworkEndpoint Get(Issuer issuer)
+        public NetworkEndpoint GetOrDefault(string issuer)
         {
             sync.EnterReadLock();
             store.TryGetValue(issuer, out var endpoint);
@@ -66,12 +75,22 @@ namespace Model.Network
             sync.ExitWriteLock();
         }
 
-        public NetworkEndpoint Pop(Issuer issuer)
+        public NetworkEndpoint PopOrDefault(string issuer)
         {
             sync.EnterWriteLock();
             store.Remove(issuer, out var endpoint);
             sync.ExitWriteLock();
             return endpoint;
+        }
+
+        public IEnumerator<NetworkEndpoint> GetEnumerator()
+        {
+            return All().GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
