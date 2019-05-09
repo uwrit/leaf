@@ -74,6 +74,7 @@ def create_schema(schema_file: str, build_file: str):
             content = reader.read()
             use = content.find('USE [LeafDB]')
             if use == -1:
+		print('WARNING: "USE [LeafDB]" not found, did something change?')
                 use = 0
             writer.write(sql_license + content[use:])
     print('Created schema file...')
