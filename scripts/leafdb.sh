@@ -9,6 +9,7 @@ LEAFDB_SA_PW = 'LEAFDB_SA_PW'
 BUILD_FILE = 'BUILD_FILE'
 DATA_FILE = 'DATA_FILE'
 PER_FILE_DIR = 'PER_FILE_DIR'
+SCHEMA_FILE = 'SCHEMA_FILE'
 
 sql_license = '''-- Copyright (c) 2019, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
@@ -49,19 +50,32 @@ def get_env():
     env[BUILD_FILE] = os.path.join(projectDir, 'src/db/build/LeafDB.sql')
     env[DATA_FILE] = os.path.join(projectDir, 'src/db/build/LeafDB.Data.sql')
     env[PER_FILE_DIR] = os.path.join(projectDir, 'src/db/obj/')
+    env[SCHEMA_FILE] = os.path.join(projectDir, 'src/db/build/LeafDB.Schema.sql')
     env[LEAFDB_SA_PW] = sa_pw
     return env
 
 
-def create_schema(build_file: str, sa_pw: str):
-    print('Creating schema file...')
+def create_bootstrap(build_file: str, sa_pw: str):
+    print('Creating bootstrap file...')
     p = Popen([r'mssql-scripter', r'-S', r'localhost', r'-d', r'LeafDB',
                r'--target-server-version', r'2014', r'-f', build_file, r'-U', r'sa', r'-P', sa_pw])
     if p.wait() != 0:
         raise Exception(report_error(p.stdout.read(),
-                                     'Error creating schema file...'))
-    print('Licensing schema file...')
+                                     'Error creating bootstrap file...'))
+    print('Licensing bootstrap file...')
     apply_license_to_file(build_file)
+    print('Created bootstrap file...')
+
+
+def create_schema(schema_file: str, build_file: str):
+    print('Creating schema file...')
+    with open(build_file, 'r') as reader:
+        with open(schema_file, 'w') as writer:
+            content = reader.read()
+            use = content.find('USE [LeafDB]')
+            if use == -1:
+                use = 0
+            writer.write(sql_license + content[use:])
     print('Created schema file...')
 
 
@@ -78,7 +92,7 @@ def create_data(data_file: str, sa_pw: str):
     print('Created data file...')
 
 
-def apply_license_to_file(fqp):
+def apply_license_to_file(fqp: str):
     with open(fqp, 'r') as reader:
         contents = reader.read().lstrip()
 
@@ -89,7 +103,7 @@ def apply_license_to_file(fqp):
         writer.write(sql_license + contents)
 
 
-def apply_license(dir):
+def apply_license(dir: str):
     for fp in os.listdir(dir):
         fqp = os.path.join(dir, fp)
         apply_license_to_file(fqp)
@@ -115,7 +129,8 @@ def main():
     args = get_args()
     env = get_env()
     print('Scripting out LeafDB...')
-    create_schema(env[BUILD_FILE], env[LEAFDB_SA_PW])
+    create_bootstrap(env[BUILD_FILE], env[LEAFDB_SA_PW])
+    create_schema(env[SCHEMA_FILE], env[BUILD_FILE])
     if args.include_data:
         create_data(env[DATA_FILE], env[LEAFDB_SA_PW])
     create_source(env[PER_FILE_DIR], env[LEAFDB_SA_PW])
