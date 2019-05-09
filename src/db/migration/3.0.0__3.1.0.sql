@@ -30,8 +30,8 @@ BEGIN
 		Issuer,
 		KeyId,
 		Certificate,
-        IsInterrogator,
-        IsResponder
+	        IsInterrogator,
+       		IsResponder
 	FROM
 		network.Endpoint;
 END
