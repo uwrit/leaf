@@ -1044,6 +1044,8 @@ CREATE TABLE [network].[Endpoint](
 	[Issuer] [nvarchar](200) NOT NULL,
 	[KeyId] [nvarchar](200) NOT NULL,
 	[Certificate] [nvarchar](max) NOT NULL,
+    [IsInterrogator] BIT NOT NULL,
+    [IsResponder] BIT NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[Updated] [datetime] NOT NULL,
  CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED 
@@ -1283,6 +1285,10 @@ GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Created]  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Updated]  DEFAULT (getdate()) FOR [Updated]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsInterrogator]  DEFAULT (0) FOR [IsInterrogator]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsResponder]  DEFAULT (0) FOR [IsResponder]
 GO
 ALTER TABLE [network].[Identity] ADD  CONSTRAINT [DF_NetworkIdentity_Lock]  DEFAULT ('X') FOR [Lock]
 GO
@@ -5776,77 +5782,6 @@ BEGIN
 END
 
 
-
-
-
-
-GO
-/****** Object:  StoredProcedure [network].[sp_CreateEndpoint]    Script Date: 5/2/19 11:57:56 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Cliff Spital
--- Create date: 2018/6/12
--- Description:	Creates a new network.Endpoint record.
--- =============================================
-CREATE PROCEDURE [network].[sp_CreateEndpoint]
-	@name nvarchar(200),
-	@address nvarchar(1000),
-	@issuer nvarchar(200),
-	@keyid nvarchar(200),
-	@certificate nvarchar(max)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-    INSERT INTO network.Endpoint
-	(
-		Name,
-		Address,
-		Issuer,
-		KeyId,
-		Certificate
-	)
-	OUTPUT inserted.Id
-	SELECT
-		@name,
-		@address,
-		@issuer,
-		@keyid,
-		@certificate 
-END
-
-
-
-
-
-
-
-
-
-
-GO
-/****** Object:  StoredProcedure [network].[sp_DeleteEndpointById]    Script Date: 5/2/19 11:57:56 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Cliff Spital
--- Create date: 2018/6/12
--- Description:	Deletes a network.Endpoint record by Id.
--- =============================================
-CREATE PROCEDURE [network].[sp_DeleteEndpointById]
-	@id int
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-    DELETE FROM network.Endpoint
-	WHERE Id = @id;
-END
 
 
 

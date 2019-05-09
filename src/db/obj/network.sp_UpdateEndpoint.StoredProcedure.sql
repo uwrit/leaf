@@ -3,9 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
-GO
-/****** Object:  StoredProcedure [network].[sp_UpdateEndpoint]    Script Date: 5/2/19 11:58:02 AM ******/
+/****** Object:  StoredProcedure [network].[sp_UpdateEndpoint]    Script Date: 5/2/19 11:57:56 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -44,16 +42,3 @@ BEGIN
 	WHERE
 		Id = @id;
 END
-
-
-
-
-
-
-
-
-
-
-
-
-GO
