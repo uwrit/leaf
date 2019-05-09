@@ -8,7 +8,7 @@ using Model.Network;
 
 namespace API.DTO.Network
 {
-    public class NetworkRespondentDTO
+    public class NetworkResponderDTO
     {
         public int Id { get; set; }
 
@@ -16,12 +16,12 @@ namespace API.DTO.Network
 
         public string Address { get; set; }
 
-        public NetworkRespondentDTO()
+        public NetworkResponderDTO()
         {
 
         }
 
-        public NetworkRespondentDTO(NetworkEndpoint ne)
+        public NetworkResponderDTO(NetworkEndpoint ne)
         {
             Id = ne.Id;
             Name = ne.Name;

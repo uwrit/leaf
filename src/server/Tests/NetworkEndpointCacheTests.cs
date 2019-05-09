@@ -98,7 +98,7 @@ namespace Tests
         }
 
         [Fact]
-        public void RespondentCacheReader_GetOrDefault_Should_Return_Endpoint_If_Responder()
+        public void ResponderCacheReader_GetOrDefault_Should_Return_Endpoint_If_Responder()
         {
             var reader = new NetworkResponderCacheReader(Cache());
 
@@ -108,7 +108,7 @@ namespace Tests
         }
 
         [Fact]
-        public void RespondentCacheReader_GetOrDefault_Should_Return_Null_If_Not_Responder()
+        public void ResponderCacheReader_GetOrDefault_Should_Return_Null_If_Not_Responder()
         {
             var reader = new NetworkResponderCacheReader(Cache());
 
@@ -118,7 +118,7 @@ namespace Tests
         }
 
         [Fact]
-        public void RespondentCacheReader_All_Should_Only_Return_Responders()
+        public void ResponderCacheReader_All_Should_Only_Return_Responders()
         {
             var reader = new NetworkResponderCacheReader(Cache());
 

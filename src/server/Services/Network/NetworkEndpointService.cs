@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Network;
 using Model.Options;
+using Model.Results;
 
 namespace Services.Network
 {
@@ -25,20 +26,14 @@ namespace Services.Network
         const string queryUpdate = "network.sp_UpdateEndpoint";
 
         readonly AppDbOptions opts;
-        readonly NetworkValidator validator;
-        readonly ILogger<NetworkEndpointService> log;
 
         public NetworkEndpointService(
-            IOptions<AppDbOptions> dbOptions,
-            NetworkValidator networkValidator,
-            ILogger<NetworkEndpointService> logger)
+            IOptions<AppDbOptions> dbOptions)
         {
             opts = dbOptions.Value;
-            validator = networkValidator;
-            log = logger;
         }
 
-        public async Task<IEnumerable<NetworkEndpoint>> AllAsync()
+        public async Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -49,13 +44,11 @@ namespace Services.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                var nrs = ValidateRespondents(ners);
-
-                return nrs;
+                return ners.Select(e => e.NetworkEndpoint());
             }
         }
 
-        public async Task<NetworkIdentityEndpoints> AllWithIdentityAsync()
+        public async Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -70,12 +63,10 @@ namespace Services.Network
                 var identity = grid.Read<NetworkIdentity>().FirstOrDefault();
                 var records = grid.Read<NetworkEndpointRecord>();
 
-                var nes = ValidateRespondents(records);
-
                 return new NetworkIdentityEndpoints
                 {
                     Identity = identity,
-                    Endpoints = nes
+                    Endpoints = records.Select(e => e.NetworkEndpoint())
                 };
             }
         }
@@ -95,10 +86,8 @@ namespace Services.Network
         }
 
         // TODO(cspital) migrate to future admin service
-        public async Task UpdateAsync(NetworkEndpoint item)
+        public async Task<UpdateResult<NetworkEndpoint>> UpdateAsync(NetworkEndpoint item)
         {
-            validator.Validate(item);
-
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -117,28 +106,12 @@ namespace Services.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                log.LogInformation("Updated NetworkEndpoint. Old:{@Old} New:{@New}", old, item);
-            }
-        }
-
-        IEnumerable<NetworkEndpoint> ValidateRespondents(IEnumerable<NetworkEndpointRecord> records)
-        {
-            var ok = new List<NetworkEndpoint>();
-            foreach (var rec in records)
-            {
-                try
+                return new UpdateResult<NetworkEndpoint>
                 {
-                    var nr = rec.NetworkEndpoint();
-                    validator.Validate(nr);
-
-                    ok.Add(nr);
-                }
-                catch (UriFormatException ue)
-                {
-                    log.LogError("NetworkEndpoint is invalid. Endpoint:{@Endpoint} Error:{Error}", rec, ue.Message);
-                }
+                    Old = old.NetworkEndpoint(),
+                    New = item
+                };
             }
-            return ok;
         }
     }
 

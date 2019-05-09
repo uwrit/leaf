@@ -15,18 +15,23 @@ namespace Model
     {
         public static IServiceCollection RegisterLeafCore(this IServiceCollection services)
         {
-            services.AddTransient<NetworkValidator>();
+            services.AddSingleton<NetworkValidator>();
+            services.AddTransient<NetworkEndpointProvider>();
+            services.AddTransient<AdminNetworkEndpointManager>();
+
             services.AddTransient<PanelValidator>();
+            services.AddTransient<PanelConverter>();
+            services.AddTransient<DemographicCompilerValidationContextProvider>();
+            services.AddTransient<DatasetCompilerValidationContextProvider>();
+
             services.AddSingleton<PatientCountAggregator>();
             services.AddTransient<CohortCounter>();
             services.AddTransient<DemographicProvider>();
             services.AddTransient<DatasetProvider>();
+
             services.AddTransient<ConceptHintSearcher>();
             services.AddTransient<ConceptTreeSearcher>();
-            services.AddTransient<PanelConverter>();
             services.AddTransient<PreflightResourceChecker>();
-            services.AddTransient<DemographicCompilerValidationContextProvider>();
-            services.AddTransient<DatasetCompilerValidationContextProvider>();
             services.AddTransient<DatasetQueryProvider>();
 
             return services;
