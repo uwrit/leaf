@@ -18,4 +18,14 @@ namespace Model.Network
         Task<NetworkIdentityEndpoints> AllWithIdentityAsync();
         Task<NetworkIdentity> GetIdentityAsync();
     }
+
+    public class NetworkEndpointProvider
+    {
+        readonly INetworkEndpointService service;
+
+        public NetworkEndpointProvider(INetworkEndpointService service)
+        {
+            this.service = service;
+        }
+    }
 }

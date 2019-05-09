@@ -42,7 +42,7 @@ namespace API
 
             try
             {
-                Log.Information("Starting Leaf's API");
+                Log.Information("Starting Leaf's API v{Version}", Config.Version);
                 CreateWebHostBuilder(args).Build().Run();
                 return 0;
             }

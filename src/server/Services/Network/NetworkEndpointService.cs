@@ -5,16 +5,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model.Network;
 using System.Data;
 using System.Data.SqlClient;
-using Dapper;
 using System.Linq;
-using Model.Options;
+using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Services.Extensions;
+using Model.Network;
+using Model.Options;
 
 namespace Services.Network
 {
@@ -23,9 +22,6 @@ namespace Services.Network
         const string queryGetIdentity = "network.sp_GetIdentity";
         const string queryGetWithIdentity = "network.sp_GetIdentityEndpoints";
         const string queryGet = "network.sp_GetEndpoints";
-        const string queryGetSince = "network.sp_GetEndpointsUpdatedAfter";
-        const string queryCreate = "network.sp_CreateEndpoint";
-        const string queryDelete = "network.sp_DeleteEndpointById";
         const string queryUpdate = "network.sp_UpdateEndpoint";
 
         readonly AppDbOptions opts;
@@ -98,6 +94,7 @@ namespace Services.Network
             }
         }
 
+        // TODO(cspital) migrate to future admin service
         public async Task UpdateAsync(NetworkEndpoint item)
         {
             validator.Validate(item);
@@ -176,6 +173,8 @@ namespace Services.Network
             Issuer = ne.Issuer;
             KeyId = ne.KeyId;
             Certificate = Convert.ToBase64String(ne.Certificate);
+            IsInterrogator = ne.IsInterrogator;
+            IsResponder = ne.IsResponder;
         }
 
         public NetworkEndpoint NetworkEndpoint()
@@ -187,7 +186,9 @@ namespace Services.Network
                 Address = new Uri(Address),
                 Issuer = Issuer,
                 KeyId = KeyId,
-                Certificate = Convert.FromBase64String(Certificate)
+                Certificate = Convert.FromBase64String(Certificate),
+                IsInterrogator = IsInterrogator,
+                IsResponder = IsResponder
             };
         }
     }
