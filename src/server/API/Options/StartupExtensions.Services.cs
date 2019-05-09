@@ -120,7 +120,7 @@ namespace API.Options
             services.AddSingleton<INetworkEndpointCache, NetworkEndpointCache>(sp =>
             {
                 var network = sp.GetService<INetworkEndpointService>();
-                var initial = network.AllAsync().Result;
+                var initial = network.GetEndpointsAsync().Result;
 
                 return new NetworkEndpointCache(initial);
             });

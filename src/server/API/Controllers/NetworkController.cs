@@ -4,20 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Services;
-using Model.Network;
-using Model.Options;
 using API.DTO.Network;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Model.Authorization;
-using Services.Network;
+using Model.Network;
 
 namespace API.Controllers
 {
@@ -26,26 +20,27 @@ namespace API.Controllers
     [Route("api/network")]
     public class NetworkController : Controller
     {
-        readonly INetworkEndpointService endpointService;
+        readonly NetworkEndpointProvider provider;
         readonly ILogger<NetworkController> log;
-        public NetworkController(ILogger<NetworkController> logger, INetworkEndpointService endpointService)
+        public NetworkController(ILogger<NetworkController> logger, NetworkEndpointProvider provider)
         {
             log = logger;
-            this.endpointService = endpointService;
+            this.provider = provider;
         }
 
+        // TODO(cspital) map respondents to new responders endpoint
         [Authorize(Policy = Access.Institutional)]
-        [HttpGet("respondents")]
-        public async Task<ActionResult<NetworkIdentityEndpointsDTO>> Respondents()
+        [HttpGet("responders")]
+        public async Task<ActionResult<NetworkIdentityRespondersDTO>> Responders()
         {
             try
             {
-                var idEndpoints = await endpointService.AllWithIdentityAsync();
-                return Ok(new NetworkIdentityEndpointsDTO(idEndpoints));
+                var idEndpoints = await provider.GetEndpointsWithIdentityAsync();
+                return Ok(new NetworkIdentityRespondersDTO(idEndpoints));
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve respondents. Error:{Error}", ex.ToString());
+                log.LogError("Could not retrieve responders. Error:{Error}", ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -55,7 +50,7 @@ namespace API.Controllers
         {
             try
             {
-                var identity = await endpointService.GetIdentityAsync();
+                var identity = await provider.GetIdentityAsync();
                 return Ok(identity);
             }
             catch (Exception ex)

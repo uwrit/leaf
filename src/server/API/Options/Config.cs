@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Reflection;
+using System.Diagnostics;
 
 using Model.Options;
 
@@ -12,7 +13,7 @@ namespace API.Options
 {
     public static partial class Config
     {
-        public static readonly Version Version = Assembly.GetExecutingAssembly().GetName().Version;
+        public static readonly Version Version = Assembly.GetEntryAssembly().GetName().Version;
 
         public static void ThrowIfInvalid(SAML2AuthorizationOptions opts)
         {

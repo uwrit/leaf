@@ -22,20 +22,20 @@ namespace API.Jobs
     {
         readonly INetworkEndpointRefresher refresher;
         readonly INetworkEndpointCache cache;
-        readonly INetworkEndpointService endpointService;
+        readonly AdminNetworkEndpointManager endpointManager;
         readonly NetworkEndpointConcurrentQueueSet queue;
         readonly ILogger<BackgroundCertificateSynchronizer> log;
 
         public BackgroundCertificateSynchronizer(
             INetworkEndpointRefresher refresher,
             INetworkEndpointCache cache,
-            INetworkEndpointService endpointService,
+            AdminNetworkEndpointManager endpointManager,
             NetworkEndpointConcurrentQueueSet queue,
             ILogger<BackgroundCertificateSynchronizer> logger)
         {
             this.refresher = refresher;
             this.cache = cache;
-            this.endpointService = endpointService;
+            this.endpointManager = endpointManager;
             this.queue = queue;
             log = logger;
         }
@@ -75,7 +75,7 @@ namespace API.Jobs
                     log.LogInformation("Refreshed NetworkEndpoint. Endpoint:{@Endpoint}", newState);
 
                     cache.Put(newState);
-                    await endpointService.UpdateAsync(newState);
+                    await endpointManager.UpdateEndpointAsync(newState);
                     log.LogInformation("Updated NetworkEndpoint. Old:{@{Old} New:{@New}", oldState, newState);
                 }
                 catch (HttpRequestException hre)
