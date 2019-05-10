@@ -40,13 +40,13 @@ namespace Model.Network
         public virtual async Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
         {
             var eps = await service.GetEndpointsAsync();
-            return ValidateEndpoints(eps);
+            return ValidateEndpoints(eps.Where(e => e.IsResponder || e.IsInterrogator));
         }
 
         public virtual async Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync()
         {
             var nie = await service.GetEndpointsWithIdentityAsync();
-            nie.Endpoints = ValidateEndpoints(nie.Endpoints);
+            nie.Endpoints = ValidateEndpoints(nie.Endpoints.Where(e => e.IsResponder || e.IsInterrogator));
             return nie;
         }
 
@@ -72,7 +72,7 @@ namespace Model.Network
 
         public virtual async Task<NetworkIdentityEndpoints> GetInterrogatorsWithIdentityAsync()
         {
-            return await GetValidIdentityEndpointsAsync(e => e.IsResponder);
+            return await GetValidIdentityEndpointsAsync(e => e.IsInterrogator);
         }
 
 

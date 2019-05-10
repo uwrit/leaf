@@ -17,5 +17,21 @@ namespace Model.Network
         public byte[] Certificate { get; set; }
         public bool IsInterrogator { get; set; }
         public bool IsResponder { get; set; }
+
+        public static NetworkEndpoint From(NetworkEndpoint e)
+        {
+            if (e == null) return null;
+            return new NetworkEndpoint
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Address = new Uri(e.Address.ToString()),
+                Issuer = e.Issuer,
+                KeyId = e.KeyId,
+                Certificate = (byte[])e.Certificate.Clone(),
+                IsInterrogator = e.IsInterrogator,
+                IsResponder = e.IsResponder
+            };
+        }
     }
 }
