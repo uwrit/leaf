@@ -17,7 +17,7 @@ import { defaultConceptSearchState } from '../reducers/conceptSearch';
 import { defaultExportState } from '../reducers/dataExport';
 import { defaultGeneralUiState } from '../reducers/generalUi';
 import { defaultMapState } from '../reducers/map';
-import { defaultRespondentsState } from '../reducers/networkRespondents';
+import { defaultRespondersState } from '../reducers/networkResponders';
 import { defaultPanelFiltersState } from '../reducers/panelFilters';
 import { defaultPanelState } from '../reducers/panels';
 import { defaultQueriesState } from '../reducers/queries';
@@ -35,7 +35,7 @@ const beginState: AppState = {
     map: defaultMapState(),
     panelFilters: defaultPanelFiltersState(),
     panels: defaultPanelState(),
-    respondents: defaultRespondentsState(),
+    responders: defaultRespondersState(),
     queries: defaultQueriesState(),
     session: defaultSessionState()
 }

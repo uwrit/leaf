@@ -8,7 +8,7 @@
 import React from 'react'
 import CountUp from 'react-countup';
 import { Popup } from 'react-leaflet'
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import './EndpointPopup.css'
 
 interface Props {

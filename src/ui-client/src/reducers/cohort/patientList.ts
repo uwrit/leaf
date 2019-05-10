@@ -126,7 +126,7 @@ export function setPatientListDatasetRequested(state: CohortState, action: Cohor
 
 export function setPatientListDatasetReceived(state: CohortState, action: CohortPatientListAction): CohortState {
 
-    // Reset patient list states (this prevents respondents that failed
+    // Reset patient list states (this prevents responders that failed
     // to pull additional datasets from being prevented from trying again)
     state.networkCohorts.forEach((nc) => { 
         if (nc.count.state === CohortStateType.LOADED) {
@@ -146,11 +146,11 @@ export function setPatientListDatasetReceived(state: CohortState, action: Cohort
     });
     const multirowDs = copy.patientList.configuration.multirowDatasets.get(action.datasetId!)!;
     
-    // If at least one of the respondents succeeded
+    // If at least one of the responders succeeded
     if (multirowDs) {
         copy.patientList.configuration.singletonDatasets.get(action.datasetId!)!.dateBounds = action.dates!;
         copy.networkCohorts.forEach((nc: NetworkCohortState) => {
-            multirowDs.respondentStates.set(nc.id, nc.patientList.state);
+            multirowDs.responderStates.set(nc.id, nc.patientList.state);
             nc.patientList.state = CohortStateType.LOADED;
         });
     }

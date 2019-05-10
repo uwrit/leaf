@@ -11,7 +11,7 @@ import { SavedQueryRef, SavedQuery, SavedQueryRefDTO, SavedQueryDefinitionDTO, Q
 import ExtensionConceptsWebWorker from '../providers/extensionConcepts/extensionConceptsWebWorker';
 import { PanelDTO, Panel } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
-import { NetworkIdentity } from '../models/NetworkRespondent';
+import { NetworkIdentity } from '../models/NetworkResponder';
 import { ResourceRef, ExtensionConcept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
 import moment from 'moment';

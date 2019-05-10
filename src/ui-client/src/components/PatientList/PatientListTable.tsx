@@ -8,7 +8,7 @@
 import React from 'react';
 import { getCurrentPatientList } from '../../actions/cohort/patientList';
 import { PatientListState } from '../../models/state/CohortState';
-import { NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListRow } from '../../models/patientList/Patient';
 import { PatientListSortType, PatientListSort } from '../../models/patientList/Configuration';
@@ -20,7 +20,7 @@ interface Props {
     className?: string;
     dispatch: any;
     patientList: PatientListState;
-    respondents: NetworkRespondentMap;
+    responders: NetworkResponderMap;
 }
 
 interface State {

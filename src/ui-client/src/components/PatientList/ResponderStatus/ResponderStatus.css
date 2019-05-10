@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .patientlist-respondent-status-summary-stats {
+ .patientlist-responder-status-summary-stats {
     border-bottom: 1px solid rgb(240,240,240);
     color: rgb(100,100,100);
     font-size: 1.0rem;
@@ -14,21 +14,21 @@
     text-align: center;
 }
 
-.patientlist-respondent-status-summary-completed {
+.patientlist-responder-status-summary-completed {
     color: rgb(0, 138, 0);
 }
 
-.patientlist-respondent-status-summary-total {
+.patientlist-responder-status-summary-total {
     color: rgb(0, 138, 0);
 }
 
-.patientlist-respondent-status-abbr {
+.patientlist-responder-status-abbr {
     display: inline-block;
     margin-right: 20px;
     font-size: 1.1rem;
 }
 
-.patientlist-respondent-status-state {
+.patientlist-responder-status-state {
     color: rgb(150,150,150);
     display: inline-block;
 }

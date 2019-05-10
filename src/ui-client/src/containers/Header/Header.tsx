@@ -15,11 +15,11 @@ import { Navbar } from 'reactstrap';
 import { Nav, NavItem } from 'reactstrap';
 import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmationModal, toggleMyLeafModal, showInfoModal } from '../../actions/generalUi';
 import { resetPanels } from '../../actions/panels';
-import NetworkHealthRespondent from '../../components/Header/NetworkHealthRespondent/NetworkHealthRespondent';
+import NetworkHealthResponder from '../../components/Header/NetworkHealthResponder/NetworkHealthResponder';
 import { AppState } from '../../models/state/AppState';
 import { UserContext, AuthConfig } from '../../models/Auth';
 import { CohortStateType } from '../../models/state/CohortState';
-import { NetworkIdentity, NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkResponder';
 import { Panel } from '../../models/panel/Panel';
 import CohortSummary from './CohortSummary';
 import { Routes, ConfirmationModalState } from '../../models/state/GeneralUiState';
@@ -36,7 +36,7 @@ interface StateProps {
     auth: AuthConfig;
     panels: Panel[];
     panelFilters: PanelFilter[];
-    respondents: NetworkRespondentMap;
+    responders: NetworkResponderMap;
     queryState: CohortStateType;
     queries: SavedQueriesState;
     user: UserContext;
@@ -57,12 +57,12 @@ class Header extends React.PureComponent<Props> {
         const { user } = this.props;
         const c = 'header';
         const resps: number[] = []; 
-        const allowDisable = this.props.respondents.size > 1;
+        const allowDisable = this.props.responders.size > 1;
         const username = user ? user.name : '';
-        let totalActiveRespondents = 0;
-        this.props.respondents.forEach((ni: NetworkIdentity) => { 
+        let totalActiveResponders = 0;
+        this.props.responders.forEach((ni: NetworkIdentity) => { 
             resps.push(ni.id);
-            if (ni.enabled) { totalActiveRespondents += 1; }
+            if (ni.enabled) { totalActiveResponders += 1; }
         });
 
         return (
@@ -102,13 +102,13 @@ class Header extends React.PureComponent<Props> {
                                         <span>Clinical databases available to query</span>
                                     </div>
                                     {resps.map((id: number) => (
-                                        <NetworkHealthRespondent 
+                                        <NetworkHealthResponder 
                                             allowDisable={allowDisable}
                                             key={id} 
                                             dispatch={this.props.dispatch} 
-                                            identity={this.props.respondents.get(id)!} 
+                                            identity={this.props.responders.get(id)!} 
                                             queryState={this.props.queryState}
-                                            totalActiveRespondents={totalActiveRespondents}/>
+                                            totalActiveResponders={totalActiveResponders}/>
                                     ))}
                                 </div>
                             </div>
@@ -214,7 +214,7 @@ const mapStateToProps = (state: AppState): StateProps => {
         panels: state.panels,
         panelFilters: state.panelFilters,
         queryState: state.cohort.count.state,
-        respondents: state.respondents,
+        responders: state.responders,
         queries: state.queries,
         user: state.auth.userContext!
     };

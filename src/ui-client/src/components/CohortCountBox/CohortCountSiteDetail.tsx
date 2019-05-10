@@ -8,7 +8,7 @@
 import React from 'react';
 import { Bar, BarChart, LabelList, XAxis, YAxis } from 'recharts';
 import { PatientCountState, CohortStateType } from '../../models/state/CohortState';
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import CohortSql from './CohortSql';
 
 import 'brace/mode/sqlserver';

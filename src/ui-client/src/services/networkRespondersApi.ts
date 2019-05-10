@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentityRespondentsDTO, NetworkRespondentDTO } from '../models/NetworkRespondent';
+import { NetworkIdentityRespondersDTO, NetworkResponderDTO } from '../models/NetworkResponder';
 import { HttpFactory } from './HttpFactory';
 
 /*
@@ -14,17 +14,17 @@ import { HttpFactory } from './HttpFactory';
  * composed of basic information about the database this
  * node represents, mostly for display to user.)
  */
-export const fetchHomeIdentityAndRespondents = async (state: AppState) => {
+export const fetchHomeIdentityAndResponders = async (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get('api/network/respondents');
-    return resp.data as NetworkIdentityRespondentsDTO;
+    const resp = await http.get('api/network/responders');
+    return resp.data as NetworkIdentityRespondersDTO;
 };
 
 /*
  * Request identity a given node.
  */
-export const fetchRespondentIdentity = async (state: AppState, resp: NetworkRespondentDTO) => {
+export const fetchResponderIdentity = async (state: AppState, resp: NetworkResponderDTO) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.get(`${resp.address}/api/network/identity`);

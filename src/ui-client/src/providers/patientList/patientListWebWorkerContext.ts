@@ -95,7 +95,7 @@ var addDatasetDefinition = function (def) {
  * Add multirow dataset data to the cache.
  */
 var addMultiRowDataset = function (payload) {
-    var dataset = payload.dataset, respondentId = payload.respondentId;
+    var dataset = payload.dataset, responderId = payload.responderId;
     var def = dataset.definition;
     var dsId = def.id;
     var data = dataset.data.results;
@@ -112,7 +112,7 @@ var addMultiRowDataset = function (payload) {
     for (var i = 0; i < uniquePatients.length; i++) {
         var p = uniquePatients[i];
         var rows = data[p];
-        var compoundId = respondentId + "_" + p;
+        var compoundId = responderId + "_" + p;
         var patientData = patientMap.get(compoundId).multirowData;
         uniqueCompoundPatients.push(compoundId);
         // Convert strings to dates
@@ -151,21 +151,21 @@ var addMultiRowDataset = function (payload) {
  * Add initial base (basic demographics) dataset to the cache.
  */
 var addDemographics = function (payload) {
-    var datasetDefinition = payload.datasetDefinition, demographics = payload.demographics, respondentId = payload.respondentId, requestId = payload.requestId;
+    var datasetDefinition = payload.datasetDefinition, demographics = payload.demographics, responderId = payload.responderId, requestId = payload.requestId;
     if (!demographics.length) {
         return { requestId: requestId };
     }
     // For each patient
     for (var i = 0; i < demographics.length; i++) {
-        // Add compound and respondent ids
+        // Add compound and responder ids
         var patientDto = demographics[i];
         var patient = {
-            compoundId: respondentId + "_" + patientDto.personId,
+            compoundId: responderId + "_" + patientDto.personId,
             detailRowCount: 0,
             detailValues: [],
             id: patientDto.personId,
             multirowData: new Map(),
-            respondentId: respondentId,
+            responderId: responderId,
             singletonData: new Map()
         };
         // Add to the patId arrays
@@ -232,7 +232,7 @@ var patientIdsToListRow = function (config, patIds) {
             detailRowCount: pat.detailRowCount,
             detailValues: pat.detailValues,
             isOpen: false,
-            respondentId: pat.respondentId,
+            responderId: pat.responderId,
             values: []
         };
         patListRow.values = config.displayColumns.map(function (col) {
@@ -428,7 +428,7 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
         displayName: def.displayName,
         id: def.id,
         multirow: false,
-        respondentStates: new Map(),
+        responderStates: new Map(),
         shape: 0,
         totalRows: ids.length
     };
@@ -523,7 +523,7 @@ var deriveNonNumericSummaryFromDataset = function (def, ids) {
         displayName: def.displayName,
         id: def.id,
         multirow: false,
-        respondentStates: new Map(),
+        responderStates: new Map(),
         shape: 0
     };
     // Short-circuit if the dataset doesn't have a date or numeric column

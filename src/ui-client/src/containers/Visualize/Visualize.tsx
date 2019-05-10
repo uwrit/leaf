@@ -8,10 +8,10 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import AggregateDemographics from '../../components/Visualize/AggregateDemographics';
-import RespondentDemographics from '../../components/Visualize/RespondentDemographics';
+import ResponderDemographics from '../../components/Visualize/ResponderDemographics';
 import { AppState, AuthorizationState } from '../../models/state/AppState';
 import { CohortMap, CohortState, NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
-import { NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkResponderMap } from '../../models/NetworkResponder';
 import computeDimensions from '../../utils/computeDimensions';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
 import './Visualize.css';
@@ -21,7 +21,7 @@ interface OwnProps { }
 interface StateProps {
     auth: AuthorizationState;
     cohort: CohortState;
-    respondents: NetworkRespondentMap;
+    responders: NetworkResponderMap;
 }
 interface DispatchProps {}
 type Props = StateProps & OwnProps & DispatchProps;
@@ -52,17 +52,17 @@ class Visualize extends React.Component<Props, State> {
     }
 
     public render() {
-        let completedRespondents = 0;
+        let completedResponders = 0;
         const c = 'visualize';
-        const { cohort, respondents, auth } = this.props;
+        const { cohort, responders, auth } = this.props;
         const demogHeight = 400;
         const respPadding = 200;
         const data: any = [];
         cohort.networkCohorts.forEach((nc: NetworkCohortState) => {
-            const r = respondents.get(nc.id)!;
+            const r = responders.get(nc.id)!;
             if (r.enabled && nc.visualization.state === CohortStateType.LOADED) {
-                completedRespondents++;
-                data.push({ cohort: nc, respondent: r });
+                completedResponders++;
+                data.push({ cohort: nc, responder: r });
             }
         });
 
@@ -73,7 +73,7 @@ class Visualize extends React.Component<Props, State> {
             return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
         }
         /*
-         * Show a loading spinner if no respondents have completed yet.
+         * Show a loading spinner if no responders have completed yet.
          */
         if (cohort.visualization.state === CohortStateType.IN_ERROR) {
             return (
@@ -85,9 +85,9 @@ class Visualize extends React.Component<Props, State> {
             );
         } 
         /*
-         * Show a loading spinner if no respondents have completed yet.
+         * Show a loading spinner if no responders have completed yet.
          */
-        if (completedRespondents === 0 || cohort.visualization.state !== CohortStateType.LOADED) {
+        if (completedResponders === 0 || cohort.visualization.state !== CohortStateType.LOADED) {
             return (
                 <div className={`${c}-loading`}>
                     <LoaderIcon size={100} />
@@ -103,14 +103,14 @@ class Visualize extends React.Component<Props, State> {
                     width={this.state.width}
                 />
                 {data.length > 1 &&
-                <div className={`${c}-respondent-demographic-container`}>
+                <div className={`${c}-responder-demographic-container`}>
                     {data.map((d: any, i: number) => {
                         return (
-                            <RespondentDemographics 
+                            <ResponderDemographics 
                                 cohort={d.cohort} 
                                 height={demogHeight}
                                 key={i} 
-                                respondent={d.respondent} 
+                                responder={d.responder} 
                                 width={this.state.width - respPadding} 
                             />
                         )
@@ -126,7 +126,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
         auth: state.auth,
         cohort: state.cohort,
-        respondents: state.respondents
+        responders: state.responders
     };
 };
 
