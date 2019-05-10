@@ -28,7 +28,6 @@ namespace API.Controllers
             this.provider = provider;
         }
 
-        // TODO(cspital) map respondents to new responders endpoint
         [Authorize(Policy = Access.Institutional)]
         [HttpGet("responders")]
         public async Task<ActionResult<NetworkIdentityRespondersDTO>> Responders()
