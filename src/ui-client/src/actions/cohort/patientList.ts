@@ -8,7 +8,7 @@
 import { Action, Dispatch } from 'redux';
 import { AppState } from '../../models/state/AppState';
 import { PatientListState, CohortStateType } from '../../models/state/CohortState';
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import { fetchDataset } from '../../services/cohortApi';
 import { addDemographicsDataset, addMultirowDataset, getPatients, removeDataset } from '../../services/patientListApi';
 import { DateBoundary } from '../../models/panel/Date';
@@ -69,24 +69,24 @@ const switchArrayPositions = (arr: any[], oldIdx: number, newIdx: number) => {
 
 // Asynchronous
 /*
- * Request a patient list dataset from each respondent which is 
+ * Request a patient list dataset from each responder which is 
  * enabled and has loaded demographics.
  */
 export const getPatientListDataset = (dataset: PatientListDatasetQueryDTO, dates: DateBoundary) => {
     return (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
-        const respondents: NetworkIdentity[] = [];
+        const responders: NetworkIdentity[] = [];
         let atLeastOneSucceeded = false;
-        state.respondents.forEach((nr: NetworkIdentity) => { 
+        state.responders.forEach((nr: NetworkIdentity) => { 
             const crt = state.cohort.networkCohorts.get(nr.id)!;
             if (
                 nr.enabled && crt.count.state === CohortStateType.LOADED && crt.patientList.state === CohortStateType.LOADED) { 
-                respondents.push(nr); 
+                responders.push(nr); 
             } 
         });
         dispatch(setPatientListDatasetRequested(dataset.id));
 
-        Promise.all(respondents.map((nr: NetworkIdentity, i: number) => { 
+        Promise.all(responders.map((nr: NetworkIdentity, i: number) => { 
             return new Promise( async (resolve, reject) => {
                 try {
                     if (nr.isHomeNode || dataset.universalId) {
@@ -111,7 +111,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQueryDTO, dates
                 allowDatasetInSearch(dataset.id, false);
                 const newDatasets = await searchDatasets(state.generalUi.datasets.searchTerm);
                 dispatch(setPatientListDatasets(newDatasets));
-            } else if (respondents.length) {
+            } else if (responders.length) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
                     header: "Error Loading Dataset",
@@ -145,17 +145,17 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
 };
 
 /*
- * Adds a respondent's base demographic dataset.
+ * Adds a responder's base demographic dataset.
  */
 export const getPatientListFromNewBaseDataset = 
     async (
-        respondentId: number, 
+        responderId: number, 
         patients: PatientListRowDTO[], 
         dispatch: any, 
         getState: () => AppState
     ) => {
-    dispatch(setPatientListSingletonReceived(respondentId, patients.length));
-    const newPatientListState = await addDemographicsDataset(getState, patients, respondentId) as PatientListState;
+    dispatch(setPatientListSingletonReceived(responderId, patients.length));
+    const newPatientListState = await addDemographicsDataset(getState, patients, responderId) as PatientListState;
     dispatch(setPatientListDisplay(newPatientListState));
 };
 
@@ -205,7 +205,7 @@ export const togglePatientRowOpen = (patientRowId: number) => {
         const newPl = getState().cohort.patientList;
         newPl.display[patientRowId] = Object.assign({}, newPl.display[patientRowId], { isOpen: !newPl.display[patientRowId].isOpen });
 
-        // Update patient list display based on newest respondent results
+        // Update patient list display based on newest responder results
         dispatch(setPatientListDisplay(newPl));
     };
 };
@@ -222,7 +222,7 @@ export const getCurrentPatientList = (sort: PatientListSort) => {
         // Get patients
         newPl.display = await getPatients(newPl.configuration) as PatientListRow[];
 
-        // Update patient list display based on newest respondent results
+        // Update patient list display based on newest responder results
         dispatch(setPatientListDisplay(newPl));
     };
 };
@@ -238,7 +238,7 @@ export const setPatientListPagination = (id: number) => {
         // Get patients
         newPl.display = await getPatients(newPl.configuration) as PatientListRow[];
 
-        // Update patient list display based on newest respondent results
+        // Update patient list display based on newest responder results
         dispatch(setPatientListDisplay(newPl));
     };
 };

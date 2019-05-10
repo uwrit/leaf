@@ -8,11 +8,11 @@
 import React from 'react';
 import { CohortCountSiteDetail, SiteCountDetail } from '../../components/CohortCountBox/CohortCountSiteDetail';
 import { CohortState, NetworkCohortState } from '../../models/state/CohortState';
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 
 interface Props { 
     cohort: CohortState;
-    networkRespondents: Map<number, NetworkIdentity>;
+    networkResponders: Map<number, NetworkIdentity>;
     show: boolean;
 }
 
@@ -27,11 +27,11 @@ export class CohortCountSiteContainer extends React.PureComponent<Props> {
         let max: number = 0;
         cohort.networkCohorts
             .forEach((nc: NetworkCohortState, i: number) => {
-                const respondent: NetworkIdentity = this.props.networkRespondents.get(nc.id)!;
-                if (respondent.enabled) {
+                const responder: NetworkIdentity = this.props.networkResponders.get(nc.id)!;
+                if (responder.enabled) {
                     const site = {
                         countResults: nc.count,
-                        id: respondent
+                        id: responder
                     } as SiteCountDetail;
                     max = nc.count.value > max ? nc.count.value : max;
                     siteData.push(site);

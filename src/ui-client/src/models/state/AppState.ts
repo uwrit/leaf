@@ -13,7 +13,7 @@ import { CohortState } from "./CohortState";
 import ExportState from "./Export";
 import { PanelFilter } from "../panel/PanelFilter";
 import { GeneralUiState } from "./GeneralUiState";
-import { NetworkRespondentMap } from "../NetworkRespondent";
+import { NetworkResponderMap } from "../NetworkResponder";
 import { Panel } from "../panel/Panel";
 import { SavedQueriesState } from "../Query";
 import { SessionState } from "../Session";
@@ -63,7 +63,7 @@ export interface AppState {
     panelFilters: PanelFilter[];
     generalUi: GeneralUiState;
     map: MapState;
-    respondents: NetworkRespondentMap;
+    responders: NetworkResponderMap;
     panels: Panel[];
     queries: SavedQueriesState;
     session: SessionState;

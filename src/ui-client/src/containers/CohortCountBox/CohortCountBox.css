@@ -189,7 +189,7 @@
     border-radius: 8px;
     box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
     color: rgb(96, 90, 102);
-    content: "This respondent was unable to run your query because it doesn't have data for at least 1 concept you've used.";
+    content: "This responder was unable to run your query because it doesn't have data for at least 1 concept you've used.";
     margin-top: 25px;
     padding: 6px;
     position: absolute;

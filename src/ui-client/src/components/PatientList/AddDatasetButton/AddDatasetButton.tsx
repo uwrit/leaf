@@ -7,8 +7,8 @@
 
 import React from 'react';
 import AddDatasetSelectors from '../AddDatasetSelectors/AddDatasetSelectors';
-import RespondentStatusSummary from '../RespondentStatus/RespondentStatusSummary';
-import { NetworkRespondentMap } from '../../../models/NetworkRespondent';
+import ResponderStatusSummary from '../ResponderStatus/ResponderStatusSummary';
+import { NetworkResponderMap } from '../../../models/NetworkResponder';
 import { NetworkCohortState } from '../../../models/state/CohortState';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
@@ -20,7 +20,7 @@ interface Props {
     cohortMap: Map<number, NetworkCohortState>;
     configuration: PatientListConfiguration;
     datasets: DatasetsState;
-    respondentMap: NetworkRespondentMap;
+    responderMap: NetworkResponderMap;
     dispatch: any;
 }
 
@@ -76,7 +76,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     public render() {
         const c = this.className;
         const { categoryIdx, datasetIdx, selectedDates, showSelectorModal } = this.state;
-        const { datasets, configuration, dispatch, cohortMap, respondentMap } = this.props;
+        const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
 
@@ -101,7 +101,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                     onMouseEnter={this.handleMouseEnter}
                     tabIndex={0}>
                     {configuration.isFetching &&
-                    <RespondentStatusSummary cohortMap={cohortMap} respondentMap={respondentMap} />
+                    <ResponderStatusSummary cohortMap={cohortMap} responderMap={responderMap} />
                     }
                     {!configuration.isFetching &&
                     <AddDatasetSelectors 

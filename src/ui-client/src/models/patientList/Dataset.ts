@@ -120,7 +120,7 @@ export interface PatientListDatasetDefinition extends PatientListDatasetDefiniti
     dateBounds?: DateBoundary;
     displayName: string;
     id: PatientListDatasetId;
-    respondentStates: Map<number, CohortStateType>;
+    responderStates: Map<number, CohortStateType>;
     summaryType?: PatientListDatasetSummaryType;
     totalRows?: number;
 };

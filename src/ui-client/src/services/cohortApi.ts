@@ -7,7 +7,7 @@
 
 import { CancelTokenSource } from 'axios';
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentity } from '../models/NetworkRespondent';
+import { NetworkIdentity } from '../models/NetworkResponder';
 import { PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';

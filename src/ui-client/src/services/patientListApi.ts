@@ -99,7 +99,7 @@ export const addMultirowDataset = async (
         getState: () => AppState, 
         datasetDto: PatientListDatasetDTO, 
         queryRef: PatientListDatasetQueryDTO, 
-        respondentId: number
+        responderId: number
     ): Promise<PatientListState> => {
 
     const patientList = getState().cohort.patientList;
@@ -116,10 +116,10 @@ export const addMultirowDataset = async (
     if (!multirowDatasets.has(def.id)) {
         multirowDatasets.set(def.id, def);
     }
-    multirowDatasets.get(def.id)!.respondentStates.set(respondentId, CohortStateType.LOADED);
+    multirowDatasets.get(def.id)!.responderStates.set(responderId, CohortStateType.LOADED);
 
     // Update the displayed patients
-    const summaryDef = await patientListProvider.addDataset(dataset, respondentId) as PatientListDatasetDefinition;
+    const summaryDef = await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
 
     // If we have a new summary dataset, add to configuration
     if (summaryDef) {
@@ -139,7 +139,7 @@ export const addMultirowDataset = async (
         summaryDef.summaryType = (def.numericValueColumn && datasetDto.schema.fields.indexOf(def.numericValueColumn!) > -1) 
             ? PatientListDatasetSummaryType.Quantitative 
             : PatientListDatasetSummaryType.NonQuantititive;
-        summaryDef.respondentStates.set(respondentId, CohortStateType.LOADED);
+        summaryDef.responderStates.set(responderId, CohortStateType.LOADED);
     }
 
     // Get the latest patient list
@@ -156,18 +156,18 @@ export const addMultirowDataset = async (
 export const addDemographicsDataset = async (
         getState: () => AppState, 
         patients: PatientListRowDTO[], 
-        respondentId: number
+        responderId: number
     ): Promise<PatientListState> => {
     const state = getState();
     const patientList = state.cohort.patientList;
-    const respondent = state.respondents.get(respondentId)!;
+    const responder = state.responders.get(responderId)!;
 
     if (!patients.length) { return patientList; }
 
-    // Add the respondent name as a column
+    // Add the responder name as a column
     for (let i = 0; i < patients.length; i++) {
         const pat = patients[i] as any;
-        pat.patientOf = respondent.name;
+        pat.patientOf = responder.name;
     }
 
     // Validate definition against actual dataset
@@ -185,7 +185,7 @@ export const addDemographicsDataset = async (
     }
 
     // Update the displayed patients
-    await patientListProvider.addDemographics(def, patients, respondentId);
+    await patientListProvider.addDemographics(def, patients, responderId);
     patientList.display = await patientListProvider.getPatients(patientList.configuration) as PatientListRow[];
     patientList.totalPatients = getState().cohort.patientList.totalPatients + patients.length;
     patientList.state = CohortStateType.LOADED;
@@ -249,7 +249,7 @@ const getDemographicsDefinition = (patient: PatientListRowDTO) => {
         columns: validateDefinitionColumns(DemographicsDefTemplate, realCols, dsName),
         displayName: dsDisplayName,
         id: dsName,
-        respondentStates: new Map()
+        responderStates: new Map()
     };
     return def;
 };
@@ -264,7 +264,7 @@ const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientL
         columns: validateDefinitionColumns(template, dataset.schema.fields, queryRef.name),
         displayName: queryRef.name,
         id: queryRef.id,
-        respondentStates: new Map()
+        responderStates: new Map()
     };
     return def;
 };

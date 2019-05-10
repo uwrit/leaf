@@ -6,14 +6,14 @@
  */ 
 
 import { CohortMap } from '../models/state/CohortState';
-import { NetworkRespondentMap } from '../models/NetworkRespondent';
+import { NetworkResponderMap } from '../models/NetworkResponder';
 import CohortAggregatorWebWorker from '../providers/cohortAggregator/cohortAggregatorWebWorker';
 
 const aggregator = new CohortAggregatorWebWorker();
 
-export const aggregateStatistics = (cohorts: CohortMap, respondents: NetworkRespondentMap) => {
+export const aggregateStatistics = (cohorts: CohortMap, responders: NetworkResponderMap) => {
     return new Promise( async (resolve, reject) => {
-        const agg = await aggregator.aggregateStatistics(cohorts, respondents);
+        const agg = await aggregator.aggregateStatistics(cohorts, responders);
         resolve(agg);
     });
 };

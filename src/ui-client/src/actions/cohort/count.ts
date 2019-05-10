@@ -11,7 +11,7 @@ import { AppState } from '../../models/state/AppState';
 import { CohortStateType, PatientCountState } from '../../models/state/CohortState';
 import { PatientCountDTO, PreflightCheckDTO } from '../../models/PatientCountDTO';
 import { DemographicDTO, DemographicStatistics } from '../../models/cohort/DemographicDTO';
-import { NetworkIdentity, NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkResponder';
 import { panelToDto } from '../../models/panel/Panel';
 import { PanelFilter } from '../../models/panel/PanelFilter';
 import { aggregateStatistics } from '../../services/cohortAggregatorApi';
@@ -41,8 +41,8 @@ export interface CohortCountAction {
     cancel?: CancelTokenSource;
     cohorts?: NetworkIdentity[];
     countResults?: PatientCountState;
-    respondents?: NetworkRespondentMap;
-    respondent?: NetworkIdentity;
+    responders?: NetworkResponderMap;
+    responder?: NetworkIdentity;
     success?: boolean;
     error?: string;
     type: string;
@@ -60,21 +60,21 @@ export const getCounts = () => {
         const cancelSource = Axios.CancelToken.source();
         const panels = state.panels.map(p => panelToDto(p));
         const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
-        const respondents: NetworkIdentity[] = [];
-        state.respondents.forEach((nr: NetworkIdentity) => { 
+        const responders: NetworkIdentity[] = [];
+        state.responders.forEach((nr: NetworkIdentity) => { 
             if (nr.enabled && (nr.isHomeNode || !runLocalOnly)) { 
-                respondents.push(nr); 
+                responders.push(nr); 
             } 
         });
-        dispatch(setCohortCountStarted(state.respondents, cancelSource));
+        dispatch(setCohortCountStarted(state.responders, cancelSource));
 
         // Clear patient list
         await clearPreviousPatientList();
 
         // Wrap entire query action in Promise.all
         Promise.all(
-            // For each enabled respondent
-            respondents.map((nr: NetworkIdentity, i: number) => { 
+            // For each enabled responder
+            responders.map((nr: NetworkIdentity, i: number) => { 
                 return new Promise( async(resolve, reject) => {
                     let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
 
@@ -136,18 +136,18 @@ const getDemographics = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
-        const respondents: NetworkIdentity[] = [];
-        state.respondents.forEach((nr: NetworkIdentity) => { 
+        const responders: NetworkIdentity[] = [];
+        state.responders.forEach((nr: NetworkIdentity) => { 
             if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED) { 
-                respondents.push(nr); 
+                responders.push(nr); 
             } 
         });
         dispatch(getAllPatientListDatasets());
-        dispatch(setCohortDemographicsStarted(state.respondents, cancelSource));
+        dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
         Promise.all(
-            // For each enabled respondent
-            respondents.map((nr: NetworkIdentity, i: number) => { 
+            // For each enabled responder
+            responders.map((nr: NetworkIdentity, i: number) => { 
                 return new Promise( async (resolve, reject) => {
                     const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
 
@@ -164,7 +164,7 @@ const getDemographics = () => {
                                 getPatientListFromNewBaseDataset(nr.id, demographics.patients, dispatch, getState);
 
                                 const newState = getState();
-                                const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.respondents) as DemographicStatistics;
+                                const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.responders) as DemographicStatistics;
                                 dispatch(setAggregateVisualizationData(aggregate));
                         },  error => {
                             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
@@ -199,9 +199,9 @@ export const cancelQuery = () => {
     };
 };
 
-export const registerNetworkCohorts = (respondents: NetworkIdentity[]) : CohortCountAction => {
+export const registerNetworkCohorts = (responders: NetworkIdentity[]) : CohortCountAction => {
     return {
-        cohorts: respondents,
+        cohorts: responders,
         id: 0,
         type: REGISTER_NETWORK_COHORTS
     };
@@ -215,11 +215,11 @@ export const setNetworkCohortCount = (id: number, countResults: PatientCountStat
     };
 };
 
-export const setCohortCountStarted = (respondents: NetworkRespondentMap, cancel: CancelTokenSource): CohortCountAction => {
+export const setCohortCountStarted = (responders: NetworkResponderMap, cancel: CancelTokenSource): CohortCountAction => {
     return {
         cancel,
         id: 0,
-        respondents,
+        responders,
         type: COHORT_COUNT_START
     };
 };
@@ -255,11 +255,11 @@ export const setNetworkCohortDemographics = (id: number, countResults: PatientCo
     };
 };
 
-export const setCohortDemographicsStarted = (respondents: NetworkRespondentMap, cancel: CancelTokenSource): CohortCountAction => {
+export const setCohortDemographicsStarted = (responders: NetworkResponderMap, cancel: CancelTokenSource): CohortCountAction => {
     return {
         cancel,
         id: 0,
-        respondents,
+        responders,
         type: COHORT_DEMOGRAPHICS_START
     };
 };

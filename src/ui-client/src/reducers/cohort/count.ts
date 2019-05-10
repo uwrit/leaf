@@ -66,7 +66,7 @@ export const recalculateCohortCount = (state: CohortState, id: number, enabled: 
 };
 
 export const setNetworkCohortCount = (state: CohortState, action: CohortCountAction): CohortState => {
-    // Update count for this network respondent
+    // Update count for this network responder
     let totalPatients: number = 0;
     const cohort = state.networkCohorts.get(action.id!)
     const networkCohort: NetworkCohortState = Object.assign({}, cohort, {

@@ -14,7 +14,7 @@ import { setCohortCountBoxState } from '../../actions/generalUi';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType, NetworkCohortState, PatientCountState } from '../../models/state/CohortState';
 import { CohortCountBoxState } from '../../models/state/GeneralUiState'
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import { Query } from '../../models/Query';
 import './CohortSummary.css';
 
@@ -24,7 +24,7 @@ interface StateProps {
     count: PatientCountState;
     currentQuery: Query;
     networkCohorts: Map<number, NetworkCohortState>;
-    respondents: Map<number, NetworkIdentity>;
+    responders: Map<number, NetworkIdentity>;
 }
 interface DispatchProps {
     setCohortCountBoxState: (boxVisible: boolean, boxMinimized: boolean, infoButtonVisible: boolean) => void;
@@ -127,7 +127,7 @@ const mapStateToProps = (state: AppState) => {
         count: state.cohort.count,
         currentQuery: state.queries.current,
         networkCohorts: state.cohort.networkCohorts,
-        respondents: state.respondents
+        responders: state.responders
     };
 }
 

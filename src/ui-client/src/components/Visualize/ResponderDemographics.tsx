@@ -8,19 +8,19 @@
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap'
 import { NetworkCohortState } from '../../models/state/CohortState';
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import { AgeByGender } from './AgeByGender';
 import { Binary } from './Binary';
 
 export interface Props {
     cohort: NetworkCohortState;
     height: number;
-    respondent: NetworkIdentity;
+    responder: NetworkIdentity;
     width: number;
 }
 
-export default class RespondentDemographics extends React.PureComponent<Props> {
-    private className = 'visualize-respondent';
+export default class ResponderDemographics extends React.PureComponent<Props> {
+    private className = 'visualize-responder';
     constructor(props: Props) {
         super(props);
     }
@@ -28,14 +28,14 @@ export default class RespondentDemographics extends React.PureComponent<Props> {
     public render() {
         const { ageByGenderData, binarySplitData } = this.props.cohort.visualization.demographics;
         const { value } = this.props.cohort.count;
-        const { primaryColor, name, enabled } = this.props.respondent;
+        const { primaryColor, name, enabled } = this.props.responder;
         const colWidth = this.props.width / 2;
         const c = this.className;
 
         if (!enabled) { return null; }
 
         return (
-            <Container className="visualize-demographic-container respondent" fluid={true}>
+            <Container className="visualize-demographic-container responder" fluid={true}>
                 <div className={`${c}-container`}>
                     <div className={`${c}-name`} style={{ color: primaryColor }}>{name}</div>
                 </div>

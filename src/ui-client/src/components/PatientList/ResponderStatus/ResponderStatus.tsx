@@ -7,25 +7,25 @@
 
 import React from 'react';
 import { CohortStateType, NetworkCohortState } from '../../../models/state/CohortState';
-import { NetworkIdentity } from '../../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../../models/NetworkResponder';
 
 interface Props {
     cohort: NetworkCohortState;
-    respondent: NetworkIdentity;
+    responder: NetworkIdentity;
 }
 
-export default class RespondentStatus extends React.PureComponent<Props> {
-    private classname = 'patientlist-respondent-status'
+export default class ResponderStatus extends React.PureComponent<Props> {
+    private classname = 'patientlist-responder-status'
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
         const c = this.classname;
-        const { cohort, respondent } = this.props;
+        const { cohort, responder } = this.props;
         return (
             <div className={c}>
-                <div className={`${c}-abbr`} style={{ color: respondent.primaryColor }}>{respondent.name}</div>
+                <div className={`${c}-abbr`} style={{ color: responder.primaryColor }}>{responder.name}</div>
                 <div className={`${c}-state`}>{this.getStateDisplay()}</div>
             </div>
         );
