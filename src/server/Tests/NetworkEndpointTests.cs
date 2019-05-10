@@ -117,6 +117,78 @@ namespace Tests
             Assert.Equal(MixedEndpoints.Count(), endpoints.Count());
         }
 
+        [Fact]
+        public void GetEndpointsWithIdentity_Should_Return_All_Endpoints()
+        {
+            var manager = GetManager(MixedEndpoints);
+
+            var result = manager.GetEndpointsWithIdentityAsync().Result;
+
+            Assert.Equal(MixedEndpoints.Count(), result.Endpoints.Count());
+        }
+
+        [Fact]
+        public void GetResponders_Should_Only_Return_Responders_Endpoints()
+        {
+            var manager = GetManager(MixedEndpoints);
+
+            var endpoints = manager.GetRespondersAsync().Result;
+
+            Assert.All(endpoints, e => Assert.True(e.IsResponder));
+        }
+
+        [Fact]
+        public void GetRespondersWithIdentity_Should_Only_Return_Responders_Endpoints()
+        {
+            var manager = GetManager(MixedEndpoints);
+
+            var result = manager.GetRespondersWithIdentityAsync().Result;
+
+            Assert.All(result.Endpoints, e => Assert.True(e.IsResponder));
+        }
+
+        [Fact]
+        public void GetInterrogators_Should_Only_Return_HTTPS_Responders_Endpoints()
+        {
+            var manager = GetManager(MixedEndpoints);
+
+            var endpoints = manager.GetInterrogatorsAsync().Result;
+
+            Assert.All(endpoints, e => Assert.True(e.IsInterrogator));
+        }
+
+        [Fact]
+        public void GetInterrogatorsWithIdentity_Should_Only_Return_HTTPS_Responders_Endpoints()
+        {
+            var manager = GetManager(MixedEndpoints);
+
+            var result = manager.GetInterrogatorsWithIdentityAsync().Result;
+
+            Assert.All(result.Endpoints, e => Assert.True(e.IsInterrogator));
+        }
+
+        [Fact]
+        public void UpdateEndpointAsync_Should_Throw_On_NonHTTPS()
+        {
+            var manager = GetManager(MixedEndpoints);
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Address = new Uri("http://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
+
+            Assert.ThrowsAsync<UriFormatException>(() => manager.UpdateEndpointAsync(update));
+        }
+
+        [Fact]
+        public void UpdateEndpointAsync_Should_Update_HTTPS_Endpoint()
+        {
+            var manager = GetManager(MixedEndpoints);
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Address = new Uri("https://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
+
+            var result = manager.UpdateEndpointAsync(update).Result;
+
+            Assert.Equal(update.Id, result.Old.Id);
+            Assert.Equal(update.Address, result.New.Address);
+            Assert.Equal(true, result.New.IsInterrogator);
+        }
+
         static readonly LoggerFactory factory = new LoggerFactory();
         static ILogger<AdminNetworkEndpointManager> GetLogger() => new Logger<AdminNetworkEndpointManager>(factory);
 
