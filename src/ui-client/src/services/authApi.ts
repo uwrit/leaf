@@ -29,7 +29,7 @@ const decodeToken = (token: string): UserContext => {
     const ctx: UserContext = {
         expirationDate: new Date(decoded.exp * 1000),
         isAdmin: roles.indexOf('admin') > -1,
-        isFederated: roles.indexOf('federated') > -1,
+        isFederatedOkay: roles.indexOf('fed') > -1,
         isPhiOkay: roles.indexOf('phi') > -1,
         isSuperUser: roles.indexOf('super') > -1,
         issuer: decoded.iss,
