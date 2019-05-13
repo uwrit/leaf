@@ -53,7 +53,7 @@ The expected columns are:
 - Values in `gender` must be `F`, `Female`, `M`, or `Male` in order to be aggregated in bar charts (case insensitive).
 
 ### Defining the Basic Demographics Query
-Currently the Basic Demographics query (and other datasets) must be added via SQL directly to the database, though we intend to create functionality in the `Admin` screen to make this easier in the future. Please let us know using this issue https://github.com/uwrit/leaf/issues/63 what you think.
+Currently the Basic Demographics query (and other datasets) must be added via SQL directly to the database, though we intend to create functionality in the `Admin` screen to make this easier in the future.
 
 1) Define a query in SQL that returns the columns defined above. Here is how we configure the [CMS SynPuf OMOP dataset](https://www.cms.gov/Research-Statistics-Data-and-Systems/Downloadable-Public-Use-Files/SynPUFs/DE_Syn_PUF.html) demographics query, for example:
 
