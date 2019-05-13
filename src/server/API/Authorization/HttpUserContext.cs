@@ -57,7 +57,11 @@ namespace API.Authorization
             }
         }
 
+        public bool IsInRole(string role) => user.IsInRole(role);
+
         public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstutional;
+
+        public bool IsQuarantined => !user.IsInRole(Role.Fed);
 
         string identity;
         string Identity

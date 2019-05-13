@@ -6,14 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Model.Authentication;
 using Model.Authorization;
-using Microsoft.AspNetCore.Http;
-using System.DirectoryServices.AccountManagement;
 using Model.Options;
-using Microsoft.Extensions.Options;
-using Services.Authorization;
-using API.Authentication;
 
 namespace API.Authorization
 {
@@ -66,6 +63,11 @@ namespace API.Authorization
             if (!string.IsNullOrWhiteSpace(roles.Identified) && groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Identified;
+            }
+
+            if (!string.IsNullOrWhiteSpace(roles.Federated) && groups.Any(g => g.Equals(roles.Federated, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                mask |= RoleMask.Federated;
             }
 
             return mask;
