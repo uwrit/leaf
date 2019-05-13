@@ -23,8 +23,8 @@ namespace API.Middleware.Federation
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            // anonymous users are delegated to controller for authorization
-            if (user != null)
+            // unauthenticated traffic delegated to controller for authorization
+            if (context.User?.Identity?.IsAuthenticated == true)
             {
                 // user is identified and not from this institution
                 if (FederatedIdentified)
