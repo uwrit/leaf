@@ -16,6 +16,7 @@
     font-size: 1.1rem;
     font-weight: 500;
     margin: 0 0 20px 0.8%;
+    min-width: 122px;
     opacity: 0.7;
     overflow: hidden;
     padding: 10px;
@@ -29,11 +30,24 @@
     display: inline-block;
 }
 
-.help-contact {
-    display: inline-block;
+.help-outer {
     margin-left: -1000px;
+    padding-left: 10px;
+    transition: margin-left 0.5s;
+}
+
+.help-inner {
     opacity: 0;
-    transition: all 0.5s, opacity 1.5s;
+    transition: opacity 0s;
+    transition-delay: 0.51s;
+}
+
+.help-container:hover .help-outer {
+    margin-left: 0;
+}
+
+.help-container:hover .help-inner {
+    opacity: 1;
 }
 
 .help-container:hover {
@@ -45,11 +59,6 @@
 .help-container:hover svg {
     fill: rgb(68, 194, 64);
     transform: scale(1.5);
-}
-
-.help-container:hover .help-contact {
-    margin-left: 0;
-    opacity: 1;
 }
 
 .help-icon-container {
