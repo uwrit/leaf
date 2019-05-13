@@ -84,7 +84,7 @@ namespace API
 
             // NOTE(cspital) Register HTTP Middleware here, in order of execution.
             app.UseUserContextLogging();
-            app.UseRejectIdentifiedFederationMiddleware();
+            app.UseRejectInvalidFederatedUserMiddleware();
             app.UseTokenBlacklistMiddleware();
 
             app.UseMvc();

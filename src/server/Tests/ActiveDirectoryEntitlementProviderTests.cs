@@ -9,7 +9,7 @@ using API.Authorization;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Options;
-using Microsoft.AspNetCore.Http;
+using Tests.Util;
 using Microsoft.Extensions.Options;
 using System.Linq;
 using System.Collections.Generic;
@@ -50,7 +50,7 @@ namespace Tests
 
             var eProvider = new ActiveDirectoryEntitlementProvider(opts, mock);
 
-            var e = eProvider.GetEntitlement(new DefaultHttpContext(), identity);
+            var e = eProvider.GetEntitlement(HttpHelper.GetHttpContext(), identity);
 
             Assert.Contains(e.Groups, g => g == "surgery");
             Assert.True(1 == e.Groups.Count());

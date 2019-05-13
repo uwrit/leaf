@@ -4,15 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Model.Authorization;
-using Model.Authentication;
-using Model.Options;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Model.Authentication;
+using Model.Authorization;
+using Model.Options;
 
 namespace API.Authorization
 {
@@ -72,6 +70,11 @@ namespace API.Authorization
             if (!string.IsNullOrWhiteSpace(roles.Identified) && asserts.Contains(roles.Identified))
             {
                 mask |= RoleMask.Identified;
+            }
+
+            if (!string.IsNullOrWhiteSpace(roles.Federated) && asserts.Contains(roles.Federated))
+            {
+                mask |= RoleMask.Federated;
             }
 
             return mask;

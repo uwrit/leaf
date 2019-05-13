@@ -96,6 +96,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
       - [Super](#super): `"urn:mace:uw:groups:uw_rit_leaf_supers"`
       - [Identified](#identified): `"urn:mace:uw:groups:uw_rit_leaf_phis"`
       - [Admin](#admin): `"urn:mace:uw:groups:uw_rit_leaf_admins"`
+      - [Federated](#federated): `"urn:mace:uw:groups:uw_rit_leaf_federated"`
 - [Compiler](#compiler)
   - [Alias](#alias): `"@"`
   - [SetPerson](#setperson): `"dbo.person_table`"
@@ -195,7 +196,8 @@ Configures how the scoped identity header key will look.
       "User": "urn:mace:users",
       "Super": "urn:mace:supers",
       "Identified": "urn:mace:phi",
-      "Admin": "urn:mace:sudos"
+      "Admin": "urn:mace:sudos",
+      "Federated": "urn:mace:federated"
     }
   }
 }

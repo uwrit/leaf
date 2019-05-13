@@ -27,5 +27,6 @@
     <Folder Include="Mock\Options\" />
     <Folder Include="Mock\Models\Collections\" />
     <Folder Include="Mock\Services\Authorization\" />
+    <Folder Include="Util\" />
   </ItemGroup>
 </Project>

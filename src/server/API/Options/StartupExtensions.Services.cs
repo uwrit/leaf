@@ -44,7 +44,7 @@ namespace API.Options
 
             services.AddScoped<IUserContext, HttpUserContext>();
             services.AddTransient<UserContextLoggingMiddleware>();
-            services.AddTransient<RejectIdentifiedFederationMiddleware>();
+            services.AddTransient<RejectInvalidFederatedUserMiddleware>();
 
             services.AddScoped<IServerContext, HttpServerContext>();
 
