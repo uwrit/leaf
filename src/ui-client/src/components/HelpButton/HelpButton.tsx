@@ -25,16 +25,30 @@ export default class HelpButton extends React.PureComponent<Props> {
         const { auth } = this.props;
         const c = this.className;
         if (!auth || !auth.config || !auth.config.clientOptions.help.enabled) { return null; }
-        const { email } = auth.config.clientOptions.help;
+        const { help } = auth.config.clientOptions;
 
         return (
             <div className={`${c}-container`}>
                 <div className={`${c}-icon-container`}>
                     <MdTagFaces />
                 </div>
-                <div className={`${c}-inner`}>
-                    <div>
-                        <div className={`${c}-needhelp`}>Need Help?</div> <div className={`${c}-contact`}><a href={`mailto:${email}`}>Contact a Leaf administrator</a></div>
+                <div className={`${c}-needhelp`}>Need Help?</div>
+                <div className={`${c}-outer`}>
+                    <div className={`${c}-inner`}>
+                        {!!help.email &&
+                            <div className={`${c}-contact`}>
+                                <a href={`mailto:${help.email}`}>Contact a Leaf administrator</a>
+                                {!!help.uri && 
+                                [
+                                    <span key={1}> or </span>,
+                                    <a href={help.uri} target="_" key={2}>Learn more here</a>
+                                ]
+                                }
+                            </div>
+                        }
+                        {!help.email && !!help.uri &&
+                            <a href={help.uri} target="_">Learn more here</a>
+                        }
                     </div>
                 </div>
             </div>

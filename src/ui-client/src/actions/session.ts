@@ -76,7 +76,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Fetch network responders if not in identified mode.
              */
             const responders: NetworkIdentity[] = [ { ...homeBase.identity, enabled: true, id: 0, isHomeNode: true } ];
-            if (!attestation.isIdentified && homeBase.responders.length) {
+            if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederated) {
                 await Promise.all(
                     homeBase.responders.map((nr: NetworkResponderDTO, id: number) => { 
                         return new Promise( async(resolve, reject) => {
