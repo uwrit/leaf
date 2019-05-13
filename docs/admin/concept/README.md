@@ -152,18 +152,18 @@ Click `Save`. Repeat the process for the final two demographic Concepts, `Female
 
 - Female
     - General Display
-        - Name: `Female`
-        - Full text: `Identify as female`
+        - `Name`: "Female"
+        - `Full text`: "Identify as female"
     - SQL
-        - Table, View, or Subquery: `dbo.v_person`
-        - WHERE Clause: `@.gender = 'F'`
+        - `Table, View, or Subquery`: "dbo.v_person"
+        - `WHERE Clause`: "@.gender = 'F'"
 - Male
     - General Display
-        - Name: `Male`
-        - Full text: `Identify as male`
+        - `Name`: "Male"
+        - `Full text`: "Identify as male"
     - SQL
-        - Table, View, or Subquery: `dbo.v_person`
-        - WHERE Clause: `@.gender = 'M'`
+        - `Table, View, or Subquery`: "dbo.v_person"
+        - `WHERE Clause`: "@.gender = 'M'"
 
 > In reality people don't necessarily identify with gender binaries of female or male, and clinical databases will often reflect this. Female and male here are used simply for demonstrative purposes.
 
@@ -194,25 +194,25 @@ The field-level information for each Concept is (making sure to nest `Inpatient`
 
 - Encounters
     - General Display
-        - Name: `Encounters`
-        - Full text: `Had an encounter`
+        - `Name`: "Encounters"
+        - `Full text`: "Had an encounter"
     - SQL
-        - Table, View, or Subquery: `dbo.v_visit_occurrence`
-        - WHERE Clause:
+        - `Table, View, or Subquery`: "dbo.v_visit_occurrence"
+        - `WHERE Clause`:
 - Inpatient
     - General Display
-        - Name: `Inpatient`
-        - Full text: `Were admitted as an inpatient`
+        - `Name`: "Inpatient"
+        - `Full text`: "Were admitted as an inpatient"
     - SQL
-        - Table, View, or Subquery: `dbo.v_visit_occurrence`
-        - WHERE Clause: `@.visit_type_code = 'IP'`
+        - `Table, View, or Subquery`: "dbo.v_visit_occurrence"
+        - `WHERE Clause`: "@.visit_type_code = 'IP'"
 - Outpatient
     - General Display
-        - Name: `Outpatient`
-        - Full text: `Had an outpatient visit`
+        - `Name`: "Outpatient"
+        - `Full text`: "Had an outpatient visit"
     - SQL
-        - Table, View, or Subquery: `dbo.v_visit_occurrence`
-        - WHERE Clause: `@.visit_type_code = 'OP'`
+        - `Table, View, or Subquery`: "dbo.v_visit_occurrence"
+        - `WHERE Clause`: "@.visit_type_code = 'OP'"
 
 And that's it! 
 
