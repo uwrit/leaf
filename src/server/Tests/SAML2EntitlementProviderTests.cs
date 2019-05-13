@@ -9,7 +9,7 @@ using API.Authorization;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Options;
-using Microsoft.AspNetCore.Http;
+using Tests.Util;
 using Microsoft.Extensions.Options;
 using System.Linq;
 
@@ -17,16 +17,6 @@ namespace Tests
 {
     public class SAML2EntitlementProviderTests
     {
-        static HttpContext GetHttpContext(params (string, string)[] headers)
-        {
-            var httpContext = new DefaultHttpContext();
-            foreach (var pair in headers)
-            {
-                httpContext.Request.Headers[pair.Item1] = pair.Item2;
-            }
-            return httpContext;
-        }
-
         static IOptions<SAML2AuthorizationOptions> GetAuthOptions(HeaderDigestionOptions digs, RolesMappingOptions roles)
         {
             return Options.Create(new SAML2AuthorizationOptions
@@ -61,7 +51,7 @@ namespace Tests
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
-            var ctx = GetHttpContext(("iam-groups", "leaf_users; leaf_admin; surgery"));
+            var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users; leaf_admin; surgery"));
             var identity = GetUserContext("johndoe@entity.tld");
 
             var entitlement = eProvider.GetEntitlement(ctx, identity);
@@ -91,7 +81,7 @@ namespace Tests
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
-            var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+            var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users"));
             var identity = GetUserContext("johndoe@entity.tld");
 
             var entitlement = eProvider.GetEntitlement(ctx, identity);
@@ -119,7 +109,7 @@ namespace Tests
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
             var eProvider = new SAML2EntitlementProvider(opts);
-            var ctx = GetHttpContext(("iam-groups", "leaf_users"));
+            var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users"));
             var identity = GetUserContext("johndoe@entity.tld");
 
             Assert.Throws<LeafAuthenticationException>(() => eProvider.GetEntitlement(ctx, identity));

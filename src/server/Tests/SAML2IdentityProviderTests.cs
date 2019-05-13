@@ -8,23 +8,13 @@ using Xunit;
 using API.Authentication;
 using Model.Authentication;
 using Model.Options;
-using Microsoft.AspNetCore.Http;
+using Tests.Util;
 using Microsoft.Extensions.Options;
 
 namespace Tests
 {
     public class SAML2IdentityProviderTests
     {
-        static HttpContext GetHttpContext(params (string, string)[] headers)
-        {
-            var httpContext = new DefaultHttpContext();
-            foreach (var pair in headers)
-            {
-                httpContext.Request.Headers[pair.Item1] = pair.Item2;
-            }
-            return httpContext;
-        }
-
         static IOptions<SAML2AuthenticationOptions> GetAuthenticationOptions(string idHeader)
         {
             return Options.Create(new SAML2AuthenticationOptions
@@ -39,7 +29,7 @@ namespace Tests
         [Fact]
         public void GetIdentity_Should_Return_Identity_Ok()
         {
-            var ctx = GetHttpContext(("eppn", "johndoe@entity.tld"));
+            var ctx = HttpHelper.GetHttpContext(("eppn", "johndoe@entity.tld"));
             var opts = GetAuthenticationOptions("eppn");
             var idProvider = new SAML2IdentityProvider(opts);
 
@@ -52,7 +42,7 @@ namespace Tests
         [Fact]
         public void GetIdentity_Should_Throw_On_Header_Not_Found()
         {
-            var ctx = GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
+            var ctx = HttpHelper.GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
             var opts = GetAuthenticationOptions("eppn");
             var idProvider = new SAML2IdentityProvider(opts);
 
@@ -62,7 +52,7 @@ namespace Tests
         [Fact]
         public void GetIdentity_Should_Throw_On_Missing_Value()
         {
-            var ctx = GetHttpContext(("eppn", ""));
+            var ctx = HttpHelper.GetHttpContext(("eppn", ""));
             var opts = GetAuthenticationOptions("eppn");
             var idProvider = new SAML2IdentityProvider(opts);
 
@@ -72,7 +62,7 @@ namespace Tests
         [Fact]
         public void GetIdentity_Should_Throw_On_Malformed_Value()
         {
-            var ctx = GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
+            var ctx = HttpHelper.GetHttpContext(("targeted_id", "987a6s8d7f6s65df8a76sd5f7s6d5f"));
             var opts = GetAuthenticationOptions("targeted_id");
             var idProvider = new SAML2IdentityProvider(opts);
 
