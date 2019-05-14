@@ -63,7 +63,8 @@ Server=<server>;Database=<dbname>;uid=sa;Password=<dbpassword>;
 
 ## Configuring the appsettings.json file
 The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. This file can be found under `src/server/API/` relative to the Leaf repo root directory.
-
+- [Runtime](#runtime)
+  - [Mode](#mode): `"FULL"`
 - [Jwt](#jwt)
   - [SigningKey](#signingkey): `"LEAF_JWT_KEY"`
   - [Password](#password): `"LEAF_JWT_KEY_PW"`
@@ -126,7 +127,11 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
     - [Email](#email): `"<your_support_email>.edu"`
     - [URI](#uri): `"https://<your_support_page>"`
 
-
+## Runtime
+Contains a mode field, indicating `FULL` or `GATEWAY`.
+### Mode
+- `FULL` enables the cohort functionality in Leaf's API.
+- `GATEWAY` disables cohort functionality in Leaf's API.
 ## JWT
 Properties relating to Leaf-issued JavaScript Web tokens (JWTs).
 ### SigningKey
