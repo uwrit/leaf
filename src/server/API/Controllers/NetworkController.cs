@@ -39,7 +39,7 @@ namespace API.Controllers
         {
             try
             {
-                var idEndpoints = await provider.GetEndpointsWithIdentityAsync();
+                var idEndpoints = await provider.GetRespondersWithIdentityAsync();
                 return Ok(new NetworkIdentityRespondersDTO(idEndpoints, runtime.Runtime));
             }
             catch (Exception ex)
