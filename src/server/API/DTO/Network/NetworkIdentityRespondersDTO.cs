@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Model.Network;
+using Model.Options;
 
 // TODO(cspital) rename Respondents to responders
 
@@ -14,7 +15,7 @@ namespace API.DTO.Network
 {
     public class NetworkIdentityRespondersDTO
     {
-        public NetworkIdentity Identity { get; set; }
+        public NetworkIdentityResponseDTO Identity { get; set; }
         public IEnumerable<NetworkResponderDTO> Responders { get; set; }
 
         public NetworkIdentityRespondersDTO()
@@ -22,9 +23,9 @@ namespace API.DTO.Network
 
         }
 
-        public NetworkIdentityRespondersDTO(NetworkIdentityEndpoints nie)
+        public NetworkIdentityRespondersDTO(NetworkIdentityEndpoints nie, RuntimeMode runtime)
         {
-            Identity = nie.Identity;
+            Identity = new NetworkIdentityResponseDTO(nie.Identity, runtime);
             Responders = nie.Endpoints
                 .Where(e => e.IsResponder)
                 .Select(n => new NetworkResponderDTO(n));

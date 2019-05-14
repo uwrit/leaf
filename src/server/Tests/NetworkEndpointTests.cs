@@ -186,7 +186,7 @@ namespace Tests
 
             Assert.Equal(update.Id, result.Old.Id);
             Assert.Equal(update.Address, result.New.Address);
-            Assert.Equal(true, result.New.IsInterrogator);
+            Assert.True(result.New.IsInterrogator);
         }
 
         static readonly LoggerFactory factory = new LoggerFactory();

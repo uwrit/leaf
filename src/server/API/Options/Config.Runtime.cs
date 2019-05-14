@@ -3,20 +3,15 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Model.Authorization
+namespace API.Options
 {
-    [Flags]
-    public enum RoleMask : ushort
+    public static partial class Config
     {
-        None = 0,
-        User = 1 << 0,
-        Admin = 1 << 1,
-        Super = 1 << 2,
-        Identified = 1 << 3,
-        Federated = 1 << 4
+        public static class Runtime
+        {
+            public const string Section = @"Runtime";
+            public const string Mode = @"Runtime:Mode";
+        }
     }
 }
