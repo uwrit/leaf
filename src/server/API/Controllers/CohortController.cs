@@ -12,20 +12,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Validation;
+using API.Controllers.Base;
+using Model.Options;
 
 namespace API.Controllers
 {
     [Authorize(Policy = TokenType.Access)]
     [Route("api/cohort")]
-    public class CohortController : Controller
+    public class CohortController : MaybeController<RuntimeOptions>
     {
         readonly ILogger<CohortController> log;
 
-        public CohortController(ILogger<CohortController> logger)
+        public CohortController(IOptions<RuntimeOptions> opts, ILogger<CohortController> logger) : base(opts)
         {
             log = logger;
         }

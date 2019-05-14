@@ -30,6 +30,10 @@ namespace API.Options
                 opts.Version = Config.Version;
             });
 
+            // Runtime options
+            services.ConfigureRuntimeOptions(configuration);
+
+            // Compiler options
             services.ConfigureCompilerOptions(configuration);
 
             // Client options
@@ -142,6 +146,18 @@ namespace API.Options
             item = new T();
             configuration.Bind(key, item);
             return !item.DefaultEqual();
+        }
+
+        static IServiceCollection ConfigureRuntimeOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var rt = new RuntimeOptions().WithRuntime(config.GetValue<string>(Config.Runtime.Mode));
+
+            services.Configure<RuntimeOptions>(opts =>
+            {
+                opts.Runtime = rt.Runtime;
+            });
+
+            return services;
         }
 
         static IServiceCollection ConfigureCompilerOptions(this IServiceCollection services, IConfiguration config)

@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Network;
+using Model.Options;
 
 namespace API.Controllers
 {
@@ -20,12 +22,15 @@ namespace API.Controllers
     [Route("api/network")]
     public class NetworkController : Controller
     {
+        readonly RuntimeOptions runtime;
         readonly NetworkEndpointProvider provider;
         readonly ILogger<NetworkController> log;
-        public NetworkController(ILogger<NetworkController> logger, NetworkEndpointProvider provider)
+
+        public NetworkController(IOptions<RuntimeOptions> runtime, ILogger<NetworkController> logger, NetworkEndpointProvider provider)
         {
             log = logger;
             this.provider = provider;
+            this.runtime = runtime.Value;
         }
 
         [Authorize(Policy = Access.Institutional)]
@@ -35,7 +40,7 @@ namespace API.Controllers
             try
             {
                 var idEndpoints = await provider.GetEndpointsWithIdentityAsync();
-                return Ok(new NetworkIdentityRespondersDTO(idEndpoints));
+                return Ok(new NetworkIdentityRespondersDTO(idEndpoints, runtime.Runtime));
             }
             catch (Exception ex)
             {
@@ -45,12 +50,12 @@ namespace API.Controllers
         }
 
         [HttpGet("identity")]
-        public async Task<ActionResult<NetworkIdentity>> Identity()
+        public async Task<ActionResult<NetworkIdentityResponseDTO>> Identity()
         {
             try
             {
                 var identity = await provider.GetIdentityAsync();
-                return Ok(identity);
+                return Ok(new NetworkIdentityResponseDTO(identity, runtime.Runtime));
             }
             catch (Exception ex)
             {
