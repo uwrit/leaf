@@ -9,16 +9,16 @@ export type NetworkResponderMap = Map<number, NetworkIdentity>;
 
 export interface NetworkIdentityRespondersDTO {
     identity: NetworkIdentity;
-    responders: NetworkResponderDTO[];
+    responders: NetworkIdentityResponseDTO[];
 }
 
-export interface NetworkResponderDTO {
+export interface NetworkIdentityResponseDTO {
     id: number;
     name: string;
     address: string;
 }
 
-export interface NetworkIdentity extends NetworkResponderDTO {
+export interface NetworkIdentity extends NetworkIdentityResponseDTO {
     abbreviation: string;
     description?: string;
     isHomeNode: boolean;
@@ -26,10 +26,16 @@ export interface NetworkIdentity extends NetworkResponderDTO {
     latitude: number;
     longitude: number;
     primaryColor: string;
+    runtime: RuntimeMode;
     secondaryColor: string;
     enabled?: boolean;
 }
 
-export interface NetworkResponder extends NetworkResponderDTO, NetworkIdentity {
+export interface NetworkResponder extends NetworkIdentityResponseDTO, NetworkIdentity {
     enabled: boolean;
+}
+
+export enum RuntimeMode {
+    Full = 1,
+    Gateway = 2
 }

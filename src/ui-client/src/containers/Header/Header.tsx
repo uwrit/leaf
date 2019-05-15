@@ -8,7 +8,7 @@
 import React from 'react';
 import { FaPlus } from 'react-icons/fa';
 import { FaDoorOpen, FaStar } from 'react-icons/fa';
-import { FiUser } from 'react-icons/fi';
+import { FiUser, FiShield, FiUserCheck, FiGlobe, FiAlertOctagon } from 'react-icons/fi';
 import { Dispatch } from 'redux';
 import { connect } from 'react-redux'
 import { Navbar } from 'reactstrap';
@@ -28,8 +28,8 @@ import { setCurrentQuery, setRunAfterSave } from '../../actions/queries';
 import { PanelFilter } from '../../models/panel/PanelFilter';
 import { getPanelItemCount } from '../../utils/panelUtils';
 import { FaDatabase, FaChevronDown } from 'react-icons/fa';
-import './Header.css';
 import { logout } from '../../actions/session';
+import './Header.css';
 
 interface OwnProps {}
 interface StateProps {
@@ -54,7 +54,7 @@ class Header extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { user } = this.props;
+        const { user, responders } = this.props;
         const c = 'header';
         const resps: number[] = []; 
         const allowDisable = this.props.responders.size > 1;
@@ -121,6 +121,55 @@ class Header extends React.PureComponent<Props> {
                             </div>
                             <div className={`${c}-option-container ${c}-myleaf-container`}>
                                 <div className={`${c}-myleaf-inner`}>
+
+                                    {/* User Roles */}
+                                    {user && user.roles.length > 0 &&
+                                    <div className={`${c}-roles`}>
+
+                                        {/* Admin */}
+                                        {user.isAdmin &&
+                                        <div className={`${c}-role`}>
+                                            <FiShield className="myleaf-menu-icon header-role-icon-admin" />
+                                            <span>Admin</span>
+                                            <div className={`${c}-role-info`}>
+                                                You are an administrator, which allows you to use the Admin Panel to the left.
+                                            </div>
+                                        </div>}
+
+                                        {/* PHI */}
+                                        {user.isPhiOkay &&
+                                        <div className={`${c}-role`}>
+                                            <FiUserCheck className="myleaf-menu-icon header-role-icon-phi" />
+                                            <span>PHI</span>
+                                            <div className={`${c}-role-info`}>
+                                                You are able to see Protected Health Information by selecting Identified mode
+                                                when you log in.
+                                            </div>
+                                        </div>}
+
+                                        {/* Fed */}
+                                        {user.isFederatedOkay &&
+                                        <div className={`${c}-role`}>
+                                            <FiGlobe className="myleaf-menu-icon header-role-icon-fed" />
+                                            <span>Federated</span>
+                                            <div className={`${c}-role-info`}>
+                                                You are able to query other networked Leaf instances if these have been configured.
+                                            </div>
+                                        </div>}
+
+                                        {/* Quarantined */}
+                                        {!user.isFederatedOkay &&
+                                        <div className={`${c}-role`}>
+                                            <FiAlertOctagon className="myleaf-menu-icon header-role-icon-quarantine" />
+                                            <span>Local Only</span>
+                                            <div className={`${c}-role-info`}>
+                                                Other networked Leaf instances may be configured, but you are currently limited in access
+                                                to only your home Leaf instance.
+                                            </div>
+                                        </div>}
+
+                                    </div>}
+
                                     <div className={`${c}-myleaf-option`} onClick={this.handleMySavedQueriesClick}>
                                         <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
                                         <span>My Saved Queries</span>
