@@ -7,7 +7,7 @@ using System;
 
 // TODO(cspital) add ctors for dbexception and new interface describing errorcode and message requirements.
 
-namespace Model.Validation
+namespace Model.Error
 {
     /// <summary>
     /// Indicates that the database threw a Leaf specific error.

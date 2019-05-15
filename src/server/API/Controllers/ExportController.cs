@@ -24,12 +24,12 @@ namespace API.Controllers
     public class ExportController : Controller
     {
         readonly ILogger<ExportController> log;
-        readonly IOptions<ExportOptions> exportOptions;
+        readonly ExportOptions exportOptions;
 
         public ExportController(ILogger<ExportController> logger, IOptions<ExportOptions> exportOptions)
         {
             this.log = logger;
-            this.exportOptions = exportOptions;
+            this.exportOptions = exportOptions.Value;
         }
 
         [HttpGet("options")]
@@ -37,7 +37,7 @@ namespace API.Controllers
         {
             try
             {
-                var opts = new ExportOptionsDTO(exportOptions.Value);
+                var opts = new ExportOptionsDTO(exportOptions);
                 return Ok(opts);
             }
             catch (Exception ex)
@@ -46,66 +46,5 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-        [HttpGet("redcap/version")]
-        public async Task<ActionResult<string>> GetREDCapVersion([FromServices] IREDCapExportService exportService)
-        {
-            try
-            {
-                var version = await exportService.GetREDCapVersion();
-                if (version.Split(' ').Length != 1)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-                return Ok(version);
-            }
-            catch (ExportException ee)
-            {
-                return StatusCode(ee.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Could not fetch REDCap version. Error:{Error}", ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpPost("redcap/project/create")]
-        public async Task<ActionResult<string>> CreateREDCapProjec([FromBody] REDCapProjectRequest project, [FromServices] IREDCapExportService exportService)
-        {
-            try
-            {
-                var token = await exportService.CreateProject(project);
-                if (token.Split(' ').Length != 1)
-                {
-                    return StatusCode(StatusCodes.Status500InternalServerError);
-                }
-                return Ok(token);
-            }
-            catch (ExportException ee)
-            {
-                return StatusCode(ee.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Could not create REDCap project. Error:{Error}", ex.Message);
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        //[HttpPost("redcap/project/failure")]
-        //public ActionResult LogREDCapProjectFailure([FromBody] string token, [FromServices] IREDCapExportService exportService)
-        //{
-        //    try
-        //    {
-        //        // Do something with token
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        log.LogError("Could not log REDCap project failure. Error:{Error}", ex.Message);
-        //        return StatusCode(StatusCodes.Status500InternalServerError);
-        //    }
-        //}
     }
 }

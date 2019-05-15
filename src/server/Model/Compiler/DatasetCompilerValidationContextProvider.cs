@@ -4,9 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Data.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Search;
+using Model.Error;
 using Microsoft.Extensions.Logging;
 
 namespace Model.Compiler
@@ -42,14 +43,22 @@ namespace Model.Compiler
         public async Task<CompilerValidationContext<DatasetCompilerContext>> GetCompilerContextAsync(DatasetExecutionRequest request)
         {
             log.LogInformation("Getting dataset query compiler context. Request:{@Request}", request);
-
-            var context = await contextProvider.GetCompilerContextAsync(request);
-            var state = GetContextState(context);
-            return new CompilerValidationContext<DatasetCompilerContext>
+            try
             {
-                Context = context,
-                State = state
-            };
+                var context = await contextProvider.GetCompilerContextAsync(request);
+                var state = GetContextState(context);
+                return new CompilerValidationContext<DatasetCompilerContext>
+                {
+                    Context = context,
+                    State = state
+                };
+            }
+            catch (DbException de)
+            {
+                log.LogError("Could not get dataset query context. Context:{@Context} Code:{Code} Error:{Error}", request, de.ErrorCode, de.Message);
+                de.MapThrow();
+                throw;
+            }
         }
 
         CompilerContextState GetContextState(DatasetCompilerContext context)

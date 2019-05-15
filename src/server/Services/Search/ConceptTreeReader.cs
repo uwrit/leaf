@@ -10,13 +10,11 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
 using Model.Search;
-using Services.Extensions;
 using Services.Tables;
 
 namespace Services.Search
@@ -39,13 +37,11 @@ namespace Services.Search
 
         readonly AppDbOptions opts;
         readonly IUserContext user;
-        readonly ILogger<ConceptTreeReader> log;
 
-        public ConceptTreeReader(IOptions<AppDbOptions> dbOpts, IUserContext userContext, ILogger<ConceptTreeReader> logger)
+        public ConceptTreeReader(IOptions<AppDbOptions> dbOpts, IUserContext userContext)
         {
             opts = dbOpts.Value;
             user = userContext;
-            log = logger;
         }
 
         public async Task<Concept> GetAsync(Guid id)
@@ -54,9 +50,7 @@ namespace Services.Search
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         querySingle,
                         new
                         {
@@ -69,14 +63,7 @@ namespace Services.Search
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return HydratedConceptReader.Read(grid).FirstOrDefault();
-                }
-                catch (SqlException se)
-                {
-                    log.LogError("Could not get concept by Id. Id:{Id} Error:{Error}", id, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return HydratedConceptReader.Read(grid).FirstOrDefault();
             }
         }
 
@@ -132,9 +119,7 @@ namespace Services.Search
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         queryChildren,
                         new
                         {
@@ -147,14 +132,7 @@ namespace Services.Search
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return HydratedConceptReader.Read(grid);
-                }
-                catch (SqlException se)
-                {
-                    log.LogError("Could not get child concepts. ParentId:{ParentId} Error:{Error}", parentId, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return HydratedConceptReader.Read(grid);
             }
         }
 
@@ -164,9 +142,7 @@ namespace Services.Search
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         queryParents,
                         new
                         {
@@ -179,14 +155,7 @@ namespace Services.Search
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return HydratedConceptReader.Read(grid);
-                }
-                catch (SqlException se)
-                {
-                    log.LogError("Could not get rooted concepts of children ids {Ids}. Error:{Error}", ids, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return HydratedConceptReader.Read(grid);
             }
         }
 

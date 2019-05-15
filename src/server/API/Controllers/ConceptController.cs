@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Search;
-using Model.Validation;
+using Model.Error;
 
 namespace API.Controllers
 {

@@ -10,7 +10,7 @@ namespace Model.Cohort
 {
     public class PatientDemographicContext
     {
-        public IReadOnlyCollection<PatientDemographic> Exported { get; set; }
-        public IReadOnlyCollection<PatientDemographic> Cohort { get; set; }
+        public IEnumerable<PatientDemographic> Exported { get; set; }
+        public IEnumerable<PatientDemographic> Cohort { get; set; }
     }
 }

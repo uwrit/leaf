@@ -13,7 +13,7 @@ using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Services.Extensions;
+using Model.Error;
 using Model.Authorization;
 
 namespace Services.Admin

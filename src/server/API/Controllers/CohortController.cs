@@ -16,7 +16,7 @@ using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
-using Model.Validation;
+using Model.Error;
 using API.Controllers.Base;
 using Model.Options;
 

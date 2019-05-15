@@ -3,9 +3,14 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#if !DEBUG
+#define RELEASE
+#endif
+
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using System.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,16 +52,7 @@ namespace API.Options
             });
 
             // Export Options
-            services.Configure<ExportOptions>(opts =>
-            {
-                // TODO(cspital) address this in the same way authorization type specific options are registered
-                // REDCap
-                opts.REDCap.ApiURI = configuration.GetValue<string>(Config.Export.REDCap.ApiURI);
-                opts.REDCap.BatchSize = configuration.GetValue<int>(Config.Export.REDCap.BatchSize);
-                opts.REDCap.RowLimit = configuration.GetValue<int>(Config.Export.REDCap.RowLimit);
-                opts.REDCap.Scope = configuration.GetValue<string>(Config.Export.REDCap.Scope);
-                opts.REDCap.SuperToken = configuration.GetByProxy(Config.Export.REDCap.SuperToken);
-            });
+            services.ConfigureExportOptions(configuration);
 
             // Authentication Options
             services.ConfigureAuthenticationOptions(configuration);
@@ -74,27 +70,7 @@ namespace API.Options
             services.Configure<CohortOptions>(configuration.GetSection(Config.Cohort.Section));
 
             // Jwt Options
-            var keyPath = configuration.GetByProxy(Config.Jwt.SigningKey);
-            var keyPass = configuration.GetByProxy(Config.Jwt.Password);
-            var issuer = configuration.GetValue<string>(Config.Jwt.Issuer);
-            var certPath = configuration.GetByProxy(Config.Jwt.Certificate);
-
-            var certBytes = File.ReadAllBytes(certPath);
-            var cert = new X509SecurityKey(new X509Certificate2(certBytes));
-
-            services.Configure<JwtSigningOptions>(opts =>
-            {
-                opts.Issuer = issuer;
-                opts.Secret = File.ReadAllBytes(keyPath);
-                opts.Password = keyPass;
-            });
-
-            services.Configure<JwtVerifyingOptions>(opts =>
-            {
-                opts.Issuer = issuer;
-                opts.Certificate = certBytes;
-                opts.KeyId = cert.KeyId;
-            });
+            services.ConfigureJwtOptions(configuration);
 
             return services;
         }
@@ -146,6 +122,64 @@ namespace API.Options
             item = new T();
             configuration.Bind(key, item);
             return !item.DefaultEqual();
+        }
+
+        static IServiceCollection ConfigureJwtOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var keyPath = config.GetByProxy(Config.Jwt.SigningKey);
+            var keyPass = config.GetByProxy(Config.Jwt.Password);
+            var issuer = config.GetValue<string>(Config.Jwt.Issuer);
+            var certPath = config.GetByProxy(Config.Jwt.Certificate);
+
+            var certBytes = File.ReadAllBytes(certPath);
+            var cert = new X509SecurityKey(new X509Certificate2(certBytes));
+
+            services.Configure<JwtSigningOptions>(opts =>
+            {
+                opts.Issuer = issuer;
+                opts.Secret = File.ReadAllBytes(keyPath);
+                opts.Password = keyPass;
+            });
+
+            services.Configure<JwtVerifyingOptions>(opts =>
+            {
+                opts.Issuer = issuer;
+                opts.Certificate = certBytes;
+                opts.KeyId = cert.KeyId;
+            });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureExportOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var rc = new REDCapOptions { Enabled = config.GetValue<bool>(Config.Export.REDCap.Enabled) };
+            if (rc.Enabled)
+            {
+                rc.ApiURI = config.GetValue<string>(Config.Export.REDCap.ApiURI);
+                rc.BatchSize = config.GetValue<int>(Config.Export.REDCap.BatchSize);
+                rc.RowLimit = config.GetValue<int>(Config.Export.REDCap.RowLimit);
+                rc.Scope = config.GetValue<string>(Config.Export.REDCap.Scope);
+                rc.SuperToken = config.GetByProxy(Config.Export.REDCap.SuperToken);
+            }
+
+            services.Configure<REDCapOptions>(opts =>
+            {
+                opts.Enabled = rc.Enabled;
+                opts.ApiURI = rc.ApiURI;
+                opts.BatchSize = rc.BatchSize;
+                opts.RowLimit = rc.RowLimit;
+                opts.Scope = rc.Scope;
+                opts.SuperToken = rc.SuperToken;
+            });
+
+            services.Configure<ExportOptions>(opts =>
+            {
+                opts.REDCap = rc;
+            });
+
+
+            return services;
         }
 
         static IServiceCollection ConfigureRuntimeOptions(this IServiceCollection services, IConfiguration config)
@@ -213,11 +247,8 @@ namespace API.Options
                 case AuthenticationMechanism.Unsecured:
                     var log = services.BuildServiceProvider().GetRequiredService<ILogger<Startup>>();
                     log.LogCritical("UNSECURED authentication detected, Leaf is not secured by authentication!");
-#if DEBUG
+                    ThrowInvalidUnsecuredEnvironment();
                     break;
-#else
-                    throw new LeafConfigurationException("Do not run UNSECURED authentication in non-development environments!");
-#endif
 
                 case AuthenticationMechanism.Saml2:
                     if (!config.TryBind<SAML2AuthenticationOptions>(Config.Authentication.SAML2, out var saml2))
@@ -232,6 +263,12 @@ namespace API.Options
             }
 
             return services;
+        }
+
+        [Conditional("RELEASE")]
+        static void ThrowInvalidUnsecuredEnvironment()
+        {
+            throw new LeafConfigurationException("Do not run UNSECURED authentication in non-development environments!");
         }
 
         static AuthenticationOptions GetAuthenticationOptions(IConfiguration config)
@@ -297,6 +334,7 @@ namespace API.Options
                         throw new LeafConfigurationException($"{AuthorizationOptions.Unsecured} authorization mechanism is only supported if {Config.Authentication.Mechanism} is also {AuthenticationOptions.Unsecured}");
                     }
                     log.LogCritical("UNSECURED authorization detected, Leaf is not secured by authorization!");
+                    ThrowInvalidUnsecuredEnvironment();
                     break;
 
                 case AuthorizationMechanism.Saml2:
