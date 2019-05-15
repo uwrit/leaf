@@ -1,48 +1,53 @@
+-- Copyright (c) 2019, UW Medicine Research IT, University of Washington
+-- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0. If a copy of the MPL was not distributed with this
+-- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 USE [LeafDB]
 GO
-/****** Object:  Schema [adm]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [adm]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [adm]
 GO
-/****** Object:  Schema [app]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [app]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [app]
 GO
-/****** Object:  Schema [auth]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [auth]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [auth]
 GO
-/****** Object:  Schema [network]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [network]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [network]
 GO
-/****** Object:  Schema [ref]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [ref]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [ref]
 GO
-/****** Object:  Schema [rela]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Schema [rela]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE SCHEMA [rela]
 GO
-/****** Object:  UserDefinedDataType [app].[DatasetQueryName]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [app].[DatasetQueryName]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[DatasetQueryName] FROM [nvarchar](200) NOT NULL
 GO
-/****** Object:  UserDefinedDataType [app].[DatasetQuerySqlStatement]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [app].[DatasetQuerySqlStatement]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[DatasetQuerySqlStatement] FROM [nvarchar](4000) NOT NULL
 GO
-/****** Object:  UserDefinedDataType [app].[QueryDefinitionJson]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [app].[QueryDefinitionJson]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[QueryDefinitionJson] FROM [nvarchar](max) NOT NULL
 GO
-/****** Object:  UserDefinedDataType [app].[UniversalId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [app].[UniversalId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[UniversalId] FROM [nvarchar](200) NOT NULL
 GO
-/****** Object:  UserDefinedDataType [auth].[User]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [auth].[User]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [auth].[User] FROM [nvarchar](1000) NOT NULL
 GO
-/****** Object:  UserDefinedDataType [network].[Issuer]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedDataType [network].[Issuer]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [network].[Issuer] FROM [nvarchar](200) NOT NULL
 GO
-/****** Object:  UserDefinedTableType [app].[ConceptPatientCountTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[ConceptPatientCountTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[ConceptPatientCountTable] AS TABLE(
 	[Id] [uniqueidentifier] NULL,
 	[PatientCount] [int] NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[ConceptPreflightTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[ConceptPreflightTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[ConceptPreflightTable] AS TABLE(
 	[Id] [uniqueidentifier] NULL,
 	[UniversalId] [nvarchar](200) NULL,
@@ -50,7 +55,7 @@ CREATE TYPE [app].[ConceptPreflightTable] AS TABLE(
 	[IsAuthorized] [bit] NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[HydratedConceptTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[HydratedConceptTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
 	[Id] [uniqueidentifier] NOT NULL,
 	[ParentId] [uniqueidentifier] NULL,
@@ -84,28 +89,28 @@ CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
 )WITH (IGNORE_DUP_KEY = OFF)
 )
 GO
-/****** Object:  UserDefinedTableType [app].[ListTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[ListTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[ListTable] AS TABLE(
 	[Id] [nvarchar](50) NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[ResourceIdTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[ResourceIdTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[ResourceIdTable] AS TABLE(
 	[Id] [uniqueidentifier] NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[ResourceUniversalIdTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[ResourceUniversalIdTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[ResourceUniversalIdTable] AS TABLE(
 	[UniversalId] [nvarchar](200) NOT NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[SearchTermTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[SearchTermTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[SearchTermTable] AS TABLE(
 	[Id] [int] NULL,
 	[Term] [nvarchar](50) NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[SpecializationTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[SpecializationTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[SpecializationTable] AS TABLE(
 	[SpecializationGroupId] [int] NULL,
 	[UniversalId] [nvarchar](200) NULL,
@@ -114,7 +119,7 @@ CREATE TYPE [app].[SpecializationTable] AS TABLE(
 	[OrderId] [int] NULL
 )
 GO
-/****** Object:  UserDefinedTableType [app].[SqlSelectors]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [app].[SqlSelectors]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [app].[SqlSelectors] AS TABLE(
 	[Column] [nvarchar](100) NOT NULL,
 	[Type] [nvarchar](20) NOT NULL,
@@ -126,32 +131,32 @@ CREATE TYPE [app].[SqlSelectors] AS TABLE(
 )WITH (IGNORE_DUP_KEY = OFF)
 )
 GO
-/****** Object:  UserDefinedTableType [auth].[Authorizations]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [auth].[Authorizations]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [auth].[Authorizations] AS TABLE(
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL
 )
 GO
-/****** Object:  UserDefinedTableType [auth].[ConceptConstraintTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [auth].[ConceptConstraintTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [auth].[ConceptConstraintTable] AS TABLE(
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL
 )
 GO
-/****** Object:  UserDefinedTableType [auth].[GroupMembership]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [auth].[GroupMembership]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [auth].[GroupMembership] AS TABLE(
 	[Group] [nvarchar](1000) NOT NULL
 )
 GO
-/****** Object:  UserDefinedTableType [rela].[ConceptSpecializationGroupTable]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedTableType [rela].[ConceptSpecializationGroupTable]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE TYPE [rela].[ConceptSpecializationGroupTable] AS TABLE(
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[SpecializationGroupId] [int] NOT NULL,
 	[OrderId] [int] NULL
 )
 GO
-/****** Object:  UserDefinedFunction [app].[fn_FilterConceptsByConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [app].[fn_FilterConceptsByConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -264,7 +269,7 @@ END
 
 
 GO
-/****** Object:  UserDefinedFunction [app].[fn_JsonifySqlSelectors]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [app].[fn_JsonifySqlSelectors]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -324,7 +329,7 @@ END
 
 
 GO
-/****** Object:  UserDefinedFunction [app].[fn_StringifyGuid]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [app].[fn_StringifyGuid]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -349,7 +354,7 @@ END
 
 
 GO
-/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorized]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorized]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -428,7 +433,7 @@ END
 
 
 GO
-/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForDatasetQueryById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForDatasetQueryById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -477,7 +482,7 @@ END
 
 
 GO
-/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForQueryById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  UserDefinedFunction [auth].[fn_UserIsAuthorizedForQueryById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -518,7 +523,7 @@ END
 
 
 GO
-/****** Object:  Table [app].[Cohort]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[Cohort]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -530,13 +535,13 @@ CREATE TABLE [app].[Cohort](
 	[Salt] [uniqueidentifier] NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Cohort_QueryId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Cohort_QueryId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE CLUSTERED INDEX [IX_Cohort_QueryId] ON [app].[Cohort]
 (
 	[QueryId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[Concept]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[Concept]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -574,7 +579,7 @@ CREATE TABLE [app].[Concept](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[ConceptEvent]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[ConceptEvent]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -592,7 +597,7 @@ CREATE TABLE [app].[ConceptEvent](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[ConceptForwardIndex]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[ConceptForwardIndex]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -610,7 +615,7 @@ CREATE TABLE [app].[ConceptForwardIndex](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[ConceptInvertedIndex]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[ConceptInvertedIndex]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -625,7 +630,7 @@ CREATE TABLE [app].[ConceptInvertedIndex](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[ConceptSqlSet]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[ConceptSqlSet]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -648,7 +653,7 @@ CREATE TABLE [app].[ConceptSqlSet](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[ConceptTokenizedIndex]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[ConceptTokenizedIndex]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -663,7 +668,7 @@ CREATE TABLE [app].[ConceptTokenizedIndex](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[DatasetQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[DatasetQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -686,7 +691,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[DatasetQueryCategory]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[DatasetQueryCategory]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -701,7 +706,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[DatasetQueryTag]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[DatasetQueryTag]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -716,7 +721,7 @@ CREATE TABLE [app].[DatasetQueryTag](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[DemographicQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[DemographicQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -733,7 +738,7 @@ CREATE TABLE [app].[DemographicQuery](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[GeneralEquivalenceMapping]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[GeneralEquivalenceMapping]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -753,7 +758,7 @@ CREATE TABLE [app].[GeneralEquivalenceMapping](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[Geometry]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[Geometry]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -769,7 +774,7 @@ CREATE TABLE [app].[Geometry](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[PanelFilter]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[PanelFilter]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -788,7 +793,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[Query]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[Query]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -810,7 +815,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[QueryDefinition]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[QueryDefinition]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -824,7 +829,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[Specialization]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[Specialization]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -842,7 +847,7 @@ CREATE TABLE [app].[Specialization](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [app].[SpecializationGroup]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [app].[SpecializationGroup]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -859,7 +864,7 @@ CREATE TABLE [app].[SpecializationGroup](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[ConceptConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[ConceptConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -876,7 +881,7 @@ CREATE TABLE [auth].[ConceptConstraint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[Constraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[Constraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -890,7 +895,7 @@ CREATE TABLE [auth].[Constraint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[DatasetQueryConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[DatasetQueryConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -907,7 +912,7 @@ CREATE TABLE [auth].[DatasetQueryConstraint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[Login]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[Login]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -923,7 +928,7 @@ CREATE TABLE [auth].[Login](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[QueryConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[QueryConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -940,7 +945,7 @@ CREATE TABLE [auth].[QueryConstraint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[TokenBlacklist]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [auth].[TokenBlacklist]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -950,7 +955,7 @@ CREATE TABLE [auth].[TokenBlacklist](
 	[Expires] [datetime] NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [network].[Endpoint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [network].[Endpoint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -964,6 +969,8 @@ CREATE TABLE [network].[Endpoint](
 	[Certificate] [nvarchar](max) NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[Updated] [datetime] NOT NULL,
+	[IsInterrogator] [bit] NOT NULL,
+	[IsResponder] [bit] NOT NULL,
  CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -978,7 +985,7 @@ CREATE TABLE [network].[Endpoint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [network].[Identity]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [network].[Identity]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -999,7 +1006,7 @@ CREATE TABLE [network].[Identity](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [ref].[Shape]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [ref].[Shape]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1014,7 +1021,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [rela].[ConceptSpecializationGroup]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [rela].[ConceptSpecializationGroup]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1030,7 +1037,7 @@ CREATE TABLE [rela].[ConceptSpecializationGroup](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [rela].[QueryConceptDependency]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [rela].[QueryConceptDependency]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1045,7 +1052,7 @@ CREATE TABLE [rela].[QueryConceptDependency](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [rela].[QueryDependency]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Table [rela].[QueryDependency]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1060,7 +1067,7 @@ CREATE TABLE [rela].[QueryDependency](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_ParentId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_ParentId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_ParentId] ON [app].[Concept]
 (
 	[ParentId] ASC
@@ -1068,7 +1075,7 @@ CREATE NONCLUSTERED INDEX [IX_ParentId] ON [app].[Concept]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_Concept_UniversalId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IXUniq_Concept_UniversalId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_Concept_UniversalId] ON [app].[Concept]
 (
 	[UniversalId] ASC
@@ -1078,7 +1085,7 @@ WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNOR
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_ConceptForwardIndex_ConceptId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_ConceptForwardIndex_ConceptId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_ConceptForwardIndex_ConceptId] ON [app].[ConceptForwardIndex]
 (
 	[ConceptId] ASC
@@ -1087,7 +1094,7 @@ INCLUDE ( 	[Word]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_ConceptInvertedIndex_Word]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_ConceptInvertedIndex_Word]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_ConceptInvertedIndex_Word] ON [app].[ConceptInvertedIndex]
 (
 	[Word] ASC
@@ -1096,7 +1103,7 @@ INCLUDE ( 	[WordId]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_I
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
 (
 	[Name] ASC
@@ -1104,7 +1111,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQue
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
 	[UniversalId] ASC
@@ -1112,13 +1119,13 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[Dat
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQueryCategory_Category]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IXUniq_DatasetQueryCategory_Category]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQueryCategory_Category] ON [app].[DatasetQueryCategory]
 (
 	[Category] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Query_Nonce]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Query_Nonce]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 (
 	[Nonce] ASC
@@ -1126,7 +1133,7 @@ CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_Owner]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Query_Owner]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 (
 	[Owner] ASC
@@ -1134,7 +1141,7 @@ CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_UniversalId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Query_UniversalId]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_UniversalId] ON [app].[Query]
 (
 	[UniversalId] ASC
@@ -1142,13 +1149,13 @@ CREATE NONCLUSTERED INDEX [IX_Query_UniversalId] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Login]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Login]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Login] ON [auth].[Login]
 (
 	[Username] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE NONCLUSTERED INDEX [IX_TokenBlacklist_Expires] ON [auth].[TokenBlacklist]
 (
 	[Expires] ASC
@@ -1156,7 +1163,7 @@ CREATE NONCLUSTERED INDEX [IX_TokenBlacklist_Expires] ON [auth].[TokenBlacklist]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Endpoint_1]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IX_Endpoint_1]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Endpoint_1] ON [network].[Endpoint]
 (
 	[Issuer] ASC
@@ -1164,7 +1171,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [IX_Endpoint_1] ON [network].[Endpoint]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_Shape_Variant]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  Index [IXUniq_Shape_Variant]    Script Date: 5/9/19 8:47:49 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_Shape_Variant] ON [ref].[Shape]
 (
 	[Variant] ASC
@@ -1201,6 +1208,10 @@ GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Created]  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Updated]  DEFAULT (getdate()) FOR [Updated]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsInterrogator]  DEFAULT ((0)) FOR [IsInterrogator]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsResponder]  DEFAULT ((0)) FOR [IsResponder]
 GO
 ALTER TABLE [network].[Identity] ADD  CONSTRAINT [DF_NetworkIdentity_Lock]  DEFAULT ('X') FOR [Lock]
 GO
@@ -1347,7 +1358,7 @@ ALTER TABLE [network].[Identity]  WITH CHECK ADD  CONSTRAINT [CK_NetworkIdentity
 GO
 ALTER TABLE [network].[Identity] CHECK CONSTRAINT [CK_NetworkIdentity_1]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConcept]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConcept]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1482,7 +1493,7 @@ BEGIN
     END CATCH;
 END
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConceptEvent]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConceptEvent]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1512,7 +1523,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1548,7 +1559,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateSpecialization]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateSpecialization]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1589,7 +1600,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateSpecializationGroup]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateSpecializationGroup]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1665,7 +1676,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1753,7 +1764,7 @@ BEGIN
     FROM @concepts;
 END
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConceptEvent]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConceptEvent]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1812,7 +1823,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConceptSqlSet]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConceptSqlSet]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1885,7 +1896,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteSpecialization]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteSpecialization]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1911,7 +1922,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteSpecializationGroup]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteSpecializationGroup]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -1972,7 +1983,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetConceptById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2034,7 +2045,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptEvents]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetConceptEvents]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2059,7 +2070,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2089,7 +2100,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetSpecializationGroups]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetSpecializationGroups]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2123,7 +2134,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetSpecializationsByGroupId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetSpecializationsByGroupId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2176,7 +2187,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2294,7 +2305,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptEvent]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptEvent]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2334,7 +2345,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2384,7 +2395,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateSpecialization]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateSpecialization]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2431,7 +2442,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateSpecializationGroup]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateSpecializationGroup]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2476,7 +2487,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_CalculateConceptPatientCount]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_CalculateConceptPatientCount]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2609,7 +2620,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_CreateCachedUnsavedQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_CreateCachedUnsavedQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2668,7 +2679,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_DeleteCachedUnsavedQueryByNonce]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_DeleteCachedUnsavedQueryByNonce]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2745,7 +2756,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -2899,7 +2910,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3009,7 +3020,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetChildConceptsByParentId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetChildConceptsByParentId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3074,7 +3085,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3124,7 +3135,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3231,7 +3242,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptsByIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptsByIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3271,7 +3282,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptsBySearchTerms]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptsBySearchTerms]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3373,7 +3384,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetConceptsByUIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetConceptsByUIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3417,7 +3428,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetIdQueryUId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetIdQueryUId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3453,7 +3464,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3490,7 +3501,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryUId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryUId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3533,7 +3544,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3602,7 +3613,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetQueries]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetQueries]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3677,7 +3688,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDemographicContextById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDemographicContextById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3724,7 +3735,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDemographicContextByUId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDemographicContextByUId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3759,7 +3770,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDemographicQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDemographicQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3787,7 +3798,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetGeneralEquivalenceMapping]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetGeneralEquivalenceMapping]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3820,7 +3831,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetGeometries]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetGeometries]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3853,7 +3864,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetParentConceptsByChildIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetParentConceptsByChildIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3939,7 +3950,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptById]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptById]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -3989,7 +4000,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptByUId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptByUId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4040,7 +4051,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptsByIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptsByIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4085,7 +4096,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptsByUIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightConceptsByUIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4130,7 +4141,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4225,7 +4236,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByUIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByUIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4328,7 +4339,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4357,7 +4368,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByUIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByUIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4387,7 +4398,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetRootConcepts]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetRootConcepts]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4434,7 +4445,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetRootsPanelFilters]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4469,7 +4480,7 @@ BEGIN
     
 END
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByConstraint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByConstraint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4535,7 +4546,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByOwner]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByOwner]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4585,7 +4596,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4717,7 +4728,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4820,7 +4831,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_InternalConceptPreflightCheck]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_InternalConceptPreflightCheck]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4898,7 +4909,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveInitial]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveInitial]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -4956,7 +4967,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveUpdateMove]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveUpdateMove]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5054,7 +5065,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_QuerySaveInitial]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_QuerySaveInitial]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5125,7 +5136,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_QuerySaveUpsert]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_QuerySaveUpsert]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5237,7 +5248,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_UniversalConceptPreflightCheck]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_UniversalConceptPreflightCheck]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5312,7 +5323,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_UpdateDemographicQuery]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_UpdateDemographicQuery]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5351,7 +5362,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [app].[sp_UpdateSearchIndexTables]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_UpdateSearchIndexTables]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5578,7 +5589,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [auth].[sp_BlacklistToken]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [auth].[sp_BlacklistToken]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5606,7 +5617,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [auth].[sp_CreateLogin]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [auth].[sp_CreateLogin]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5636,7 +5647,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [auth].[sp_GetLoginByUsername]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [auth].[sp_GetLoginByUsername]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5670,7 +5681,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [auth].[sp_RefreshTokenBlacklist]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [auth].[sp_RefreshTokenBlacklist]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5699,83 +5710,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [network].[sp_CreateEndpoint]    Script Date: 5/2/19 11:57:56 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Cliff Spital
--- Create date: 2018/6/12
--- Description:	Creates a new network.Endpoint record.
--- =============================================
-CREATE PROCEDURE [network].[sp_CreateEndpoint]
-	@name nvarchar(200),
-	@address nvarchar(1000),
-	@issuer nvarchar(200),
-	@keyid nvarchar(200),
-	@certificate nvarchar(max)
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-    INSERT INTO network.Endpoint
-	(
-		Name,
-		Address,
-		Issuer,
-		KeyId,
-		Certificate
-	)
-	OUTPUT inserted.Id
-	SELECT
-		@name,
-		@address,
-		@issuer,
-		@keyid,
-		@certificate 
-END
-
-
-
-
-
-
-
-
-
-
-GO
-/****** Object:  StoredProcedure [network].[sp_DeleteEndpointById]    Script Date: 5/2/19 11:57:56 AM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =============================================
--- Author:		Cliff Spital
--- Create date: 2018/6/12
--- Description:	Deletes a network.Endpoint record by Id.
--- =============================================
-CREATE PROCEDURE [network].[sp_DeleteEndpointById]
-	@id int
-AS
-BEGIN
-	SET NOCOUNT ON;
-
-    DELETE FROM network.Endpoint
-	WHERE Id = @id;
-END
-
-
-
-
-
-
-
-
-
-GO
-/****** Object:  StoredProcedure [network].[sp_GetEndpoints]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [network].[sp_GetEndpoints]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5796,7 +5731,9 @@ BEGIN
 		Address,
 		Issuer,
 		KeyId,
-		Certificate
+		Certificate,
+        IsInterrogator,
+        IsResponder
 	FROM
 		network.Endpoint;
 END
@@ -5809,8 +5746,9 @@ END
 
 
 
+
 GO
-/****** Object:  StoredProcedure [network].[sp_GetIdentity]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [network].[sp_GetIdentity]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5844,7 +5782,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [network].[sp_GetIdentityEndpoints]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [network].[sp_GetIdentityEndpoints]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5872,7 +5810,7 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [network].[sp_UpdateEndpoint]    Script Date: 5/2/19 11:57:56 AM ******/
+/****** Object:  StoredProcedure [network].[sp_UpdateEndpoint]    Script Date: 5/9/19 8:47:49 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -5912,4 +5850,19 @@ BEGIN
 		Id = @id;
 END
 
+
+
+
+
+
+
+
+
+
+
+
+GO
+USE [master]
+GO
+ALTER DATABASE [LeafDB] SET  READ_WRITE 
 GO

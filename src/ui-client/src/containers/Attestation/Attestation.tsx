@@ -18,8 +18,8 @@ import { UserContext } from '../../models/Auth';
 import { getBrowser } from '../../utils/browser';
 import { setBrowser } from '../../actions/generalUi';
 import { Browser } from '../../models/state/GeneralUiState';
-import './Attestation.css';
 import BrowserError from '../../components/Attestation/BrowserError';
+import './Attestation.css';
 
 interface DispatchProps {
     dispatch: any;

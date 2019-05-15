@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Validation;
+using Model.Error;
 
 namespace Model.Cohort
 {

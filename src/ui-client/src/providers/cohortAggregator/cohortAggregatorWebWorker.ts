@@ -8,7 +8,7 @@
 import { generate as generateId } from 'shortid';
 import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
 import { AgeByGenderBucket, BinarySplitPair, DemographicStatistics } from '../../models/cohort/DemographicDTO';
-import { NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
 
 const AGGREGATE_STATISTICS = 'AGGREGATE_STATISTICS';
@@ -16,7 +16,7 @@ const AGGREGATE_STATISTICS = 'AGGREGATE_STATISTICS';
 interface InboundMessagePartialPayload {
     cohorts?: CohortMap;
     message: string;
-    respondents?: NetworkRespondentMap;
+    responders?: NetworkResponderMap;
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -56,8 +56,8 @@ export default class CohortAggregatorWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public aggregateStatistics = (cohorts: CohortMap, respondents: NetworkRespondentMap) => {
-        return this.postMessage({ message: AGGREGATE_STATISTICS, cohorts, respondents });
+    public aggregateStatistics = (cohorts: CohortMap, responders: NetworkResponderMap) => {
+        return this.postMessage({ message: AGGREGATE_STATISTICS, cohorts, responders });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -99,10 +99,10 @@ export default class CohortAggregatorWebWorker {
         };
 
         const aggregateStatistics = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { cohorts, respondents, requestId } = payload;
+            const { cohorts, responders, requestId } = payload;
             const preAgg: DemographicStatistics[] = [];
             cohorts!.forEach((c: NetworkCohortState) => {
-                if (respondents!.get(c.id)!.enabled && c.visualization && c.visualization.demographics) {
+                if (responders!.get(c.id)!.enabled && c.visualization && c.visualization.demographics) {
                     preAgg.push(c.visualization.demographics);
                 }
             });

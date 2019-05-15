@@ -14,13 +14,13 @@ import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { CohortState } from '../../models/state/CohortState'
 import { CohortCountBoxState } from '../../models/state/GeneralUiState'
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import './CohortCountBox.css';
 import { CohortCountSiteContainer } from './CohortCountSiteContainer';
 
 interface StateProps { 
     cohort: CohortState;
-    networkRespondents: Map<number, NetworkIdentity>;
+    networkResponders: Map<number, NetworkIdentity>;
     cohortCountBox: CohortCountBoxState;
 }
 interface DispatchProps {
@@ -130,7 +130,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
                 {!boxMinimized && 
                 <CohortCountSiteContainer 
                     cohort={cohort} 
-                    networkRespondents={this.props.networkRespondents!} 
+                    networkResponders={this.props.networkResponders!} 
                     show={this.state.showDetail} />
                 }
             </div>
@@ -142,7 +142,7 @@ const mapStateToProps = (state: AppState): StateProps => {
     return { 
         cohort: state.cohort,
         cohortCountBox: state.generalUi.cohortCountBox,
-        networkRespondents: state.respondents
+        networkResponders: state.responders
     };
 }
 

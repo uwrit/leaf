@@ -115,6 +115,7 @@ namespace Model.Options
         public string Super { get; set; }
         public string Identified { get; set; }
         public string Admin { get; set; }
+        public string Federated { get; set; }
 
         public IEnumerable<string> Roles
         {
@@ -122,7 +123,7 @@ namespace Model.Options
             {
                 return new string[]
                 {
-                    User, Super, Identified, Admin
+                    User, Super, Identified, Admin, Federated
                 };
             }
         }

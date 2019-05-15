@@ -6,14 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 using Model.Authentication;
 using Model.Authorization;
-using Microsoft.AspNetCore.Http;
-using System.DirectoryServices.AccountManagement;
 using Model.Options;
-using Microsoft.Extensions.Options;
-using Services.Authorization;
-using API.Authentication;
 
 namespace API.Authorization
 {
@@ -48,24 +45,29 @@ namespace API.Authorization
         {
             var mask = RoleMask.None;
 
-            if (groups.Any(g => g.Equals(roles.User, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.User) && groups.Any(g => g.Equals(roles.User, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.User;
             }
 
-            if (groups.Any(g => g.Equals(roles.Admin, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Admin) && groups.Any(g => g.Equals(roles.Admin, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Admin;
             }
 
-            if (groups.Any(g => g.Equals(roles.Super, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Super) && groups.Any(g => g.Equals(roles.Super, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Super;
             }
 
-            if (groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
+            if (!string.IsNullOrWhiteSpace(roles.Identified) && groups.Any(g => g.Equals(roles.Identified, StringComparison.InvariantCultureIgnoreCase)))
             {
                 mask |= RoleMask.Identified;
+            }
+
+            if (!string.IsNullOrWhiteSpace(roles.Federated) && groups.Any(g => g.Equals(roles.Federated, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                mask |= RoleMask.Federated;
             }
 
             return mask;

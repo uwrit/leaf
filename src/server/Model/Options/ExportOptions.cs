@@ -11,27 +11,16 @@ namespace Model.Options
 {
     public class ExportOptions
     {
-        public REDCapOptions REDCap = new REDCapOptions();
+        public REDCapOptions REDCap { get; set; }
+    }
 
-        public class REDCapOptions
-        {
-            public string ApiURI { get; set; }
-            public string Scope { get; set; }
-            public string SuperToken { get; set; }
-            public int BatchSize { get; set; }
-            public int RowLimit { get; set; }
-
-            public bool Enabled
-            {
-                get
-                {
-                    if (!string.IsNullOrWhiteSpace(Scope) && !string.IsNullOrWhiteSpace(SuperToken) && !string.IsNullOrWhiteSpace(ApiURI))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-        }
+    public class REDCapOptions : IEnabled
+    {
+        public string ApiURI { get; set; }
+        public string Scope { get; set; }
+        public string SuperToken { get; set; }
+        public int BatchSize { get; set; }
+        public int RowLimit { get; set; }
+        public bool Enabled { get; set; } = false;
     }
 }

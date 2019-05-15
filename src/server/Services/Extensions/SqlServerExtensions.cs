@@ -15,15 +15,6 @@ namespace Services.Extensions
 {
     public static class SqlServerExtensions
     {
-        /// <summary>
-        /// Maps and wraps <see cref="SqlException"/> in a <see cref="LeafRPCException"/> and throws if ErrorCode is in <see cref="LeafErrorCode"/>
-        /// </summary>
-        /// <param name="se">SqlException.</param>
-        public static void MapThrow(this DbException se)
-        {
-            DbError.ThrowFrom(se);
-        }
-
         public static SqlParameter[] SqlParameters(this ShapedDatasetExecutionContext ctx)
         {
             return ctx.Parameters.SqlParameters();

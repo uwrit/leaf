@@ -18,7 +18,7 @@ using Model.Compiler;
 using Model.Extensions;
 using Model.Search;
 using Model.Tagging;
-using Model.Validation;
+using Model.Error;
 
 namespace API.Controllers
 {
@@ -28,13 +28,13 @@ namespace API.Controllers
     public class QueryController : Controller
     {
         readonly ILogger<QueryController> log;
-        readonly IQueryService queryService;
+        readonly QueryManager manager;
         readonly IUserContext user;
 
-        public QueryController(IQueryService queryService, ILogger<QueryController> logger, IUserContext userContext)
+        public QueryController(QueryManager manager, ILogger<QueryController> logger, IUserContext userContext)
         {
             log = logger;
-            this.queryService = queryService;
+            this.manager = manager;
             user = userContext;
         }
 
@@ -44,7 +44,7 @@ namespace API.Controllers
         {
             try
             {
-                var queries = await queryService.GetQueries();
+                var queries = await manager.GetQueriesAsync();
                 return Ok(queries.Select(q => new BaseQueryDTO(q)));
             }
             catch (Exception e)
@@ -60,7 +60,7 @@ namespace API.Controllers
             try
             {
                 var urn = QueryUrn.From(ident);
-                var query = await queryService.GetQuery(urn);
+                var query = await manager.GetQueryAsync(urn);
                 if (query == null)
                 {
                     return NotFound();
@@ -82,8 +82,6 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
-            [FromServices] PanelConverter panelConverter,
-            [FromServices] PanelValidator panelValidator,
             CancellationToken cancelToken
         )
         {
@@ -95,49 +93,21 @@ namespace API.Controllers
                     return BadRequest("Initial save requests must be made to home node.");
                 }
 
-                var ctx = await panelConverter.GetPanelsAsync(querySave, cancelToken);
-                if (!ctx.PreflightPassed)
-                {
-                    return BadRequest(new QuerySaveResponseDTO { Preflight = new PreflightCheckDTO(ctx.PreflightCheck) });
-                }
-                var query = panelValidator.Validate(ctx);
+                var result = await manager.SaveAsync(new Guid(id), querySave, QueryDefinitionDTO.JSON, cancelToken);
 
-                cancelToken.ThrowIfCancellationRequested();
-
-                if (!user.IsInstutional)
+                switch (result.State)
                 {
-                    panelConverter.LocalizeDefinition(querySave, query);
+                    case QueryManager.SaveState.Preflight:
+                        return BadRequest(new QuerySaveResponseDTO { Preflight = new PreflightCheckDTO(result.Preflight) });
+                    case QueryManager.SaveState.NotFound:
+                        return NotFound();
                 }
 
-
-                var toSave = new QuerySave
+                return Ok(new QuerySaveResponseDTO
                 {
-                    QueryId = new Guid(id),
-                    UniversalId = ctx.UniversalId,
-                    Name = querySave.Name,
-                    Category = querySave.Category,
-                    Definition = QueryDefinitionDTO.JSON(querySave),
-                    Resources = query.Panels.GetResources()
-                };
-                if (querySave.Ver.HasValue)
-                {
-                    toSave.Ver = querySave.Ver.Value;
-                }
-
-                var saved = await queryService.Save(toSave);
-
-                if (saved == null)
-                {
-                    return NotFound();
-                }
-
-                var response = new QuerySaveResponseDTO
-                {
-                    Preflight = new PreflightCheckDTO(ctx.PreflightCheck),
-                    Query = new QuerySaveResultDTO(saved)
-                };
-
-                return Ok(response);
+                    Preflight = new PreflightCheckDTO(result.Preflight),
+                    Query = new QuerySaveResultDTO(result.Result)
+                });
             }
             catch (InvalidOperationException ie)
             {
@@ -171,7 +141,7 @@ namespace API.Controllers
             try
             {
                 var urn = QueryUrn.From(ident);
-                var result = await queryService.Delete(urn, force);
+                var result = await manager.DeleteAsync(urn, force);
 
                 if (!result.Ok)
                 {

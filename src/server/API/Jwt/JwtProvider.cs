@@ -9,16 +9,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using Model.Authorization;
-using Model.Options;
-using Services.Authorization;
-using Microsoft.AspNetCore.Http;
-using Model.Authentication;
 using API.Authentication;
 using API.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Model.Authentication;
+using Model.Authorization;
+using Model.Options;
 
 namespace API.Jwt
 {
@@ -183,6 +181,11 @@ namespace API.Jwt
             if (mask.HasFlag(RoleMask.Identified))
             {
                 claims.Add(new Claim(ClaimTypes.Role, Role.Phi));
+            }
+
+            if (mask.HasFlag(RoleMask.Federated))
+            {
+                claims.Add(new Claim(ClaimTypes.Role, Role.Fed));
             }
 
             return claims;

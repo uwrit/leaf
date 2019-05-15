@@ -13,7 +13,7 @@ import { conceptSearch } from './conceptSearch';
 import { dataExport } from './dataExport';
 import { generalUi } from './generalUi';
 import { map } from './map';
-import { respondents } from './networkRespondents';
+import { responders } from './networkResponders';
 import { panelFilters } from './panelFilters';
 import { panels } from './panels';
 import { queries } from './queries';
@@ -31,7 +31,7 @@ const rootReducer = combineReducers({
     map,
     panelFilters,
     panels,
-    respondents,
+    responders,
     queries,
     session
 });

@@ -13,7 +13,7 @@ import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getQueriesAsConc
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { setNoClickModalState, showInfoModal, toggleSaveQueryPane, hideMyLeafModal, showConfirmationModal, setRoute } from './generalUi';
 import { NoClickModalStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
-import { NetworkIdentity } from '../models/NetworkRespondent';
+import { NetworkIdentity } from '../models/NetworkResponder';
 import { mergeExtensionConcepts } from './concepts';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { resetPanels } from './panels';
@@ -128,11 +128,11 @@ export const requestQuerySave = () => {
             dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
 
             /*
-             * Save to any network respondent nodes.
+             * Save to any network responder nodes.
              */
-            const respondents: NetworkIdentity[] = [];
-            state.respondents.forEach((nr: NetworkIdentity) => { if (nr.enabled && !nr.isHomeNode) { respondents.push(nr); } });
-            await Promise.all(respondents.map((nr: NetworkIdentity) => { 
+            const responders: NetworkIdentity[] = [];
+            state.responders.forEach((nr: NetworkIdentity) => { if (nr.enabled && !nr.isHomeNode) { responders.push(nr); } });
+            await Promise.all(responders.map((nr: NetworkIdentity) => { 
                 return new Promise( async(resolve, reject) => {
                     const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                     saveQueryFedNode(getState(), nr, panels, panelFilters, queryId, saved.universalId!).then(
@@ -177,7 +177,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
         try {
             const state = getState();
             const user = state.auth.userContext!.name;
-            const homeNode = state.respondents.get(0)!;
+            const homeNode = state.responders.get(0)!;
 
             dispatch(setNoClickModalState({ message: "Deleting Query", state: NoClickModalStates.CallingServer }));
 
@@ -212,11 +212,11 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                         dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
 
                         /*
-                         * Delete from network respondents.
+                         * Delete from network responders.
                          */
-                        const respondents: NetworkIdentity[] = [];
-                        state.respondents.forEach((nr: NetworkIdentity) => { if (nr.enabled && !nr.isHomeNode) { respondents.push(nr); } });
-                        Promise.all(respondents.map((nr: NetworkIdentity) => { 
+                        const responders: NetworkIdentity[] = [];
+                        state.responders.forEach((nr: NetworkIdentity) => { if (nr.enabled && !nr.isHomeNode) { responders.push(nr); } });
+                        Promise.all(responders.map((nr: NetworkIdentity) => { 
                             return new Promise( async(resolve, reject) => {
                                 deleteSavedQuery(state, nr, query, force)
                                     .then(response => resolve(), error => resolve());

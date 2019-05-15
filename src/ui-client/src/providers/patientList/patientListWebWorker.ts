@@ -33,7 +33,7 @@ interface InboundMessagePartialPayload {
     datasetId?: PatientListDatasetId;
     message: string;
     demographics?: PatientListRowDTO[];
-    respondentId?: number;
+    responderId?: number;
     template?: PatientListDatasetDefinitionTemplate;
     useDisplayedColumnsOnly?: boolean;
 }
@@ -105,12 +105,12 @@ export default class PatientListWebWorker {
         this.worker.onerror = error => this.reject(error);
     }
 
-    public addDemographics = (datasetDefinition: PatientListDatasetDefinition, demographics: PatientListRowDTO[], respondentId: number) => {
-        return this.postMessage({ message: ADD_DEMOGRAPHICS, datasetDefinition, demographics, respondentId });
+    public addDemographics = (datasetDefinition: PatientListDatasetDefinition, demographics: PatientListRowDTO[], responderId: number) => {
+        return this.postMessage({ message: ADD_DEMOGRAPHICS, datasetDefinition, demographics, responderId });
     }
 
-    public addDataset = (dataset: PatientListDataset, respondentId: number) => {
-        return this.postMessage({ message: ADD_DATASET, dataset, respondentId });
+    public addDataset = (dataset: PatientListDataset, responderId: number) => {
+        return this.postMessage({ message: ADD_DATASET, dataset, responderId });
     }
 
     public removeDataset = (config: PatientListConfiguration, datasetId: PatientListDatasetId) => {
@@ -261,7 +261,7 @@ export default class PatientListWebWorker {
          * Add multirow dataset data to the cache.
          */
         const addMultiRowDataset = (payload: InboundMessagePayload): PatientListDatasetDefinition => {
-            const { dataset, respondentId } = payload;
+            const { dataset, responderId } = payload;
             const def = dataset!.definition!;
             const dsId = def.id;
             const data = dataset!.data.results;
@@ -279,7 +279,7 @@ export default class PatientListWebWorker {
             for (let i = 0; i < uniquePatients.length; i++) {
                 const p = uniquePatients![i];
                 const rows = data[p];
-                const compoundId = `${respondentId}_${p}`;
+                const compoundId = `${responderId}_${p}`;
                 const patientData = patientMap.get(compoundId)!.multirowData;
                 uniqueCompoundPatients.push(compoundId);
 
@@ -324,21 +324,21 @@ export default class PatientListWebWorker {
          * Add initial base (basic demographics) dataset to the cache.
          */
         const addDemographics = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { datasetDefinition, demographics, respondentId, requestId } = payload;
+            const { datasetDefinition, demographics, responderId, requestId } = payload;
 
             if (!demographics!.length) { return { requestId }; }
             
             // For each patient
             for (let i = 0; i < demographics!.length; i++) {
-                // Add compound and respondent ids
+                // Add compound and responder ids
                 const patientDto = demographics![i]! as any;
                 const patient: Patient = {
-                    compoundId: `${respondentId}_${patientDto.personId}`,
+                    compoundId: `${responderId}_${patientDto.personId}`,
                     detailRowCount: 0,
                     detailValues: [],
                     id: patientDto.personId,
                     multirowData: new Map<PatientListDatasetId, PatientListRowDTO[]>(),
-                    respondentId: respondentId!,
+                    responderId: responderId!,
                     singletonData: new Map<PatientListDatasetId, ValueByColumnKey>()
                 }
 
@@ -410,7 +410,7 @@ export default class PatientListWebWorker {
                     detailRowCount: pat.detailRowCount, 
                     detailValues: pat.detailValues,
                     isOpen: false,
-                    respondentId: pat.respondentId, 
+                    responderId: pat.responderId, 
                     values: [] 
                 };
                 patListRow.values = config.displayColumns.map((col: PatientListColumn) =>  {
@@ -613,7 +613,7 @@ export default class PatientListWebWorker {
                 displayName: def.displayName,
                 id: def.id,
                 multirow: false,
-                respondentStates: new Map(),
+                responderStates: new Map(),
                 shape: 0,
                 totalRows: ids.length
             };
@@ -715,7 +715,7 @@ export default class PatientListWebWorker {
                 displayName: def.displayName,
                 id: def.id,
                 multirow: false,
-                respondentStates: new Map(),
+                responderStates: new Map(),
                 shape: 0
             };
 

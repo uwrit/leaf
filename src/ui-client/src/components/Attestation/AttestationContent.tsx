@@ -148,8 +148,7 @@ export default class AttestationContent extends React.PureComponent<Props> {
         const { documentationStatusSelected, hasApprovedIrb, hasApprovedQi } = this.props.parentState;
         if (documentationStatusSelected && !(hasApprovedIrb || hasApprovedQi)) {
             return true;
-        }
-        else if (this.props.allowPhiIdentified()) {
+        } else if (this.props.allowPhiIdentified()) {
             return true;
         }
         return false;
@@ -166,11 +165,9 @@ export default class AttestationContent extends React.PureComponent<Props> {
         const { attestation , identificationTypeSelected } = this.props.parentState;
         if (isIdentified === attestation.isIdentified && identificationTypeSelected) {
             return `${className}-button selected`;
-        }
-        else if (isIdentified && (!this.props.allowPhiIdentified() || !userContext!.isPhiOkay)) {
+        } else if (isIdentified && (!this.props.allowPhiIdentified() || !userContext!.isPhiOkay)) {
             return `${className}-button disabled`;
-        }
-        else {
+        } else {
             return `${className}-button`;
         }
     }

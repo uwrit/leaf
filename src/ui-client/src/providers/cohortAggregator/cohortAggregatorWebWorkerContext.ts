@@ -15,10 +15,10 @@ var handleWorkMessage = function (payload) {
     }
 };
 var aggregateStatistics = function (payload) {
-    var cohorts = payload.cohorts, respondents = payload.respondents, requestId = payload.requestId;
+    var cohorts = payload.cohorts, responders = payload.responders, requestId = payload.requestId;
     var preAgg = [];
     cohorts.forEach(function (c) {
-        if (respondents.get(c.id).enabled && c.visualization && c.visualization.demographics) {
+        if (responders.get(c.id).enabled && c.visualization && c.visualization.demographics) {
             preAgg.push(c.visualization.demographics);
         }
     });

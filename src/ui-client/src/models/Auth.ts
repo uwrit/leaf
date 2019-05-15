@@ -61,6 +61,7 @@ export interface DecodedIdToken {
 export interface UserContext {
     expirationDate: Date;
     isAdmin: boolean;
+    isFederatedOkay: boolean;
     isPhiOkay: boolean;
     isSuperUser: boolean;
     issuer: string;

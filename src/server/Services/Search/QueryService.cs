@@ -17,10 +17,8 @@ using Model.Compiler;
 using Model.Options;
 using Model.Tagging;
 using Services.Tables;
-using Services.Extensions;
+using Model.Error;
 using Model.Search;
-
-// TODO(cspital) where does this belong, definitely NOT part of compiler
 
 namespace Services.Search
 {
@@ -34,52 +32,38 @@ namespace Services.Search
 
         readonly IUserContext user;
         readonly AppDbOptions dbOpts;
-        readonly ILogger<QueryService> logger;
 
         public QueryService(
             IUserContext userContext,
-            IOptions<AppDbOptions> dbOpts,
-            ILogger<QueryService> logger
+            IOptions<AppDbOptions> dbOpts
         )
         {
             user = userContext;
             this.dbOpts = dbOpts.Value;
-            this.logger = logger;
         }
 
-        public async Task<QueryDeleteResult> Delete(QueryUrn uid, bool force)
+        public async Task<QueryDeleteResult> DeleteAsync(QueryUrn uid, bool force)
         {
-            logger.LogInformation("Deleting query. Query:{Query}", uid.ToString());
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var dependents = await cn.QueryAsync<QueryDependentRecord>(
+                var dependents = await cn.QueryAsync<QueryDependentRecord>(
                         deleteQuery,
                         new { uid = uid.ToString(), force, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: dbOpts.DefaultTimeout
                     );
 
-                    return QueryDeleteResult.From(dependents.Select(d =>
-                    {
-                        return new QueryDependent(d.Id, QueryUrn.From(d.UniversalId), d.Name, d.Owner);
-                    }));
-                }
-                catch (SqlException se)
+                return QueryDeleteResult.From(dependents.Select(d =>
                 {
-                    logger.LogError("Could not delete query. Query:{Query} Code:{Code} Error:{Error}", uid.ToString(), se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                    return new QueryDependent(d.Id, QueryUrn.From(d.UniversalId), d.Name, d.Owner);
+                }));
             }
         }
 
-        public async Task<IEnumerable<BaseQuery>> GetQueries()
+        public async Task<IEnumerable<BaseQuery>> GetQueriesAsync()
         {
-            logger.LogInformation("Getting queries");
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -105,138 +89,101 @@ namespace Services.Search
             }
         }
 
-        public async Task<Query> GetQuery(QueryUrn uid)
+        public async Task<Query> GetQueryAsync(QueryUrn uid)
         {
-            logger.LogInformation("Getting query UId:{UId}", uid);
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var r = await cn.QueryFirstOrDefaultAsync<QueryRecord>(
-                        queryQueryByUId,
-                        new { uid = uid.ToString(), user = user.UUID, groups = GroupMembership.From(user) },
-                        commandType: CommandType.StoredProcedure,
-                        commandTimeout: dbOpts.DefaultTimeout
-                    );
+                var r = await cn.QueryFirstOrDefaultAsync<QueryRecord>(
+                    queryQueryByUId,
+                    new { uid = uid.ToString(), user = user.UUID, groups = GroupMembership.From(user) },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOpts.DefaultTimeout
+                );
 
-                    return new Query
-                    {
-                        Id = r.Id,
-                        UniversalId = QueryUrn.From(r.UniversalId),
-                        Name = r.Name,
-                        Category = r.Category,
-                        Owner = r.Owner,
-                        Created = r.Created,
-                        Updated = r.Updated,
-                        Count = r.Count,
-                        Definition = r.Definition
-                    };
-                }
-                catch (SqlException se)
+                return new Query
                 {
-                    logger.LogError("Could not get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", uid, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                    Id = r.Id,
+                    UniversalId = QueryUrn.From(r.UniversalId),
+                    Name = r.Name,
+                    Category = r.Category,
+                    Owner = r.Owner,
+                    Created = r.Created,
+                    Updated = r.Updated,
+                    Count = r.Count,
+                    Definition = r.Definition
+                };
             }
         }
 
-        public async Task<QuerySaveResult> Save(QuerySave query)
-        {
-            if (query.UniversalId == null)
-            {
-                return await InitialSave(query);
-            }
-            return await UpsertSave(query);
-        }
-
-        async Task<QuerySaveResult> InitialSave(QuerySave query)
+        public async Task<QuerySaveResult> InitialSaveAsync(QuerySave query)
         {
             var urn = QueryUrn.Create(query.QueryId);
             var conceptids = query.Resources.Concepts.Select(c => c.Id.Value);
             var queryids = query.Resources.Queries.Select(q => q.Id.Value);
-            try
+            using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
-                using (var cn = new SqlConnection(dbOpts.ConnectionString))
-                {
-                    await cn.OpenAsync();
+                await cn.OpenAsync();
 
-                    var qsr = await cn.QueryFirstOrDefaultAsync<QuerySaveResultRecord>(
-                        initialQuerySave,
-                        new
-                        {
-                            queryid = query.QueryId,
-                            urn = urn.ToString(),
-                            name = query.Name,
-                            category = query.Category,
-                            conceptids = ResourceIdTable.From(conceptids),
-                            queryids = ResourceIdTable.From(queryids),
-                            definition = query.Definition,
-                            user = user.UUID
-                        },
-                        commandType: CommandType.StoredProcedure,
-                        commandTimeout: dbOpts.DefaultTimeout
-                    );
-
-                    if (qsr == null)
+                var qsr = await cn.QueryFirstOrDefaultAsync<QuerySaveResultRecord>(
+                    initialQuerySave,
+                    new
                     {
-                        return null;
-                    }
+                        queryid = query.QueryId,
+                        urn = urn.ToString(),
+                        name = query.Name,
+                        category = query.Category,
+                        conceptids = ResourceIdTable.From(conceptids),
+                        queryids = ResourceIdTable.From(queryids),
+                        definition = query.Definition,
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOpts.DefaultTimeout
+                );
 
-                    return new QuerySaveResult(query.QueryId, QueryUrn.From(qsr.UniversalId), qsr.Ver);
+                if (qsr == null)
+                {
+                    return null;
                 }
-            }
-            catch (SqlException se)
-            {
-                logger.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", query, se.ErrorCode, se.Message);
-                se.MapThrow();
-                throw;
+
+                return new QuerySaveResult(query.QueryId, QueryUrn.From(qsr.UniversalId), qsr.Ver);
             }
         }
 
-        async Task<QuerySaveResult> UpsertSave(QuerySave query)
+        public async Task<QuerySaveResult> UpsertSaveAsync(QuerySave query)
         {
             var conceptids = query.Resources.Concepts.Select(c => c.Id.Value);
             var queryids = query.Resources.Queries.Select(q => q.Id.Value);
-            try
+            using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
-                using (var cn = new SqlConnection(dbOpts.ConnectionString))
-                {
-                    await cn.OpenAsync();
+                await cn.OpenAsync();
 
-                    var qsr = await cn.QueryFirstOrDefaultAsync<QuerySaveResultRecord>(
-                        upsertQuerySave,
-                        new
-                        {
-                            queryid = query.QueryId,
-                            urn = query.UniversalId.ToString(),
-                            ver = query.Ver,
-                            name = query.Name,
-                            category = query.Category,
-                            conceptids = ResourceIdTable.From(conceptids),
-                            queryids = ResourceIdTable.From(queryids),
-                            definition = query.Definition,
-                            user = user.UUID
-                        },
-                        commandType: CommandType.StoredProcedure,
-                        commandTimeout: dbOpts.DefaultTimeout
-                    );
-
-                    if (qsr == null)
+                var qsr = await cn.QueryFirstOrDefaultAsync<QuerySaveResultRecord>(
+                    upsertQuerySave,
+                    new
                     {
-                        return null;
-                    }
+                        queryid = query.QueryId,
+                        urn = query.UniversalId.ToString(),
+                        ver = query.Ver,
+                        name = query.Name,
+                        category = query.Category,
+                        conceptids = ResourceIdTable.From(conceptids),
+                        queryids = ResourceIdTable.From(queryids),
+                        definition = query.Definition,
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOpts.DefaultTimeout
+                );
 
-                    return new QuerySaveResult(query.QueryId, QueryUrn.From(qsr.UniversalId), qsr.Ver);
+                if (qsr == null)
+                {
+                    return null;
                 }
-            }
-            catch (SqlException se)
-            {
-                logger.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", query, se.ErrorCode, se.Message);
-                se.MapThrow();
-                throw;
+
+                return new QuerySaveResult(query.QueryId, QueryUrn.From(qsr.UniversalId), qsr.Ver);
             }
         }
     }

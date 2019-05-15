@@ -37,7 +37,7 @@ import {
     VISUALIZATION_SET_AGGREGATE,
     VISUALIZATION_SET_NETWORK
 } from '../../actions/cohort/visualize';
-import { DISABLE_RESPONDENT, ENABLE_RESPONDENT } from '../../actions/networkRespondents';
+import { DISABLE_Responder, ENABLE_Responder } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
 import { 
     ADD_PANEL_ITEM, 
@@ -125,9 +125,9 @@ function resetCohorts(state: CohortState): CohortState {
 
 function startCountQuery(state: CohortState, action: CohortCountAction): CohortState {
     const network = new Map(state.networkCohorts);
-    const respondents = action.respondents!;
+    const responders = action.responders!;
     network.forEach((n: NetworkCohortState) => { 
-        const resp = respondents.get(n.id)!;
+        const resp = responders.get(n.id)!;
         const clone = Object.assign({}, n);
         clone.count = {
             ...defaultCountState(),
@@ -158,9 +158,9 @@ function finishCountQuery(state: CohortState, action: CohortCountAction): Cohort
 
 function startDemographicQuery(state: CohortState, action: CohortCountAction): CohortState {
     const network = new Map(state.networkCohorts);
-    const respondents = action.respondents!;
+    const responders = action.responders!;
     network.forEach((n: NetworkCohortState) => { 
-        const resp = respondents.get(n.id)!;
+        const resp = responders.get(n.id)!;
         const newState = resp.enabled ? CohortStateType.REQUESTING : CohortStateType.NOT_LOADED;
         const clone = Object.assign({}, n, {
             patientList: {
@@ -303,10 +303,10 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
         case PATIENT_LIST_DATASET_NOT_IMPLEMENTED:
             return setNetworkPatientListDatasetNotImplemented(state, action);
 
-        // Enabled/disabling respondents after data loaded
-        case ENABLE_RESPONDENT:
+        // Enabled/disabling responders after data loaded
+        case ENABLE_Responder:
             return recalculateCohortCount(state, action.id, true);
-        case DISABLE_RESPONDENT:
+        case DISABLE_Responder:
             return recalculateCohortCount(state, action.id, false);
 
         // Any change to panel query definition resets the cohort

@@ -5,20 +5,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export type NetworkRespondentMap = Map<number, NetworkIdentity>;
+export type NetworkResponderMap = Map<number, NetworkIdentity>;
 
-export interface NetworkIdentityRespondentsDTO {
+export interface NetworkIdentityRespondersDTO {
     identity: NetworkIdentity;
-    respondents: NetworkRespondentDTO[];
+    responders: NetworkIdentityResponseDTO[];
 }
 
-export interface NetworkRespondentDTO {
+export interface NetworkIdentityResponseDTO {
     id: number;
     name: string;
     address: string;
 }
 
-export interface NetworkIdentity extends NetworkRespondentDTO {
+export interface NetworkIdentity extends NetworkIdentityResponseDTO {
     abbreviation: string;
     description?: string;
     isHomeNode: boolean;
@@ -26,10 +26,16 @@ export interface NetworkIdentity extends NetworkRespondentDTO {
     latitude: number;
     longitude: number;
     primaryColor: string;
+    runtime: RuntimeMode;
     secondaryColor: string;
     enabled?: boolean;
 }
 
-export interface NetworkRespondent extends NetworkRespondentDTO, NetworkIdentity {
+export interface NetworkResponder extends NetworkIdentityResponseDTO, NetworkIdentity {
     enabled: boolean;
+}
+
+export enum RuntimeMode {
+    Full = 1,
+    Gateway = 2
 }

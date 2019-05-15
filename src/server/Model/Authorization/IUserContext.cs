@@ -20,9 +20,12 @@ namespace Model.Authorization
         string UUID { get; }
         bool IsInstutional { get; }
         bool IsAdmin { get; }
+        bool IsQuarantined { get; }
         Guid IdNonce { get; }
         Guid? SessionNonce { get; }
         bool Identified { get; }
         AuthenticationMechanism AuthenticationMechanism { get; }
+
+        bool IsInRole(string role);
     }
 }

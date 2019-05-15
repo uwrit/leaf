@@ -5,7 +5,7 @@
     <TieredCompilation>true</TieredCompilation>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
-    <ReleaseVersion>3.0.0</ReleaseVersion>
+    <ReleaseVersion>3.1</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,5 +27,6 @@
     <Folder Include="Mock\Options\" />
     <Folder Include="Mock\Models\Collections\" />
     <Folder Include="Mock\Services\Authorization\" />
+    <Folder Include="Util\" />
   </ItemGroup>
 </Project>

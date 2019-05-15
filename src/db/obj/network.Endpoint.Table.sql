@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [network].[Endpoint]    Script Date: 5/2/19 11:58:02 AM ******/
+/****** Object:  Table [network].[Endpoint]    Script Date: 5/9/19 8:47:55 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -19,6 +19,8 @@ CREATE TABLE [network].[Endpoint](
 	[Certificate] [nvarchar](max) NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[Updated] [datetime] NOT NULL,
+	[IsInterrogator] [bit] NOT NULL,
+	[IsResponder] [bit] NOT NULL,
  CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -35,7 +37,7 @@ CREATE TABLE [network].[Endpoint](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Endpoint_1]    Script Date: 5/2/19 11:58:02 AM ******/
+/****** Object:  Index [IX_Endpoint_1]    Script Date: 5/9/19 8:47:55 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Endpoint_1] ON [network].[Endpoint]
 (
 	[Issuer] ASC
@@ -44,4 +46,8 @@ GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Created]  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_Updated]  DEFAULT (getdate()) FOR [Updated]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsInterrogator]  DEFAULT ((0)) FOR [IsInterrogator]
+GO
+ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsResponder]  DEFAULT ((0)) FOR [IsResponder]
 GO

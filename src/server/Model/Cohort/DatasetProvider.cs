@@ -7,7 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Model.Compiler;
-using Model.Search;
+using Model.Error;
 using Model.Validation;
 using Microsoft.Extensions.Logging;
 

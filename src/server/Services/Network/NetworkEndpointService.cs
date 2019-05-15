@@ -5,16 +5,16 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Model.Network;
 using System.Data;
 using System.Data.SqlClient;
-using Dapper;
 using System.Linq;
-using Model.Options;
+using System.Threading.Tasks;
+using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Services.Extensions;
+using Model.Network;
+using Model.Options;
+using Model.Results;
 
 namespace Services.Network
 {
@@ -23,26 +23,17 @@ namespace Services.Network
         const string queryGetIdentity = "network.sp_GetIdentity";
         const string queryGetWithIdentity = "network.sp_GetIdentityEndpoints";
         const string queryGet = "network.sp_GetEndpoints";
-        const string queryGetSince = "network.sp_GetEndpointsUpdatedAfter";
-        const string queryCreate = "network.sp_CreateEndpoint";
-        const string queryDelete = "network.sp_DeleteEndpointById";
         const string queryUpdate = "network.sp_UpdateEndpoint";
 
         readonly AppDbOptions opts;
-        readonly NetworkValidator validator;
-        readonly ILogger<NetworkEndpointService> log;
 
         public NetworkEndpointService(
-            IOptions<AppDbOptions> dbOptions,
-            NetworkValidator networkValidator,
-            ILogger<NetworkEndpointService> logger)
+            IOptions<AppDbOptions> dbOptions)
         {
             opts = dbOptions.Value;
-            validator = networkValidator;
-            log = logger;
         }
 
-        public async Task<IEnumerable<NetworkEndpoint>> AllAsync()
+        public async Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -53,13 +44,11 @@ namespace Services.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                var nrs = ValidateRespondents(ners);
-
-                return nrs;
+                return ners.Select(e => e.NetworkEndpoint());
             }
         }
 
-        public async Task<NetworkIdentityEndpoints> AllWithIdentityAsync()
+        public async Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -74,71 +63,11 @@ namespace Services.Network
                 var identity = grid.Read<NetworkIdentity>().FirstOrDefault();
                 var records = grid.Read<NetworkEndpointRecord>();
 
-                var nes = ValidateRespondents(records);
-
                 return new NetworkIdentityEndpoints
                 {
                     Identity = identity,
-                    Endpoints = nes
+                    Endpoints = records.Select(e => e.NetworkEndpoint())
                 };
-            }
-        }
-
-        public async Task<NetworkEndpoint> CreateAsync(NetworkEndpoint item)
-        {
-            validator.Validate(item);
-
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                var id = cn.ExecuteScalar<int>(
-                    queryCreate,
-                    new
-                    {
-                        name = item.Name,
-                        address = item.Address.AbsoluteUri,
-                        issuer = item.Issuer,
-                        keyid = item.KeyId,
-                        certificate = item.Certificate
-                    },
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                var created = new NetworkEndpoint
-                {
-                    Id = id,
-                    Name = item.Name,
-                    Address = item.Address,
-                    Issuer = item.Issuer,
-                    KeyId = item.KeyId,
-                    Certificate = item.Certificate
-                };
-
-                log.LogInformation("Created NetworkEndpoint. Endpoint:{@Endpoint}", created);
-
-                return created;
-            }
-        }
-
-        public async Task DeleteAsync(NetworkEndpoint item)
-        {
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                await cn.ExecuteAsync(
-                    queryDelete,
-                    new
-                    {
-                        id = item.Id
-                    },
-                    commandTimeout: opts.DefaultTimeout,
-                    commandType: CommandType.StoredProcedure
-                );
-
-                log.LogInformation("Deleted NetworkEndpoint. Endpoint:{@Endpoint}", item);
             }
         }
 
@@ -156,10 +85,9 @@ namespace Services.Network
             }
         }
 
-        public async Task UpdateAsync(NetworkEndpoint item)
+        // TODO(cspital) migrate to future admin service
+        public async Task<UpdateResult<NetworkEndpoint>> UpdateAsync(NetworkEndpoint item)
         {
-            validator.Validate(item);
-
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -178,28 +106,12 @@ namespace Services.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                log.LogInformation("Updated NetworkEndpoint. Old:{@Old} New:{@New}", old, item);
-            }
-        }
-
-        IEnumerable<NetworkEndpoint> ValidateRespondents(IEnumerable<NetworkEndpointRecord> records)
-        {
-            var ok = new List<NetworkEndpoint>();
-            foreach (var rec in records)
-            {
-                try
+                return new UpdateResult<NetworkEndpoint>
                 {
-                    var nr = rec.NetworkEndpoint();
-                    validator.Validate(nr);
-
-                    ok.Add(nr);
-                }
-                catch (UriFormatException ue)
-                {
-                    log.LogError("NetworkEndpoint is invalid. Endpoint:{@Endpoint} Error:{Error}", rec, ue.Message);
-                }
+                    Old = old.NetworkEndpoint(),
+                    New = item
+                };
             }
-            return ok;
         }
     }
 
@@ -217,6 +129,10 @@ namespace Services.Network
 
         public string Certificate { get; set; }
 
+        public bool IsInterrogator { get; set; }
+
+        public bool IsResponder { get; set; }
+
         public NetworkEndpointRecord()
         {
 
@@ -230,6 +146,8 @@ namespace Services.Network
             Issuer = ne.Issuer;
             KeyId = ne.KeyId;
             Certificate = Convert.ToBase64String(ne.Certificate);
+            IsInterrogator = ne.IsInterrogator;
+            IsResponder = ne.IsResponder;
         }
 
         public NetworkEndpoint NetworkEndpoint()
@@ -241,7 +159,9 @@ namespace Services.Network
                 Address = new Uri(Address),
                 Issuer = Issuer,
                 KeyId = KeyId,
-                Certificate = Convert.FromBase64String(Certificate)
+                Certificate = Convert.FromBase64String(Certificate),
+                IsInterrogator = IsInterrogator,
+                IsResponder = IsResponder
             };
         }
     }

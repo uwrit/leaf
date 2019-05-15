@@ -21,7 +21,7 @@ import PatientListTable from '../../components/PatientList/PatientListTable';
 import { AppState, AuthorizationState } from '../../models/state/AppState';
 import { CohortStateType, NetworkCohortState, PatientListState, CohortState } from '../../models/state/CohortState';
 import ExportState from '../../models/state/Export';
-import { NetworkRespondentMap } from '../../models/NetworkRespondent';
+import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { getCsvs } from '../../services/patientListApi';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { RowCount } from '../../components/PatientList/RowCount';
@@ -39,7 +39,7 @@ interface StateProps {
     datasets: DatasetsState;
     isIdentified: boolean;
     patientList: PatientListState;
-    respondents: NetworkRespondentMap;
+    responders: NetworkResponderMap;
     showExportModal: boolean;
     totalPatients: number;
 }
@@ -62,7 +62,7 @@ class PatientList extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const { auth, exportState, cohort, datasets, isIdentified, patientList, respondents, dispatch, showExportModal } = this.props;
+        const { auth, exportState, cohort, datasets, isIdentified, patientList, responders, dispatch, showExportModal } = this.props;
         const c = this.className;
         const classes = [ `${c}-container` ];
         const datasetDefs: PatientListDatasetDefinition[] = [];
@@ -71,10 +71,10 @@ class PatientList extends React.PureComponent<Props, State> {
         /*
          * Calculate the number of patients and rows displayed.
          */
-        let totalRespondents = 0;
+        let totalResponders = 0;
         cohort.networkCohorts.forEach((nc: NetworkCohortState) => {
             if (nc.count.state === CohortStateType.LOADED) {
-                totalRespondents++;
+                totalResponders++;
             }
         });
         const showPaginate = patientList.totalPatients > patientList.configuration.pageSize;
@@ -86,7 +86,7 @@ class PatientList extends React.PureComponent<Props, State> {
             return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
         }
         /*
-         * Show a loading spinner if no respondents have completed yet.
+         * Show a loading spinner if no responders have completed yet.
          */
         if (cohort.patientList.state === CohortStateType.REQUESTING) {
             return (
@@ -112,14 +112,14 @@ class PatientList extends React.PureComponent<Props, State> {
                                 configuration={patientList.configuration} 
                                 datasets={datasets}
                                 dispatch={dispatch} 
-                                respondentMap={respondents}
+                                responderMap={responders}
                             />
                             }
                         </div>
                         <RowCount 
                             exportLimit={auth.config!.exportLimit}
                             isIdentified={isIdentified}
-                            isFederated={totalRespondents > 1}
+                            isFederated={totalResponders > 1}
                             totalCohortPatients={cohort.count.value} 
                             totalPatients={patientList.totalPatients} 
                             totalDatapoints={patientList.totalRows} 
@@ -144,7 +144,7 @@ class PatientList extends React.PureComponent<Props, State> {
                 <PatientListTable
                     className={c}
                     dispatch={dispatch}
-                    respondents={respondents}
+                    responders={responders}
                     patientList={patientList}
                 />
                 {showPaginate && patientList.totalPatients > 25 &&
@@ -181,7 +181,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
         cohort: state.cohort,
         isIdentified: state.session.attestation!.isIdentified,
         patientList: state.cohort.patientList,
-        respondents: state.respondents,
+        responders: state.responders,
         showExportModal: state.generalUi.showExportDataModal,
         totalPatients: state.cohort.count.value
     };

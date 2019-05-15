@@ -20,7 +20,7 @@ import { AppState, MapState } from '../../models/state/AppState';
 import { CohortStateType, NetworkCohortState } from '../../models/state/CohortState';
 import { CohortState } from '../../models/state/CohortState';
 import { Viewport} from '../../models/state/Map';
-import { NetworkIdentity } from '../../models/NetworkRespondent';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 import { CalculateGeodesicLine } from '../../utils/calculateGeodesicLine';
 import computeDimensions from '../../utils/computeDimensions';
 import './LeafMap.css'
@@ -31,7 +31,7 @@ interface OwnProps {
 
 interface StateProps {
     cohort: CohortState;
-    networkRespondents: Map<number,NetworkIdentity>;
+    networkResponders: Map<number,NetworkIdentity>;
     map: MapState;
 }
 
@@ -91,21 +91,21 @@ export class LeafMap extends React.Component<Props, State> {
     }
 
     public render() {
-        const { networkRespondents, cohort, tileUrl, map } = this.props;
+        const { networkResponders, cohort, tileUrl, map } = this.props;
         const { width, height, ref } = this.state;
         const markers: any[] = [];
         const popups: any[] = [];
         const paths: any[] = [];
-        const home: NetworkIdentity = networkRespondents.get(0)!;
-        const respondents: NetworkIdentity[] = networkRespondents.size > 0 && cohort.networkCohorts.size > 0
+        const home: NetworkIdentity = networkResponders.get(0)!;
+        const responders: NetworkIdentity[] = networkResponders.size > 0 && cohort.networkCohorts.size > 0
             ? Array
-                .from(networkRespondents.keys())
-                .map((k: number) => networkRespondents.get(k)!)
+                .from(networkResponders.keys())
+                .map((k: number) => networkResponders.get(k)!)
                 .filter((n: NetworkIdentity) => n.enabled)
             : [];
         
         
-        for (const nr of respondents) {
+        for (const nr of responders) {
             const netCohort = cohort.networkCohorts.get(nr.id);
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
@@ -150,7 +150,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
         cohort: state.cohort,
         map: state.map,
-        networkRespondents: state.respondents
+        networkResponders: state.responders
     };
 }
 

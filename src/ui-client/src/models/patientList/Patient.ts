@@ -16,7 +16,7 @@ export interface Patient {
     detailRowCount: number;
     detailValues: PatientListDetailEncounter[];
     id: string;
-    respondentId: number;
+    responderId: number;
     singletonData: SingletonDataByDatasetKey;
     multirowData: MultirowDataByDatasetKey;
 }
@@ -27,7 +27,7 @@ export interface PatientListRow {
     detailRowCount: number;
     detailValues: PatientListDetailEncounter[];
     isOpen: boolean;
-    respondentId: number;
+    responderId: number;
     values: any[];
 }
 

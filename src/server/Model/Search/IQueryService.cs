@@ -13,9 +13,10 @@ namespace Model.Search
 {
     public interface IQueryService
     {
-        Task<IEnumerable<BaseQuery>> GetQueries();
-        Task<Query> GetQuery(QueryUrn uid);
-        Task<QuerySaveResult> Save(QuerySave query);
-        Task<QueryDeleteResult> Delete(QueryUrn uid, bool force);
+        Task<IEnumerable<BaseQuery>> GetQueriesAsync();
+        Task<Query> GetQueryAsync(QueryUrn uid);
+        Task<QuerySaveResult> InitialSaveAsync(QuerySave query);
+        Task<QuerySaveResult> UpsertSaveAsync(QuerySave query);
+        Task<QueryDeleteResult> DeleteAsync(QueryUrn uid, bool force);
     }
 }

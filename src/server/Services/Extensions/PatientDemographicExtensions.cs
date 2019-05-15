@@ -6,7 +6,7 @@
 using System;
 using Model.Cohort;
 
-// TODO(cspital) move this into the Model
+// TODO(cspital) move this into the Model?
 
 namespace Services.Extensions
 {

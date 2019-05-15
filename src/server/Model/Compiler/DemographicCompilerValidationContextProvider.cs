@@ -5,6 +5,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Model.Error;
+using System.Data.Common;
 
 namespace Model.Compiler
 {
@@ -39,14 +41,22 @@ namespace Model.Compiler
         public async Task<CompilerValidationContext<DemographicCompilerContext>> GetCompilerContextAsync(QueryRef qr)
         {
             log.LogInformation("Getting DemographicQueryCompilerContext. QueryRef:{@QueryRef}", qr);
-
-            var context = await contextProvider.GetCompilerContextAsync(qr);
-            var state = GetContextState(context);
-            return new CompilerValidationContext<DemographicCompilerContext>
+            try
             {
-                Context = context,
-                State = state
-            };
+                var context = await contextProvider.GetCompilerContextAsync(qr);
+                var state = GetContextState(context);
+                return new CompilerValidationContext<DemographicCompilerContext>
+                {
+                    Context = context,
+                    State = state
+                };
+            }
+            catch (DbException de)
+            {
+                log.LogError("Could not get demographic query context. Query:{@QueryRef} Code:{Code} Error:{Error}", qr, de.ErrorCode, de.Message);
+                de.MapThrow();
+                throw;
+            }
         }
 
         CompilerContextState GetContextState(DemographicCompilerContext context)

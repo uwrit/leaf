@@ -28,7 +28,7 @@ export interface CohortState {
 }
 export type CohortMap = Map<number, NetworkCohortState>;
 
-// Respondent-level state
+// Responder-level state
 export interface NetworkCohortState {
     count: PatientCountState;
     id: number;

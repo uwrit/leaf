@@ -39,7 +39,7 @@ The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt
 ```bash
 openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem \
     -out cert.pem -days 3650 -subj \
-    "//CN=urn:leaf:issuer:leaf.<your_institution>.<tld>"
+    "/CN=urn:leaf:issuer:leaf.<your_institution>.<tld>"
 ```
 ```bash
 openssl pkcs12 -in cert.pem -inkey key.pem \
@@ -63,7 +63,8 @@ Server=<server>;Database=<dbname>;uid=sa;Password=<dbpassword>;
 
 ## Configuring the appsettings.json file
 The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. This file can be found under `src/server/API/` relative to the Leaf repo root directory.
-
+- [Runtime](#runtime)
+  - [Mode](#mode): `"FULL"`
 - [Jwt](#jwt)
   - [SigningKey](#signingkey): `"LEAF_JWT_KEY"`
   - [Password](#password): `"LEAF_JWT_KEY_PW"`
@@ -96,6 +97,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
       - [Super](#super): `"urn:mace:uw:groups:uw_rit_leaf_supers"`
       - [Identified](#identified): `"urn:mace:uw:groups:uw_rit_leaf_phis"`
       - [Admin](#admin): `"urn:mace:uw:groups:uw_rit_leaf_admins"`
+      - [Federated](#federated): `"urn:mace:uw:groups:uw_rit_leaf_federated"`
 - [Compiler](#compiler)
   - [Alias](#alias): `"@"`
   - [SetPerson](#setperson): `"dbo.person_table`"
@@ -125,7 +127,11 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
     - [Email](#email): `"<your_support_email>.edu"`
     - [URI](#uri): `"https://<your_support_page>"`
 
-
+## Runtime
+Contains a mode field, indicating `FULL` or `GATEWAY`.
+### Mode
+- `FULL` enables the cohort functionality in Leaf's API.
+- `GATEWAY` disables cohort functionality in Leaf's API.
 ## JWT
 Properties relating to Leaf-issued JavaScript Web tokens (JWTs).
 ### SigningKey
@@ -195,7 +201,8 @@ Configures how the scoped identity header key will look.
       "User": "urn:mace:users",
       "Super": "urn:mace:supers",
       "Identified": "urn:mace:phi",
-      "Admin": "urn:mace:sudos"
+      "Admin": "urn:mace:sudos",
+      "Federated": "urn:mace:federated"
     }
   }
 }

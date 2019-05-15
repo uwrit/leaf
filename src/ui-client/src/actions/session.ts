@@ -9,16 +9,16 @@ import { Dispatch } from 'redux';
 import { registerNetworkCohorts } from '../actions/cohort/count';
 import { initializeSearchEngine } from '../actions/conceptSearch';
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentity, NetworkIdentityRespondentsDTO, NetworkRespondentDTO } from '../models/NetworkRespondent';
+import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO, RuntimeMode } from '../models/NetworkResponder';
 import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
-import { fetchHomeIdentityAndRespondents, fetchRespondentIdentity } from '../services/networkRespondentsApi';
+import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
 import { getExportOptions } from '../services/redcapApi';
 import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutToken } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
-import { errorRespondent, setRespondents } from './networkRespondents';
+import { errorResponder, setResponders } from './networkResponders';
 import { setPatientListDatasets, showConfirmationModal, setPatientListTotalDatasetsAvailableCount } from '../actions/generalUi';
 import { getSavedQueries, getQueriesAsConcepts } from '../services/queryApi';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
@@ -64,26 +64,30 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Get home node identity.
              */
             dispatch(setSessionLoadState('Finding Home Leaf server', 20));
-            const homeBase = await fetchHomeIdentityAndRespondents(getState()) as NetworkIdentityRespondentsDTO;
+            const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
             homeBase.identity.address = '';
 
             /* 
-             * Get respondents.
+             * Get responders.
              */
             dispatch(setSessionLoadState('Finding Partner Leaf servers', 40));
 
             /* 
-             * Fetch network respondents if not in identified mode.
+             * Fetch network responders if not in identified mode.
              */
-            const respondents: NetworkIdentity[] = [ { ...homeBase.identity, enabled: true, id: 0, isHomeNode: true } ];
-            if (!attestation.isIdentified && homeBase.respondents.length) {
+            const responders: NetworkIdentity[] = [];
+            if (homeBase.identity.runtime === RuntimeMode.Full) {
+                responders.push({ ...homeBase.identity, enabled: true, id: 0, isHomeNode: true });
+            }
+            
+            if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
                 await Promise.all(
-                    homeBase.respondents.map((nr: NetworkRespondentDTO, id: number) => { 
+                    homeBase.responders.map((nr: NetworkIdentityResponseDTO, id: number) => { 
                         return new Promise( async(resolve, reject) => {
-                            fetchRespondentIdentity(getState(), nr)
+                            fetchResponderIdentity(getState(), nr)
                                 .then(
-                                    response => respondents.push({ ...response.data, address: nr.address, enabled: true, id: (id + 1), isHomeNode: false }),
-                                    error => errorRespondent(nr.id, error))
+                                    response => responders.push({ ...response.data, address: nr.address, enabled: true, id: (id + 1), isHomeNode: false }),
+                                    error => errorResponder(nr.id, error))
                                 .then(() => resolve())
                         })
                     })
@@ -91,10 +95,10 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             }         
 
             /* 
-             * Set respondents.
+             * Set responders.
              */
-            dispatch(setRespondents(respondents));
-            dispatch(registerNetworkCohorts(respondents));
+            dispatch(setResponders(responders));
+            dispatch(registerNetworkCohorts(responders));
 
             /* 
              * Load export options.

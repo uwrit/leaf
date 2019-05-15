@@ -7,35 +7,35 @@
 
 import React from 'react';
 import { NetworkCohortState, CohortStateType } from '../../../models/state/CohortState';
-import { NetworkIdentity, NetworkRespondentMap } from '../../../models/NetworkRespondent';
-import RespondentStatus from './RespondentStatus';
-import './RespondentStatus.css';
+import { NetworkIdentity, NetworkResponderMap } from '../../../models/NetworkResponder';
+import ResponderStatus from './ResponderStatus';
+import './ResponderStatus.css';
 
 interface Props {
     cohortMap: Map<number, NetworkCohortState>;
-    respondentMap: NetworkRespondentMap;
+    responderMap: NetworkResponderMap;
 }
 
-interface CohortRespondent {
+interface CohortResponder {
     cohort: NetworkCohortState;
-    respondent: NetworkIdentity;
+    responder: NetworkIdentity;
 }
 
-export default class RespondentStatusSummary extends React.PureComponent<Props> {
-    private classname = 'patientlist-respondent-status-summary'
+export default class ResponderStatusSummary extends React.PureComponent<Props> {
+    private classname = 'patientlist-responder-status-summary'
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
         const c = this.classname;
-        const { cohortMap, respondentMap } = this.props;
-        const cohorts: CohortRespondent[] = [];
+        const { cohortMap, responderMap } = this.props;
+        const cohorts: CohortResponder[] = [];
         let completed = 0;
         cohortMap.forEach((nc: NetworkCohortState) => {
-            const r = respondentMap.get(nc.id)!;
+            const r = responderMap.get(nc.id)!;
             if (r.enabled && nc.count.state === CohortStateType.LOADED) {
-                cohorts.push({ cohort: nc, respondent: r });
+                cohorts.push({ cohort: nc, responder: r });
             }
             if (nc.patientList.state === CohortStateType.LOADED) {
                 completed++;
@@ -50,8 +50,8 @@ export default class RespondentStatusSummary extends React.PureComponent<Props> 
                     <span className={`${c}-total`}> {cohorts.length} </span>
                     <span> sites complete</span>
                 </div>
-                {cohorts.map((nc: CohortRespondent) => (
-                    <RespondentStatus cohort={nc.cohort} key={nc.cohort.id} respondent={nc.respondent} />)
+                {cohorts.map((nc: CohortResponder) => (
+                    <ResponderStatus cohort={nc.cohort} key={nc.cohort.id} responder={nc.responder} />)
                 )}
             </div>
         );
