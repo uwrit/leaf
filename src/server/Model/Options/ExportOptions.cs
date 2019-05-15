@@ -13,7 +13,7 @@ namespace Model.Options
     {
         public REDCapOptions REDCap = new REDCapOptions();
 
-        public class REDCapOptions
+        public class REDCapOptions : IEnabled
         {
             public string ApiURI { get; set; }
             public string Scope { get; set; }
@@ -25,11 +25,7 @@ namespace Model.Options
             {
                 get
                 {
-                    if (!string.IsNullOrWhiteSpace(Scope) && !string.IsNullOrWhiteSpace(SuperToken) && !string.IsNullOrWhiteSpace(ApiURI))
-                    {
-                        return true;
-                    }
-                    return false;
+                    return !string.IsNullOrWhiteSpace(Scope) && !string.IsNullOrWhiteSpace(SuperToken) && !string.IsNullOrWhiteSpace(ApiURI);
                 }
             }
         }
