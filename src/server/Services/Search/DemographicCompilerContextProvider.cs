@@ -4,18 +4,16 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
+using Dapper;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
-using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.Data.SqlClient;
-using System.Data;
-using Dapper;
 using Services.Tables;
-using Model.Error;
-using Model.Authorization;
-using Model.Search;
 
 namespace Services.Search
 {
@@ -42,19 +40,9 @@ namespace Services.Search
 
         public async Task<DemographicCompilerContext> GetCompilerContextAsync(QueryRef queryRef)
         {
-            log.LogInformation("Getting DemographicQueryCompilerContext. QueryRef:{@QueryRef}", queryRef);
             var hydrator = GetContextHydrator(queryRef);
-            try
-            {
-                var context = await hydrator(queryRef);
-                return context;
-            }
-            catch (SqlException se)
-            {
-                log.LogError("Could not get demographic query context. Query:{@QueryRef} Code:{Code} Error:{Error}", queryRef, se.ErrorCode, se.Message);
-                se.MapThrow();
-                throw;
-            }
+            var context = await hydrator(queryRef);
+            return context;
         }
 
         Hydrator GetContextHydrator(QueryRef queryRef)

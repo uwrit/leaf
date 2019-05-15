@@ -40,17 +40,8 @@ namespace Services.Search
         public async Task<DatasetCompilerContext> GetCompilerContextAsync(DatasetExecutionRequest request)
         {
             var hydrator = GetHydrator(request);
-            try
-            {
-                var context = await hydrator(request);
-                return context;
-            }
-            catch (SqlException se)
-            {
-                log.LogError("Could not get dataset query context. Context:{@Context} Code:{Code} Error:{Error}", request, se.ErrorCode, se.Message);
-                se.MapThrow();
-                throw;
-            }
+            var context = await hydrator(request);
+            return context;
         }
 
         Hydrator GetHydrator(DatasetExecutionRequest request)
