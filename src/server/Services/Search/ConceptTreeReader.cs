@@ -16,7 +16,7 @@ using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
 using Model.Search;
-using Services.Extensions;
+using Model.Error;
 using Services.Tables;
 
 namespace Services.Search

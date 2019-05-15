@@ -28,6 +28,7 @@ namespace Model
             services.AddTransient<CohortCounter>();
             services.AddTransient<DemographicProvider>();
             services.AddTransient<DatasetProvider>();
+            services.AddTransient<QueryManager>();
 
             services.AddTransient<ConceptHintSearcher>();
             services.AddTransient<ConceptTreeSearcher>();

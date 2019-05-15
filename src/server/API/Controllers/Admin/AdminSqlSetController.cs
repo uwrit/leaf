@@ -15,7 +15,7 @@ using Model.Authorization;
 using Services.Admin;
 using Model.Admin;
 using Model.Validation;
-using Services;
+using Model.Error;
 using API.DTO.Admin;
 
 namespace API.Controllers.Admin

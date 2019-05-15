@@ -13,7 +13,7 @@ using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Services.Tables;
-using Services.Extensions;
+using Model.Error;
 using Model.Authorization;
 using Model.Search;
 

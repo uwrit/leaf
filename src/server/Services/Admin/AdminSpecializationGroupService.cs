@@ -14,7 +14,7 @@ using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Services.Extensions;
+using Model.Error;
 using Services.Tables;
 using System.Linq;
 using Model.Authorization;

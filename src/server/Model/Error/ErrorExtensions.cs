@@ -5,10 +5,17 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Data.Common;
-using Model.Validation;
 
-namespace Services.Extensions
+namespace Model.Error
 {
+    public static class ErrorExtensions
+    {
+        public static void MapThrow(this DbException se)
+        {
+            DbError.ThrowFrom(se);
+        }
+    }
+
     internal static class DbError
     {
         internal static void ThrowFrom(DbException se)
