@@ -1,5 +1,5 @@
 # Deploying Leaf
-Welcome! This page serves as a living document for deploying Leaf to your environment. For suggestions, comments, or questions you think we should address, please let us know by commenting here https://github.com/uwrit/leaf/issues/62.
+Welcome! This page serves as a living document for deploying Leaf to your environment. For suggestions, comments, or questions you think we should address, please feel free to open an issue..
 
 ## Architecture
 Leaf is designed to be deployed in a standard [three-tier architecture](https://en.wikipedia.org/wiki/Multitier_architecture). These tiers are:
