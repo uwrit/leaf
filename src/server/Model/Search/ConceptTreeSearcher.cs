@@ -4,10 +4,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Data.Common;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Model.Compiler;
 using Model.Validation;
+using Model.Error;
 using Microsoft.Extensions.Logging;
 
 namespace Model.Search
@@ -50,7 +52,7 @@ namespace Model.Search
         /// <param name="root">Optional root id to search within.</param>
         /// <param name="term">Search term to match on.</param>
         /// <exception cref="ArgumentNullException"/>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<IEnumerable<Concept>> GetAncestryBySearchTermAsync(Guid? root, string term)
         {
             Ensure.NotNull(term, nameof(term));
@@ -66,13 +68,24 @@ namespace Model.Search
         /// <returns>Identified concepts and ancestry.</returns>
         /// <param name="ids">Concept Ids.</param>
         /// <exception cref="ArgumentNullException"/>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
+        /// <exception cref="LeafRPCException"/>
         public async Task<IEnumerable<Concept>> GetAncestryAsync(HashSet<Guid> ids)
         {
             Ensure.NotNull(ids, nameof(ids));
 
             log.LogInformation("Getting parent concepts for Ids:{Ids}", ids);
-            return await reader.GetWithParentsAsync(ids);
+
+            try
+            {
+                return await reader.GetWithParentsAsync(ids);
+            }
+            catch (DbException de)
+            {
+                log.LogError("Could not get rooted concepts of children ids {Ids}. Error:{Error}", ids, de.Message);
+                de.MapThrow();
+                throw;
+            }
         }
 
         /// <summary>
@@ -81,19 +94,27 @@ namespace Model.Search
         /// <returns>Child concepts.</returns>
         /// <param name="parent">Parent concept id.</param>
         /// <exception cref="LeafRPCException"/>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<IEnumerable<Concept>> GetChildrenAsync(Guid parent)
         {
             log.LogInformation("Getting child concepts. Parent:{Parent}", parent);
-
-            return await reader.GetChildrenAsync(parent);
+            try
+            {
+                return await reader.GetChildrenAsync(parent);
+            }
+            catch (DbException de)
+            {
+                log.LogError("Could not get child concepts. ParentId:{ParentId} Error:{Error}", parent, de.Message);
+                de.MapThrow();
+                throw;
+            }
         }
 
         /// <summary>
         /// Provides a concept tree, containing the root concepts and panel filters.
         /// </summary>
         /// <returns>The root concept tree.</returns>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<ConceptTree> GetTreetopAsync() => await reader.GetTreetopAsync();
 
         /// <summary>
@@ -102,12 +123,20 @@ namespace Model.Search
         /// <returns>The concept if found, else null.</returns>
         /// <param name="id">Concept id.</param>
         /// <exception cref="LeafRPCException"/>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<Concept> GetAsync(Guid id)
         {
             log.LogInformation("Getting Concept. Id:{Id}", id);
-
-            return await reader.GetAsync(id);
+            try
+            {
+                return await reader.GetAsync(id);
+            }
+            catch (DbException de)
+            {
+                log.LogError("Could not get concept by Id. Id:{Id} Error:{Error}", id, de.Message);
+                de.MapThrow();
+                throw;
+            }
         }
 
         /// <summary>
@@ -115,7 +144,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>The allowed concepts.</returns>
         /// <param name="ids">Concept ids.</param>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<Guid> ids)
         {
             log.LogInformation("Getting Concepts. Ids:{Ids}", ids);
@@ -128,7 +157,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>The allowed concepts.</returns>
         /// <param name="uids">Concept universal ids.</param>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<string> uids)
         {
             log.LogInformation("Getting Universal Concepts. UIds:{UIds}", uids);
