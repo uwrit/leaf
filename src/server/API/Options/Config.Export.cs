@@ -22,6 +22,7 @@ namespace API.Options
                 public const string RowLimit = @"Export:REDCap:RowLimit";
                 public const string Scope = @"Export:REDCap:Scope";
                 public const string SuperToken = @"Export:REDCap:SuperToken";
+                public const string Enabled = @"Export:REDCap:Enabled";
             }
         }
     }

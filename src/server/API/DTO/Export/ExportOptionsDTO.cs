@@ -12,14 +12,14 @@ namespace API.DTO.Export
 {
     public class ExportOptionsDTO
     {
-        public REDCapOptions REDCap { get; set; }
+        public REDCapOptionsDTO REDCap { get; set; }
 
         public ExportOptionsDTO(ExportOptions exportOptions)
         {
-            REDCap = new REDCapOptions(exportOptions.REDCap);
+            REDCap = new REDCapOptionsDTO(exportOptions.REDCap);
         }
 
-        public class REDCapOptions
+        public class REDCapOptionsDTO
         {
             public string ApiURI { get; set; }
             public string Scope { get; set; }
@@ -27,7 +27,7 @@ namespace API.DTO.Export
             public int RowLimit { get; set; }
             public bool Enabled { get; set; }
 
-            public REDCapOptions(ExportOptions.REDCapOptions redcapOptions)
+            public REDCapOptionsDTO(REDCapOptions redcapOptions)
             {
                 ApiURI = redcapOptions.ApiURI;
                 Scope = redcapOptions.Scope;

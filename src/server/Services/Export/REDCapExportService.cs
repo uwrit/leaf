@@ -22,7 +22,7 @@ namespace Services.Export
     public class REDCapExportService : IREDCapExportService
     {
         readonly ILogger<REDCapExportService> logger;
-        readonly ExportOptions.REDCapOptions options;
+        readonly REDCapOptions options;
         readonly HttpClient client;
         readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
