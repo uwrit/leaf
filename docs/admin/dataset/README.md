@@ -59,7 +59,7 @@ Currently the Basic Demographics query (and other datasets) must be added via SQ
 
 ```sql
 SELECT 
-    personId = CASE(p.person_id AS NVARCHAR)
+    personId = CAST(p.person_id AS NVARCHAR)
   , addressPostalCode = l.zip
   , addressState = p.location_state
   , birthDate = p.birth_datetime
@@ -88,7 +88,7 @@ INSERT [app].[DemographicQuery] ([Lock], [SqlStatement], [Shape], [LastChanged],
 VALUES 
 (   'X'
   , 'SELECT 
-        personId = CASE(p.person_id AS NVARCHAR)
+      personId = CAST(p.person_id AS NVARCHAR)
     , addressPostalCode = l.zip
     , addressState = p.location_state
     , birthDate = p.birth_datetime
