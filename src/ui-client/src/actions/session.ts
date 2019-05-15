@@ -9,7 +9,7 @@ import { Dispatch } from 'redux';
 import { registerNetworkCohorts } from '../actions/cohort/count';
 import { initializeSearchEngine } from '../actions/conceptSearch';
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkResponderDTO } from '../models/NetworkResponder';
+import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO, RuntimeMode } from '../models/NetworkResponder';
 import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
@@ -75,11 +75,14 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Fetch network responders if not in identified mode.
              */
-            const responders: NetworkIdentity[] = [ { ...homeBase.identity, enabled: true, id: 0, isHomeNode: true } ];
+            const responders: NetworkIdentity[] = [];
+            if (homeBase.identity.runtime === RuntimeMode.Full) {
+                responders.push({ ...homeBase.identity, enabled: true, id: 0, isHomeNode: true });
+            }
             
             if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
                 await Promise.all(
-                    homeBase.responders.map((nr: NetworkResponderDTO, id: number) => { 
+                    homeBase.responders.map((nr: NetworkIdentityResponseDTO, id: number) => { 
                         return new Promise( async(resolve, reject) => {
                             fetchResponderIdentity(getState(), nr)
                                 .then(

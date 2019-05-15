@@ -61,4 +61,3 @@ export interface StoredSessionState {
     panelFilters: PanelFilter[];
     timestamp: number;
 }
-
