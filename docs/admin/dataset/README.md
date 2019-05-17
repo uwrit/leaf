@@ -2,7 +2,7 @@
 - [Introduction](#introduction)
 - [Basic Demographics](#basic-demographics)
 - [Adding New Datasets](#adding-new-datasets)
-- [Dataset Templates Reference](#dataset-template-reference)
+- [Dataset Templates Reference](#dataset-templates-reference)
   - [Observation](#observation)
   - [Encounter](#encounter)
   - [Basic Demographics](#basic-demographics-1)
@@ -159,11 +159,11 @@ SELECT 'Labs', GETDATE()
 SELECT Id, Category
 FROM [app].[DatasetQueryCategory]
 ```
+Output:
 
-This outputs:
-| Id | Category |
-| -- | -------- |
-| 1  | Labs     |
+| Id  | Category |
+| --- | -------- |
+| 1   | Labs     |
 
 ### Determine the Template and Query
 Next, we'll determine which dataset template is the best fit for this new dataset by checking the [Dataset Templates Reference](#dataset-templates-reference) below. In FHIR labs are generally represented as [Observations](#observation), so let's use that.
