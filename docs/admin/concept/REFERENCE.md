@@ -173,7 +173,7 @@ urn:leaf:concept:encounter:type=outpatient
 Or a Concept representing diagnosis codes for hypertension in pregnancy in ICD-10 could be:
 
 ```
-urn:leaf:concept:diagnosis:coding=icd10&code=O13.9
+urn:leaf:concept:diagnosis:coding=icd10+code=O13.9
 ```
 
 Note that these are simply examples, and you are free to define `UniversalIds` as you'd like. Perhaps the most important point though is to be sure that the `UniversalId` naming conventions for your Leaf instance and any other Leaf instances match exactly.
