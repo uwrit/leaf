@@ -15,7 +15,7 @@
 * **Flexible:** Clinical databases come in all shapes and sizes. Leaf can work with nearly any clinical data model, including the [OMOP Common Data Model](https://github.com/OHDSI/CommonDataModel), [i2b2 and SHRINE](https://github.com/i2b2/i2b2-data), or other proprietary or non-standard data models. Add Leaf as a sidecar to an existing data warehouse.
 * **User Friendly:** Leaf is designed to be simple, intuitive, and fast. Searching for diagnosis or procedural codes, labs, or whatever you point Leaf to is easy.
 * **Secure:** Security of protected health information is critical to any healthcare organization. Leaf implements current best security practices to make clinical data both accessible and safe.
-* **Open:** Curious how Leaf works, how you can help, or how you can use Leaf to help researchers at your <a href="https://ncats.nih.gov/ctsa">CTSA</a>? Let us know! Leaf is an open-source project *by CTSAs, for CTSAs*. See the [CONTRIBUTING.md](https://github.com/uwrit/leaf/blob/master/CONTRIBUTING.md) document to learn more.
+* **Open:** Curious how Leaf works, how you can help, or how you can use Leaf to help researchers at your <a href="https://ncats.nih.gov/ctsa">CTSA</a>? [Let us know!](https://github.com/uwrit/leaf/blob/master/CONTRIBUTING.md) Leaf is an open-source project *by CTSAs, for CTSAs*.
 
 Leaf is developed by real people passionate about translational biomedical science and software engineering. :smiley:
 
