@@ -6,6 +6,7 @@
     - [Demographics](#demographics)
     - [Road test](#road-test)
     - [Encounters](#encounters)
+- [Making Concepts Searchable](#making-concepts-searchable)
 - [Final Thoughts](#final-thoughts)
 
 
@@ -214,7 +215,18 @@ The field-level information for each Concept is (making sure to nest `Inpatient`
         - `Table, View, or Subquery`: "dbo.v_visit_occurrence"
         - `WHERE Clause`: "@.visit_type_code = 'OP'"
 
-And that's it! 
+And that's it!
+
+## Making Concepts Searchable
+So you've been able to make Concepts that users can query - great! Over time you'll likely find that your Concept tree will grow as you find new use cases and data sources, and may because more cumbersome for users to manually traverse.
+
+GIF HERE
+
+Leaf's Concept search is a powerful feature which will automatically parse and tokenize the text in your Concepts. This allows users to search for Concepts of interest to them in any word order. To enable this feature, run the [app.sp_UpdateSearchIndexTables](https://github.com/uwrit/leaf/blob/master/src/db/obj/app.sp_UpdateSearchIndexTables.StoredProcedure.sql) stored procedure.
+
+Leaf search works by using a relatively simple [inverted index](https://en.wikipedia.org/wiki/Inverted_index) and [forward index](https://en.wikipedia.org/wiki/Search_engine_indexing#The_forward_index) search engine in pure SQL.
+
+**Note: Be sure to run this stored procedure after any edits or additions to your Concept tree to ensure that users can search for all current Concepts.**
 
 ## Final thoughts
 If you were able to successfully make the Concepts in this tutorial, congratulations! Hopefully this was helpful and intuitive enough for you to get started making your clinical database accessible and intuitive for your users as well. 
