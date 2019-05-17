@@ -32,7 +32,7 @@ Leaf is designed to be deployed in a standard [three-tier architecture](https://
 1) [Creating Concepts](https://github.com/uwrit/leaf/tree/master/docs/admin/concept/README.md)
 2) [Defining the Basic Demographics Dataset](https://github.com/uwrit/leaf/blob/master/docs/admin/dataset/README.md#basic-demographics)
 3) [Setting the Instance Name, Description, and Colors](https://github.com/uwrit/leaf/blob/master/docs/deploy/db/README.md#defining-the-instance-name-description-and-colorset)
-4) [Adding Other Datasets](https://github.com/uwrit/leaf/blob/master/docs/admin/dataset/README.md#adding-datasets)
+4) [Adding New Datasets](https://github.com/uwrit/leaf/blob/master/docs/admin/dataset/README.md#adding-new-datasets)
 
 ## Networking Multiple Leaf instances
 One powerful feature of Leaf is the ability to federate user queries to multiple Leaf instances, even those using different data models. This enables institutions to securely compare patient populations in a de-identified fashion. An example of this functionality can be found at https://www.youtube.com/watch?v=ZuKKC7B8mHI. 
