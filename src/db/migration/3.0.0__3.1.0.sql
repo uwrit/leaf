@@ -5,6 +5,8 @@ ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsInterrogator]  D
 ALTER TABLE [network].[Endpoint] ADD  CONSTRAINT [DF_Endpoint_IsResponder]  DEFAULT (0) FOR [IsResponder]
 GO
 
+ALTER TABLE app.DatasetQuery ALTER COLUMN UniversalId NVARCHAR(200) NULL
+
 DROP PROCEDURE [network].[sp_CreateEndpoint]
 DROP PROCEDURE [network].[sp_DeleteEndpointById]
 GO

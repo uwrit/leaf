@@ -12,10 +12,10 @@ namespace Model.Cohort
     [Schema(Shape = Shape.MedicationRequest)]
     public class MedicationRequest : ShapedDataset
     {
-        [Field(Name = MedicationRequestColumns.Amount, Type = LeafType.String)]
+        [Field(Name = MedicationRequestColumns.Amount, Type = LeafType.Numeric)]
         public object Amount { get; set; }
 
-        [Field(Name = MedicationRequestColumns.AuthoredOn, Type = LeafType.String, Required = true)]
+        [Field(Name = MedicationRequestColumns.AuthoredOn, Type = LeafType.DateTime, Required = true)]
         public DateTime? AuthoredOn { get; set; }
 
         [Field(Name = MedicationRequestColumns.Category, Type = LeafType.String, Required = true)]

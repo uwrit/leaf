@@ -3,36 +3,11 @@ The application server hosts the [Leaf REST API](https://github.com/uwrit/leaf/t
 
 The API is written in C# and .NET Core, and can run in either Linux or Windows environments.
 
-## Building the API
-There are a variety of ways to build the API, the `dotnet` CLI tool supports both self-contained builds, as well as runtime dependent targets. Although .NET Core is cross-platform, some targets have some quirks that should be called out. If you're curious, you can review the build.sh script in the project's root directory. Self-contained builds produce an executable and embeds the entire .NET runtime in the build artifacts, this results in a much larger deployment payload but removes the need to install the .NET Core runtime on your target machine. Conversely, runtime dependent builds assume that the .NET Core runtime will be installed on your target machine and only includes the application and it's 3rd party dependencies in the artifact folder.
-
-### Windows
-Windows fully supports both self-contained builds as well as runtime dependent builds.
-
-Self-contained:
-```bash
-dotnet publish -c Release -r win-x64 -o <output_dir>
-```
-Runtime dependent:
-```bash
-dotnet publish -c Release -o <output_dir>
-```
-### Red Hat Enterprise Linux (RHEL)/CentOS
-RHEL7 and Cent7 only support runtime dependent builds and require.
-
-On RHEL7 or Cent7 with .NET Core installed:
-```bash
-dotnet publish -c Release -o <output_dir>
-```
-On Windows/MacOS building for RHEL/Cent:
-```bash
-dotnet publish -c Release -o <output_dir> -r rhel.7-x64 --self-contained false /p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App
-```
-
 ## Installation
 1) [Creating a JWT Signing Key](#creating-a-jwt-signing-key)
 2) [Setting Environment Variables](#setting-environment-variables)
 3) [Configuring the appsettings.json file](#configuring-the-appsettingsjson-file)
+4) [Building the API](#building-the-api)
 
 ## Creating a JWT Signing Key
 The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt.io/introduction/) (pronounced "JA-ts"). In a bash terminal, start by creating a JWT signing key. This allows the JWT recipient to verify the sender is who they say they are.
@@ -113,6 +88,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
   - [ExportLimit](#exportlimit): `5000`
 - [Export](#export)
   - [REDCap](#redcap)
+    - [Enabled](#enabled): `true`
     - [ApiURI](#apiuri): `"https://<your_redcap_instance>.org/api"`
     - [BatchSize](#batchsize): `10`
     - [RowLimit](#rowlimit): `50000`
@@ -120,7 +96,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
     - [SuperToken](#supertoken): `"LEAF_REDCAP_SUPERTOKEN"`
 - [Client](#client)
   - [Map](#map)
-    - [Enabled](#enabled): `true`
+    - [Enabled](#enabled-1): `true`
     - [TileURI](#tileuri): `"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"`
   - [Help](#help)
     - [Enabled](#enabled): `true`
@@ -295,13 +271,15 @@ The maximum number of individual patients that Leaf will return to the client on
 ## Export
 Properties relating to the export of data from Leaf to other applications.
 ### REDCap
-Properties relating to the export of data to a [REDCap](https://www.project-redcap.org/) instance. REDCap export is completely optional and will not be enabled if any of these values are omitted.
+Properties relating to the export of data to a [REDCap](https://www.project-redcap.org/) instance. REDCap export is completely optional.
+#### Enabled
+Boolean value indicated whether or not REDCap export should be enabled. This must be `true` or `false`.
 #### ApiURI
-The absolute path to a given REDCap instance's root API path, such as `https://redcap.vanderbilt.edu/api` . Note that this should **not** end with `/`.
+The absolute path to a given REDCap instance's root API path, such as `https://redcap.vanderbilt.edu/api`. Note that this should **not** end with `/`.
 #### BatchSize
 The number of rows of data per API request that Leaf will export to REDCap. This number should be relatively low, such as 10, and is used to give feedback to users as to progress and estimated time remaining.
 #### RowLimit
-The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number if users are simply viewing the `Patient List`, but they will be prevented from exporting. This is designed to prevent the export of larger datasets than REDCap is designed to manage.
+The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number if users are simply viewing the `Patient List`, but they will be prevented from exporting. This is designed to prevent the export of larger datasets than REDCap is able to effectively manage.
 #### Scope
 The scoped identity for the REDCap instance that will be exported to. This is typically the `u.<insitution>.edu` in `sally_johnson@u.<institution>.edu`. When assigning user permissions via the REDCap API, Leaf will prepend the current user name (e.g. `sally_johnson`) to this value.
 #### SuperToken
@@ -318,10 +296,37 @@ Boolean value indicating whether to show a `Map` tab on the left of the screen. 
 URI for the `tile layer` from which to request dynamic images and generate maps for, such as `https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png`. Leaf uses [Leaflet.js](https://leafletjs.com/) and [React-Leaflet](https://react-leaflet.js.org/) for map generation. A list of Leaflet tile layer providers can be found here https://leaflet-extras.github.io/leaflet-providers/preview/.
 
 ### Help
-Properties relating to the `Help` floating button which appears in the lower-left of the screen.
+Properties relating to the `Help` floating button which appears in the lower-left of the screen. If enabled, the help button must have values in either the [Email](#email) or [URI](#uri) properties, or both.
+![Help](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/help.gif "Help")
 #### Enabled 
 Boolean value indicating whether to show the `Help` button. This must be `true` or `false`. If false, nothing will be shown.
 #### Email
-Email path with to direct user questions to, such as `<your_support_email>.edu`. If users click the `Help` button, their default email client will be triggered to draft a new email to this address.
+Email address to direct user questions to, such as `<your_support_email>.edu`. Clicking `Contact a Leaf administrator` will direct users' default email client to draft a new email to this address.
 #### URI
-Similar to [Email](#email), but instead an absolute path to direct users to if clicked, such as a FAQ page. Note that **Email and URI are mutually exclusive**, and if both are defined the email workflow will begin.
+Similar to [Email](#email), but instead a URL to direct users to if clicked, such as a FAQ page. This will be clickable under `Learn more here`.
+
+## Building the API
+There are a variety of ways to build the API, as the `dotnet` CLI tool supports both self-contained builds as well as runtime dependent targets. Although .NET Core is cross-platform, some targets have quirks that should be noted. If you're curious, you can review the [build.sh](https://github.com/uwrit/leaf/blob/master/build.sh) script in the project's root directory. Self-contained builds produce an executable and embed the entire .NET runtime in the build artifacts, resulting in a much larger deployment payload but removing the need to install the .NET Core runtime on your target machine. Conversely, runtime dependent builds assume that the .NET Core runtime will be installed on your target machine and only includes the application and its 3rd party dependencies in the artifact folder.
+
+### Windows
+Windows fully supports both self-contained builds as well as runtime dependent builds.
+
+Self-contained:
+```bash
+dotnet publish -c Release -r win-x64 -o <output_dir>
+```
+Runtime dependent:
+```bash
+dotnet publish -c Release -o <output_dir>
+```
+### Red Hat Enterprise Linux (RHEL)/CentOS
+RHEL7 and Cent7 only support runtime dependent builds.
+
+On RHEL7 or Cent7 with .NET Core installed:
+```bash
+dotnet publish -c Release -o <output_dir>
+```
+On Windows/MacOS building for RHEL/Cent:
+```bash
+dotnet publish -c Release -o <output_dir> -r rhel.7-x64 --self-contained false /p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App
+```

@@ -35,7 +35,7 @@ export class HintContainer extends React.PureComponent<Props> {
             <div className={`${c}-hint-container`}>
 
                 {/* 'Possible Equivalent of' ICD9->10 or ICD10->9 suggestion */}
-                {termIsNumeric && currentEquivalentHint.targetCode && 
+                {conceptSearchState.term.length > 0 && termIsNumeric && currentEquivalentHint.targetCode &&
                  <div className={`${c}-hint-equivalent`}>
                     <span className={`${c}-hint-equivalent-text`}>Possible equivalent of </span>
                     <span 

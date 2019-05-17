@@ -173,7 +173,7 @@ urn:leaf:concept:encounter:type=outpatient
 Or a Concept representing diagnosis codes for hypertension in pregnancy in ICD-10 could be:
 
 ```
-urn:leaf:concept:diagnosis:coding=icd10&code=O13.9
+urn:leaf:concept:diagnosis:coding=icd10+code=O13.9
 ```
 
 Note that these are simply examples, and you are free to define `UniversalIds` as you'd like. Perhaps the most important point though is to be sure that the `UniversalId` naming conventions for your Leaf instance and any other Leaf instances match exactly.
@@ -201,3 +201,4 @@ Good news: That's okay!
 If a user uses one or more Concepts that are "local only" and don't have `UniversalIds`, Leaf will let them know which institutions weren't able to run the query.
 
 ## Creating Concepts by SQL Scripts
+Certain Concepts are inherantly hierarchical or voluminous enough that it makes more sense to programmatically add them, such as diagnosis or procedure codes. Head over to the Leaf Scripts repo at https://github.com/uwrit/leaf-scripts to see examples of how to do this.

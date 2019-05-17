@@ -128,7 +128,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
                         }
 
                         {/* Search suggestions pseudo-dropdown */}
-                        {showHintsDropdown && !conceptsState.requestingSearchTree && 
+                        {showHintsDropdown && !conceptsState.requestingSearchTree &&
                         <HintContainer 
                             conceptSearchState={conceptsSearchState}
                             dispatch={dispatch}
