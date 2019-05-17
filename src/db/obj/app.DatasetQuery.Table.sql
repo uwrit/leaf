@@ -12,7 +12,7 @@ SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [app].[DatasetQuery](
 	[Id] [uniqueidentifier] NOT NULL,
-	[UniversalId] [nvarchar](200) NOT NULL,
+	[UniversalId] [nvarchar](200) NULL,
 	[Shape] [int] NOT NULL,
 	[Name] [nvarchar](200) NOT NULL,
 	[CategoryId] [int] NULL,
