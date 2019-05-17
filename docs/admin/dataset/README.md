@@ -19,7 +19,7 @@ At a high level, Leaf aims to do two things:
 1) Identify cohorts of patients (using [Concepts](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/README.md)).
 2) Extract data for those patients.
 
-After users identify a Cohort in (1), they can next do (2). In Leaf, extracted data for a cohort are called "datasets", which is short-hand for `Patient List Datasets`. This refers to the row-level patient data you can see on the `Patient List` screen.
+After users identify a Cohort in (1), they can next do (2), which we'll explain here. In Leaf, extracted data for a cohort are called "datasets", which is short-hand for `Patient List Datasets`. This refers to the row-level patient data you can see on the `Patient List` screen.
 
 Each dataset is based on templates, or denormalized tabular representations of [FHIR resources](https://www.hl7.org/fhir/resourcelist.html). In order to add datasets, administrators can define SQL queries whose column names and types match a given template. 
 
@@ -55,9 +55,13 @@ The expected columns are:
 
 ### Key Points
 - **All columns in `Basic Demongraphics` are required** - Leaf will automatically date-shift, calculate ages, and remove the HIPAA identified columns (`mrn` and `name`) depending on if the user is in `Identified` or `De-identified` mode.
+
 - **The Patient Identifier column must be called *personId*** - While Leaf Concepts are flexible regarding the [column name for patient identifiers](https://github.com/uwrit/leaf/blob/master/docs/deploy/app/README.md#fieldpersonid), datasets are more restrictive and require a predictable, specific column name. This ensures alignment of Leaf datasets when multiple Leaf instances are federated, among other reasons.
+
 - **It's okay if you don't have data for every column** - Though every column must be returned in the SQL statement, it's fine to hard-code it as 'Unknown', etc. For example, `religion = 'Unknown'`.
+
 - **The `isDeceased`, `isHispanic`, and `isMarried` bit/boolean columns are used in the bar charts on the `Visualize` screen** - These are needed because Leaf does not enforce specific values for the `ethnicity` or `maritalStatus` columns (so you have flexiblity in showing your data as it is), but in return you need to define these true/false columns yourself. For example, `hispanicBoolean = CAST(CASE ethnicity WHEN 'Hispanic or Latino' THEN 1 ELSE 0 END AS BIT)`.
+
 - **Values in `gender` must be `F`, `Female`, `M`, or `Male`** - This allows them to be predictably aggregated in bar charts (case insensitive).
 
 ### Defining the Basic Demographics Query
@@ -137,12 +141,13 @@ To do so, we'll need to add rows in the [app.DatasetQuery](https://github.com/uw
 
 Let's start with an example. In this case, we'll add a [Platelet](https://en.wikipedia.org/wiki/Platelet) dataset which will represent platelet count laboratory tests.
 
-1) To begin, we need to decide how best to visually organize the platelets dataset, specifically whether to place it under a category or not. Visually this would look like:
+### Create a Dataset Category
+To begin, we need to decide how best to visually organize the platelets dataset, specifically whether to place it under a category or not. Visually this would look like:
 
-Under a 'Labs' Category
+**Under a 'Labs' Category**
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/dataset_category.png"/></p>
 
-Uncategorized
+**Uncategorized**
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/dataset_nocategory.png"/></p>
 
 In most cases, we recommend categorizing datasets to provide context to users, particularly as your datasets grow in number. To add a category, simply insert a row into the [app.DatasetQueryCategory](https://github.com/uwrit/leaf/blob/master/src/db/obj/app.DatasetQueryCategory.Table.sql) table. You'll use the `Id` created as a foreign key to the `app.DatasetQuery` `CategoryId` field.
@@ -155,11 +160,13 @@ SELECT Id, Category
 FROM [app].[DatasetQueryCategory]
 ```
 
+This outputs:
 | Id | Category |
 | -- | -------- |
 | 1  | Labs     |
 
-2) Next, we'll determine which dataset template is the best fit for this new dataset by checking the [Dataset Templates Reference](#dataset-templates-reference) below. In FHIR labs are generally represented as [Observations](#observation), so let's use that.
+### Determine the Template and Query
+Next, we'll determine which dataset template is the best fit for this new dataset by checking the [Dataset Templates Reference](#dataset-templates-reference) below. In FHIR labs are generally represented as [Observations](#observation), so let's use that.
 
 For demonstrative purposes we'll use data from the [MIMIC Critical Care Database](https://mimic.physionet.org/), but the methods here can be applied to other data models as well.
 
@@ -175,7 +182,7 @@ To output a SQL set satisfying the [Observation](#observation) template columns,
 
 ```sql
 SELECT 
-	personId      = CAST(SUBJECT_ID AS NVARCHAR)
+    personId      = CAST(SUBJECT_ID AS NVARCHAR)
   , encounterId   = CAST(HADM_ID AS NVARCHAR)
   , category      = 'lab'
   , code          = LOINC_CODE
@@ -195,7 +202,8 @@ Which would output:
 | 1          | 200         | lab      | 777-3 | 2101-02-10      | 192         | 192           | K/uL      | 
 | 2          | 300         | lab      | 777-3 | 2101-12-22      | 533         | 533           | K/uL      |
 
-3) Next, we need to insert a row into the `app.DatasetQuery` table:
+### Insert the dataset
+Next, we need to insert a row into the `app.DatasetQuery` table:
 
 ```sql
 DECLARE @categoryId INT      = 1
@@ -226,11 +234,14 @@ SELECT
   , '<my_user_name'
 ```
 
-4) Now just test it!
+### Test
+Finally, let's test to see if the dataset works. In the Leaf client app, run a query for a cohort which you know to have platelet lab values. In the `Patient List`, select the new dataset.
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/dataset_add.gif"/></p>
 
-If you're able to navigate to the `Patient List` and add the new dataset, congratulations! If you run into errors, be sure to check the Leaf logs.
+If you're able to navigate to the `Patient List` and add the new dataset, congratulations! Leaf automatically determines that this is a numeric dataset because the `valueQuantity` field is populated, and computes statistics for each patient.
+
+>If you run into errors, be sure to check the Leaf logs.
 
 ## Dataset Templates Reference
 As mentioned in the [Introduction](#introduction), datasets are denormalized, tabular representations of [FHIR resources](https://www.hl7.org/fhir/resourcelist.html).
@@ -255,15 +266,15 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name               | Type      | Required | Is PHI |
 | -----------------  | --------- | -------- | ------ |
-| personId           | nvarchar  | true     | true   |
-| encounterId        | nvarchar  | true     | true   |
-| category           | nvarchar  | true     |        |
-| code               | nvarchar  | true     |        |
-| effectiveDate      | datetime  | true     | true   |
+| personId           | nvarchar  | X        | X      |
+| encounterId        | nvarchar  | X        | X      |
+| category           | nvarchar  | X        |        |
+| code               | nvarchar  | X        |        |
+| effectiveDate      | datetime  | X        | X      |
 | referenceRangeLow  | datetime  |          |        |
 | referenceRangeHigh | nvarchar  |          |        |
 | specimenType       | nvarchar  |          |        |
-| valueString        | nvarchar  | true     |        |
+| valueString        | nvarchar  | X        |        |
 | valueQuantity      | numeric   |          |        |
 | valueUnit          | nvarchar  |          |        |
 
@@ -277,13 +288,13 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| admitDate            | datetime  |          | true   |
-| class                | nvarchar  | true     |        |
-| dischargeDate        | datetime  | true     | true   |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| admitDate            | datetime  |          | X      |
+| class                | nvarchar  | X        |        |
+| dischargeDate        | datetime  | X        | X      |
 | dischargeDisposition | nvarchar  |          |        |
-| location             | nvarchar  | true     |        |
+| location             | nvarchar  | X        |        |
 | status               | nvarchar  |          |        |
 
 ## Basic Demographics
@@ -295,22 +306,22 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name              | Type      | Required | Is PHI |
 | ----------------- | --------- | -------- | ------ |
-| personId          | nvarchar  | true     | true   |
-| addressPostalCode | nvarchar  | true     |        |
-| addressState      | nvarchar  | true     |        |
-| birthDate         | datetime  | true     |        |
-| deceasedDateTime  | datetime  | true     |        |
-| ethnicity         | nvarchar  | true     |        |
-| gender            | nvarchar  | true     |        |
-| deceasedBoolean   | bit       | true     |        |
-| hispanicBoolean   | bit       | true     |        |
-| marriedBoolean    | bit       | true     |        |
-| language          | nvarchar  | true     |        |
-| maritalStatus     | nvarchar  | true     |        |
-| mrn               | nvarchar  | true     | true   |
-| name              | nvarchar  | true     | true   |
-| race              | nvarchar  | true     |        |
-| religion          | nvarchar  | true     |        |
+| personId          | nvarchar  | X        | X      |
+| addressPostalCode | nvarchar  | X        |        |
+| addressState      | nvarchar  | X        |        |
+| birthDate         | datetime  | X        |        |
+| deceasedDateTime  | datetime  | X        |        |
+| ethnicity         | nvarchar  | X        |        |
+| gender            | nvarchar  | X        |        |
+| deceasedBoolean   | bit       | X        |        |
+| hispanicBoolean   | bit       | X        |        |
+| marriedBoolean    | bit       | X        |        |
+| language          | nvarchar  | X        |        |
+| maritalStatus     | nvarchar  | X        |        |
+| mrn               | nvarchar  | X        | X      |
+| name              | nvarchar  | X        | X      |
+| race              | nvarchar  | X        |        |
+| religion          | nvarchar  | X        |        |
 
 ## Condition
 *Dataset Shape **4*** - A representation of the [FHIR Condition Resource](https://www.hl7.org/fhir/condition.html).
@@ -322,15 +333,15 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| abatementDateTime    | datetime  |          | true   |
-| category             | nvarchar  | true     |        |
-| code                 | nvarchar  | true     |        |
-| coding               | nvarchar  | true     |        |
-| onsetDateTime        | datetime  | true     | true   |
-| recordedDate         | nvarchar  |          | true   |
-| text                 | nvarchar  | true     |        |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| abatementDateTime    | datetime  |          | X      |
+| category             | nvarchar  | X        |        |
+| code                 | nvarchar  | X        |        |
+| coding               | nvarchar  | X        |        |
+| onsetDateTime        | datetime  | X        | X      |
+| recordedDate         | nvarchar  |          | X      |
+| text                 | nvarchar  | X        |        |
 
 ## Procedure
 *Dataset Shape **5*** - A representation of the [FHIR Procedure Resource](https://www.hl7.org/fhir/procedure.html).
@@ -342,13 +353,13 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| category             | nvarchar  | true     |        |
-| code                 | nvarchar  | true     |        |
-| coding               | nvarchar  | true     |        |
-| performedDateTime    | datetime  | true     | true   |
-| text                 | nvarchar  | true     |        |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| category             | nvarchar  | X        |        |
+| code                 | nvarchar  | X        |        |
+| coding               | nvarchar  | X        |        |
+| performedDateTime    | datetime  | X        | X      |
+| text                 | nvarchar  | X        |        |
 
 ## Immunization
 *Dataset Shape **6*** - A representation of the [FHIR Immunization Resource](https://www.hl7.org/fhir/immunization.html).
@@ -360,15 +371,15 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| coding               | nvarchar  | true     |        |
-| doseQuantity         | nvarchar  |          |        |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| coding               | nvarchar  | X        |        |
+| doseQuantity         | numeric   |          |        |
 | doseUnit             | nvarchar  |          |        |
-| occurenceDateTime    | datetime  | true     | true   |
+| occurenceDateTime    | datetime  | X        | X      |
 | route                | nvarchar  |          |        |
-| text                 | nvarchar  | true     |        |
-| vaccineCode          | nvarchar  | true     |        |
+| text                 | nvarchar  | X        |        |
+| vaccineCode          | nvarchar  | X        |        |
 
 ## Allergy
 *Dataset Shape **7*** - A representation of the [FHIR AllergyIntolerance Resource](https://www.hl7.org/fhir/allergyintolerance.html).
@@ -380,14 +391,14 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| category             | nvarchar  | true     |        |
-| code                 | nvarchar  | true     |        |
-| coding               | nvarchar  | true     |        |
-| onsetDateTime        | datetime  | true     | true   |
-| recordedDate         | nvarchar  |          | true   |
-| text                 | nvarchar  | true     |        |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| category             | nvarchar  | X        |        |
+| code                 | nvarchar  | X        |        |
+| coding               | nvarchar  | X        |        |
+| onsetDateTime        | datetime  | X        | X      |
+| recordedDate         | datetime  |          | X      |
+| text                 | nvarchar  | X        |        |
 
 ## MedicationRequest
 *Dataset Shape **8*** - A representation of the [FHIR MedicationRequest Resource](https://www.hl7.org/fhir/medicationrequest.html).
@@ -399,15 +410,15 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
 | amount               | numeric   |          |        |
-| authoredOn           | datetime  | true     | true   |
-| category             | nvarchar  | true     |        |
-| code                 | nvarchar  | true     |        |
-| coding               | nvarchar  | true     |        |
+| authoredOn           | datetime  | X        | X      |
+| category             | nvarchar  | X        |        |
+| code                 | nvarchar  | X        |        |
+| coding               | nvarchar  | X        |        |
 | form                 | nvarchar  |          |        |
-| text                 | nvarchar  | true     |        |
+| text                 | nvarchar  | X        |        |
 | unit                 | nvarchar  |          |        |
 
 ## MedicationAdministration
@@ -420,12 +431,12 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 
 | Name                 | Type      | Required | Is PHI |
 | -----------------    | --------- | -------- | ------ |
-| personId             | nvarchar  | true     | true   |
-| encounterId          | nvarchar  | true     | true   |
-| code                 | nvarchar  | true     |        |
-| coding               | nvarchar  | true     |        |
-| doseQuantity         | nvarchar  |          |        |
+| personId             | nvarchar  | X        | X      |
+| encounterId          | nvarchar  | X        | X      |
+| code                 | nvarchar  | X        |        |
+| coding               | nvarchar  | X        |        |
+| doseQuantity         | numeric   |          |        |
 | doseUnit             | nvarchar  |          |        |
-| effectiveDateTime    | datetime  | true     | true   |
+| effectiveDateTime    | datetime  | X        | X      |
 | route                | nvarchar  |          |        |
-| text                 | nvarchar  | true     |        |
+| text                 | nvarchar  | X        |        |
