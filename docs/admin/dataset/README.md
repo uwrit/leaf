@@ -229,9 +229,9 @@ SELECT
   , @categoryId
   , @query
   , GETDATE()
-  , '<my_user_name'
+  , '<my_user_name>'
   , GETDATE()
-  , '<my_user_name'
+  , '<my_user_name>'
 ```
 
 ### Test
