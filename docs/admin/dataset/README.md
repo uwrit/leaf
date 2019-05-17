@@ -121,7 +121,7 @@ DECLARE @query NVARCHAR(MAX) =
 FROM v_person p 
      LEFT JOIN [location] l ON p.location_id = l.location_id'
 
-INSERT [app].[DemographicQuery] ([Lock], [SqlStatement], [Shape], [LastChanged], [ChangedBy]) 
+INSERT INTO [app].[DemographicQuery] ([Lock], [SqlStatement], [Shape], [LastChanged], [ChangedBy]) 
 VALUES 
 (   
     'X'
