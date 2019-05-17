@@ -202,7 +202,7 @@ DECLARE @categoryId INT      = 1
 DECLARE @shape INT           = 1  -- Observation dataset shape id
 DECLARE @query NVARCHAR(MAX) = 
 'SELECT 
-	personId      = CAST(SUBJECT_ID AS NVARCHAR)
+    personId      = CAST(SUBJECT_ID AS NVARCHAR)
   , encounterId   = CAST(HADM_ID AS NVARCHAR)
   , category      = ''lab''
   , code          = LOINC_CODE
@@ -213,9 +213,10 @@ DECLARE @query NVARCHAR(MAX) =
 FROM [dbo].[v_LABEVENTS]
 WHERE LABEL = ''Platelet Count'''
 
-INSERT INTO [app].[DatasetQuery] ([Shape],[Name],[CategoryId],[SqlStatement],[Created],[CreatedBy],[Updated],[UpdatedBy])
+INSERT INTO [app].[DatasetQuery] ([Shape],[Name],[CategoryId],[SqlStatement],
+                                  [Created],[CreatedBy],[Updated],[UpdatedBy])
 SELECT 
-	@shape
+    @shape
   , 'Platelet Count'
   , @categoryId
   , @query
