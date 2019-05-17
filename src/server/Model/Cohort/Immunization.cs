@@ -15,7 +15,7 @@ namespace Model.Cohort
         [Field(Name = ImmunizationColumns.Coding, Type = LeafType.String, Required = true)]
         public string Coding { get; set; }
 
-        [Field(Name = ImmunizationColumns.DoseQuantity, Type = LeafType.String)]
+        [Field(Name = ImmunizationColumns.DoseQuantity, Type = LeafType.Numeric)]
         public object DoseQuantity { get; set; }
 
         [Field(Name = ImmunizationColumns.DoseUnit, Type = LeafType.String)]

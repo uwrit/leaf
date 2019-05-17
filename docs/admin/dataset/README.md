@@ -239,3 +239,111 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 | onsetDateTime        | datetime  | true     | true   |
 | recordedDate         | nvarchar  | false    | true   |
 | text                 | nvarchar  | true     | false  |
+
+## Procedure
+*Dataset Shape **5***
+
+A representation of the [FHIR Procedure Resource](https://www.hl7.org/fhir/procedure.html).
+
+The FHIR documention describes this as:
+> This resource is used to record the details of current and historical procedures performed on or for a patient. A procedure is an activity that is performed on, with, or for a patient as part of the provision of care. Examples include surgical procedures, diagnostic procedures, endoscopic procedures, biopsies, counseling, physiotherapy, personal support services, adult day care services, non-emergency transportation, home modification, exercise, etc. Procedures may be performed by a healthcare professional, a service provider, a friend or relative or in some cases by the patient themselves. 
+
+SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model/Cohort/Procedure.cs)):
+
+| Name                 | Type      | Required | Is PHI |
+| -----------------    | --------- | -------- | ------ |
+| personId             | nvarchar  | true     | true   |
+| encounterId          | nvarchar  | true     | true   |
+| category             | nvarchar  | true     | false  |
+| code                 | nvarchar  | true     | false  |
+| coding               | nvarchar  | true     | false  |
+| performedDateTime    | datetime  | true     | true   |
+| text                 | nvarchar  | true     | false  |
+
+## Immunization
+*Dataset Shape **6***
+
+A representation of the [FHIR Immunization Resource](https://www.hl7.org/fhir/immunization.html).
+
+The FHIR documention describes this as:
+> The Immunization resource is intended to cover the recording of current and historical administration of vaccines to patients across all healthcare disciplines in all care settings and all regions. This includes immunization of both humans and animals but does not include the administration of non-vaccine agents, even those that may have or claim to have immunological effects. While the terms "immunization" and "vaccination" are not clinically identical, for the purposes of the FHIR resources, the terms are used synonymously. 
+
+SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model/Cohort/Immunization.cs)):
+
+| Name                 | Type      | Required | Is PHI |
+| -----------------    | --------- | -------- | ------ |
+| personId             | nvarchar  | true     | true   |
+| encounterId          | nvarchar  | true     | true   |
+| coding               | nvarchar  | true     | false  |
+| doseQuantity         | nvarchar  | false    | false  |
+| doseUnit             | nvarchar  | false    | false  |
+| occurenceDateTime    | datetime  | true     | true   |
+| route                | nvarchar  | false    | false  |
+| text                 | nvarchar  | true     | false  |
+| vaccineCode          | nvarchar  | true     | false  |
+
+## Allergy
+*Dataset Shape **7***
+
+A representation of the [FHIR AllergyIntolerance Resource](https://www.hl7.org/fhir/allergyintolerance.html).
+
+The FHIR documention describes this as:
+> A record of a clinical assessment of an allergy or intolerance; a propensity, or a potential risk to an individual, to have an adverse reaction on future exposure to the specified substance, or class of substance. 
+
+SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model/Cohort/Allergy.cs)):
+
+| Name                 | Type      | Required | Is PHI |
+| -----------------    | --------- | -------- | ------ |
+| personId             | nvarchar  | true     | true   |
+| encounterId          | nvarchar  | true     | true   |
+| category             | nvarchar  | true     | false  |
+| code                 | nvarchar  | true     | false  |
+| coding               | nvarchar  | true     | false  |
+| onsetDateTime        | datetime  | true     | true   |
+| recordedDate         | nvarchar  | false    | true   |
+| text                 | nvarchar  | true     | false  |
+
+## MedicationRequest
+*Dataset Shape **8***
+
+A representation of the [FHIR MedicationRequest Resource](https://www.hl7.org/fhir/medicationrequest.html).
+
+The FHIR documention describes this as (emphasis added):
+> This resource covers **all type of orders for medications for a patient**. This includes inpatient medication orders as well as community orders (whether filled by the prescriber or by a pharmacy). It also includes orders for over-the-counter medications (e.g. Aspirin), total parenteral nutrition and diet/ vitamin supplements. It may be used to support the order of medication-related devices. It is not intended for use in prescribing particular diets, or for ordering non-medication-related items (eyeglasses, supplies, etc.). In addition, the MedicationRequest may be used to report orders/request from external systems that have been reported for informational purposes and are not authoritative and are not expected to be acted upon (e.g. dispensed or administered). 
+
+SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model/Cohort/MedicationRequest.cs)):
+
+| Name                 | Type      | Required | Is PHI |
+| -----------------    | --------- | -------- | ------ |
+| personId             | nvarchar  | true     | true   |
+| encounterId          | nvarchar  | true     | true   |
+| amount               | numeric   | false    | false  |
+| authoredOn           | datetime  | true     | true   |
+| category             | nvarchar  | true     | false  |
+| code                 | nvarchar  | true     | false  |
+| coding               | nvarchar  | true     | false  |
+| form                 | nvarchar  | false    | false  |
+| text                 | nvarchar  | true     | false  |
+| unit                 | nvarchar  | false    | false  |
+
+## MedicationAdmministration
+*Dataset Shape **9***
+
+A representation of the [FHIR MedicationAdministration Resource](https://www.hl7.org/fhir/medicationadministration.html).
+
+The FHIR documention describes this as:
+> This resource covers the administration of all medications and vaccines. Please refer to the Immunization Resource/Profile for the treatment of vaccines. It will principally be used within care settings (including inpatient) to record the capture of medication administrations, including self-administrations of oral medications, injections, intra-venous adjustments, etc. It can also be used in outpatient settings to record allergy shots and other non-immunization administrations. In some cases, it might be used for home-health reporting, such as recording self-administered or even device-administered insulin. 
+
+SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model/Cohort/MedicationAdministration.cs)):
+
+| Name                 | Type      | Required | Is PHI |
+| -----------------    | --------- | -------- | ------ |
+| personId             | nvarchar  | true     | true   |
+| encounterId          | nvarchar  | true     | true   |
+| code                 | nvarchar  | true     | false  |
+| coding               | nvarchar  | true     | false  |
+| doseQuantity         | nvarchar  | false    | false  |
+| doseUnit             | nvarchar  | false    | false  |
+| effectiveDateTime    | datetime  | true     | true   |
+| route                | nvarchar  | false    | false  |
+| text                 | nvarchar  | true     | false  |
