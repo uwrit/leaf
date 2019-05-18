@@ -17,6 +17,7 @@ interface Props {
     show: boolean;
     exportState: ExportState
     toggle: () => any;
+    rowCount: number;
 }
 
 interface State {
@@ -35,15 +36,15 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
 
     public render() {
         const c = 'patientlist-export-modal';
-        const { redCap, isExporting } = this.props.exportState;
-        const hasExportOptions = redCap.enabled;
+        const { exportState, rowCount } = this.props;
+        const { redCap, isExporting } = exportState;
         const modalClasses = [ c, 'leaf-modal', (isExporting ? 'exporting' : '') ];
 
         return (
             <Modal isOpen={this.props.show} className={modalClasses.join(' ')} backdrop={true} size="lg">
                 <ModalHeader>Export Data</ModalHeader>
                 <ModalBody>
-                    {hasExportOptions &&
+                    {redCap.enabled &&
                     <Row>
                         <Col className={`${c}-options`} md={3}>
                             <div className={`${c}-option selected`}>
@@ -56,11 +57,12 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
                                 exportState={this.props.exportState} 
                                 handleClickClearErrorOrComplete={this.handleClickClearErrorOrComplete} 
                                 registerClickExportHandler={this.setClickExportHandler}
+                                rowCount={rowCount}
                             />
                         </Col>
                     </Row>
                     }
-                    {!hasExportOptions &&
+                    {!redCap.enabled &&
                     <div className={`${c}-no-options`}>
                         <p>
                             Whoops! It doesn't look like you have any export options configured. 

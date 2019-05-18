@@ -43,7 +43,8 @@ export const exportToREDCap = (projectTitle: string) => {
              */
             dispatch(setExportProgress(1, 'Preparing export'));
             const state = getState();
-            const batchSize = state.dataExport.redCap.batchSize || 10;
+            const { redCap } = state.dataExport;
+            const batchSize = redCap.batchSize || 10;
             const username = state.auth.userContext!.name;
 
             /*
@@ -56,13 +57,13 @@ export const exportToREDCap = (projectTitle: string) => {
             const useRepeatableForms: boolean = repeatableFormsAllowed(version);
             const createResp: any = await requestProjectCreation(state, projectTitle, useRepeatableForms);
             const token = createResp.data as string;
-            const conn = new REDCapHttpConnector(token, state.dataExport.redCap.apiURI!);
+            const conn = new REDCapHttpConnector(token, redCap.apiURI!);
 
             /*
              * Pull down the patient list, transform for REDCap project.
              */
             const data = await getAllData(state.cohort.patientList.configuration, false) as PatientListDatasetExport[];
-            const config = await getREDCapExportData(state.dataExport.redCap, data, projectTitle, username, useRepeatableForms) as REDCapProjectExportConfiguration;
+            const config = await getREDCapExportData(redCap, data, projectTitle, username, useRepeatableForms) as REDCapProjectExportConfiguration;
 
             /*
              * Set metadata (fields) from each dataset.

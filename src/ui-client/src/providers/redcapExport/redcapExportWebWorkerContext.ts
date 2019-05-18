@@ -20,8 +20,9 @@ var handleWorkMessage = function (payload) {
  */
 var createExportConfiguration = function (payload) {
     var requestId = payload.requestId, options = payload.options, patientList = payload.patientList, projectTitle = payload.projectTitle, username = payload.username, useRepeatingForms = payload.useRepeatingForms;
+    console.log('payload',payload);
     patientList.forEach(function (d) { return d.datasetId = d.datasetId.toLowerCase(); });
-    var derived = deriveRecords(patientList, useRepeatingForms);
+    var derived = deriveRecords(patientList, useRepeatingForms, options.rowLimit);
     var config = {
         data: derived.records,
         metadata: deriveFieldMetadata(derived),
@@ -51,7 +52,7 @@ var createExportConfiguration = function (payload) {
  * and and a single array of records derived from
  * all patient list datasets.
  */
-var deriveRecords = function (pl, useRepeatingForms) {
+var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
     var _a;
     var colPersonId = 'personId';
     var colRcPersonId = colPersonId.toLowerCase();
@@ -60,7 +61,10 @@ var deriveRecords = function (pl, useRepeatingForms) {
     var colRcRepeatInstance = 'redcap_repeat_instance';
     var derived = { datasets: pl, records: [] };
     var recordCompleteStateCode = 2;
+    var totalRowCount = 0;
+    var totalRowLimitReached = false;
     var personIdAdded = false;
+    console.log('rowLimit',rowLimit);
     // For each dataset
     for (var i = 0; i < derived.datasets.length; i++) {
         var ds = derived.datasets[i];
@@ -113,7 +117,13 @@ var deriveRecords = function (pl, useRepeatingForms) {
                 }
                 derived.records.push(record);
             }
+            totalRowCount++;
+            totalRowLimitReached = rowLimit > 0 && totalRowCount >= rowLimit;
+            if (totalRowLimitReached)
+                break;
         }
+        if (totalRowLimitReached)
+            break;
     }
     return derived;
 };

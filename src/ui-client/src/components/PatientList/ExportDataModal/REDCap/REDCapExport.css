@@ -25,3 +25,13 @@
 .patientlist-export-modal.exporting .modal-footer {
     display: none;
 }
+
+.patientlist-export-modal-redcap-row-limit {
+    background-color: #edf8ff;
+    border-left: 4px solid #5cc1ff;
+    padding: 4px 10px;
+}
+
+.patientlist-export-modal-redcap-emphasis {
+    font-weight: 500;
+}

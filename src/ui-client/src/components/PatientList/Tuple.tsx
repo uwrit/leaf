@@ -38,7 +38,19 @@ export default class Tuple extends React.PureComponent<Props> {
         super(props);
     }
 
-    public createSparkline = (vals: XY[]) => {
+    public render() {
+        const { className, type } = this.props;
+        const c = className ? className : 'patientlist';
+        const val = this.getValueDisplay();
+
+        return (
+            <td className={`${c}-tuple ${PatientListColumnType[type]}`}>
+                {val}
+            </td>
+        )
+    }
+
+    private createSparkline = (vals: XY[]) => {
         if (!vals || !vals.length) { return null; }
         this.lastSparklineValIndex = vals.length - 1;
         return (
@@ -55,7 +67,7 @@ export default class Tuple extends React.PureComponent<Props> {
         );
     }
 
-    public createSparklineDotAndLabel = (props: SparklineDotProps) => {
+    private createSparklineDotAndLabel = (props: SparklineDotProps) => {
         if (props.index === this.lastSparklineValIndex) {
             return (
                 <g key="0">
@@ -69,24 +81,12 @@ export default class Tuple extends React.PureComponent<Props> {
         return null;
     }
 
-    public getValueDisplay = () => {
+    private getValueDisplay = () => {
         const { type, value } = this.props;
         return (
               type === PatientListColumnType.sparkline ? this.createSparkline(value) 
-            : type === PatientListColumnType.date ? new Date(value).toLocaleString() 
+            : type === PatientListColumnType.date && !!value ? new Date(value).toLocaleString() 
             : value
         );
-    }
-
-    public render() {
-        const { className, type } = this.props;
-        const c = className ? className : 'patientlist';
-        const val = this.getValueDisplay();
-
-        return (
-            <td className={`${c}-tuple ${PatientListColumnType[type]}`}>
-                {val}
-            </td>
-        )
     }
 }
