@@ -22,5 +22,6 @@ GO
 ALTER TABLE [ref].[Version] CHECK CONSTRAINT [CK_Version_1]
 GO
 
-
+INSERT INTO [ref].[Version] (Lock, [Version])
+SELECT 'X', N'3.2.0';
 --
