@@ -21,7 +21,7 @@ interface Props {
     row: PatientListRow;
 }
 
-export default class Row extends React.PureComponent<Props> {
+export default class Row extends React.Component<Props> {
     private className = 'patientlist';
     constructor(props: Props) {
         super(props);

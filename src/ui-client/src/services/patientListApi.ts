@@ -112,39 +112,61 @@ export const addMultirowDataset = async (
         ...queryRef
     }
 
-    // Add dataset definition
+    /* 
+     * Add dataset definition.
+     */
     if (!multirowDatasets.has(def.id)) {
         multirowDatasets.set(def.id, def);
     }
     multirowDatasets.get(def.id)!.responderStates.set(responderId, CohortStateType.LOADED);
 
-    // Update the displayed patients
+    /* 
+     * Update the displayed patients.
+     */
     const summaryDef = await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
 
-    // If we have a new summary dataset, add to configuration
+    /* 
+     * If we have a new summary dataset, add to configuration.
+     */
     if (summaryDef) {
+        /*
+         * If the dataset hasn't been added yet (from a different responder),
+         * add the default display columns.
+         */
         if (!singletonDatasets.has(summaryDef.id)) {
             singletonDatasets.set(summaryDef.id, summaryDef);
-            summaryDef.columns.forEach((col: PatientListColumn) => {
-                if (col.isDisplayed) {
-                    patientList.configuration.displayColumns.push(col);
-                }
-            });
-        } 
+            summaryDef.columns.forEach((col: PatientListColumn) => { if (col.isDisplayed) patientList.configuration.displayColumns.push(col); });
+        /* 
+         * Else it's already been loaded, so aggregate the total rows.
+         */
+        } else {
+            const previousSumDef = singletonDatasets.get(summaryDef.id);
+            if (previousSumDef && previousSumDef.totalRows) {
+                previousSumDef.totalRows += summaryDef.totalRows!;
+                singletonDatasets.set(previousSumDef.id, previousSumDef);
+            }
+        }
+        /*
+         * If it has a numeric column and the column is present in the data,
+         * set the type to 'Quantitative', else 'NonQuantitative'.
+         */
         if (summaryDef.numericValueColumn && datasetDto.schema.fields.indexOf(summaryDef.numericValueColumn) > -1) {
             summaryDef.summaryType = PatientListDatasetSummaryType.Quantitative;
         } else {
             summaryDef.summaryType = PatientListDatasetSummaryType.NonQuantititive;
         }
-        summaryDef.summaryType = (def.numericValueColumn && datasetDto.schema.fields.indexOf(def.numericValueColumn!) > -1) 
-            ? PatientListDatasetSummaryType.Quantitative 
-            : PatientListDatasetSummaryType.NonQuantititive;
+        /*
+         * Set the dataset as 'LOADED' from this responder.
+         */
         summaryDef.responderStates.set(responderId, CohortStateType.LOADED);
     }
 
-    // Get the latest patient list
+    /* 
+     * Get the latest patient list.
+     */
     patientList.display = await getPatients(patientList.configuration) as PatientListRow[];
     patientList.totalRows = getState().cohort.patientList.totalRows + summaryDef.totalRows!;
+    
     return patientList;
 };
 
@@ -164,19 +186,24 @@ export const addDemographicsDataset = async (
 
     if (!patients.length) { return patientList; }
 
-    // Add the responder name as a column
+    /*
+     * Add the responder name as a column.
+     */
     for (let i = 0; i < patients.length; i++) {
         const pat = patients[i] as any;
         pat.patientOf = responder.name;
     }
 
-    // Validate definition against actual dataset
+    /* 
+     * Validate definition against actual dataset.
+     */
     const def = getDemographicsDefinition(patients[0]);
 
-    // Add columns if none are displayed
+    /* 
+     * Add columns if none are displayed.
+     */
     if (!patientList.configuration.singletonDatasets.size) {
 
-        // Add columns
         def.columns.forEach((c: PatientListColumn) => {
             c.isDisplayed = true;
             patientList.configuration.displayColumns.push(c);
@@ -184,7 +211,9 @@ export const addDemographicsDataset = async (
         patientList.configuration.singletonDatasets.set(def.id, def);
     }
 
-    // Update the displayed patients
+    /*
+     * Update the displayed patients.
+     */
     await patientListProvider.addDemographics(def, patients, responderId);
     patientList.display = await patientListProvider.getPatients(patientList.configuration) as PatientListRow[];
     patientList.totalPatients = getState().cohort.patientList.totalPatients + patients.length;
@@ -217,23 +246,6 @@ const validateDefinitionColumns = (
             i++;
         }
     })
-
-    /*
-    actualColNames.forEach((c: string) => {
-        const tempCol = template.columns.get(c);
-        if (tempCol) {
-            const col: PatientListColumn = {
-                ...tempCol,
-                datasetId,
-                displayName: camelCaseToUpperSpaced(c),
-                index: i,
-                isDisplayed: !!tempCol.autoDisplayOnLoad
-            };
-            cols.set(c, col);
-            i++;
-        }
-    });
-    */
     return cols;
 };
 
@@ -263,7 +275,7 @@ const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientL
         ...template,
         columns: validateDefinitionColumns(template, dataset.schema.fields, queryRef.name),
         displayName: queryRef.name,
-        id: queryRef.id,
+        id: queryRef.id.toLowerCase().replace(' ',''),
         responderStates: new Map()
     };
     return def;

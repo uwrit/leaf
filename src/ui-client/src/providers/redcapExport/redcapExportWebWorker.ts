@@ -138,7 +138,7 @@ export default class REDCapExportWebWorker {
         const createExportConfiguration = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, options, patientList, projectTitle, username, useRepeatingForms } = payload;
             patientList!.forEach((d: PatientListDatasetExport) => d.datasetId = d.datasetId.toLowerCase());
-            const derived: REDCapExportDerivedPatientListData = deriveRecords(patientList!, useRepeatingForms!);
+            const derived: REDCapExportDerivedPatientListData = deriveRecords(patientList!, useRepeatingForms!, options!.rowLimit!);
             const config: REDCapExportConfiguration = {
                 data: derived.records,
                 metadata: deriveFieldMetadata(derived),
@@ -171,7 +171,7 @@ export default class REDCapExportWebWorker {
          * all patient list datasets.
          */
 
-        const deriveRecords = (pl: PatientListDatasetExport[], useRepeatingForms: boolean): REDCapExportDerivedPatientListData => {
+        const deriveRecords = (pl: PatientListDatasetExport[], useRepeatingForms: boolean, rowLimit: number): REDCapExportDerivedPatientListData => {
             const colPersonId = 'personId';
             const colRcPersonId = colPersonId.toLowerCase();
             const colRcEventName = 'redcap_event_name';
@@ -179,6 +179,8 @@ export default class REDCapExportWebWorker {
             const colRcRepeatInstance = 'redcap_repeat_instance';
             const derived: REDCapExportDerivedPatientListData = { datasets: pl, records: [] };
             const recordCompleteStateCode = 2;
+            let totalRowCount = 0;
+            let totalRowLimitReached = false;
             let personIdAdded = false;
 
             // For each dataset
@@ -238,7 +240,11 @@ export default class REDCapExportWebWorker {
                         }
                         derived.records.push(record);
                     }
+                    totalRowCount++;
+                    totalRowLimitReached = rowLimit > 0 && totalRowCount >= rowLimit;
+                    if (totalRowLimitReached) break;
                 }
+                if (totalRowLimitReached) break;
             }
             return derived;
         }

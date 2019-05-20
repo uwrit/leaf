@@ -10,6 +10,7 @@ import { Button, FormGroup, Input } from 'reactstrap';
 import { exportToREDCap } from '../../../../actions/dataExport';
 import ExportState from '../../../../models/state/Export';
 import ExportProgress from '../ExportProgress/ExportProgress';
+import { formatSmallNumber } from '../../../../utils/formatNumber';
 import './REDCapExport.css';
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
     exportState: ExportState;
     handleClickClearErrorOrComplete: () => void;
     registerClickExportHandler: (f: any) => void;
+    rowCount: number;
 }
 
 interface State {
@@ -38,11 +40,12 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { className, exportState } = this.props;
+        const { className, exportState, rowCount } = this.props;
         const { isComplete, isErrored, isExporting, redCap } = exportState;
         const c = className ? className : 'patientlist-export-modal-redcap';
         const inputClasses = [ 'leaf-input' ];
         const redcapInstanceUrl = redCap.apiURI ? redCap.apiURI!.replace('/api/','') : '';
+        const formattedRowLimit = formatSmallNumber(redCap.rowLimit!);
         let inputPlaceholder = 'REDCap Project name....';
 
         if (this.state.projectNameError) {
@@ -61,6 +64,18 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
                     <p>
                         Your project will export to <a href={redcapInstanceUrl} target="_blank">{redcapInstanceUrl}</a>
                     </p>
+
+                    {!!redCap.rowLimit && redCap.rowLimit < rowCount &&
+                    <p className={`${c}-row-limit`}>
+                        <span>Your administrator has limited REDCap data export to </span>
+                        <span className={`${c}-emphasis`}>{formattedRowLimit}</span>
+                        <span> rows of data, which is less than the current </span>
+                        <span className={`${c}-emphasis`}>{formatSmallNumber(rowCount)}</span> 
+                        <span> rows. Leaf will export </span>
+                        <span className={`${c}-emphasis`}> only the first {formattedRowLimit} rows in your datasets.</span>
+                    </p>
+                    }
+
                     <FormGroup>
                         <Input 
                             className={inputClasses.join(' ')}

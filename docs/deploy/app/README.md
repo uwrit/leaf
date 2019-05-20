@@ -279,7 +279,7 @@ The absolute path to a given REDCap instance's root API path, such as `https://r
 #### BatchSize
 The number of rows of data per API request that Leaf will export to REDCap. This number should be relatively low, such as 10, and is used to give feedback to users as to progress and estimated time remaining.
 #### RowLimit
-The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number if users are simply viewing the `Patient List`, but they will be prevented from exporting. This is designed to prevent the export of larger datasets than REDCap is able to effectively manage.
+The absolute maximium number of rows that Leaf will export to REDCap. Note that the Leaf client can exceed this number if users are simply viewing the `Patient List`, but they will be prevented from exporting. This is designed to prevent the export of larger datasets than REDCap is able to effectively manage. Setting this value to `0` allows an unlimited number of rows to be exported.
 #### Scope
 The scoped identity for the REDCap instance that will be exported to. This is typically the `u.<insitution>.edu` in `sally_johnson@u.<institution>.edu`. When assigning user permissions via the REDCap API, Leaf will prepend the current user name (e.g. `sally_johnson`) to this value.
 #### SuperToken

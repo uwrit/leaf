@@ -385,7 +385,7 @@ var getNumericSummaryDatasetColums = function (def) {
         var col = cols[k];
         col.index = i;
         col.displayName = "" + def.displayName + camelCaseToUpperSpaced(col.id);
-        col.id = "" + def.displayName + col.id;
+        col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
     });
@@ -490,7 +490,7 @@ var getNonNumericSummaryDatasetColums = function (def) {
         var col = cols[k];
         col.index = i;
         col.displayName = "" + def.displayName + camelCaseToUpperSpaced(col.id);
-        col.id = "" + def.displayName + col.id;
+        col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
     });

@@ -98,7 +98,13 @@ class PatientList extends React.PureComponent<Props, State> {
 
         return (    
             <div className={classes.join(' ')}>
-                <ExportDataModal dispatch={dispatch} exportState={exportState} show={showExportModal} toggle={toggleExportDataModal} />
+                <ExportDataModal 
+                    dispatch={dispatch} 
+                    exportState={exportState} 
+                    rowCount={patientList.totalPatients + patientList.totalRows}
+                    show={showExportModal} 
+                    toggle={toggleExportDataModal}
+                />
                 <Row className={`${c}-toprow-container`}>
                     <Col md={8}>
                         <div className={`${c}-dataset-column-selector-container`}>

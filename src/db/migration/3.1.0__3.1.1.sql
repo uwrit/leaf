@@ -1,0 +1,1 @@
+ALTER TABLE app.DatasetQuery ALTER COLUMN UniversalId NVARCHAR(200) NULL
