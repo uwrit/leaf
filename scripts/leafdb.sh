@@ -22,7 +22,7 @@ tables = [r'app.Concept', r'auth.Constraint',
           r'app.PanelFilter', r'app.DemographicQuery',
           r'network.Identity', r'ref.Shape', r'app.DatasetQuery',
           r'app.ConceptSqlSet', r'app.SpecializationGroup', r'app.Specialization',
-          r'rela.ConceptSpecializationGroup']
+          r'rela.ConceptSpecializationGroup', 'ref.Version']
 
 
 def report_error(err, m):
