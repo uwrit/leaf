@@ -38,7 +38,7 @@ class Sidebar extends React.Component<Props> {
     }
 
     public render() {
-        const { cohortCountState, currentRoute, routes } = this.props;
+        const { cohortCountState, currentRoute, dispatch, routes } = this.props;
         const cohortLoaded = cohortCountState === CohortStateType.LOADED;
         const c = 'sidebar';
         return (
@@ -49,12 +49,10 @@ class Sidebar extends React.Component<Props> {
                             <SidebarTab 
                                 key={e.index} 
                                 selectable={cohortLoaded || (e.index === Routes.FindPatients || e.index === Routes.AdminPanel)}
-                                icon={e.icon}
-                                index={e.index}
-                                display={e.display} 
                                 isActive={e.index === currentRoute}
-                                path={e.path} 
                                 clickHandler={this.handleTabClick} 
+                                config={e}
+                                dispatch={dispatch}
                                 />
                             ))}
                     </ul>

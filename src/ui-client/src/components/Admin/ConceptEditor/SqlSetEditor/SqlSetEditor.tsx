@@ -8,7 +8,7 @@
 import React from 'react';
 import { ConceptSqlSet, ConceptEvent } from '../../../../models/admin/Concept';
 import { Button, Container } from 'reactstrap';
-import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
+import { checkIfAdminPanelUnsavedAndSetSubPane } from '../../../../actions/admin/admin';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
@@ -108,6 +108,6 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     private handleBackToConceptEditorClick = () => {
         const { dispatch } = this.props;
-        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.MAIN));
+        dispatch(checkIfAdminPanelUnsavedAndSetSubPane(AdminPanelConceptEditorPane.MAIN));
     }
 };

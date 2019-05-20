@@ -67,7 +67,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
 
     private getCurrentPane = (): any => {
         const { data, dispatch } = this.props;
-        switch (data.concepts.pane) {
+        switch (data.activeSubPane) {
             case AdminPanelConceptEditorPane.MAIN:
                 return  (
                     <MainEditor 

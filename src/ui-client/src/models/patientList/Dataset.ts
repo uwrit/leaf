@@ -29,6 +29,7 @@ export enum PatientListDatasetSummaryType {
  * what columns to expect and how to compute summary statistics.
  */
 export enum PatientListDatasetShape {
+    Dynamic = -1,
     Summary = 0,
     Observation = 1,
     Encounter = 2,

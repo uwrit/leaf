@@ -86,7 +86,7 @@ export default class CohortSql extends React.PureComponent<Props, State> {
                         text={sql}>
                         <div className={copyClass} onClick={this.handleCopyClick}>{copyText}</div>
                     </CopyToClipboard>
-                    <SqlBox height={innerStyle.height} width={innerStyle.width} sql={sql}/>
+                    <SqlBox height={innerStyle.height} width={innerStyle.width} sql={sql} readonly={true}/>
                 </div>
             </PopupBox>
         );

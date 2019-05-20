@@ -25,7 +25,7 @@ export class SqlPreview extends React.PureComponent<Props> {
             createPortal(
                 <div className={`${c}-sql-container concept-editor-preview`}>
                     <div className={`${c}-sql-container-inner`}>
-                        <SqlBox height={230} width={width} sql={sql} fontSize={'0.9rem'} />
+                        <SqlBox height={230} width={width} sql={sql} fontSize={'0.9rem'} readonly={true}/>
                     </div>
                 </div>,
                 document.body

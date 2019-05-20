@@ -13,7 +13,7 @@ import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
 import { Configuration } from '../Sections/Configuration';
 import { Concept as AdminConcept, ConceptSqlSet } from '../../../../models/admin/Concept';
-import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, setAdminPanelCurrentUserConcept, removeUnsavedAdminConcept, saveAdminConcept, setAdminPanelConceptEditorPane } from '../../../../actions/admin/concept';
+import { setAdminConcept, deleteAdminConceptFromServer, revertAdminAndUserConceptChanges, setAdminPanelCurrentUserConcept, removeUnsavedAdminConcept, saveAdminConcept } from '../../../../actions/admin/concept';
 import { setConcept, createConcept, setSelectedConcept, removeConcept } from '../../../../actions/concepts';
 import { SqlEditor } from '../Sections/SqlEditor';
 import { EditorPaneProps as Props, SectionProps } from '../Props';
@@ -23,6 +23,7 @@ import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin';
 import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
+import { setAdminPanelSubPane } from '../../../../actions/admin/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -150,7 +151,7 @@ export class MainEditor extends React.PureComponent<Props> {
             unsaved: true
         }
         dispatch(setAdminConceptSqlSet(newSet, true));
-        dispatch(setAdminPanelConceptEditorPane(AdminPanelConceptEditorPane.SQL_SET));
+        dispatch(setAdminPanelSubPane(AdminPanelConceptEditorPane.SQL_SET));
     }
 
     /* 
