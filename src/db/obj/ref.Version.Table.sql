@@ -5,23 +5,23 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[GeneralEquivalenceMapping]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  Table [ref].[Version]    Script Date: 5/20/19 10:56:05 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-CREATE TABLE [app].[GeneralEquivalenceMapping](
-	[SourceCode] [nvarchar](10) NOT NULL,
-	[TargetCode] [nvarchar](10) NOT NULL,
-	[SourceCodeType] [nvarchar](10) NOT NULL,
-	[TargetCodeType] [nvarchar](10) NOT NULL,
-	[UiDisplayTargetName] [nvarchar](400) NULL,
- CONSTRAINT [PK_GeneralEquivalenceMapping] PRIMARY KEY CLUSTERED 
+CREATE TABLE [ref].[Version](
+	[Lock] [char](1) NOT NULL,
+	[Version] [nvarchar](100) NOT NULL,
+ CONSTRAINT [PK_Version] PRIMARY KEY CLUSTERED 
 (
-	[SourceCode] ASC,
-	[TargetCode] ASC,
-	[SourceCodeType] ASC,
-	[TargetCodeType] ASC
+	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+ALTER TABLE [ref].[Version] ADD  CONSTRAINT [DF_Version_Lock]  DEFAULT ('X') FOR [Lock]
+GO
+ALTER TABLE [ref].[Version]  WITH CHECK ADD  CONSTRAINT [CK_Version_1] CHECK  (([Lock]='X'))
+GO
+ALTER TABLE [ref].[Version] CHECK CONSTRAINT [CK_Version_1]
 GO

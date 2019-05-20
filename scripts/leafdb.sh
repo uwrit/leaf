@@ -22,7 +22,7 @@ tables = [r'app.Concept', r'auth.Constraint',
           r'app.PanelFilter', r'app.DemographicQuery',
           r'network.Identity', r'ref.Shape', r'app.DatasetQuery',
           r'app.ConceptSqlSet', r'app.SpecializationGroup', r'app.Specialization',
-          r'rela.ConceptSpecializationGroup']
+          r'rela.ConceptSpecializationGroup', 'ref.Version']
 
 
 def report_error(err, m):
@@ -74,7 +74,7 @@ def create_schema(schema_file: str, build_file: str):
             content = reader.read()
             use = content.find('USE [LeafDB]')
             if use == -1:
-		print('WARNING: "USE [LeafDB]" not found, did something change?')
+                print('WARNING: "USE [LeafDB]" not found, did something change?')
                 use = 0
             writer.write(sql_license + content[use:])
     print('Created schema file...')
