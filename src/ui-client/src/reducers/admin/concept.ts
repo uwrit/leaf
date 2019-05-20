@@ -80,15 +80,6 @@ export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConc
     });
 };
 
-export const setAdminPanelConceptEditorPane = (state: AdminState, action: AdminConceptAction): AdminState => {
-    return Object.assign({}, state, {
-        concepts: { 
-            ...state.concepts,
-            pane: action.pane
-        }
-    });
-}; 
-
 export const createAdminConcept = (state: AdminState,  action: AdminConceptAction): AdminState => {
     const adminConcept = action.adminConcept!;
     state.concepts.concepts.set(adminConcept.id, adminConcept);

@@ -11,7 +11,7 @@ import { PropertyProps } from '../Props';
 import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
+import { checkIfAdminPanelUnsavedAndSetSubPane } from '../../../../actions/admin/admin';
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 
 interface Props extends PropertyProps {
@@ -97,7 +97,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
 
     private handleManageSqlSetsClick = () => {
         const { dispatch, focusToggle } = this.props;
-        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.SQL_SET));
+        dispatch(checkIfAdminPanelUnsavedAndSetSubPane(AdminPanelConceptEditorPane.SQL_SET));
         if (focusToggle) {
             focusToggle(false);
         }

@@ -5,15 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import AdminState, { AdminPanelLoadState, AdminPanelConceptEditorPane } from "../../models/state/AdminState";
+import AdminState, { AdminPanelLoadState, AdminPanelConceptEditorPane, AdminPanelPane } from "../../models/state/AdminState";
+import {
+    SET_ADMIN_PANEL_PANE,
+    SET_ADMIN_PANEL_SUBPANE,
+    SET_ADMIN_PANEL_LOAD_STATE,
+    AdminPanelAction
+} from '../../actions/admin/admin';
 import {
     SET_ADMIN_CONCEPT,
     SET_ADMIN_PANEL_CURRENT_USER_CONCEPT,
     AdminConceptAction,
-    SET_ADMIN_PANEL_LOAD_STATE,
     SET_ADMIN_PANEL_CONCEPT_LOAD_STATE,
     SET_ADMIN_CONCEPT_EXAMPLE_SQL,
-    SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE,
     CREATE_ADMIN_CONCEPT,
     REMOVE_UNSAVED_ADMIN_CONCEPT
 } from '../../actions/admin/concept';
@@ -38,7 +42,7 @@ import {
     SET_ADMIN_SQL_SETS_UNCHANGED,
     SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
-import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminPanelConceptEditorPane, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept } from './concept';
+import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept } from './concept';
 import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
 import { REMOVE_CONCEPT } from "../../actions/concepts";
@@ -47,10 +51,13 @@ import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGr
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
 import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEPT_EVENT_CHANGE, SET_ADMIN_UNEDITED_CONCEPT_EVENT } from "../../actions/admin/conceptEvent";
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
+import { PatientListDatasetShape } from "../../models/patientList/Dataset";
+import formatSql from "../../utils/formatSql";
 
 export const defaultAdminState = (): AdminState => {
     return {
-        activeTab: AdminPanelConceptEditorPane.MAIN,
+        activePane: AdminPanelPane.CONCEPTS,
+        activeSubPane: AdminPanelConceptEditorPane.MAIN,
         configuration: {
             sql: {
                 alias: '',
@@ -65,7 +72,6 @@ export const defaultAdminState = (): AdminState => {
             concepts: new Map(),
             examplePanel: generateDummyPanel(),
             exampleSql: '',
-            pane: AdminPanelConceptEditorPane.MAIN,
             state: AdminPanelLoadState.NOT_LOADED
         },
         conceptEvents: {
@@ -73,7 +79,16 @@ export const defaultAdminState = (): AdminState => {
             events: new Map()
         },
         datasets: {
-
+            changed: false,
+            currentDataset: {
+                id: '8BB12CC0-E278-E911-9D11-B886875607D1',
+                category: 'Labs',
+                name: 'Platelet Count',
+                shape: PatientListDatasetShape.Observation,
+                 sql: formatSql("SELECT personId = CAST(SUBJECT_ID AS NVARCHAR), encounterId = CAST(HADM_ID AS NVARCHAR), category= 'lab', code = LOINC_CODE, effectiveDate = DATEADD(YEAR,-150,CAST(CHARTTIME AS DATETIME))  , valueString = VALUE, valueQuantity = VALUENUM, valueUnit = VALUEUOM FROM [dbo].[v_LABEVENTS] WHERE LABEL = 'Platelet Count'")
+            },
+            datasets: new Map(),
+            state: AdminPanelLoadState.NOT_LOADED
         },
         panelFilters: {
             changed: false,
@@ -94,10 +109,28 @@ const setAdminPanelLoadState = (state: AdminState, action: AdminConceptAction) =
     });
 };
 
-type AdminAction = AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
+const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminState => {
+    return Object.assign({}, state, {
+        activePane: action.pane
+    });
+}; 
+
+const setAdminPanelSubPane = (state: AdminState, action: AdminPanelAction): AdminState => {
+    return Object.assign({}, state, {
+        activeSubPane: action.subPane
+    });
+}; 
+
+type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
 export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
+
+        // UI
+        case SET_ADMIN_PANEL_PANE:
+            return setAdminPanelPane(state, action);
+        case SET_ADMIN_PANEL_SUBPANE:
+            return setAdminPanelSubPane(state, action);
 
         // Concepts
         case SET_ADMIN_CONCEPT:
@@ -112,8 +145,6 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setExampleSql(state, action);
         case REMOVE_CONCEPT:
             return deleteAdminConceptFromCache(state, action);
-        case SET_ADMIN_PANEL_CONCEPT_EDITOR_PANE:
-            return setAdminPanelConceptEditorPane(state, action);
         case CREATE_ADMIN_CONCEPT:
             return createAdminConcept(state, action);
         case REMOVE_UNSAVED_ADMIN_CONCEPT:

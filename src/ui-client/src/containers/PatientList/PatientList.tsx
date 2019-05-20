@@ -25,7 +25,7 @@ import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { getCsvs } from '../../services/patientListApi';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { RowCount } from '../../components/PatientList/RowCount';
-import { PatientListDatasetQueryDTO, PatientListDatasetDefinition, CategorizedDatasetRef } from '../../models/patientList/Dataset';
+import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import { DatasetsState } from '../../models/state/GeneralUiState';
 import './PatientList.css';
 

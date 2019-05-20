@@ -8,11 +8,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { ConceptEditor } from '../../components/Admin/ConceptEditor/ConceptEditor';
-import AdminState from '../../models/state/AdminState';
+import AdminState, { AdminPanelPane } from '../../models/state/AdminState';
 import { AppState } from '../../models/state/AppState';
+import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEditor';
+import { DatasetsState } from '../../models/state/GeneralUiState';
 
 interface StateProps { 
     admin?: AdminState;
+    datasets: DatasetsState;
 }
 interface DispatchProps {
     dispatch: any;
@@ -22,22 +25,6 @@ interface OwnProps {
 }
 type Props = StateProps & DispatchProps & OwnProps;
 
-interface AdminTab {
-    id: number;
-    display: string;
-    render: (admin: AdminState, dispatch: any) => any;
-}
-
-const selectable: AdminTab[] = [
-    {
-        id: 1,
-        display: "Concepts",
-        render: (admin: AdminState, dispatch: any) => (
-            <ConceptEditor data={admin} dispatch={dispatch}/>
-        )
-    }
-];
-
 class AdminPanel extends React.PureComponent<Props> {
     private className = "admin-panel"
     constructor(props: Props) {
@@ -45,28 +32,40 @@ class AdminPanel extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { admin, dispatch } = this.props;
+        const { admin } = this.props;
         if (!admin) { return null; }
-
-        const content = selectable.find((s) => s.id === admin.activeTab)!.render(admin, dispatch)
         return (
             <div>
-                {content}
-          </div>
+                {this.getContent()}
+           </div>
         )
+    }
+
+    private getContent = () => {
+        const { admin, dispatch, datasets } = this.props;
+
+        switch (admin!.activePane) {
+            case AdminPanelPane.CONCEPTS:
+                return <ConceptEditor data={admin!} dispatch={dispatch} />;
+            case AdminPanelPane.DATASETS:
+                return <DatasetEditor data={admin!} dispatch={dispatch} datasets={datasets}/>;
+            default: 
+                return null;
+        }
     }
 }
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
-        admin: state.admin
+        admin: state.admin,
+        datasets: state.generalUi.datasets
     };
 }
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         dispatch
-    }
+    };
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(AdminPanel);

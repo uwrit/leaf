@@ -16,6 +16,9 @@ import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AuthConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import AdminPanel from '../containers/Admin/AdminPanel';
+import AdminState, { AdminPanelPane } from '../models/state/AdminState';
+import { ConceptEditor } from '../components/Admin/ConceptEditor/ConceptEditor';
+import { setAdminPanelSubPane, setAdminPanelPane } from '../actions/admin/admin';
 
 export interface RouteConfig {
     display: string;
@@ -23,6 +26,12 @@ export interface RouteConfig {
     index: Routes;
     path: string;
     render: any;
+    subRoutes?: SubRouteConfig[];
+}
+
+interface SubRouteConfig {
+    clickHandler: any;
+    display: string;
 }
 
 const findPatients = (): RouteConfig => {
@@ -71,7 +80,14 @@ const admin = (): RouteConfig => {
         icon: <MdSecurity />,
         index: Routes.AdminPanel,
         path: '/admin',
-        render: () => <AdminPanel />
+        render: () => <AdminPanel />,
+        subRoutes: [{
+            clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.CONCEPTS)),
+            display: 'Concepts',
+        }, {
+            clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.DATASETS)),
+            display: 'Datasets',
+        }]
     };
 }
 

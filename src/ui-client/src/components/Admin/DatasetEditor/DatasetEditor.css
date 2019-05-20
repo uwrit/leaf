@@ -1,0 +1,56 @@
+/* Left Column */
+.dataset-editor-column-left {
+    padding: 20px;
+    padding-right: 30px !important;
+}
+
+/* Right Column */
+.dataset-editor-column-right {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100vh !important;
+    outline: none;
+    padding: 0;
+    position: fixed;
+    right: 0;
+    width: 54%;
+    z-index: 100;
+}
+
+/* Main */
+.dataset-editor-main {
+    background-color: rgb(240,240,240);
+    height: 100%;
+    overflow-y: auto;
+    padding: 20px 20px 75px;
+}
+
+.dataset-editor-sql-column-container {
+    display: flex;
+}
+
+.dataset-editor-sql {
+    margin-right: 20px;
+    width: 570px;
+}
+
+.dataset-editor-sql-right {
+    vertical-align: top;
+    width: 100%;
+}
+
+.dataset-editor-shape-container {
+    width: 100%;
+}
+
+/* Header */
+.dataset-editor-column-right-header {
+    margin-bottom: 20px;
+}
+
+.dataset-editor-column-right-header .leaf-button {
+    margin-right: 20px !important;
+}
+
+.dataset-editor-column-right-header .leaf-button-secondary {
+    background-color: white;
+}

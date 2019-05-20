@@ -10,6 +10,8 @@ import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
+import { AdminDatasetQuery } from '../admin/Dataset';
+
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -17,6 +19,11 @@ export enum AdminPanelLoadState {
     LOADED = 3,
     ERROR = 4,
     NOT_APPLICABLE = 5
+}
+
+export enum AdminPanelPane {
+    CONCEPTS = 1,
+    DATASETS = 2
 }
 
 export enum AdminPanelConceptEditorPane {
@@ -29,7 +36,6 @@ export interface AdminConceptState {
     concepts: Map<string, AdminConcept>;
     currentAdminConcept?: AdminConcept;
     currentUserConcept?: UserConcept;
-    pane: AdminPanelConceptEditorPane;
     examplePanel: Panel;
     exampleSql: string;
     state: AdminPanelLoadState;
@@ -53,11 +59,15 @@ export interface AdminPanelFilterState {
 }
 
 export interface AdminDatasetState {
-    
+    changed: boolean;
+    currentDataset?: AdminDatasetQuery;
+    datasets: Map<string, AdminDatasetQuery>;
+    state: AdminPanelLoadState;
 }
 
 export default interface AdminState {
-    activeTab: number;
+    activePane: AdminPanelPane;
+    activeSubPane: number;
     concepts: AdminConceptState;
     conceptEvents: AdminConceptEventState;
     configuration: AdminConfiguration;
