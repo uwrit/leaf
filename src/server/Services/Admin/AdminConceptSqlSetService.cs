@@ -18,7 +18,7 @@ using Model.Authorization;
 
 namespace Services.Admin
 {
-    public class AdminConceptSqlSetService : IAdminConceptSqlSetService
+    public class AdminConceptSqlSetService : AdminConceptSqlSetManager.IAdminConceptSqlSetService
     {
         readonly IUserContext user;
         readonly ILogger<AdminConceptSqlSetService> logger;
@@ -34,15 +34,12 @@ namespace Services.Admin
             user = userContext;
         }
 
-        public async Task<ConceptSqlSet> Create(ConceptSqlSet set)
+        public async Task<ConceptSqlSet> CreateAsync(ConceptSqlSet set)
         {
-            logger.LogInformation("Creating ConceptSqlSet:{@ConceptSqlSet}", set);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    var created = await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
+                var created = await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
                         Sql.Create,
                         new
                         {
@@ -57,48 +54,30 @@ namespace Services.Admin
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    logger.LogInformation("Created ConceptSqlSet:{@ConceptSqlSet}", set);
-                    return created;
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not create ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return created;
             }
         }
 
-        public async Task<ConceptSqlSetDeleteResult> Delete(int id)
+        public async Task<ConceptSqlSetDeleteResult> DeleteAsync(int id)
         {
-            logger.LogInformation("Deleting ConceptSqlSet. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Delete,
                         new { id, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    var concepts = grid.Read<ConceptDependent>();
-                    var specs = grid.Read<SpecializationGroupDependent>();
-                    return new ConceptSqlSetDeleteResult { ConceptDependents = concepts, SpecializationGroupDependents = specs };
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not delete ConceptSqlSet. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                var concepts = grid.Read<ConceptDependent>();
+                var specs = grid.Read<SpecializationGroupDependent>();
+                return new ConceptSqlSetDeleteResult { ConceptDependents = concepts, SpecializationGroupDependents = specs };
             }
         }
 
-        public async Task<IEnumerable<ConceptSqlSet>> Get()
+        public async Task<IEnumerable<ConceptSqlSet>> GetAsync()
         {
-            logger.LogInformation("Getting all ConceptSqlSets");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -111,15 +90,13 @@ namespace Services.Admin
             }
         }
 
-        public async Task<ConceptSqlSet> Update(ConceptSqlSet set)
+        public async Task<ConceptSqlSet> UpdateAsync(ConceptSqlSet set)
         {
-            logger.LogInformation("Updating ConceptSqlSet:{@ConceptSqlSet}", set);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    return await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
+
+                return await cn.QueryFirstOrDefaultAsync<ConceptSqlSet>(
                         Sql.Update,
                         new
                         {
@@ -135,13 +112,6 @@ namespace Services.Admin
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not update ConceptSqlSet:{@ConceptSqlSet}. Code:{Code} Error:{Error}", set, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
             }
         }
 

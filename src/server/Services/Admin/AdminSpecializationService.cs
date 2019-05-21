@@ -20,7 +20,7 @@ using Model.Authorization;
 
 namespace Services.Admin
 {
-    public class AdminSpecializationService : IAdminSpecializationService
+    public class AdminSpecializationService : AdminSpecializationManager.IAdminSpecializationService
     {
         readonly IUserContext user;
         readonly ILogger<AdminSpecializationService> logger;
@@ -36,16 +36,13 @@ namespace Services.Admin
             user = userContext;
         }
 
-        public async Task<Specialization> Create(Specialization spec)
+        public async Task<Specialization> CreateAsync(Specialization spec)
         {
-            logger.LogInformation("Creating Specialization:{@Specialization}", spec);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var created = await cn.QueryFirstAsync<SpecializationRecord>(
+                var created = await cn.QueryFirstAsync<SpecializationRecord>(
                         Sql.Create,
                         new
                         {
@@ -60,20 +57,12 @@ namespace Services.Admin
                         commandTimeout: opts.DefaultTimeout
                     );
 
-                    return created.Specialization();
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not create Specialization. Specialization:{@Specialization} Code:{Code} Error:{Error}", spec, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return created.Specialization();
             }
         }
 
-        public async Task<Specialization> Delete(Guid id)
+        public async Task<Specialization> DeleteAsync(Guid id)
         {
-            logger.LogInformation("Deleting Specialization. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -87,43 +76,29 @@ namespace Services.Admin
             }
         }
 
-        public async Task<IEnumerable<Specialization>> GetByGroupId(int id)
+        public async Task<IEnumerable<Specialization>> GetByGroupIdAsync(int id)
         {
-            logger.LogInformation("Getting Specializations. GroupId:{GroupId}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var specializations = await cn.QueryAsync<SpecializationRecord>(
+                var specializations = await cn.QueryAsync<SpecializationRecord>(
                     Sql.Get,
                     new { groupId = id },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                    return specializations.Select(s => s.Specialization());
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not fetch Specializations. SpecializationGroupId:{SpecializationGroupId} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
-
+                return specializations.Select(s => s.Specialization());
             }
         }
 
-        public async Task<Specialization> Update(Specialization spec)
+        public async Task<Specialization> UpdateAsync(Specialization spec)
         {
-            logger.LogInformation("Update Specialization:{@Specialization}", spec);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var updated = await cn.QueryFirstOrDefaultAsync<SpecializationRecord>(
+                var updated = await cn.QueryFirstOrDefaultAsync<SpecializationRecord>(
                         Sql.Update,
                         new
                         {
@@ -137,14 +112,7 @@ namespace Services.Admin
                         },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout);
-                    return updated.Specialization();
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not update Specialization:{@Specialization}. Code:{Code} Error:{Error}", spec, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return updated.Specialization();
             }
         }
 

@@ -56,7 +56,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
+                log.LogError("Failed to get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -71,7 +71,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not delete query. Query:{Query} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
+                log.LogError("Failed to delete query. Query:{Query} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -133,7 +133,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", toSave, de.ErrorCode, de.Message);
+                log.LogError("Failed to save query. Query:{@Query} Code:{Code} Error:{Error}", toSave, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }

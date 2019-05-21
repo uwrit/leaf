@@ -18,7 +18,7 @@ using Model.Authorization;
 
 namespace Services.Admin
 {
-    public class AdminConceptEventService : IAdminConceptEventService
+    public class AdminConceptEventService : AdminConceptEventManager.IAdminConceptEventService
     {
         readonly IUserContext user;
         readonly ILogger<AdminConceptEventService> logger;
@@ -34,15 +34,13 @@ namespace Services.Admin
             user = userContext;
         }
 
-        public async Task<ConceptEvent> Create(ConceptEvent ev)
+        public async Task<ConceptEvent> CreateAsync(ConceptEvent ev)
         {
-            logger.LogInformation("Creating ConceptEvent:{@ConceptEvent}", ev);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    var created = await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
+
+                var created = await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
                         Sql.Create,
                         new
                         {
@@ -52,19 +50,11 @@ namespace Services.Admin
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    logger.LogInformation("Created ConceptEvent:{@ConceptEvent}", ev);
-                    return created;
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not create ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return created;
             }
         }
 
-        public async Task<ConceptEventDeleteResult> Delete(int id)
+        public async Task<ConceptEventDeleteResult> DeleteAsync(int id)
         {
             logger.LogInformation("Deleting ConceptEvent. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -83,16 +73,15 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not delete ConceptEvent. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
+                    logger.LogError("Failed to delete ConceptEvent. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
                     se.MapThrow();
                     throw;
                 }
             }
         }
 
-        public async Task<IEnumerable<ConceptEvent>> Get()
+        public async Task<IEnumerable<ConceptEvent>> GetAsync()
         {
-            logger.LogInformation("Getting all ConceptEvents");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -105,7 +94,7 @@ namespace Services.Admin
             }
         }
 
-        public async Task<ConceptEvent> Update(ConceptEvent ev)
+        public async Task<ConceptEvent> UpdateAsync(ConceptEvent ev)
         {
             logger.LogInformation("Updating ConceptEvent:{@ConceptEvent}", ev);
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -127,7 +116,7 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not update ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
+                    logger.LogError("Failed to update ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
                     se.MapThrow();
                     throw;
                 }

@@ -40,7 +40,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not get dataset queries. Error:{Error}", e.ToString());
+                log.LogError("Failed to get dataset queries. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

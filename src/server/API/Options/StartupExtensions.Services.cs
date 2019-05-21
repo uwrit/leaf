@@ -106,11 +106,11 @@ namespace API.Options
 
         static IServiceCollection AddAdminServices(this IServiceCollection services)
         {
-            services.AddTransient<IAdminConceptSqlSetService, AdminConceptSqlSetService>();
-            services.AddTransient<IAdminSpecializationService, AdminSpecializationService>();
-            services.AddTransient<IAdminSpecializationGroupService, AdminSpecializationGroupService>();
+            services.AddTransient<AdminConceptSqlSetManager.IAdminConceptSqlSetService, AdminConceptSqlSetService>();
+            services.AddTransient<AdminSpecializationManager.IAdminSpecializationService, AdminSpecializationService>();
+            services.AddTransient<AdminSpecializationGroupManager.IAdminSpecializationGroupService, AdminSpecializationGroupService>();
             services.AddTransient<IAdminConceptService, AdminConceptService>();
-            services.AddTransient<IAdminConceptEventService, AdminConceptEventService>();
+            services.AddTransient<AdminConceptEventManager.IAdminConceptEventService, AdminConceptEventService>();
 
             return services;
         }

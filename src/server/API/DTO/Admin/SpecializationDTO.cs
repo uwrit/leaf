@@ -66,15 +66,19 @@ namespace API.DTO.Admin
                 UiDefaultText = sg.UiDefaultText
             };
         }
+    }
 
-        public SpecializationGroup SpecializationGroup()
+    public static class SpecializationGroupExtensions
+    {
+        public static SpecializationGroup SpecializationGroup(this SpecializationGroupDTO dto)
         {
+            if (dto == null) return null;
             return new SpecializationGroup
             {
-                Id = Id,
-                SqlSetId = SqlSetId,
-                Specializations = Specializations.Select(s => s.ConceptSpecialization()),
-                UiDefaultText = UiDefaultText
+                Id = dto.Id,
+                SqlSetId = dto.SqlSetId,
+                Specializations = dto.Specializations.Select(s => s.ConceptSpecialization()),
+                UiDefaultText = dto.UiDefaultText
             };
         }
     }

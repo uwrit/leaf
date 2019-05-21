@@ -67,7 +67,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not execute query. Error:{Error}", ex.ToString());
+                log.LogError("Failed to execute query. Error:{Error}", ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -114,7 +114,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not fetch demographics. QueryID:{QueryID} Error:{Error}", queryid, ex.ToString());
+                log.LogError("Failed to fetch demographics. QueryID:{QueryID} Error:{Error}", queryid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -172,7 +172,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
+                log.LogError("Failed to fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

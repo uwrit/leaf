@@ -53,7 +53,7 @@ namespace Model.Compiler
             }
             catch (DbException de)
             {
-                log.LogError("Could not get demographic query context. Query:{@QueryRef} Code:{Code} Error:{Error}", qr, de.ErrorCode, de.Message);
+                log.LogError("Failed to get demographic query context. Query:{@QueryRef} Code:{Code} Error:{Error}", qr, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }

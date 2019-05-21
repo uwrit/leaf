@@ -27,12 +27,12 @@ namespace API.Controllers.Admin
     {
 
         readonly ILogger<AdminSqlSetController> logger;
-        readonly IAdminConceptSqlSetService setService;
+        readonly AdminConceptSqlSetManager manager;
 
-        public AdminSqlSetController(ILogger<AdminSqlSetController> logger, IAdminConceptSqlSetService setService)
+        public AdminSqlSetController(ILogger<AdminSqlSetController> logger, AdminConceptSqlSetManager manager)
         {
             this.logger = logger;
-            this.setService = setService;
+            this.manager = manager;
         }
 
         [HttpGet]
@@ -40,12 +40,12 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var sets = await setService.Get();
+                var sets = await manager.GetAsync();
                 return Ok(sets);
             }
             catch (Exception e)
             {
-                logger.LogError("Could not get ConceptSqlSets. Error:{Error}", e.ToString());
+                logger.LogError("Failed to get ConceptSqlSets. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -55,22 +55,22 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (conceptSqlSet == null)
+                if (conceptSqlSet != null)
                 {
-                    return BadRequest(CRUDError.From("ConceptSqlSet is missing."));
+                    conceptSqlSet.Id = id;
                 }
-                if (string.IsNullOrWhiteSpace(conceptSqlSet.SqlSetFrom))
-                {
-                    return BadRequest(CRUDError.From("ConceptSqlSet.SqlSetFrom is required."));
-                }
-                conceptSqlSet.Id = id;
 
-                var updated = await setService.Update(conceptSqlSet);
+                var updated = await manager.UpdateAsync(conceptSqlSet);
                 if (updated == null)
                 {
                     return NotFound();
                 }
                 return Ok(updated);
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update ConceptSqlSet model. Model:{@Model} Error:{Error}", conceptSqlSet, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(ConceptSqlSet)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -78,7 +78,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not update ConceptSqlSet:{@ConceptSqlSet}. Error:{Error}", conceptSqlSet, e.ToString());
+                logger.LogError("Failed to update ConceptSqlSet:{@ConceptSqlSet}. Error:{Error}", conceptSqlSet, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -88,17 +88,13 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (conceptSqlSet == null)
-                {
-                    return BadRequest(CRUDError.From("ConceptSqlSet is missing."));
-                }
-                if (string.IsNullOrWhiteSpace(conceptSqlSet.SqlSetFrom))
-                {
-                    return BadRequest(CRUDError.From("ConceptSqlSet.SqlSetFrom is required."));
-                }
-
-                var created = await setService.Create(conceptSqlSet);
+                var created = await manager.CreateAsync(conceptSqlSet);
                 return Ok(created);
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid create ConceptSqlSet model. Model:{@Model} Error:{Error}", conceptSqlSet, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(ConceptSqlSet)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -106,7 +102,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not create ConceptSqlSet:{@ConceptSqlSet}. Error:{Error}", conceptSqlSet, e.ToString());
+                logger.LogError("Failed to create ConceptSqlSet:{@ConceptSqlSet}. Error:{Error}", conceptSqlSet, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -116,7 +112,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var result = await setService.Delete(id);
+                var result = await manager.DeleteAsync(id);
                 if (!result.Ok)
                 {
                     return Conflict(ConceptSqlSetDeleteResponse.From(result));
@@ -125,7 +121,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not delete ConceptSqlSet. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to delete ConceptSqlSet. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

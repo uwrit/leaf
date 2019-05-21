@@ -56,7 +56,7 @@ namespace Services.Export
                 var version = await response.Content.ReadAsStringAsync();
                 return version;
             }
-            logger.LogError("Could not get REDCap version. StatusCode:{StatusCode} Reason:{Reason}", (int)response.StatusCode, response.ReasonPhrase);
+            logger.LogError("Failed to get REDCap version. StatusCode:{StatusCode} Reason:{Reason}", (int)response.StatusCode, response.ReasonPhrase);
             throw new ExportException((int)response.StatusCode);
         }
 
@@ -70,7 +70,7 @@ namespace Services.Export
                 var token = await response.Content.ReadAsStringAsync();
                 return token;
             }
-            logger.LogError("Could not create REDCap project. Project:{@Project} StatusCode:{StatusCode} Reason:{Reason}", projectRequest, (int)response.StatusCode, response.ReasonPhrase);
+            logger.LogError("Failed to create REDCap project. Project:{@Project} StatusCode:{StatusCode} Reason:{Reason}", projectRequest, (int)response.StatusCode, response.ReasonPhrase);
             throw new ExportException((int)response.StatusCode);
         }
     }

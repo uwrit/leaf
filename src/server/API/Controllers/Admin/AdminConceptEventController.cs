@@ -26,12 +26,12 @@ namespace API.Controllers.Admin
     public class AdminConceptEventController : Controller
     {
         readonly ILogger<AdminConceptEventController> logger;
-        readonly IAdminConceptEventService evService;
+        readonly AdminConceptEventManager manager;
 
-        public AdminConceptEventController(ILogger<AdminConceptEventController> logger, IAdminConceptEventService evService)
+        public AdminConceptEventController(ILogger<AdminConceptEventController> logger, AdminConceptEventManager manager)
         {
             this.logger = logger;
-            this.evService = evService;
+            this.manager = manager;
         }
 
         [HttpGet]
@@ -39,12 +39,12 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var evs = await evService.Get();
+                var evs = await manager.GetAsync();
                 return Ok(evs);
             }
             catch (Exception e)
             {
-                logger.LogError("Could not get ConceptEvents. Error:{Error}", e.ToString());
+                logger.LogError("Failed to get ConceptEvents. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -54,22 +54,22 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (conceptEvent == null)
+                if (conceptEvent != null)
                 {
-                    return BadRequest(CRUDError.From("ConceptEvent is missing."));
+                    conceptEvent.Id = id;
                 }
-                if (string.IsNullOrWhiteSpace(conceptEvent.UiDisplayEventName))
-                {
-                    return BadRequest(CRUDError.From("ConceptEvent.UiDisplayEventName is required."));
-                }
-                conceptEvent.Id = id;
 
-                var updated = await evService.Update(conceptEvent);
+                var updated = await manager.UpdateAsync(conceptEvent);
                 if (updated == null)
                 {
                     return NotFound();
                 }
                 return Ok(updated);
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update ConceptEvent model. Model:{@Model} Error:{Error}", conceptEvent, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(ConceptEvent)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -77,7 +77,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not update ConceptEvent:{@ConceptEvent}. Error:{Error}", conceptEvent, e.ToString());
+                logger.LogError("Failed to update ConceptEvent:{@ConceptEvent}. Error:{Error}", conceptEvent, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -87,17 +87,13 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (conceptEvent == null)
-                {
-                    return BadRequest(CRUDError.From("ConceptEvent is missing."));
-                }
-                if (string.IsNullOrWhiteSpace(conceptEvent.UiDisplayEventName))
-                {
-                    return BadRequest(CRUDError.From("ConceptEvent.UiDisplayEventName is required."));
-                }
-
-                var created = await evService.Create(conceptEvent);
+                var created = await manager.CreateAsync(conceptEvent);
                 return Ok(created);
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid create ConceptEvent model. Model:{@Model} Error:{Error}", conceptEvent, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(ConceptEvent)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -105,7 +101,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not create ConceptEvent:{@ConceptEvent}. Error:{Error}", conceptEvent, e.ToString());
+                logger.LogError("Failed to create ConceptEvent:{@ConceptEvent}. Error:{Error}", conceptEvent, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -115,7 +111,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var result = await evService.Delete(id);
+                var result = await manager.DeleteAsync(id);
                 if (!result.Ok)
                 {
                     return Conflict(ConceptEventDeleteResponse.From(result));
@@ -124,7 +120,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not delete ConceptEvent. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to delete ConceptEvent. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
