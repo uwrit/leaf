@@ -10,7 +10,6 @@ import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { DatasetsState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
-import './DatasetEditor.css';
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
@@ -18,6 +17,9 @@ import { PatientListDatasetShape, PatientListDatasetDefinitionTemplate } from '.
 import { PatientListColumnTemplate, PatientListColumnType, AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { setAdminDataset, setAdminPanelDatasetColumns } from '../../../actions/admin/dataset';
+import './DatasetEditor.css';
+import { FiCheck, FiAlertTriangle } from 'react-icons/fi';
+import { getSqlColumns } from '../../../utils/parseSql';
 
 interface Props { 
     data: AdminState;
@@ -83,37 +85,63 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                     <Button className='leaf-button leaf-button-warning'>Delete Dataset</Button>
                                 </div>
 
-                                <div className={`${c}-sql-column-container`}>
-                                    <div className={`${c}-sql`}>
+                                <Row>
+                                    <Col md={12} className={`${c}-sql`}>
                                         <Section header='SQL'>
                                             <SqlBox 
                                                 sql={currentDataset!.sql} 
-                                                height={700} 
-                                                width={550} 
+                                                height={300} 
+                                                width={this.getWidth()} 
                                                 readonly={false} 
                                                 changeHandler={this.handleSqlChange}
                                             />
                                         </Section>
-                                    </div>
-                                    <div className={`${c}-sql-right`}>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col md={6}>
                                         <Section header='Columns'>
                                             <div className={`${c}-column-container`}>
                                                 {columns.map((c) => this.setColumn(c))}
                                             </div>
                                         </Section>
+                                    </Col>
+                                    <Col md={6}>
                                         <Section header='Dataset Shapes'>
                                             <div className={`${c}-shape-container`}>
                                                 {templates.map((t) => this.setShape(t, currentDataset!.shape))}
                                             </div>
                                         </Section>
-                                    </div>
-                                </div>
+                                    </Col>
+                                </Row>
                             </div>
                         </div>
                     </Row>
                 </Container>
             </div>
         );
+    }
+
+    /*
+     * The Ace Editor needs an explicit width, so this computes the width 
+     * of the container DOM object around it, minus padding.
+     */
+    private getWidth = () => {
+        const main = document.getElementsByClassName(`${this.className}-main`);
+        const dflt = 800;
+        const scrollWidth = 25;
+
+        if (main && main[0]) {
+            const computed = window.getComputedStyle(main[0]);
+            const paddingLeftStr = computed.paddingLeft;
+            const widthStr = computed.width;
+            if (paddingLeftStr && widthStr) {
+                const paddingLeft = +paddingLeftStr.replace('px','');
+                const width = +widthStr.replace('px','');
+                return width - (paddingLeft * 2) - scrollWidth;
+            }
+        }
+        return dflt;
     }
 
     /* 
@@ -127,15 +155,18 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         dispatch(setAdminDataset(newDataset, true));
     }
 
-    private handleSqlChange = (val: any) => {
+    /* 
+     * Handles 
+     */
+    private handleSqlChange = (val: string) => {
         const { dispatch, data } = this.props;
         const { columns, currentDataset } = this.props.data.datasets;
 
         for (let i = 0; i < columns.length; i++) {
             const col = columns[i];
-            const present = currentDataset!.sql.indexOf(col.id) > -1;
+            const present = val.indexOf(col.id) > -1;
             if (present !== col.present) {
-                columns[i] = Object.assign({}, col, present);
+                columns[i] = Object.assign({}, col, { present });
             }
         }
         
@@ -146,6 +177,8 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             },
         ) as AdminDatasetQuery;
         dispatch(setAdminDataset(newDataset, true));
+        const x = getSqlColumns(val);
+        console.log(x);
     }
 
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
@@ -162,24 +195,34 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         if (!template) { return; }
 
         const cols: AdminPanelPatientListColumnTemplate[] = [];
-        template.columns.forEach((t) => {
-            
-        })
-
-        for (let i = 0; i < columns.length; i++) {
-            const col = columns[i];
+        template.columns.forEach((col) => {
             const present = currentDataset!.sql.indexOf(col.id) > -1;
             cols.push({ ...col, present });
-        }
+        });
+
         this.handleInputChange(shape, 'shape');
         dispatch(setAdminPanelDatasetColumns(cols));
     }
 
     private setColumn = (col: AdminPanelPatientListColumnTemplate) => {
         const c = this.className;
-        const className = `${c}-column ${col.present ? 'present' : ''}`;
+        const classes = [ `${c}-column` ];
+        let icon = null;
+
+        if (col.present) {
+            classes.push('present');
+            icon = <FiCheck className='present' />;
+        } else if (!col.optional) {
+            classes.push('missing');
+            icon = <FiAlertTriangle className='missing' />;
+        }
+        if (col.optional) {
+            classes.push('optional');
+        }
+
         return (
-            <div key={col.id} className={className}>
+            <div key={col.id} className={classes.join(' ')}>
+                {icon}
                 {col.id}
             </div>
         );
@@ -187,9 +230,14 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     private setShape = (template: PatientListDatasetDefinitionTemplate, currentShape: PatientListDatasetShape) => {
         const c = this.className;
-        const className = `${c}-shape ${template.shape === currentShape ? 'selected' : ''}`;
+        const classes = [ `${c}-shape` ];
+
+        if (template.shape === currentShape) {
+            classes.push('selected');
+        }
+
         return (
-            <div key={template.shape} className={className} onClick={this.handleShapeClick.bind(null, template.shape)}>
+            <div key={template.shape} className={classes.join(' ')} onClick={this.handleShapeClick.bind(null, template.shape)}>
                 {PatientListDatasetShape[template.shape]}
             </div>
         );
