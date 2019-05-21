@@ -53,6 +53,8 @@ import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEP
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import formatSql from "../../utils/formatSql";
+import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_PANEL_DATASET_COLUMNS } from "../../actions/admin/dataset";
+import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDatasetColumns } from "./dataset";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -80,6 +82,7 @@ export const defaultAdminState = (): AdminState => {
         },
         datasets: {
             changed: false,
+            columns: [],
             currentDataset: {
                 id: '8BB12CC0-E278-E911-9D11-B886875607D1',
                 category: 'Labs',
@@ -193,6 +196,14 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminConceptEvent(state, action);
         case UNDO_ADMIN_CONCEPT_EVENT_CHANGE:
             return undoAdminConceptEventChange(state, action);
+
+        // Datasets
+        case SET_ADMIN_PANEL_DATASET_LOAD_STATE:
+            return setAdminPanelDatasetLoadState(state, action);
+        case SET_ADMIN_DATASET:
+            return setAdminPanelCurrentDataset(state, action);
+        case SET_ADMIN_PANEL_DATASET_COLUMNS:
+            return setAdminPanelDatasetColumns(state, action);
 
         default:
             return state;

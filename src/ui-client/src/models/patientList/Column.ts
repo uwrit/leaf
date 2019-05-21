@@ -25,6 +25,10 @@ export interface PatientListColumnTemplate {
     type: PatientListColumnType;
 }
 
+export interface AdminPanelPatientListColumnTemplate extends PatientListColumnTemplate {
+    present: boolean;
+}
+
 export interface PatientListColumn extends PatientListColumnTemplate {
     datasetId: PatientListDatasetId;
     index: number;

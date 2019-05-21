@@ -14,15 +14,9 @@ import { getAdminConcept, updateAdminConcept, createAdminConcept, deleteAdminCon
 import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
-import { getSqlSets } from '../../services/admin/sqlSetApi';
-import { getAdminSqlConfiguration } from './configuration';
 import { generateSampleSql, getRootId } from '../../utils/admin';
 import { setConcept, removeConcept, reparentConcept, createConcept } from '../concepts';
-import { setAdminConceptSqlSets } from './sqlSet';
 import { fetchConcept } from '../../services/conceptApi'
-import { getConceptEvents } from '../../services/admin/conceptEventApi';
-import { setAdminConceptEvents } from './conceptEvent';
-import { setAdminPanelLoadState } from './admin';
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
 export const SET_ADMIN_CONCEPT_EXAMPLE_SQL = 'SET_ADMIN_CONCEPT_EXAMPLE_SQL';
