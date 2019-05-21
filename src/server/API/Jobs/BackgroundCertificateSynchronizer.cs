@@ -80,11 +80,11 @@ namespace API.Jobs
                 }
                 catch (HttpRequestException hre)
                 {
-                    log.LogError("Could not refresh NetworkEndpoint. Endpoint:{@Endpoint} Error:{Error}", oldState, hre.Message);
+                    log.LogError("Failed to refresh NetworkEndpoint. Endpoint:{@Endpoint} Error:{Error}", oldState, hre.Message);
                 }
                 catch (SqlException se)
                 {
-                    log.LogError("Could not update NetworkEndpoint. Old:{@Old} New:{@New} Error:{Error}", oldState, newState, se.Message);
+                    log.LogError("Failed to update NetworkEndpoint. Old:{@Old} New:{@New} Error:{Error}", oldState, newState, se.Message);
                 }
                 return newState;
             });

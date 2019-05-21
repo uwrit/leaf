@@ -17,5 +17,19 @@ namespace Model.Validation
             if (value == null)
                 throw new ArgumentNullException(name);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
+        public static void NotNullOrWhitespace(string value, string name)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentNullException(name);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
+        public static void NotDefault<T>(T value, string name)
+        {
+            if (value == default)
+                throw new ArgumentException($"Value cannot be default.{Environment.NewLine}Parameter name: {name}");
+        }
     }
 }

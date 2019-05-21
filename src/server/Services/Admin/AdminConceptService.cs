@@ -83,7 +83,7 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not create concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
+                    logger.LogError("Failed to create concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
                     se.MapThrow();
                     throw;
                 }
@@ -110,7 +110,7 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not delete concept. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
+                    logger.LogError("Failed to delete concept. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
                     se.MapThrow();
                     throw;
                 }
@@ -181,7 +181,7 @@ namespace Services.Admin
                 }
                 catch (SqlException se)
                 {
-                    logger.LogError("Could not update concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
+                    logger.LogError("Failed to update concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
                     se.MapThrow();
                     throw;
                 }

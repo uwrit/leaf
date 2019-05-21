@@ -8,6 +8,7 @@ using Model.Network;
 using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
+using Model.Admin;
 
 namespace Model
 {
@@ -17,7 +18,6 @@ namespace Model
         {
             services.AddSingleton<NetworkValidator>();
             services.AddTransient<NetworkEndpointProvider>();
-            services.AddTransient<AdminNetworkEndpointManager>();
 
             services.AddTransient<PanelValidator>();
             services.AddTransient<PanelConverter>();
@@ -34,6 +34,12 @@ namespace Model
             services.AddTransient<ConceptTreeSearcher>();
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DatasetQueryProvider>();
+
+            services.AddTransient<AdminConceptSqlSetManager>();
+            services.AddTransient<AdminSpecializationManager>();
+            services.AddTransient<AdminSpecializationGroupManager>();
+            services.AddTransient<AdminConceptEventManager>();
+            services.AddTransient<AdminNetworkEndpointManager>();
 
             return services;
         }

@@ -44,7 +44,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not get concept. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to get concept. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -70,7 +70,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                logger.LogError("Failed to update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -95,7 +95,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not create concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                logger.LogError("Failed to create concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -118,7 +118,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not delete concept. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to delete concept. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

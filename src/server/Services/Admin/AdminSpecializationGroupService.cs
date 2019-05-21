@@ -21,7 +21,7 @@ using Model.Authorization;
 
 namespace Services.Admin
 {
-    public class AdminSpecializationGroupService : IAdminSpecializationGroupService
+    public class AdminSpecializationGroupService : AdminSpecializationGroupManager.IAdminSpecializationGroupService
     {
         readonly IUserContext user;
         readonly ILogger<AdminSpecializationGroupService> logger;
@@ -37,16 +37,13 @@ namespace Services.Admin
             user = userContext;
         }
 
-        public async Task<SpecializationGroup> Create(SpecializationGroup g)
+        public async Task<SpecializationGroup> CreateAsync(SpecializationGroup g)
         {
-            logger.LogInformation("Creating SpecializationGroup:{@SpecializationGroup}", g);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Create,
                         new
                         {
@@ -57,46 +54,28 @@ namespace Services.Admin
                         },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout);
-                    return HydratedSpecializationGroupReader.ReadSingle(grid);
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not create SpecializationGroup. SpecializationGroup:{@SpecializationGroup} Code:{Code} Error:{Error}", g, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return HydratedSpecializationGroupReader.ReadSingle(grid);
             }
         }
 
-        public async Task<SpecializationGroupDeleteResult> Delete(int id)
+        public async Task<SpecializationGroupDeleteResult> DeleteAsync(int id)
         {
-            logger.LogInformation("Deleting SpecializationGroup. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var deps = await cn.QueryAsync<ConceptDependent>(
+                var deps = await cn.QueryAsync<ConceptDependent>(
                         Sql.Delete,
                         new { id, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout);
 
-                    return new SpecializationGroupDeleteResult { ConceptDependents = deps };
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Could not delete SpecializationGroup. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return new SpecializationGroupDeleteResult { ConceptDependents = deps };
             }
         }
 
-        public async Task<IEnumerable<SpecializationGroup>> Get()
+        public async Task<IEnumerable<SpecializationGroup>> GetAsync()
         {
-            logger.LogInformation("Getting SpecializationGroups.");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -111,7 +90,7 @@ namespace Services.Admin
             }
         }
 
-        public async Task<SpecializationGroup> Update(SpecializationGroup spec)
+        public async Task<SpecializationGroup> UpdateAsync(SpecializationGroup spec)
         {
             var record = new SpecializationGroupRecord(spec);
             logger.LogInformation("Updating SpecializationGroup:{SpecializationGroup}", record);
@@ -119,30 +98,21 @@ namespace Services.Admin
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var updatedRecord = await cn.QueryFirstOrDefaultAsync<SpecializationGroupRecord>(
+                var updatedRecord = await cn.QueryFirstOrDefaultAsync<SpecializationGroupRecord>(
                         Sql.Update,
                         new { id = record.Id, sqlSetId = record.SqlSetId, uiDefaultText = record.UiDefaultText, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
 
-                    if (updatedRecord == null)
-                    {
-                        return null;
-                    }
-
-                    var updated = updatedRecord.SpecializationGroup();
-                    updated.Specializations = spec.Specializations;
-                    return updated;
-                }
-                catch (SqlException se)
+                if (updatedRecord == null)
                 {
-                    logger.LogInformation("Could not update SpecializationGroup. SpecializationGroup:{@SpecializationGroup} Code:{Code} Error:{Error}", record, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
+                    return null;
                 }
+
+                var updated = updatedRecord.SpecializationGroup();
+                updated.Specializations = spec.Specializations;
+                return updated;
             }
         }
 

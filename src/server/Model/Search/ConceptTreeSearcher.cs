@@ -82,7 +82,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get rooted concepts of children ids {Ids}. Error:{Error}", ids, de.Message);
+                log.LogError("Failed to get rooted concepts of children ids {Ids}. Error:{Error}", ids, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -104,7 +104,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get child concepts. ParentId:{ParentId} Error:{Error}", parent, de.Message);
+                log.LogError("Failed to get child concepts. ParentId:{ParentId} Error:{Error}", parent, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -133,7 +133,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get concept by Id. Id:{Id} Error:{Error}", id, de.Message);
+                log.LogError("Failed to get concept by Id. Id:{Id} Error:{Error}", id, de.Message);
                 de.MapThrow();
                 throw;
             }

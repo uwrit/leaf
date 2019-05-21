@@ -49,7 +49,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogInformation("Could not get saved queries. Error:{Error}", e.ToString());
+                log.LogInformation("Failed to get saved queries. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -73,7 +73,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not get query. Identifier:{Identifier} Error:{Error}", ident, e.ToString());
+                log.LogError("Failed to get query. Identifier:{Identifier} Error:{Error}", ident, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -130,7 +130,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not save query. QueryId:{QueryId} Query:{@Query} Error:{Error}", id, querySave, e.ToString());
+                log.LogError("Failed to save query. QueryId:{QueryId} Query:{@Query} Error:{Error}", id, querySave, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -161,7 +161,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not delete query. UniversalId:{UniversalId} Error:{Error}", ident, e.ToString());
+                log.LogError("Failed to delete query. UniversalId:{UniversalId} Error:{Error}", ident, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -184,7 +184,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not preflight resource. Resource:{@Resource} Error:{Error}", resourceRef, e.ToString());
+                log.LogError("Failed to preflight resource. Resource:{@Resource} Error:{Error}", resourceRef, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

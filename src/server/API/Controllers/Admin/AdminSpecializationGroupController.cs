@@ -26,12 +26,12 @@ namespace API.Controllers.Admin
     public class AdminSpecializationGroupController : Controller
     {
         readonly ILogger<AdminSpecializationGroupController> logger;
-        readonly IAdminSpecializationGroupService sgService;
+        readonly AdminSpecializationGroupManager manager;
 
-        public AdminSpecializationGroupController(ILogger<AdminSpecializationGroupController> logger, IAdminSpecializationGroupService adminSpecializationGroupService)
+        public AdminSpecializationGroupController(ILogger<AdminSpecializationGroupController> logger, AdminSpecializationGroupManager manager)
         {
             this.logger = logger;
-            sgService = adminSpecializationGroupService;
+            this.manager = manager;
         }
 
         [HttpGet]
@@ -39,12 +39,12 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var groups = await sgService.Get();
+                var groups = await manager.GetAsync();
                 return Ok(groups.Select(SpecializationGroupDTO.From));
             }
             catch (Exception e)
             {
-                logger.LogError("Could not get SpecializationGroups. Error:{Error}", e.ToString());
+                logger.LogError("Failed to get SpecializationGroups. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -54,22 +54,13 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (dto == null)
+                if (dto != null)
                 {
-                    return BadRequest(CRUDError.From("SpecializationGroup is missing."));
+                    dto.Id = id;
                 }
-                if (dto.SqlSetId == default)
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup.SqlSetId is missing."));
-                }
-                if (string.IsNullOrWhiteSpace(dto.UiDefaultText))
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup.UiDefaultText is missing."));
-                }
-                dto.Id = id;
 
                 var group = dto.SpecializationGroup();
-                var updated = await sgService.Update(group);
+                var updated = await manager.UpdateAsync(group);
                 if (updated == null)
                 {
                     return NotFound();
@@ -81,13 +72,18 @@ namespace API.Controllers.Admin
                 logger.LogError("Malformed SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From(fe.Message));
             }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update SpecializationGroup model. Model:{@Model} Error:{Error}", dto, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(SpecializationGroup)} is missing or incomplete."));
+            }
             catch (LeafRPCException le)
             {
                 return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
-                logger.LogError("Could not update SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, e.ToString());
+                logger.LogError("Failed to update SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -97,32 +93,19 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (dto == null)
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup is missing."));
-                }
-                if (dto.SqlSetId == default)
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup.SqlSetId is missing."));
-                }
-                if (string.IsNullOrWhiteSpace(dto.UiDefaultText))
-                {
-                    return BadRequest(CRUDError.From("SpecializationGroup.UiDefaultText is missing."));
-                }
-                if (dto.Specializations?.Any(s => string.IsNullOrWhiteSpace(s.SqlSetWhere) || string.IsNullOrWhiteSpace(s.UiDisplayText)) ?? false)
-                {
-                    return BadRequest(CRUDError.From("Malformed Specializations."));
-                }
-
                 var group = dto.SpecializationGroup();
-                var created = await sgService.Create(group);
+                var created = await manager.CreateAsync(group);
                 return Ok(SpecializationGroupDTO.From(created));
-
             }
             catch (FormatException fe)
             {
                 logger.LogError("Malformed SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, fe.Message);
                 return BadRequest(CRUDError.From(fe.Message));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid create SpecializationGroup model. Model:{@Model} Error:{Error}", dto, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(SpecializationGroup)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -130,7 +113,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not create SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, e.ToString());
+                logger.LogError("Failed to create SpecializationGroup:{@SpecializationGroup} Error:{Error}", dto, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -140,7 +123,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var result = await sgService.Delete(id);
+                var result = await manager.DeleteAsync(id);
                 if (!result.Ok)
                 {
                     return Conflict(SpecializationGroupDeleteResponse.From(result));
@@ -153,7 +136,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Could not delete SpecializationGroup. Id:{Id} Error:{Error}", id, e.ToString());
+                logger.LogError("Failed to delete SpecializationGroup. Id:{Id} Error:{Error}", id, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

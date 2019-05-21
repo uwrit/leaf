@@ -44,7 +44,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve responders. Error:{Error}", ex.ToString());
+                log.LogError("Failed to retrieve responders. Error:{Error}", ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -59,7 +59,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve network identity. Error:{Error}", ex.ToString());
+                log.LogError("Failed to retrieve network identity. Error:{Error}", ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
