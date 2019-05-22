@@ -22,32 +22,26 @@ using Services.Tables;
 
 namespace Services.Admin
 {
-    public class AdminConceptService : IAdminConceptService
+    public class AdminConceptService : AdminConceptManager.IAdminConceptService
     {
         readonly IUserContext user;
-        readonly ILogger<AdminConceptService> logger;
         readonly AppDbOptions opts;
 
         public AdminConceptService(
-            ILogger<AdminConceptService> logger,
             IOptions<AppDbOptions> options,
             IUserContext userContext)
         {
-            this.logger = logger;
             opts = options.Value;
             user = userContext;
         }
 
-        public async Task<Concept> Create(Concept c)
+        public async Task<Concept> CreateAsync(Concept c)
         {
-            logger.LogInformation("Creating Concept. Concept:{@Concept}", c);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Create,
                         new
                         {
@@ -79,47 +73,29 @@ namespace Services.Admin
                         commandTimeout: opts.DefaultTimeout
                     );
 
-                    return AdminConceptReader.Read(grid);
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Failed to create concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return AdminConceptReader.Read(grid);
             }
         }
 
-        public async Task<ConceptDeleteResult> Delete(Guid id)
+        public async Task<ConceptDeleteResult> DeleteAsync(Guid id)
         {
-            logger.LogInformation("Deleting Concept. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Delete,
                         new { id, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
 
-                    return AdminConceptDeleteReader.Read(grid);
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Failed to delete concept. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return AdminConceptDeleteReader.Read(grid);
             }
         }
 
-        public async Task<Concept> Get(Guid id)
+        public async Task<Concept> GetAsync(Guid id)
         {
-            logger.LogInformation("Getting Concept. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -135,16 +111,13 @@ namespace Services.Admin
             }
         }
 
-        public async Task<Concept> Update(Concept c)
+        public async Task<Concept> UpdateAsync(Concept c)
         {
-            logger.LogInformation("Updating Concept. Concept:{@Concept}", c);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Update,
                         new
                         {
@@ -177,14 +150,7 @@ namespace Services.Admin
                         commandTimeout: opts.DefaultTimeout
                     );
 
-                    return AdminConceptReader.Read(grid);
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Failed to update concept. Concept:{@Concept} Code:{Code} Error:{Error}", c, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                return AdminConceptReader.Read(grid);
             }
         }
 

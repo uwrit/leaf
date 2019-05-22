@@ -109,7 +109,7 @@ namespace API.Options
             services.AddTransient<AdminConceptSqlSetManager.IAdminConceptSqlSetService, AdminConceptSqlSetService>();
             services.AddTransient<AdminSpecializationManager.IAdminSpecializationService, AdminSpecializationService>();
             services.AddTransient<AdminSpecializationGroupManager.IAdminSpecializationGroupService, AdminSpecializationGroupService>();
-            services.AddTransient<IAdminConceptService, AdminConceptService>();
+            services.AddTransient<AdminConceptManager.IAdminConceptService, AdminConceptService>();
             services.AddTransient<AdminConceptEventManager.IAdminConceptEventService, AdminConceptEventService>();
 
             return services;

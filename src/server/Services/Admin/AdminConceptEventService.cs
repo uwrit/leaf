@@ -21,15 +21,12 @@ namespace Services.Admin
     public class AdminConceptEventService : AdminConceptEventManager.IAdminConceptEventService
     {
         readonly IUserContext user;
-        readonly ILogger<AdminConceptEventService> logger;
         readonly AppDbOptions opts;
 
         public AdminConceptEventService(
-            ILogger<AdminConceptEventService> logger,
             IOptions<AppDbOptions> options,
             IUserContext userContext)
         {
-            this.logger = logger;
             opts = options.Value;
             user = userContext;
         }
@@ -56,27 +53,18 @@ namespace Services.Admin
 
         public async Task<ConceptEventDeleteResult> DeleteAsync(int id)
         {
-            logger.LogInformation("Deleting ConceptEvent. Id:{Id}", id);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    var grid = await cn.QueryMultipleAsync(
+
+                var grid = await cn.QueryMultipleAsync(
                         Sql.Delete,
                         new { id, user = user.UUID },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                    var sqlSets = grid.Read<ConceptSqlSetDependent>();
-                    return new ConceptEventDeleteResult { ConceptSqlSetDependents = sqlSets };
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Failed to delete ConceptEvent. Id:{Id} Code:{Code} Error:{Error}", id, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
+                var sqlSets = grid.Read<ConceptSqlSetDependent>();
+                return new ConceptEventDeleteResult { ConceptSqlSetDependents = sqlSets };
             }
         }
 
@@ -96,13 +84,11 @@ namespace Services.Admin
 
         public async Task<ConceptEvent> UpdateAsync(ConceptEvent ev)
         {
-            logger.LogInformation("Updating ConceptEvent:{@ConceptEvent}", ev);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                try
-                {
-                    return await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
+
+                return await cn.QueryFirstOrDefaultAsync<ConceptEvent>(
                         Sql.Update,
                         new
                         {
@@ -113,13 +99,6 @@ namespace Services.Admin
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );
-                }
-                catch (SqlException se)
-                {
-                    logger.LogError("Failed to update ConceptEvent:{@ConceptEvent}. Code:{Code} Error:{Error}", ev, se.ErrorCode, se.Message);
-                    se.MapThrow();
-                    throw;
-                }
             }
         }
 

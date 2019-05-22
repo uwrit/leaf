@@ -24,15 +24,12 @@ namespace Services.Admin
     public class AdminSpecializationGroupService : AdminSpecializationGroupManager.IAdminSpecializationGroupService
     {
         readonly IUserContext user;
-        readonly ILogger<AdminSpecializationGroupService> logger;
         readonly AppDbOptions opts;
 
         public AdminSpecializationGroupService(
-            ILogger<AdminSpecializationGroupService> logger,
             IOptions<AppDbOptions> options,
             IUserContext userContext)
         {
-            this.logger = logger;
             opts = options.Value;
             user = userContext;
         }
@@ -93,7 +90,6 @@ namespace Services.Admin
         public async Task<SpecializationGroup> UpdateAsync(SpecializationGroup spec)
         {
             var record = new SpecializationGroupRecord(spec);
-            logger.LogInformation("Updating SpecializationGroup:{SpecializationGroup}", record);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
