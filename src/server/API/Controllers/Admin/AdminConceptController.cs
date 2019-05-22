@@ -4,19 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using API.DTO.Admin;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Model.Admin;
 using Model.Authorization;
 using Model.Error;
-using Services.Admin;
-using Model.Admin;
-using API.DTO.Admin;
-using Services;
 
 namespace API.Controllers.Admin
 {
@@ -26,12 +22,12 @@ namespace API.Controllers.Admin
     public class AdminConceptController : Controller
     {
         readonly ILogger<AdminConceptController> logger;
-        readonly IAdminConceptService cService;
+        readonly AdminConceptManager manager;
 
-        public AdminConceptController(ILogger<AdminConceptController> logger, IAdminConceptService cService)
+        public AdminConceptController(ILogger<AdminConceptController> logger, AdminConceptManager manager)
         {
             this.logger = logger;
-            this.cService = cService;
+            this.manager = manager;
         }
 
         [HttpGet("{id}")]
@@ -39,7 +35,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var concept = await cService.Get(id);
+                var concept = await manager.GetAsync(id);
                 return Ok(new ConceptDTO(concept));
             }
             catch (Exception ex)
@@ -54,15 +50,19 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (o == null)
+                if (o != null)
                 {
-                    return BadRequest(CRUDError.From("Concept missing."));
+                    o.Id = id;
                 }
-                o.Id = id;
 
                 var c = o.Concept();
-                var updated = await cService.Update(c);
+                var updated = await manager.UpdateAsync(c);
                 return Ok(new ConceptDTO(updated));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(Concept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -80,14 +80,14 @@ namespace API.Controllers.Admin
         {
             try
             {
-                if (o == null)
-                {
-                    return BadRequest(CRUDError.From("Concept missing."));
-                }
-
                 var c = o.Concept();
-                var updated = await cService.Create(c);
+                var updated = await manager.CreateAsync(c);
                 return Ok(new ConceptDTO(updated));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid create Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(Concept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -105,7 +105,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var result = await cService.Delete(id);
+                var result = await manager.DeleteAsync(id);
                 if (!result.Ok)
                 {
                     return Conflict(new ConceptDeleteResponse(result));

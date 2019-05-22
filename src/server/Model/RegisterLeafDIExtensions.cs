@@ -39,6 +39,7 @@ namespace Model
             services.AddTransient<AdminSpecializationManager>();
             services.AddTransient<AdminSpecializationGroupManager>();
             services.AddTransient<AdminConceptEventManager>();
+            services.AddTransient<AdminConceptManager>();
             services.AddTransient<AdminNetworkEndpointManager>();
 
             return services;

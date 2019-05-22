@@ -72,35 +72,39 @@ namespace API.DTO.Admin
             Constraints = c.Constraints;
             SpecializationGroups = c.SpecializationGroups;
         }
+    }
 
-        public Model.Admin.Concept Concept()
+    public static class ConceptExtensions
+    {
+        public static Model.Admin.Concept Concept(this ConceptDTO dto)
         {
+            if (dto == null) return null;
             return new Model.Admin.Concept
             {
-                Id = Id,
-                UniversalId = ConceptUrn.From(UniversalId),
-                ParentId = ParentId,
-                RootId = RootId,
-                ExternalId = ExternalId,
-                ExternalParentId = ExternalParentId,
-                SqlSetId = SqlSetId,
-                IsNumeric = IsNumeric,
-                IsParent = IsParent,
-                IsRoot = IsRoot,
-                IsPatientCountAutoCalculated = IsPatientCountAutoCalculated,
-                IsSpecializable = IsSpecializable,
-                SqlSetWhere = SqlSetWhere,
-                SqlFieldNumeric = SqlFieldNumeric,
-                UiDisplayName = UiDisplayName,
-                UiDisplayText = UiDisplayText,
-                UiDisplaySubtext = UiDisplaySubtext,
-                UiDisplayUnits = UiDisplayUnits,
-                UiDisplayTooltip = UiDisplayTooltip,
-                UiDisplayPatientCount = UiDisplayPatientCount,
-                UiDisplayPatientCountByYear = UiDisplayPatientCountByYear,
-                UiNumericDefaultText = UiNumericDefaultText,
-                Constraints = Constraints,
-                SpecializationGroups = SpecializationGroups,
+                Id = dto.Id,
+                UniversalId = ConceptUrn.From(dto.UniversalId),
+                ParentId = dto.ParentId,
+                RootId = dto.RootId,
+                ExternalId = dto.ExternalId,
+                ExternalParentId = dto.ExternalParentId,
+                SqlSetId = dto.SqlSetId,
+                IsNumeric = dto.IsNumeric,
+                IsParent = dto.IsParent,
+                IsRoot = dto.IsRoot,
+                IsPatientCountAutoCalculated = dto.IsPatientCountAutoCalculated,
+                IsSpecializable = dto.IsSpecializable,
+                SqlSetWhere = dto.SqlSetWhere,
+                SqlFieldNumeric = dto.SqlFieldNumeric,
+                UiDisplayName = dto.UiDisplayName,
+                UiDisplayText = dto.UiDisplayText,
+                UiDisplaySubtext = dto.UiDisplaySubtext,
+                UiDisplayUnits = dto.UiDisplayUnits,
+                UiDisplayTooltip = dto.UiDisplayTooltip,
+                UiDisplayPatientCount = dto.UiDisplayPatientCount,
+                UiDisplayPatientCountByYear = dto.UiDisplayPatientCountByYear,
+                UiNumericDefaultText = dto.UiNumericDefaultText,
+                Constraints = dto.Constraints,
+                SpecializationGroups = dto.SpecializationGroups,
             };
         }
     }

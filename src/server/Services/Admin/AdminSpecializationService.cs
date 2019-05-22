@@ -23,15 +23,12 @@ namespace Services.Admin
     public class AdminSpecializationService : AdminSpecializationManager.IAdminSpecializationService
     {
         readonly IUserContext user;
-        readonly ILogger<AdminSpecializationService> logger;
         readonly AppDbOptions opts;
 
         public AdminSpecializationService(
-            ILogger<AdminSpecializationService> logger,
             IOptions<AppDbOptions> options,
             IUserContext userContext)
         {
-            this.logger = logger;
             opts = options.Value;
             user = userContext;
         }
