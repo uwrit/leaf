@@ -1,16 +1,20 @@
-const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM/;
-const PARENS = /(\(|\))/;
+const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM/i;
 const BRACKETS = /(\[|\])/g;
-const ALPHABET = /[a-z]/i;
 const EQUALS = '=';
 const AS = 'AS';
 const COMMA = ',';
 const SPACE = ' ';
 const PERIOD = '.';
 const EMPTY = '';
+const LEFT_PAREN = '(';
+const LEFT_PAREN_REGEX = /\(/g;
+const LEFT_PAREN_SPACED = ' ( ';
+const RIGHT_PAREN = ')';
+const RIGHT_PAREN_REGEX = /\)/g;
+const RIGHT_PAREN_SPACED = ' ) ';
 
 export const getSqlColumns = (input: string) => {
-    const split = input.split(SELECT_FROM_SPLITTER);
+    const split = removeParens(input).split(SELECT_FROM_SPLITTER);
     const columns: string[] = [];
 
     if (split.length >= 3) {
@@ -32,7 +36,7 @@ export const getSqlColumns = (input: string) => {
                  * If unaliased (e.g., [column]), just use
                  * the sole token returned.
                  */
-                if (aliased.length === 1 && ALPHABET.test(tokens[0])) {
+                if (aliased.length === 1) {
                     columns.push(tokens[0]);
 
                 /*
@@ -44,9 +48,9 @@ export const getSqlColumns = (input: string) => {
                 }
             
             /*
-             * Else if there are at least 3 tokens.
+             * Else if there are at least 2 tokens.
              */
-            } else if (len >= 3) {
+            } else if (len >= 2) {
 
                 /*
                  * If the second token is '=', use the first token.
@@ -60,13 +64,41 @@ export const getSqlColumns = (input: string) => {
                  * Else if the second-to-last token is 'AS',
                  * use the last token.
                  */
-                const t_02 = tokens[len-2].toUpperCase();
-                const t_01 = tokens[len-1];
-                if (t_02 === AS && !PARENS.test(t_02) && !PARENS.test(t_01)) {
-                    columns.push(t_01);
+                else if (tokens[len-2].toUpperCase() === AS) {
+                    columns.push(tokens[len-1]);
                 }
             }
         }
     }
     return columns;
+};
+
+/*
+ * Removes any parenthesis pairs and substrings
+ * contained between them - i.e., 'DATEADD(DAY, 1, MyDate)' => 'DATEADD'.
+ * This makes the comma split() in getSqlColumns() more predicatable and prevents
+ * functions with commas being falsely identified as return columns.
+ */
+const removeParens = (input: string): string => {
+    const tokens = input
+        .replace(LEFT_PAREN_REGEX, LEFT_PAREN_SPACED)
+        .replace(RIGHT_PAREN_REGEX, RIGHT_PAREN_SPACED)
+        .split(SPACE);
+    const outside: string[] = [];
+    let parenCnt = 0;
+    console.log(tokens);
+
+    for (let i = 0; i < tokens.length; i++) {
+        const token = tokens[i];
+        if (!token) { continue; }
+
+        if (token === LEFT_PAREN) {
+            parenCnt++;
+        } else if (token === RIGHT_PAREN && parenCnt > 0) {
+            parenCnt--;
+        } else if (parenCnt === 0) {
+            outside.push(token);
+        }
+    }
+    return outside.join(SPACE);
 };
