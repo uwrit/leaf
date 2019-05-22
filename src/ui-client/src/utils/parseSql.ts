@@ -41,7 +41,7 @@ export const getSqlColumns = (input: string) => {
 
                 /*
                  * Else if aliased, use the second token, as the
-                 * first is like the SQL set's alias.
+                 * first is likely the SQL set's alias.
                  */
                 } else if (aliased.length === 2) {
                     columns.push(aliased[1]);
@@ -81,12 +81,12 @@ export const getSqlColumns = (input: string) => {
  */
 const removeParens = (input: string): string => {
     const tokens = input
+        .trim()
         .replace(LEFT_PAREN_REGEX, LEFT_PAREN_SPACED)
         .replace(RIGHT_PAREN_REGEX, RIGHT_PAREN_SPACED)
         .split(SPACE);
     const outside: string[] = [];
     let parenCnt = 0;
-    console.log(tokens);
 
     for (let i = 0; i < tokens.length; i++) {
         const token = tokens[i];
