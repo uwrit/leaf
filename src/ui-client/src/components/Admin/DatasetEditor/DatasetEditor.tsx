@@ -161,10 +161,11 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     private handleSqlChange = (val: string) => {
         const { dispatch, data } = this.props;
         const { columns, currentDataset } = this.props.data.datasets;
+        const returned = new Set(getSqlColumns(val));
 
         for (let i = 0; i < columns.length; i++) {
             const col = columns[i];
-            const present = val.indexOf(col.id) > -1;
+            const present = returned.has(col.id);
             if (present !== col.present) {
                 columns[i] = Object.assign({}, col, { present });
             }
@@ -177,8 +178,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             },
         ) as AdminDatasetQuery;
         dispatch(setAdminDataset(newDataset, true));
-        const x = getSqlColumns(val);
-        console.log(x);
     }
 
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
@@ -191,12 +190,13 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { dispatch, data } = this.props;
         const { currentDataset } = data.datasets;
         const template = DefTemplates.get(shape);
+        const returned = new Set(getSqlColumns(currentDataset!.sql));
 
         if (!template) { return; }
 
         const cols: AdminPanelPatientListColumnTemplate[] = [];
         template.columns.forEach((col) => {
-            const present = currentDataset!.sql.indexOf(col.id) > -1;
+            const present = returned.has(col.id);
             cols.push({ ...col, present });
         });
 
