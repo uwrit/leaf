@@ -8,7 +8,7 @@ namespace Model.Compiler
 {
     public class ConceptPatientYearCount
     {
-        public int Year { get; set; }
+        public int? Year { get; set; }
         public int PatientCount { get; set; }
     }
 }

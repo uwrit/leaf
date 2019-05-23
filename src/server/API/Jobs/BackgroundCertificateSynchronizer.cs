@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Model.Network;
+using Model.Admin.Network;
 
 // NOTE(cspital) this does not support clustered deployments yet....Redis impl incoming soon
 
@@ -74,17 +75,22 @@ namespace API.Jobs
                     newState = await refresher.Refresh(oldState);
                     log.LogInformation("Refreshed NetworkEndpoint. Endpoint:{@Endpoint}", newState);
 
-                    cache.Put(newState);
-                    await endpointManager.UpdateEndpointAsync(newState);
+                    var result = await endpointManager.UpdateEndpointAsync(newState);
+                    newState = result.New;
+                    if (newState != null)
+                    {
+                        cache.Put(newState);
+                    }
                     log.LogInformation("Updated NetworkEndpoint. Old:{@{Old} New:{@New}", oldState, newState);
                 }
                 catch (HttpRequestException hre)
                 {
                     log.LogError("Failed to refresh NetworkEndpoint. Endpoint:{@Endpoint} Error:{Error}", oldState, hre.Message);
                 }
-                catch (SqlException se)
+                catch (DbException se)
                 {
                     log.LogError("Failed to update NetworkEndpoint. Old:{@Old} New:{@New} Error:{Error}", oldState, newState, se.Message);
+                    cache.PopOrDefault(oldState.Issuer);
                 }
                 return newState;
             });

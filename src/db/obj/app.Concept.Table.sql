@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[Concept]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  Table [app].[Concept]    Script Date: 5/23/19 3:52:48 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -43,7 +43,7 @@ CREATE TABLE [app].[Concept](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Index [IX_ParentId]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  Index [IX_ParentId]    Script Date: 5/23/19 3:52:48 PM ******/
 CREATE NONCLUSTERED INDEX [IX_ParentId] ON [app].[Concept]
 (
 	[ParentId] ASC
@@ -51,7 +51,7 @@ CREATE NONCLUSTERED INDEX [IX_ParentId] ON [app].[Concept]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_Concept_UniversalId]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  Index [IXUniq_Concept_UniversalId]    Script Date: 5/23/19 3:52:48 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_Concept_UniversalId] ON [app].[Concept]
 (
 	[UniversalId] ASC

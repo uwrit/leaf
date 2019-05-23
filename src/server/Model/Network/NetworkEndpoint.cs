@@ -18,6 +18,9 @@ namespace Model.Network
         public bool IsInterrogator { get; set; }
         public bool IsResponder { get; set; }
 
+        public DateTime Created { get; set; }
+        public DateTime Updated { get; set; }
+
         public static NetworkEndpoint From(NetworkEndpoint e)
         {
             if (e == null) return null;
@@ -30,7 +33,9 @@ namespace Model.Network
                 KeyId = e.KeyId,
                 Certificate = (byte[])e.Certificate.Clone(),
                 IsInterrogator = e.IsInterrogator,
-                IsResponder = e.IsResponder
+                IsResponder = e.IsResponder,
+                Created = e.Created,
+                Updated = e.Updated
             };
         }
     }

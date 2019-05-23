@@ -15,6 +15,7 @@ using Model.Authorization;
 using Model.Admin;
 using Model.Options;
 using Microsoft.Extensions.Options;
+using Model.Admin.Compiler;
 
 namespace API.Controllers.Admin
 {
