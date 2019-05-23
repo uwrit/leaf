@@ -14,12 +14,12 @@ import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetDefinitionTemplate } from '../../../models/patientList/Dataset';
-import { PatientListColumnTemplate, PatientListColumnType, AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
+import { AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
-import { setAdminDataset, setAdminPanelDatasetColumns } from '../../../actions/admin/dataset';
-import './DatasetEditor.css';
+import { setAdminDataset, setAdminPanelDatasetColumns, fetchAdminDatasetIfNeeded } from '../../../actions/admin/dataset';
 import { FiCheck, FiAlertTriangle } from 'react-icons/fi';
 import { getSqlColumns } from '../../../utils/parseSql';
+import './DatasetEditor.css';
 
 interface Props { 
     data: AdminState;
@@ -181,14 +181,18 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
+        const { dispatch, datasets } = this.props;
         this.setState({ categoryIdx, datasetIdx });
+        const dataset = datasets.available[categoryIdx].datasets[datasetIdx];
+
+        dispatch(fetchAdminDatasetIfNeeded(dataset));
     }
 
     private handleDatasetRequest = () => null;
 
     private handleShapeClick = (shape: PatientListDatasetShape) => {
         const { dispatch, data } = this.props;
-        const { currentDataset } = data.datasets;
+        const { currentDataset, columns } = data.datasets;
         const template = DefTemplates.get(shape);
         const returned = new Set(getSqlColumns(currentDataset!.sql));
 

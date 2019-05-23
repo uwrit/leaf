@@ -25,7 +25,7 @@ import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
-import { setPanelFilters, setPanelFilterActiveStates } from './panelFilter';
+import { setPanelFilterActiveStates } from './panelFilter';
 import { addDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
 
