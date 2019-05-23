@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDemographicQuery]    Script Date: 5/23/19 3:52:48 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteEndpoint]    Script Date: 5/23/19 3:52:48 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -13,23 +13,21 @@ GO
 
 -- =======================================
 -- Author:      Cliff Spital
--- Create date: 2018/8/28
--- Description: Retrieves the DemographicQuery record.
+-- Create date: 2019/5/23
+-- Description: Deletes a new network.Endpoint
 -- =======================================
-CREATE PROCEDURE [app].[sp_GetDemographicQuery]
+CREATE PROCEDURE [adm].[sp_DeleteEndpoint]
+    @id int,
+    @user auth.[User]
 AS
 BEGIN
     SET NOCOUNT ON
 
-    SELECT TOP 1
-        SqlStatement
-    FROM app.DemographicQuery
+    DELETE FROM network.Endpoint
+    OUTPUT deleted.Id, deleted.Name, deleted.Address, deleted.Issuer, deleted.KeyId, deleted.Certificate, deleted.Created, deleted.Updated, deleted.IsInterrogator, deleted.IsResponder
+    WHERE Id = @id;
+
 END
-
-
-
-
-
 
 
 GO

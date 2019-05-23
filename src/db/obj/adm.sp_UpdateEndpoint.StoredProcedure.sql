@@ -5,55 +5,61 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [network].[sp_UpdateEndpoint]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: 5/23/19 3:52:48 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =============================================
 -- Author:		Cliff Spital
 -- Create date: 2018/6/12
 -- Description:	Update the given network.Endpoint
 -- =============================================
-CREATE PROCEDURE [network].[sp_UpdateEndpoint]
+CREATE PROCEDURE [adm].[sp_UpdateEndpoint]
 	@id int,
 	@name nvarchar(200),
 	@address nvarchar(1000),
 	@issuer nvarchar(200),
 	@keyid nvarchar(200),
-	@certificate nvarchar(max)
+	@certificate nvarchar(max),
+    @isResponder bit,
+    @isInterrogator bit,
+    @user auth.[User]
 AS
 BEGIN
 	SET NOCOUNT ON;
 
-    UPDATE network.Endpoint
+	BEGIN TRAN;
+
+	IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
+			THROW 70404, N'NetworkEndpoint not found.', 1;
+
+	UPDATE network.Endpoint
 	SET
 		Name = @name,
 		Address = @address,
 		Issuer = @issuer,
 		KeyId = @keyid,
 		Certificate = @certificate,
-        Updated = getdate()
-    OUTPUT
-        deleted.Id,
-        deleted.Name,
-        deleted.Address,
-        deleted.Issuer,
-        deleted.KeyId,
-        deleted.Certificate
+		IsResponder = @isResponder,
+		IsInterrogator = @isInterrogator
+	OUTPUT
+		deleted.Id,
+		deleted.Name,
+		deleted.Address,
+		deleted.Issuer,
+		deleted.KeyId,
+		deleted.Certificate,
+		deleted.IsResponder,
+		deleted.IsInterrogator,
+		deleted.Updated,
+		deleted.Created
 	WHERE
 		Id = @id;
+
+	COMMIT;
 END
-
-
-
-
-
-
-
-
-
-
 
 
 GO

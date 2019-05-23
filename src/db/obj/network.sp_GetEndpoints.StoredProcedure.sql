@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [network].[sp_GetEndpoints]    Script Date: 5/20/19 10:56:05 AM ******/
+/****** Object:  StoredProcedure [network].[sp_GetEndpoints]    Script Date: 5/23/19 3:52:48 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -28,10 +28,13 @@ BEGIN
 		KeyId,
 		Certificate,
         IsInterrogator,
-        IsResponder
+        IsResponder,
+        Created,
+        Updated
 	FROM
 		network.Endpoint;
 END
+
 
 
 
