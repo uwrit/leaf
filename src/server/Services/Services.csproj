@@ -31,5 +31,7 @@
     <Folder Include="Startup\" />
     <Folder Include="Authentication\" />
     <Folder Include="Search\" />
+    <Folder Include="Admin\Compiler\" />
+    <Folder Include="Admin\Network\" />
   </ItemGroup>
 </Project>

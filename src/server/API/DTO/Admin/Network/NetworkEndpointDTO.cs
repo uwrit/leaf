@@ -4,38 +4,41 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using Model.Network;
 
-namespace Model.Network
+namespace API.DTO.Admin.Network
 {
-    public class NetworkEndpoint : IUriAddress
+    public class NetworkEndpointDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Uri Address { get; set; }
+        public string Address { get; set; }
         public string Issuer { get; set; }
         public string KeyId { get; set; }
-        public byte[] Certificate { get; set; }
+        public string Certificate { get; set; }
         public bool IsInterrogator { get; set; }
         public bool IsResponder { get; set; }
-
         public DateTime Created { get; set; }
         public DateTime Updated { get; set; }
+    }
 
-        public static NetworkEndpoint From(NetworkEndpoint e)
+    public static class NetworkEndpointExtensions
+    {
+        public static NetworkEndpoint NetworkEndpoint(this NetworkEndpointDTO dto)
         {
-            if (e == null) return null;
+            if (dto == null) return null;
             return new NetworkEndpoint
             {
-                Id = e.Id,
-                Name = e.Name,
-                Address = new Uri(e.Address.ToString()),
-                Issuer = e.Issuer,
-                KeyId = e.KeyId,
-                Certificate = (byte[])e.Certificate.Clone(),
-                IsInterrogator = e.IsInterrogator,
-                IsResponder = e.IsResponder,
-                Created = e.Created,
-                Updated = e.Updated
+                Id = dto.Id,
+                Name = dto.Name,
+                Address = new Uri(dto.Address),
+                Issuer = dto.Issuer,
+                KeyId = dto.KeyId,
+                Certificate = Convert.FromBase64String(dto.Certificate),
+                IsInterrogator = dto.IsInterrogator,
+                IsResponder = dto.IsResponder,
+                Created = dto.Created,
+                Updated = dto.Updated
             };
         }
     }

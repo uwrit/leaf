@@ -4,11 +4,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-namespace Model.Compiler
+namespace Model.Admin.Compiler
 {
-    public class ConceptPatientYearCount
+    public class PanelFilterDependent
     {
-        public int? Year { get; set; }
-        public int PatientCount { get; set; }
+        public int Id { get; set; }
+        public string UiDisplayText { get; set; }
     }
 }

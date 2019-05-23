@@ -8,7 +8,8 @@ using Model.Network;
 using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
-using Model.Admin;
+using Model.Admin.Compiler;
+using Model.Admin.Network;
 
 namespace Model
 {

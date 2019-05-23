@@ -14,7 +14,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Model;
-using Model.Admin;
+using Model.Admin.Compiler;
+using Model.Admin.Network;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Cohort;
@@ -24,7 +25,8 @@ using Model.Export;
 using Model.Network;
 using Model.Options;
 using Model.Search;
-using Services.Admin;
+using Services.Admin.Compiler;
+using Services.Admin.Network;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
@@ -58,7 +60,7 @@ namespace API.Options
 
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
 
-            services.AddTransient<INetworkEndpointService, NetworkEndpointService>();
+            services.AddTransient<NetworkEndpointProvider.INetworkEndpointReader, NetworkEndpointReader>();
 
             services.AddNetworkCache();
 
@@ -111,6 +113,7 @@ namespace API.Options
             services.AddTransient<AdminSpecializationGroupManager.IAdminSpecializationGroupService, AdminSpecializationGroupService>();
             services.AddTransient<AdminConceptManager.IAdminConceptService, AdminConceptService>();
             services.AddTransient<AdminConceptEventManager.IAdminConceptEventService, AdminConceptEventService>();
+            services.AddTransient<AdminNetworkEndpointManager.IAdminNetworkUpdater, AdminNetworkEndpointUpdater>();
 
             return services;
         }
@@ -119,7 +122,7 @@ namespace API.Options
         {
             services.AddSingleton<INetworkEndpointCache, NetworkEndpointCache>(sp =>
             {
-                var network = sp.GetService<INetworkEndpointService>();
+                var network = sp.GetService<NetworkEndpointProvider.INetworkEndpointReader>();
                 var initial = network.GetEndpointsAsync().Result;
 
                 return new NetworkEndpointCache(initial);

@@ -4,11 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-namespace Model.Compiler
+using System.Linq;
+using System.Collections.Generic;
+
+namespace Model.Admin.Compiler
 {
-    public class ConceptPatientYearCount
+    public class SpecializationGroupDeleteResult
     {
-        public int? Year { get; set; }
-        public int PatientCount { get; set; }
+        public bool Ok => !ConceptDependents?.Any() ?? true;
+        public IEnumerable<ConceptDependent> ConceptDependents { get; set; }
     }
 }

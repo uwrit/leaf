@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Model.Network;
 using Model.Options;
 using Model.Results;
+using Model.Admin.Network;
 using Xunit;
 
 namespace Tests
@@ -194,8 +195,11 @@ namespace Tests
 
         static AdminNetworkEndpointManager GetManager(IEnumerable<NetworkEndpoint> endpoints = null, NetworkIdentity identity = null)
         {
+            var svc = new MockNetworkEndpointService(endpoints, identity);
             return new AdminNetworkEndpointManager(
-                new MockNetworkEndpointService(endpoints, identity),
+                svc,
+                svc,
+                null,
                 new NetworkValidator(Options.Create(new NetworkValidationOptions
                 {
                     EnsureHttps = true
@@ -215,15 +219,28 @@ namespace Tests
             };
     }
 
-    class MockNetworkEndpointService : INetworkEndpointService
+    class MockNetworkEndpointService : NetworkEndpointProvider.INetworkEndpointReader, AdminNetworkEndpointManager.IAdminNetworkUpdater
     {
         readonly Dictionary<int, NetworkEndpoint> endpoints;
-        readonly NetworkIdentity identity;
+        NetworkIdentity identity;
 
         public MockNetworkEndpointService(IEnumerable<NetworkEndpoint> endpoints, NetworkIdentity identity)
         {
             this.endpoints = endpoints.ToDictionary(e => e.Id);
             this.identity = identity;
+        }
+
+        public Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint endpoint)
+        {
+            endpoints.Add(endpoint.Id, endpoint);
+            return Task.FromResult(endpoint);
+        }
+
+        public Task<NetworkEndpoint> DeleteEndpointAsync(int id)
+        {
+            endpoints.TryGetValue(id, out var ep);
+            endpoints.Remove(id);
+            return Task.FromResult(ep);
         }
 
         public Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
@@ -245,7 +262,7 @@ namespace Tests
             return Task.FromResult(identity);
         }
 
-        public Task<UpdateResult<NetworkEndpoint>> UpdateAsync(NetworkEndpoint endpoint)
+        public Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint endpoint)
         {
             var old = endpoints[endpoint.Id];
             endpoints[endpoint.Id] = endpoint;
@@ -254,6 +271,18 @@ namespace Tests
             {
                 Old = old,
                 New = endpoint
+            });
+        }
+
+        public Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity identity)
+        {
+            var old = this.identity;
+            this.identity = identity;
+
+            return Task.FromResult(new UpdateResult<NetworkIdentity>
+            {
+                Old = old,
+                New = identity
             });
         }
     }
