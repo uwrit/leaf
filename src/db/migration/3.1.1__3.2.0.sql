@@ -54,7 +54,8 @@ CREATE PROCEDURE [adm].[sp_UpdateEndpoint]
 	@keyid nvarchar(200),
 	@certificate nvarchar(max),
     @isResponder bit,
-    @isInterrogator bit
+    @isInterrogator bit,
+    @user auth.[User]
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -92,6 +93,7 @@ END
 
 GO
 
+
 IF OBJECT_ID('adm.sp_UpsertIdentity', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_UpsertIdentity];
 GO
@@ -107,9 +109,10 @@ CREATE PROCEDURE [adm].[sp_UpsertIdentity]
     @desc nvarchar(4000),
     @totalPatients int,
     @lat DECIMAL(7,4),
-    @long DECIMAL(7,4),
+    @lng DECIMAL(7,4),
     @primColor nvarchar(40),
-    @secColor nvarchar(40)
+    @secColor nvarchar(40),
+    @user auth.[User]
 AS
 BEGIN
     SET NOCOUNT ON
@@ -128,7 +131,7 @@ BEGIN
             [Description] = @desc,
             TotalPatients = @totalPatients,
             Latitude = @lat,
-            Longitude = @long,
+            Longitude = @lng,
             PrimaryColor = @primColor,
             SecondaryColor = @secColor
         OUTPUT
@@ -145,7 +148,7 @@ BEGIN
     BEGIN;
         INSERT INTO network.[Identity] ([Name], Abbreviation, [Description], TotalPatients, Latitude, Longitude, PrimaryColor, SecondaryColor)
         OUTPUT NULL as [Name], NULL as Abbreviation, NULL as [Description], NULL as TotalPatients, NULL as Latitude, NULL as Longitude, NULL as PrimaryColor, NULL as SecondaryColor
-        VALUES (@name, @abbr, @desc, @totalPatients, @lat, @long, @primColor, @secColor);
+        VALUES (@name, @abbr, @desc, @totalPatients, @lat, @lng, @primColor, @secColor);
     END;
 
     COMMIT;
@@ -154,8 +157,81 @@ END
 GO
 
 
+IF OBJECT_ID('adm.sp_CreateEndpoint', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_CreateEndpoint];
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/5/23
+-- Description: Creates a new network.Endpoint
+-- =======================================
+CREATE PROCEDURE adm.sp_CreateEndpoint
+    @name nvarchar(200),
+    @addr nvarchar(1000),
+    @iss nvarchar(200),
+    @kid nvarchar(200),
+    @cert nvarchar(max),
+    @isInterrogator bit,
+    @isResponder bit,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@name IS NULL)
+        THROW 70400, N'NetworkEndpoint.Name is required.', 1;
+    
+    IF (@addr IS NULL)
+        THROW 70400, N'NetworkEndpoint.Address is required.', 1;
+    
+    IF (@iss IS NULL)
+        THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
+    
+    IF (@kid IS NULL)
+        THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
+    
+    IF (@cert IS NULL)
+        THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
+    
+    IF (@isInterrogator IS NULL)
+        THROW 70400, N'NetworkEndpoint.IsInterrogator is required.', 1;
+
+    IF (@isResponder IS NULL)
+        THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
+    
+    INSERT INTO network.Endpoint ([Name], [Address], Issuer, KeyId, [Certificate], Created, Updated, IsInterrogator, IsResponder)
+    OUTPUT inserted.Id, inserted.Name, inserted.Address, inserted.Issuer, inserted.KeyId, inserted.Certificate, inserted.Created, inserted.Updated, inserted.IsInterrogator, inserted.IsResponder
+    VALUES (@name, @addr, @iss, @kid, @cert, getdate(), getdate(), @isInterrogator, @isResponder);
+
+END
+
+GO
 
 
+IF OBJECT_ID('adm.sp_DeleteEndpoint', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_DeleteEndpoint];
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/5/23
+-- Description: Deletes a new network.Endpoint
+-- =======================================
+CREATE PROCEDURE adm.sp_DeleteEndpoint
+    @id int,
+	@user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DELETE FROM network.Endpoint
+    OUTPUT deleted.Id, deleted.Name, deleted.Address, deleted.Issuer, deleted.KeyId, deleted.Certificate, deleted.Created, deleted.Updated, deleted.IsInterrogator, deleted.IsResponder
+    WHERE Id = @id;
+
+END
+
+GO
 
 
 -- set version

@@ -12,7 +12,6 @@ using Model.Results;
 
 namespace Model.Network
 {
-    // TODO(cspital) migrate update to future admin service
     public class NetworkEndpointProvider
     {
         public interface INetworkEndpointReader

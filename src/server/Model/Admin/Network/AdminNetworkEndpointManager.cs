@@ -97,6 +97,45 @@ namespace Model.Admin.Network
             return result;
         }
 
+        public async Task<NetworkEndpoint> DeleteEndpointAsync(int id)
+        {
+            var deleted = await updater.DeleteEndpointAsync(id);
+            if (deleted != null)
+            {
+                log.LogInformation("Deleted NetworkEndpoint:{@NetworkEndpoint}", deleted);
+            }
+            else
+            {
+                log.LogWarning("Failed to delete NetworkEndpoint, not found. Id:{Id}", id);
+            }
+            return deleted;
+        }
+
+        public async Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint e)
+        {
+            Ensure.NotNull(e, nameof(e));
+            Ensure.NotNullOrWhitespace(e.Name, nameof(e.Name));
+            validator.Validate(e);
+            Ensure.NotNullOrWhitespace(e.Issuer, nameof(e.Issuer));
+            Ensure.NotNullOrWhitespace(e.KeyId, nameof(e.KeyId));
+            Ensure.NotNull(e.Certificate, nameof(e.Certificate));
+
+            try
+            {
+                var created = await updater.CreateEndpointAsync(e);
+                log.LogInformation("Created NetworkEndpoint. Endpoint:{@Endpoint}", new { e.Id, e.Name, e.Issuer, e.KeyId, e.IsInterrogator, e.IsResponder });
+                return created;
+            }
+            catch (DbException de)
+            {
+                log.LogError("Failed to create NetworkEndpoint. Endpoint:{@Endpoint} Code:{Code} Error:{Error}",
+                    new { e.Name, e.Issuer, e.KeyId, e.IsInterrogator, e.IsResponder },
+                    de.ErrorCode, de.Message);
+                de.MapThrow();
+                throw;
+            }
+        }
+
         public async Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity id)
         {
             Ensure.NotNull(id, nameof(id));

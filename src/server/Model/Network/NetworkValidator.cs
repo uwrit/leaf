@@ -27,6 +27,11 @@ namespace Model.Network
         /// <exception cref="UriFormatException"></exception>
         public void Validate(IUriAddress endpoint)
         {
+            if (endpoint.Address == null)
+            {
+                throw new ArgumentNullException(nameof(endpoint.Address));
+            }
+
             if (options.EnsureHttps && endpoint.Address.Scheme != Uri.UriSchemeHttps)
             {
                 throw new UriFormatException("All peering nodes must be HTTPS");

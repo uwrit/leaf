@@ -14,17 +14,21 @@ using Dapper;
 using System.Data.SqlClient;
 using Services.Network;
 using System.Data;
+using Model.Authorization;
 
 namespace Services.Admin.Network
 {
     public class AdminNetworkEndpointUpdater : AdminNetworkEndpointManager.IAdminNetworkUpdater
     {
         readonly AppDbOptions opts;
+        readonly IUserContext user;
 
         public AdminNetworkEndpointUpdater(
-            IOptions<AppDbOptions> dbOptions)
+            IOptions<AppDbOptions> dbOptions,
+            IUserContext user)
         {
             opts = dbOptions.Value;
+            this.user = user;
         }
 
         public async Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint item)
@@ -46,7 +50,7 @@ namespace Services.Admin.Network
                         certificate = record.Certificate,
                         isResponder = record.IsResponder,
                         isInterrogator = record.IsInterrogator,
-                        updated = record.Updated
+                        user = user.UUID
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
@@ -76,7 +80,8 @@ namespace Services.Admin.Network
                         lat = identity.Latitude,
                         lng = identity.Longitude,
                         primColor = identity.PrimaryColor,
-                        secColor = identity.SecondaryColor
+                        secColor = identity.SecondaryColor,
+                        user = user.UUID
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
@@ -94,18 +99,53 @@ namespace Services.Admin.Network
             }
         }
 
-        public Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint endpoint)
+        public async Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint endpoint)
         {
-            throw new NotImplementedException();
+            var record = new NetworkEndpointRecord(endpoint);
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var inserted = await cn.QueryFirstAsync<NetworkEndpointRecord>(
+                    Sql.CreateEndpoint,
+                    new
+                    {
+                        name = record.Name,
+                        addr = record.Address,
+                        iss = record.Issuer,
+                        kid = record.KeyId,
+                        cert = record.Certificate,
+                        isInterrogator = record.IsInterrogator,
+                        isResponder = record.IsResponder,
+                        user = user.UUID
+                    },
+                    commandTimeout: opts.DefaultTimeout,
+                    commandType: CommandType.StoredProcedure);
+
+                return inserted.NetworkEndpoint();
+            }
         }
 
-        public Task<NetworkEndpoint> DeleteEndpointAsync(int id)
+        public async Task<NetworkEndpoint> DeleteEndpointAsync(int id)
         {
-            throw new NotImplementedException();
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var deleted = await cn.QueryFirstOrDefaultAsync<NetworkEndpointRecord>(
+                    Sql.DeleteEndpoint,
+                    new { id, user = user.UUID },
+                    commandTimeout: opts.DefaultTimeout,
+                    commandType: CommandType.StoredProcedure);
+
+                return deleted.NetworkEndpoint();
+            }
         }
 
         static class Sql
         {
+            public const string DeleteEndpoint = "adm.sp_DeleteEndpoint";
+            public const string CreateEndpoint = "adm.sp_CreateEndpoint";
             public const string UpdateEndpoint = "adm.sp_UpdateEndpoint";
             public const string UpsertIdentity = "adm.sp_UpsertIdentity";
         }
