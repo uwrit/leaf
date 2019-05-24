@@ -233,6 +233,10 @@ END
 
 GO
 
+IF OBJECT_ID('app.sp_CalculatePatientCounts', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_DeleteEndpoint];
+GO
+
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2019/5/23
