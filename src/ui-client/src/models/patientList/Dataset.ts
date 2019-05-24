@@ -84,6 +84,7 @@ export interface PatientListDatasetQueryDTO {
     name: string;
     shape: PatientListDatasetShape;
     universalId?: string;
+    unsaved?: boolean;
 }
 
 /*

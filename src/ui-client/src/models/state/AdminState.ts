@@ -10,7 +10,8 @@ import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
-import { AdminDatasetQuery } from '../admin/Dataset';
+import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from '../admin/Dataset';
+import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 
 
 export enum AdminPanelLoadState {
@@ -60,8 +61,10 @@ export interface AdminPanelFilterState {
 
 export interface AdminDatasetState {
     changed: boolean;
+    columns: AdminPanelPatientListColumnTemplate[];
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
+    demographicsDataset?: AdminDemographicsDatasetQuery;
     state: AdminPanelLoadState;
 }
 
