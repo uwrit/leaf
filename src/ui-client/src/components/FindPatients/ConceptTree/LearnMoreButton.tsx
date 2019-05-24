@@ -13,6 +13,7 @@ import { formatLargeNumber, formatSmallNumber } from '../../../utils/formatNumbe
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import TextareaAutosize from 'react-textarea-autosize';
 import './LearnMoreButton.css';
+import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
 
 interface Props {
     concept: Concept;
@@ -21,40 +22,8 @@ interface Props {
 interface State {
     DOMRect?: DOMRect;
     showInfoBox: boolean;
+    ShowAllYears: boolean;
 }
-
-/*
-const testYears: PatientCountPerYear[] = [
-    { patientCount: 341 },
-    { year: 1994, patientCount: 622 },
-    { year: 1995, patientCount: 231 },
-    { year: 1996, patientCount: 522 },
-    { year: 1997, patientCount: 324 },
-    { year: 1998, patientCount: 787 },
-    { year: 1999, patientCount: 231 },
-    { year: 2000, patientCount: 622 },
-    { year: 2001, patientCount: 212 },
-    { year: 2002, patientCount: 123 },
-    { year: 2003, patientCount: 772 },
-    { year: 2004, patientCount: 341 },
-    { year: 2005, patientCount: 232 },
-    { year: 2006, patientCount: 231 },
-    { year: 2007, patientCount: 152 },
-    { year: 2008, patientCount: 123 },
-    { year: 2009, patientCount: 789 },
-    { year: 2010, patientCount: 342 },
-    { year: 2011, patientCount: 123 },
-    { year: 2012, patientCount: 231 },
-    { year: 2013, patientCount: 235 },
-    { year: 2014, patientCount: 908 },
-    { year: 2015, patientCount: 458 },
-    { year: 2016, patientCount: 632 },
-    { year: 2017, patientCount: 341 },
-    { year: 2018, patientCount: 342 },
-    { year: 2019, patientCount: 214 },
-    { year: 2020, patientCount: 528 }
-];
-*/
 
 export default class LearnMoreButton extends React.PureComponent<Props,State> {
     private className = 'concept-tree-learn-more';
@@ -67,23 +36,40 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            showInfoBox: false
+            showInfoBox: false,
+            ShowAllYears: false
         }
+    }
+
+    public getYearData = () => {
+        const { concept } = this.props;
+        const formatterThreshold = 10000;
+
+        if (concept.uiDisplayPatientCountByYear) {
+            let data: DisplayablePatientCountPerYear[] = [];
+            if (!this.state.ShowAllYears) {
+                data = this.groupYears(concept.uiDisplayPatientCountByYear);
+            } else {
+                data = concept.uiDisplayPatientCountByYear;
+            }
+            return data.map((p: DisplayablePatientCountPerYear) => ({ 
+                ...p, 
+                label: !p.year ? '?' :
+                    p.patientCount >= formatterThreshold 
+                        ? formatLargeNumber(p.patientCount)
+                        : formatSmallNumber(p.patientCount)
+            }))
+        }
+        return [];
     }
 
     public render(): any {
         const { concept } = this.props;
+        const { showInfoBox, ShowAllYears, DOMRect } = this.state;
         const c = this.className;
         const countsByYear = concept.uiDisplayPatientCountByYear;
         const calcWidth = countsByYear ? (countsByYear.length * 40) : this.minWidth;
-        const formatterThreshold = 10000;
-        const data = countsByYear
-            ? this.groupYears(countsByYear)
-                .map((p: DisplayablePatientCountPerYear) => ({ ...p, label: p.patientCount >= formatterThreshold 
-                    ? formatLargeNumber(p.patientCount)
-                    : formatSmallNumber(p.patientCount)
-                }))
-            : countsByYear;
+        const data = this.getYearData();
         const width = calcWidth < this.minWidth 
             ? this.minWidth : calcWidth > this.maxWidth 
             ? this.maxWidth : calcWidth;
@@ -95,9 +81,9 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                     Learn More
 
                     {/* Popup Box */}
-                    {this.state.showInfoBox &&
+                    {showInfoBox &&
                     <PopupBox 
-                        parentDomRect={this.state.DOMRect!} 
+                        parentDomRect={DOMRect!} 
                         toggle={this.handleInfoBoxClickedOutside}>
                         <div className={`${c}`} style={{ width }}>
                             <div className={`${c}-title`}>
@@ -137,6 +123,15 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             </BarChart>
                             </ResponsiveContainer>}
 
+                            {countsByYear && 
+                                <div className={`${c}-show-all-years`}>
+                                    <div className={`${c}-show-all-years-text`}>
+                                        Show all years
+                                    </div>
+                                    <CheckboxSlider checked={ShowAllYears} onClick={this.handleShowAllYearsClick} />
+                                </div>
+                            }
+
                             {countsByYear && <div className={`${c}-separator-long`} />}
 
                             {/* Tooltip / Info */}
@@ -168,6 +163,10 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
             const domRect: DOMRect = e.target.getBoundingClientRect();
             this.setState({ showInfoBox: !this.state.showInfoBox, DOMRect: domRect });
         }
+    }
+
+    private handleShowAllYearsClick = () => {
+        this.setState({ ShowAllYears: !this.state.ShowAllYears });
     }
 
     private handleInfoBoxClickedOutside = () => {
