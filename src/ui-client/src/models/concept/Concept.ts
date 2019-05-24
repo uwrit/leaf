@@ -68,11 +68,18 @@ export interface ConceptSpecializationGroup {
     uiDefaultText: string;
 }
 
-export interface PatientCountPerYear {
-    // Need to allow '?' as a valid year (meaning unknown), so [year] is string
-    year: string;          
+export interface DisplayablePatientCountPerYear {
     label?: string;
     patientCount: number;
+    year?: any;
+}
+
+export interface PatientCountPerYear extends DisplayablePatientCountPerYear {
+    year?: number;
+}
+
+export interface PatientCountPerYearGrouped extends DisplayablePatientCountPerYear {
+    year: string;
 }
 
 export interface ConceptParentsDTO {

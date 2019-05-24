@@ -103,8 +103,6 @@ export class LeafMap extends React.Component<Props, State> {
                 .map((k: number) => networkResponders.get(k)!)
                 .filter((n: NetworkIdentity) => n.enabled)
             : [];
-        
-        
         for (const nr of responders) {
             const netCohort = cohort.networkCohorts.get(nr.id);
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);

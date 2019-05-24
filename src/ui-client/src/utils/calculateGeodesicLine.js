@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { arc } from './arc';
+import { arc } from '../bundled/arc';
 
 // tslint:disable 
 export function CalculateGeodesicLine (from, to) {
