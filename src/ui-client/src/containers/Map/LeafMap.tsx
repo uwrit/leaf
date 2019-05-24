@@ -103,18 +103,10 @@ export class LeafMap extends React.Component<Props, State> {
                 .map((k: number) => networkResponders.get(k)!)
                 .filter((n: NetworkIdentity) => n.enabled)
             : [];
-        
-            
-        const dummmy_resp: NetworkIdentity[] = [
-            { id: 0, abbreviation: '1', isHomeNode: true, latitude: 47.6062, longitude: -122.3321, primaryColor: 'blue', secondaryColor: '', runtime: 1, name: '1', address: '' },
-            { id: 1, abbreviation: '2', isHomeNode: true, latitude: 40.4406, longitude: -79.9959, primaryColor: 'red', secondaryColor: '', runtime: 1, name: '2', address: '' },
-            { id: 2, abbreviation: '3', isHomeNode: true, latitude: 30.2672, longitude: -97.7431, primaryColor: 'purple', secondaryColor: '', runtime: 1, name: '3', address: '' }
-        ];
-
-        for (const nr of dummmy_resp) {
-            // const netCohort = cohort.networkCohorts.get(nr.id);
-            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={/*netCohort!.count.state*/ CohortStateType.LOADED} />);
-            popups.push(<EndpointPopup key={nr.id} id={nr} count={/*netCohort!.count.value*/ 100}  />)
+        for (const nr of responders) {
+            const netCohort = cohort.networkCohorts.get(nr.id);
+            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);
+            popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 
             if (nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;
