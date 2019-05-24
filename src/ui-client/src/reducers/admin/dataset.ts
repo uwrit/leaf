@@ -22,7 +22,18 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     return Object.assign({}, state, { 
         datasets: { 
             ...state.datasets,
+            changed: action.changed,
             currentDataset: action.dataset
+        }
+    });
+};
+
+export const setAdminPanelDemographicsDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
+    return Object.assign({}, state, { 
+        datasets: { 
+            ...state.datasets,
+            changed: action.changed,
+            demographicsDataset: action.dataset
         }
     });
 };

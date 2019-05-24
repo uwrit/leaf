@@ -53,8 +53,8 @@ import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEP
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import formatSql from "../../utils/formatSql";
-import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_PANEL_DATASET_COLUMNS } from "../../actions/admin/dataset";
-import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDatasetColumns } from "./dataset";
+import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_PANEL_DATASET_COLUMNS, SET_ADMIN_DEMOGRAPHICS_DATASET } from "../../actions/admin/dataset";
+import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDatasetColumns, setAdminPanelDemographicsDataset } from "./dataset";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -83,13 +83,6 @@ export const defaultAdminState = (): AdminState => {
         datasets: {
             changed: false,
             columns: [],
-            currentDataset: {
-                id: '8BB12CC0-E278-E911-9D11-B886875607D1',
-                category: 'Labs',
-                name: 'Platelet Count',
-                shape: PatientListDatasetShape.Observation,
-                 sql: formatSql("SELECT personId = CAST(SUBJECT_ID AS NVARCHAR), encounterId = CAST(HADM_ID AS NVARCHAR), category= 'lab', code = LOINC_CODE, effectiveDate = DATEADD(YEAR,-150,CAST(CHARTTIME AS DATETIME))  , valueString = VALUE, valueQuantity = VALUENUM, valueUnit = VALUEUOM FROM [dbo].[v_LABEVENTS] WHERE LABEL = 'Platelet Count'")
-            },
             datasets: new Map(),
             state: AdminPanelLoadState.NOT_LOADED
         },
@@ -202,6 +195,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminPanelDatasetLoadState(state, action);
         case SET_ADMIN_DATASET:
             return setAdminPanelCurrentDataset(state, action);
+        case SET_ADMIN_DEMOGRAPHICS_DATASET:
+            return setAdminPanelDemographicsDataset(state, action);
         case SET_ADMIN_PANEL_DATASET_COLUMNS:
             return setAdminPanelDatasetColumns(state, action);
 

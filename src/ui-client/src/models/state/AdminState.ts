@@ -64,7 +64,7 @@ export interface AdminDatasetState {
     columns: AdminPanelPatientListColumnTemplate[];
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
-    demographicsDataset: AdminDemographicsDatasetQuery;
+    demographicsDataset?: AdminDemographicsDatasetQuery;
     state: AdminPanelLoadState;
 }
 

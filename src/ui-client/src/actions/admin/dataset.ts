@@ -1,4 +1,4 @@
-import { AdminDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AdminPanelPatientListColumnTemplate } from "../../models/patientList/Column";
 import { AppState } from "../../models/state/AppState";
@@ -9,13 +9,14 @@ import { PatientListDatasetQueryDTO } from "../../models/patientList/Dataset";
 import { getAdminDataset } from "../../services/admin/datasetApi";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
+export const SET_ADMIN_DEMOGRAPHICS_DATASET = 'SET_ADMIN_DEMOGRAPHICS_DATASET';
 export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_STATE';
 export const SET_ADMIN_PANEL_DATASET_COLUMNS = 'SET_ADMIN_PANEL_DATASET_COLUMNS';
 
 export interface AdminDatasetAction {
     changed?: boolean;
     columns?: AdminPanelPatientListColumnTemplate[];
-    dataset?: AdminDatasetQuery;
+    dataset?: AdminDatasetQuery | AdminDemographicsDatasetQuery;
     state?: AdminPanelLoadState;
     type: string;
 }
@@ -66,6 +67,14 @@ export const setAdminDataset = (dataset: AdminDatasetQuery, changed: boolean): A
         dataset,
         changed,
         type: SET_ADMIN_DATASET
+    };
+};
+
+export const setAdminDemographicsDataset = (dataset: AdminDemographicsDatasetQuery, changed: boolean): AdminDatasetAction => {
+    return {
+        dataset,
+        changed,
+        type: SET_ADMIN_DEMOGRAPHICS_DATASET
     };
 };
 
