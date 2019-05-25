@@ -232,18 +232,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     private getColumnContent = (col: AdminPanelPatientListColumnTemplate) => {
         const classes = [ `${this.className}-column` ];
-        let icon = null;
 
-        if (col.optional) { 
-            classes.push('optional'); 
-        }
-        if (col.present) { 
-            classes.push('present');
-            icon = <FiCheck />
-        }
+        if (col.optional) { classes.push('optional'); }
+        if (col.present)  { classes.push('present'); }
         return (
             <div key={col.id} className={classes.join(' ')}>
-                {icon}
+                <FiCheck />
                 <span>{col.id}</span>
             </div>
         );

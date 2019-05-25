@@ -107,23 +107,23 @@
 .dataset-editor-column {
     font-family: Roboto;
     font-size: 1.0rem;
-    font-weight: 300;
+    font-weight: 500;
     min-height: 25px;
 }
-.dataset-editor-column > span {
-    margin-left: 0;
-    transition: margin-left 0.5s;
-}
 
-.dataset-editor-column.present > span {
-    color: black !important;
-    font-weight: 500;
+.dataset-editor-column > span {
     margin-left: 20px;
 }
 
-.dataset-editor-column.present svg {
+.dataset-editor-column svg {
+    opacity: 0;
     stroke: rgb(7, 192, 69);
     position: absolute;
+    transition: opacity 0.3s;
+}
+
+.dataset-editor-column.present svg {
+    opacity: 1;
 }
 
 .dataset-editor-column.missing svg {
@@ -135,7 +135,8 @@
 }
 
 .dataset-editor-column.optional {
-    color: rgb(150,150,150);
+    color: rgb(150,150,150) !important;
+    font-weight: 300;
 }
 
 /* Auto-format button */
