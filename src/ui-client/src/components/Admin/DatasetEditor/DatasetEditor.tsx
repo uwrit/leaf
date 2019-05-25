@@ -13,7 +13,7 @@ import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetConta
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
-import { PatientListDatasetShape, PatientListDatasetDefinitionTemplate } from '../../../models/patientList/Dataset';
+import { PatientListDatasetShape, PatientListDatasetDefinitionTemplate, PatientListDatasetQueryDTO } from '../../../models/patientList/Dataset';
 import { PatientListColumnTemplate, PatientListColumnType, AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
 import { fetchAdminDatasetIfNeeded, setAdminPanelDatasetColumns, setAdminDataset } from '../../../actions/admin/dataset';
 import './DatasetEditor.css';
@@ -22,6 +22,8 @@ import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { FiCheck } from 'react-icons/fi';
 import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
 import formatSql from '../../../utils/formatSql';
+import { TextArea } from '../ConceptEditor/Sections/TextArea';
+import { setPatientListDatasetByIndex } from '../../../actions/generalUi';
 
 interface Props { 
     data: AdminState;
@@ -93,20 +95,37 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 </div>
 
                                 <Section header='Dataset'>
+                                    {currentDataset && 
+                                        <div>
+                                            <Row>
+                                                <Col md={4}>
+                                                <TextArea 
+                                                    changeHandler={this.handleInputChange} propName={'name'} value={currentDataset.name}
+                                                    label='Name' required={true}
+                                                />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <TextArea 
+                                                        changeHandler={this.handleInputChange} propName={'category'} value={currentDataset.category}
+                                                        label='Category'
+                                                    />
+                                                </Col>
+                                                <Col md={4}>
+                                                    <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={shape} clickHandler={this.handleShapeClick}/>
+                                                </Col>
+                                            </Row>
 
-                                    <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={shape} clickHandler={this.handleShapeClick}/>
-
-                                    <div className={`${c}-sql-container`}>
-                                        <div className={`${c}-column-container`}>
-                                            {data.datasets.columns.map((col) => this.getColumnContent(col))}
-                                        </div>
-                                        <div className={`${c}-sql`}>
-                                            {currentDataset &&
-                                            <SqlBox sql={currentDataset.sql} height={400} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
-                                            }
-                                            <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
+                                        <div className={`${c}-sql-container`}>
+                                            <div className={`${c}-column-container`}>
+                                                {data.datasets.columns.map((col) => this.getColumnContent(col))}
+                                            </div>
+                                            <div className={`${c}-sql`}>
+                                                <SqlBox sql={currentDataset.sql} height={400} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
+                                                <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
+                                            </div>
                                         </div>
                                     </div>
+                                    }
 
                                 </Section>
                             </div>
@@ -122,11 +141,17 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      */
     private handleInputChange = (val: any, propName: string) => {
         const { currentDataset } = this.props.data.datasets;
+        const { categoryIdx, datasetIdx } = this.state;
         const { dispatch } = this.props;
 
-        const newDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
+        const newAdminDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
+        const newDs: PatientListDatasetQueryDTO = {
+            ...newAdminDs,
+            category: newAdminDs.category ? newAdminDs.category : ''
+        };
 
-        dispatch(setAdminDataset(newDs, true));
+        dispatch(setAdminDataset(newAdminDs, true));
+        dispatch(setPatientListDatasetByIndex(newDs, categoryIdx, datasetIdx));
     }
 
     private handleSqlChange = (val: any) => {

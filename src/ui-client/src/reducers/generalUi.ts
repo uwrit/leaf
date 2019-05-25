@@ -17,7 +17,8 @@ import {
     TOGGLE_SAVE_QUERY_PANE, 
     SET_PATIENTLIST_DATASETS, 
     MY_LEAF_MODAL_HIDE,
-    MY_LEAF_MODAL_SHOW
+    MY_LEAF_MODAL_SHOW,
+    SET_PATIENTLIST_DATASET_BY_INDEX
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -103,6 +104,19 @@ const setPatientListDatasets = (state: GeneralUiState, datasets: CategorizedData
     });
 };
 
+const setPatientListDatasetByIndex = (state: GeneralUiState, action: GeneralUiAction): GeneralUiState => {
+    const available = state.datasets.available.slice();
+    const newDs = Object.assign({}, available[action.datasetCategoryIndex!].datasets[action.datasetIndex!], action.dataset);
+    available[action.datasetCategoryIndex!].datasets[action.datasetIndex!] = newDs;
+
+    return Object.assign({}, state, {
+        datasets: {
+            ...state.datasets,
+            available,
+        }
+    });
+};
+
 const setPatientListDatasetSearchTerm = (state: GeneralUiState, searchTerm: string): GeneralUiState => {
     return Object.assign({}, state, {
         datasets: {
@@ -160,6 +174,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         // Patient List datasets
         case SET_PATIENTLIST_DATASETS:
             return setPatientListDatasets(state, action.datasets!);
+        case SET_PATIENTLIST_DATASET_BY_INDEX:
+            return setPatientListDatasetByIndex(state, action);
         case SET_DATASET_SEARCH_TERM:
             return setPatientListDatasetSearchTerm(state, action.searchTerm!);
         case SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT:

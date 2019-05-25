@@ -9,7 +9,7 @@ import { Routes, InformationModalState, ConfirmationModalState, NoClickModalStat
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
-import { CategorizedDatasetRef } from '../models/patientList/Dataset';
+import { CategorizedDatasetRef, PatientListDatasetQueryDTO } from '../models/patientList/Dataset';
 import { AppState } from '../models/state/AppState';
 import { searchDatasets, allowAllDatasets } from '../services/datasetSearchApi';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
@@ -20,6 +20,7 @@ export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
 export const SET_ROUTE = 'SET_ROUTE';
 export const SET_ROUTE_CONFIG = 'SET_ROUTE_CONFIG';
 export const SET_PATIENTLIST_DATASETS = 'SET_PATIENTLIST_DATASETS';
+export const SET_PATIENTLIST_DATASET_BY_INDEX = 'SET_PATIENTLIST_DATASET_BY_INDEX';
 export const SET_BROWSER = 'SET_BROWSER';
 export const SET_DATASET_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
 export const SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT = 'SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT';
@@ -41,6 +42,9 @@ export interface GeneralUiAction {
     cohortInfoButtonVisible?: boolean;
     confirmModal?: ConfirmationModalState;
     datasetsAvailableCount?: number;
+    dataset?: PatientListDatasetQueryDTO;
+    datasetCategoryIndex?: number;
+    datasetIndex?: number;
     datasets?: CategorizedDatasetRef[];
     infoModal?: InformationModalState;
     noclickModal?: NoClickModalState;
@@ -188,6 +192,15 @@ export const setPatientListDatasets = (datasets: CategorizedDatasetRef[]): Gener
     return {
         datasets,
         type: SET_PATIENTLIST_DATASETS
+    };
+};
+
+export const setPatientListDatasetByIndex = (dataset: PatientListDatasetQueryDTO, datasetCategoryIndex: number, datasetIndex: number): GeneralUiAction  => {
+    return {
+        dataset,
+        datasetCategoryIndex,
+        datasetIndex,
+        type: SET_PATIENTLIST_DATASET_BY_INDEX
     };
 };
 

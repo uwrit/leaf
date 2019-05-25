@@ -37,14 +37,6 @@
     padding: 20px 20px 75px;
 }
 
-.dataset-editor-shape,
-.dataset-editor-column {
-    font-family: Roboto;
-    font-size: 1.1rem;
-    font-weight: 300;
-    min-height: 28px;
-}
-
 .dataset-editor-column-container,
 .dataset-editor-sql {
     display: inline-block;
@@ -53,7 +45,6 @@
 /* SQL */
 .dataset-editor-sql-container {
     background-color: white;
-    border: 1px solid rgb(230,230,230);
     display: flex;
     padding: 8px;
     position: relative;
@@ -62,11 +53,12 @@
 .dataset-editor-sql {
     border-left: 1px solid rgb(240,240,240);
     overflow-x: hidden;
-    padding: 20px 10px 0;
+    padding: 30px 10px 0;
     position: relative;
 }
 
 .dataset-editor-sql::after {
+    border-bottom: 1px solid rgb(240,240,240);
     content: 'SQL Query';
     color: rgb(180,180,180);
     font-size: 0.85rem;
@@ -94,10 +86,11 @@
 .dataset-editor-column-container {
     height: 100%;
     min-width: 200px;
-    padding: 20px 8px 8px;
+    padding: 30px 8px 8px;
 }
 
 .dataset-editor-column-container::after {
+    border-bottom: 1px solid rgb(240,240,240);
     content: 'Expected Columns';
     color: rgb(180,180,180);
     font-size: 0.85rem;
@@ -112,8 +105,11 @@
 }
 
 .dataset-editor-column {
+    font-family: Roboto;
+    font-size: 1.0rem;
+    font-weight: 300;
+    min-height: 25px;
 }
-
 .dataset-editor-column > span {
     margin-left: 0;
     transition: margin-left 0.5s;
@@ -162,4 +158,5 @@
 
 .dataset-editor-sql-autoformat:hover {
     box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.2);
+    color: black;
 }
