@@ -1,22 +1,23 @@
 import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
-import { AdminPanelPatientListColumnTemplate } from "../../models/patientList/Column";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState } from "../../models/state/GeneralUiState";
 import { showInfoModal } from "../generalUi";
 import { setAdminPanelConceptLoadState } from "./concept";
-import { PatientListDatasetQueryDTO } from "../../models/patientList/Dataset";
+import { PatientListDatasetQueryDTO, PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { getAdminDataset } from "../../services/admin/datasetApi";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
+export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
+export const SET_ADMIN_DATASET_SHAPE = 'SET_ADMIN_DATASET_SHAPE';
 export const SET_ADMIN_DEMOGRAPHICS_DATASET = 'SET_ADMIN_DEMOGRAPHICS_DATASET';
 export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_STATE';
-export const SET_ADMIN_PANEL_DATASET_COLUMNS = 'SET_ADMIN_PANEL_DATASET_COLUMNS';
 
 export interface AdminDatasetAction {
     changed?: boolean;
-    columns?: AdminPanelPatientListColumnTemplate[];
     dataset?: AdminDatasetQuery | AdminDemographicsDatasetQuery;
+    shape?: PatientListDatasetShape;
+    sql?: string;
     state?: AdminPanelLoadState;
     type: string;
 }
@@ -70,6 +71,20 @@ export const setAdminDataset = (dataset: AdminDatasetQuery, changed: boolean): A
     };
 };
 
+export const setAdminDatasetShape = (shape: PatientListDatasetShape): AdminDatasetAction => {
+    return {
+        shape,
+        type: SET_ADMIN_DATASET_SHAPE
+    };
+};
+
+export const setAdminDatasetSql = (sql: string): AdminDatasetAction => {
+    return {
+        sql,
+        type: SET_ADMIN_DATASET_SQL
+    };
+};
+
 export const setAdminDemographicsDataset = (dataset: AdminDemographicsDatasetQuery, changed: boolean): AdminDatasetAction => {
     return {
         dataset,
@@ -82,12 +97,5 @@ export const setAdminPanelDatasetLoadState = (state: AdminPanelLoadState): Admin
     return {
         state,
         type: SET_ADMIN_PANEL_DATASET_LOAD_STATE
-    };
-};
-
-export const setAdminPanelDatasetColumns = (columns: AdminPanelPatientListColumnTemplate[]): AdminDatasetAction => {
-    return {
-        columns,
-        type: SET_ADMIN_PANEL_DATASET_COLUMNS
     };
 };

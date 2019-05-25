@@ -51,10 +51,8 @@ import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGr
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
 import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEPT_EVENT_CHANGE, SET_ADMIN_UNEDITED_CONCEPT_EVENT } from "../../actions/admin/conceptEvent";
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
-import { PatientListDatasetShape } from "../../models/patientList/Dataset";
-import formatSql from "../../utils/formatSql";
-import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_PANEL_DATASET_COLUMNS, SET_ADMIN_DEMOGRAPHICS_DATASET } from "../../actions/admin/dataset";
-import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDatasetColumns, setAdminPanelDemographicsDataset } from "./dataset";
+import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_DEMOGRAPHICS_DATASET, SET_ADMIN_DATASET_SHAPE, SET_ADMIN_DATASET_SQL } from "../../actions/admin/dataset";
+import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql } from "./dataset";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -82,8 +80,9 @@ export const defaultAdminState = (): AdminState => {
         },
         datasets: {
             changed: false,
-            columns: [],
+            expectedColumns: [],
             datasets: new Map(),
+            sqlColumns: new Set(),
             state: AdminPanelLoadState.NOT_LOADED
         },
         panelFilters: {
@@ -197,8 +196,10 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminPanelCurrentDataset(state, action);
         case SET_ADMIN_DEMOGRAPHICS_DATASET:
             return setAdminPanelDemographicsDataset(state, action);
-        case SET_ADMIN_PANEL_DATASET_COLUMNS:
-            return setAdminPanelDatasetColumns(state, action);
+        case SET_ADMIN_DATASET_SHAPE:
+            return setAdminPanelDatasetShape(state, action);
+        case SET_ADMIN_DATASET_SQL:
+            return setAdminPanelDatasetSql(state, action);
 
         default:
             return state;

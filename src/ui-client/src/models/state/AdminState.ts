@@ -61,10 +61,11 @@ export interface AdminPanelFilterState {
 
 export interface AdminDatasetState {
     changed: boolean;
-    columns: AdminPanelPatientListColumnTemplate[];
+    expectedColumns: AdminPanelPatientListColumnTemplate[];
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
     demographicsDataset?: AdminDemographicsDatasetQuery;
+    sqlColumns: Set<string>;
     state: AdminPanelLoadState;
 }
 

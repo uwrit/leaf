@@ -1,4 +1,5 @@
 import { PatientListDatasetShape } from "../patientList/Dataset";
+import { Constraint } from "./Concept";
 
 /* Copyright (c) 2019, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
@@ -11,9 +12,14 @@ export interface AdminDemographicsDatasetQuery {
     sql: string;
 }
 
+export interface DatasetQueryConstraint extends Constraint {
+    datasetQueryId: string;
+}
+
 export interface AdminDatasetQuery {
     id: string;
     category?: string;
+    constraints: DatasetQueryConstraint[];
     description?: string;
     name: string;
     shape: PatientListDatasetShape;

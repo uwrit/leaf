@@ -6,13 +6,14 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
-import { SectionProps } from '../Props';
-import { ConstraintType, ConceptConstraint, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
-import { Constraint } from './Constraint';
+import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
+import { Section } from '../../ConceptEditor/Sections/Section';
+import { DatasetQueryConstraint, AdminDatasetQuery } from '../../../../models/admin/Dataset';
+import { Constraint } from '../../ConceptEditor/Sections/Constraint';
 
 interface Props {
-    data: SectionProps;
+    changeHandler: (constraints: DatasetQueryConstraint[], propName: string) => any;
+    dataset: AdminDatasetQuery;
 }
 
 export class Constraints extends React.PureComponent<Props> {
@@ -23,23 +24,22 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { adminConcept } = this.props.data;
+        const { dataset } = this.props;
         const c = this.className;
 
         return (
             <Section header='Access Restrictions'>
                 <div className={`${c}-constraints`}>
-                    <p>Restrict access to this Concept by specific users or groups</p>
-                    <small>Any restrictions placed will be inherited by all descendant Concepts</small>
+                    <p>Restrict access to this Dataset by specific users or groups</p>
                     <div className={`${c}-constraints-container`}>
-                        {adminConcept!.constraints.map((constraint, i) => 
+                        {dataset.constraints.map((constraint, i) => 
                             <Constraint 
                                 constraint={constraint} index={i} key={i}
                                 changeHandler={this.handleConstraintChange} deleteHandler={this.handleConstraintDelete} 
                             />
                         )}
-                        {adminConcept!.constraints.length === 0 &&
-                            <div className={`${c}-constraints-none`}>No restrictions - all users can see this Concept</div>
+                        {dataset.constraints.length === 0 &&
+                            <div className={`${c}-constraints-none`}>No restrictions - all users can see this Dataset</div>
                         }
                     </div>
                 </div>
@@ -49,23 +49,23 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     private handleConstraintDelete = (idx: number) => {
-        const { changeHandler, adminConcept } = this.props.data;
-        const constraints = adminConcept!.constraints.slice();
+        const { changeHandler, dataset } = this.props;
+        const constraints = dataset.constraints.slice();
         constraints.splice(idx, 1);
         changeHandler(constraints, this.propName);
     }
 
     private handleConstraintChange = (idx: number, newConstraint: ConstraintModel) => {
-        const { changeHandler, adminConcept } = this.props.data;
-        const constraints = adminConcept!.constraints.slice();
-        constraints.splice(idx, 1, (newConstraint as ConceptConstraint));
+        const { changeHandler, dataset } = this.props;
+        const constraints = dataset.constraints.slice();
+        constraints.splice(idx, 1, (newConstraint as DatasetQueryConstraint));
         changeHandler(constraints, this.propName);
     }
 
     private handleAddNewClick = () => {
-        const { changeHandler, adminConcept } = this.props.data;
-        const newConstraint: ConceptConstraint = { conceptId: adminConcept!.id, constraintId: ConstraintType.User, constraintValue: '' };
-        const constraints = adminConcept!.constraints.slice();
+        const { changeHandler, dataset } = this.props;
+        const newConstraint: DatasetQueryConstraint = { datasetQueryId: dataset.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const constraints = dataset.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);
     }

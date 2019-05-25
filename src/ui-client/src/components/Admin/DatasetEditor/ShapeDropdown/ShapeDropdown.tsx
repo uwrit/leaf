@@ -53,6 +53,11 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                         </DropdownToggle>
                         <DropdownMenu>
                             <div className={`${c}-dropdown-item-container`}>
+                                <DropdownItem 
+                                    onClick={clickHandler.bind(null,PatientListDatasetShape.Dynamic)}>
+                                    {PatientListDatasetShape[PatientListDatasetShape.Dynamic]}
+                                </DropdownItem>
+                                <DropdownItem divider={true} />
                             {shapes.map((s) => {
                                 return (
                                     <DropdownItem 
