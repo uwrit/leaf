@@ -10,12 +10,18 @@ import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { DatasetsState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
-import './DatasetEditor.css';
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetDefinitionTemplate } from '../../../models/patientList/Dataset';
-import { PatientListColumnTemplate, PatientListColumnType } from '../../../models/patientList/Column';
+import { PatientListColumnTemplate, PatientListColumnType, AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
+import { fetchAdminDatasetIfNeeded, setAdminPanelDatasetColumns, setAdminDataset } from '../../../actions/admin/dataset';
+import './DatasetEditor.css';
+import { getSqlColumns } from '../../../utils/parseSql';
+import { AdminDatasetQuery } from '../../../models/admin/Dataset';
+import { FiCheck } from 'react-icons/fi';
+import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
+import formatSql from '../../../utils/formatSql';
 
 interface Props { 
     data: AdminState;
@@ -26,7 +32,8 @@ interface Props {
 interface State {
     categoryIdx: number;
     datasetIdx: number;
-    templates: PatientListDatasetDefinitionTemplate[];
+    columns: AdminPanelPatientListColumnTemplate[];
+    shapes: PatientListDatasetShape[];
 }
 
 export class DatasetEditor extends React.PureComponent<Props,State> {
@@ -36,34 +43,30 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         this.state = {
             categoryIdx: 0,
             datasetIdx: 0,
-            templates: []
+            columns: [],
+            shapes: []
         }
     }
 
     public componentDidMount() {
-        const templates: PatientListDatasetDefinitionTemplate[] = [];
+        const shapes: PatientListDatasetShape[] = [ PatientListDatasetShape.Dynamic ];
+
         DefTemplates.forEach((t) => {
             if (t.shape !== PatientListDatasetShape.Demographics) {
-                templates.push(t);
+                shapes.push(t.shape);
             }
         });
-        this.setState({ templates });
+        this.setState({ shapes });
     }
 
     public render() {
         const { data, datasets, dispatch } = this.props;
-        const { categoryIdx, datasetIdx } = this.state;
+        const { categoryIdx, datasetIdx, } = this.state;
         const { currentDataset, changed, state } = data.datasets;
-        const { templates } = this.state;
+        const { shapes } = this.state;
         const c = this.className;
-        const cols: PatientListColumnTemplate[] = [{ id: 'personId', type: PatientListColumnType.string }];
-        
-        if (currentDataset) {
-            const template = DefTemplates.get(currentDataset.shape);
-            if (template) {
-                template.columns.forEach((c) => cols.push(c));
-            }
-        }
+        const sqlWidth = this.getSqlWidth();
+        const shape: PatientListDatasetShape = currentDataset ? currentDataset.shape : PatientListDatasetShape.Dynamic;
         
         return (
             <div className={c}>
@@ -89,27 +92,23 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                     <Button className='leaf-button leaf-button-warning'>Delete Dataset</Button>
                                 </div>
 
-                                <div className={`${c}-sql-column-container`}>
-                                    <div className={`${c}-sql`}>
-                                        <Section header='SQL'>
+                                <Section header='Dataset'>
+
+                                    <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={shape} clickHandler={this.handleShapeClick}/>
+
+                                    <div className={`${c}-sql-container`}>
+                                        <div className={`${c}-column-container`}>
+                                            {data.datasets.columns.map((col) => this.getColumnContent(col))}
+                                        </div>
+                                        <div className={`${c}-sql`}>
                                             {currentDataset &&
-                                            <SqlBox sql={currentDataset.sql} height={700} width={550} readonly={false} changeHandler={this.handleChange}/>
+                                            <SqlBox sql={currentDataset.sql} height={400} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
                                             }
-                                        </Section>
+                                            <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
+                                        </div>
                                     </div>
-                                    <div className={`${c}-sql-right`}>
-                                        <Section header='Columns'>
-                                            <div className={`${c}-column-container`}>
-                                                {cols.map((c) => <div key={c.id}>{c.id}</div>)}
-                                            </div>
-                                        </Section>
-                                        <Section header='Dataset Shapes'>
-                                            <div className={`${c}-shape-container`}>
-                                                {templates.map((t) => <div key={t.shape}>{PatientListDatasetShape[t.shape]}</div>)}
-                                            </div>
-                                        </Section>
-                                    </div>
-                                </div>
+
+                                </Section>
                             </div>
                         </div>
                     </Row>
@@ -118,13 +117,110 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         );
     }
 
-    private handleChange = (value: string, evt: any) => {
-        console.log(value, evt);
+    /* 
+     * Handles tracking of input changes to the Dataset.
+     */
+    private handleInputChange = (val: any, propName: string) => {
+        const { currentDataset } = this.props.data.datasets;
+        const { dispatch } = this.props;
+
+        const newDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
+
+        dispatch(setAdminDataset(newDs, true));
+    }
+
+    private handleSqlChange = (val: any) => {
+        const { dispatch } = this.props;
+        const { currentDataset } = this.props.data.datasets;
+        const template = DefTemplates.get(currentDataset!.shape);
+        const sqlCols = new Set(getSqlColumns(val));
+        const cols = this.setColumns(sqlCols, template!.columns);
+
+        this.handleInputChange(val, 'sql');
+        dispatch(setAdminPanelDatasetColumns(cols));
+    }
+
+    private handleAutoFormatClick = () => {
+        const { currentDataset } = this.props.data.datasets;
+        if (currentDataset) {
+            const pretty = formatSql(currentDataset.sql);
+            this.handleInputChange(pretty, 'sql');
+        }
+    }
+
+    private getSqlWidth = (): number => {
+        const max = 800;
+        const min = 400;
+        const sqlDom = document.getElementsByClassName(`${this.className}-sql`);
+        if (sqlDom && sqlDom[0]) {
+            const style = window.getComputedStyle(sqlDom[0]);
+            if (style) {
+                const w = +style.width!.replace('px','');
+                const p = +style.paddingLeft!.replace('px','');
+                const width = w - (p * 2);
+                if (width < min) {
+                    return min;
+                } else if (width > max) {
+                    return max;
+                }
+                return width;
+            }
+        }
+        return max;
     }
 
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
+        const { dispatch, datasets } = this.props;
         this.setState({ categoryIdx, datasetIdx });
+        const ds = datasets.available[categoryIdx].datasets[datasetIdx];
+
+        if (ds) { 
+            dispatch(fetchAdminDatasetIfNeeded(ds));
+        }
+
+    }
+
+    private handleShapeClick = (shape: PatientListDatasetShape) => {
+        const { data, dispatch } = this.props;
+        const template = DefTemplates.get(shape);
+        let sqlCols: Set<string> = new Set;
+
+        if (data.datasets.currentDataset) {
+            sqlCols = new Set(getSqlColumns(data.datasets.currentDataset.sql));
+        }
+
+        if (template) {
+            const cols = this.setColumns(sqlCols, template.columns);
+            this.handleInputChange(shape, 'shape');
+            dispatch(setAdminPanelDatasetColumns(cols));
+        }
+    }
+
+    private setColumns = (sqlCols: Set<string>, colMap: Map<string, PatientListColumnTemplate>) => {
+        const personId = 'personId'
+        const cols: AdminPanelPatientListColumnTemplate[] = [{ id: personId, type: PatientListColumnType.string, present: sqlCols.has(personId) }];
+        colMap.forEach((c) => cols.push({ ...c, present: sqlCols.has(c.id) }));
+        return cols;
     }
 
     private handleDatasetRequest = () => null;
+
+    private getColumnContent = (col: AdminPanelPatientListColumnTemplate) => {
+        const classes = [ `${this.className}-column` ];
+        let icon = null;
+
+        if (col.optional) { 
+            classes.push('optional'); 
+        }
+        if (col.present) { 
+            classes.push('present');
+            icon = <FiCheck />
+        }
+        return (
+            <div key={col.id} className={classes.join(' ')}>
+                {icon}
+                <span>{col.id}</span>
+            </div>
+        );
+    }
 }

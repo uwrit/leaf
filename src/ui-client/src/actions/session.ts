@@ -117,10 +117,10 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Load datasets.
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
-            const datasetsResp = await fetchAvailableDatasets(getState());
-            const datasetsCategorized = await addDatasets(datasetsResp.data);
+            const datasets = await fetchAvailableDatasets(getState());
+            const datasetsCategorized = await addDatasets(datasets);
             dispatch(setPatientListDatasets(datasetsCategorized));
-            dispatch(setPatientListTotalDatasetsAvailableCount(datasetsResp.data.length));
+            dispatch(setPatientListTotalDatasetsAvailableCount(datasets.length));
             
             /*
              * Load saved queries.

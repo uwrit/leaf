@@ -8,6 +8,7 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminDatasetAction } from "../../actions/admin/dataset";
 import { AdminPanelPatientListColumnTemplate } from "../../models/patientList/Column";
+import { AdminDatasetQuery } from "../../models/admin/Dataset";
 
 export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDatasetAction): AdminState => {
     return Object.assign({}, state, { 
@@ -19,11 +20,16 @@ export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDa
 };
 
 export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
+    const datasets = state.datasets.datasets;
+    const ds = action.dataset! as AdminDatasetQuery;
+    datasets.set(ds.id, ds);
+
     return Object.assign({}, state, { 
         datasets: { 
             ...state.datasets,
             changed: action.changed,
-            currentDataset: action.dataset
+            currentDataset: action.dataset,
+            datasets
         }
     });
 };
@@ -42,7 +48,7 @@ export const setAdminPanelDatasetColumns = (state: AdminState, action: AdminData
     return Object.assign({}, state, { 
         datasets: { 
             ...state.datasets,
-            columns: setColumnsPresent(state.datasets.currentDataset!.sql, action.columns!)
+            columns: action.columns
         }
     });
 };
