@@ -44,16 +44,18 @@ namespace Services.Admin.Network
                     {
                         id = record.Id,
                         name = record.Name,
-                        address = record.Address,
-                        issuer = record.Issuer,
-                        keyid = record.KeyId,
-                        certificate = record.Certificate,
+                        addr = record.Address,
+                        iss = record.Issuer,
+                        kid = record.KeyId,
+                        cert = record.Certificate,
                         isResponder = record.IsResponder,
                         isInterrogator = record.IsInterrogator,
                         user = user.UUID
                     },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
+
+                item.Updated = DateTime.Now;
 
                 return new UpdateResult<NetworkEndpoint>
                 {

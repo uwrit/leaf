@@ -72,7 +72,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Failed to update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                logger.LogError("Failed to update concept. Concept:{@Concept} Error:{Error}", o, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

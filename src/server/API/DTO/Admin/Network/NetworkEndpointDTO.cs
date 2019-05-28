@@ -41,5 +41,23 @@ namespace API.DTO.Admin.Network
                 Updated = dto.Updated
             };
         }
+
+        public static NetworkEndpointDTO NetworkEndpointDTO(this NetworkEndpoint e)
+        {
+            if (e == null) return null;
+            return new NetworkEndpointDTO
+            {
+                Id = e.Id,
+                Name = e.Name,
+                Address = e.Address.AbsoluteUri,
+                Issuer = e.Issuer,
+                KeyId = e.KeyId,
+                Certificate = Convert.ToBase64String(e.Certificate),
+                IsInterrogator = e.IsInterrogator,
+                IsResponder = e.IsResponder,
+                Created = e.Created,
+                Updated = e.Updated
+            };
+        }
     }
 }

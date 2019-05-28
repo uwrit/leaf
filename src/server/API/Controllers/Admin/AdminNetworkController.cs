@@ -33,5 +33,36 @@ namespace API.Controllers.Admin
             this.logger = logger;
             this.manager = manager;
         }
+
+        [HttpPut("endpoint/{id}")]
+        public async Task<ActionResult<NetworkEndpointDTO>> UpdateEndpoint(int id, [FromBody] NetworkEndpointDTO state)
+        {
+            try
+            {
+                if (state != null)
+                {
+                    state.Id = id;
+                }
+
+                var e = state.NetworkEndpoint();
+                var swap = await manager.UpdateEndpointAsync(e);
+
+                return Ok(swap.New.NetworkEndpointDTO());
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update NetworkEndpoint model. Model:{@Model} Error:{Error}", state, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(NetworkEndpointDTO)} is missing or incomplete."));
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Failed to update NetworkEndpoint. Endpoint:{@Endpoint} Error:{Error}", state, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
     }
 }

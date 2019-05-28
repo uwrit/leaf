@@ -180,7 +180,7 @@ namespace Tests
         public void UpdateEndpointAsync_Should_Update_HTTPS_Endpoint()
         {
             var manager = GetManager(MixedEndpoints);
-            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("https://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("https://leaf.site4.tld"), KeyId = "12309123khjg423khj4g", Certificate = new byte[] { }, IsResponder = true, IsInterrogator = true };
 
             var result = manager.UpdateEndpointAsync(update).Result;
 
