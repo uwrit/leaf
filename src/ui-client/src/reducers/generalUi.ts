@@ -18,7 +18,8 @@ import {
     SET_PATIENTLIST_DATASETS, 
     MY_LEAF_MODAL_HIDE,
     MY_LEAF_MODAL_SHOW,
-    SET_PATIENTLIST_DATASET_BY_INDEX
+    SET_PATIENTLIST_DATASET_BY_INDEX,
+    REMOVE_PATIENTLIST_DATASET
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -117,6 +118,18 @@ const setPatientListDatasetByIndex = (state: GeneralUiState, action: GeneralUiAc
     });
 };
 
+const removePatientListDatasetByIndex = (state: GeneralUiState, action: GeneralUiAction): GeneralUiState => {
+    const available = state.datasets.available.slice();
+    available[action.datasetCategoryIndex!].datasets.splice(action.datasetIndex!,1);
+
+    return Object.assign({}, state, {
+        datasets: {
+            ...state.datasets,
+            available,
+        }
+    });
+};
+
 const setPatientListDatasetSearchTerm = (state: GeneralUiState, searchTerm: string): GeneralUiState => {
     return Object.assign({}, state, {
         datasets: {
@@ -180,6 +193,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return setPatientListDatasetSearchTerm(state, action.searchTerm!);
         case SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT:
             return setPatientListDatasetTotalAvailable(state, action.datasetsAvailableCount!);
+        case REMOVE_PATIENTLIST_DATASET:
+            return removePatientListDatasetByIndex(state, action);
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:

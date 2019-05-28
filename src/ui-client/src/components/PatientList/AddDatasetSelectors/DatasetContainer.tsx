@@ -29,6 +29,11 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         super(props);
     }
 
+    public componentDidMount() {
+        const { datasets } = this.props;
+        dsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);
+    }
+
     public getSnapshotBeforeUpdate() {
         const { datasets, handleDatasetSelect } = this.props;
         const newDsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);

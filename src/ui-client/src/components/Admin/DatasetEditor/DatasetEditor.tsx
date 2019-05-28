@@ -7,23 +7,25 @@
 
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
-import AdminState from '../../../models/state/AdminState';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
+import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
+import { DatasetsState, InformationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQueryDTO } from '../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
-import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql } from '../../../actions/admin/dataset';
+import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { FiCheck } from 'react-icons/fi';
 import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
 import formatSql from '../../../utils/formatSql';
 import { TextArea } from '../ConceptEditor/Sections/TextArea';
-import { setPatientListDatasetByIndex } from '../../../actions/generalUi';
-import './DatasetEditor.css';
+import { setPatientListDatasetByIndex, showInfoModal } from '../../../actions/generalUi';
 import { Constraints } from './Constraints/Constraints';
+import './DatasetEditor.css';
+import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
+import { DatasetQueryCategoryDropdown } from './CategoryDropdown/CategoryDropdown';
 
 interface Props { 
     data: AdminState;
@@ -43,7 +45,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         super(props);
         this.state = {
             categoryIdx: 0,
-            datasetIdx: 0,
+            datasetIdx: -1,
             shapes: []
         }
     }
@@ -63,11 +65,17 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     public render() {
         const { data, datasets, dispatch } = this.props;
         const { categoryIdx, datasetIdx, } = this.state;
+        const { categories } = data.datasetQueryCategories;
         const { currentDataset, changed, state } = data.datasets;
         const { shapes } = this.state;
         const c = this.className;
         const sqlWidth = this.getSqlWidth();
         const shape: PatientListDatasetShape = currentDataset ? currentDataset.shape : PatientListDatasetShape.Dynamic;
+        let currentCategory = undefined;
+
+        if (currentDataset && currentDataset.categoryId) {
+            currentCategory = data.datasetQueryCategories.categories.get(currentDataset.categoryId)!;
+        }
         
         return (
             <div className={c}>
@@ -84,14 +92,17 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             />
                         </Col>
                         <div className={`${c}-column-right`}>
+                            {this.getStatusDependentContent(data.datasets.state, 'concept-editor')}
                             <div className={`${c}-main`}>
 
+                                {datasets.available.length > 0 &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed}>+ Create New Dataset</Button>
-                                    <Button className='leaf-button leaf-button-secondary' disabled={!changed}>Undo Changes</Button>
-                                    <Button className='leaf-button leaf-button-primary' disabled={!changed}>Save</Button>
+                                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
+                                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
                                     <Button className='leaf-button leaf-button-warning'>Delete Dataset</Button>
                                 </div>
+                                }
 
                                 <Section header='Dataset'>
                                     {currentDataset && 
@@ -100,13 +111,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                                 <Col md={4}>
                                                 <TextArea 
                                                     changeHandler={this.handleInputChange} propName={'name'} value={currentDataset.name}
-                                                    label='Name' required={true}
+                                                    label='Name' required={true} subLabel='Text for this Dataset'
                                                 />
                                                 </Col>
                                                 <Col md={4}>
-                                                    <TextArea 
-                                                        changeHandler={this.handleInputChange} propName={'category'} value={currentDataset.category}
-                                                        label='Category'
+                                                    <DatasetQueryCategoryDropdown
+                                                        changeHandler={this.handleInputChange} dispatch={dispatch} currentCategory={currentCategory} categories={categories}
                                                     />
                                                 </Col>
                                                 <Col md={4}>
@@ -138,9 +148,62 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /* 
+     * Sets optional content.
+     */
+    private getStatusDependentContent = (state: AdminPanelLoadState, c: string) => {
+        if (state === AdminPanelLoadState.LOADING) {
+            return (
+                <div>
+                    <div className={`${c}-loading`}>
+                        <LoaderIcon size={100} />
+                    </div>
+                    <div className={`${c}-loading-overlay`}/>
+                </div>
+            );
+        } else if (state === AdminPanelLoadState.NOT_APPLICABLE) {
+            return (
+                <div className={`${c}-na`}>
+                    <p>Saved queries cannot be edited. Please select a normal Leaf concept.</p>
+                </div>
+            );
+        } else if (state === AdminPanelLoadState.ERROR) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>Leaf encountered an error while trying to fetch this concept.</p>
+                </div>
+            );
+        }
+        return null;
+    }
+
+    /*
+     * Triggers a fallback to unedited, undoing any current changes.
+     */
+    private handleUndoChanges = () => {
+        const { datasets} = this.props.data;
+        const { dispatch } = this.props;
+
+        if (datasets.currentDataset!.unsaved) {
+            dispatch(setAdminDataset(undefined, false));
+        } else {
+            dispatch(revertAdminDatasetChanges(datasets.currentDataset!));
+        }
+    }
+
+    /*
+     * Handles initiation of saving async changes and syncing with the DB.
+     */
+    private handleSaveChanges = () => {
+        const { datasets} = this.props.data;
+        const { dispatch } = this.props;
+        dispatch(saveAdminDataset(datasets.currentDataset!));
+    }
+
+    /* 
      * Handles tracking of input changes to the Dataset.
      */
     private handleInputChange = (val: any, propName: string) => {
+        const { datasetQueryCategories } = this.props.data;
         const { currentDataset } = this.props.data.datasets;
         const { categoryIdx, datasetIdx } = this.state;
         const { dispatch } = this.props;
@@ -148,7 +211,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const newAdminDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
         const newDs: PatientListDatasetQueryDTO = {
             ...newAdminDs,
-            category: newAdminDs.category ? newAdminDs.category : ''
+            category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
         };
 
         dispatch(setAdminDataset(newAdminDs, true));
@@ -203,10 +266,27 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      * Handles clicks or up/down arrow selections of datasets.
      */
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
-        const { dispatch, datasets } = this.props;
-        this.setState({ categoryIdx, datasetIdx });
+        const { dispatch, datasets, data } = this.props;
+
+        if (data.datasets.changed) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+            return;
+        }
+
+        if (data.datasets.state === AdminPanelLoadState.LOADING) {
+            return;
+        }
+
         const ds = datasets.available[categoryIdx].datasets[datasetIdx];
-        if (ds) { dispatch(fetchAdminDatasetIfNeeded(ds)); }
+        if (ds) {
+            this.setState({ categoryIdx, datasetIdx });
+            dispatch(fetchAdminDatasetIfNeeded(ds)); 
+        }
     }
 
     private handleShapeClick = (shape: PatientListDatasetShape) => {

@@ -1,11 +1,12 @@
 import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
-import { InformationModalState } from "../../models/state/GeneralUiState";
-import { showInfoModal } from "../generalUi";
-import { setAdminPanelConceptLoadState } from "./concept";
+import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
+import { showInfoModal, setNoClickModalState, setPatientListDatasets, removePatientListDataset } from "../generalUi";
 import { PatientListDatasetQueryDTO, PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { getAdminDataset } from "../../services/admin/datasetApi";
+import { getAdminDataset, createDataset, updateDataset, deleteDataset } from "../../services/admin/datasetApi";
+import { fetchAvailableDatasets } from "../../services/cohortApi";
+import { addDatasets } from "../../services/datasetSearchApi";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
 export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
@@ -23,6 +24,61 @@ export interface AdminDatasetAction {
 }
 
 // Asynchronous
+/*
+ * Save a new Dataset.
+ */
+export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+
+        try {
+            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            const newAdminDataset = dataset.unsaved
+                ? await createDataset(state, dataset)
+                : await updateDataset(state, dataset);
+
+            dispatch(setAdminDataset(newAdminDataset, false));
+            
+            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+        } catch (err) {
+            console.log(err);
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            const info: InformationModalState = {
+                body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
+                header: "Error Saving Dataset",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        }
+    }
+};
+
+/*
+ * Delete a existing concept.
+ */
+export const deleteAdminDatasetFromServer = (dataset: AdminDatasetQuery) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+        deleteDataset(state, dataset)
+            .then(
+                response => {
+                    dispatch(setNoClickModalState({ message: "Dataset Deleted", state: NoClickModalStates.Complete }));
+                    // dispatch(removePatientListDataset());
+                }, error => {
+                    const info: InformationModalState = {
+                        body: "An error occurred while attempting to delete the Dataset. Please see the Leaf error logs for details.",
+                        header: "Error Deleting Concept",
+                        show: true
+                    };
+                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(showInfoModal(info));
+                }
+            );
+        
+    }
+};
+
 /*
  * Fetch admin datatset if it hasn't already been loaded.
  */
@@ -46,10 +102,11 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) =
             * If not previously loaded, fetch from server.
             */ 
             if (!admDataset) {
-                dispatch(setAdminPanelConceptLoadState(AdminPanelLoadState.LOADING));
+                dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADING));
                 admDataset = await getAdminDataset(state, dataset.id);
             } 
             dispatch(setAdminDataset(admDataset!, false));
+            dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADED));
         } catch (err) {
             const info : InformationModalState = {
                 header: "Error Loading Dataset",
@@ -57,13 +114,30 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) =
                 show: true
             }
             dispatch(showInfoModal(info));
-            dispatch(setAdminPanelConceptLoadState(AdminPanelLoadState.ERROR));
+            dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.ERROR));
         }
     };
 };
 
+export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        try {
+            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
+            const state = getState();
+            const admDataset = await getAdminDataset(state, dataset.id);
+            const datasets = await fetchAvailableDatasets(getState());
+            const datasetsCategorized = await addDatasets(datasets);
+            dispatch(setPatientListDatasets(datasetsCategorized));
+            dispatch(setAdminDataset(admDataset, false));
+        } catch (err) {
+            console.log(err);
+        }
+        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+    };
+};
+
 // Synchonous
-export const setAdminDataset = (dataset: AdminDatasetQuery, changed: boolean): AdminDatasetAction => {
+export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed: boolean): AdminDatasetAction => {
     return {
         dataset,
         changed,

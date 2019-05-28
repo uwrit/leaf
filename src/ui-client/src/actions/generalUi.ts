@@ -20,6 +20,7 @@ export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
 export const SET_ROUTE = 'SET_ROUTE';
 export const SET_ROUTE_CONFIG = 'SET_ROUTE_CONFIG';
 export const SET_PATIENTLIST_DATASETS = 'SET_PATIENTLIST_DATASETS';
+export const REMOVE_PATIENTLIST_DATASET = 'REMOVE_PATIENTLIST_DATASET';
 export const SET_PATIENTLIST_DATASET_BY_INDEX = 'SET_PATIENTLIST_DATASET_BY_INDEX';
 export const SET_BROWSER = 'SET_BROWSER';
 export const SET_DATASET_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
@@ -188,11 +189,19 @@ export const toggleExportDataModal = (): GeneralUiAction => {
     };
 };
 
-export const setPatientListDatasets = (datasets: CategorizedDatasetRef[]): GeneralUiAction  => {
+export const setPatientListDatasets = (datasets: CategorizedDatasetRef[]): GeneralUiAction => {
     return {
         datasets,
         type: SET_PATIENTLIST_DATASETS
     };
+};
+
+export const removePatientListDataset = (datasetCategoryIndex: number, datasetIndex: number): GeneralUiAction => {
+    return {
+        datasetCategoryIndex,
+        datasetIndex,
+        type: REMOVE_PATIENTLIST_DATASET
+    }
 };
 
 export const setPatientListDatasetByIndex = (dataset: PatientListDatasetQueryDTO, datasetCategoryIndex: number, datasetIndex: number): GeneralUiAction  => {

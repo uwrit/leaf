@@ -68,6 +68,28 @@
     top: 0;
 }
 
+/* Input */
+.dataset-editor-column-right .form-group label {
+    font-size: 1.0rem;
+    margin-bottom: 0;
+}
+
+.dataset-editor-column-right .leaf-input,
+.dataset-editor-column-right .leaf-input:read-only {
+    background-color: rgba(28, 168, 221, 0.07) !important;
+    border-bottom-color: transparent !important;
+    font-size: 1.1rem;
+}
+
+.dataset-editor-column-right .leaf-input:hover,
+.dataset-editor-column-right .leaf-input:focus {
+    background-color:rgba(28, 168, 221, 0.1) !important;
+}
+
+.dataset-editor-column-right text-area.leaf-input {
+    margin-top: 6px !important;
+}
+
 /* Shapes */
 .dataset-editor-shape {
     border-left: 4px solid transparent;
@@ -160,4 +182,75 @@
 .dataset-editor-sql-autoformat:hover {
     box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.2);
     color: black;
+}
+
+/* Dataset Query Category */
+.dataset-editor-dataset-query-category-dropdown .dropdown-item {
+    margin-right: 70px;
+    padding: 6px 20px;
+    position: relative;
+}
+
+.dataset-editor-dataset-query-category-edit-container {
+    padding: 4px 8px;
+    position: relative;
+}
+
+.dataset-editor-dataset-query-category-edit-container > div {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
+.dataset-editor-dataset-query-category-edit-container > div > div {
+    width: 60%;
+}
+
+.dataset-editor-dataset-query-category-edit-container .leaf-input {
+    border: none !important
+}
+
+.dataset-editor-dataset-query-category-delete, 
+.dataset-editor-dataset-query-category-edit, 
+.dataset-editor-dataset-query-category-edit-undo, 
+.dataset-editor-dataset-query-category-edit-done {
+    border-radius: 4px 8px;
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 8px 6px 0 0;
+    padding: 2px 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dataset-editor-dataset-query-category-edit {
+    margin-right: 50px;
+}
+
+.dataset-editor-dataset-query-category-edit:hover {
+    color: rgb(28, 168, 221);
+}
+
+.dataset-editor-dataset-query-category-edit,
+.dataset-editor-dataset-query-category-delete {
+    margin-top: 6px;
+}
+
+.dataset-editor-dataset-query-category-delete:hover {
+    color: rgb(244, 67, 54);
+}
+
+.dataset-editor-dataset-query-category-edit-done {
+    color: rgb(28, 168, 221);
+    margin-right: 50px;
+}
+
+.dataset-editor-dataset-query-category-edit-done:hover {
+    background-color: rgb(240,240,240);
+}
+
+.dataset-editor-dataset-query-category-edit-undo:hover{
+    background-color: rgb(240,240,240);
+    color: rgb(28, 168, 221);
 }
