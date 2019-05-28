@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [auth].[Login]    Script Date: 5/23/19 3:52:48 PM ******/
+/****** Object:  Table [auth].[Login]    Script Date: 5/28/19 1:33:44 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ CREATE TABLE [auth].[Login](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Login]    Script Date: 5/23/19 3:52:48 PM ******/
+/****** Object:  Index [IX_Login]    Script Date: 5/28/19 1:33:44 PM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_Login] ON [auth].[Login]
 (
 	[Username] ASC
