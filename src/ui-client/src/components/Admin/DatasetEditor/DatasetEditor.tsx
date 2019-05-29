@@ -13,7 +13,7 @@ import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetConta
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
-import { PatientListDatasetShape, PatientListDatasetQueryDTO } from '../../../models/patientList/Dataset';
+import { PatientListDatasetShape, PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
 import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
@@ -23,9 +23,9 @@ import formatSql from '../../../utils/formatSql';
 import { TextArea } from '../ConceptEditor/Sections/TextArea';
 import { setPatientListDatasetByIndex, showInfoModal } from '../../../actions/generalUi';
 import { Constraints } from './Constraints/Constraints';
-import './DatasetEditor.css';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { DatasetQueryCategoryDropdown } from './CategoryDropdown/CategoryDropdown';
+import './DatasetEditor.css';
 
 interface Props { 
     data: AdminState;
@@ -36,8 +36,17 @@ interface Props {
 interface State {
     categoryIdx: number;
     datasetIdx: number;
+    expandedDatasets: DatasetsState;
+    isDemographics: boolean;
     shapes: PatientListDatasetShape[];
 }
+
+const demographics: CategorizedDatasetRef = {
+    category: '',
+    datasets: [{ id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', name: 'Basic Demographics' }]
+};
+
+let dsCount = 0;
 
 export class DatasetEditor extends React.PureComponent<Props,State> {
     private className = 'dataset-editor';
@@ -46,9 +55,32 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         this.state = {
             categoryIdx: 0,
             datasetIdx: -1,
+            expandedDatasets: { ...props.datasets },
+            isDemographics: false,
             shapes: []
         }
     }
+
+    public getSnapshotBeforeUpdate() {
+        const { datasets } = this.props;
+        const newDsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);
+
+        if (dsCount !== newDsCount) {
+            dsCount = newDsCount;
+            const expandedDatasets = this.updateExpandedDatasets();
+            this.setState({ expandedDatasets });
+        }
+        return null;
+    }
+
+    public updateExpandedDatasets = (): DatasetsState => {
+        const expandedDatasets = { ... this.state.expandedDatasets };
+        expandedDatasets.available = this.state.expandedDatasets.available.slice();
+        expandedDatasets.available.unshift(demographics);
+        return expandedDatasets;
+    }
+
+    public componentDidUpdate() { }
 
     public componentDidMount() {
         let shapes: PatientListDatasetShape[] = [];
@@ -67,7 +99,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { categoryIdx, datasetIdx, } = this.state;
         const { categories } = data.datasetQueryCategories;
         const { currentDataset, changed, state } = data.datasets;
-        const { shapes } = this.state;
+        const { shapes, isDemographics, expandedDatasets } = this.state;
         const c = this.className;
         const sqlWidth = this.getSqlWidth();
         const shape: PatientListDatasetShape = currentDataset ? currentDataset.shape : PatientListDatasetShape.Dynamic;
@@ -83,9 +115,10 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     <Row className={`${c}-container-row`}>
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
                             <DatasetContainer 
+                                autoSelectOnSearch={false}
                                 categoryIdx={categoryIdx}
                                 datasetIdx={datasetIdx}
-                                datasets={datasets}
+                                datasets={expandedDatasets}
                                 dispatch={dispatch}
                                 handleDatasetSelect={this.handleDatasetSelect}
                                 handleDatasetRequest={this.handleDatasetRequest}
@@ -95,50 +128,53 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             {this.getStatusDependentContent(data.datasets.state, 'concept-editor')}
                             <div className={`${c}-main`}>
 
-                                {datasets.available.length > 0 &&
+                                {/* New, Undo, Save, Delete buttons */}
+                                {datasets.unfilteredAvailableCount > 0 &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                                    <Button className='leaf-button leaf-button-warning'>Delete Dataset</Button>
+                                    <Button className='leaf-button leaf-button-warning'>Delete</Button>
                                 </div>
-                                }
+                                }        
 
+                                {currentDataset &&
                                 <Section header='Dataset'>
-                                    {currentDataset && 
-                                        <div>
-                                            <Row>
-                                                <Col md={4}>
-                                                <TextArea 
-                                                    changeHandler={this.handleInputChange} propName={'name'} value={currentDataset.name}
-                                                    label='Name' required={true} subLabel='Text for this Dataset'
+                                    {currentDataset.shape !== PatientListDatasetShape.Demographics &&
+                                        <Row>
+                                            <Col md={4}>
+                                            <TextArea 
+                                                changeHandler={this.handleInputChange} propName={'name'} value={currentDataset.name}
+                                                label='Name' required={true} subLabel='Text for this Dataset'
+                                            />
+                                            </Col>
+                                            <Col md={4}>
+                                                <DatasetQueryCategoryDropdown
+                                                    changeHandler={this.handleInputChange} dispatch={dispatch} currentCategory={currentCategory} categories={categories}
                                                 />
-                                                </Col>
-                                                <Col md={4}>
-                                                    <DatasetQueryCategoryDropdown
-                                                        changeHandler={this.handleInputChange} dispatch={dispatch} currentCategory={currentCategory} categories={categories}
-                                                    />
-                                                </Col>
-                                                <Col md={4}>
-                                                    <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={shape} clickHandler={this.handleShapeClick}/>
-                                                </Col>
-                                            </Row>
+                                            </Col>
+                                            <Col md={4}>
+                                                <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={shape} clickHandler={this.handleShapeClick}/>
+                                            </Col>
+                                        </Row>
+                                    }
 
-                                            <div className={`${c}-sql-container`}>
-                                                <div className={`${c}-column-container`}>
-                                                    {data.datasets.expectedColumns.map((col) => this.getColumnContent(col))}
-                                                </div>
-                                                <div className={`${c}-sql`}>
-                                                    <SqlBox sql={currentDataset.sql} height={400} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
-                                                    <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
-                                                </div>
-                                            </div>
-
-                                            <Constraints dataset={currentDataset} changeHandler={this.handleInputChange} />
+                                    <div className={`${c}-sql-container`}>
+                                        <div className={`${c}-column-container`}>
+                                            {data.datasets.expectedColumns.map((col) => this.getColumnContent(col))}
                                         </div>
+                                        <div className={`${c}-sql`}>
+                                            <SqlBox sql={currentDataset.sql} height={350} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
+                                            <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
+                                        </div>
+                                    </div>
+
+                                    {currentDataset.shape !== PatientListDatasetShape.Demographics &&
+                                        <Constraints dataset={currentDataset} changeHandler={this.handleInputChange} />
                                     }
 
                                 </Section>
+                                }
                             </div>
                         </div>
                     </Row>
@@ -284,7 +320,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
         const ds = datasets.available[categoryIdx].datasets[datasetIdx];
         if (ds) {
-            this.setState({ categoryIdx, datasetIdx });
+            this.setState({ categoryIdx, datasetIdx, isDemographics: false });
             dispatch(fetchAdminDatasetIfNeeded(ds)); 
         }
     }

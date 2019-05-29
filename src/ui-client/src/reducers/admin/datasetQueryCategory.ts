@@ -25,7 +25,7 @@ export const setAdminUneditedDatasetQueryCategory = (state: AdminState, action: 
     return Object.assign({}, state, { 
         datasetQueryCategories: {
             ...state.datasetQueryCategories,
-            uneditedEvent: Object.assign({}, action.cat, { changed: false })
+            uneditedCategory: Object.assign({}, action.cat, { changed: false })
         }
     });
 };
@@ -50,7 +50,7 @@ export const undoAdminDatasetQueryCategoryChange = (state: AdminState, action: A
         datasetQueryCategories: { 
             changed: false,
             categories: new Map(state.datasetQueryCategories.categories),
-            uneditedEvent: undefined
+            uneditedCategory: undefined
         }
     });
 };

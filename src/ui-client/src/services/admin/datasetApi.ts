@@ -17,7 +17,7 @@ const demographics: AdminDemographicsDatasetQuery = {
 };
 const platelet: AdminDatasetQuery = {
     id: '7d90433e-f36b-1410-8127-00ffffffffff',
-    category: 'Labs',
+    categoryId: 1,
     constraints: [],
     name: 'Platelet Count',
     shape: PatientListDatasetShape.Observation,
@@ -25,7 +25,7 @@ const platelet: AdminDatasetQuery = {
 };
 const encounter: AdminDatasetQuery = {
     id: '8490433e-f36b-1410-8127-00ffffffffff',
-    category: 'Encounters',
+    categoryId: 2,
     constraints: [],
     name: 'Encounters',
     shape: PatientListDatasetShape.Encounter,
@@ -33,7 +33,7 @@ const encounter: AdminDatasetQuery = {
 };
 const procedure: AdminDatasetQuery = {
     id: 'b18e4b63-be42-e911-9d09-b886875607d2',
-    category: 'Procedures',
+    categoryId: 3,
     constraints: [],
     name: 'Procedures',
     shape: PatientListDatasetShape.Procedure,
