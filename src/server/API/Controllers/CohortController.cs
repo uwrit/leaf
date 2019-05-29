@@ -156,11 +156,6 @@ namespace API.Controllers
                 log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
                 return BadRequest();
             }
-            catch (LeafPreflightException lpe)
-            {
-                log.LogInformation("Dataset query failed preflight check. Error:{Error}", lpe.Message);
-                return BadRequest();
-            }
             catch (OperationCanceledException)
             {
                 log.LogInformation("Request cancelled. QueryID:{QueryID} DatasetId:{DatasetId}", queryid, datasetid);
