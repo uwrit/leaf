@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetGeneralEquivalenceMapping]    Script Date: 5/28/19 1:33:44 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetGeneralEquivalenceMapping]    Script Date: 5/29/19 9:58:40 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
