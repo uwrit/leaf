@@ -65,6 +65,10 @@ namespace API.Controllers
                 log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
                 return BadRequest();
             }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
+            }
             catch (Exception ex)
             {
                 log.LogError("Failed to execute query. Error:{Error}", ex.ToString());

@@ -12,6 +12,9 @@ namespace Model.Compiler
 {
     using PanelItemMapping = Tuple<IPanelItemDTO, PanelItem>;
 
+    /// <summary>
+    /// Panel validator.
+    /// </summary>
     public class PanelValidator
     {
         readonly ILogger<PanelValidator> log;
@@ -21,6 +24,12 @@ namespace Model.Compiler
             log = logger;
         }
 
+        /// <summary>
+        /// Validate the specified context. Throws if there are unrecoverable errors.
+        /// </summary>
+        /// <returns>The validated PatientCountQuery.</returns>
+        /// <param name="ctx">Context.</param>
+        /// <exception cref="LeafCompilerException"/>
         public PatientCountQuery Validate(PanelValidationContext ctx)
         {
             if (!ctx.PreflightPassed)

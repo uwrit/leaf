@@ -71,9 +71,12 @@ namespace Model.Cohort
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
+            log.LogInformation("CohortCounter starting. DTO:{@DTO}", queryDTO);
             Ensure.NotNull(queryDTO, nameof(queryDTO));
 
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
+            log.LogInformation("CohortCounter conversion done. ValidationContext:{@ValidationContext}", ctx);
+
             if (!ctx.PreflightPassed)
             {
                 return new Result
@@ -83,7 +86,9 @@ namespace Model.Cohort
             }
 
             var query = validator.Validate(ctx);
+
             var cohort = await counter.GetPatientCohortAsync(query, token);
+            log.LogInformation("CohortCounter cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
 
             token.ThrowIfCancellationRequested();
 
@@ -105,9 +110,8 @@ namespace Model.Cohort
         {
             try
             {
-                log.LogInformation("Caching unsaved cohort.");
                 var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
-                log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
+                log.LogInformation("CohortCounter caching complete. QueryId:{QueryId}", qid);
                 return qid;
             }
             catch (InvalidOperationException ie)
