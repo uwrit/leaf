@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 
-
 namespace Model.Compiler
 {
     using PanelItemMapping = Tuple<IPanelItemDTO, PanelItem>;
@@ -26,7 +25,7 @@ namespace Model.Compiler
         {
             if (!ctx.PreflightPassed)
             {
-                throw new InvalidOperationException("PreflightCheck failed, nothing to validate.");
+                throw new LeafCompilerException("PreflightCheck failed, nothing to validate.");
             }
             ValidateItems(ctx);
             var panels = ValidatePanels(ctx);
@@ -88,7 +87,7 @@ namespace Model.Compiler
                 {
                     if (start.Date.CompareTo(end.Date) > 0)
                     {
-                        throw new InvalidOperationException($"End date precedes start.");
+                        throw new LeafCompilerException($"End date precedes start.");
                     }
                 }
             }
@@ -133,7 +132,7 @@ namespace Model.Compiler
                 {
                     var message = $"SpecializationId: {spec.specialization.Id} or UniversalId: {spec.specialization.UniversalId} invalid";
                     log.LogWarning("Specialization Misalignment: {Message}. Payload:{@Payload}", message, mapping.Item1);
-                    throw new InvalidOperationException($"Specialization Misalignment: {message}.");
+                    throw new LeafCompilerException($"Specialization Misalignment: {message}.");
                 }
             }
         }
@@ -149,7 +148,7 @@ namespace Model.Compiler
             if (item.RecencyFilter == RecencyFilterType.None)
             {
                 log.LogWarning("Recency Filter Misalignment: No Recency Type Selected. Payload:{@Payload}", mapping.Item1);
-                throw new InvalidOperationException($"Recency Filter Misalignment: No Recency Type Selected.");
+                throw new LeafCompilerException($"Recency Filter Misalignment: No Recency Type Selected.");
             }
         }
 
@@ -168,13 +167,13 @@ namespace Model.Compiler
                 if (actual < expected)
                 {
                     log.LogWarning("Numeric Filter Misalignment: Not enough arguments for NumericFilterType:{Type}. Payload:{@Payload}", filter.FilterType.ToString(), mapping.Item1);
-                    throw new InvalidOperationException($"Numeric Filter Misalignment: Missing Numeric Arguments.");
+                    throw new LeafCompilerException($"Numeric Filter Misalignment: Missing Numeric Arguments.");
                 }
 
                 if (actual > expected)
                 {
                     log.LogWarning("Numeric Filter Misalignment: Too many arguments for NumericFilterType:{Type}. Payload:{@Payload}", filter.FilterType.ToString(), mapping.Item1);
-                    throw new InvalidOperationException($"Numeric Filter Misalignment: Excessive Numeric Arguments.");
+                    throw new LeafCompilerException($"Numeric Filter Misalignment: Excessive Numeric Arguments.");
                 }
             }
 

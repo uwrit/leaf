@@ -10,6 +10,7 @@ using Model.Compiler;
 using Model.Authorization;
 using Microsoft.Extensions.Logging;
 using Model.Validation;
+using Model.Error;
 
 namespace Model.Cohort
 {
@@ -64,7 +65,7 @@ namespace Model.Cohort
         /// <param name="queryDTO">Abstract query representation.</param>
         /// <param name="token">Cancellation token.</param>
         /// <exception cref="OperationCanceledException"/>
-        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="LeafRPCException"/>
         /// <exception cref="System.Data.Common.DbException"/>
@@ -86,9 +87,7 @@ namespace Model.Cohort
 
             token.ThrowIfCancellationRequested();
 
-            log.LogInformation("Caching unsaved cohort.");
-            var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
-            log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
+            var qid = await CacheCohort(cohort);
 
             return new Result
             {
@@ -100,6 +99,22 @@ namespace Model.Cohort
                     SqlStatements = cohort.SqlStatements
                 }
             };
+        }
+
+        async Task<Guid> CacheCohort(PatientCohort cohort)
+        {
+            try
+            {
+                log.LogInformation("Caching unsaved cohort.");
+                var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
+                log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
+                return qid;
+            }
+            catch (InvalidOperationException ie)
+            {
+                log.LogError("Failed to cache cohort. Error:{Error}", ie.Message);
+                throw new LeafRPCException(LeafErrorCode.Internal, ie.Message, ie);
+            }
         }
 
         public class Result

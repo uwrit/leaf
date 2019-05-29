@@ -60,9 +60,9 @@ namespace API.Controllers
                 log.LogInformation("Request cancelled.");
                 return NoContent();
             }
-            catch (InvalidOperationException ie)
+            catch (LeafCompilerException ce)
             {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ie.Message);
+                log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
                 return BadRequest();
             }
             catch (Exception ex)
