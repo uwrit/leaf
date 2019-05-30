@@ -1,3 +1,10 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
 /* Left Column */
 .dataset-editor-column-left {
     padding: 20px;
@@ -32,6 +39,11 @@
 
 .dataset-editor-column-right-header .leaf-button-secondary {
     background-color: white;
+}
+
+.dataset-editor small {
+    color: rgb(130,130,130) !important;
+    margin-top: 0;
 }
 
 /* Main */
@@ -110,9 +122,11 @@
 
 /* Columns */
 .dataset-editor-column-container {
-    height: 100%;
+    height: 370px;
     min-width: 200px;
+    overflow: auto;
     padding: 30px 8px 8px;
+    position: relative;
 }
 
 .dataset-editor-column-container::after {

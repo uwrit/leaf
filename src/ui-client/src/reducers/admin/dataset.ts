@@ -8,9 +8,9 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminDatasetAction } from "../../actions/admin/dataset";
 import { AdminPanelPatientListColumnTemplate, PatientListColumnType } from "../../models/patientList/Column";
-import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery } from "../../models/admin/Dataset";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { DefTemplates } from "../../models/patientList/DatasetDefinitionTemplate";
+import { DefTemplates, DemographicsAdminSqlDefTemplate } from "../../models/patientList/DatasetDefinitionTemplate";
 import { getSqlColumns } from "../../utils/parseSql";
 
 const personId = 'personId';
@@ -29,12 +29,15 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     const ds = action.dataset! as AdminDatasetQuery;
     let expectedColumns = datasets.expectedColumns;
     let sqlColumns = datasets.sqlColumns;
-    datasets.datasets.set(ds.id, ds);
 
     if (!action.changed) {
         const cols = getShapeColumns(ds.sql, ds.shape);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;
+
+        if (ds.shape !== PatientListDatasetShape.Demographics) {
+            datasets.datasets.set(ds.id, ds);
+        }
     }
 
     return Object.assign({}, state, { 
@@ -43,7 +46,7 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
             changed: action.changed,
             currentDataset: action.dataset,
             datasets: datasets.datasets,
-            editingDemographics: false,
+            editingDemographics: ds.shape === PatientListDatasetShape.Demographics,
             expectedColumns,
             sqlColumns
         }
@@ -51,24 +54,11 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
 };
 
 export const setAdminPanelDemographicsDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
-    const sqlColumns = new Set(getSqlColumns((action.dataset! as AdminDemographicsDatasetQuery).sql));
-
     return Object.assign({}, state, { 
         datasets: { 
             ...state.datasets,
             changed: action.changed,
-            demographicsDataset: action.dataset,
-            expectedColumns: sqlColumns
-        }
-    });
-};
-
-export const setAdminPanelEditingDemographicsDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
-    return Object.assign({}, state, { 
-        datasets: { 
-            ...state.datasets,
-            currentDataset: state.datasets.demographicsDataset,
-            editingDemographics: true
+            demographicsDataset: action.dataset
         }
     });
 };
@@ -94,7 +84,7 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { sql: action.sql }) as AdminDatasetQuery;
     const sqlColumns = new Set(getSqlColumns(action.sql!));
-    datasets.datasets.set(ds.id, ds);
+    // datasets.datasets.set(ds.id, ds);
     datasets.expectedColumns.forEach((c) => c.present = sqlColumns.has(c.id));
 
     return Object.assign({}, state, { 
@@ -108,7 +98,9 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
 };
 
 const getShapeColumns = (sql: string, shape: PatientListDatasetShape) => {
-    const template = DefTemplates.get(shape);
+    const template = shape === PatientListDatasetShape.Demographics
+        ? DemographicsAdminSqlDefTemplate
+        : DefTemplates.get(shape);
     const sqlColumns = new Set(getSqlColumns(sql));
     const expectedColumns: AdminPanelPatientListColumnTemplate[] = [
         { id: personId, type: PatientListColumnType.string, present: sqlColumns.has(personId) }

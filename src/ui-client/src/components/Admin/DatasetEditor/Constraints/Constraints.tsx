@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
-import { Section } from '../../ConceptEditor/Sections/Section';
 import { DatasetQueryConstraint, AdminDatasetQuery } from '../../../../models/admin/Dataset';
 import { Constraint } from '../../ConceptEditor/Sections/Constraint';
 
 interface Props {
     changeHandler: (constraints: DatasetQueryConstraint[], propName: string) => any;
     dataset: AdminDatasetQuery;
+    locked?: boolean;
 }
 
 export class Constraints extends React.PureComponent<Props> {
@@ -24,11 +24,11 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { dataset } = this.props;
+        const { dataset, locked } = this.props;
         const c = this.className;
 
         return (
-            <Section header='Access Restrictions'>
+            <div>
                 <div className={`${c}-constraints`}>
                     <p>Restrict access to this Dataset by specific users or groups</p>
                     <div className={`${c}-constraints-container`}>
@@ -43,8 +43,10 @@ export class Constraints extends React.PureComponent<Props> {
                         }
                     </div>
                 </div>
-                <div className={`${c}-constraints-addnew`} onClick={this.handleAddNewClick}>+ Add New Restriction</div>
-            </Section>
+                {!locked &&
+                    <div className={`${c}-constraints-addnew`} onClick={this.handleAddNewClick}>+ Add New Restriction</div>
+                }
+            </div>
         );
     }
 

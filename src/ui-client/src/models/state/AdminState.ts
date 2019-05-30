@@ -65,7 +65,6 @@ export interface AdminDatasetState {
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
     demographicsDataset?: AdminDatasetQuery;
-    editingDemographics: boolean;
     sqlColumns: Set<string>;
     state: AdminPanelLoadState;
 }

@@ -1,10 +1,10 @@
-import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
-import { showInfoModal, setNoClickModalState, setPatientListDatasets, removePatientListDataset } from "../generalUi";
-import { PatientListDatasetQueryDTO, PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { getAdminDataset, createDataset, updateDataset, deleteDataset, getAdminDemographicsDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
+import { showInfoModal, setNoClickModalState, setPatientListDatasets, setDatasetSearchTerm } from "../generalUi";
+import { PatientListDatasetQuery, PatientListDatasetShape, CategorizedDatasetRef } from "../../models/patientList/Dataset";
+import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { fetchAvailableDatasets } from "../../services/cohortApi";
 import { addDatasets } from "../../services/datasetSearchApi";
 
@@ -13,11 +13,10 @@ export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
 export const SET_ADMIN_DATASET_SHAPE = 'SET_ADMIN_DATASET_SHAPE';
 export const SET_ADMIN_DEMOGRAPHICS_DATASET = 'SET_ADMIN_DEMOGRAPHICS_DATASET';
 export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_STATE';
-export const SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS = 'SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS';
 
 export interface AdminDatasetAction {
     changed?: boolean;
-    dataset?: AdminDatasetQuery | AdminDemographicsDatasetQuery;
+    dataset?: AdminDatasetQuery;
     shape?: PatientListDatasetShape;
     sql?: string;
     state?: AdminPanelLoadState;
@@ -57,7 +56,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
 /*
  * Saves the current demographics dataset.
  */
-export const saveAdminDemographicsDataset = (dataset: AdminDemographicsDatasetQuery) => {
+export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
 
@@ -108,7 +107,7 @@ export const deleteAdminDatasetFromServer = (dataset: AdminDatasetQuery) => {
 /*
  * Fetch admin datatset if it hasn't already been loaded.
  */
-export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) => {
+export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
@@ -118,6 +117,14 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) =
              */
             if (dataset.unsaved) { return; }
             const adm = state.admin!.datasets;
+
+            /*
+             * If demographics, set that and short-circuit.
+             */
+            if (dataset.shape === PatientListDatasetShape.Demographics) {
+                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false));
+                return;
+            }
 
             /*
              * Try to load from local cache.
@@ -145,18 +152,17 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) =
     };
 };
 
-export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery | AdminDemographicsDatasetQuery) => {
+export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
             const state = getState();
-            const { editingDemographics } = state.admin!.datasets;
+            const { currentDataset } = state.admin!.datasets;
 
-            if (editingDemographics) {
-                const admDataset = await getAdminDemographicsDataset(state);
-                dispatch(setAdminDemographicsDataset(admDataset, false));
+            if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false));
             } else {
-                const admDataset = await getAdminDataset(state, (dataset as AdminDatasetQuery).id);
+                const admDataset = await getAdminDataset(state, dataset.id);
                 const datasets = await fetchAvailableDatasets(getState());
                 const datasetsCategorized = await addDatasets(datasets);
                 dispatch(setPatientListDatasets(datasetsCategorized));
@@ -169,18 +175,37 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery | AdminDemo
     };
 };
 
+export const addDemographicsDatasetToSearch = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADING));
+        const state = getState();
+        const datasets = state.generalUi.datasets.available.reduce((a: PatientListDatasetQuery[], b: CategorizedDatasetRef) => a.concat(b.datasets), []);
+        datasets.unshift(demographics);
+        const datasetsCategorized = await addDatasets(datasets);
+        dispatch(setPatientListDatasets(datasetsCategorized));
+        dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADED));
+    };
+};
+
+export const removeDemographicsDatasetFromSearch = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        const datasets = state.generalUi.datasets.available
+            .reduce((a: PatientListDatasetQuery[], b: CategorizedDatasetRef) => (
+                a.concat(b.datasets.filter((d) => d.shape !== PatientListDatasetShape.Demographics))
+            ), [])
+
+        const datasetsCategorized = await addDatasets(datasets);
+        dispatch(setPatientListDatasets(datasetsCategorized));
+    };
+};
+
 // Synchonous
 export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed: boolean): AdminDatasetAction => {
     return {
         dataset,
         changed,
         type: SET_ADMIN_DATASET
-    };
-};
-
-export const setAdminEditingDemographics = (): AdminDatasetAction => {
-    return {
-        type: SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS
     };
 };
 
@@ -198,7 +223,7 @@ export const setAdminDatasetSql = (sql: string): AdminDatasetAction => {
     };
 };
 
-export const setAdminDemographicsDataset = (dataset: AdminDemographicsDatasetQuery, changed: boolean): AdminDatasetAction => {
+export const setAdminDemographicsDataset = (dataset: AdminDatasetQuery, changed: boolean): AdminDatasetAction => {
     return {
         dataset,
         changed,
@@ -212,3 +237,5 @@ export const setAdminPanelDatasetLoadState = (state: AdminPanelLoadState): Admin
         type: SET_ADMIN_PANEL_DATASET_LOAD_STATE
     };
 };
+
+const demographics: PatientListDatasetQuery = { id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', name: 'Basic Demographics', tags: [] };

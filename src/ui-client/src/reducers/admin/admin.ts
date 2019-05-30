@@ -51,8 +51,8 @@ import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGr
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
 import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEPT_EVENT_CHANGE, SET_ADMIN_UNEDITED_CONCEPT_EVENT } from "../../actions/admin/conceptEvent";
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
-import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_DEMOGRAPHICS_DATASET, SET_ADMIN_DATASET_SHAPE, SET_ADMIN_DATASET_SQL, SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS } from "../../actions/admin/dataset";
-import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql, setAdminPanelEditingDemographicsDataset } from "./dataset";
+import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_DEMOGRAPHICS_DATASET, SET_ADMIN_DATASET_SHAPE, SET_ADMIN_DATASET_SQL } from "../../actions/admin/dataset";
+import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql } from "./dataset";
 import { SET_ADMIN_DATASET_QUERY_CATEGORIES, SET_ADMIN_UNEDITED_DATASET_QUERY_CATEGORY, UNDO_ADMIN_DATASET_QUERY_CATEGORY_CHANGE, REMOVE_ADMIN_DATASET_QUERY_CATEGORY } from "../../actions/admin/datasetQueryCategory";
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
 
@@ -84,7 +84,6 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             expectedColumns: [],
             datasets: new Map(),
-            editingDemographics: false,
             sqlColumns: new Set(),
             state: AdminPanelLoadState.NOT_LOADED
         },
@@ -207,8 +206,6 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminPanelDatasetShape(state, action);
         case SET_ADMIN_DATASET_SQL:
             return setAdminPanelDatasetSql(state, action);
-        case SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS:
-            return setAdminPanelEditingDemographicsDataset(state, action);
 
         // Dataset Query Categories
         case SET_ADMIN_DATASET_QUERY_CATEGORIES:

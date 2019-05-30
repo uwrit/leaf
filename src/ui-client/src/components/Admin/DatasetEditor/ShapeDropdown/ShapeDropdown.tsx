@@ -17,6 +17,7 @@ interface Props {
     clickHandler: (shape: PatientListDatasetShape) => any;
     shapes: PatientListDatasetShape[];
     selected: PatientListDatasetShape;
+    locked?: boolean;
 }
 
 interface State {
@@ -33,7 +34,7 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { clickHandler, shapes, selected } = this.props;
+        const { clickHandler, shapes, selected, locked } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
 
@@ -45,7 +46,7 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                 </Label>
                 <div className={`${c}-dropdown`} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c}>
-                        <DropdownToggle>
+                        <DropdownToggle disabled={locked}>
                             <div>
                                 {PatientListDatasetShape[selected]} 
                                 <FaChevronDown className={`${c}-dropdown-chevron`}/>

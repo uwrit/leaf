@@ -6,7 +6,7 @@
  */ 
 
 import { CohortStateType } from '../state/CohortState';
-import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, PatientListColumnType, ValueByColumnKey } from './Column';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, ValueByColumnKey } from './Column';
 import { PatientListRowDTO } from './Patient';
 import { DateBoundary } from '../panel/Date';
 
@@ -83,7 +83,11 @@ export interface PatientListDatasetQueryDTO {
     description?: string;
     name: string;
     shape: PatientListDatasetShape;
+    tags: string[];
     universalId?: string;
+}
+
+export interface PatientListDatasetQuery extends PatientListDatasetQueryDTO {
     unsaved?: boolean;
 }
 
@@ -133,7 +137,7 @@ export interface PatientListDatasetDefinition extends PatientListDatasetDefiniti
  */
 export interface TokenizedDatasetRef {
     id: PatientListDatasetId;
-    dataset: PatientListDatasetQueryDTO;
+    dataset: PatientListDatasetQuery;
     token: string;
     tokenArray: string[];
 }
@@ -143,5 +147,5 @@ export interface TokenizedDatasetRef {
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: PatientListDatasetQueryDTO[];
+    datasets: PatientListDatasetQuery[];
 }

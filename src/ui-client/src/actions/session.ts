@@ -28,6 +28,7 @@ import { setPanels } from './panels';
 import { setPanelFilterActiveStates } from './panelFilter';
 import { addDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
+import { PatientListDatasetShape } from '../models/patientList/Dataset';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -118,7 +119,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
             const datasets = await fetchAvailableDatasets(getState());
-            const datasetsCategorized = await addDatasets(datasets);
+            const datasetsCategorized = await addDatasets(datasets.filter((d) => d.shape !== PatientListDatasetShape.Demographics));
             dispatch(setPatientListDatasets(datasetsCategorized));
             dispatch(setPatientListTotalDatasetsAvailableCount(datasets.length));
             

@@ -21,6 +21,7 @@ interface Props {
     changeHandler: (val: any, propName: string) => any;
     dispatch: any;
     categories: Map<number,DatasetQueryCategory>;
+    locked?: boolean;
 }
 
 interface State {
@@ -28,7 +29,7 @@ interface State {
     isOpen: boolean;
 }
 
-export class DatasetQueryCategoryDropdown extends React.PureComponent<Props,State> {
+export class CategoryDropdown extends React.PureComponent<Props,State> {
     private className = 'dataset-editor';
     private propName = 'categoryId';
     constructor(props: Props) {
@@ -39,7 +40,7 @@ export class DatasetQueryCategoryDropdown extends React.PureComponent<Props,Stat
     }
 
     public render() {
-        const { currentCategory, categories } = this.props;
+        const { currentCategory, categories, locked } = this.props;
         const { editId, isOpen } = this.state;
         const c = this.className;
         const display = currentCategory ? currentCategory.category : 'None';
@@ -53,7 +54,7 @@ export class DatasetQueryCategoryDropdown extends React.PureComponent<Props,Stat
                 <FormText color="muted">Domain or data type</FormText>
                 <div className={`concept-editor-dropdown ${c}-dataset-query-category-dropdown`}>
                     <Dropdown isOpen={isOpen} toggle={this.toggle}>
-                        <DropdownToggle>
+                        <DropdownToggle disabled={locked}>
                             {display}
                             <FaChevronDown className={`concept-editor-dropdown-chevron`}/>
                         </DropdownToggle>

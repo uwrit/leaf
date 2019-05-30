@@ -12,8 +12,8 @@ import PatientListWebWorker from '../providers/patientList/patientListWebWorker'
 import REDCapExportWebWorker from '../providers/redcapExport/redcapExportWebWorker';
 import camelCaseToUpperSpaced from '../utils/camelCaseToUpperSpaced';
 import { PatientListConfiguration } from '../models/patientList/Configuration';
-import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQueryDTO, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate } from '../models/patientList/Dataset';
-import { PatientListColumn, PatientListColumnId, PatientListColumnType } from '../models/patientList/Column';
+import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQuery, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate } from '../models/patientList/Dataset';
+import { PatientListColumn, PatientListColumnId } from '../models/patientList/Column';
 import { PatientListRow, PatientListRowDTO } from '../models/patientList/Patient';
 import { DemographicsDefTemplate, DefTemplates } from '../models/patientList/DatasetDefinitionTemplate';
 
@@ -98,7 +98,7 @@ export const clearPreviousPatientList = () => patientListProvider.clearPatients(
 export const addMultirowDataset = async (
         getState: () => AppState, 
         datasetDto: PatientListDatasetDTO, 
-        queryRef: PatientListDatasetQueryDTO, 
+        queryRef: PatientListDatasetQuery, 
         responderId: number
     ): Promise<PatientListState> => {
 
@@ -269,7 +269,7 @@ const getDemographicsDefinition = (patient: PatientListRowDTO) => {
 /*
  * Extracts a dataset definition.
  */
-const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQueryDTO) => {
+const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery) => {
     const template = DefTemplates.get(queryRef.shape)!;
     const def: PatientListDatasetDefinition = {
         ...template,

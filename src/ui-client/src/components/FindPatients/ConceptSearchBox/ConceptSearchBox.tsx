@@ -14,9 +14,9 @@ import { AggregateConceptHintRef } from '../../../models/concept/ConceptHint';
 import { HintContainer } from './HintContainer';
 import { isEmbeddedQuery } from '../../../utils/panelUtils';
 import { keys } from '../../../models/Keyboard';
-import './ConceptSearchBox.css';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 
+import './ConceptSearchBox.css';
 interface Props {
     conceptsState: ConceptsState;
     conceptsSearchState: ConceptsSearchState;

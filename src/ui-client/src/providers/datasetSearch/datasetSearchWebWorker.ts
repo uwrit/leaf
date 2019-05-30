@@ -7,7 +7,7 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQueryDTO, CategorizedDatasetRef, PatientListDatasetShape } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
 const ADD_DATASETS = 'ADD_DATASETS';
@@ -17,7 +17,7 @@ const SEARCH_DATASETS = 'SEARCH_DATASETS';
 
 interface InboundMessagePartialPayload {
     datasetId?: string;
-    datasets?: PatientListDatasetQueryDTO[];
+    datasets?: PatientListDatasetQuery[];
     include?: boolean;
     message: string;
     searchString?: string;
@@ -60,7 +60,7 @@ export default class DatasetSearchEngineWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public addDatasets = (datasets: PatientListDatasetQueryDTO[]) => {
+    public addDatasets = (datasets: PatientListDatasetQuery[]) => {
         return this.postMessage({ message: ADD_DATASETS, datasets });
     }
 
@@ -121,7 +121,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         // Dataset cache
-        const datasetCache: Map<string, PatientListDatasetQueryDTO> = new Map();
+        const datasetCache: Map<string, PatientListDatasetQuery> = new Map();
         const excluded: Set<string> = new Set();
         let allDatasets: CategorizedDatasetRef[] = [];
         let allowedDatasets: CategorizedDatasetRef[] = [];
@@ -152,7 +152,7 @@ export default class DatasetSearchEngineWebWorker {
             allowedDatasets = [];
 
             for (let i = 0; i < allDatasets.length; i++) {
-                const datasets: PatientListDatasetQueryDTO[] = [];
+                const datasets: PatientListDatasetQuery[] = [];
                 const cat = allDatasets[i];
                 for (let j = 0; j < cat.datasets.length; j++) {
                     const ds = cat.datasets[j];
@@ -239,7 +239,7 @@ export default class DatasetSearchEngineWebWorker {
             return dedupeAndSort(ds);
         };
 
-        const dedupeAndSort = (refs: PatientListDatasetQueryDTO[]): CategorizedDatasetRef[] => {
+        const dedupeAndSort = (refs: PatientListDatasetQuery[]): CategorizedDatasetRef[] => {
             const added: Set<string> = new Set();
             const catIdxMap: Map<string,number> = new Map();
             let out: CategorizedDatasetRef[] = [];
@@ -277,19 +277,18 @@ export default class DatasetSearchEngineWebWorker {
             return a.category.localeCompare(b.category);
         };
 
-        const datasetSorter = (a: PatientListDatasetQueryDTO, b: PatientListDatasetQueryDTO) => {
+        const datasetSorter = (a: PatientListDatasetQuery, b: PatientListDatasetQuery) => {
             return a.name.localeCompare(b.name);
         };
 
         const addDatasetsToCache = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { datasets, requestId } = payload;
             const allDs = [];
+            datasetCache.clear();
         
             // Foreach dataset
             for (let i = 0; i < datasets!.length; i++) {
                 const ds = datasets![i];
-                if (ds.shape === 3) { continue; } // Ensure Demographics-shape datasets are excluded.
-
                 let tokens = ds.name.toLowerCase().split(' ');
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
