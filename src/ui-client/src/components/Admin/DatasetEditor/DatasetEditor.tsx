@@ -15,8 +15,8 @@ import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
-import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset } from '../../../actions/admin/dataset';
-import { AdminDatasetQuery } from '../../../models/admin/Dataset';
+import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, setAdminDemographicsDataset, setAdminEditingDemographics } from '../../../actions/admin/dataset';
+import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from '../../../models/admin/Dataset';
 import { FiCheck } from 'react-icons/fi';
 import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
 import formatSql from '../../../utils/formatSql';
@@ -37,7 +37,6 @@ interface State {
     categoryIdx: number;
     datasetIdx: number;
     expandedDatasets: DatasetsState;
-    isDemographics: boolean;
     shapes: PatientListDatasetShape[];
 }
 
@@ -56,7 +55,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             categoryIdx: 0,
             datasetIdx: -1,
             expandedDatasets: { ...props.datasets },
-            isDemographics: false,
             shapes: []
         }
     }
@@ -98,15 +96,22 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { data, datasets, dispatch } = this.props;
         const { categoryIdx, datasetIdx, } = this.state;
         const { categories } = data.datasetQueryCategories;
-        const { currentDataset, changed, state } = data.datasets;
-        const { shapes, isDemographics, expandedDatasets } = this.state;
+        const { currentDataset, changed, editingDemographics, demographicsDataset } = data.datasets;
+        const { shapes, expandedDatasets } = this.state;
         const c = this.className;
         const sqlWidth = this.getSqlWidth();
         const shape: PatientListDatasetShape = currentDataset ? currentDataset.shape : PatientListDatasetShape.Dynamic;
+        let sql = '';
         let currentCategory = undefined;
 
         if (currentDataset && currentDataset.categoryId) {
             currentCategory = data.datasetQueryCategories.categories.get(currentDataset.categoryId)!;
+        }
+
+        if (editingDemographics) {
+            sql = demographicsDataset!.sql;
+        } else if (currentDataset) {
+            sql = currentDataset.sql;
         }
         
         return (
@@ -164,7 +169,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                             {data.datasets.expectedColumns.map((col) => this.getColumnContent(col))}
                                         </div>
                                         <div className={`${c}-sql`}>
-                                            <SqlBox sql={currentDataset.sql} height={350} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
+                                            <SqlBox sql={sql} height={350} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
                                             <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
                                         </div>
                                     </div>
@@ -180,6 +185,55 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     </Row>
                 </Container>
             </div>
+        );
+    }
+
+    private getDatasetEditorContent = (dataset: AdminDatasetQuery) => {
+        const { dispatch, data } = this.props;
+        const { shapes, expandedDatasets } = this.state;
+        const sqlWidth = this.getSqlWidth();
+        const c = this.className;
+        let currentCategory = undefined;
+
+        if (dataset && dataset.categoryId) {
+            currentCategory = data.datasetQueryCategories.categories.get(dataset.categoryId)!;
+        }
+
+        return (
+            <Section header='Dataset'>
+                <Row>
+                    <Col md={4}>
+                    <TextArea 
+                        changeHandler={this.handleInputChange} propName={'name'} value={dataset.name}
+                        label='Name' required={true} subLabel='Text for this Dataset'
+                    />
+                    </Col>
+                    <Col md={4}>
+                        <DatasetQueryCategoryDropdown
+                            changeHandler={this.handleInputChange} 
+                            dispatch={dispatch} 
+                            currentCategory={currentCategory} 
+                            categories={data.datasetQueryCategories.categories}
+                        />
+                    </Col>
+                    <Col md={4}>
+                        <ShapeDropdown dispatch={dispatch} shapes={shapes} selected={dataset.shape} clickHandler={this.handleShapeClick}/>
+                    </Col>
+                </Row>
+
+                <div className={`${c}-sql-container`}>
+                    <div className={`${c}-column-container`}>
+                        {data.datasets.expectedColumns.map((col) => this.getColumnContent(col))}
+                    </div>
+                    <div className={`${c}-sql`}>
+                        <SqlBox sql={dataset.sql} height={350} width={sqlWidth} readonly={false} changeHandler={this.handleSqlChange}/>
+                        <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
+                    </div>
+                </div>
+
+                <Constraints dataset={dataset} changeHandler={this.handleInputChange} />
+
+            </Section>
         );
     }
 
@@ -258,8 +312,14 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      * Handles any direct changes to SQL input.
      */
     private handleSqlChange = (val: any) => {
-        const { dispatch } = this.props;
-        dispatch(setAdminDatasetSql(val));
+        const { dispatch, data } = this.props;
+        if (!data.datasets.editingDemographics) {
+            dispatch(setAdminDatasetSql(val));
+        } else {
+            const ds: AdminDemographicsDatasetQuery = { ...data.datasets.demographicsDataset!, sql: val };
+            dispatch(setAdminDemographicsDataset(ds, true));
+        }
+        
     }
 
     /*
@@ -303,6 +363,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      */
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
         const { dispatch, datasets, data } = this.props;
+        const { expandedDatasets } = this.state;
 
         if (data.datasets.changed) {
             const info: InformationModalState = {
@@ -318,10 +379,14 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             return;
         }
 
-        const ds = datasets.available[categoryIdx].datasets[datasetIdx];
+        const ds = expandedDatasets.available[categoryIdx].datasets[datasetIdx];
         if (ds) {
-            this.setState({ categoryIdx, datasetIdx, isDemographics: false });
-            dispatch(fetchAdminDatasetIfNeeded(ds)); 
+            if (ds.shape !== PatientListDatasetShape.Demographics) {
+                this.setState({ categoryIdx, datasetIdx });
+                dispatch(fetchAdminDatasetIfNeeded(ds)); 
+            } else {
+                dispatch(setAdminEditingDemographics());
+            }
         }
     }
 

@@ -13,6 +13,7 @@ export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
 export const SET_ADMIN_DATASET_SHAPE = 'SET_ADMIN_DATASET_SHAPE';
 export const SET_ADMIN_DEMOGRAPHICS_DATASET = 'SET_ADMIN_DEMOGRAPHICS_DATASET';
 export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_STATE';
+export const SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS = 'SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS';
 
 export interface AdminDatasetAction {
     changed?: boolean;
@@ -142,6 +143,12 @@ export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed:
         dataset,
         changed,
         type: SET_ADMIN_DATASET
+    };
+};
+
+export const setAdminEditingDemographics = (): AdminDatasetAction => {
+    return {
+        type: SET_ADMIN_PANEL_EDITING_DEMOGRAPHICS
     };
 };
 

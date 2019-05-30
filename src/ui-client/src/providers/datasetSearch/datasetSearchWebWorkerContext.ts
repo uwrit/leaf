@@ -166,6 +166,8 @@ var addDatasetsToCache = function (payload) {
     // Foreach dataset
     for (var i = 0; i < datasets.length; i++) {
         var ds = datasets[i];
+        if (ds.shape === 3) { continue; } // Ensure Demographics-shape datasets are excluded.
+        
         var tokens = ds.name.toLowerCase().split(' ');
         if (ds.category) {
             tokens = tokens.concat(ds.category.toLowerCase().split(' '));

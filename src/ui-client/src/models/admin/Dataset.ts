@@ -1,6 +1,3 @@
-import { PatientListDatasetShape } from "../patientList/Dataset";
-import { Constraint } from "./Concept";
-
 /* Copyright (c) 2019, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -8,8 +5,13 @@ import { Constraint } from "./Concept";
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+import { PatientListDatasetShape } from "../patientList/Dataset";
+import { Constraint } from "./Concept";
+
 export interface AdminDemographicsDatasetQuery {
+    changed?: boolean;
     sql: string;
+    unsaved?: boolean;
 }
 
 export interface DatasetQueryConstraint extends Constraint {

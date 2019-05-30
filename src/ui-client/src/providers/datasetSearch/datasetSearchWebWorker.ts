@@ -7,7 +7,7 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQueryDTO, CategorizedDatasetRef, PatientListDatasetShape } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
 const ADD_DATASETS = 'ADD_DATASETS';
@@ -288,6 +288,8 @@ export default class DatasetSearchEngineWebWorker {
             // Foreach dataset
             for (let i = 0; i < datasets!.length; i++) {
                 const ds = datasets![i];
+                if (ds.shape === 3) { continue; } // Ensure Demographics-shape datasets are excluded.
+
                 let tokens = ds.name.toLowerCase().split(' ');
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
