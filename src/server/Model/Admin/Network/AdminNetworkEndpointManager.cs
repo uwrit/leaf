@@ -88,10 +88,16 @@ namespace Model.Admin.Network
             return endpoints.Where(predicate);
         }
 
-        public async Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint item)
+        public async Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint e)
         {
-            validator.Validate(item);
-            var result = await updater.UpdateEndpointAsync(item);
+            Ensure.NotNull(e, nameof(e));
+            Ensure.NotNullOrWhitespace(e.Name, nameof(e.Name));
+            validator.Validate(e);
+            Ensure.NotNullOrWhitespace(e.Issuer, nameof(e.Issuer));
+            Ensure.NotNullOrWhitespace(e.KeyId, nameof(e.KeyId));
+            Ensure.NotNull(e.Certificate, nameof(e.Certificate));
+
+            var result = await updater.UpdateEndpointAsync(e);
             cache.Put(result.New);
             log.LogInformation("Updated NetworkEndpoint. Result:{@Result}", result);
             return result;

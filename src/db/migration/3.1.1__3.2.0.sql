@@ -43,22 +43,46 @@ GO
 
 -- =============================================
 -- Author:		Cliff Spital
--- Create date: 2018/6/12
+-- Create date: 2019/5/28
 -- Description:	Update the given network.Endpoint
 -- =============================================
 CREATE PROCEDURE [adm].[sp_UpdateEndpoint]
 	@id int,
 	@name nvarchar(200),
-	@address nvarchar(1000),
-	@issuer nvarchar(200),
-	@keyid nvarchar(200),
-	@certificate nvarchar(max),
+	@addr nvarchar(1000),
+	@iss nvarchar(200),
+	@kid nvarchar(200),
+	@cert nvarchar(max),
     @isResponder bit,
     @isInterrogator bit,
     @user auth.[User]
 AS
 BEGIN
 	SET NOCOUNT ON;
+
+    IF (@id IS NULL)
+		THROW 70400, N'NetworkEndpoint.Id is required.', 1;
+
+	IF (@name IS NULL)
+        THROW 70400, N'NetworkEndpoint.Name is required.', 1;
+    
+    IF (@addr IS NULL)
+        THROW 70400, N'NetworkEndpoint.Address is required.', 1;
+    
+    IF (@iss IS NULL)
+        THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
+    
+    IF (@kid IS NULL)
+        THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
+    
+    IF (@cert IS NULL)
+        THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
+    
+    IF (@isInterrogator IS NULL)
+        THROW 70400, N'NetworkEndpoint.IsInterrogator is required.', 1;
+
+    IF (@isResponder IS NULL)
+        THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
 
 	BEGIN TRAN;
 
@@ -68,12 +92,13 @@ BEGIN
 	UPDATE network.Endpoint
 	SET
 		Name = @name,
-		Address = @address,
-		Issuer = @issuer,
-		KeyId = @keyid,
-		Certificate = @certificate,
+		Address = @addr,
+		Issuer = @iss,
+		KeyId = @kid,
+		Certificate = @cert,
 		IsResponder = @isResponder,
-		IsInterrogator = @isInterrogator
+		IsInterrogator = @isInterrogator,
+        Updated = GETDATE()
 	OUTPUT
 		deleted.Id,
 		deleted.Name,
@@ -90,7 +115,6 @@ BEGIN
 
 	COMMIT;
 END
-
 GO
 
 
