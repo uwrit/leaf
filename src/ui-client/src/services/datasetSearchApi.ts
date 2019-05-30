@@ -6,12 +6,12 @@
  */ 
 
 import DatasetSearchEngineWebWorker from "../providers/datasetSearch/datasetSearchWebWorker";
-import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, CategorizedDatasetRef } from "../models/patientList/Dataset";
 
 
 const engine = new DatasetSearchEngineWebWorker();
 
-export const addDatasets = (datasets: PatientListDatasetQueryDTO[]): Promise<CategorizedDatasetRef[]> => {
+export const addDatasets = (datasets: PatientListDatasetQuery[]): Promise<CategorizedDatasetRef[]> => {
     return new Promise( async (resolve, reject) => {
         const result = await engine.addDatasets(datasets) as CategorizedDatasetRef[];
         resolve(result);

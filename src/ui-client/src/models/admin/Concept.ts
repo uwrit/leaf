@@ -106,10 +106,13 @@ export enum ConstraintType {
     Group = 2
 }
 
-export interface ConceptConstraint {
-    conceptId: string;
+export interface Constraint {
     constraintId: ConstraintType;
     constraintValue: string;
+}
+
+export interface ConceptConstraint extends Constraint {
+    conceptId: string;
 }
 
 export interface ConceptDeleteResponse {

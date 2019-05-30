@@ -7,14 +7,14 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownToggle, DropdownMenu, FormGroup } from 'reactstrap';
-import { ConstraintType, ConceptConstraint } from '../../../../models/admin/Concept';
+import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
 import { TextArea } from './TextArea';
 import { FaChevronDown } from 'react-icons/fa';
 
 interface Props {
-    changeHandler: (idx: number, newConstraint: ConceptConstraint) => any;
+    changeHandler: (idx: number, newConstraint: ConstraintModel) => any;
     deleteHandler: (idx: number) => any;
-    constraint: ConceptConstraint;
+    constraint: ConstraintModel;
     index: number;
 }
 
