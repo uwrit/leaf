@@ -14,7 +14,8 @@ export enum PatientListColumnType {
     string = 1,
     number = 2, 
     date = 3,
-    sparkline = 4
+    sparkline = 4,
+    boolean = 5
 }
 
 export interface PatientListColumnTemplate {

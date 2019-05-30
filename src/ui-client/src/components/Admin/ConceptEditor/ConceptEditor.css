@@ -230,7 +230,7 @@
 }
 
 .concept-editor-dropdown button {
-    background-color: rgba(28, 168, 221, 0.05);
+    background-color: rgba(28, 168, 221, 0.05) !important;
     border: 1px solid rgba(28, 168, 221, 0.1) !important;
     border-radius: 4px;
     box-shadow: none !important;

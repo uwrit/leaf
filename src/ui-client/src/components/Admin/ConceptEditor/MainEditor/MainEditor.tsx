@@ -61,7 +61,7 @@ export class MainEditor extends React.PureComponent<Props> {
                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>Delete Concept</Button>
+                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>Delete</Button>
                 </div>
                 }
 

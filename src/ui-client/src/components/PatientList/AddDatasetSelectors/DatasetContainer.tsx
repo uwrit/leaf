@@ -13,6 +13,7 @@ import { keys } from '../../../models/Keyboard';
 import { Input } from 'reactstrap';
 
 interface Props {
+    autoSelectOnSearch?: boolean;
     categoryIdx: number;
     datasetIdx: number;
     datasets: DatasetsState;
@@ -22,15 +23,23 @@ interface Props {
 }
 
 let dsCount = 0;
+let autoSelectOnSearch = false;
 
 export default class DatasetContainer extends React.PureComponent<Props> {
     private className = 'patientlist-add-dataset';
     constructor(props: Props) {
         super(props);
+        autoSelectOnSearch = !!props.autoSelectOnSearch;
+    }
+
+    public componentDidMount() {
+        const { datasets } = this.props;
+        dsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);
     }
 
     public getSnapshotBeforeUpdate() {
         const { datasets, handleDatasetSelect } = this.props;
+        if (!autoSelectOnSearch) { return null; }
         const newDsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);
 
         if (newDsCount && dsCount !== newDsCount) {
@@ -144,6 +153,8 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         }
 
         const cat = datasets.available[newCatIdx];
+        if (!cat) { return [categoryIdx, datasetIdx]; }
+
         const totalDatasets = cat.datasets.length;
         const maxDs = totalDatasets - 1;
 

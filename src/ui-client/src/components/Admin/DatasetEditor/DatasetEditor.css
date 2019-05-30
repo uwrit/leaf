@@ -1,3 +1,10 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
 /* Left Column */
 .dataset-editor-column-left {
     padding: 20px;
@@ -16,6 +23,11 @@
     z-index: 100;
 }
 
+.dataset-editor .required {
+    color: rgba(221, 41, 28, 0.699);
+    margin-left: 4px;
+}
+
 /* Header */
 .dataset-editor-column-right-header {
     margin-bottom: 20px;
@@ -29,6 +41,11 @@
     background-color: white;
 }
 
+.dataset-editor small {
+    color: rgb(130,130,130) !important;
+    margin-top: 0;
+}
+
 /* Main */
 .dataset-editor-main {
     background-color: rgb(240,240,240);
@@ -37,29 +54,56 @@
     padding: 20px 20px 75px;
 }
 
+.dataset-editor-column-container,
 .dataset-editor-sql {
-    overflow: hidden;
+    display: inline-block;
 }
 
-.dataset-editor-column-container svg {
-    margin-bottom: -3px;
-    margin-right: 3px;
+/* SQL */
+.dataset-editor-sql-container {
+    background-color: white;
+    display: flex;
+    padding: 8px;
+    position: relative;
 }
 
-.dataset-editor-column-container svg.present {
-    stroke: rgb(7, 192, 69);
+.dataset-editor-sql {
+    border-left: 1px solid rgb(240,240,240);
+    overflow-x: hidden;
+    padding: 30px 10px 0;
+    position: relative;
 }
 
-.dataset-editor-column-container svg.missing {
-    stroke: rgb(206, 185, 0);
+.dataset-editor-sql::after {
+    border-bottom: 1px solid rgb(240,240,240);
+    content: 'SQL Query';
+    font-size: 1.0rem;
+    left: 0;
+    margin: -4px 0 0 4px;
+    position: absolute;
+    top: 0;
 }
 
-.dataset-editor-shape,
-.dataset-editor-column {
-    font-family: Roboto;
+/* Input */
+.dataset-editor-column-right .form-group label {
+    font-size: 1.0rem;
+    margin-bottom: 0;
+}
+
+.dataset-editor-column-right .leaf-input,
+.dataset-editor-column-right .leaf-input:read-only {
+    background-color: rgba(28, 168, 221, 0.07) !important;
+    border-bottom-color: transparent !important;
     font-size: 1.1rem;
-    font-weight: 300;
-    min-height: 28px;
+}
+
+.dataset-editor-column-right .leaf-input:hover,
+.dataset-editor-column-right .leaf-input:focus {
+    background-color:rgba(28, 168, 221, 0.1) !important;
+}
+
+.dataset-editor-column-right text-area.leaf-input {
+    margin-top: 6px !important;
 }
 
 /* Shapes */
@@ -77,14 +121,60 @@
 }
 
 /* Columns */
+.dataset-editor-column-container {
+    height: 370px;
+    min-width: 200px;
+    overflow: auto;
+    padding: 30px 8px 8px;
+    position: relative;
+}
+
+.dataset-editor-column-container::after {
+    border-bottom: 1px solid rgb(240,240,240);
+    content: 'Expected Columns';
+    font-size: 1.0rem;
+    left: 0;
+    margin: 4px;
+    position: absolute;
+    top: 0;
+}
+
+.dataset-editor-column-container svg {
+    margin: 5px 0 0 4px;
+}
+
 .dataset-editor-column {
-    padding-left: 18px;
+    font-family: Roboto;
+    font-size: 1.0rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+    min-height: 25px;
+    padding-top: 2px;
+    transition: background-color 0.3s;
+}
+
+.dataset-editor-column > span {
+    margin-left: 20px;
+}
+
+.dataset-editor-column svg {
+    opacity: 0;
+    stroke: rgb(7, 192, 69);
+    position: absolute;
+    transition: opacity 0.3s;
 }
 
 .dataset-editor-column.present {
-    color: black !important;
-    font-weight: 500;
-    padding-left: 0;
+    background-color: rgba(7, 192, 69, 0.08);
+    border-radius: 4px;
+}
+
+.dataset-editor-column.present svg {
+    opacity: 1;
+}
+
+.dataset-editor-column.missing svg {
+    stroke: rgb(206, 185, 0);
 }
 
 .dataset-editor-column.missing {
@@ -92,5 +182,115 @@
 }
 
 .dataset-editor-column.optional {
-    color: rgb(150,150,150);
+    color: rgb(150,150,150) !important;
+    font-weight: 300;
+}
+
+/* Auto-format button */
+.dataset-editor-sql-autoformat {
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    cursor: pointer;
+    margin: 0;
+    padding: 4px 8px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    transition: all 0.2s;
+    width: 135px;
+    z-index: 100;
+}
+
+.dataset-editor-sql-autoformat:hover {
+    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.2);
+    color: black;
+}
+
+/* Dataset Query Category */
+.dataset-editor-dataset-query-category-dropdown .dropdown-item {
+    margin-right: 70px;
+    padding: 6px 20px;
+    position: relative;
+}
+
+.dataset-editor-dataset-query-category-edit-container {
+    padding: 4px 8px;
+    position: relative;
+}
+
+.dataset-editor-dataset-query-category-edit-container > div {
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+}
+
+.dataset-editor-dataset-query-category-edit-container > div > div {
+    width: 60%;
+}
+
+.dataset-editor-dataset-query-category-edit-container .leaf-input {
+    border: none !important
+}
+
+.dataset-editor-dataset-query-category-delete, 
+.dataset-editor-dataset-query-category-edit, 
+.dataset-editor-dataset-query-category-edit-undo, 
+.dataset-editor-dataset-query-category-edit-done {
+    border-radius: 4px 8px;
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 8px 6px 0 0;
+    padding: 2px 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dataset-editor-dataset-query-category-edit {
+    margin-right: 50px;
+}
+
+.dataset-editor-dataset-query-category-edit:hover {
+    color: rgb(28, 168, 221);
+}
+
+.dataset-editor-dataset-query-category-edit,
+.dataset-editor-dataset-query-category-delete {
+    margin-top: 6px;
+}
+
+.dataset-editor-dataset-query-category-delete:hover {
+    color: rgb(244, 67, 54);
+}
+
+.dataset-editor-dataset-query-category-edit-done {
+    color: rgb(28, 168, 221);
+    margin-right: 50px;
+}
+
+.dataset-editor-dataset-query-category-edit-done:hover {
+    background-color: rgb(240,240,240);
+}
+
+.dataset-editor-dataset-query-category-edit-undo:hover{
+    background-color: rgb(240,240,240);
+    color: rgb(28, 168, 221);
+}
+
+.dataset-editor-demographics-dataset {
+    border-left: 3px solid transparent;
+    color: rgb(70,70,70);
+    cursor: pointer;
+    font-size: 1.0rem;
+    outline: none;
+    padding: 4px 8px; 
+}
+
+.dataset-editor-demographics-dataset:hover,
+.dataset-editor-demographics-dataset.selected  {
+    background-color: rgba(28, 170, 221, 0.1);
+    border-left-color: #1CA8DD; 
 }

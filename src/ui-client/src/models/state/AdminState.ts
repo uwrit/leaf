@@ -10,7 +10,7 @@ import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
-import { AdminDatasetQuery, AdminDemographicsDatasetQuery } from '../admin/Dataset';
+import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 
 
@@ -61,11 +61,18 @@ export interface AdminPanelFilterState {
 
 export interface AdminDatasetState {
     changed: boolean;
-    columns: AdminPanelPatientListColumnTemplate[];
+    expectedColumns: AdminPanelPatientListColumnTemplate[];
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
-    demographicsDataset?: AdminDemographicsDatasetQuery;
+    demographicsDataset?: AdminDatasetQuery;
+    sqlColumns: Set<string>;
     state: AdminPanelLoadState;
+}
+
+export interface AdminDatasetQueryCategoryState {
+    changed: boolean;
+    categories: Map<number,DatasetQueryCategory>;
+    uneditedCategory?: DatasetQueryCategory;
 }
 
 export default interface AdminState {
@@ -75,6 +82,7 @@ export default interface AdminState {
     conceptEvents: AdminConceptEventState;
     configuration: AdminConfiguration;
     datasets: AdminDatasetState;
+    datasetQueryCategories: AdminDatasetQueryCategoryState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
     state: AdminPanelLoadState;
