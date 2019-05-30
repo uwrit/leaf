@@ -4,7 +4,7 @@ import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState, setPatientListDatasets, removePatientListDataset } from "../generalUi";
 import { PatientListDatasetQueryDTO, PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { getAdminDataset, createDataset, updateDataset, deleteDataset } from "../../services/admin/datasetApi";
+import { getAdminDataset, createDataset, updateDataset, deleteDataset, getAdminDemographicsDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { fetchAvailableDatasets } from "../../services/cohortApi";
 import { addDatasets } from "../../services/datasetSearchApi";
 
@@ -26,7 +26,7 @@ export interface AdminDatasetAction {
 
 // Asynchronous
 /*
- * Save a new Dataset.
+ * Saves a new Dataset.
  */
 export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
@@ -40,6 +40,31 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
 
             dispatch(setAdminDataset(newAdminDataset, false));
             
+            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+        } catch (err) {
+            console.log(err);
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            const info: InformationModalState = {
+                body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
+                header: "Error Saving Dataset",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        }
+    }
+};
+
+/*
+ * Saves the current demographics dataset.
+ */
+export const saveAdminDemographicsDataset = (dataset: AdminDemographicsDatasetQuery) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+
+        try {
+            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            const newAdminDataset = await upsertDemographicsDataset(state, dataset);
+            dispatch(setAdminDemographicsDataset(newAdminDataset, false));
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
@@ -120,16 +145,23 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQueryDTO) =
     };
 };
 
-export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
+export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery | AdminDemographicsDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
             const state = getState();
-            const admDataset = await getAdminDataset(state, dataset.id);
-            const datasets = await fetchAvailableDatasets(getState());
-            const datasetsCategorized = await addDatasets(datasets);
-            dispatch(setPatientListDatasets(datasetsCategorized));
-            dispatch(setAdminDataset(admDataset, false));
+            const { editingDemographics } = state.admin!.datasets;
+
+            if (editingDemographics) {
+                const admDataset = await getAdminDemographicsDataset(state);
+                dispatch(setAdminDemographicsDataset(admDataset, false));
+            } else {
+                const admDataset = await getAdminDataset(state, (dataset as AdminDatasetQuery).id);
+                const datasets = await fetchAvailableDatasets(getState());
+                const datasetsCategorized = await addDatasets(datasets);
+                dispatch(setPatientListDatasets(datasetsCategorized));
+                dispatch(setAdminDataset(admDataset, false));
+            }
         } catch (err) {
             console.log(err);
         }
