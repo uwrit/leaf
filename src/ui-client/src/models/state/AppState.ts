@@ -18,6 +18,7 @@ import { Panel } from "../panel/Panel";
 import { SavedQueriesState } from "../Query";
 import { SessionState } from "../Session";
 import AdminState from "./AdminState";
+import { CategorizedDatasetRef } from "../patientList/Dataset";
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -53,6 +54,12 @@ export interface MapState {
     viewport: Viewport;
 }
 
+export interface DatasetsState {
+    available: CategorizedDatasetRef[];
+    unfilteredAvailableCount: number;
+    searchTerm: string;
+}
+
 export interface AppState {
     admin?: AdminState;
     auth: AuthorizationState;
@@ -60,6 +67,7 @@ export interface AppState {
     conceptSearch: ConceptsSearchState;
     cohort: CohortState;
     dataExport: ExportState;
+    datasets: DatasetsState;
     panelFilters: PanelFilter[];
     generalUi: GeneralUiState;
     map: MapState;

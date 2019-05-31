@@ -19,7 +19,7 @@ import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { setPatientListDatasets, showConfirmationModal, setPatientListTotalDatasetsAvailableCount } from '../actions/generalUi';
+import { showConfirmationModal } from '../actions/generalUi';
 import { getSavedQueries, getQueriesAsConcepts } from '../services/queryApi';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
@@ -29,6 +29,7 @@ import { setPanelFilterActiveStates } from './panelFilter';
 import { addDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
 import { PatientListDatasetShape } from '../models/patientList/Dataset';
+import { setPatientListDatasets, setPatientListTotalDatasetsAvailableCount } from './datasets';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';

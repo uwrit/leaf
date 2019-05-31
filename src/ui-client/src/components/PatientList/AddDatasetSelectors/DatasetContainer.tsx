@@ -7,10 +7,10 @@
 
 import React from 'react';
 import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../../models/patientList/Dataset';
-import { searchPatientListDatasets, setDatasetSearchTerm } from '../../../actions/generalUi';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
 import { keys } from '../../../models/Keyboard';
 import { Input } from 'reactstrap';
+import { DatasetsState } from '../../../models/state/AppState';
+import { searchPatientListDatasets, setDatasetSearchTerm } from '../../../actions/datasets';
 
 interface Props {
     autoSelectOnSearch?: boolean;

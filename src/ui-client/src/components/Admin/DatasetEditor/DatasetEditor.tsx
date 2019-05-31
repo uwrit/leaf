@@ -21,11 +21,12 @@ import { FiCheck } from 'react-icons/fi';
 import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
 import formatSql from '../../../utils/formatSql';
 import { TextArea } from '../ConceptEditor/Sections/TextArea';
-import { setPatientListDatasetByIndex, showInfoModal, setPatientListDatasets } from '../../../actions/generalUi';
+import { setPatientListDatasetByIndex } from '../../../actions/datasets';
 import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { CategoryDropdown } from './CategoryDropdown/CategoryDropdown';
 import { Tagger } from './Tagger/Tagger';
+import { showInfoModal } from '../../../actions/generalUi';
 import './DatasetEditor.css';
 
 interface Props { 

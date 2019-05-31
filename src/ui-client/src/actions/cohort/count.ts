@@ -20,9 +20,10 @@ import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
 import { getPatientListFromNewBaseDataset } from './patientList';
 import { setAggregateVisualizationData, setNetworkVisualizationData } from './visualize';
-import { showInfoModal, getAllPatientListDatasets } from '../generalUi';
+import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
+import { getAllPatientListDatasets } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';

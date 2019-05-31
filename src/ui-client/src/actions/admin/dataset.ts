@@ -2,11 +2,12 @@ import { AdminDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
-import { showInfoModal, setNoClickModalState, setPatientListDatasets, setDatasetSearchTerm } from "../generalUi";
+import { showInfoModal, setNoClickModalState } from "../generalUi";
 import { PatientListDatasetQuery, PatientListDatasetShape, CategorizedDatasetRef } from "../../models/patientList/Dataset";
 import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { fetchAvailableDatasets } from "../../services/cohortApi";
 import { addDatasets } from "../../services/datasetSearchApi";
+import { setPatientListDatasets } from "../datasets";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
 export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
@@ -179,7 +180,7 @@ export const addDemographicsDatasetToSearch = () => {
     return async (dispatch: any, getState: () => AppState) => {
         dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADING));
         const state = getState();
-        const datasets = state.generalUi.datasets.available.reduce((a: PatientListDatasetQuery[], b: CategorizedDatasetRef) => a.concat(b.datasets), []);
+        const datasets = state.datasets.available.reduce((a: PatientListDatasetQuery[], b: CategorizedDatasetRef) => a.concat(b.datasets), []);
         datasets.unshift(demographics);
         const datasetsCategorized = await addDatasets(datasets);
         dispatch(setPatientListDatasets(datasetsCategorized));
@@ -190,7 +191,7 @@ export const addDemographicsDatasetToSearch = () => {
 export const removeDemographicsDatasetFromSearch = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        const datasets = state.generalUi.datasets.available
+        const datasets = state.datasets.available
             .reduce((a: PatientListDatasetQuery[], b: CategorizedDatasetRef) => (
                 a.concat(b.datasets.filter((d) => d.shape !== PatientListDatasetShape.Demographics))
             ), [])
