@@ -39,12 +39,16 @@ export default class DatasetContainer extends React.PureComponent<Props> {
 
     public getSnapshotBeforeUpdate() {
         const { datasets, handleDatasetSelect } = this.props;
-        if (!autoSelectOnSearch) { return null; }
         const newDsCount = datasets.available.reduce((a: number, b: CategorizedDatasetRef) => a + b.datasets.length, 0);
 
         if (newDsCount && dsCount !== newDsCount) {
             dsCount = newDsCount;
-            handleDatasetSelect(0, 0);
+            if (autoSelectOnSearch) {
+                handleDatasetSelect(0, 0);
+            } else {
+                handleDatasetSelect(0, -1);
+            }
+            
         }
         return null;
     }

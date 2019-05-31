@@ -26,11 +26,11 @@ export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDa
 
 export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
-    const ds = action.dataset! as AdminDatasetQuery;
+    const ds = action.dataset as AdminDatasetQuery;
     let expectedColumns = datasets.expectedColumns;
     let sqlColumns = datasets.sqlColumns;
 
-    if (!action.changed) {
+    if (ds && !action.changed) {
         const cols = getShapeColumns(ds.sql, ds.shape);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;
@@ -46,7 +46,6 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
             changed: action.changed,
             currentDataset: action.dataset,
             datasets: datasets.datasets,
-            editingDemographics: ds.shape === PatientListDatasetShape.Demographics,
             expectedColumns,
             sqlColumns
         }

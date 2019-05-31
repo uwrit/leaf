@@ -10,8 +10,8 @@ import { Col, Row, Button } from 'reactstrap';
 import { getPatientListDataset } from '../../../actions/cohort/patientList';
 import { DateBoundary } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from './DatasetContainer';
+import { DatasetsState } from '../../../models/state/AppState';
 
 interface Props {
     categoryIdx: number;

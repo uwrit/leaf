@@ -8,7 +8,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
-import { DatasetsState, InformationModalState } from '../../../models/state/GeneralUiState';
+import { InformationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
@@ -27,6 +27,7 @@ import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { CategoryDropdown } from './CategoryDropdown/CategoryDropdown';
 import { Tagger } from './Tagger/Tagger';
 import { showInfoModal } from '../../../actions/generalUi';
+import { DatasetsState } from '../../../models/state/AppState';
 import './DatasetEditor.css';
 
 interface Props { 
@@ -59,30 +60,21 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     public componentDidMount() {
         const { dispatch } = this.props;
-
-        /*
-         * Cache templated shapes.
-         */
         let shapes: PatientListDatasetShape[] = [];
+
         DefTemplates.forEach((t) => {
             if (t.shape !== PatientListDatasetShape.Demographics) { shapes.push(t.shape); }
         });
         shapes = shapes.sort((a,b) => PatientListDatasetShape[a] > PatientListDatasetShape[b] ? 1 : -1);
+
         this.setState({ shapes });
-        
-        /*
-         * Add demographics to possible datasets.
-         */
         dispatch(addDemographicsDatasetToSearch());
     }
 
     public componentWillUnmount() {
         const { dispatch } = this.props;
-
-        /*
-         * Remove demographics from possible datasets.
-         */
         dispatch(removeDemographicsDatasetFromSearch());
+        dispatch(setAdminDataset(undefined, false));
     }
 
     public render() {
@@ -186,7 +178,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                         <Section header='Identifiers'>
                             <TextArea 
                                 changeHandler={this.handleInputChange} propName={'universalId'} value={dataset.universalId}
-                                label='UniversalId' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.' locked={locked}
+                                label='Universal Id' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.' locked={locked}
                             />
                             <Tagger
                                 changeHandler={this.handleInputChange} propName={'tags'} tags={dataset.tags} locked={locked}
@@ -344,11 +336,13 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             dispatch(showInfoModal(info));
             return;
         }
-
-        const ds = datasets.available[categoryIdx].datasets[datasetIdx];
-        if (ds) {
-            this.setState({ categoryIdx, datasetIdx });
-            dispatch(fetchAdminDatasetIfNeeded(ds)); 
+        const cat = datasets.available[categoryIdx];
+        if (cat) {
+            const ds = cat.datasets[datasetIdx];
+            if (ds) {
+                this.setState({ categoryIdx, datasetIdx });
+                dispatch(fetchAdminDatasetIfNeeded(ds)); 
+            }
         }
     }
 

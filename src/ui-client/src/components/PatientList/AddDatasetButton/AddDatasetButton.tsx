@@ -12,8 +12,8 @@ import { NetworkResponderMap } from '../../../models/NetworkResponder';
 import { NetworkCohortState } from '../../../models/state/CohortState';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
 import { createPortal } from 'react-dom';
+import { DatasetsState } from '../../../models/state/AppState';
 import './AddDatasetButton.css';
 
 interface Props {

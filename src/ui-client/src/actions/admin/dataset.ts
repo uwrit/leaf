@@ -155,24 +155,23 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
 
 export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
-        try {
-            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
-            const state = getState();
-            const { currentDataset } = state.admin!.datasets;
+        const state = getState();
+        const { currentDataset, datasets, demographicsDataset } = state.admin!.datasets;
+        const { categories } = state.admin!.datasetQueryCategories;
 
-            if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
-                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false));
-            } else {
-                const admDataset = await getAdminDataset(state, dataset.id);
-                const datasets = await fetchAvailableDatasets(getState());
-                const datasetsCategorized = await addDatasets(datasets);
-                dispatch(setPatientListDatasets(datasetsCategorized));
-                dispatch(setAdminDataset(admDataset, false));
+        if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
+            dispatch(setAdminDataset(demographicsDataset, false));
+        } else {
+            const original = datasets.get(dataset.id)!;
+            const userDs: PatientListDatasetQuery = {
+                ...original,
+                category: original.categoryId 
+                    ? categories.get(original.categoryId)!.category
+                    : ''
             }
-        } catch (err) {
-            console.log(err);
+            dispatch(setAdminDataset(datasets.get(dataset.id), false));
+            
         }
-        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
     };
 };
 
