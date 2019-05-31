@@ -9,9 +9,7 @@ import { Routes, InformationModalState, ConfirmationModalState, NoClickModalStat
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
-import { CategorizedDatasetRef, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import { AppState } from '../models/state/AppState';
-import { searchDatasets, allowAllDatasets } from '../services/datasetSearchApi';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';

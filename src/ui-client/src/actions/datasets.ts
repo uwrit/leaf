@@ -5,23 +5,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef } from "../models/patientList/Dataset";
 import { AppState } from "../models/state/AppState";
 import { Dispatch } from "redux";
-import { searchDatasets, allowAllDatasets } from "../services/datasetSearchApi";
+import { searchDatasets, allowAllDatasets, allowDemographics } from "../services/datasetSearchApi";
 
-export const SET_PATIENTLIST_DATASETS = 'SET_PATIENTLIST_DATASETS';
-export const SET_PATIENTLIST_DATASET_BY_INDEX = 'SET_PATIENTLIST_DATASET_BY_INDEX';
-export const SET_DATASET_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
-export const SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT = 'SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT';
-export const REMOVE_PATIENTLIST_DATASET = 'REMOVE_PATIENTLIST_DATASET';
+export const SET_DATASET = 'SET_DATASET';
+export const MOVE_DATASET_CATEGORY = 'MOVE_DATASET_CATEGORY';
+export const SET_DATASETS = 'SET_DATASETS';
+export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASET_DISPLAY_ALL';
+export const SET_DATASETS_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
+export const SET_DATASETS_SEARCH_RESULT = 'SET_DATASET_SEARCH_RESULT';
+export const REMOVE_DATASET = 'REMOVE_DATASET';
+export const ADD_DATASET = 'ADD_DATASET';
 
 export interface DatasetAction {
+    category?: string;
+    categories?: CategorizedDatasetRef[];
     datasetsAvailableCount?: number;
     dataset?: PatientListDatasetQuery;
     datasetCategoryIndex?: number;
     datasetIndex?: number;
-    datasets?: CategorizedDatasetRef[];
+    datasets?: PatientListDatasetQuery[];
+    result?: DatasetSearchResult;
     searchTerm?: string;
     type: string;
 }
@@ -29,54 +35,89 @@ export interface DatasetAction {
 // Asynchronous
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        const results = await searchDatasets(searchTerm);
-        dispatch(setPatientListDatasets(results));
+        if (searchTerm) {
+            const results = await searchDatasets(searchTerm);
+            dispatch(setDatasetSearchResult(results));
+        } else {
+            dispatch(setDatasetsDisplayAll());
+        }
     };
 };
 
-export const getAllPatientListDatasets = () => {
+export const resetPatientListDatasets = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowAllDatasets();
-        dispatch(setPatientListDatasets(results));
+        dispatch(setDatasetSearchResult(results));
+        dispatch(setDatasetSearchTerm(''));
+    };
+};
+
+export const allowDemographicsDatasetInSearch = (allow: boolean) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const results = await allowDemographics(allow);
+        dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
 };
 
 // Synchronous
-export const setPatientListDatasets = (datasets: CategorizedDatasetRef[]): DatasetAction => {
+export const addDataset = (dataset: PatientListDatasetQuery): DatasetAction  => {
     return {
-        datasets,
-        type: SET_PATIENTLIST_DATASETS
+        dataset,
+        type: ADD_DATASET
     };
 };
 
-export const removePatientListDataset = (datasetCategoryIndex: number, datasetIndex: number): DatasetAction => {
-    return {
-        datasetCategoryIndex,
-        datasetIndex,
-        type: REMOVE_PATIENTLIST_DATASET
-    }
-};
-
-export const setPatientListDatasetByIndex = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): DatasetAction  => {
+export const setDataset = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): DatasetAction  => {
     return {
         dataset,
         datasetCategoryIndex,
         datasetIndex,
-        type: SET_PATIENTLIST_DATASET_BY_INDEX
+        type: SET_DATASET
     };
 };
 
-export const setPatientListTotalDatasetsAvailableCount = (datasetsAvailableCount: number): DatasetAction  => {
+export const moveDatasetCategory = (dataset: PatientListDatasetQuery, category: string): DatasetAction  => {
     return {
-        datasetsAvailableCount,
-        type: SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT
+        dataset,                    // dataset (with old category name)
+        category,                   // new category name
+        type: MOVE_DATASET_CATEGORY
+    };
+};
+
+
+export const setDatasets = (datasets: PatientListDatasetQuery[], categories: CategorizedDatasetRef[]): DatasetAction => {
+    return {
+        categories,
+        datasets,
+        type: SET_DATASETS
+    };
+};
+
+export const setDatasetsDisplayAll = (): DatasetAction => {
+    return {
+        type: SET_DATASETS_DISPLAY_ALL
     };
 };
 
 export const setDatasetSearchTerm = (searchTerm: string): DatasetAction  => {
     return {
         searchTerm,
-        type: SET_DATASET_SEARCH_TERM
+        type: SET_DATASETS_SEARCH_TERM
     };
+};
+
+export const setDatasetSearchResult = (result: DatasetSearchResult): DatasetAction => {
+    return {
+        result,
+        type: SET_DATASETS_SEARCH_RESULT
+    };
+};
+
+export const removeDataset = (datasetCategoryIndex: number, datasetIndex: number): DatasetAction => {
+    return {
+        datasetCategoryIndex,
+        datasetIndex,
+        type: REMOVE_DATASET
+    }
 };

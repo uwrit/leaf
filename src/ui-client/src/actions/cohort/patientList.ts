@@ -19,7 +19,7 @@ import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Pati
 import { allowDatasetInSearch, searchDatasets } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
 import { InformationModalState, NoClickModalStates } from '../../models/state/GeneralUiState';
-import { setPatientListDatasets } from '../datasets';
+import { setDatasetSearchResult } from '../datasets';
 
 // Cohort patient list actions
 export const REQUEST_PATIENT_LIST_DATA = 'REQUEST_PATIENT_LIST_DATA';
@@ -111,7 +111,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
             if (atLeastOneSucceeded) { 
                 allowDatasetInSearch(dataset.id, false);
                 const newDatasets = await searchDatasets(state.datasets.searchTerm);
-                dispatch(setPatientListDatasets(newDatasets));
+                dispatch(setDatasetSearchResult(newDatasets));
             } else if (responders.length) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
@@ -140,7 +140,7 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
         newPl.display = await removeDataset(newPl.configuration, def) as PatientListRow[];
         await allowDatasetInSearch(def.id, true);
         const newDatasets = await searchDatasets(state.datasets.searchTerm);
-        dispatch(setPatientListDatasets(newDatasets));
+        dispatch(setDatasetSearchResult(newDatasets));
         dispatch(setPatientListDisplay(newPl));
     };
 };

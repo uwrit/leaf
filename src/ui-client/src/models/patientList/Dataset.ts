@@ -143,9 +143,17 @@ export interface TokenizedDatasetRef {
 }
 
 /*
- * Return object from the dataset search web worker.
+ * Datasets organized by category, used for display in DatasetContainer component.
  */
 export interface CategorizedDatasetRef {
     category: string;
     datasets: PatientListDatasetQuery[];
+}
+
+/*
+ * Return object from the dataset search web worker.
+ */
+export interface DatasetSearchResult {
+    categories: CategorizedDatasetRef[];
+    datasetCount: number;
 }
