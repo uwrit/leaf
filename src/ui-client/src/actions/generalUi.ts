@@ -54,7 +54,7 @@ export const handleSidebarTabClick = (route: Routes) => {
         if (route === currentRoute) {
             return;
         } 
-        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed)) {
+        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed || state.admin!.datasets.changed)) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",

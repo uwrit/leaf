@@ -11,9 +11,9 @@ import { PatientListDatasetQuery, DatasetSearchResult } from "../models/patientL
 
 const engine = new DatasetSearchEngineWebWorker();
 
-export const addDatasets = (datasets: PatientListDatasetQuery[]): Promise<DatasetSearchResult> => {
+export const indexDatasets = (datasets: PatientListDatasetQuery[]): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.addDatasets(datasets) as DatasetSearchResult;
+        const result = await engine.indexDatasets(datasets) as DatasetSearchResult;
         resolve(result);
     });
 };

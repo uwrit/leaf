@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../../models/patientList/Dataset';
+import { CategorizedDatasetRef, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { keys } from '../../../models/Keyboard';
 import { Input } from 'reactstrap';
 import { DatasetsState } from '../../../models/state/AppState';
@@ -79,11 +79,11 @@ export default class DatasetContainer extends React.PureComponent<Props> {
                         return (
                         <div className={`${c}-select-category`} key={cat.category}>
                             <div className={`${c}-select-category-name`}>{cat.category}</div>
-                            {cat.datasets.map((d: PatientListDatasetQueryDTO, dsIdx: number) => {
+                            {cat.datasets.map((d: PatientListDatasetQuery, dsIdx: number) => {
                                 return (
                                     <div 
                                         key={d.id} 
-                                        className={this.setDatasetOptionClass(catIdx, dsIdx)} 
+                                        className={this.setDatasetOptionClass(d, catIdx, dsIdx)} 
                                         onClick={this.handleDatasetOptionClick.bind(null, catIdx, dsIdx)}
                                         onDoubleClick={handleDatasetRequest}
                                         onKeyDown={this.handleSearchKeydown}
@@ -182,8 +182,14 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         handleDatasetSelect(categoryIdx, datasetIdx);
     }
 
-    private setDatasetOptionClass = (catIdx: number, dsIdx: number) => {
+    private setDatasetOptionClass = (dataset: PatientListDatasetQuery, catIdx: number, dsIdx: number) => {
         const { categoryIdx, datasetIdx } = this.props;
-        return `${this.className}-select-dataset-option ${catIdx === categoryIdx && dsIdx === datasetIdx ? 'selected' : ''}`;
+        const c = this.className;
+        const classes = [ `${c}-select-dataset-option` ];
+
+        if (catIdx === categoryIdx && dsIdx === datasetIdx) { classes.push('selected'); }
+        if (dataset.unsaved) { classes.push('unsaved'); }
+
+        return classes.join(' ');
     }
 };

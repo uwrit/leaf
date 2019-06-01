@@ -10,7 +10,7 @@ import { generate as generateId } from 'shortid';
 import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
-const ADD_DATASETS = 'ADD_DATASETS';
+const INDEX_DATASETS = 'INDEX_DATASETS';
 const ALLOW_DATASET_IN_SEARCH = 'ALLOW_DATASET_IN_SEARCH';
 const ALLOW_ALL_DATASETS = 'ALLOW_ALL_DATASETS';
 const ALLOW_DEMOGRAPHICS = 'ALLOW_DEMOGRAPHICS';
@@ -49,7 +49,7 @@ export default class DatasetSearchEngineWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ADD_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, ALLOW_DEMOGRAPHICS])}
+            ${this.addMessageTypesToContext([INDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, ALLOW_DEMOGRAPHICS])}
             ${this.stripFunctionToContext(this.workerContext)}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -61,8 +61,8 @@ export default class DatasetSearchEngineWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public addDatasets = (datasets: PatientListDatasetQuery[]) => {
-        return this.postMessage({ message: ADD_DATASETS, datasets });
+    public indexDatasets = (datasets: PatientListDatasetQuery[]) => {
+        return this.postMessage({ message: INDEX_DATASETS, datasets });
     }
 
     public allowDatasetInSearch = (datasetId: string, allow: boolean) => {
@@ -112,7 +112,7 @@ export default class DatasetSearchEngineWebWorker {
 
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
-                case ADD_DATASETS:
+                case INDEX_DATASETS:
                     return addDatasetsToCache(payload);
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
@@ -378,8 +378,6 @@ export default class DatasetSearchEngineWebWorker {
                     }
                 }
             }
-
-            console.log(firstCharCache);
 
             if (!demographicsAllowed) {
                 all.pop();

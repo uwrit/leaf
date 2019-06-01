@@ -11,13 +11,14 @@ import { Dispatch } from "redux";
 import { searchDatasets, allowAllDatasets, allowDemographics } from "../services/datasetSearchApi";
 
 export const SET_DATASET = 'SET_DATASET';
-export const MOVE_DATASET_CATEGORY = 'MOVE_DATASET_CATEGORY';
+export const SET_DATASET_DISPLAY = 'SET_DATASET_DISPLAY';
 export const SET_DATASETS = 'SET_DATASETS';
 export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASET_DISPLAY_ALL';
 export const SET_DATASETS_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
 export const SET_DATASETS_SEARCH_RESULT = 'SET_DATASET_SEARCH_RESULT';
 export const REMOVE_DATASET = 'REMOVE_DATASET';
 export const ADD_DATASET = 'ADD_DATASET';
+export const MOVE_DATASET_CATEGORY = 'MOVE_DATASET_CATEGORY';
 
 export interface DatasetAction {
     category?: string;
@@ -35,12 +36,8 @@ export interface DatasetAction {
 // Asynchronous
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        if (searchTerm) {
-            const results = await searchDatasets(searchTerm);
-            dispatch(setDatasetSearchResult(results));
-        } else {
-            dispatch(setDatasetsDisplayAll());
-        }
+        const results = await searchDatasets(searchTerm);
+        dispatch(setDatasetSearchResult(results));
     };
 };
 
@@ -68,12 +65,19 @@ export const addDataset = (dataset: PatientListDatasetQuery): DatasetAction  => 
     };
 };
 
-export const setDataset = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): DatasetAction  => {
+export const setDataset = (dataset: PatientListDatasetQuery): DatasetAction  => {
+    return {
+        dataset,
+        type: SET_DATASET
+    };
+};
+
+export const setDatasetDisplay = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): DatasetAction  => {
     return {
         dataset,
         datasetCategoryIndex,
         datasetIndex,
-        type: SET_DATASET
+        type: SET_DATASET_DISPLAY
     };
 };
 
@@ -114,10 +118,9 @@ export const setDatasetSearchResult = (result: DatasetSearchResult): DatasetActi
     };
 };
 
-export const removeDataset = (datasetCategoryIndex: number, datasetIndex: number): DatasetAction => {
+export const removeDataset = (dataset: PatientListDatasetQuery): DatasetAction => {
     return {
-        datasetCategoryIndex,
-        datasetIndex,
+        dataset,
         type: REMOVE_DATASET
     }
 };

@@ -3,15 +3,17 @@ import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState } from "../generalUi";
-import { PatientListDatasetQuery, PatientListDatasetShape, CategorizedDatasetRef } from "../../models/patientList/Dataset";
+import { PatientListDatasetQuery, PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
-import { addDatasets } from "../../services/datasetSearchApi";
+import { indexDatasets, searchDatasets } from "../../services/datasetSearchApi";
+import { setDataset, removeDataset, setDatasetSearchResult } from "../datasets";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
 export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
 export const SET_ADMIN_DATASET_SHAPE = 'SET_ADMIN_DATASET_SHAPE';
 export const SET_ADMIN_DEMOGRAPHICS_DATASET = 'SET_ADMIN_DEMOGRAPHICS_DATASET';
 export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_STATE';
+export const REMOVE_ADMIN_DATASET = 'REMOVE_ADMIN_DATASET';
 
 export interface AdminDatasetAction {
     changed?: boolean;
@@ -41,14 +43,12 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
              * Reindex search engine.
              */
             const datasets: PatientListDatasetQuery[] = [];
-            const userDataset: PatientListDatasetQuery = {
-                ...dataset,
-                category: dataset.categoryId ? state.admin!.datasetQueryCategories.categories.get(dataset.categoryId)!.category : ''
-            }
-            
+            const userDataset = deriveUserDatasetFromAdmin(state, dataset);
+
             state.datasets.allMap.set(dataset.id, userDataset);
             state.datasets.allMap.forEach((ds) => datasets.push(ds));
-            await addDatasets(datasets);
+            await indexDatasets(datasets);
+            dispatch(setDataset(userDataset));
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
@@ -91,19 +91,26 @@ export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
 /*
  * Delete a existing concept.
  */
-export const deleteAdminDatasetFromServer = (dataset: AdminDatasetQuery) => {
+export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
+        let state = getState();
         dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
         deleteDataset(state, dataset)
             .then(
-                response => {
+                async (response) => {
+                    const userDataset = deriveUserDatasetFromAdmin(state, dataset);
+                    dispatch(removeDataset(userDataset));
+                    state = getState();
+
+                    const datasets: PatientListDatasetQuery[] = [];
+                    state.datasets.allMap.forEach((ds) => datasets.push(ds));
+                    await indexDatasets(datasets);
+                    dispatch(setAdminDataset(undefined, false));
                     dispatch(setNoClickModalState({ message: "Dataset Deleted", state: NoClickModalStates.Complete }));
-                    // dispatch(removePatientListDataset());
                 }, error => {
                     const info: InformationModalState = {
                         body: "An error occurred while attempting to delete the Dataset. Please see the Leaf error logs for details.",
-                        header: "Error Deleting Concept",
+                        header: "Error Deleting Dataset",
                         show: true
                     };
                     dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
@@ -164,22 +171,27 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
 
 export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
+        let state = getState();
         const { currentDataset, datasets, demographicsDataset } = state.admin!.datasets;
-        const { categories } = state.admin!.datasetQueryCategories;
 
         if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
             dispatch(setAdminDataset(demographicsDataset, false));
         } else {
-            const original = datasets.get(dataset.id)!;
-            const userDs: PatientListDatasetQuery = {
-                ...original,
-                category: original.categoryId 
-                    ? categories.get(original.categoryId)!.category
-                    : ''
+            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
+            const originalAdminDataset = datasets.get(dataset.id)!;
+            const userDataset = deriveUserDatasetFromAdmin(state, originalAdminDataset);
+            const results = await searchDatasets(state.datasets.searchTerm);
+
+            if (dataset.unsaved) {
+                dispatch(setAdminDataset(undefined, false));
+                dispatch(removeDataset(userDataset));
+            } else {
+                dispatch(setAdminDataset(originalAdminDataset, false));
+                dispatch(setDataset(userDataset));
             }
-            dispatch(setAdminDataset(datasets.get(dataset.id), false));
-            
+            dispatch(removeAdminDataset(dataset));
+            dispatch(setDatasetSearchResult(results));
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
         }
     };
 };
@@ -190,6 +202,13 @@ export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed:
         dataset,
         changed,
         type: SET_ADMIN_DATASET
+    };
+};
+
+export const removeAdminDataset = (dataset: AdminDatasetQuery): AdminDatasetAction => {
+    return {
+        dataset,
+        type: REMOVE_ADMIN_DATASET
     };
 };
 
@@ -220,4 +239,13 @@ export const setAdminPanelDatasetLoadState = (state: AdminPanelLoadState): Admin
         state,
         type: SET_ADMIN_PANEL_DATASET_LOAD_STATE
     };
+};
+
+const deriveUserDatasetFromAdmin = (state: AppState, dataset: AdminDatasetQuery): PatientListDatasetQuery => {
+    return {
+        ...dataset,
+        category: Boolean(dataset.categoryId)
+            ? state.admin!.datasetQueryCategories.categories.get(dataset.categoryId!)!.category 
+            : ''
+    }
 };

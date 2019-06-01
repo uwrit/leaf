@@ -68,19 +68,20 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
                             {/* Event Types */}
                             {cats.length > 0 && <DropdownItem divider={true}/>} 
                             {cats.map((cat) => {
-                                if (cat.id === editId) { return (
-                                    <div className={`${c}-dataset-query-category-edit-container`} key={cat.id}>
-                                        <TextArea 
-                                            propName='category' changeHandler={this.handleEdit} onClick={this.handleEditingItemClick} 
-                                            value={cat.category}
-                                        />
-                                        <span className={`${c}-dataset-query-category-edit-done`} onClick={this.handleEditDoneClick}>Done</span>
-                                        <span className={`${c}-dataset-query-category-edit-undo`} onClick={this.handleEditUndoClick}>Undo</span>
-                                    </div>
-                                )}
+                                if (cat.id === editId) { 
+                                    return (
+                                        <div className={`${c}-dataset-query-category-edit-container`} key={cat.id}>
+                                            <TextArea 
+                                                propName='category' changeHandler={this.handleEdit} onClick={this.handleEditingItemClick} 
+                                                value={cat.category}
+                                            />
+                                            <span className={`${c}-dataset-query-category-edit-done`} onClick={this.handleEditDoneClick}>Done</span>
+                                            <span className={`${c}-dataset-query-category-edit-undo`} onClick={this.handleEditUndoClick}>Undo</span>
+                                        </div>
+                                );}
                                 return (
                                 <DropdownItem key={cat.id} onClick={this.handleDropdownItemClick.bind(null, cat)}>
-                                    <div className={`${c}-dataset-query-category`} onClick={this.handleDropdownItemClick.bind(null, cat)}>
+                                    <div className={`${c}-dataset-query-category`}>
                                         {cat.category}
                                         <span className={`${c}-dataset-query-category-edit`} onClick={this.handleEditButtonClick.bind(null, cat)}>Edit</span>
                                         <span className={`${c}-dataset-query-category-delete`} onClick={this.handleDeleteButtonClick.bind(null, cat)}>Delete</span>
@@ -115,11 +116,15 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
 
         if (hasText) {
             let isDuplicate = false;
-            categories.forEach((cat) => { if (cat.category === current.category) { isDuplicate = true; } });
+            categories.forEach((cat) => { 
+                if (editId !== cat.id && cat.category === current.category) { 
+                    isDuplicate = true; 
+                } 
+            });
             
             if (isDuplicate) {
                 const info: InformationModalState = {
-                    body: "A Category with this name already exists. Please select a new category.",
+                    body: "A Category with this name already exists. Please create a different category name.",
                     header: "Error Saving Dataset Query Category",
                     show: true
                 };

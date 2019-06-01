@@ -15,7 +15,8 @@ import {
     SET_DATASETS_SEARCH_RESULT,
     REMOVE_DATASET,
     ADD_DATASET,
-    MOVE_DATASET_CATEGORY
+    MOVE_DATASET_CATEGORY,
+    SET_DATASET_DISPLAY
 } from "../actions/datasets";
 import { PatientListDatasetQuery, CategorizedDatasetRef } from "../models/patientList/Dataset";
 
@@ -55,13 +56,12 @@ const setDatasetsSearchTermResult = (state: DatasetsState, action: DatasetAction
     });
 };
 
-const setDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+const setDatasetDisplay = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     const categories = state.display.slice();
     const category = Object.assign({}, categories[action.datasetCategoryIndex!]);
 
     category.datasets[action.datasetIndex!] = action.dataset!;
     categories[action.datasetCategoryIndex!] = category;
-    state.allMap.set(action.dataset!.id, action.dataset!);
 
     return Object.assign({}, state, {
         allMap: new Map(state.allMap),
@@ -69,21 +69,57 @@ const setDataset = (state: DatasetsState, action: DatasetAction): DatasetsState 
     });
 };
 
-const removeDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    const categories = state.allCategorized.slice();
-    const category = Object.assign({}, categories[action.datasetCategoryIndex!]);
-    const ds = category.datasets[action.datasetIndex!];
+const setDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+    state.allMap.set(action.dataset!.id, action.dataset!);
 
-    if (ds) {
-        state.allMap.delete(ds.id);
-        category.datasets.splice(action.datasetIndex!, 1);
-        categories[action.datasetCategoryIndex!] = category;
+    return Object.assign({}, state, {
+        allMap: new Map(state.allMap)
+    });
+};
+
+const removeDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+    let categoryIdx = -1;
+    let dsIdx = -1;
+
+    /*
+     * Remove from 'all'
+     */
+    const allCategorized = state.allCategorized.slice();
+    categoryIdx = allCategorized.findIndex((cat) => cat.category === action.dataset!.category);
+
+    if (categoryIdx > -1) {
+        const categoryAll = allCategorized[categoryIdx];
+        dsIdx = categoryAll.datasets.findIndex((d) => d.id === action.dataset!.id);
+        if (dsIdx > -1) {
+            categoryAll.datasets.splice(dsIdx, 1);
+            if (!categoryAll.datasets.length) {
+                allCategorized.splice(categoryIdx, 1);
+            }
+        }
     }
+
+    /*
+     * Remove from 'display'
+     */
+    const display = state.display.slice();
+    categoryIdx = display.findIndex((cat) => cat.category === action.dataset!.category);
+
+    if (categoryIdx > -1) {
+        const categoryDisplay = display[categoryIdx];
+        dsIdx = categoryDisplay.datasets.findIndex((d) => d.id === action.dataset!.id);
+        if (dsIdx > -1) {
+            categoryDisplay.datasets.splice(dsIdx, 1);
+            if (!categoryDisplay.datasets.length) {
+                display.splice(categoryIdx, 1);
+            }
+        }
+    }
+    state.allMap.delete(action.dataset!.id);
 
     return Object.assign({}, state, {
         allMap: new Map(state.allMap),
-        allCategorized: categories,
-        display: categories,
+        allCategorized,
+        display,
         displayCount: state.displayCount - 1
     });
 };
@@ -125,55 +161,8 @@ const addDataset = (state: DatasetsState, action: DatasetAction): DatasetsState 
 
 const moveDatasetCategory = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     const { dataset, category } = action;
-    state.allMap.set(action.dataset!.id, action.dataset!);
-
-    /*
-    const clone = Object.assign({}, dataset, { category });
-    let oldCatIdx = -1;
-    let newCatIdx = -1;
-    let oldDsIdx = -1;
-    let oldCat = null;
-    let newCat = null;
-    */
-
-    /*
-    const allCategorized = state.allCategorized.slice();
-    oldCatIdx = allCategorized.findIndex((cat) => cat.category === dataset!.category);
-    if (oldCatIdx > -1) {
-        oldCat = allCategorized[oldCatIdx];
-        oldDsIdx = oldCat.datasets.findIndex((ds) => ds.id === dataset!.id)!;
-        oldCat.datasets.splice(oldDsIdx, 1);
-        if (!oldCat.datasets.length) {
-            allCategorized.splice(oldCatIdx, 1);
-        }
-    }
-
-    newCatIdx = allCategorized.findIndex((cat) => cat.category === action.category!);
-    if (newCatIdx > -1) {
-        newCat = allCategorized[newCatIdx];
-        newCat.datasets.unshift(clone);
-    }
-
-    const display = state.display.slice();
-    oldCatIdx = display.findIndex((cat) => cat.category === dataset!.category);
-    if (oldCatIdx > -1) {
-        oldCat = display[oldCatIdx];
-        oldDsIdx = oldCat.datasets.findIndex((ds) => ds.id === dataset!.id)!;
-        oldCat.datasets.splice(oldDsIdx, 1);
-        if (!oldCat.datasets.length) {
-            display.splice(oldCatIdx, 1);
-        }
-    }
-
-    newCatIdx = allCategorized.findIndex((cat) => cat.category === action.category!);
-    if (newCatIdx > -1) {
-        newCat = allCategorized[newCatIdx];
-        newCat.datasets.unshift(clone);
-    }
-    */
 
     return Object.assign({}, state, {
-        allMap: new Map(state.allMap),
         allCategorized: moveDatasetFromCategorizedArray(dataset!, category!, state.allCategorized),
         display: moveDatasetFromCategorizedArray(dataset!, category!, state.display)
     });
@@ -185,7 +174,7 @@ const moveDatasetFromCategorizedArray = (dataset: PatientListDatasetQuery, newCa
     /* 
      * Remove from old category array.
      */
-    const newCategories = categories.slice();
+    let newCategories = categories.slice();
     const oldCatIdx = newCategories.findIndex((cat) => cat.category === dataset.category);
     if (oldCatIdx > -1) {
         const oldCat = newCategories[oldCatIdx];
@@ -195,7 +184,6 @@ const moveDatasetFromCategorizedArray = (dataset: PatientListDatasetQuery, newCa
             newCategories.splice(oldCatIdx, 1);
         }
     }
-
     /*
      * Add into new category array.
      */
@@ -203,6 +191,10 @@ const moveDatasetFromCategorizedArray = (dataset: PatientListDatasetQuery, newCa
     if (newCatIdx > -1) {
         const newCat = newCategories[newCatIdx];
         newCat.datasets.unshift(clone);
+    } else {
+        const newCat: CategorizedDatasetRef = { category: newCategory, datasets: [ clone ] };
+        newCategories.push(newCat);
+        newCategories = newCategories.sort((a,b) => a.category > b.category ? 1 : -1);
     }
     return newCategories;
 };
@@ -220,6 +212,8 @@ export const datasets = (state: DatasetsState = defaultDatasetsState(), action: 
             return setDatasets(state, action);
         case SET_DATASET:
             return setDataset(state, action);
+        case SET_DATASET_DISPLAY:
+            return setDatasetDisplay(state, action);
         case SET_DATASETS_DISPLAY_ALL:
             return setDatasetsDisplayAll(state, action);
         case SET_DATASETS_SEARCH_TERM:
