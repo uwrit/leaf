@@ -24,7 +24,15 @@ const getIdTokenKey = (config: AuthConfig) => {
 const decodeToken = (token: string): UserContext => {
     const decoded = jwt_decode(token) as DecodedIdToken;
     const roles = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-    const name = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+    const fullname = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
+    const nameSplit = fullname.split('@');
+    let name = fullname;
+    let scope = '';
+
+    if (nameSplit.length === 2) {
+        name = nameSplit[0];
+        scope = nameSplit[1];
+    }
     
     const ctx: UserContext = {
         expirationDate: new Date(decoded.exp * 1000),
@@ -37,6 +45,7 @@ const decodeToken = (token: string): UserContext => {
         name,
         rawDecoded: decoded,
         roles,
+        scope,
         token,
         version: decoded['leaf-version']
     }

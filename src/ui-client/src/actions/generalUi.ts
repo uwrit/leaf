@@ -9,9 +9,7 @@ import { Routes, InformationModalState, ConfirmationModalState, NoClickModalStat
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
-import { CategorizedDatasetRef, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import { AppState } from '../models/state/AppState';
-import { searchDatasets, allowAllDatasets } from '../services/datasetSearchApi';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
@@ -19,12 +17,7 @@ import { CohortStateType } from '../models/state/CohortState';
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
 export const SET_ROUTE = 'SET_ROUTE';
 export const SET_ROUTE_CONFIG = 'SET_ROUTE_CONFIG';
-export const SET_PATIENTLIST_DATASETS = 'SET_PATIENTLIST_DATASETS';
-export const REMOVE_PATIENTLIST_DATASET = 'REMOVE_PATIENTLIST_DATASET';
-export const SET_PATIENTLIST_DATASET_BY_INDEX = 'SET_PATIENTLIST_DATASET_BY_INDEX';
 export const SET_BROWSER = 'SET_BROWSER';
-export const SET_DATASET_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
-export const SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT = 'SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT';
 export const TOGGLE_SAVE_QUERY_PANE = 'TOGGLE_SAVE_QUERY_PANE';
 export const TOGGLE_MY_LEAF_MODAL = 'TOGGLE_MY_LEAF_MODAL';
 export const MY_LEAF_MODAL_HIDE = 'MY_LEAF_MODAL_HIDE';
@@ -42,11 +35,6 @@ export interface GeneralUiAction {
     cohortCountBoxMinimized?: boolean;
     cohortInfoButtonVisible?: boolean;
     confirmModal?: ConfirmationModalState;
-    datasetsAvailableCount?: number;
-    dataset?: PatientListDatasetQuery;
-    datasetCategoryIndex?: number;
-    datasetIndex?: number;
-    datasets?: CategorizedDatasetRef[];
     infoModal?: InformationModalState;
     noclickModal?: NoClickModalState;
     searchTerm?: string;
@@ -57,21 +45,6 @@ export interface GeneralUiAction {
 }
 
 // Asynchronous
-export const searchPatientListDatasets = (searchTerm: string) => {
-    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        const results = await searchDatasets(searchTerm);
-        dispatch(setPatientListDatasets(results));
-    };
-};
-
-export const getAllPatientListDatasets = () => {
-    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        const results = await allowAllDatasets();
-        dispatch(setPatientListDatasets(results));
-        dispatch(setDatasetSearchTerm(''));
-    };
-};
-
 export const handleSidebarTabClick = (route: Routes) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
@@ -81,7 +54,7 @@ export const handleSidebarTabClick = (route: Routes) => {
         if (route === currentRoute) {
             return;
         } 
-        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed)) {
+        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed || state.admin!.datasets.changed)) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",
@@ -189,47 +162,9 @@ export const toggleExportDataModal = (): GeneralUiAction => {
     };
 };
 
-export const setPatientListDatasets = (datasets: CategorizedDatasetRef[]): GeneralUiAction => {
-    return {
-        datasets,
-        type: SET_PATIENTLIST_DATASETS
-    };
-};
-
-export const removePatientListDataset = (datasetCategoryIndex: number, datasetIndex: number): GeneralUiAction => {
-    return {
-        datasetCategoryIndex,
-        datasetIndex,
-        type: REMOVE_PATIENTLIST_DATASET
-    }
-};
-
-export const setPatientListDatasetByIndex = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): GeneralUiAction  => {
-    return {
-        dataset,
-        datasetCategoryIndex,
-        datasetIndex,
-        type: SET_PATIENTLIST_DATASET_BY_INDEX
-    };
-};
-
-export const setPatientListTotalDatasetsAvailableCount = (datasetsAvailableCount: number): GeneralUiAction  => {
-    return {
-        datasetsAvailableCount,
-        type: SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT
-    };
-};
-
 export const setBrowser = (browser: Browser): GeneralUiAction  => {
     return {
         browser,
         type: SET_BROWSER
     }
-};
-
-export const setDatasetSearchTerm = (searchTerm: string): GeneralUiAction  => {
-    return {
-        searchTerm,
-        type: SET_DATASET_SEARCH_TERM
-    };
 };

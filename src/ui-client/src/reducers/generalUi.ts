@@ -15,11 +15,13 @@ import {
     TOGGLE_EXPORT_DATA_MODAL, 
     TOGGLE_MY_LEAF_MODAL, 
     TOGGLE_SAVE_QUERY_PANE, 
-    SET_PATIENTLIST_DATASETS, 
     MY_LEAF_MODAL_HIDE,
     MY_LEAF_MODAL_SHOW,
-    SET_PATIENTLIST_DATASET_BY_INDEX,
-    REMOVE_PATIENTLIST_DATASET
+    INFO_MODAL_SHOW,
+    INFO_MODAL_HIDE,
+    CONFIRM_MODAL_SHOW,
+    CONFIRM_MODAL_HIDE,
+    NOCLICK_MODAL_SET_STATE
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -36,17 +38,8 @@ import {
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
 import { GeneralUiState, Routes, NoClickModalStates } from '../models/state/GeneralUiState';
-import {
-    INFO_MODAL_SHOW,
-    INFO_MODAL_HIDE,
-    CONFIRM_MODAL_SHOW,
-    CONFIRM_MODAL_HIDE,
-    NOCLICK_MODAL_SET_STATE,
-    SET_DATASET_SEARCH_TERM,
-    SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT
-} from '../actions/generalUi';
-import { CategorizedDatasetRef } from '../models/patientList/Dataset';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
+import { SET_DATASETS_DISPLAY_ALL } from '../actions/datasets';
 
 export const defaultGeneralUiState = (): GeneralUiState => {
     return {
@@ -63,11 +56,6 @@ export const defaultGeneralUiState = (): GeneralUiState => {
             noButtonText: "",
             show: false,
             yesButtonText: "",
-        },
-        datasets: {
-            available: [],
-            unfilteredAvailableCount: 0,
-            searchTerm: ''
         },
         informationModal: {
             body: "",
@@ -96,57 +84,7 @@ const setCohortCountBoxState = (state: GeneralUiState, boxVisible: boolean, boxM
     });
 };
 
-const setPatientListDatasets = (state: GeneralUiState, datasets: CategorizedDatasetRef[]): GeneralUiState => {
-    return Object.assign({}, state, {
-        datasets: {
-            ...state.datasets,
-            available: datasets,
-        }
-    });
-};
 
-const setPatientListDatasetByIndex = (state: GeneralUiState, action: GeneralUiAction): GeneralUiState => {
-    const available = state.datasets.available.slice();
-    const newDs = Object.assign({}, available[action.datasetCategoryIndex!].datasets[action.datasetIndex!], action.dataset);
-    available[action.datasetCategoryIndex!].datasets[action.datasetIndex!] = newDs;
-
-    return Object.assign({}, state, {
-        datasets: {
-            ...state.datasets,
-            available,
-        }
-    });
-};
-
-const removePatientListDatasetByIndex = (state: GeneralUiState, action: GeneralUiAction): GeneralUiState => {
-    const available = state.datasets.available.slice();
-    available[action.datasetCategoryIndex!].datasets.splice(action.datasetIndex!,1);
-
-    return Object.assign({}, state, {
-        datasets: {
-            ...state.datasets,
-            available,
-        }
-    });
-};
-
-const setPatientListDatasetSearchTerm = (state: GeneralUiState, searchTerm: string): GeneralUiState => {
-    return Object.assign({}, state, {
-        datasets: {
-            ...state.datasets,
-            searchTerm
-        }
-    });
-};
-
-const setPatientListDatasetTotalAvailable = (state: GeneralUiState, datasetsAvailableCount: number): GeneralUiState => {
-    return Object.assign({}, state, {
-        datasets: {
-            ...state.datasets,
-            unfilteredAvailableCount: datasetsAvailableCount
-        }
-    });
-};
 
 export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), action: GeneralUiAction): GeneralUiState => {
 
@@ -183,18 +121,6 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { noclickModal: action.noclickModal! });
         case SET_BROWSER:
             return Object.assign({}, state, { browser: action.browser! });
-
-        // Patient List datasets
-        case SET_PATIENTLIST_DATASETS:
-            return setPatientListDatasets(state, action.datasets!);
-        case SET_PATIENTLIST_DATASET_BY_INDEX:
-            return setPatientListDatasetByIndex(state, action);
-        case SET_DATASET_SEARCH_TERM:
-            return setPatientListDatasetSearchTerm(state, action.searchTerm!);
-        case SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT:
-            return setPatientListDatasetTotalAvailable(state, action.datasetsAvailableCount!);
-        case REMOVE_PATIENTLIST_DATASET:
-            return removePatientListDatasetByIndex(state, action);
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:
@@ -203,7 +129,7 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case SET_PANEL_DATE_FILTER:
         case SET_SUBPANEL_INCLUSION:
         case SET_SUBPANEL_MINCOUNT:
-        case SET_PATIENTLIST_TOTAL_DATASETS_AVAILABLE_COUNT:
+        case SET_DATASETS_DISPLAY_ALL:
         case SET_SUBPANEL_JOIN_SEQUENCE:
         case SELECT_CONCEPT_SPECIALIZATION:
         case DESELECT_CONCEPT_SPECIALIZATION:

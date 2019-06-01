@@ -69,6 +69,7 @@ export interface UserContext {
     name: string;
     rawDecoded: DecodedIdToken;
     roles: string[];
+    scope: string;
     token: string;
     version: string;
 }

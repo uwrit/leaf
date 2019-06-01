@@ -51,18 +51,13 @@ export interface NoClickModalState {
     state: NoClickModalStates;
 }
 
-export interface DatasetsState {
-    available: CategorizedDatasetRef[];
-    unfilteredAvailableCount: number;
-    searchTerm: string;
-}
+
 
 export interface GeneralUiState {
     browser?: Browser;
     cohortCountBox: CohortCountBoxState;
     confirmationModal: ConfirmationModalState;
     currentRoute: Routes;
-    datasets: DatasetsState;
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
     routes: RouteConfig[];

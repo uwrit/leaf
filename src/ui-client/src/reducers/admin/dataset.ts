@@ -24,13 +24,25 @@ export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDa
     });
 };
 
+export const removeAdminPanelDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
+    const datasets = state.datasets;
+    datasets.datasets.delete(action.dataset!.id);
+    
+    return Object.assign({}, state, { 
+        datasets: { 
+            ...state.datasets,
+            datasets: new Map(datasets.datasets),
+        }
+    });
+}
+
 export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
-    const ds = action.dataset! as AdminDatasetQuery;
+    const ds = action.dataset as AdminDatasetQuery;
     let expectedColumns = datasets.expectedColumns;
     let sqlColumns = datasets.sqlColumns;
 
-    if (!action.changed) {
+    if (ds && !action.changed) {
         const cols = getShapeColumns(ds.sql, ds.shape);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;
@@ -46,7 +58,6 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
             changed: action.changed,
             currentDataset: action.dataset,
             datasets: datasets.datasets,
-            editingDemographics: ds.shape === PatientListDatasetShape.Demographics,
             expectedColumns,
             sqlColumns
         }
@@ -67,7 +78,6 @@ export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatase
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { shape: action.shape }) as AdminDatasetQuery;
     const { expectedColumns, sqlColumns } = getShapeColumns(ds.sql, action.shape!);
-    datasets.datasets.set(ds.id, ds);
 
     return Object.assign({}, state, { 
         datasets: { 
@@ -84,7 +94,6 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { sql: action.sql }) as AdminDatasetQuery;
     const sqlColumns = new Set(getSqlColumns(action.sql!));
-    // datasets.datasets.set(ds.id, ds);
     datasets.expectedColumns.forEach((c) => c.present = sqlColumns.has(c.id));
 
     return Object.assign({}, state, { 

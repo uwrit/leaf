@@ -22,9 +22,9 @@ export const getDatasetQueryCategories = async (state: AppState): Promise<Datase
     const cats = resp.data as DatasetQueryCategory[];
     */
     const cats: DatasetQueryCategory[] = [
-        { id: 1, category: 'Labs' },
-        { id: 2, category: 'Procedures' },
-        { id: 3, category: 'Diagnoses' },
+        { id: 1, category: 'Encounters' },
+        { id: 2, category: 'Labs' },
+        { id: 3, category: 'Procedures' },
     ];
     return cats;
 };

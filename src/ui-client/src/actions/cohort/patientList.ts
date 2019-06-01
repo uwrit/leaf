@@ -17,8 +17,9 @@ import { PatientListDatasetQuery, PatientListDatasetDefinition } from '../../mod
 import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch, searchDatasets } from '../../services/datasetSearchApi';
-import { setPatientListDatasets, showInfoModal, setNoClickModalState } from '../generalUi';
+import { showInfoModal, setNoClickModalState } from '../generalUi';
 import { InformationModalState, NoClickModalStates } from '../../models/state/GeneralUiState';
+import { setDatasetSearchResult } from '../datasets';
 
 // Cohort patient list actions
 export const REQUEST_PATIENT_LIST_DATA = 'REQUEST_PATIENT_LIST_DATA';
@@ -109,8 +110,8 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
         .then( async () => {
             if (atLeastOneSucceeded) { 
                 allowDatasetInSearch(dataset.id, false);
-                const newDatasets = await searchDatasets(state.generalUi.datasets.searchTerm);
-                dispatch(setPatientListDatasets(newDatasets));
+                const newDatasets = await searchDatasets(state.datasets.searchTerm);
+                dispatch(setDatasetSearchResult(newDatasets));
             } else if (responders.length) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
@@ -138,8 +139,8 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
         newPl.configuration.singletonDatasets.delete(def.id);
         newPl.display = await removeDataset(newPl.configuration, def) as PatientListRow[];
         await allowDatasetInSearch(def.id, true);
-        const newDatasets = await searchDatasets(state.generalUi.datasets.searchTerm);
-        dispatch(setPatientListDatasets(newDatasets));
+        const newDatasets = await searchDatasets(state.datasets.searchTerm);
+        dispatch(setDatasetSearchResult(newDatasets));
         dispatch(setPatientListDisplay(newPl));
     };
 };
