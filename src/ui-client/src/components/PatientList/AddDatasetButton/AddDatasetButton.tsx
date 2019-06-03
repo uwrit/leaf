@@ -12,8 +12,8 @@ import { NetworkResponderMap } from '../../../models/NetworkResponder';
 import { NetworkCohortState } from '../../../models/state/CohortState';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
 import { createPortal } from 'react-dom';
+import { DatasetsState } from '../../../models/state/AppState';
 import './AddDatasetButton.css';
 
 interface Props {
@@ -125,7 +125,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         const c = this.className;
         const { categoryIdx, datasetIdx, showSelectorModal } = this.state;
         const { datasets, configuration } = this.props;
-        const cat = datasets.available[categoryIdx];
+        const cat = datasets.display[categoryIdx];
         const ds = cat ? cat.datasets[datasetIdx] : undefined;
         let selectedName = '';
 
@@ -139,7 +139,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
         if (configuration.isFetching) {
             return <div className={`${c}-button-dataset`}>Loading data...</div>;
-        } else if (showSelectorModal && datasets.available.length) {
+        } else if (showSelectorModal && datasets.display.length) {
             return <div className={`${c}-button-dataset`}>+ {selectedName}</div>;
         } else {
             return <span>+ Add More Data</span>;

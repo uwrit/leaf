@@ -9,8 +9,8 @@ import React from 'react';
 import { Dropdown, DropdownItem, DropdownToggle, DropdownMenu, FormGroup } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import Label from 'reactstrap/lib/Label';
-import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
-import { showConfirmationModal } from '../../../../actions/generalUi';
+import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { DatasetQueryCategory } from '../../../../models/admin/Dataset';
 import { TextArea } from '../../ConceptEditor/Sections/TextArea';
 import { saveAdminDatasetQueryCategory, removeAdminDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, setAdminUneditedDatasetQueryCategory, deleteAdminDatasetQueryCategory, setAdminDatasetQueryCategory } from '../../../../actions/admin/datasetQueryCategory';
@@ -68,19 +68,20 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
                             {/* Event Types */}
                             {cats.length > 0 && <DropdownItem divider={true}/>} 
                             {cats.map((cat) => {
-                                if (cat.id === editId) { return (
-                                    <div className={`${c}-dataset-query-category-edit-container`} key={cat.id}>
-                                        <TextArea 
-                                            propName='category' changeHandler={this.handleEdit} onClick={this.handleEditingItemClick} 
-                                            value={cat.category}
-                                        />
-                                        <span className={`${c}-dataset-query-category-edit-done`} onClick={this.handleEditDoneClick}>Done</span>
-                                        <span className={`${c}-dataset-query-category-edit-undo`} onClick={this.handleEditUndoClick}>Undo</span>
-                                    </div>
-                                )}
+                                if (cat.id === editId) { 
+                                    return (
+                                        <div className={`${c}-dataset-query-category-edit-container`} key={cat.id}>
+                                            <TextArea 
+                                                propName='category' changeHandler={this.handleEdit} onClick={this.handleEditingItemClick} 
+                                                value={cat.category}
+                                            />
+                                            <span className={`${c}-dataset-query-category-edit-done`} onClick={this.handleEditDoneClick}>Done</span>
+                                            <span className={`${c}-dataset-query-category-edit-undo`} onClick={this.handleEditUndoClick}>Undo</span>
+                                        </div>
+                                );}
                                 return (
                                 <DropdownItem key={cat.id} onClick={this.handleDropdownItemClick.bind(null, cat)}>
-                                    <div className={`${c}-dataset-query-category`} onClick={this.handleDropdownItemClick.bind(null, cat)}>
+                                    <div className={`${c}-dataset-query-category`}>
                                         {cat.category}
                                         <span className={`${c}-dataset-query-category-edit`} onClick={this.handleEditButtonClick.bind(null, cat)}>Edit</span>
                                         <span className={`${c}-dataset-query-category-delete`} onClick={this.handleDeleteButtonClick.bind(null, cat)}>Delete</span>
@@ -103,7 +104,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles editing blur events, basically toggle closes and 
+     * Handle editing blur events, basically toggle closes and 
      * 'Edit' clicks on different Categories while an active edit
      * is already happening.
      */
@@ -114,6 +115,22 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
         const hasText = current.category.trim().length > 0;
 
         if (hasText) {
+            let isDuplicate = false;
+            categories.forEach((cat) => { 
+                if (editId !== cat.id && cat.category === current.category) { 
+                    isDuplicate = true; 
+                } 
+            });
+            
+            if (isDuplicate) {
+                const info: InformationModalState = {
+                    body: "A Category with this name already exists. Please create a different category name.",
+                    header: "Error Saving Dataset Query Category",
+                    show: true
+                };
+                dispatch(showInfoModal(info));
+                return;
+            }
             if (current.changed) {
                 dispatch(saveAdminDatasetQueryCategory(current));
             }
@@ -128,7 +145,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles 'done' clicks, which just initiates the 'blur'
+     * Handle 'done' clicks, which just initiates the 'blur'
      * event flow. This could be removed in favor of just using
      * the blur handler, but is separate in case we need the behavior 
      * to diverge in the future.
@@ -138,7 +155,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles 'undo' clicks, which fallback to the pre-edit
+     * Handle 'undo' clicks, which fallback to the pre-edit
      * state and removes the Event if not saved on the server.
      */
     private handleEditUndoClick = () => {
@@ -156,14 +173,14 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Makes sure 'Edit' area clicks don't close the dropdown.
+     * Make sure 'Edit' area clicks don't close the dropdown.
      */
     private handleEditingItemClick = (e: React.MouseEvent<HTMLElement>) => {
         e.stopPropagation();
     }
 
     /*
-     * Handles 'edit' button clicks to allow editig on a given Category.
+     * Handle 'edit' button clicks to allow editig on a given Category.
      */
     private handleEditButtonClick = (cat: DatasetQueryCategory, e: React.MouseEvent<HTMLElement>) => {
         const { dispatch } = this.props;
@@ -179,7 +196,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles 'delete' button clicks, checking for confirmation first before deleting.
+     * Handle 'delete' button clicks, checking for confirmation first before deleting.
      */
     private handleDeleteButtonClick = (cat: DatasetQueryCategory, e: React.MouseEvent<HTMLElement>) => {
         const { dispatch } = this.props;
@@ -198,7 +215,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles edits by cloning and updating the edited object.
+     * Handle edits by cloning and updating the edited object.
      */
     private handleEdit = (val: any, propName: string) => {
         const { dispatch, categories } = this.props;
@@ -208,7 +225,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Toggles the dropdown 'isOpen' state.
+     * Toggle the dropdown 'isOpen' state.
      */
     private toggle = () => {
         const { isOpen, editId } = this.state;
@@ -221,7 +238,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles 'None' clicks in the dropdown, which represents
+     * Handle 'None' clicks in the dropdown, which represents
      * 'no cateogory' for a given dataset.
      */
     private handleNoneDropdownItemClick = () => {
@@ -230,7 +247,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles dropdown Category clicks.
+     * Handle dropdown Category clicks.
      */
     private handleDropdownItemClick = (cat: DatasetQueryCategory) => {
         const { changeHandler } = this.props;
@@ -238,7 +255,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles 'Add New Category' clicks by adding a new Category
+     * Handle 'Add New Category' clicks by adding a new Category
      * with a dummy id that is replaced on save.
      */
     private handleAddNewEventTypeClick = (e: React.MouseEvent<HTMLElement>) => {

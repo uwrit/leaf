@@ -19,16 +19,16 @@ import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { setPatientListDatasets, showConfirmationModal, setPatientListTotalDatasetsAvailableCount } from '../actions/generalUi';
+import { showConfirmationModal } from '../actions/generalUi';
 import { getSavedQueries, getQueriesAsConcepts } from '../services/queryApi';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
 import { setPanelFilterActiveStates } from './panelFilter';
-import { addDatasets } from '../services/datasetSearchApi';
+import { indexDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
-import { PatientListDatasetShape } from '../models/patientList/Dataset';
+import { setDatasets } from './datasets';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -119,9 +119,8 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
             const datasets = await fetchAvailableDatasets(getState());
-            const datasetsCategorized = await addDatasets(datasets.filter((d) => d.shape !== PatientListDatasetShape.Demographics));
-            dispatch(setPatientListDatasets(datasetsCategorized));
-            dispatch(setPatientListTotalDatasetsAvailableCount(datasets.length));
+            const datasetsCategorized = await indexDatasets(datasets);
+            dispatch(setDatasets(datasets, datasetsCategorized.categories));
             
             /*
              * Load saved queries.

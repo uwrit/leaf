@@ -9,9 +9,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { ConceptEditor } from '../../components/Admin/ConceptEditor/ConceptEditor';
 import AdminState, { AdminPanelPane } from '../../models/state/AdminState';
-import { AppState } from '../../models/state/AppState';
+import { AppState, DatasetsState } from '../../models/state/AppState';
 import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEditor';
-import { DatasetsState } from '../../models/state/GeneralUiState';
 
 interface StateProps { 
     admin?: AdminState;
@@ -58,7 +57,7 @@ class AdminPanel extends React.PureComponent<Props> {
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         admin: state.admin,
-        datasets: state.generalUi.datasets
+        datasets: state.datasets
     };
 }
 

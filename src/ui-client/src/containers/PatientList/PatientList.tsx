@@ -18,15 +18,13 @@ import DatasetColumnSelector from '../../components/PatientList/DatasetColumnSel
 import ExportDataModal from '../../components/PatientList/ExportDataModal/ExportDataModal';
 import Paginate from '../../components/PatientList/Paginate';
 import PatientListTable from '../../components/PatientList/PatientListTable';
-import { AppState, AuthorizationState } from '../../models/state/AppState';
+import { AppState, AuthorizationState, DatasetsState } from '../../models/state/AppState';
 import { CohortStateType, NetworkCohortState, PatientListState, CohortState } from '../../models/state/CohortState';
 import ExportState from '../../models/state/Export';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
-import { getCsvs } from '../../services/patientListApi';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { RowCount } from '../../components/PatientList/RowCount';
 import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
-import { DatasetsState } from '../../models/state/GeneralUiState';
 import './PatientList.css';
 
 interface OwnProps {
@@ -112,7 +110,7 @@ class PatientList extends React.PureComponent<Props, State> {
                             {datasetDefs.map((d: PatientListDatasetDefinition) => (
                                 <DatasetColumnSelector className={c} data={d} dispatch={dispatch} key={d.id} />
                             ))}
-                            {datasetDefs.length <= datasets.unfilteredAvailableCount &&
+                            {datasetDefs.length <= datasets.allMap.size &&
                             <AddDatasetButton 
                                 cohortMap={cohort.networkCohorts}
                                 configuration={patientList.configuration} 
@@ -182,7 +180,7 @@ class PatientList extends React.PureComponent<Props, State> {
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
         auth: state.auth,
-        datasets: state.generalUi.datasets,
+        datasets: state.datasets,
         exportState: state.dataExport,
         cohort: state.cohort,
         isIdentified: state.session.attestation!.isIdentified,

@@ -8,24 +8,27 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
-import { DatasetsState, InformationModalState } from '../../../models/state/GeneralUiState';
+import { InformationModalState, ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
 import { SqlBox } from '../../Other/SqlBox/SqlBox';
 import { Section } from '../ConceptEditor/Sections/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
-import { PatientListDatasetShape, PatientListDatasetQuery, CategorizedDatasetRef } from '../../../models/patientList/Dataset';
+import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../models/patientList/Column';
-import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, addDemographicsDatasetToSearch, removeDemographicsDatasetFromSearch } from '../../../actions/admin/dataset';
+import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { FiCheck } from 'react-icons/fi';
 import { ShapeDropdown } from './ShapeDropdown/ShapeDropdown';
 import formatSql from '../../../utils/formatSql';
 import { TextArea } from '../ConceptEditor/Sections/TextArea';
-import { setPatientListDatasetByIndex, showInfoModal, setPatientListDatasets } from '../../../actions/generalUi';
 import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { CategoryDropdown } from './CategoryDropdown/CategoryDropdown';
 import { Tagger } from './Tagger/Tagger';
+import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
+import { DatasetsState } from '../../../models/state/AppState';
+import { allowDemographicsDatasetInSearch, moveDatasetCategory, setDatasetDisplay, addDataset } from '../../../actions/datasets';
+import { generate as generateId } from 'shortid';
 import './DatasetEditor.css';
 
 interface Props { 
@@ -40,11 +43,6 @@ interface State {
     shapes: PatientListDatasetShape[];
 }
 
-const demographics: CategorizedDatasetRef = {
-    category: '',
-    datasets: [{ id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', name: 'Basic Demographics', tags: [] }]
-};
-
 export class DatasetEditor extends React.PureComponent<Props,State> {
     private className = 'dataset-editor';
     constructor(props: Props) {
@@ -56,38 +54,43 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         }
     }
 
+    public getSnapshotBeforeUpdate(prevProps: Props) {
+        const { datasets, data } = this.props;
+        if (data.datasets.currentDataset && prevProps.datasets.display !== datasets.display) {
+            this.updateDatasetIndexes();
+        }
+
+        return null;
+    }
+
+    public componentDidUpdate() { }
+
     public componentDidMount() {
         const { dispatch } = this.props;
-
-        /*
-         * Cache templated shapes.
-         */
         let shapes: PatientListDatasetShape[] = [];
-        DefTemplates.forEach((t) => {
-            if (t.shape !== PatientListDatasetShape.Demographics) { shapes.push(t.shape); }
+
+        DefTemplates.forEach((t) => { 
+            if (t.shape !== PatientListDatasetShape.Demographics) { 
+                shapes.push(t.shape);
+            }
         });
         shapes = shapes.sort((a,b) => PatientListDatasetShape[a] > PatientListDatasetShape[b] ? 1 : -1);
+
         this.setState({ shapes });
-        
-        /*
-         * Add demographics to possible datasets.
-         */
-        dispatch(addDemographicsDatasetToSearch());
+        dispatch(allowDemographicsDatasetInSearch(true));
     }
 
     public componentWillUnmount() {
         const { dispatch } = this.props;
-
-        /*
-         * Remove demographics from possible datasets.
-         */
-        dispatch(removeDemographicsDatasetFromSearch());
+        dispatch(allowDemographicsDatasetInSearch(false));
+        dispatch(setAdminDataset(undefined, false));
     }
 
     public render() {
         const { data, datasets, dispatch } = this.props;
         const { categoryIdx, datasetIdx, } = this.state;
         const { currentDataset, changed } = data.datasets;
+        const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
         const c = this.className;
 
         return (
@@ -103,6 +106,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 dispatch={dispatch}
                                 handleDatasetSelect={this.handleDatasetSelect}
                                 handleDatasetRequest={this.handleDatasetRequest}
+                                searchEnabled={!changed}
                             />
                         </Col>
                         <div className={`${c}-column-right`}>
@@ -110,12 +114,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* New, Undo, Save, Delete buttons */}
-                                {datasets.unfilteredAvailableCount > 0 &&
+                                {datasets.allMap.size > 0 &&
                                 <div className={`${c}-column-right-header`}>
-                                    <Button className='leaf-button leaf-button-addnew' disabled={changed}>+ Create New Dataset</Button>
+                                    <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                                    <Button className='leaf-button leaf-button-warning' disabled={!currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics}>Delete</Button>
+                                    <Button className='leaf-button leaf-button-warning' disabled={allowDelete} onClick={this.handleDeleteClick}>Delete</Button>
                                 </div>
                                 }        
 
@@ -157,7 +161,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                         </Col>
                         <Col md={4}>
                             <CategoryDropdown
-                                changeHandler={this.handleInputChange} 
+                                changeHandler={this.handleCategoryChange} 
                                 dispatch={dispatch} 
                                 currentCategory={currentCategory} 
                                 categories={data.datasetQueryCategories.categories}
@@ -185,7 +189,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                         <Section header='Identifiers'>
                             <TextArea 
                                 changeHandler={this.handleInputChange} propName={'universalId'} value={dataset.universalId}
-                                label='UniversalId' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.' locked={locked}
+                                label='Universal Id' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.' locked={locked}
                             />
                             <Tagger
                                 changeHandler={this.handleInputChange} propName={'tags'} tags={dataset.tags} locked={locked}
@@ -203,7 +207,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /* 
-     * Sets optional content.
+     * Set optional content.
      */
     private getStatusDependentContent = (state: AdminPanelLoadState, c: string) => {
         if (state === AdminPanelLoadState.LOADING) {
@@ -232,21 +236,16 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Triggers a fallback to unedited, undoing any current changes.
+     * Trigger a fallback to unedited, undoing any current changes.
      */
     private handleUndoChanges = () => {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
-
-        if (datasets.currentDataset!.unsaved) {
-            dispatch(setAdminDataset(undefined, false));
-        } else {
-            dispatch(revertAdminDatasetChanges(datasets.currentDataset!));
-        }
+        dispatch(revertAdminDatasetChanges(datasets.currentDataset!));
     }
 
     /*
-     * Handles initiation of saving async changes and syncing with the DB.
+     * Handle initiation of saving async changes and syncing with the DB.
      */
     private handleSaveChanges = () => {
         const { datasets} = this.props.data;
@@ -260,39 +259,83 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /* 
-     * Handles tracking of input changes to the Dataset.
+     * Handle tracking of input changes to the Dataset.
      */
     private handleInputChange = (val: any, propName: string) => {
-        const { datasetQueryCategories } = this.props.data;
-        const { currentDataset } = this.props.data.datasets;
+        const { data, datasets, dispatch } = this.props;
+        const { datasetQueryCategories } = data;
+        const { currentDataset } = data.datasets;
         const { categoryIdx, datasetIdx } = this.state;
-        const { dispatch } = this.props;
 
-        if (currentDataset!.shape !== PatientListDatasetShape.Demographics) {
-            const newAdminDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
-            const newDs: PatientListDatasetQuery = {
-                ...newAdminDs,
-                category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
-            };
+        const newAdminDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
+        const userDs = datasets.allMap.get(currentDataset!.id);
+        const newDs: PatientListDatasetQuery = {
+            ...userDs,
+            ...newAdminDs,
+            category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
+        };
 
-            dispatch(setAdminDataset(newAdminDs, true));
-            dispatch(setPatientListDatasetByIndex(newDs, categoryIdx, datasetIdx));
-        } else {
-            const newAdminDemogDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
-            dispatch(setAdminDataset(newAdminDemogDs, true));
-        }
+        dispatch(setAdminDataset(newAdminDs, true));
+        dispatch(setDatasetDisplay(newDs, categoryIdx, datasetIdx));
     }
 
     /*
-     * Handles any direct changes to SQL input.
+     * Handle any direct changes to SQL input.
      */
     private handleSqlChange = (val: any) => {
-        const { dispatch, data } = this.props;
+        const { dispatch } = this.props;
         dispatch(setAdminDatasetSql(val));
     }
 
     /*
-     * Handles clicks to the 'Auto-format' button, which pretty prints SQL.
+     * Handle changes to the Category dropdown.
+     */
+    private handleCategoryChange = (categoryId: number, propName: string) => {
+        const { data, dispatch, datasets } = this.props;
+        const { currentDataset } = data.datasets;
+        const { categoryIdx, datasetIdx } = this.state;
+
+        if (currentDataset!.categoryId !== categoryId) {
+            const newCategory = data.datasetQueryCategories.categories.get(categoryId);
+            const newCategoryText = newCategory ? newCategory.category : '';
+            const hadCategory = Boolean(currentDataset!.categoryId);
+
+            const adminDs: AdminDatasetQuery = Object.assign({}, currentDataset, { categoryId });
+            const userDs = datasets.allMap.get(currentDataset!.id);
+            const ds: PatientListDatasetQuery = {
+                ...userDs,
+                ...currentDataset!,
+                category: hadCategory
+                    ? data.datasetQueryCategories.categories.get(currentDataset!.categoryId!)!.category
+                    : ''
+            }
+            dispatch(setDatasetDisplay(ds, categoryIdx, datasetIdx));
+            dispatch(moveDatasetCategory(ds, newCategoryText));
+            dispatch(setAdminDataset(adminDs, true));
+        }
+    }
+
+    /*
+     * Update current dataset index after category change.
+     */
+    private updateDatasetIndexes = () => {
+        const { data, datasets } = this.props;
+        const { currentDataset } = data.datasets;
+        const hasCategory = Boolean(currentDataset!.categoryId);
+        const categoryText = hasCategory
+            ? data.datasetQueryCategories.categories.get(currentDataset!.categoryId!)!.category
+            : ''
+        const categoryIdx = datasets.display.findIndex((cat) => cat.category === categoryText);
+        if (categoryIdx > -1) {
+            const datasetIdx = datasets.display[categoryIdx].datasets.findIndex((ds) => ds.id === currentDataset!.id);
+            if (datasetIdx > -1) {
+                this.setState({ categoryIdx, datasetIdx });
+            }
+        }
+    }
+
+    /*
+     * Handle clicks to the 'Auto-format' button, which pretty prints SQL.
      */
     private handleAutoFormatClick = () => {
         const { currentDataset } = this.props.data.datasets;
@@ -303,7 +346,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Computes the width of the SQL container. This is needed because React Ace Editor
+     * Compute the width of the SQL container. This is needed because React Ace Editor
      * requires a hard-coded width in order to have predictable size.
      */
     private getSqlWidth = (): number => {
@@ -328,13 +371,15 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handles clicks or up/down arrow selections of datasets.
+     * Handle clicks or up/down arrow selections of datasets.
      */
     private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
         const { dispatch, data, datasets } = this.props;
+        const { changed } = data.datasets;
 
         if (data.datasets.state === AdminPanelLoadState.LOADING) { return; }
-        if (data.datasets.changed) {
+        if (changed && datasetIdx === -1) { return; }
+        if (changed) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",
@@ -343,21 +388,34 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             dispatch(showInfoModal(info));
             return;
         }
-
-        const ds = datasets.available[categoryIdx].datasets[datasetIdx];
-        if (ds) {
-            this.setState({ categoryIdx, datasetIdx });
-            dispatch(fetchAdminDatasetIfNeeded(ds)); 
+        const cat = datasets.display[categoryIdx];
+        if (cat) {
+            const ds = cat.datasets[datasetIdx];
+            if (ds) {
+                this.setState({ categoryIdx, datasetIdx });
+                dispatch(fetchAdminDatasetIfNeeded(ds)); 
+            }
         }
     }
 
+    /*
+     * Handle changes to the dataset shape.
+     */
     private handleShapeClick = (shape: PatientListDatasetShape) => {
         const { dispatch } = this.props;
         dispatch(setAdminDatasetShape(shape));
     }
 
+    /*
+     * Dummy function to satisfy dataset 'requests' if the 
+     * user hits enter. This function is used in the Patient List
+     * but serves no use in the Admin Panel.
+     */
     private handleDatasetRequest = () => null;
 
+    /*
+     * Get React elements depending on whether columns are present, optional, etc.
+     */
     private getColumnContent = (col: AdminPanelPatientListColumnTemplate) => {
         const classes = [ `${this.className}-column` ];
 
@@ -369,5 +427,59 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 <span>{col.id}</span>
             </div>
         );
+    }
+
+    /*
+     * Handle 'delete' button clicks.
+     */
+    private handleDeleteClick = () => {
+        const { dispatch, data } = this.props;
+        const { currentDataset } = data.datasets;
+
+        const confirm: ConfirmationModalState = {
+            body: `Are you sure you want to delete the Dataset, "${currentDataset!.name}" (id: ${currentDataset!.id})? ` +
+                  `This will take effect immediately and can't be undone.`,
+            header: 'Delete Dataset',
+            onClickNo: () => null,
+            onClickYes: () => { 
+                dispatch(deleteAdminDataset(currentDataset!)); 
+                this.setState({ categoryIdx: 0, datasetIdx: -1 }) 
+            },
+            show: true,
+            noButtonText: `No`,
+            yesButtonText: `Yes, Delete Dataset`
+        };
+        dispatch(showConfirmationModal(confirm));
+    }
+
+    /*
+     * Handle 'Create New Dataset' button clicks.
+     */
+    private handleCreateDatasetClick = () => {
+        const { dispatch } = this.props;
+        const id = generateId();
+        const name = 'New Dataset';
+        const shape = PatientListDatasetShape.Allergy;
+        const newAdminDs: AdminDatasetQuery = {
+            id,
+            constraints: [],
+            name,
+            shape,
+            sql: '',
+            tags: [],
+            unsaved: true
+        };
+        const newUserDs: PatientListDatasetQuery = {
+            id,
+            category: '',
+            name,
+            shape,
+            tags: [],
+            unsaved: true
+        };
+        dispatch(addDataset(newUserDs));
+        dispatch(setAdminDataset(newAdminDs, false));
+        dispatch(setAdminDataset(newAdminDs, true));
+        dispatch(setAdminDatasetSql('SELECT FROM dbo.table'));
     }
 }
