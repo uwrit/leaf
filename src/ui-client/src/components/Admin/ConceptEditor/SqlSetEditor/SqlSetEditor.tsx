@@ -12,7 +12,7 @@ import { checkIfAdminPanelUnsavedAndSetSubPane } from '../../../../actions/admin
 import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
 import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
 import { EditorPaneProps as Props } from '../Props';
-import { conceptEditorValid } from '../../../../utils/admin';
+import { conceptEditorValid } from '../../../../utils/admin/concept';
 import { SqlSetRow } from './SqlSetRow';
 import { InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../../actions/generalUi';

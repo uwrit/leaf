@@ -17,6 +17,7 @@ import './NetworkHealthResponder.css';
 
 interface Props {
     allowDisable: boolean;
+    forceUpdate: boolean;
     queryState: CohortStateType;
     dispatch: any;
     identity: NetworkIdentity;
@@ -25,12 +26,22 @@ interface Props {
 
 export default class NetworkHealthResponder extends React.Component<Props> {
     private className = 'header-networkhealth-responder';
+
     constructor(props: Props) {
         super(props);
     }
 
+    public static defaultProps = {
+        forceUpdate: false
+    }
+
     public shouldComponentUpdate(nextProps: Props) {
-        if (nextProps.identity.enabled !== this.props.identity.enabled) {
+        const { forceUpdate, identity } = this.props;
+
+        if (forceUpdate) {
+            return true;
+        }
+        if (nextProps.identity.enabled !== identity.enabled) {
             return true;
         }
         return false;

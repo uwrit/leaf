@@ -12,7 +12,7 @@ import Label from 'reactstrap/lib/Label';
 import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { DatasetQueryCategory } from '../../../../models/admin/Dataset';
-import { TextArea } from '../../ConceptEditor/Sections/TextArea';
+import { TextArea } from '../../Section/TextArea';
 import { saveAdminDatasetQueryCategory, removeAdminDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, setAdminUneditedDatasetQueryCategory, deleteAdminDatasetQueryCategory, setAdminDatasetQueryCategory } from '../../../../actions/admin/datasetQueryCategory';
 import FormText from 'reactstrap/lib/FormText';
 
@@ -52,11 +52,11 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>Category</Label>
                 <FormText color="muted">Domain or data type</FormText>
-                <div className={`concept-editor-dropdown ${c}-dataset-query-category-dropdown`}>
+                <div className={`admin-panel-dropdown ${c}-dataset-query-category-dropdown`}>
                     <Dropdown isOpen={isOpen} toggle={this.toggle}>
                         <DropdownToggle disabled={locked}>
                             {display}
-                            <FaChevronDown className={`concept-editor-dropdown-chevron`}/>
+                            <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                         </DropdownToggle>
                         <DropdownMenu>
 

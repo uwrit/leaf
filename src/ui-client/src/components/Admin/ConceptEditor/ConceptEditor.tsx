@@ -50,7 +50,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-column-left-overlay ${showSqlPreview || showPanelPreview ? 'show' : ''}`}></div>
                             <ConceptColumnContainer />
                         </Col>
-                        <div className={`${c}-column-right`}>
+                        <div className={`${c}-column-right admin-panel-editor`}>
                             {this.getCurrentPane()}
                         </div>
                     </Row>

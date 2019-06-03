@@ -42,19 +42,49 @@ import {
     SET_ADMIN_SQL_SETS_UNCHANGED,
     SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED
 } from '../../actions/admin/sqlSet';
+import { 
+    SET_ADMIN_CONCEPT_EVENTS, 
+    REMOVE_ADMIN_CONCEPT_EVENT, 
+    UNDO_ADMIN_CONCEPT_EVENT_CHANGE, 
+    SET_ADMIN_UNEDITED_CONCEPT_EVENT 
+} from "../../actions/admin/conceptEvent";
+import { 
+    REMOVE_CONCEPT 
+} from "../../actions/concepts";
+import { 
+    SET_ADMIN_PANEL_DATASET_LOAD_STATE, 
+    SET_ADMIN_DATASET, 
+    SET_ADMIN_DEMOGRAPHICS_DATASET, 
+    SET_ADMIN_DATASET_SHAPE, 
+    SET_ADMIN_DATASET_SQL 
+} from "../../actions/admin/dataset";
+import { 
+    SET_ADMIN_DATASET_QUERY_CATEGORIES, 
+    SET_ADMIN_UNEDITED_DATASET_QUERY_CATEGORY, 
+    UNDO_ADMIN_DATASET_QUERY_CATEGORY_CHANGE, 
+    REMOVE_ADMIN_DATASET_QUERY_CATEGORY 
+} from "../../actions/admin/datasetQueryCategory";
+import { 
+    SET_ADMIN_NETWORK_IDENTITY, 
+    SET_ADMIN_NETWORK_ENDPOINT, 
+    SET_ADMIN_NETWORK_ENDPOINTS, 
+    REVERT_ADMIN_NETWORK_CHANGES, 
+    REMOVE_ADMIN_NETWORK_ENDPOINT
+} from "../../actions/admin/networkAndIdentity";
+import { 
+    SET_ADMIN_SQL_CONFIGURATION, 
+    AdminConfigurationAction 
+} from "../../actions/admin/configuration";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept } from './concept';
-import { SET_ADMIN_SQL_CONFIGURATION, AdminConfigurationAction } from "../../actions/admin/configuration";
 import { setAdminSqlConfiguration } from "./configuration";
-import { REMOVE_CONCEPT } from "../../actions/concepts";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
 import { setAdminConceptSpecializationGroups, removeAdminConceptSpecializationGroup, syncAdminConceptSpecializationGroupUnsavedWithSaved } from "./specializationGroup";
 import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAdminConceptSpecializationUnsavedWithSaved } from "./specialization";
-import { SET_ADMIN_CONCEPT_EVENTS, REMOVE_ADMIN_CONCEPT_EVENT, UNDO_ADMIN_CONCEPT_EVENT_CHANGE, SET_ADMIN_UNEDITED_CONCEPT_EVENT } from "../../actions/admin/conceptEvent";
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
-import { SET_ADMIN_PANEL_DATASET_LOAD_STATE, SET_ADMIN_DATASET, SET_ADMIN_DEMOGRAPHICS_DATASET, SET_ADMIN_DATASET_SHAPE, SET_ADMIN_DATASET_SQL } from "../../actions/admin/dataset";
 import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql } from "./dataset";
-import { SET_ADMIN_DATASET_QUERY_CATEGORIES, SET_ADMIN_UNEDITED_DATASET_QUERY_CATEGORY, UNDO_ADMIN_DATASET_QUERY_CATEGORY_CHANGE, REMOVE_ADMIN_DATASET_QUERY_CATEGORY } from "../../actions/admin/datasetQueryCategory";
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
+import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, revertAdminNetworkChanges, removeAdminNetworkEndpoint } from "./networkAndIdentity";
+
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -90,6 +120,13 @@ export const defaultAdminState = (): AdminState => {
         datasetQueryCategories: {
             changed: false,
             categories: new Map()
+        },
+        networkAndIdentity: {
+            changed: false,
+            endpoints: new Map(),
+            identity: getDefaultIdentity(),
+            uneditedEndpoints: new Map(),
+            uneditedIdentity: getDefaultIdentity()
         },
         panelFilters: {
             changed: false,
@@ -216,6 +253,18 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return undoAdminDatasetQueryCategoryChange(state, action);
         case REMOVE_ADMIN_DATASET_QUERY_CATEGORY:
             return removeAdminDatasetQueryCategory(state, action);
+
+        // Network Identity & Endpoints
+        case SET_ADMIN_NETWORK_IDENTITY:
+            return setAdminNetworkIdentity(state, action);
+        case SET_ADMIN_NETWORK_ENDPOINT:
+            return setAdminNetworkEndpoint(state, action);
+        case SET_ADMIN_NETWORK_ENDPOINTS:
+            return setAdminNetworkEndpoints(state, action);
+        case REMOVE_ADMIN_NETWORK_ENDPOINT:
+            return removeAdminNetworkEndpoint(state, action);
+        case REVERT_ADMIN_NETWORK_CHANGES:
+            return revertAdminNetworkChanges(state, action);
 
         default:
             return state;

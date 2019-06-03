@@ -10,7 +10,7 @@ import { ConceptSqlSet, ConceptSqlSetDeleteResponse } from "../../models/admin/C
 import { getSqlSets, createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { getApiUpdateQueue } from "../../utils/admin";
+import { getApiUpdateQueue } from "../../utils/admin/concept";
 
 export const SET_ADMIN_SQL_SETS = 'SET_ADMIN_SQL_SETS';
 export const SET_ADMIN_UNEDITED_SQL_SETS = 'SET_ADMIN_UNEDITED_SQL_SETS';

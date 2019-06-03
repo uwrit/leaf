@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { FormGroup, Input as BSInput, Label, FormText } from 'reactstrap';
-import { PropertyProps as Props } from '../Props';
+import { PropertyProps as Props } from '../ConceptEditor/Props';
 
 interface State {
     valid: boolean;

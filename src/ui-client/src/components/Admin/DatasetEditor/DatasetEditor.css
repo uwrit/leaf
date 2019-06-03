@@ -23,11 +23,6 @@
     z-index: 100;
 }
 
-.dataset-editor .required {
-    color: rgba(221, 41, 28, 0.699);
-    margin-left: 4px;
-}
-
 /* Header */
 .dataset-editor-column-right-header {
     margin-bottom: 20px;
@@ -82,42 +77,6 @@
     margin: -4px 0 0 4px;
     position: absolute;
     top: 0;
-}
-
-/* Input */
-.dataset-editor-column-right .form-group label {
-    font-size: 1.0rem;
-    margin-bottom: 0;
-}
-
-.dataset-editor-column-right .leaf-input,
-.dataset-editor-column-right .leaf-input:read-only {
-    background-color: rgba(28, 168, 221, 0.07) !important;
-    border-bottom-color: transparent !important;
-    font-size: 1.1rem;
-}
-
-.dataset-editor-column-right .leaf-input:hover,
-.dataset-editor-column-right .leaf-input:focus {
-    background-color:rgba(28, 168, 221, 0.1) !important;
-}
-
-.dataset-editor-column-right text-area.leaf-input {
-    margin-top: 6px !important;
-}
-
-/* Shapes */
-.dataset-editor-shape {
-    border-left: 4px solid transparent;
-    cursor: pointer;
-    margin-left: 2px;
-    padding: 4px 8px;
-}
-
-.dataset-editor-shape.selected,
-.dataset-editor-shape:hover {
-    border-left-color: #1CA8DD;
-    background-color: rgba(28, 170, 221, 0.1);
 }
 
 /* Columns */

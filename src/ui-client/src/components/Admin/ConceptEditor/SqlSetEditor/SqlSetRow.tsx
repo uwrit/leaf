@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { Row, Col, Container } from 'reactstrap';
-import { Checkbox } from '../Sections/Checkbox';
-import { TextArea } from '../Sections/TextArea';
+import { Checkbox } from '../../Section/Checkbox';
+import { TextArea } from '../../Section/TextArea';
 import { ConceptSqlSet, SpecializationGroup, ConceptEvent } from '../../../../models/admin/Concept';
 import { Collapse } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';

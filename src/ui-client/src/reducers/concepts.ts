@@ -28,7 +28,7 @@ import {
 import { ConceptsAction } from '../actions/concepts';
 import { ConceptMap, ConceptsState } from '../models/state/AppState';
 import { Concept, ExtensionConcept } from '../models/concept/Concept';
-import { getRootId } from '../utils/admin';
+import { getRootId } from '../utils/admin/concept';
 
 export const defaultConceptsState = (): ConceptsState => {
     return {

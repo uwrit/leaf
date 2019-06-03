@@ -1,0 +1,29 @@
+.identity-editor .admin-panel-section {
+    border: 1px solid rgb(245,245,245);
+    margin-top: 15px;
+}
+
+.identity-preview {
+    background-color: rgb(245,245,245);
+    display: flex;
+    padding: 20px;
+}
+
+.identity-preview-left {
+    background-color: rgba(0, 48, 66, 1);
+}
+
+.identity-preview-left,
+.identity-preview-right {
+    vertical-align: top;
+}
+
+.identity-preview-right {
+    float: right;
+}
+
+.identity-preview .header-networkhealth-responder {
+    border-color: transparent !important;
+    color: white;
+    width: auto !important;
+}

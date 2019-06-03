@@ -23,8 +23,8 @@ export interface NetworkIdentity extends NetworkIdentityResponseDTO {
     description?: string;
     isHomeNode: boolean;
     totalPatients?: number;
-    latitude: number;
-    longitude: number;
+    latitude?: number;
+    longitude?: number;
     primaryColor: string;
     runtime: RuntimeMode;
     secondaryColor: string;

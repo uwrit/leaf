@@ -6,8 +6,8 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
-import { Checkbox } from './Checkbox';
+import { Section } from '../../Section/Section';
+import { Checkbox } from '../../Section/Checkbox';
 import { SectionProps } from '../Props';
 import { Container } from 'reactstrap';
 

@@ -8,9 +8,11 @@
 import React from 'react';
 import { Tooltip } from 'reactstrap';
 import { RouteConfig } from '../../config/routes';
+import { AdminPanelConceptEditorPane } from '../../models/state/AdminState';
 
 interface Props {
     config: RouteConfig;
+    currentAdminPane: AdminPanelConceptEditorPane;
     dispatch: any;
     isActive: boolean;
     clickHandler: (i: number) => void;
@@ -30,7 +32,7 @@ export class SidebarTab extends React.PureComponent<Props, State> {
     }
     
     public render () {
-        const { selectable, isActive, config, clickHandler, dispatch } = this.props;
+        const { selectable, isActive, config, clickHandler, dispatch, currentAdminPane } = this.props;
         const c = 'sidebar';
         const id = `${c}-tab_${config.index}`;
         const classes = [ `${c}-tab` ];
@@ -62,7 +64,9 @@ export class SidebarTab extends React.PureComponent<Props, State> {
                     <div className={`${c}-subroute-container`}>
                         {config.subRoutes.map((r,i) => {
                             return (
-                                <div className={`${c}-subroute`} key={i} onClick={r.clickHandler.bind(null, dispatch)}>
+                                <div 
+                                    className={`${c}-subroute ${isActive && i+1 === currentAdminPane ? 'selected' : ''}`} 
+                                    key={i} onClick={r.clickHandler.bind(null, dispatch)}>
                                     {r.display}
                                 </div>
                             );

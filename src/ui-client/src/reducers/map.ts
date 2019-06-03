@@ -11,7 +11,7 @@ import { MapState } from '../models/state/AppState';
 import { Viewport } from '../models/state/Map';
 
 const centerOfUS: number[] = [ 42.76314586689494, -95.70117187500001 ];
-const defaultBounds: LatLngBounds = new LatLngBounds([ [47.6062, -122.3321], [39.3299, -76.6205] ])
+const defaultBounds: LatLngBounds = new LatLngBounds([ [47.6062, -122.3321], [39.3299, -76.6205] ]);
 
 export function defaultMapState(): MapState {
     return {
