@@ -10,8 +10,8 @@ import { Col, Row, Button } from 'reactstrap';
 import { getPatientListDataset } from '../../../actions/cohort/patientList';
 import { DateBoundary } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
-import { DatasetsState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from './DatasetContainer';
+import { DatasetsState } from '../../../models/state/AppState';
 
 interface Props {
     categoryIdx: number;
@@ -64,7 +64,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                 <div className={`${c}-select-footer`}>
                     <Button 
                         className="leaf-button leaf-button-primary" 
-                        disabled={datasets.available.length === 0}
+                        disabled={datasets.displayCount === 0}
                         onClick={this.handleDatasetRequest}
                         style={{ float: 'right' }}>
                         Add Dataset
@@ -86,7 +86,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
 
     private handleDatasetRequest = () => {
         const { datasets, categoryIdx, datasetIdx, selectedDates, dispatch, handleDatasetSelect } = this.props;
-        const cat = datasets.available[categoryIdx];
+        const cat = datasets.display[categoryIdx];
         const ds = cat ? cat.datasets[datasetIdx] : undefined;
 
         if (ds) {

@@ -6,7 +6,7 @@
  */ 
 
 import { CohortStateType } from '../state/CohortState';
-import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, PatientListColumnType, ValueByColumnKey } from './Column';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, ValueByColumnKey } from './Column';
 import { PatientListRowDTO } from './Patient';
 import { DateBoundary } from '../panel/Date';
 
@@ -83,7 +83,11 @@ export interface PatientListDatasetQueryDTO {
     description?: string;
     name: string;
     shape: PatientListDatasetShape;
+    tags: string[];
     universalId?: string;
+}
+
+export interface PatientListDatasetQuery extends PatientListDatasetQueryDTO {
     unsaved?: boolean;
 }
 
@@ -133,15 +137,23 @@ export interface PatientListDatasetDefinition extends PatientListDatasetDefiniti
  */
 export interface TokenizedDatasetRef {
     id: PatientListDatasetId;
-    dataset: PatientListDatasetQueryDTO;
+    dataset: PatientListDatasetQuery;
     token: string;
     tokenArray: string[];
 }
 
 /*
- * Return object from the dataset search web worker.
+ * Datasets organized by category, used for display in DatasetContainer component.
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: PatientListDatasetQueryDTO[];
+    datasets: PatientListDatasetQuery[];
+}
+
+/*
+ * Return object from the dataset search web worker.
+ */
+export interface DatasetSearchResult {
+    categories: CategorizedDatasetRef[];
+    datasetCount: number;
 }

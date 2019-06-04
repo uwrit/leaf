@@ -13,12 +13,13 @@ import { fetchDataset } from '../../services/cohortApi';
 import { addDemographicsDataset, addMultirowDataset, getPatients, removeDataset } from '../../services/patientListApi';
 import { DateBoundary } from '../../models/panel/Date';
 import { PatientListColumn } from '../../models/patientList/Column';
-import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetDefinition } from '../../models/patientList/Dataset';
+import { PatientListDatasetQuery, PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch, searchDatasets } from '../../services/datasetSearchApi';
-import { setPatientListDatasets, showInfoModal, setNoClickModalState } from '../generalUi';
+import { showInfoModal, setNoClickModalState } from '../generalUi';
 import { InformationModalState, NoClickModalStates } from '../../models/state/GeneralUiState';
+import { setDatasetSearchResult } from '../datasets';
 
 // Cohort patient list actions
 export const REQUEST_PATIENT_LIST_DATA = 'REQUEST_PATIENT_LIST_DATA';
@@ -43,7 +44,7 @@ export interface CohortPatientListAction {
     id: number;
     column?: PatientListColumn;
     datasetId?: string;
-    datasets?: PatientListDatasetQueryDTO[];
+    datasets?: PatientListDatasetQuery[];
     dates?: DateBoundary;
     patientList?: PatientListState;
     rowCount?: number;
@@ -72,7 +73,7 @@ const switchArrayPositions = (arr: any[], oldIdx: number, newIdx: number) => {
  * Request a patient list dataset from each responder which is 
  * enabled and has loaded demographics.
  */
-export const getPatientListDataset = (dataset: PatientListDatasetQueryDTO, dates: DateBoundary) => {
+export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: DateBoundary) => {
     return (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const responders: NetworkIdentity[] = [];
@@ -109,8 +110,8 @@ export const getPatientListDataset = (dataset: PatientListDatasetQueryDTO, dates
         .then( async () => {
             if (atLeastOneSucceeded) { 
                 allowDatasetInSearch(dataset.id, false);
-                const newDatasets = await searchDatasets(state.generalUi.datasets.searchTerm);
-                dispatch(setPatientListDatasets(newDatasets));
+                const newDatasets = await searchDatasets(state.datasets.searchTerm);
+                dispatch(setDatasetSearchResult(newDatasets));
             } else if (responders.length) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
@@ -138,8 +139,8 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
         newPl.configuration.singletonDatasets.delete(def.id);
         newPl.display = await removeDataset(newPl.configuration, def) as PatientListRow[];
         await allowDatasetInSearch(def.id, true);
-        const newDatasets = await searchDatasets(state.generalUi.datasets.searchTerm);
-        dispatch(setPatientListDatasets(newDatasets));
+        const newDatasets = await searchDatasets(state.datasets.searchTerm);
+        dispatch(setDatasetSearchResult(newDatasets));
         dispatch(setPatientListDisplay(newPl));
     };
 };

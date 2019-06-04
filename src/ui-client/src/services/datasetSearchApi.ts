@@ -6,22 +6,22 @@
  */ 
 
 import DatasetSearchEngineWebWorker from "../providers/datasetSearch/datasetSearchWebWorker";
-import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, DatasetSearchResult } from "../models/patientList/Dataset";
 
 
 const engine = new DatasetSearchEngineWebWorker();
 
-export const addDatasets = (datasets: PatientListDatasetQueryDTO[]): Promise<CategorizedDatasetRef[]> => {
+export const indexDatasets = (datasets: PatientListDatasetQuery[]): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.addDatasets(datasets) as CategorizedDatasetRef[];
+        const result = await engine.indexDatasets(datasets) as DatasetSearchResult;
         resolve(result);
     });
 };
 
-export const searchDatasets = (searchTerm: string): Promise<CategorizedDatasetRef[]> => {
+export const searchDatasets = (searchTerm: string): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
         const term = searchTerm.trim().toLowerCase();
-        const result = await engine.searchDatasets(term) as CategorizedDatasetRef[];
+        const result = await engine.searchDatasets(term) as DatasetSearchResult;
         resolve(result);
     });
 };
@@ -33,9 +33,16 @@ export const allowDatasetInSearch = (datasetId: string, include: boolean) => {
     });
 };
 
-export const allowAllDatasets = (): Promise<CategorizedDatasetRef[]> => {
+export const allowAllDatasets = (): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.allowAllDatasets() as CategorizedDatasetRef[];
+        const result = await engine.allowAllDatasets() as DatasetSearchResult;
+        resolve(result);
+    });
+};
+
+export const allowDemographics = (allow: boolean): Promise<DatasetSearchResult> => {
+    return new Promise( async (resolve, reject) => {
+        const result = await engine.allowDemographics(allow) as DatasetSearchResult;
         resolve(result);
     });
 };
