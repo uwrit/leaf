@@ -13,16 +13,6 @@ namespace Tests
 {
     public class PatientCohortTests
     {
-        [Fact]
-        public void SeasonedPatients_Should_Only_Export_Up_To_MaxSize()
-        {
-            var cohort = new PatientCohort
-            {
-                PatientIds = new HashSet<string>(new string[]
-                {
-                    "a","b","c","d","e","f","g"
-                })
-            };
-        }
+        // TODO(cspital) fill this out
     }
 }

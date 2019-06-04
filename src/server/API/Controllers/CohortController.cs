@@ -60,10 +60,14 @@ namespace API.Controllers
                 log.LogInformation("Request cancelled.");
                 return NoContent();
             }
-            catch (InvalidOperationException ie)
+            catch (LeafCompilerException ce)
             {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ie.Message);
+                log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
                 return BadRequest();
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
             }
             catch (Exception ex)
             {
@@ -150,11 +154,6 @@ namespace API.Controllers
             catch (FormatException fe)
             {
                 log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (LeafPreflightException lpe)
-            {
-                log.LogInformation("Dataset query failed preflight check. Error:{Error}", lpe.Message);
                 return BadRequest();
             }
             catch (OperationCanceledException)

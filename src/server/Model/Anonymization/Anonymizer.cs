@@ -14,6 +14,7 @@ using Model.Schema;
 
 namespace Model.Anonymization
 {
+    using System.Runtime.Serialization;
     using Actor = Action<object, PropertyInfo, Guid, Guid>;
 
     public class Anonymizer<T>
@@ -149,12 +150,12 @@ namespace Model.Anonymization
 
                 if (!prop.CanRead || !prop.CanWrite)
                 {
-                    throw new InvalidOperationException($"{prop.DeclaringType.ToString()}.{prop.Name} property must have a public getter and setter.");
+                    throw new LeafAnonymizerException(prop, $"Property must have a public getter and setter.");
                 }
 
                 if (!attr.Mask && !IsNullable(prop))
                 {
-                    throw new InvalidOperationException($"Unmaskable Phi must be nullable. Property: {prop.DeclaringType.ToString()}.{prop.Name}.");
+                    throw new LeafAnonymizerException(prop, $"Unmaskable Phi must be nullable.");
                 }
 
                 infos.Add(pair);
@@ -178,5 +179,23 @@ namespace Model.Anonymization
     {
         public PropertyInfo Prop { get; set; }
         public FieldAttribute Attr { get; set; }
+    }
+
+    public class LeafAnonymizerException : Exception
+    {
+        public PropertyInfo Property { get; set; }
+
+        readonly string _message;
+        public override string Message => $"{_message ?? ""} Property: {Property.DeclaringType.ToString()}.{Property.Name}";
+        public LeafAnonymizerException(PropertyInfo prop)
+        {
+            Property = prop;
+        }
+
+        public LeafAnonymizerException(PropertyInfo prop, string message)
+        {
+            Property = prop;
+            _message = message;
+        }
     }
 }

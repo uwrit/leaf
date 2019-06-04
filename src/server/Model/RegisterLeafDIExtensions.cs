@@ -42,6 +42,7 @@ namespace Model
             services.AddTransient<AdminConceptEventManager>();
             services.AddTransient<AdminConceptManager>();
             services.AddTransient<AdminNetworkEndpointManager>();
+            services.AddTransient<AdminDatasetQueryManager>();
 
             return services;
         }

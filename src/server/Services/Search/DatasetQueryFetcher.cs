@@ -3,20 +3,17 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
 using Model.Search;
-using Services.Extensions;
 using Services.Tables;
 
 namespace Services.Search
@@ -24,16 +21,13 @@ namespace Services.Search
     public class DatasetQueryFetcher : IDatasetQueryFetcher
     {
         readonly IUserContext user;
-        readonly ILogger<DatasetQueryFetcher> log;
         readonly AppDbOptions opts;
 
         public DatasetQueryFetcher(
             IUserContext userContext,
-            IOptions<AppDbOptions> dbOptions,
-            ILogger<DatasetQueryFetcher> logger)
+            IOptions<AppDbOptions> dbOptions)
         {
             user = userContext;
-            log = logger;
             opts = dbOptions.Value;
         }
 
@@ -45,7 +39,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     CRUDQuery.getDatasetQueries,
-                    new { user = user.UUID, groups = GroupMembership.From(user) },
+                    new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

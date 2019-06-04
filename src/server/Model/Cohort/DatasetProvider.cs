@@ -52,7 +52,6 @@ namespace Model.Cohort
         /// <param name="cancel">Cancelcellation token.</param>
         /// <param name="early">Early time bound.</param>
         /// <param name="late">Late time bound.</param>
-        /// <exception cref="LeafPreflightException"/>
         /// <exception cref="LeafRPCException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>

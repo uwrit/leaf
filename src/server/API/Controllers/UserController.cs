@@ -91,15 +91,19 @@ namespace API.Controllers
             {
                 if (blacklistCache.IsBlacklisted(userContext.IdNonce))
                 {
+                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce, attestation);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
                 var token = jwtProvider.AccessToken(HttpContext, attestation);
+
+                logger.LogInformation("Created Access Token. Attestation:{@Attestation} Token:{Token}", attestation, token);
+
                 return Ok(new AccessTokenDTO { AccessToken = token });
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to produce access token. Error:{Error}", e.ToString());
+                logger.LogError("Failed to produce access token. Attestation:{@Attestation} Error:{Error}", attestation, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -118,10 +122,14 @@ namespace API.Controllers
             {
                 if (blacklistCache.IsBlacklisted(userContext.IdNonce))
                 {
+                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
                 var token = jwtProvider.AccessToken(HttpContext);
+
+                logger.LogInformation("Refreshed Access Token. Token:{Token}", token);
+
                 return Ok(new AccessTokenDTO { AccessToken = token });
             }
             catch (Exception e)

@@ -63,7 +63,7 @@ namespace Services.Tables
             return new ConceptConstraintTable(conceptId, cs).Value;
         }
 
-        public static DataTable From(Concept concept)
+        public static DataTable From(AdminConcept concept)
         {
             return From(concept.Id, concept.Constraints);
         }

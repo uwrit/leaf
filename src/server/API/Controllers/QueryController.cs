@@ -82,8 +82,7 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
-            CancellationToken cancelToken
-        )
+            CancellationToken cancelToken)
         {
             try
             {
@@ -109,9 +108,9 @@ namespace API.Controllers
                     Query = new QuerySaveResultDTO(result.Result)
                 });
             }
-            catch (InvalidOperationException ie)
+            catch (LeafCompilerException ce)
             {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ie.Message);
+                log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
                 return BadRequest();
             }
             catch (FormatException fe)
