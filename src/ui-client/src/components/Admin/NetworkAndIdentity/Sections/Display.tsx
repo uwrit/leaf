@@ -62,7 +62,7 @@ export class Display extends React.PureComponent<Props> {
                         />
                         <Input 
                             changeHandler={changeHandler} propName={'primaryColor'} value={identity.primaryColor}
-                            label='Primary Color' subLabel='Primary color shown next to name' required={true}
+                            label='Primary Color' subLabel={`Primary color shown next to name, such as '#bf5700' or 'rgb(75,46,131)'`} required={true}
                         />
                     </Col>
                     <Col md={6}>

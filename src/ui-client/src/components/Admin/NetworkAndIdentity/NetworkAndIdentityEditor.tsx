@@ -13,6 +13,7 @@ import { Display } from './Sections/Display';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
 import { setAdminNetworkIdentity } from '../../../actions/admin/networkAndIdentity';
 import { IdentityPreview } from './Sections/IdentityPreview';
+import { Endpoint } from '../Endpoint/Endpoint';
 
 
 interface Props {
@@ -36,15 +37,15 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { dispatch, data } = this.props;
-        const { identity } = data.networkAndIdentity;
+        const { identity, endpoints } = data.networkAndIdentity;
         const c = this.className;
 
         return (
             <div className={c}>
                 <Container fluid={true}>
                     <Row>
-                        <Col md={7}>
-                            <div className={`${c}-column-left admin-panel-editor`}>
+                        <Col md={7} className={`${c}-column-left admin-panel-editor`}>
+                            <div>
                                 <Display
                                     changeHandler={this.handleInputChange}
                                     identity={identity}
@@ -55,9 +56,15 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                                 />
                             </div>
                         </Col>
-                        <Col md={5}>
-                            <div className={`${c}-column-right admin-panel-editor`}>
-                            
+                        <Col md={5} className={`${c}-column-right admin-panel-editor`}>
+                            <div>
+                                {[ ...endpoints.values() ].map((e) => (
+                                    <Endpoint
+                                        key={e.id}
+                                        dispatch={dispatch}
+                                        endpoint={e}
+                                    />
+                                ))}
                             </div>
                         </Col>
                     </Row>

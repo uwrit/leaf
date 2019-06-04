@@ -69,11 +69,12 @@ export class MapPreview extends React.Component<Props, State> {
 
     private getLatLng = () => {
         const { identity } = this.props;
-        try {
-            return new LatLng(+identity.latitude!, +identity.longitude!);
-        } catch {
-            return null;
-        }
+        const lat = identity.latitude ? +identity.latitude : 0;
+        const lng = identity.longitude
+            ? (identity.longitude > 0 ? -identity.longitude : identity.longitude)
+            : 0;
+
+        return new LatLng(lat, lng);
     }
 }
 

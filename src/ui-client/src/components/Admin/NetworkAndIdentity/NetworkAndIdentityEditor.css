@@ -1,29 +1,60 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.identity-editor {
+    
+}
+
+.identity-editor-column-left {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100vh;
+    z-index: 101;
+}
+
+.identity-editor-column-right {
+    background-color: rgb(240,240,240);
+    padding-top: 15px;
+    z-index: 100;
+}
+
 .identity-editor .admin-panel-section {
     border: 1px solid rgb(245,245,245);
     margin-top: 15px;
 }
 
 .identity-preview {
-    background-color: rgb(245,245,245);
     display: flex;
-    padding: 20px;
+    padding: 24px 0;
+    position: relative;
 }
 
 .identity-preview-left {
     background-color: rgba(0, 48, 66, 1);
+    flex: 1;
 }
 
-.identity-preview-left,
-.identity-preview-right {
-    vertical-align: top;
-}
-
-.identity-preview-right {
-    float: right;
+.identity-preview::after {
+    color: rgb(180,180,180);;
+    content: 'PREVIEW';
+    left: 0;
+    margin: 2px 4px;
+    position: absolute;
+    top: 0;
 }
 
 .identity-preview .header-networkhealth-responder {
     border-color: transparent !important;
     color: white;
-    width: auto !important;
+    
+}
+
+/* Endpoints */
+.identity-network-endpoint {
+    background-color: white;
+    border-radius: 8px;
+    padding: 10px;
 }
