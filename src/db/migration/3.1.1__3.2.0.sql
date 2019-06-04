@@ -567,6 +567,144 @@ END
 GO
 
 
+IF OBJECT_ID('adm.sp_GetDatasetQueryById', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_GetDatasetQueryById]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/4
+-- Description: Get an app.DatasetQuery by Id for admins.
+-- =======================================
+CREATE PROCEDURE adm.sp_GetDatasetQueryById
+    @id UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Get query definition.
+    SELECT
+        dq.Id,
+        dq.UniversalId,
+        dq.Shape,
+        dq.Name,
+        dq.CategoryId,
+        dq.[Description],
+        dq.SqlStatement,
+        dq.Created,
+        dq.CreatedBy,
+        dq.Updated,
+        dq.UpdatedBy
+    FROM app.DatasetQuery dq
+    WHERE dq.Id = @id;
+
+    -- Get tags
+    SELECT
+        DatasetQueryId,
+        Tag
+    FROM app.DatasetQueryTag
+    WHERE DatasetQueryId = @id;
+END
+GO
+
+IF TYPE_ID('[app].[DatasetQueryName]') IS NOT NULL
+	DROP TYPE [app].[DatasetQueryName];
+GO
+IF TYPE_ID('[app].[DatasetQueryTagTable]') IS NOT NULL
+	DROP TYPE [app].[DatasetQueryTagTable];
+GO
+CREATE TYPE [app].[DatasetQueryTagTable] AS TABLE(
+	[Tag] [nvarchar](100) NOT NULL
+)
+GO
+
+
+IF OBJECT_ID('adm.sp_UpdateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_UpdateDatasetQuery]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/4
+-- Description: Update a datasetquery.
+-- =======================================
+CREATE PROCEDURE adm.sp_UpdateDatasetQuery
+    @id UNIQUEIDENTIFIER,
+    @uid app.UniversalId,
+    @shape int,
+    @name nvarchar(200),
+    @catid int,
+    @desc nvarchar(max),
+    @sql nvarchar(4000),
+    @tags app.DatasetQueryTagTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@id IS NULL)
+        THROW 70400, N'DatasetQuery.Id is required.', 1;
+	
+	IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
+		THROW 70404, N'DatasetQuery not found.', 1;
+
+    IF (@shape IS NULL)
+        THROW 70400, N'DatasetQuery.Shape is required.', 1;
+    
+    IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
+        THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
+    
+    IF (@name IS NULL)
+        THROW 70400, N'DatasetQuery.Name is required.', 1;
+
+    IF (@sql IS NULL)
+        THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        UPDATE app.DatasetQuery
+        SET
+            UniversalId = @uid,
+            Shape = @shape,
+            [Name] = @name,
+            CategoryId = @catid,
+            [Description] = @desc,
+            SqlStatement = @sql,
+            Updated = GETDATE(),
+            UpdatedBy = @user
+        OUTPUT
+            deleted.Id,
+            deleted.UniversalId,
+            deleted.Shape,
+            deleted.Name,
+            deleted.CategoryId,
+            deleted.[Description],
+            deleted.SqlStatement,
+            deleted.Created,
+            deleted.CreatedBy,
+            deleted.Updated,
+            deleted.UpdatedBy
+        WHERE Id = @id 
+
+        DELETE FROM app.DatasetQueryTag
+        OUTPUT deleted.DatasetQueryId, deleted.Tag
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        SELECT @id, Tag
+        FROM @tags;
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
+
+
+
 
 -- set version
 INSERT INTO [ref].[Version] (Lock, [Version])

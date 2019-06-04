@@ -36,7 +36,7 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<Concept> CreateAsync(Concept c)
+        public async Task<AdminConcept> CreateAsync(AdminConcept c)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -95,7 +95,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<Concept> GetAsync(Guid id)
+        public async Task<AdminConcept> GetAsync(Guid id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -112,7 +112,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<Concept> UpdateAsync(Concept c)
+        public async Task<AdminConcept> UpdateAsync(AdminConcept c)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -166,7 +166,7 @@ namespace Services.Admin.Compiler
 
     static class AdminConceptReader
     {
-        public static Concept Read(SqlMapper.GridReader grid)
+        public static AdminConcept Read(SqlMapper.GridReader grid)
         {
             var cr = grid.ReadFirstOrDefault<ConceptRecord>();
             if (cr == null)
@@ -220,9 +220,9 @@ namespace Services.Admin.Compiler
         public string UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
 
-        public Concept Concept(IEnumerable<SpecializationGroupRelationship> groups = null, IEnumerable<ConceptConstraintRecord> constraints = null)
+        public AdminConcept Concept(IEnumerable<SpecializationGroupRelationship> groups = null, IEnumerable<ConceptConstraintRecord> constraints = null)
         {
-            return new Concept
+            return new AdminConcept
             {
                 Id = Id,
                 UniversalId = ConceptUrn.From(UniversalId),

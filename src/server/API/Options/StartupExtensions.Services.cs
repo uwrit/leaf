@@ -114,6 +114,7 @@ namespace API.Options
             services.AddTransient<AdminConceptManager.IAdminConceptService, AdminConceptService>();
             services.AddTransient<AdminConceptEventManager.IAdminConceptEventService, AdminConceptEventService>();
             services.AddTransient<AdminNetworkEndpointManager.IAdminNetworkUpdater, AdminNetworkEndpointUpdater>();
+            services.AddTransient<AdminDatasetQueryManager.IAdminDatasetQueryService, AdminDatasetQueryService>();
 
             return services;
         }

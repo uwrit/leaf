@@ -46,7 +46,7 @@ namespace API.DTO.Admin.Compiler
 
         }
 
-        public ConceptDTO(Model.Admin.Compiler.Concept c)
+        public ConceptDTO(Model.Admin.Compiler.AdminConcept c)
         {
             Id = c.Id;
             UniversalId = c.UniversalId?.ToString();
@@ -77,10 +77,10 @@ namespace API.DTO.Admin.Compiler
 
     public static class ConceptExtensions
     {
-        public static Model.Admin.Compiler.Concept Concept(this ConceptDTO dto)
+        public static Model.Admin.Compiler.AdminConcept Concept(this ConceptDTO dto)
         {
             if (dto == null) return null;
-            return new Model.Admin.Compiler.Concept
+            return new Model.Admin.Compiler.AdminConcept
             {
                 Id = dto.Id,
                 UniversalId = ConceptUrn.From(dto.UniversalId),

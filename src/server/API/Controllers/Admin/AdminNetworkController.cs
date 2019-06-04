@@ -5,6 +5,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using API.DTO.Admin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +34,22 @@ namespace API.Controllers.Admin
         {
             this.logger = logger;
             this.manager = manager;
+        }
+
+        [HttpGet("endpoint")]
+        public async Task<ActionResult<IEnumerable<NetworkEndpointDTO>>> Get()
+        {
+            try
+            {
+                var endpoints = await manager.GetEndpointsAsync();
+                var payload = endpoints.Select(e => e.NetworkEndpointDTO());
+                return Ok(payload);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Failed to get NetworkEndpoints. Error:{Error}", ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpPut("endpoint/{id}")]
