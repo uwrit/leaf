@@ -5,6 +5,6 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Schema [rela]    Script Date: 5/29/19 9:58:39 AM ******/
+/****** Object:  Schema [rela]    Script Date: 6/4/19 3:20:19 PM ******/
 CREATE SCHEMA [rela]
 GO

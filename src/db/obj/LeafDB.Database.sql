@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [master]
 GO
-/****** Object:  Database [LeafDB]    Script Date: 5/29/19 9:58:39 AM ******/
+/****** Object:  Database [LeafDB]    Script Date: 6/4/19 3:20:19 PM ******/
 CREATE DATABASE [LeafDB]
  CONTAINMENT = NONE
  ON  PRIMARY 

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [auth].[TokenBlacklist]    Script Date: 5/29/19 9:58:40 AM ******/
+/****** Object:  Table [auth].[TokenBlacklist]    Script Date: 6/4/19 3:20:20 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,7 +15,7 @@ CREATE TABLE [auth].[TokenBlacklist](
 	[Expires] [datetime] NOT NULL
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: 5/29/19 9:58:40 AM ******/
+/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: 6/4/19 3:20:20 PM ******/
 CREATE NONCLUSTERED INDEX [IX_TokenBlacklist_Expires] ON [auth].[TokenBlacklist]
 (
 	[Expires] ASC
