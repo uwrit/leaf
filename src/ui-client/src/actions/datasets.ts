@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef, IndexedPatientListDatasetQuery } from "../models/patientList/Dataset";
 import { AppState } from "../models/state/AppState";
 import { Dispatch } from "redux";
 import { searchDatasets, allowAllDatasets, allowDemographics } from "../services/datasetSearchApi";
@@ -24,7 +24,7 @@ export interface DatasetAction {
     category?: string;
     categories?: CategorizedDatasetRef[];
     datasetsAvailableCount?: number;
-    dataset?: PatientListDatasetQuery;
+    dataset?: PatientListDatasetQuery | IndexedPatientListDatasetQuery;
     datasetCategoryIndex?: number;
     datasetIndex?: number;
     datasets?: PatientListDatasetQuery[];
@@ -65,7 +65,7 @@ export const addDataset = (dataset: PatientListDatasetQuery): DatasetAction  => 
     };
 };
 
-export const setDataset = (dataset: PatientListDatasetQuery): DatasetAction  => {
+export const setDataset = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery): DatasetAction  => {
     return {
         dataset,
         type: SET_DATASET

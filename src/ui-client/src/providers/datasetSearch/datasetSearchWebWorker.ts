@@ -7,7 +7,7 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, IndexedPatientListDatasetQuery } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
 const INDEX_DATASETS = 'INDEX_DATASETS';
@@ -128,7 +128,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         // Dataset cache
-        const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
+        const demographics: IndexedPatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [], nextId: '', prevId: '' };
         const demographicsCat: CategorizedDatasetRef = { category: '', datasets: [ demographics ]};
         const excluded: Set<string> = new Set([ demographics.id ]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
@@ -284,10 +284,17 @@ export default class DatasetSearchEngineWebWorker {
         const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
             const added: Set<string> = new Set();
             const catIdxMap: Map<string,number> = new Map();
-            let out: CategorizedDatasetRef[] = [];
+            const out: CategorizedDatasetRef[] = [];
+            const len = refs.length;
+            const lastIdx = len-1;
 
-            for (let i = 0; i < refs.length; i++) {
+            for (let i = 0; i < len; i++) {
                 const ref = refs[i];
+                const indexed: IndexedPatientListDatasetQuery = {
+                    ...ref,
+                    nextId: i < lastIdx ? refs[i+1].id : refs[0].id,
+                    prevId: i > 0 ? refs[i-1].id : refs[lastIdx].id
+                }
                 const cat = ref.category ? ref.category : '';
 
                 /*
@@ -299,12 +306,12 @@ export default class DatasetSearchEngineWebWorker {
                      */
                     let catIdx = catIdxMap.get(cat);
                     if (catIdx !== undefined) {
-                        out[catIdx].datasets.push(ref);
+                        out[catIdx].datasets.push(indexed);
                     } else {
                         catIdxMap.set(cat, out.length);
                         out.push({
                             category: cat,
-                            datasets: [ ref ]
+                            datasets: [ indexed ]
                         });
                     }
                     added.add(ref.id);

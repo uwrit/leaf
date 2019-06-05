@@ -33,8 +33,6 @@ interface Props {
 }
 
 interface State {
-    categoryIdx: number;
-    datasetIdx: number;
     shapes: PatientListDatasetShape[];
 }
 
@@ -43,8 +41,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            categoryIdx: 0,
-            datasetIdx: -1,
             shapes: []
         }
     }
@@ -83,7 +79,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { data, datasets, dispatch } = this.props;
-        const { categoryIdx, datasetIdx, } = this.state;
         const { currentDataset, changed } = data.datasets;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
         const c = this.className;
@@ -95,8 +90,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
                             <DatasetContainer 
                                 autoSelectOnSearch={false}
-                                categoryIdx={categoryIdx}
-                                datasetIdx={datasetIdx}
                                 datasets={datasets}
                                 dispatch={dispatch}
                                 handleDatasetSelect={this.handleDatasetSelect}
@@ -297,12 +290,11 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     /*
      * Handle clicks or up/down arrow selections of datasets.
      */
-    private handleDatasetSelect = (categoryIdx: number, datasetIdx: number) => {
+    private handleDatasetSelect = (id: string) => {
         const { dispatch, data, datasets } = this.props;
         const { changed } = data.datasets;
 
         if (data.datasets.state === AdminPanelLoadState.LOADING) { return; }
-        if (changed && datasetIdx === -1) { return; }
         if (changed) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
