@@ -34,10 +34,17 @@ export const getIdToken = () => {
                 dispatch(receiveAuthConfig(config));
 
                 // Get user id token
-                getUserTokenAndContext(config).then((token) => {
-                dispatch(setRouteConfig(getRoutes(config, token)));
-                dispatch(receiveIdToken(token));
-            });
+                getUserTokenAndContext(config)
+                .then((token) => {
+                    dispatch(setRouteConfig(getRoutes(config, token)));
+                    dispatch(receiveIdToken(token));
+                })
+                .catch((reason) => {
+                    attemptLoginRetryIfPossible();
+                    console.log(reason);
+                    const message = "Hmm... The Leaf server doesn't seem to be responding. Please contact your Leaf administrator.";
+                    dispatch(failureIdToken(message));
+                });
         }, error => {
             attemptLoginRetryIfPossible();
             console.log(error);
