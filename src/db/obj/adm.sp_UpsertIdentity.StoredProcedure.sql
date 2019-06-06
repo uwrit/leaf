@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpsertIdentity]    Script Date: 6/4/19 3:20:20 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpsertIdentity]    Script Date: 6/6/19 8:49:35 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -48,24 +47,23 @@ BEGIN
             PrimaryColor = @primColor,
             SecondaryColor = @secColor
         OUTPUT
-            deleted.Name,
-            deleted.Abbreviation,
-            deleted.[Description],
-            deleted.TotalPatients,
-            deleted.Latitude,
-            deleted.Longitude,
-            deleted.PrimaryColor,
-            deleted.SecondaryColor;
+            inserted.Name,
+            inserted.Abbreviation,
+            inserted.[Description],
+            inserted.TotalPatients,
+            inserted.Latitude,
+            inserted.Longitude,
+            inserted.PrimaryColor,
+            inserted.SecondaryColor;
     END;
     ELSE
     BEGIN;
         INSERT INTO network.[Identity] ([Name], Abbreviation, [Description], TotalPatients, Latitude, Longitude, PrimaryColor, SecondaryColor)
-        OUTPUT NULL as [Name], NULL as Abbreviation, NULL as [Description], NULL as TotalPatients, NULL as Latitude, NULL as Longitude, NULL as PrimaryColor, NULL as SecondaryColor
+        OUTPUT inserted.Name, inserted.Abbreviation, inserted.[Description], inserted.TotalPatients, inserted.Latitude, inserted.Longitude, inserted.PrimaryColor, inserted.SecondaryColor
         VALUES (@name, @abbr, @desc, @totalPatients, @lat, @lng, @primColor, @secColor);
     END;
 
     COMMIT;
 END
-
 
 GO

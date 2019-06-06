@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using Model.Results;
 using Model.Network;
 using Model.Validation;
 using Model.Error;
@@ -22,8 +21,8 @@ namespace Model.Admin.Network
         {
             Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint endpoint);
             Task<NetworkEndpoint> DeleteEndpointAsync(int id);
-            Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint endpoint);
-            Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity identity);
+            Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint endpoint);
+            Task<NetworkIdentity> UpdateIdentityAsync(NetworkIdentity identity);
         }
 
         readonly IAdminNetworkUpdater updater;
@@ -88,7 +87,7 @@ namespace Model.Admin.Network
             return endpoints.Where(predicate);
         }
 
-        public async Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint e)
+        public async Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint e)
         {
             Ensure.NotNull(e, nameof(e));
             Ensure.NotNullOrWhitespace(e.Name, nameof(e.Name));
@@ -97,10 +96,10 @@ namespace Model.Admin.Network
             Ensure.NotNullOrWhitespace(e.KeyId, nameof(e.KeyId));
             Ensure.NotNull(e.Certificate, nameof(e.Certificate));
 
-            var result = await updater.UpdateEndpointAsync(e);
-            cache.Put(result.New);
-            log.LogInformation("Updated NetworkEndpoint. Result:{@Result}", result);
-            return result;
+            var updated = await updater.UpdateEndpointAsync(e);
+            cache.Put(updated);
+            log.LogInformation("Updated NetworkEndpoint. Result:{@Result}", updated);
+            return updated;
         }
 
         public async Task<NetworkEndpoint> DeleteEndpointAsync(int id)
@@ -142,16 +141,16 @@ namespace Model.Admin.Network
             }
         }
 
-        public async Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity id)
+        public async Task<NetworkIdentity> UpdateIdentityAsync(NetworkIdentity id)
         {
             Ensure.NotNull(id, nameof(id));
             Ensure.NotNullOrWhitespace(id.Name, nameof(id.Name));
 
             try
             {
-                var result = await updater.UpdateIdentityAsync(id);
-                log.LogInformation("Update NetworkIdentity. Swap:{@Swap}", result);
-                return result;
+                var udpated = await updater.UpdateIdentityAsync(id);
+                log.LogInformation("Update NetworkIdentity. Swap:{@Swap}", udpated);
+                return udpated;
             }
             catch (DbException de)
             {

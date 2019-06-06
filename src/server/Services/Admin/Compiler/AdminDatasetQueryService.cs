@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Dapper;
 using Model.Compiler;
-using Model.Results;
 using Services.Tables;
 using Model.Extensions;
 
@@ -50,7 +49,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query)
+        public async Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -73,15 +72,8 @@ namespace Services.Admin.Compiler
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                var old = DbReader.Read(grid);
-                query.UpdatedBy = user.UUID;
-                query.Updated = DateTime.Now;
-
-                return new UpdateResult<AdminDatasetQuery>
-                {
-                    Old = old,
-                    New = query
-                };
+                var updated = DbReader.Read(grid);
+                return updated;
             }
         }
 

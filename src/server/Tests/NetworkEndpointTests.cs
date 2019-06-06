@@ -11,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Network;
 using Model.Options;
-using Model.Results;
 using Model.Admin.Network;
 using Xunit;
 
@@ -182,11 +181,10 @@ namespace Tests
             var manager = GetManager(MixedEndpoints);
             var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("https://leaf.site4.tld"), KeyId = "12309123khjg423khj4g", Certificate = new byte[] { }, IsResponder = true, IsInterrogator = true };
 
-            var result = manager.UpdateEndpointAsync(update).Result;
+            var updated = manager.UpdateEndpointAsync(update).Result;
 
-            Assert.Equal(update.Id, result.Old.Id);
-            Assert.Equal(update.Address, result.New.Address);
-            Assert.True(result.New.IsInterrogator);
+            Assert.Equal(4, update.Id);
+            Assert.True(updated.IsInterrogator);
         }
 
         [Fact]
@@ -270,28 +268,18 @@ namespace Tests
             return Task.FromResult(identity);
         }
 
-        public Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint endpoint)
+        public Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint endpoint)
         {
-            var old = endpoints[endpoint.Id];
             endpoints[endpoint.Id] = endpoint;
 
-            return Task.FromResult(new UpdateResult<NetworkEndpoint>
-            {
-                Old = old,
-                New = endpoint
-            });
+            return Task.FromResult(endpoint);
         }
 
-        public Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity identity)
+        public Task<NetworkIdentity> UpdateIdentityAsync(NetworkIdentity identity)
         {
-            var old = this.identity;
             this.identity = identity;
 
-            return Task.FromResult(new UpdateResult<NetworkIdentity>
-            {
-                Old = old,
-                New = identity
-            });
+            return Task.FromResult(identity);
         }
     }
 }

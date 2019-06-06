@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
-using Model.Results;
 using Model.Validation;
 using Model.Compiler;
 using Model.Error;
@@ -21,7 +20,7 @@ namespace Model.Admin.Compiler
         public interface IAdminDatasetQueryService
         {
             Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id);
-            Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query);
         }
 
         readonly IAdminDatasetQueryService svc;
@@ -40,15 +39,15 @@ namespace Model.Admin.Compiler
             return await svc.GetDatasetQueryByIdAsync(id);
         }
 
-        public async Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query)
+        public async Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query)
         {
             ThrowIfInvalid(query);
 
             try
             {
-                var result = await svc.UpdateDatasetQueryAsync(query);
-                log.LogInformation("Updated DatasetQuery. DatasetQuery:{@DatasetQuery}", result.New);
-                return result;
+                var updated = await svc.UpdateDatasetQueryAsync(query);
+                log.LogInformation("Updated DatasetQuery. DatasetQuery:{@DatasetQuery}", updated);
+                return updated;
             }
             catch (DbException db)
             {
