@@ -54,7 +54,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> UpdateAsync(Guid id, [FromBody] AdminDatasetQueryDTO dto)
+        public async Task<ActionResult<AdminDatasetQueryDTO>> UpdateAsync(Guid id, [FromBody] AdminDatasetQueryDTO dto)
         {
             try
             {
@@ -83,6 +83,55 @@ namespace API.Controllers.Admin
             catch (Exception ex)
             {
                 log.LogError("Failed to update DatasetQuery. Model:{@Model} Error:{Error}", dto, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<AdminDatasetQueryDTO>> CreateAsync([FromBody] AdminDatasetQueryDTO dto)
+        {
+            try
+            {
+                var query = dto.AdminDatasetQuery();
+                var created = await manager.CreateDatasetQueryAsync(query);
+                return Ok(created.AdminDatasetQueryDTO());
+            }
+            catch (FormatException fe)
+            {
+                log.LogError("Malformed DatasetQueryUrn UniversalId. Error:{Error}", fe.Message);
+                return BadRequest();
+            }
+            catch (ArgumentException ae)
+            {
+                log.LogError("Invalid create DatasetQuery model. Model:{@Model} Error:{Error}", dto, ae.Message);
+                return BadRequest();
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to create DatasetQuery. Model:{@Model} Error:{Error}", dto, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteAsync(Guid id)
+        {
+            try
+            {
+                var deleted = await manager.DeleteDatasetQueryAsync(id);
+                if (!deleted.HasValue)
+                {
+                    return NotFound();
+                }
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to delete DatasetQuery. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

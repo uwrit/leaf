@@ -21,6 +21,8 @@ namespace Model.Admin.Compiler
         {
             Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id);
             Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<Guid?> DeleteDatasetQueryAsync(Guid id);
         }
 
         readonly IAdminDatasetQueryService svc;
@@ -55,6 +57,40 @@ namespace Model.Admin.Compiler
                 db.MapThrow();
                 throw;
             }
+        }
+
+        public async Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query)
+        {
+            ThrowIfInvalid(query);
+
+            try
+            {
+                var created = await svc.CreateDatasetQueryAsync(query);
+                log.LogInformation("Created DatasetQuery. DatasetQuery:{@DatasetQuery}", created);
+                return created;
+            }
+            catch (DbException db)
+            {
+                log.LogError("Failed to create DatasetQuery. Query:{@Query} Code:{Code} Error:{Error}", query, db.ErrorCode, db.Message);
+                db.MapThrow();
+                throw;
+            }
+        }
+
+        public async Task<Guid?> DeleteDatasetQueryAsync(Guid id)
+        {
+            Ensure.NotDefault(id, nameof(id));
+
+            var deleted = await svc.DeleteDatasetQueryAsync(id);
+            if (deleted.HasValue)
+            {
+                log.LogInformation("Deleted DatasetQuery. Id:{Id}", id);
+            }
+            else
+            {
+                log.LogInformation("DatasetQuery not found. Id:{Id}", id);
+            }
+            return deleted;
         }
 
         void ThrowIfInvalid(AdminDatasetQuery query)

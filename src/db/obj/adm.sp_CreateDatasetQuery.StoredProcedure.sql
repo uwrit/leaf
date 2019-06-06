@@ -5,18 +5,17 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 -- =======================================
 -- Author:      Cliff Spital
--- Create date: 2019/6/4
--- Description: Update a datasetquery.
+-- Create date: 2019/6/5
+-- Description: Create a datasetquery.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateDatasetQuery]
-    @id UNIQUEIDENTIFIER,
+CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
     @uid app.UniversalId,
     @shape int,
     @name nvarchar(200),
@@ -28,12 +27,6 @@ CREATE PROCEDURE [adm].[sp_UpdateDatasetQuery]
 AS
 BEGIN
     SET NOCOUNT ON
-
-    IF (@id IS NULL)
-        THROW 70400, N'DatasetQuery.Id is required.', 1;
-	
-	IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
-		THROW 70404, N'DatasetQuery not found.', 1;
 
     IF (@shape IS NULL)
         THROW 70400, N'DatasetQuery.Shape is required.', 1;
@@ -50,16 +43,21 @@ BEGIN
     BEGIN TRAN;
     BEGIN TRY
 
-        UPDATE app.DatasetQuery
-        SET
-            UniversalId = @uid,
-            Shape = @shape,
-            [Name] = @name,
-            CategoryId = @catid,
-            [Description] = @desc,
-            SqlStatement = @sql,
-            Updated = GETDATE(),
-            UpdatedBy = @user
+        DECLARE @ins TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null
+        );
+
+        INSERT INTO app.DatasetQuery (UniversalId, Shape, [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
         OUTPUT
             inserted.Id,
             inserted.UniversalId,
@@ -72,10 +70,25 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
-        WHERE Id = @id 
+        INTO @ins
+        VALUES (@uid, @shape, @name, @catid, @desc, @sql, GETDATE(), @user, GETDATE(), @user);
 
-        DELETE FROM app.DatasetQueryTag
-        WHERE DatasetQueryId = @id;
+        DECLARE @id UNIQUEIDENTIFIER;
+        SELECT TOP 1 @id = Id from @ins;
+
+        SELECT
+            Id,
+            UniversalId,
+            Shape,
+            [Name],
+            CategoryId,
+            [Description],
+            SqlStatement,
+            Created,
+            CreatedBy,
+            Updated,
+            UpdatedBy
+        FROM @ins;
 
         INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
         OUTPUT inserted.DatasetQueryId, inserted.Tag
