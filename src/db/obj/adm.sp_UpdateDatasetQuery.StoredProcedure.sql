@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/4/19 3:20:20 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/6/19 8:49:35 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -61,24 +61,24 @@ BEGIN
             Updated = GETDATE(),
             UpdatedBy = @user
         OUTPUT
-            deleted.Id,
-            deleted.UniversalId,
-            deleted.Shape,
-            deleted.Name,
-            deleted.CategoryId,
-            deleted.[Description],
-            deleted.SqlStatement,
-            deleted.Created,
-            deleted.CreatedBy,
-            deleted.Updated,
-            deleted.UpdatedBy
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
         WHERE Id = @id 
 
         DELETE FROM app.DatasetQueryTag
-        OUTPUT deleted.DatasetQueryId, deleted.Tag
         WHERE DatasetQueryId = @id;
 
         INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
         SELECT @id, Tag
         FROM @tags;
 

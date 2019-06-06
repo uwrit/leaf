@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedFunction [app].[fn_JsonifySqlSelectors]    Script Date: 6/4/19 3:20:20 PM ******/
+/****** Object:  UserDefinedFunction [app].[fn_JsonifySqlSelectors]    Script Date: 6/6/19 8:49:35 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
