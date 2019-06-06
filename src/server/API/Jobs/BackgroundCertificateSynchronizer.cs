@@ -75,8 +75,8 @@ namespace API.Jobs
                     newState = await refresher.Refresh(oldState);
                     log.LogInformation("Refreshed NetworkEndpoint. Endpoint:{@Endpoint}", newState);
 
-                    var result = await endpointManager.UpdateEndpointAsync(newState);
-                    newState = result.New;
+                    var updated = await endpointManager.UpdateEndpointAsync(newState);
+                    newState = updated;
                     if (newState != null)
                     {
                         cache.Put(newState);

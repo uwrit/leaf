@@ -92,16 +92,16 @@ BEGIN
 		IsInterrogator = @isInterrogator,
         Updated = GETDATE()
 	OUTPUT
-		deleted.Id,
-		deleted.Name,
-		deleted.Address,
-		deleted.Issuer,
-		deleted.KeyId,
-		deleted.Certificate,
-		deleted.IsResponder,
-		deleted.IsInterrogator,
-		deleted.Updated,
-		deleted.Created
+		inserted.Id,
+		inserted.Name,
+		inserted.Address,
+		inserted.Issuer,
+		inserted.KeyId,
+		inserted.Certificate,
+		inserted.IsResponder,
+		inserted.IsInterrogator,
+		inserted.Updated,
+		inserted.Created
 	WHERE
 		Id = @id;
 
@@ -150,19 +150,19 @@ BEGIN
             PrimaryColor = @primColor,
             SecondaryColor = @secColor
         OUTPUT
-            deleted.Name,
-            deleted.Abbreviation,
-            deleted.[Description],
-            deleted.TotalPatients,
-            deleted.Latitude,
-            deleted.Longitude,
-            deleted.PrimaryColor,
-            deleted.SecondaryColor;
+            inserted.Name,
+            inserted.Abbreviation,
+            inserted.[Description],
+            inserted.TotalPatients,
+            inserted.Latitude,
+            inserted.Longitude,
+            inserted.PrimaryColor,
+            inserted.SecondaryColor;
     END;
     ELSE
     BEGIN;
         INSERT INTO network.[Identity] ([Name], Abbreviation, [Description], TotalPatients, Latitude, Longitude, PrimaryColor, SecondaryColor)
-        OUTPUT NULL as [Name], NULL as Abbreviation, NULL as [Description], NULL as TotalPatients, NULL as Latitude, NULL as Longitude, NULL as PrimaryColor, NULL as SecondaryColor
+        OUTPUT inserted.Name, inserted.Abbreviation, inserted.[Description], inserted.TotalPatients, inserted.Latitude, inserted.Longitude, inserted.PrimaryColor, inserted.SecondaryColor
         VALUES (@name, @abbr, @desc, @totalPatients, @lat, @lng, @primColor, @secColor);
     END;
 
@@ -672,24 +672,24 @@ BEGIN
             Updated = GETDATE(),
             UpdatedBy = @user
         OUTPUT
-            deleted.Id,
-            deleted.UniversalId,
-            deleted.Shape,
-            deleted.Name,
-            deleted.CategoryId,
-            deleted.[Description],
-            deleted.SqlStatement,
-            deleted.Created,
-            deleted.CreatedBy,
-            deleted.Updated,
-            deleted.UpdatedBy
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
         WHERE Id = @id 
 
         DELETE FROM app.DatasetQueryTag
-        OUTPUT deleted.DatasetQueryId, deleted.Tag
         WHERE DatasetQueryId = @id;
 
         INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
         SELECT @id, Tag
         FROM @tags;
 

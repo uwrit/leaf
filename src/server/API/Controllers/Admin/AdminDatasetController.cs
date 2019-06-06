@@ -63,8 +63,8 @@ namespace API.Controllers.Admin
                     dto.Id = id;
                 }
                 var query = dto.AdminDatasetQuery();
-                var result = await manager.UpdateDatasetQueryAsync(query);
-                return Ok(result.New.AdminDatasetQueryDTO());
+                var updated = await manager.UpdateDatasetQueryAsync(query);
+                return Ok(updated.AdminDatasetQueryDTO());
             }
             catch (FormatException fe)
             {
