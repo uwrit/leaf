@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/6/19 4:01:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -31,9 +31,6 @@ BEGIN
 
     IF (@id IS NULL)
         THROW 70400, N'DatasetQuery.Id is required.', 1;
-	
-	IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
-		THROW 70404, N'DatasetQuery not found.', 1;
 
     IF (@shape IS NULL)
         THROW 70400, N'DatasetQuery.Shape is required.', 1;
@@ -41,14 +38,20 @@ BEGIN
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
     
-    IF (@name IS NULL)
+    IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
-    IF (@sql IS NULL)
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
     
     BEGIN TRAN;
     BEGIN TRY
+
+        IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
+            THROW 70404, N'DatasetQuery not found.', 1;
+
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId OR @name = Name))
+            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
 
         UPDATE app.DatasetQuery
         SET

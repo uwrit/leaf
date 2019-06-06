@@ -5,29 +5,26 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteSpecialization]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  UserDefinedFunction [app].[fn_NullOrWhitespace]    Script Date: 6/6/19 4:01:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
--- Create date: 2019/3/11
--- Description: Deletes an app.Specialization by id.
+-- Create date: 2019/6/5
+-- Description: Returns 1 if string is null or consists of only whitespace, else 0.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_DeleteSpecialization]
-    @id UNIQUEIDENTIFIER,
-    @user auth.[User]
+CREATE FUNCTION [app].[fn_NullOrWhitespace]
+(
+    @s nvarchar(max)
+)
+RETURNS bit
 AS
 BEGIN
-    SET NOCOUNT ON
+    IF (ISNULL(@s, N'') = N'')
+        RETURN 1;
 
-    DELETE FROM app.Specialization
-    OUTPUT deleted.Id, deleted.SpecializationGroupId, deleted.UniversalId, deleted.UiDisplayText, deleted.SqlSetWhere, deleted.OrderId
-    WHERE Id = @id;
+    RETURN 0;
 END
-
-
-
 GO
