@@ -26,10 +26,4 @@ namespace Model.Admin.Compiler
 
         public IEnumerable<string> Tags { get; set; }
     }
-
-    public class DatasetQueryCategory
-    {
-        public int Id { get; set; }
-        public string Category { get; set; }
-    }
 }

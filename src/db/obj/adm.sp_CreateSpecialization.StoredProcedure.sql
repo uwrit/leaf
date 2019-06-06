@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateSpecialization]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateSpecialization]    Script Date: 6/6/19 4:01:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/11
@@ -27,13 +26,13 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    IF (@groupId IS NULL)
+    IF (app.fn_NullOrWhitespace(@groupId) = 1)
         THROW 70400, N'Specialization.SpecializationGroupId is required.', 1;
     
-    IF (@uiDisplayText IS NULL OR LEN(@uiDisplayText) = 0)
+    IF (app.fn_NullOrWhitespace(@uiDisplayText) = 1)
         THROW 70400, N'Specialization.UiDisplayText is required.', 1;
 
-    IF (@sqlSetWhere IS NULL OR LEN(@sqlSetWhere) = 0)
+    IF (app.fn_NullOrWhitespace(@sqlSetWhere) = 1)
         THROW 70400, N'Specialization.SqlSetWhere is required.', 1;
 
     IF NOT EXISTS (SELECT 1 FROM app.SpecializationGroup WHERE Id = @groupId)
@@ -43,6 +42,5 @@ BEGIN
     OUTPUT inserted.Id, inserted.SpecializationGroupId, inserted.UniversalId, inserted.UiDisplayText, inserted.SqlSetWhere, inserted.OrderId
     VALUES (@groupId, @uid, @uiDisplayText, @sqlSetWhere, @order);
 END
-
 
 GO

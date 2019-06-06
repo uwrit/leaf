@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 6/6/19 4:01:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -34,14 +34,17 @@ BEGIN
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
     
-    IF (@name IS NULL)
+    IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
-    IF (@sql IS NULL)
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
     
     BEGIN TRAN;
     BEGIN TRY
+
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE @uid = UniversalId OR @name = Name)
+            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
 
         DECLARE @ins TABLE (
             Id uniqueidentifier,
@@ -103,5 +106,4 @@ BEGIN
     END CATCH;
 
 END
-
 GO

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpsertIdentity]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpsertIdentity]    Script Date: 6/6/19 4:01:12 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -29,7 +29,7 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    IF (@name IS NULL)
+    IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'NetworkIdentity.Name is required.', 1;
 
     BEGIN TRAN;
@@ -65,5 +65,4 @@ BEGIN
 
     COMMIT;
 END
-
 GO
