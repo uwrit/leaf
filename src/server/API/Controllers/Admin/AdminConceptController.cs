@@ -33,7 +33,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Concept>> Get(Guid id)
+        public async Task<ActionResult<AdminConcept>> Get(Guid id)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace API.Controllers.Admin
             catch (ArgumentException ae)
             {
                 logger.LogError("Invalid update Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(Concept)} is missing or incomplete."));
+                return BadRequest(CRUDError.From($"{nameof(AdminConcept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -89,7 +89,7 @@ namespace API.Controllers.Admin
             catch (ArgumentException ae)
             {
                 logger.LogError("Invalid create Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(Concept)} is missing or incomplete."));
+                return BadRequest(CRUDError.From($"{nameof(AdminConcept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {

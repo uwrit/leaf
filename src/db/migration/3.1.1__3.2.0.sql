@@ -2,7 +2,6 @@
 IF OBJECT_ID('ref.Version') IS NOT NULL
 	DROP TABLE [ref].[Version]
 GO
-
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -27,12 +26,6 @@ ALTER TABLE [ref].[Version] CHECK CONSTRAINT [CK_Version_1]
 GO
 
 -- Update network sprocs.
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
-
 IF OBJECT_ID('network.sp_UpdateEndpoint', 'P') IS NOT NULL
 	DROP PROCEDURE [network].[sp_UpdateEndpoint]
 GO
@@ -40,7 +33,6 @@ GO
 IF OBJECT_ID('adm.sp_UpdateEndpoint', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_UpdateEndpoint];
 GO
-
 -- =============================================
 -- Author:		Cliff Spital
 -- Create date: 2019/5/28
@@ -121,7 +113,6 @@ GO
 IF OBJECT_ID('adm.sp_UpsertIdentity', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_UpsertIdentity];
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -177,14 +168,12 @@ BEGIN
 
     COMMIT;
 END
-
 GO
 
 
 IF OBJECT_ID('adm.sp_CreateEndpoint', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_CreateEndpoint];
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -229,14 +218,12 @@ BEGIN
     VALUES (@name, @addr, @iss, @kid, @cert, getdate(), getdate(), @isInterrogator, @isResponder);
 
 END
-
 GO
 
 
 IF OBJECT_ID('adm.sp_DeleteEndpoint', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_DeleteEndpoint];
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -254,13 +241,136 @@ BEGIN
     WHERE Id = @id;
 
 END
-
 GO
+
+
+IF OBJECT_ID('app.sp_CalculateConceptPatientCount', 'P') IS NOT NULL
+        DROP PROCEDURE [app].[sp_CalculateConceptPatientCount]
+GO
+CREATE PROCEDURE [app].[sp_CalculateConceptPatientCount]
+	@PersonIdField NVARCHAR(50),
+	@TargetDatabaseName NVARCHAR(100),
+	@From NVARCHAR(MAX),
+	@Where NVARCHAR(MAX),
+	@Date NVARCHAR(200),
+	@isEncounterBased BIT,
+	@CurrentRootId [uniqueidentifier],
+	@CurrentConceptId [uniqueidentifier]
+AS
+BEGIN
+
+	DECLARE @ExecuteSql NVARCHAR(MAX),
+			@Result NVARCHAR(MAX),
+			@ParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsOUT INT OUTPUT',
+			@PatientsByYearParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsByYearOUT NVARCHAR(MAX) OUTPUT'
+	
+	BEGIN 
+			
+			------------------------------------------------------------------------------------------------------------------------------ 
+			-- Total Patient Count
+			------------------------------------------------------------------------------------------------------------------------------
+			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
+			
+							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
+															 'FROM ' + @TargetDatabaseName + '.' + @From + ' _T ' +
+															  ISNULL('WHERE ' + @Where,'') + 
+															')'
+
+			BEGIN TRY 
+			
+				EXECUTE sp_executesql 
+					@ExecuteSql,
+					@ParameterDefinition,
+					@TotalPatientsOUT = @Result OUTPUT
+
+				UPDATE app.Concept
+				SET UiDisplayPatientCount = TRY_PARSE(@Result AS INT)
+				  , PatientCountLastUpdateDateTime = GETDATE()
+				WHERE Id = @CurrentConceptId
+
+			END TRY 
+			
+			BEGIN CATCH 
+
+				PRINT('Failed to run query for ' + CONVERT(NVARCHAR(50),@CurrentConceptId));
+				PRINT('Failed query: ' + @ExecuteSql);
+				PRINT('Error: ' + ERROR_MESSAGE())
+				PRINT('')
+
+			END CATCH
+
+			------------------------------------------------------------------------------------------------------------------------------ 
+			-- Patient Count by Year
+			------------------------------------------------------------------------------------------------------------------------------
+
+			IF (@isEncounterBased = 1 AND TRY_CONVERT(INT, @Result) > 0)
+			
+				BEGIN
+				
+					-- Output to the @TotalPatientsByYear (JSON) parameter to log the result
+					SET @ExecuteSql = 
+								'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
+								 
+								 WITH year_calculation AS
+									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
+											, _T.' + @PersonIdField +'
+									   FROM ' + @From + ' _T 
+									   WHERE ' + ISNULL(@Where,'') + ')
+									  
+									, year_grouping AS
+									  (SELECT PatientYear
+											, PatientCount = COUNT(DISTINCT ' + @PersonIdField + ')
+									   FROM year_calculation
+									   GROUP BY PatientYear)
+
+								SELECT @TotalPatientsByYearOUT = (' + 
+										 '''['' + STUFF(
+		  										(SELECT ''{"Year":'' + PatientYear + '',"PatientCount":'' + CONVERT(NVARCHAR(20),PatientCount) + ''},'' 
+		  										 FROM year_grouping
+												 WHERE PatientCount > 0
+												 ORDER BY PatientYear
+		  										 FOR XML PATH(''''), TYPE).value(''text()[1]'', ''varchar(MAX)''
+												 ), 1, 0, '''') +
+										'']'')'
+	
+					BEGIN TRY 
+
+						PRINT(@ExecuteSql)
+			
+						EXECUTE sp_executesql 
+							@ExecuteSql,
+							@PatientsByYearParameterDefinition,
+							@TotalPatientsByYearOUT = @Result OUTPUT
+
+						-- Clean up JSON by removing last unnecessary comma
+						SET @Result = REPLACE(REPLACE(LEFT(@Result, LEN(@Result) - 2) + ']','_',''),'z','')
+
+						UPDATE app.Concept
+						SET UiDisplayPatientCountByYear = @Result
+						WHERE Id = @CurrentConceptId
+
+					END TRY 
+			
+					BEGIN CATCH 
+			
+						PRINT('Failed to run query for ' + CONVERT(NVARCHAR(50),@CurrentConceptId));
+						PRINT('Failed query: ' + @ExecuteSql);
+						PRINT('Error: ' + ERROR_MESSAGE())
+						PRINT('')
+
+					END CATCH
+
+				END
+
+		END 
+
+END
+GO
+
 
 IF OBJECT_ID('app.sp_CalculatePatientCounts', 'P') IS NOT NULL
     DROP PROCEDURE [app].[sp_CalculatePatientCounts];
 GO
-
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2019/5/23
@@ -376,6 +486,222 @@ BEGIN
 
 
 END
+GO
+
+IF OBJECT_ID('app.sp_GetDatasetQueries', 'P') IS NOT NULL
+        DROP PROCEDURE [app].[sp_GetDatasetQueries]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/12/21
+-- Description: Retrieves all DatasetQuery records to which the user is authorized.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetDatasetQueries]
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    declare @ids table (
+        Id UNIQUEIDENTIFIER NOT NULL
+    );
+
+    IF (@admin = 1)
+    BEGIN;
+        -- user is an admin, load them all
+        INSERT INTO @ids
+        SELECT Id
+        FROM app.DatasetQuery;
+    END;
+    ELSE
+    BEGIN;
+        -- user is not an admin, assess their privilege
+        insert into @ids (Id)
+        select distinct
+            dq.Id
+        from app.DatasetQuery dq
+        where exists (
+            select 1
+            from auth.DatasetQueryConstraint
+            where DatasetQueryId = dq.Id and
+            ConstraintId = 1 and
+            ConstraintValue = @user
+        )
+        or exists (
+            select 1
+            from auth.DatasetQueryConstraint
+            where DatasetQueryId = dq.Id and
+            ConstraintId = 2 and
+            ConstraintValue in (select [Group] from @groups)
+        )
+        or not exists (
+            select 1
+            from auth.DatasetQueryConstraint
+            where DatasetQueryId = dq.Id
+        );
+    END;
+
+    -- produce the hydrated records
+    select
+        i.Id,
+        dq.UniversalId,
+        dq.Shape,
+        dq.Name,
+        dqc.Category,
+        dq.[Description],
+        dq.SqlStatement
+    from @ids i
+    join app.DatasetQuery dq on i.Id = dq.Id
+    left join app.DatasetQueryCategory dqc on dq.CategoryId = dqc.Id;
+
+    -- produce the tags for each record
+    select
+        i.Id,
+        Tag
+    from @ids i
+    join app.DatasetQueryTag t on i.Id = t.DatasetQueryId
+
+END
+GO
+
+
+IF OBJECT_ID('adm.sp_GetDatasetQueryById', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_GetDatasetQueryById]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/4
+-- Description: Get an app.DatasetQuery by Id for admins.
+-- =======================================
+CREATE PROCEDURE adm.sp_GetDatasetQueryById
+    @id UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Get query definition.
+    SELECT
+        dq.Id,
+        dq.UniversalId,
+        dq.Shape,
+        dq.Name,
+        dq.CategoryId,
+        dq.[Description],
+        dq.SqlStatement,
+        dq.Created,
+        dq.CreatedBy,
+        dq.Updated,
+        dq.UpdatedBy
+    FROM app.DatasetQuery dq
+    WHERE dq.Id = @id;
+
+    -- Get tags
+    SELECT
+        DatasetQueryId,
+        Tag
+    FROM app.DatasetQueryTag
+    WHERE DatasetQueryId = @id;
+END
+GO
+
+IF TYPE_ID('[app].[DatasetQueryName]') IS NOT NULL
+	DROP TYPE [app].[DatasetQueryName];
+GO
+IF TYPE_ID('[app].[DatasetQueryTagTable]') IS NOT NULL
+	DROP TYPE [app].[DatasetQueryTagTable];
+GO
+CREATE TYPE [app].[DatasetQueryTagTable] AS TABLE(
+	[Tag] [nvarchar](100) NOT NULL
+)
+GO
+
+
+IF OBJECT_ID('adm.sp_UpdateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_UpdateDatasetQuery]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/4
+-- Description: Update a datasetquery.
+-- =======================================
+CREATE PROCEDURE adm.sp_UpdateDatasetQuery
+    @id UNIQUEIDENTIFIER,
+    @uid app.UniversalId,
+    @shape int,
+    @name nvarchar(200),
+    @catid int,
+    @desc nvarchar(max),
+    @sql nvarchar(4000),
+    @tags app.DatasetQueryTagTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@id IS NULL)
+        THROW 70400, N'DatasetQuery.Id is required.', 1;
+	
+	IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
+		THROW 70404, N'DatasetQuery not found.', 1;
+
+    IF (@shape IS NULL)
+        THROW 70400, N'DatasetQuery.Shape is required.', 1;
+    
+    IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
+        THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
+    
+    IF (@name IS NULL)
+        THROW 70400, N'DatasetQuery.Name is required.', 1;
+
+    IF (@sql IS NULL)
+        THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        UPDATE app.DatasetQuery
+        SET
+            UniversalId = @uid,
+            Shape = @shape,
+            [Name] = @name,
+            CategoryId = @catid,
+            [Description] = @desc,
+            SqlStatement = @sql,
+            Updated = GETDATE(),
+            UpdatedBy = @user
+        OUTPUT
+            deleted.Id,
+            deleted.UniversalId,
+            deleted.Shape,
+            deleted.Name,
+            deleted.CategoryId,
+            deleted.[Description],
+            deleted.SqlStatement,
+            deleted.Created,
+            deleted.CreatedBy,
+            deleted.Updated,
+            deleted.UpdatedBy
+        WHERE Id = @id 
+
+        DELETE FROM app.DatasetQueryTag
+        OUTPUT deleted.DatasetQueryId, deleted.Tag
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        SELECT @id, Tag
+        FROM @tags;
+
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
 
 
 

@@ -14,4 +14,10 @@ namespace Model.Admin.Compiler
         public bool Ok => !ConceptDependents?.Any() ?? true;
         public IEnumerable<ConceptDependent> ConceptDependents { get; set; }
     }
+
+    public class SpecializationGroupDependent
+    {
+        public int Id { get; set; }
+        public string UiDefaultText { get; set; }
+    }
 }

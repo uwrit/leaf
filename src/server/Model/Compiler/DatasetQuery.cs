@@ -81,4 +81,25 @@ namespace Model.Compiler
             return @ref.Id.Value.GetHashCode();
         }
     }
+
+    public class TagEqualityComparer : IEqualityComparer<string>
+    {
+        public bool Equals(string x, string y)
+        {
+            if (x != null)
+            {
+                return x.Equals(y, StringComparison.InvariantCultureIgnoreCase);
+            }
+            if (y != null)
+            {
+                return y.Equals(x, StringComparison.InvariantCultureIgnoreCase);
+            }
+            return true;
+        }
+
+        public int GetHashCode(string obj)
+        {
+            return obj.GetConsistentHashCode();
+        }
+    }
 }

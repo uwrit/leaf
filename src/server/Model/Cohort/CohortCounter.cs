@@ -10,6 +10,7 @@ using Model.Compiler;
 using Model.Authorization;
 using Microsoft.Extensions.Logging;
 using Model.Validation;
+using Model.Error;
 
 namespace Model.Cohort
 {
@@ -64,15 +65,18 @@ namespace Model.Cohort
         /// <param name="queryDTO">Abstract query representation.</param>
         /// <param name="token">Cancellation token.</param>
         /// <exception cref="OperationCanceledException"/>
-        /// <exception cref="InvalidOperationException"/>
+        /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="LeafRPCException"/>
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> Count(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
+            log.LogInformation("CohortCounter starting. DTO:{@DTO}", queryDTO);
             Ensure.NotNull(queryDTO, nameof(queryDTO));
 
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
+            log.LogInformation("CohortCounter conversion done. ValidationContext:{@ValidationContext}", ctx);
+
             if (!ctx.PreflightPassed)
             {
                 return new Result
@@ -82,13 +86,13 @@ namespace Model.Cohort
             }
 
             var query = validator.Validate(ctx);
+
             var cohort = await counter.GetPatientCohortAsync(query, token);
+            log.LogInformation("CohortCounter cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
 
             token.ThrowIfCancellationRequested();
 
-            log.LogInformation("Caching unsaved cohort.");
-            var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
-            log.LogInformation("Cached unsaved cohort. QueryId:{QueryId}", qid);
+            var qid = await CacheCohort(cohort);
 
             return new Result
             {
@@ -100,6 +104,21 @@ namespace Model.Cohort
                     SqlStatements = cohort.SqlStatements
                 }
             };
+        }
+
+        async Task<Guid> CacheCohort(PatientCohort cohort)
+        {
+            try
+            {
+                var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
+                log.LogInformation("CohortCounter caching complete. QueryId:{QueryId}", qid);
+                return qid;
+            }
+            catch (InvalidOperationException ie)
+            {
+                log.LogError("Failed to cache cohort. Error:{Error}", ie.Message);
+                throw new LeafRPCException(LeafErrorCode.Internal, ie.Message, ie);
+            }
         }
 
         public class Result

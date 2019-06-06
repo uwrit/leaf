@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace Model.Admin.Compiler
 {
-    public class Concept
+    public class AdminConcept
     {
         public Guid Id { get; set; }
         public ConceptUrn UniversalId { get; set; }
