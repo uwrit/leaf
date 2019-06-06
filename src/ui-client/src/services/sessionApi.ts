@@ -125,7 +125,7 @@ export const attemptLoginRetryIfPossible = () => {
     const retry = sessionStorage.getItem(key);
     if (!retry) {
         sessionStorage.setItem(key, 'X');
-        window.location = window.location;
+        window.location.reload(true);
     } else {
         sessionStorage.removeItem(key);
     }
