@@ -17,7 +17,6 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Dapper;
 using Model.Compiler;
-using Model.Results;
 using Services.Tables;
 using Model.Extensions;
 
@@ -50,7 +49,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query)
+        public async Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -73,15 +72,50 @@ namespace Services.Admin.Compiler
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                var old = DbReader.Read(grid);
-                query.UpdatedBy = user.UUID;
-                query.Updated = DateTime.Now;
+                var updated = DbReader.Read(grid);
+                return updated;
+            }
+        }
 
-                return new UpdateResult<AdminDatasetQuery>
-                {
-                    Old = old,
-                    New = query
-                };
+        public async Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                    Sql.Create,
+                    new
+                    {
+                        uid = query.UniversalId?.ToString(),
+                        shape = query.Shape,
+                        name = query.Name,
+                        catid = query.CategoryId,
+                        desc = query.Description,
+                        sql = query.SqlStatement,
+                        tags = DatasetQueryTagTable.From(query.Tags),
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout);
+                var created = DbReader.Read(grid);
+                return created;
+            }
+        }
+
+        public async Task<Guid?> DeleteDatasetQueryAsync(Guid id)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var deleted = await cn.QueryFirstOrDefaultAsync<Guid?>(
+                    Sql.Delete,
+                    new { id },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout);
+
+                return deleted;
             }
         }
 
@@ -89,6 +123,8 @@ namespace Services.Admin.Compiler
         {
             public const string GetById = "adm.sp_GetDatasetQueryById";
             public const string Update = "adm.sp_UpdateDatasetQuery";
+            public const string Create = "adm.sp_CreateDatasetQuery";
+            public const string Delete = "adm.sp_DeleteDatasetQuery";
         }
 
         class DatasetQueryRecord

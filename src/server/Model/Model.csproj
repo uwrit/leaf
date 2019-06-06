@@ -15,7 +15,6 @@
     <Folder Include="Validation\" />
     <Folder Include="Schema\" />
     <Folder Include="Search\" />
-    <Folder Include="Results\" />
     <Folder Include="Error\" />
     <Folder Include="Admin\Network\" />
     <Folder Include="Admin\Compiler\" />

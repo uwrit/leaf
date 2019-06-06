@@ -76,10 +76,10 @@ BEGIN
     IF (@isResponder IS NULL)
         THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
 
-	BEGIN TRAN;
-
-	IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
+    IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
 			THROW 70404, N'NetworkEndpoint not found.', 1;
+
+	BEGIN TRAN;
 
 	UPDATE network.Endpoint
 	SET
@@ -92,16 +92,16 @@ BEGIN
 		IsInterrogator = @isInterrogator,
         Updated = GETDATE()
 	OUTPUT
-		deleted.Id,
-		deleted.Name,
-		deleted.Address,
-		deleted.Issuer,
-		deleted.KeyId,
-		deleted.Certificate,
-		deleted.IsResponder,
-		deleted.IsInterrogator,
-		deleted.Updated,
-		deleted.Created
+		inserted.Id,
+		inserted.Name,
+		inserted.Address,
+		inserted.Issuer,
+		inserted.KeyId,
+		inserted.Certificate,
+		inserted.IsResponder,
+		inserted.IsInterrogator,
+		inserted.Updated,
+		inserted.Created
 	WHERE
 		Id = @id;
 
@@ -150,19 +150,19 @@ BEGIN
             PrimaryColor = @primColor,
             SecondaryColor = @secColor
         OUTPUT
-            deleted.Name,
-            deleted.Abbreviation,
-            deleted.[Description],
-            deleted.TotalPatients,
-            deleted.Latitude,
-            deleted.Longitude,
-            deleted.PrimaryColor,
-            deleted.SecondaryColor;
+            inserted.Name,
+            inserted.Abbreviation,
+            inserted.[Description],
+            inserted.TotalPatients,
+            inserted.Latitude,
+            inserted.Longitude,
+            inserted.PrimaryColor,
+            inserted.SecondaryColor;
     END;
     ELSE
     BEGIN;
         INSERT INTO network.[Identity] ([Name], Abbreviation, [Description], TotalPatients, Latitude, Longitude, PrimaryColor, SecondaryColor)
-        OUTPUT NULL as [Name], NULL as Abbreviation, NULL as [Description], NULL as TotalPatients, NULL as Latitude, NULL as Longitude, NULL as PrimaryColor, NULL as SecondaryColor
+        OUTPUT inserted.Name, inserted.Abbreviation, inserted.[Description], inserted.TotalPatients, inserted.Latitude, inserted.Longitude, inserted.PrimaryColor, inserted.SecondaryColor
         VALUES (@name, @abbr, @desc, @totalPatients, @lat, @lng, @primColor, @secColor);
     END;
 
@@ -672,27 +672,28 @@ BEGIN
             Updated = GETDATE(),
             UpdatedBy = @user
         OUTPUT
-            deleted.Id,
-            deleted.UniversalId,
-            deleted.Shape,
-            deleted.Name,
-            deleted.CategoryId,
-            deleted.[Description],
-            deleted.SqlStatement,
-            deleted.Created,
-            deleted.CreatedBy,
-            deleted.Updated,
-            deleted.UpdatedBy
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
         WHERE Id = @id 
 
         DELETE FROM app.DatasetQueryTag
-        OUTPUT deleted.DatasetQueryId, deleted.Tag
         WHERE DatasetQueryId = @id;
 
         INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
         SELECT @id, Tag
         FROM @tags;
 
+        COMMIT;
     END TRY
     BEGIN CATCH
         ROLLBACK;
@@ -702,6 +703,137 @@ BEGIN
 END
 GO
 
+
+IF OBJECT_ID('adm.sp_CreateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_CreateDatasetQuery]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/5
+-- Description: Create a datasetquery.
+-- =======================================
+CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
+    @uid app.UniversalId,
+    @shape int,
+    @name nvarchar(200),
+    @catid int,
+    @desc nvarchar(max),
+    @sql nvarchar(4000),
+    @tags app.DatasetQueryTagTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@shape IS NULL)
+        THROW 70400, N'DatasetQuery.Shape is required.', 1;
+    
+    IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
+        THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
+    
+    IF (@name IS NULL)
+        THROW 70400, N'DatasetQuery.Name is required.', 1;
+
+    IF (@sql IS NULL)
+        THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        DECLARE @ins TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null
+        );
+
+        INSERT INTO app.DatasetQuery (UniversalId, Shape, [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        OUTPUT
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
+        INTO @ins
+        VALUES (@uid, @shape, @name, @catid, @desc, @sql, GETDATE(), @user, GETDATE(), @user);
+
+        DECLARE @id UNIQUEIDENTIFIER;
+        SELECT TOP 1 @id = Id from @ins;
+
+        SELECT
+            Id,
+            UniversalId,
+            Shape,
+            [Name],
+            CategoryId,
+            [Description],
+            SqlStatement,
+            Created,
+            CreatedBy,
+            Updated,
+            UpdatedBy
+        FROM @ins;
+
+        INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
+        SELECT @id, Tag
+        FROM @tags;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
+
+IF OBJECT_ID('adm.sp_DeleteDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_DeleteDatasetQuery]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/5
+-- Description: Delete an app.DatasetQuery.
+-- =======================================
+CREATE PROCEDURE adm.sp_DeleteDatasetQuery
+    @id UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    BEGIN TRAN;
+    BEGIN TRY
+        DELETE FROM app.DatasetQueryTag
+        WHERE DatasetQueryId = @id;
+
+        DELETE FROM app.DatasetQuery
+        OUTPUT deleted.Id
+        WHERE Id = @id;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+END
+GO
 
 
 

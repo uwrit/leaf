@@ -8,7 +8,6 @@ using Microsoft.Extensions.Options;
 using Model.Options;
 using Model.Admin.Network;
 using System.Threading.Tasks;
-using Model.Results;
 using Model.Network;
 using Dapper;
 using System.Data.SqlClient;
@@ -31,14 +30,14 @@ namespace Services.Admin.Network
             this.user = user;
         }
 
-        public async Task<UpdateResult<NetworkEndpoint>> UpdateEndpointAsync(NetworkEndpoint item)
+        public async Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint item)
         {
             var record = new NetworkEndpointRecord(item);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var old = await cn.QueryFirstOrDefaultAsync<NetworkEndpointRecord>(
+                var updated = await cn.QueryFirstOrDefaultAsync<NetworkEndpointRecord>(
                     Sql.UpdateEndpoint,
                     new
                     {
@@ -55,23 +54,17 @@ namespace Services.Admin.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                item.Updated = DateTime.Now;
-
-                return new UpdateResult<NetworkEndpoint>
-                {
-                    Old = old.NetworkEndpoint(),
-                    New = item
-                };
+                return updated.NetworkEndpoint();
             }
         }
 
-        public async Task<UpdateResult<NetworkIdentity>> UpdateIdentityAsync(NetworkIdentity identity)
+        public async Task<NetworkIdentity> UpdateIdentityAsync(NetworkIdentity identity)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var old = await cn.QueryFirstOrDefaultAsync<NetworkIdentity>(
+                var updated = await cn.QueryFirstOrDefaultAsync<NetworkIdentity>(
                     Sql.UpsertIdentity,
                     new
                     {
@@ -88,16 +81,7 @@ namespace Services.Admin.Network
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure);
 
-                if (old?.Name == null)
-                {
-                    old = null;
-                }
-
-                return new UpdateResult<NetworkIdentity>
-                {
-                    Old = old,
-                    New = identity
-                };
+                return updated;
             }
         }
 

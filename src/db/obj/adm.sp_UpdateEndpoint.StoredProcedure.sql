@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: 6/4/19 3:20:20 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: 6/6/19 11:15:59 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =============================================
 -- Author:		Cliff Spital
 -- Create date: 2019/5/28
@@ -54,10 +53,10 @@ BEGIN
     IF (@isResponder IS NULL)
         THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
 
-	BEGIN TRAN;
-
-	IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
+    IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
 			THROW 70404, N'NetworkEndpoint not found.', 1;
+
+	BEGIN TRAN;
 
 	UPDATE network.Endpoint
 	SET
@@ -70,22 +69,20 @@ BEGIN
 		IsInterrogator = @isInterrogator,
         Updated = GETDATE()
 	OUTPUT
-		deleted.Id,
-		deleted.Name,
-		deleted.Address,
-		deleted.Issuer,
-		deleted.KeyId,
-		deleted.Certificate,
-		deleted.IsResponder,
-		deleted.IsInterrogator,
-		deleted.Updated,
-		deleted.Created
+		inserted.Id,
+		inserted.Name,
+		inserted.Address,
+		inserted.Issuer,
+		inserted.KeyId,
+		inserted.Certificate,
+		inserted.IsResponder,
+		inserted.IsInterrogator,
+		inserted.Updated,
+		inserted.Created
 	WHERE
 		Id = @id;
 
 	COMMIT;
 END
-
-
 
 GO

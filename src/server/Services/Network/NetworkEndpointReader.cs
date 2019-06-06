@@ -14,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Network;
 using Model.Options;
-using Model.Results;
 
 namespace Services.Network
 {

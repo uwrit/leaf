@@ -63,8 +63,8 @@ namespace API.Controllers.Admin
                 }
 
                 var e = state.NetworkEndpoint();
-                var swap = await manager.UpdateEndpointAsync(e);
-                var payload = swap.New.NetworkEndpointDTO();
+                var updated = await manager.UpdateEndpointAsync(e);
+                var payload = updated.NetworkEndpointDTO();
 
                 return Ok(payload);
             }
@@ -141,12 +141,12 @@ namespace API.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<ActionResult> UpsertIdentity([FromBody] NetworkIdentity identity)
+        public async Task<ActionResult<NetworkIdentity>> UpsertIdentity([FromBody] NetworkIdentity identity)
         {
             try
             {
-                var result = await manager.UpdateIdentityAsync(identity);
-                return Ok(result.New);
+                var updated = await manager.UpdateIdentityAsync(identity);
+                return Ok(updated);
             }
             catch (ArgumentException ae)
             {

@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Data.Common;
-using Model.Results;
 using Model.Validation;
 using Model.Compiler;
 using Model.Error;
@@ -21,7 +20,9 @@ namespace Model.Admin.Compiler
         public interface IAdminDatasetQueryService
         {
             Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id);
-            Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query);
+            Task<Guid?> DeleteDatasetQueryAsync(Guid id);
         }
 
         readonly IAdminDatasetQueryService svc;
@@ -40,15 +41,15 @@ namespace Model.Admin.Compiler
             return await svc.GetDatasetQueryByIdAsync(id);
         }
 
-        public async Task<UpdateResult<AdminDatasetQuery>> UpdateDatasetQueryAsync(AdminDatasetQuery query)
+        public async Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query)
         {
             ThrowIfInvalid(query);
 
             try
             {
-                var result = await svc.UpdateDatasetQueryAsync(query);
-                log.LogInformation("Updated DatasetQuery. DatasetQuery:{@DatasetQuery}", result.New);
-                return result;
+                var updated = await svc.UpdateDatasetQueryAsync(query);
+                log.LogInformation("Updated DatasetQuery. DatasetQuery:{@DatasetQuery}", updated);
+                return updated;
             }
             catch (DbException db)
             {
@@ -56,6 +57,40 @@ namespace Model.Admin.Compiler
                 db.MapThrow();
                 throw;
             }
+        }
+
+        public async Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query)
+        {
+            ThrowIfInvalid(query);
+
+            try
+            {
+                var created = await svc.CreateDatasetQueryAsync(query);
+                log.LogInformation("Created DatasetQuery. DatasetQuery:{@DatasetQuery}", created);
+                return created;
+            }
+            catch (DbException db)
+            {
+                log.LogError("Failed to create DatasetQuery. Query:{@Query} Code:{Code} Error:{Error}", query, db.ErrorCode, db.Message);
+                db.MapThrow();
+                throw;
+            }
+        }
+
+        public async Task<Guid?> DeleteDatasetQueryAsync(Guid id)
+        {
+            Ensure.NotDefault(id, nameof(id));
+
+            var deleted = await svc.DeleteDatasetQueryAsync(id);
+            if (deleted.HasValue)
+            {
+                log.LogInformation("Deleted DatasetQuery. Id:{Id}", id);
+            }
+            else
+            {
+                log.LogInformation("DatasetQuery not found. Id:{Id}", id);
+            }
+            return deleted;
         }
 
         void ThrowIfInvalid(AdminDatasetQuery query)
