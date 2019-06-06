@@ -54,7 +54,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<ConceptEvent> CreateAsync(ConceptEvent ev)
         {
-            ThrowIfMissing(ev);
+            ThrowIfInvalid(ev);
 
             try
             {
@@ -121,7 +121,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<ConceptEvent> UpdateAsync(ConceptEvent ev)
         {
-            ThrowIfMissing(ev);
+            ThrowIfInvalid(ev);
 
             try
             {
@@ -145,7 +145,7 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfMissing(ConceptEvent ev)
+        void ThrowIfInvalid(ConceptEvent ev)
         {
             Ensure.NotNull(ev, nameof(ev));
             Ensure.NotNullOrWhitespace(ev.UiDisplayEventName, nameof(ev.UiDisplayEventName));

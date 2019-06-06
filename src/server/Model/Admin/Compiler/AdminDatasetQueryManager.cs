@@ -12,6 +12,7 @@ using System.Data.Common;
 using Model.Validation;
 using Model.Compiler;
 using Model.Error;
+using System.Runtime.CompilerServices;
 
 namespace Model.Admin.Compiler
 {
@@ -28,7 +29,8 @@ namespace Model.Admin.Compiler
         readonly IAdminDatasetQueryService svc;
         readonly ILogger<AdminDatasetQueryManager> log;
 
-        public AdminDatasetQueryManager(IAdminDatasetQueryService service,
+        public AdminDatasetQueryManager(
+            IAdminDatasetQueryService service,
             ILogger<AdminDatasetQueryManager> log)
         {
             svc = service;
@@ -93,10 +95,10 @@ namespace Model.Admin.Compiler
             return deleted;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ThrowIfInvalid(AdminDatasetQuery query)
         {
             Ensure.NotNull(query, nameof(query));
-            Ensure.NotDefault(query.Id, nameof(query.Id));
             Ensure.Defined<Shape>(query.Shape, nameof(query.Shape));
             Ensure.NotNullOrWhitespace(query.Name, nameof(query.Name));
             Ensure.NotNullOrWhitespace(query.SqlStatement, nameof(query.SqlStatement));

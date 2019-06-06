@@ -53,7 +53,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<ConceptSqlSet> CreateAsync(ConceptSqlSet set)
         {
-            ThrowIfMissing(set);
+            ThrowIfInvalid(set);
 
             try
             {
@@ -120,7 +120,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<ConceptSqlSet> UpdateAsync(ConceptSqlSet set)
         {
-            ThrowIfMissing(set);
+            ThrowIfInvalid(set);
 
             try
             {
@@ -137,7 +137,7 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfMissing(ConceptSqlSet set)
+        void ThrowIfInvalid(ConceptSqlSet set)
         {
             Ensure.NotNull(set, nameof(set));
             Ensure.NotNullOrWhitespace(set.SqlSetFrom, nameof(set.SqlSetFrom));

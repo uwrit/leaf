@@ -49,7 +49,7 @@ namespace Model.Admin.Compiler
         /// <param name="g">New <see cref="SpecializationGroup"/>.</param>
         public async Task<SpecializationGroup> CreateAsync(SpecializationGroup g)
         {
-            ThrowIfMissing(g);
+            ThrowIfInvalid(g);
             if (g.Specializations?.Any(s => string.IsNullOrWhiteSpace(s.SqlSetWhere) || string.IsNullOrWhiteSpace(s.UiDisplayText)) ?? false)
             {
                 throw new ArgumentException($"{nameof(SpecializationGroup)}.{nameof(SpecializationGroup.Specializations)} contains malfored specializations.");
@@ -120,7 +120,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<SpecializationGroup> UpdateAsync(SpecializationGroup g)
         {
-            ThrowIfMissing(g);
+            ThrowIfInvalid(g);
 
             try
             {
@@ -144,10 +144,9 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfMissing(SpecializationGroup g)
+        void ThrowIfInvalid(SpecializationGroup g)
         {
             Ensure.NotNull(g, nameof(g));
-            Ensure.NotDefault(g.SqlSetId, nameof(g.SqlSetId));
             Ensure.NotNullOrWhitespace(g.UiDefaultText, nameof(g.UiDefaultText));
         }
     }

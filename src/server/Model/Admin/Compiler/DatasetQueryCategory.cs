@@ -5,25 +5,34 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using Model.Tagging;
-using Model.Compiler;
+using System.Linq;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminDatasetQuery
+    public class DatasetQueryCategory
     {
-        public Guid Id { get; set; }
-        public DatasetQueryUrn UniversalId { get; set; }
-        public Shape Shape { get; set; }
-        public string Name { get; set; }
-        public int? CategoryId { get; set; }
-        public string Description { get; set; }
-        public string SqlStatement { get; set; }
+        public int Id { get; set; }
+        public string Category { get; set; }
         public DateTime Created { get; set; }
         public string CreatedBy { get; set; }
         public DateTime Updated { get; set; }
         public string UpdatedBy { get; set; }
+    }
 
-        public IEnumerable<string> Tags { get; set; }
+    public class DatasetQueryCategoryDeleteResult
+    {
+        public bool Ok
+        {
+            get
+            {
+                return !DatasetQueryDependents?.Any() ?? true;
+            }
+        }
+        public IEnumerable<DatasetQueryDependent> DatasetQueryDependents { get; set; }
+    }
+
+    public class DatasetQueryDependent
+    {
+        public Guid Id { get; set; }
     }
 }
