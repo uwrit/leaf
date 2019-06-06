@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [auth].[sp_CreateLogin]    Script Date: 6/6/19 8:49:35 AM ******/
+/****** Object:  StoredProcedure [auth].[sp_CreateLogin]    Script Date: 6/6/19 11:15:59 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON

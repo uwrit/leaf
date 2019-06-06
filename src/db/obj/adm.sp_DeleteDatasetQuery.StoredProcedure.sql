@@ -5,33 +5,37 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
--- Create date: 2019/3/7
--- Description: Gets all app.ConceptSqlSet records.
+-- Create date: 2019/6/5
+-- Description: Delete an app.DatasetQuery.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetConceptSqlSets]    
+CREATE PROCEDURE [adm].[sp_DeleteDatasetQuery]
+    @id UNIQUEIDENTIFIER
 AS
 BEGIN
     SET NOCOUNT ON
 
-    SELECT
-        Id,
-        IsEncounterBased,
-        IsEventBased,
-        SqlSetFrom,
-        SqlFieldDate,
-        SqlFieldEvent,
-		EventId
-    FROM
-        app.ConceptSqlSet;
-END
+    BEGIN TRAN;
+    BEGIN TRY
+        DELETE FROM app.DatasetQueryTag
+        WHERE DatasetQueryId = @id;
 
+        DELETE FROM app.DatasetQuery
+        OUTPUT deleted.Id
+        WHERE Id = @id;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+END
 
 GO

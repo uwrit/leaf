@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: 6/6/19 8:49:35 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: 6/6/19 11:15:59 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -53,10 +53,10 @@ BEGIN
     IF (@isResponder IS NULL)
         THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
 
-	BEGIN TRAN;
-
-	IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
+    IF NOT EXISTS (SELECT 1 FROM network.Endpoint WHERE Id = @id)
 			THROW 70404, N'NetworkEndpoint not found.', 1;
+
+	BEGIN TRAN;
 
 	UPDATE network.Endpoint
 	SET
