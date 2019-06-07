@@ -11,6 +11,8 @@ import { getAdminDemographicsDataset } from "../../services/admin/datasetApi";
 import { setAdminDemographicsDataset } from "./dataset";
 import { getDatasetQueryCategories } from "../../services/admin/datasetQueryCategoryApi";
 import { setAdminDatasetQueryCategories } from "./datasetQueryCategory";
+import { getNetworkEndpoints } from "../../services/admin/networkAndIdentityApi";
+import { setAdminNetworkEndpoints } from "./networkAndIdentity";
 
 export const SET_ADMIN_PANEL_PANE = 'SET_ADMIN_PANEL_PANE';
 export const SET_ADMIN_PANEL_SUBPANE = 'SET_ADMIN_PANEL_SUBPANE';
@@ -44,12 +46,26 @@ export const loadAdminPanelDataIfNeeded = () => {
                  */ 
                 const sqlSets = await getSqlSets(state);
                 const conceptEvents = await getConceptEvents(state);
-                const demographics = await getAdminDemographicsDataset(state);
-                const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminConceptEvents(conceptEvents));
+
+                /*
+                 * Load datasets data.
+                 */
+                const demographics = await getAdminDemographicsDataset(state);
+                const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminDemographicsDataset(demographics, false));
                 dispatch(setAdminDatasetQueryCategories(datasetQueryCategories));
+
+                /*
+                 * Load network & identity data.
+                 */
+                const endpoints = await getNetworkEndpoints(state);
+                dispatch(setAdminNetworkEndpoints(endpoints));
+
+                /*
+                 * Finish.
+                 */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
             } catch (err) {

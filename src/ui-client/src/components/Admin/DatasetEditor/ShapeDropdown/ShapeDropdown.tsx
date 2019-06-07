@@ -44,16 +44,16 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                     Dataset Template
                     <FormText color="muted">FHIR Resource Shape</FormText>
                 </Label>
-                <div className={`${c}-dropdown`} tabIndex={0}>
+                <div className={`admin-panel-dropdown`} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c}>
                         <DropdownToggle disabled={locked}>
                             <div>
                                 {PatientListDatasetShape[selected]} 
-                                <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                                <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                             </div>
                         </DropdownToggle>
                         <DropdownMenu>
-                            <div className={`${c}-dropdown-item-container`}>
+                            <div className={`admin-panel-dropdown-item-container`}>
 
                                 {/* No dynamic datasets yet
                                 <DropdownItem 

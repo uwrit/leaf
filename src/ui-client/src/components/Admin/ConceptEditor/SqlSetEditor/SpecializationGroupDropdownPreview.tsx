@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { TextArea } from '../Sections/TextArea';
+import { TextArea } from '../../Section/TextArea';
 import { SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
 import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
 import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';

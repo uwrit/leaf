@@ -98,26 +98,19 @@ export class LeafMap extends React.Component<Props, State> {
         const paths: any[] = [];
         const home: NetworkIdentity = networkResponders.get(0)!;
         const responders: NetworkIdentity[] = networkResponders.size > 0 && cohort.networkCohorts.size > 0
-            ? Array
-                .from(networkResponders.keys())
-                .map((k: number) => networkResponders.get(k)!)
-                .filter((n: NetworkIdentity) => n.enabled)
+            ? [ ...networkResponders.values() ].filter((n: NetworkIdentity) => n.enabled && n.latitude && n.longitude)
             : [];
+
         for (const nr of responders) {
             const netCohort = cohort.networkCohorts.get(nr.id);
-            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);
+            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude!, nr.longitude!)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 
             if (nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;
+                const line = CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ]);
                 if (home.enabled) {
-                    paths.push(
-                        <AntPath 
-                            key={nr.id} 
-                            options={opts} 
-                            positions={CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ])} 
-                        />
-                    )
+                    paths.push(<AntPath key={nr.id} options={opts} positions={line}/>);
                 }
             }
         }

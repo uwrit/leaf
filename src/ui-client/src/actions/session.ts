@@ -29,6 +29,7 @@ import { setPanelFilterActiveStates } from './panelFilter';
 import { indexDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
+import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -67,6 +68,9 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(setSessionLoadState('Finding Home Leaf server', 20));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
             homeBase.identity.address = '';
+            if (getState().auth.userContext!.isAdmin) {
+                dispatch(setAdminNetworkIdentity(homeBase.identity, false));
+            }
 
             /* 
              * Get responders.
@@ -92,7 +96,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
                                 .then(() => resolve())
                         })
                     })
-                ) 
+                ); 
             }         
 
             /* 

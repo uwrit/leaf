@@ -18,7 +18,7 @@ import {
     MOVE_DATASET_CATEGORY,
     SET_DATASET_DISPLAY
 } from "../actions/datasets";
-import { PatientListDatasetQuery, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, CategorizedDatasetRef, IndexedPatientListDatasetQuery } from "../models/patientList/Dataset";
 
 export const defaultDatasetsState = (): DatasetsState => {
     return {
@@ -60,7 +60,7 @@ const setDatasetDisplay = (state: DatasetsState, action: DatasetAction): Dataset
     const categories = state.display.slice();
     const category = Object.assign({}, categories[action.datasetCategoryIndex!]);
 
-    category.datasets[action.datasetIndex!] = action.dataset!;
+    category.datasets[action.datasetIndex!] = action.dataset! as IndexedPatientListDatasetQuery;
     categories[action.datasetCategoryIndex!] = category;
 
     return Object.assign({}, state, {
@@ -134,9 +134,9 @@ const addDataset = (state: DatasetsState, action: DatasetAction): DatasetsState 
     let emptyCategoryIdx = state.allCategorized.findIndex((cat) => !cat.category);
 
     if (emptyCategoryIdx > -1) {
-        allCategorized[emptyCategoryIdx].datasets.unshift(action.dataset!);
+        allCategorized[emptyCategoryIdx].datasets.unshift(action.dataset! as IndexedPatientListDatasetQuery);
     } else {
-        allCategorized.unshift({ category: '', datasets: [ action.dataset! ]});
+        allCategorized.unshift({ category: '', datasets: [ action.dataset! as IndexedPatientListDatasetQuery]});
     }
 
     /* 
@@ -146,9 +146,9 @@ const addDataset = (state: DatasetsState, action: DatasetAction): DatasetsState 
     emptyCategoryIdx = state.display.findIndex((cat) => !cat.category);
 
     if (emptyCategoryIdx > -1) {
-        display[emptyCategoryIdx].datasets.unshift(action.dataset!);
+        display[emptyCategoryIdx].datasets.unshift(action.dataset! as IndexedPatientListDatasetQuery);
     } else {
-        display.unshift({ category: '', datasets: [ action.dataset! ]});
+        display.unshift({ category: '', datasets: [ action.dataset! as IndexedPatientListDatasetQuery ]});
     }
 
     return Object.assign({}, state, {
@@ -169,7 +169,7 @@ const moveDatasetCategory = (state: DatasetsState, action: DatasetAction): Datas
 };
 
 const moveDatasetFromCategorizedArray = (dataset: PatientListDatasetQuery, newCategory: string, categories: CategorizedDatasetRef[]): CategorizedDatasetRef[] => {
-    const clone = Object.assign({}, dataset, { category: newCategory });
+    const clone = Object.assign({}, dataset, { category: newCategory }) as IndexedPatientListDatasetQuery ;
 
     /* 
      * Remove from old category array.

@@ -142,12 +142,20 @@ export interface TokenizedDatasetRef {
     tokenArray: string[];
 }
 
+/* 
+ * Dataset query object with properties for the preceding and following query ids.
+ */
+export interface IndexedPatientListDatasetQuery extends PatientListDatasetQuery {
+    nextId: string;
+    prevId: string;
+}
+
 /*
  * Datasets organized by category, used for display in DatasetContainer component.
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: PatientListDatasetQuery[];
+    datasets: IndexedPatientListDatasetQuery[];
 }
 
 /*

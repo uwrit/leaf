@@ -87,6 +87,9 @@ const admin = (): RouteConfig => {
         }, {
             clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.DATASETS)),
             display: 'Datasets',
+        }, {
+            clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.NETWORK)),
+            display: 'Network and Identity',
         }]
     };
 }

@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
-import { Input } from './Input';
-import { TextArea } from './TextArea';
+import { Section } from '../../Section/Section';
+import { Input } from '../../Section/Input';
+import { TextArea } from '../../Section/TextArea';
 import { SectionProps } from '../Props';
 
 interface Props {

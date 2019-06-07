@@ -43,6 +43,6 @@ export interface PropertyProps {
     propName: string;
     required?: boolean;
     subLabel?: string;
-    type?: string;
+    type?: 'text' | 'number';
     value?: any;
 }

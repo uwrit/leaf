@@ -7,11 +7,11 @@
 
 import React from 'react';
 import { Col, Row } from 'reactstrap';
-import CheckboxSlider from '../../../Other/CheckboxSlider/CheckboxSlider';
-import { PropertyProps as Props } from '../Props';
+import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
+import { PropertyProps as Props } from '../ConceptEditor/Props';
 
 export class Checkbox extends React.PureComponent<Props> {
-    private className = "concept-editor"
+    private className = "admin-panel"
     public render() {
         const { label, value } = this.props;
         const c = this.className;

@@ -48,13 +48,19 @@ export interface GeneralUiAction {
 export const handleSidebarTabClick = (route: Routes) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
+        const admin = state.admin;
         const currentRoute = state.generalUi.currentRoute;
         const cohortCountState = state.cohort.count.state;
 
         if (route === currentRoute) {
             return;
         } 
-        else if (currentRoute === Routes.AdminPanel && (state.admin!.concepts.changed || state.admin!.sqlSets.changed || state.admin!.datasets.changed)) {
+        else if (currentRoute === Routes.AdminPanel && admin && (
+            admin.concepts.changed ||
+            admin.sqlSets.changed  || 
+            admin.datasets.changed || 
+            admin.networkAndIdentity.changed)
+            ) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",

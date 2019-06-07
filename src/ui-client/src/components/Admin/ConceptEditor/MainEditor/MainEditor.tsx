@@ -21,7 +21,7 @@ import { ConfirmationModalState, InformationModalState } from '../../../../model
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
-import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin';
+import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin/concept';
 import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 import { setAdminPanelSubPane } from '../../../../actions/admin/admin';
 

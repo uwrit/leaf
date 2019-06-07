@@ -6,39 +6,30 @@
  */ 
 
 import React from 'react';
-import { Dispatch } from 'redux';
-import { connect } from 'react-redux'
 import { handleSidebarTabClick } from '../../actions/generalUi';
 import { SidebarTab} from '../../components/Sidebar/SidebarTab';
 import { RouteConfig } from '../../config/routes';
-import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { Routes } from '../../models/state/GeneralUiState';
+import { AdminPanelConceptEditorPane } from '../../models/state/AdminState';
 import './Sidebar.css';
 
-interface StateProps {
+interface Props {
     cohortCountState: CohortStateType;
+    currentAdminPane: AdminPanelConceptEditorPane;
+    currentRoute: Routes;
+    dispatch: any;
     routes: RouteConfig[];
 }
 
-interface DispatchProps {
-    dispatch: any;
-}
-
-interface OwnProps {
-    currentRoute: Routes;
-}
-
-type Props = StateProps & DispatchProps & OwnProps;
-
-class Sidebar extends React.Component<Props> {
+export default class Sidebar extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
         this.state = { activeIndex: 0 };
     }
 
     public render() {
-        const { cohortCountState, currentRoute, dispatch, routes } = this.props;
+        const { cohortCountState, currentRoute, currentAdminPane, dispatch, routes } = this.props;
         const cohortLoaded = cohortCountState === CohortStateType.LOADED;
         const c = 'sidebar';
         return (
@@ -48,11 +39,12 @@ class Sidebar extends React.Component<Props> {
                         {routes.map((e: RouteConfig) => (
                             <SidebarTab 
                                 key={e.index} 
-                                selectable={cohortLoaded || (e.index === Routes.FindPatients || e.index === Routes.AdminPanel)}
-                                isActive={e.index === currentRoute}
                                 clickHandler={this.handleTabClick} 
                                 config={e}
+                                currentAdminPane={currentAdminPane}
                                 dispatch={dispatch}
+                                isActive={e.index === currentRoute}
+                                selectable={cohortLoaded || (e.index === Routes.FindPatients || e.index === Routes.AdminPanel)}
                                 />
                             ))}
                     </ul>
@@ -66,19 +58,3 @@ class Sidebar extends React.Component<Props> {
         dispatch(handleSidebarTabClick(route));
     }
 };
-
-const mapStateToProps = (state: AppState): StateProps => {
-    return { 
-        cohortCountState: state.cohort.count.state,
-        routes: state.generalUi.routes
-    };
-}
-
-const mapDispatchToProps = (dispatch: Dispatch, ownProps: OwnProps) : DispatchProps => {
-    return { 
-        dispatch
-    }
-}
-
-export default connect<StateProps, DispatchProps, OwnProps, AppState>
-    (mapStateToProps, mapDispatchToProps)(Sidebar);

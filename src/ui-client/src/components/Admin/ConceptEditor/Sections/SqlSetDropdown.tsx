@@ -61,16 +61,16 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                     <FormText color="muted">{subLabel}</FormText>
                     }
                 </Label>
-                <div className={`${c}-dropdown`} ref={this.state.ref} onBlur={this.handleBlur} tabIndex={0}>
+                <div className={`admin-panel-dropdown`} ref={this.state.ref} onBlur={this.handleBlur} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c} onFocus={this.handleFocus}>
                         <DropdownToggle>
                             <div>
                                 {displayText} 
-                                <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                                <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                             </div>
                         </DropdownToggle>
                         <DropdownMenu>
-                            <div className={`${c}-dropdown-item-container`}>
+                            <div className={`admin-panel-dropdown-item-container`}>
                             {sets.map((s) => {
                                 return (
                                     <DropdownItem 
@@ -110,7 +110,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     private handleBlur = (e: any) => {
         const { focusToggle } = this.props;
         if (focusToggle) { 
-            if (e.currentTarget.className === "concept-editor-dropdown" && divFocused) {
+            if (e.currentTarget.className === 'admin-panel-dropdown' && divFocused) {
                 divFocused = false;
                 focusToggle(false); 
             }
