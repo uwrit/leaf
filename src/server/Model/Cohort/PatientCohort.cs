@@ -13,7 +13,7 @@ namespace Model.Cohort
     {
         public Guid? QueryId { get; set; }
         public HashSet<string> PatientIds { get; set; } = new HashSet<string>();
-        public IEnumerable<string> SqlStatements { get; set; }
+        public IEnumerable<string> SqlStatements { get; set; } = new string[] { };
 
         int count;
         public int Count

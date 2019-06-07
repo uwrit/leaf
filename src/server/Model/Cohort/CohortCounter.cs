@@ -165,7 +165,7 @@ namespace Model.Cohort
             var query = validator.Validate(ctx);
 
             var cohort = await counter.GetPatientCohortAsync(query, token);
-            log.LogInformation("CohortCounter cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
+            log.LogInformation("CohortCounter.FullCount cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
 
             token.ThrowIfCancellationRequested();
 
