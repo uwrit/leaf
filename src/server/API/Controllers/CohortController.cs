@@ -33,49 +33,6 @@ namespace API.Controllers
             log = logger;
         }
 
-        [HttpPost("count")]
-        public async Task<ActionResult<CohortCountDTO>> Count(
-            [FromBody] PatientCountQueryDTO patientCountQuery,
-            [FromServices] CohortCounter counter,
-            CancellationToken cancelToken)
-        {
-            try
-            {
-                var cohort = await counter.Count(patientCountQuery, cancelToken);
-                var resp = new CohortCountDTO(cohort);
-                if (!cohort.ValidationContext.PreflightPassed)
-                {
-                    return BadRequest(resp);
-                }
-
-                return Ok(resp);
-            }
-            catch (ArgumentNullException ane)
-            {
-                log.LogError("Missing argument. Error:{Error}", ane.Message);
-                return BadRequest();
-            }
-            catch (OperationCanceledException)
-            {
-                log.LogInformation("Request cancelled.");
-                return NoContent();
-            }
-            catch (LeafCompilerException ce)
-            {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
-                return BadRequest();
-            }
-            catch (LeafRPCException le)
-            {
-                return StatusCode(le.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed to execute query. Error:{Error}", ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         [HttpGet("{queryid}/demographics")]
         public async Task<ActionResult<Demographic>> Demographics(
             string queryid,
