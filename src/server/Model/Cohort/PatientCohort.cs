@@ -12,7 +12,7 @@ namespace Model.Cohort
     public class PatientCohort
     {
         public Guid? QueryId { get; set; }
-        public HashSet<string> PatientIds { get; set; }
+        public HashSet<string> PatientIds { get; set; } = new HashSet<string>();
         public IEnumerable<string> SqlStatements { get; set; }
 
         int count;
@@ -33,6 +33,8 @@ namespace Model.Cohort
                 return count;
             }
         }
+
+        public bool Any() => PatientIds.Any();
 
         public IEnumerable<SeasonedPatient> SeasonedPatients(int maxExport, Guid queryId)
         {
