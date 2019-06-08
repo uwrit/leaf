@@ -12,7 +12,7 @@ import { InformationModalState, ConfirmationModalState } from '../../../models/s
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
 import { Section } from '../Section/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
-import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import { PatientListDatasetShape, PatientListDatasetQuery, IndexedPatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { Constraints } from './Constraints/Constraints';
@@ -44,17 +44,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             shapes: []
         }
     }
-
-    public getSnapshotBeforeUpdate(prevProps: Props) {
-        const { datasets, data } = this.props;
-        if (data.datasets.currentDataset && prevProps.datasets.display !== datasets.display) {
-            this.updateDatasetIndexes();
-        }
-
-        return null;
-    }
-
-    public componentDidUpdate() { }
 
     public componentDidMount() {
         const { dispatch } = this.props;
@@ -95,6 +84,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 handleDatasetSelect={this.handleDatasetSelect}
                                 handleDatasetRequest={this.handleDatasetRequest}
                                 searchEnabled={!changed}
+                                selected={datasets.selected}
                             />
                         </Col>
                         <div className={`${c}-column-right admin-panel-editor`}>
@@ -102,7 +92,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* New, Undo, Save, Delete buttons */}
-                                {datasets.allMap.size > 0 &&
+                                {datasets.categorized.size > 0 &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
@@ -226,10 +216,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { data, datasets, dispatch } = this.props;
         const { datasetQueryCategories } = data;
         const { currentDataset } = data.datasets;
-        const { categoryIdx, datasetIdx } = this.state;
 
         const newAdminDs = Object.assign({}, currentDataset, { [propName]: val }) as AdminDatasetQuery;
-        const userDs = datasets.allMap.get(currentDataset!.id);
+        const userDs = datasets.all.get(currentDataset!.id);
         const newDs: PatientListDatasetQuery = {
             ...userDs,
             ...newAdminDs,
@@ -237,7 +226,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         };
 
         dispatch(setAdminDataset(newAdminDs, true));
-        dispatch(setDatasetDisplay(newDs, categoryIdx, datasetIdx));
     }
 
     /*
@@ -246,7 +234,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     private handleCategoryChange = (categoryId: number) => {
         const { data, dispatch, datasets } = this.props;
         const { currentDataset } = data.datasets;
-        const { categoryIdx, datasetIdx } = this.state;
 
         if (currentDataset!.categoryId !== categoryId) {
             const newCategory = data.datasetQueryCategories.categories.get(categoryId);
@@ -254,7 +241,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             const hadCategory = Boolean(currentDataset!.categoryId);
 
             const adminDs: AdminDatasetQuery = Object.assign({}, currentDataset, { categoryId });
-            const userDs = datasets.allMap.get(currentDataset!.id);
+            const userDs = datasets.all.get(currentDataset!.id);
             const ds: PatientListDatasetQuery = {
                 ...userDs,
                 ...currentDataset!,
@@ -262,36 +249,16 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     ? data.datasetQueryCategories.categories.get(currentDataset!.categoryId!)!.category
                     : ''
             }
-            dispatch(setDatasetDisplay(ds, categoryIdx, datasetIdx));
             dispatch(moveDatasetCategory(ds, newCategoryText));
             dispatch(setAdminDataset(adminDs, true));
         }
     }
 
     /*
-     * Update current dataset index after category change.
-     */
-    private updateDatasetIndexes = () => {
-        const { data, datasets } = this.props;
-        const { currentDataset } = data.datasets;
-        const hasCategory = Boolean(currentDataset!.categoryId);
-        const categoryText = hasCategory
-            ? data.datasetQueryCategories.categories.get(currentDataset!.categoryId!)!.category
-            : ''
-        const categoryIdx = datasets.display.findIndex((cat) => cat.category === categoryText);
-        if (categoryIdx > -1) {
-            const datasetIdx = datasets.display[categoryIdx].datasets.findIndex((ds) => ds.id === currentDataset!.id);
-            if (datasetIdx > -1) {
-                this.setState({ categoryIdx, datasetIdx });
-            }
-        }
-    }
-
-    /*
      * Handle clicks or up/down arrow selections of datasets.
      */
-    private handleDatasetSelect = (id: string) => {
-        const { dispatch, data, datasets } = this.props;
+    private handleDatasetSelect = (dataset: IndexedPatientListDatasetQuery | undefined) => {
+        const { dispatch, data } = this.props;
         const { changed } = data.datasets;
 
         if (data.datasets.state === AdminPanelLoadState.LOADING) { return; }
@@ -304,13 +271,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             dispatch(showInfoModal(info));
             return;
         }
-        const cat = datasets.display[categoryIdx];
-        if (cat) {
-            const ds = cat.datasets[datasetIdx];
-            if (ds) {
-                this.setState({ categoryIdx, datasetIdx });
-                dispatch(fetchAdminDatasetIfNeeded(ds)); 
-            }
+
+        if (dataset) {
+            dispatch(fetchAdminDatasetIfNeeded(dataset)); 
         }
     }
 
@@ -343,7 +306,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             onClickNo: () => null,
             onClickYes: () => { 
                 dispatch(deleteAdminDataset(currentDataset!)); 
-                this.setState({ categoryIdx: 0, datasetIdx: -1 }) 
             },
             show: true,
             noButtonText: `No`,

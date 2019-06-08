@@ -23,7 +23,7 @@ import { setAggregateVisualizationData, setNetworkVisualizationData } from './vi
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
-import { setDatasetsDisplayAll } from '../datasets';
+import { setDatasetDisplay, setDatasetDisplayAll } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -143,7 +143,7 @@ const getDemographics = () => {
                 responders.push(nr); 
             } 
         });
-        dispatch(setDatasetsDisplayAll());
+        dispatch(setDatasetDisplayAll());
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
         Promise.all(

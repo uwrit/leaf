@@ -146,8 +146,8 @@ export interface TokenizedDatasetRef {
  * Dataset query object with properties for the preceding and following query ids.
  */
 export interface IndexedPatientListDatasetQuery extends PatientListDatasetQuery {
-    nextId: string;
-    prevId: string;
+    next?: IndexedPatientListDatasetQuery;
+    prev?: IndexedPatientListDatasetQuery;
 }
 
 /*
@@ -155,13 +155,13 @@ export interface IndexedPatientListDatasetQuery extends PatientListDatasetQuery 
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: IndexedPatientListDatasetQuery[];
+    datasets: Map<string, IndexedPatientListDatasetQuery>;
 }
 
 /*
  * Return object from the dataset search web worker.
  */
 export interface DatasetSearchResult {
-    categories: CategorizedDatasetRef[];
+    categories: Map<string, CategorizedDatasetRef>;
     datasetCount: number;
 }

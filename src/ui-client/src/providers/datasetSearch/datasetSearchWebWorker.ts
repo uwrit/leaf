@@ -50,7 +50,7 @@ export default class DatasetSearchEngineWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([INDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, ALLOW_DEMOGRAPHICS])}
-            ${this.stripFunctionToContext(this.workerContext)}
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -128,12 +128,15 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         // Dataset cache
-        const demographics: IndexedPatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [], nextId: '', prevId: '' };
-        const demographicsCat: CategorizedDatasetRef = { category: '', datasets: [ demographics ]};
+        const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
+        const demographicsCat: CategorizedDatasetRef = { 
+            category: '', 
+            datasets: new Map([[ demographics.id, demographics ]])
+        };
         const excluded: Set<string> = new Set([ demographics.id ]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let demographicsAllowed = false;
-        let allDs: CategorizedDatasetRef[] = [];
+        let allDs: Map<string,CategorizedDatasetRef> = new Map();
         
         /*
          * Sets the special demographics dataset to be included in 
@@ -145,12 +148,10 @@ export default class DatasetSearchEngineWebWorker {
 
             if (allow) {
                 excluded.delete(demographics.id);
-                allDs.unshift(demographicsCat);
+                allDs.set(demographicsCat.category, demographicsCat);
             } else {
                 excluded.add(demographics.id);
-                if (allDs.length && allDs[0].datasets.length && allDs[0].datasets[0].shape === 3) {
-                    allDs.shift();
-                }
+                allDs.delete(demographicsCat.category);
             }
             demographicsAllowed = allow!;
             return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
@@ -173,8 +174,8 @@ export default class DatasetSearchEngineWebWorker {
         /*
          * Returns the count of datasets present in a categorized dataset array.
          */
-        const getDatasetCount = (categories: CategorizedDatasetRef[]): number => {
-            return categories.reduce((sum, cat) => sum + cat.datasets.length, 0);
+        const getDatasetCount = (categories: Map<string,CategorizedDatasetRef>): number => {
+            return [ ...categories.values() ].reduce((sum, cat) => sum + cat.datasets.size, 0);
         }
 
         /*
@@ -207,7 +208,7 @@ export default class DatasetSearchEngineWebWorker {
                 return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) }}; 
             }
             if (!datasets) { 
-                return { requestId, result: { categories: [], datasetCount: 0 } }; 
+                return { requestId, result: { categories: new Map(), datasetCount: 0 } }; 
             }
             
             // ******************
@@ -281,62 +282,42 @@ export default class DatasetSearchEngineWebWorker {
          * Removes duplicates, sorts alphabetically, and
          * returns a displayable categorized array of datasets.
          */
-        const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
-            const added: Set<string> = new Set();
-            const catIdxMap: Map<string,number> = new Map();
-            const out: CategorizedDatasetRef[] = [];
+        const dedupeAndSort = (refs: IndexedPatientListDatasetQuery[]): DatasetSearchResult => {
+            const addedDatasets: Set<string> = new Set();
+            const out: Map<string,CategorizedDatasetRef> = new Map();
             const len = refs.length;
             const lastIdx = len-1;
+            const sortedRefs = refs.sort((a,b) => {
+                if (a.category === b.category) {
+                    return a.name > b.name ? 1 : -1;
+                 }
+                 return a.category > b.category ? 1 : -1;
+            }).map((ref) => Object.assign({}, ref));
 
             for (let i = 0; i < len; i++) {
-                const ref = refs[i];
-                const indexed: IndexedPatientListDatasetQuery = {
-                    ...ref,
-                    nextId: i < lastIdx ? refs[i+1].id : refs[0].id,
-                    prevId: i > 0 ? refs[i-1].id : refs[lastIdx].id
-                }
-                const cat = ref.category ? ref.category : '';
+                const ref = sortedRefs[i];
+                const category = ref.category ? ref.category : '';
 
                 /*
                  * Add the dataset.
                  */
-                if (!added.has(ref.id)) {
-                    /*
-                     * Add the category.
-                     */
-                    let catIdx = catIdxMap.get(cat);
-                    if (catIdx !== undefined) {
-                        out[catIdx].datasets.push(indexed);
+                if (!addedDatasets.has(ref.id)) {
+                    const catObj = out.get(category);
+                    ref.prev = i > 0 ? sortedRefs[i-1] : sortedRefs[lastIdx];
+                    ref.next = i < lastIdx ? sortedRefs[i+1] : refs[0];
+                    
+                    if (catObj) {
+                        catObj.datasets.set(ref.id, ref);
                     } else {
-                        catIdxMap.set(cat, out.length);
-                        out.push({
-                            category: cat,
-                            datasets: [ indexed ]
-                        });
+                        out.set(category, { category, datasets: new Map([[ ref.id, ref ]]) })
                     }
-                    added.add(ref.id);
+                    addedDatasets.add(ref.id);
                 }
             }
             return { 
-                categories: out.sort(categorySorter), 
+                categories: out, 
                 datasetCount: refs.length 
             };
-        };
-
-        /* 
-         * Sorts categories alphabetically.
-         */
-        const categorySorter = (a: CategorizedDatasetRef, b: CategorizedDatasetRef) => {
-            a.datasets.sort(datasetSorter);
-            b.datasets.sort(datasetSorter);
-            return a.category.localeCompare(b.category);
-        };
-
-        /*
-         * Sorts datasets alphabetically by name.
-         */
-        const datasetSorter = (a: PatientListDatasetQuery, b: PatientListDatasetQuery) => {
-            return a.name.localeCompare(b.name);
         };
 
         /*
