@@ -21,18 +21,16 @@ export interface NetworkIdentityResponseDTO {
 export interface NetworkIdentity extends NetworkIdentityResponseDTO {
     abbreviation: string;
     description?: string;
-    isHomeNode: boolean;
     totalPatients?: number;
     latitude?: number;
     longitude?: number;
-    primaryColor: string;
     runtime: RuntimeMode;
+    primaryColor: string;
     secondaryColor: string;
-    enabled?: boolean;
-}
 
-export interface NetworkResponder extends NetworkIdentityResponseDTO, NetworkIdentity {
+    isGateway: boolean;
     enabled: boolean;
+    isHomeNode: boolean;
 }
 
 export enum RuntimeMode {

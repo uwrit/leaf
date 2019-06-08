@@ -32,6 +32,7 @@ var excluded = new Set([demographics.id]);
 var firstCharCache = new Map();
 var demographicsAllowed = false;
 var allDs = new Map();
+var defaultOrder = new Map();
 /*
  * Sets the special demographics dataset to be included in
  * search results. This is used in the admin panel and ensure
@@ -48,7 +49,7 @@ var allowDemographics = function (payload) {
         allDs.delete(demographicsCat.category);
     }
     demographicsAllowed = allow;
-    return { requestId: requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+    return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
 };
 /*
  * Resets excluded datasets cache. Called when users
@@ -60,13 +61,7 @@ var allowAllDatasets = function (payload) {
     if (!demographicsAllowed) {
         excluded.add(demographics.id);
     }
-    return { requestId: requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
-};
-/*
- * Returns the count of datasets present in a categorized dataset array.
- */
-var getDatasetCount = function (categories) {
-    return [ ...categories.values() ].reduce((sum, cat) => sum + cat.datasets.size, 0);
+    return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
 };
 /*
  * Allows or disallows a dataset to be included in search results.
@@ -93,10 +88,10 @@ var searchDatasets = function (payload) {
     var datasets = firstCharCache.get(firstTerm[0]);
     var dsOut = [];
     if (!searchString) {
-        return { requestId: requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+        return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
     }
     if (!datasets) {
-        return { requestId: requestId, result: { categories: new Map(), datasetCount: 0 } };
+        return { requestId: requestId, result: { categories: new Map(), displayOrder: new Map() } };
     }
     // ******************
     // First term
@@ -162,46 +157,58 @@ var dedupeAndSortTokenized = function (refs) {
  */
 var dedupeAndSort = function (refs) {
     var addedDatasets = new Set();
+    var addedRefs = [];
     var out = new Map();
-    var len = refs.length;
-    var lastIdx = len - 1;
-    var sortedRefs = refs.sort((a,b) => {
-        if (a.category === b.category) {
-            return a.name > b.name ? 1 : -1;
-         }
-         return a.category > b.category ? 1 : -1;
-    }).map((ref) => Object.assign({}, ref));
-    for (var i = 0; i < len; i++) {
-        var ref = sortedRefs[i];
-        var category = ref.category ? ref.category : '';
-        /*
-        * Add the dataset.
-        */
+    var displayOrder = new Map();
+    var includesDemographics = false;
+    /*
+    * Get unique only.
+    */
+    for (var i = 0; i < refs.length; i++) {
+        var ref = refs[i];
         if (!addedDatasets.has(ref.id)) {
-            var catObj = out.get(category);
-            ref.prev = i > 0 ? sortedRefs[i-1] : sortedRefs[lastIdx];
-            ref.next = i < lastIdx ? sortedRefs[i+1] : refs[0];
-            if (catObj) {
-                catObj.datasets.set(ref.id, ref);
+            if (ref.shape === 3) {
+                includesDemographics = true;
             }
             else {
-                out.set(category, { category: category, datasets: new Map([[ref.id, ref]]) });
+                addedRefs.push(ref);
+                addedDatasets.add(ref.id);
             }
-            addedDatasets.add(ref.id);
         }
     }
-    return {
-        categories: out,
-        datasetCount: refs.length
-    };
-};
-/*
- * Sorts categories alphabetically.
- */
-var sortCategories = function (input) {
-    var sortedCats = new Map([ ...input.entries()].sort());
-    sortedCats.forEach((cat) => cat.datasets = new Map([ ...cat.datasets ].sort()));
-    return sortedCats;
+    /*
+    * Sort.
+    */
+    var sortedRefs = addedRefs.sort(function (a, b) {
+        if (a.category === b.category) {
+            return a.name > b.name ? 1 : -1;
+        }
+        return a.category > b.category ? 1 : -1;
+    });
+    if (includesDemographics) {
+        sortedRefs.unshift(demographics);
+    }
+    var len = sortedRefs.length;
+    var lastIdx = len - 1;
+    /*
+    * Add to map.
+    */
+    for (var i = 0; i < len; i++) {
+        var ref = sortedRefs[i];
+        var catObj = out.get(ref.category);
+        var order = {
+            prevId: i > 0 ? sortedRefs[i - 1].id : sortedRefs[lastIdx].id,
+            nextId: i < lastIdx ? sortedRefs[i + 1].id : sortedRefs[0].id
+        };
+        displayOrder.set(ref.id, order);
+        if (catObj) {
+            catObj.datasets.set(ref.id, ref);
+        }
+        else {
+            out.set(ref.category, { category: ref.category, datasets: new Map([[ref.id, ref]]) });
+        }
+    }
+    return { categories: out, displayOrder: displayOrder };
 };
 /*
  * Resets the dataset search cache and (re)loads
@@ -259,6 +266,7 @@ var addDatasetsToCache = function (payload) {
     }
     var sorted = dedupeAndSort(all);
     allDs = sorted.categories;
+    defaultOrder = sorted.displayOrder;
     return { requestId: requestId, result: sorted };
 };
 `;

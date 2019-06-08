@@ -7,7 +7,7 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, IndexedPatientListDatasetQuery } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
 const INDEX_DATASETS = 'INDEX_DATASETS';
@@ -136,7 +136,8 @@ export default class DatasetSearchEngineWebWorker {
         const excluded: Set<string> = new Set([ demographics.id ]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let demographicsAllowed = false;
-        let allDs: Map<string,CategorizedDatasetRef> = new Map();
+        let allDs: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
         
         /*
          * Sets the special demographics dataset to be included in 
@@ -154,7 +155,7 @@ export default class DatasetSearchEngineWebWorker {
                 allDs.delete(demographicsCat.category);
             }
             demographicsAllowed = allow!;
-            return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+            return { requestId, result: { categories: allDs, displayOrder: defaultOrder } };
         }
 
         /* 
@@ -168,15 +169,8 @@ export default class DatasetSearchEngineWebWorker {
             if (!demographicsAllowed) {
                 excluded.add(demographics.id);
             }
-            return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+            return { requestId, result: { categories: allDs, displayOrder: defaultOrder } };
         };
-
-        /*
-         * Returns the count of datasets present in a categorized dataset array.
-         */
-        const getDatasetCount = (categories: Map<string,CategorizedDatasetRef>): number => {
-            return [ ...categories.values() ].reduce((sum, cat) => sum + cat.datasets.size, 0);
-        }
 
         /*
          * Allows or disallows a dataset to be included in search results.
@@ -205,10 +199,10 @@ export default class DatasetSearchEngineWebWorker {
             const dsOut: TokenizedDatasetRef[] = [];
 
             if (!searchString) {
-                return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) }}; 
+                return { requestId, result: { categories: allDs, displayOrder: defaultOrder }}; 
             }
             if (!datasets) { 
-                return { requestId, result: { categories: new Map(), datasetCount: 0 } }; 
+                return { requestId, result: { categories: new Map(), displayOrder: new Map() } }; 
             }
             
             // ******************
@@ -282,42 +276,60 @@ export default class DatasetSearchEngineWebWorker {
          * Removes duplicates, sorts alphabetically, and
          * returns a displayable categorized array of datasets.
          */
-        const dedupeAndSort = (refs: IndexedPatientListDatasetQuery[]): DatasetSearchResult => {
+        const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
             const addedDatasets: Set<string> = new Set();
-            const out: Map<string,CategorizedDatasetRef> = new Map();
-            const len = refs.length;
-            const lastIdx = len-1;
-            const sortedRefs = refs.sort((a,b) => {
-                if (a.category === b.category) {
-                    return a.name > b.name ? 1 : -1;
-                 }
-                 return a.category > b.category ? 1 : -1;
-            }).map((ref) => Object.assign({}, ref));
+            const addedRefs: PatientListDatasetQuery[] = [];
+            const out: Map<string, CategorizedDatasetRef> = new Map();
+            const displayOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
+            let includesDemographics = false;
 
-            for (let i = 0; i < len; i++) {
-                const ref = sortedRefs[i];
-                const category = ref.category ? ref.category : '';
-
-                /*
-                 * Add the dataset.
-                 */
+            /*
+             * Get unique only.
+             */
+            for (let i = 0; i < refs.length; i++) {
+                const ref = refs[i];
                 if (!addedDatasets.has(ref.id)) {
-                    const catObj = out.get(category);
-                    ref.prev = i > 0 ? sortedRefs[i-1] : sortedRefs[lastIdx];
-                    ref.next = i < lastIdx ? sortedRefs[i+1] : refs[0];
-                    
-                    if (catObj) {
-                        catObj.datasets.set(ref.id, ref);
+                    if (ref.shape === 3) {
+                        includesDemographics = true;
                     } else {
-                        out.set(category, { category, datasets: new Map([[ ref.id, ref ]]) })
+                        addedRefs.push(ref);
+                        addedDatasets.add(ref.id);
                     }
-                    addedDatasets.add(ref.id);
                 }
             }
-            return { 
-                categories: out, 
-                datasetCount: refs.length 
-            };
+
+            /*
+             * Sort.
+             */
+            const sortedRefs = addedRefs.sort((a,b) => {
+                if (a.category === b.category) { 
+                    return a.name > b.name ? 1 : -1;
+                }
+                return a.category > b.category ? 1 : -1;
+            });
+            if (includesDemographics) { sortedRefs.unshift(demographics); }
+            const len = sortedRefs.length;
+            const lastIdx = len-1;
+
+            /*
+             * Add to map.
+             */
+            for (let i = 0; i < len; i++) {
+                const ref = sortedRefs[i];
+                const catObj = out.get(ref.category);
+                const order: PatientListDatasetQueryIndex = {
+                    prevId: i > 0 ? sortedRefs[i-1].id : sortedRefs[lastIdx].id,
+                    nextId: i < lastIdx ? sortedRefs[i+1].id : sortedRefs[0].id
+                }
+                displayOrder.set(ref.id, order);
+                
+                if (catObj) {
+                    catObj.datasets.set(ref.id, ref);
+                } else {
+                    out.set(ref.category, { category: ref.category, datasets: new Map([[ ref.id, ref ]]) })
+                }
+            }
+            return { categories: out, displayOrder };
         };
 
         /*
@@ -374,6 +386,7 @@ export default class DatasetSearchEngineWebWorker {
 
             const sorted = dedupeAndSort(all);
             allDs = sorted.categories;
+            defaultOrder = sorted.displayOrder;
 
             return { requestId, result: sorted };
         };

@@ -12,14 +12,14 @@ import { InformationModalState, ConfirmationModalState } from '../../../models/s
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
 import { Section } from '../Section/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
-import { PatientListDatasetShape, PatientListDatasetQuery, IndexedPatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
 import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
-import { allowDemographicsDatasetInSearch, moveDatasetCategory, setDatasetDisplay, addDataset } from '../../../actions/datasets';
+import { allowDemographicsDatasetInSearch, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
 import { generate as generateId } from 'shortid';
 import { Display } from './Sections/Display';
 import { SqlEditor } from './Sections/SqlEditor';
@@ -92,7 +92,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* New, Undo, Save, Delete buttons */}
-                                {datasets.categorized.size > 0 &&
+                                {datasets.display.size > 0 &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
@@ -225,6 +225,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
         };
 
+        dispatch(setDatasetDisplay(newDs));
         dispatch(setAdminDataset(newAdminDs, true));
     }
 
@@ -257,7 +258,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     /*
      * Handle clicks or up/down arrow selections of datasets.
      */
-    private handleDatasetSelect = (dataset: IndexedPatientListDatasetQuery | undefined) => {
+    private handleDatasetSelect = (dataset: PatientListDatasetQuery) => {
         const { dispatch, data } = this.props;
         const { changed } = data.datasets;
 
@@ -272,9 +273,8 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             return;
         }
 
-        if (dataset) {
-            dispatch(fetchAdminDatasetIfNeeded(dataset)); 
-        }
+        dispatch(setDatasetSelected(dataset));
+        dispatch(fetchAdminDatasetIfNeeded(dataset));
     }
 
     /*

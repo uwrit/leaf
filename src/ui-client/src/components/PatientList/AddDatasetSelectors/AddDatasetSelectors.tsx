@@ -12,7 +12,7 @@ import { DateBoundary } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
-import { IndexedPatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 
 interface Props {
     className?: string;
@@ -20,7 +20,7 @@ interface Props {
     dates: DateBoundary[];
     datasets: DatasetsState;
     dispatch: any;
-    handleDatasetSelect: (dataset: IndexedPatientListDatasetQuery | undefined) => void;
+    handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
     handleDateSelect: (date: DateBoundary) => void;
     selectedDates: DateBoundary;
 }
@@ -62,7 +62,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                 <div className={`${c}-select-footer`}>
                     <Button 
                         className="leaf-button leaf-button-primary" 
-                        disabled={datasets.displayCount === 0}
+                        disabled={datasets.displayOrder.size === 0}
                         onClick={this.handleDatasetRequest}
                         style={{ float: 'right' }}>
                         Add Dataset
@@ -86,8 +86,9 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
         const { datasets, selectedDates, dispatch, handleDatasetSelect } = this.props;
 
         if (datasets.selected) {
-            dispatch(getPatientListDataset(datasets.selected, selectedDates));
-            handleDatasetSelect(datasets.selected);
+            const ds = datasets.all.get(datasets.selected)!;
+            dispatch(getPatientListDataset(ds, selectedDates));
+            handleDatasetSelect(ds);
         }
     }
 }

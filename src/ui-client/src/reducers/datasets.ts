@@ -25,9 +25,11 @@ export const defaultDatasetsState = (): DatasetsState => {
     return {
         all: new Map(),
         allCategorized: new Map(),
+        allOrder: new Map(),
         display: new Map(),
-        displayCount: 0,
-        searchTerm: ''
+        displayOrder: new Map(),
+        searchTerm: '',
+        selected: ''
     };
 };
 
@@ -37,16 +39,17 @@ const setDatasets = (state: DatasetsState, action: DatasetAction): DatasetsState
 
     return Object.assign({}, state, {
         all,
-        allCategorized: action.categories!,
-        display: action.categories!,
-        displayCount: action.datasets!.length
+        allCategorized: action.result!.categories,
+        allOrder: action.result!.displayOrder,
+        display: action.result!.categories,
+        displayOrder: action.result!.displayOrder
     });
 };
 
 const setDatasetsSearchTermResult = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     return Object.assign({}, state, {
         display: action.result!.categories,
-        displayCount: action.result!.datasetCount
+        displayOrder: action.result!.displayOrder
     });
 };
 
@@ -61,14 +64,14 @@ const setDatasetDisplay = (state: DatasetsState, action: DatasetAction): Dataset
 
 const setDatasetDisplayAll = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     return Object.assign({}, state, {
-        display: new Map(state.allCategorized),
-        displayCount: state.all.size
+        display: state.allCategorized,
+        displayOrder: state.allOrder
     });
 };
 
 const setDatasetSelected = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     return Object.assign({}, state, {
-        selected: action.dataset
+        selected: action.dataset!.id
     });
 };
 
@@ -95,11 +98,17 @@ const removeDataset = (state: DatasetsState, action: DatasetAction): DatasetsSta
     state.allCategorized.get(ds.category)!.datasets.delete(ds.id);
     state.display.get(ds.category)!.datasets.delete(ds.id);
 
+    if (!state.allCategorized.has(ds.category)) {
+        state.allCategorized.delete(ds.category);
+    }
+    if (!state.display.has(ds.category)) {
+        state.display.delete(ds.category);
+    }
+
     return Object.assign({}, state, {
         all: new Map(state.all),
         allCategorized: new Map(state.allCategorized),
-        display: new Map(state.display),
-        displayCount: state.displayCount - 1
+        display: new Map(state.display)
     });
 };
 
@@ -114,8 +123,7 @@ const addDataset = (state: DatasetsState, action: DatasetAction): DatasetsState 
     }
 
     return Object.assign({}, state, {
-        display: new Map(state.display),
-        displayCount: state.displayCount + 1
+        display: new Map(state.display)
     });
 };
 
@@ -125,7 +133,10 @@ const moveDatasetCategory = (state: DatasetsState, action: DatasetAction): Datas
 
     const oldCategory = state.display.get(ds.category);
     if (oldCategory) { 
-        oldCategory.datasets.delete(ds.id); 
+        oldCategory.datasets.delete(ds.id);
+        if (!oldCategory.datasets.size) {
+            state.display.delete(oldCategory.category);
+        }
     }
 
     let newCategory = state.display.get(category);

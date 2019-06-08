@@ -14,9 +14,9 @@ import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/pan
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import { createPortal } from 'react-dom';
 import { DatasetsState } from '../../../models/state/AppState';
-import './AddDatasetButton.css';
-import { IndexedPatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { setDatasetSelected } from '../../../actions/datasets';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import './AddDatasetButton.css';
 
 interface Props {
     cohortMap: Map<number, NetworkCohortState>;
@@ -124,16 +124,17 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         let selectedName = '';
 
         if (datasets.selected) {
-            if (datasets.selected.name.length > 30) {
-                selectedName = datasets.selected.name.substring(0, 30) + '...';
+            const name = datasets.all.get(datasets.selected)!.name;
+            if (name.length > 30) {
+                selectedName = name.substring(0, 30) + '...';
             } else {
-                selectedName = datasets.selected.name;
+                selectedName = name;
             }
         }
 
         if (configuration.isFetching) {
             return <div className={`${c}-button-dataset`}>Loading data...</div>;
-        } else if (showSelectorModal && datasets.display.size) {
+        } else if (showSelectorModal && datasets.display.size && datasets.selected) {
             return <div className={`${c}-button-dataset`}>+ {selectedName}</div>;
         } else {
             return <span>+ Add More Data</span>;
@@ -144,7 +145,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         this.setState({ selectedDates: opt });
     }
 
-    private handleDatasetOptionClick = (dataset: IndexedPatientListDatasetQuery | undefined) => {
+    private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
         const { dispatch } = this.props;
         dispatch(setDatasetSelected(dataset));
     }

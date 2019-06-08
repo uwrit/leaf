@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef, IndexedPatientListDatasetQuery } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef } from "../models/patientList/Dataset";
 import { AppState } from "../models/state/AppState";
 import { Dispatch } from "redux";
 import { searchDatasets, allowAllDatasets, allowDemographics } from "../services/datasetSearchApi";
@@ -25,7 +25,7 @@ export interface DatasetAction {
     category?: string;
     categories?: Map<string, CategorizedDatasetRef>;
     datasetsAvailableCount?: number;
-    dataset?: PatientListDatasetQuery | IndexedPatientListDatasetQuery;
+    dataset?: PatientListDatasetQuery;
     datasets?: PatientListDatasetQuery[];
     result?: DatasetSearchResult;
     searchTerm?: string;
@@ -36,7 +36,7 @@ export interface DatasetAction {
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await searchDatasets(searchTerm);
-        console.log('search results', results);
+        console.log('search results order', results);
         dispatch(setDatasetSearchResult(results));
     };
 };
@@ -58,28 +58,28 @@ export const allowDemographicsDatasetInSearch = (allow: boolean) => {
 };
 
 // Synchronous
-export const addDataset = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery): DatasetAction  => {
+export const addDataset = (dataset: PatientListDatasetQuery): DatasetAction  => {
     return {
         dataset,
         type: ADD_DATASET
     };
 };
 
-export const setDataset = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery): DatasetAction  => {
+export const setDataset = (dataset: PatientListDatasetQuery): DatasetAction  => {
     return {
         dataset,
         type: SET_DATASET
     };
 };
 
-export const setDatasetSelected = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery | undefined): DatasetAction  => {
+export const setDatasetSelected = (dataset: PatientListDatasetQuery): DatasetAction  => {
     return {
         dataset,
         type: SET_DATASET_SELECTED
     };
 };
 
-export const setDatasetDisplay = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery): DatasetAction  => {
+export const setDatasetDisplay = (dataset: PatientListDatasetQuery): DatasetAction  => {
     return {
         dataset,
         type: SET_DATASET_DISPLAY
@@ -101,9 +101,9 @@ export const moveDatasetCategory = (dataset: PatientListDatasetQuery, category: 
 };
 
 
-export const setDatasets = (datasets: PatientListDatasetQuery[], categories: Map<string, CategorizedDatasetRef>): DatasetAction => {
+export const setDatasets = (datasets: PatientListDatasetQuery[], result: DatasetSearchResult): DatasetAction => {
     return {
-        categories,
+        result,
         datasets,
         type: SET_DATASETS
     };
@@ -123,7 +123,7 @@ export const setDatasetSearchResult = (result: DatasetSearchResult): DatasetActi
     };
 };
 
-export const removeDataset = (dataset: PatientListDatasetQuery | IndexedPatientListDatasetQuery): DatasetAction => {
+export const removeDataset = (dataset: PatientListDatasetQuery): DatasetAction => {
     return {
         dataset,
         type: REMOVE_DATASET
