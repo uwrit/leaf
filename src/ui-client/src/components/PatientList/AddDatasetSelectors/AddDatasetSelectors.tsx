@@ -12,16 +12,15 @@ import { DateBoundary } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 
 interface Props {
-    categoryIdx: number;
     className?: string;
     configuration: PatientListConfiguration;
-    datasetIdx: number;
     dates: DateBoundary[];
     datasets: DatasetsState;
     dispatch: any;
-    handleDatasetSelect: (categoryIdx: number, datasetIdx: number) => void;
+    handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
     handleDateSelect: (date: DateBoundary) => void;
     selectedDates: DateBoundary;
 }
@@ -32,19 +31,18 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { categoryIdx, datasetIdx, datasets, className, dates, dispatch, handleDatasetSelect } = this.props;
+        const { datasets, className, dates, dispatch, handleDatasetSelect } = this.props;
         const c = className ? className : 'patientlist-add-dataset';
         return (
             <div>
                 <Row>
                     <Col md={7} className={`${c}-select-col-left`}>
                         <DatasetContainer 
-                            categoryIdx={categoryIdx}
-                            datasetIdx={datasetIdx}
                             datasets={datasets}
                             dispatch={dispatch}
                             handleDatasetSelect={handleDatasetSelect}
                             handleDatasetRequest={this.handleDatasetRequest}
+                            selected={datasets.selected}
                         />
                     </Col>
                     <Col md={5} className={`${c}-select-col-right`}>
@@ -64,7 +62,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                 <div className={`${c}-select-footer`}>
                     <Button 
                         className="leaf-button leaf-button-primary" 
-                        disabled={datasets.displayCount === 0}
+                        disabled={datasets.displayOrder.size === 0}
                         onClick={this.handleDatasetRequest}
                         style={{ float: 'right' }}>
                         Add Dataset
@@ -85,13 +83,12 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
     }
 
     private handleDatasetRequest = () => {
-        const { datasets, categoryIdx, datasetIdx, selectedDates, dispatch, handleDatasetSelect } = this.props;
-        const cat = datasets.display[categoryIdx];
-        const ds = cat ? cat.datasets[datasetIdx] : undefined;
+        const { datasets, selectedDates, dispatch, handleDatasetSelect } = this.props;
 
-        if (ds) {
+        if (datasets.selected) {
+            const ds = datasets.all.get(datasets.selected)!;
             dispatch(getPatientListDataset(ds, selectedDates));
-            handleDatasetSelect(0,0);
+            handleDatasetSelect(ds);
         }
     }
 }

@@ -110,7 +110,7 @@ class PatientList extends React.PureComponent<Props, State> {
                             {datasetDefs.map((d: PatientListDatasetDefinition) => (
                                 <DatasetColumnSelector className={c} data={d} dispatch={dispatch} key={d.id} />
                             ))}
-                            {datasetDefs.length <= datasets.allMap.size &&
+                            {datasetDefs.length <= datasets.all.size &&
                             <AddDatasetButton 
                                 cohortMap={cohort.networkCohorts}
                                 configuration={patientList.configuration} 

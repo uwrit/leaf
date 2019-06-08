@@ -96,7 +96,7 @@ export class LeafMap extends React.Component<Props, State> {
         const markers: any[] = [];
         const popups: any[] = [];
         const paths: any[] = [];
-        const home: NetworkIdentity = networkResponders.get(0)!;
+        const home = networkResponders.get(0);
         const responders: NetworkIdentity[] = networkResponders.size > 0 && cohort.networkCohorts.size > 0
             ? [ ...networkResponders.values() ].filter((n: NetworkIdentity) => n.enabled && n.latitude && n.longitude)
             : [];
@@ -106,7 +106,7 @@ export class LeafMap extends React.Component<Props, State> {
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude!, nr.longitude!)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 
-            if (nr.id > 0) {
+            if (home && nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;
                 const line = CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ]);
                 if (home.enabled) {

@@ -14,11 +14,13 @@ export const getDefaultIdentity = (): NetworkIdentity => {
     return {
         abbreviation: '',
         address: '',
+        enabled: true,
         id: 0,
+        isGateway: false,
         isHomeNode: true,
         name: '',
-        primaryColor: '',
         runtime: RuntimeMode.Full,
+        primaryColor: '',
         secondaryColor: ''
     }
  };

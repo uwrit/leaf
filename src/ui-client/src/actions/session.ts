@@ -80,10 +80,9 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Fetch network responders if not in identified mode.
              */
-            const responders: NetworkIdentity[] = [];
-            if (homeBase.identity.runtime === RuntimeMode.Full) {
-                responders.push({ ...homeBase.identity, enabled: true, id: 0, isHomeNode: true });
-            }
+            const responders: NetworkIdentity[] = [
+                { ...homeBase.identity, enabled: true, id: 0, isHomeNode: true, isGateway: homeBase.identity.runtime === RuntimeMode.Gateway }
+            ];
             
             if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
                 await Promise.all(
@@ -124,7 +123,8 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
-            dispatch(setDatasets(datasets, datasetsCategorized.categories));
+            console.log('initial datasets order', datasetsCategorized);
+            dispatch(setDatasets(datasets, datasetsCategorized));
             
             /*
              * Load saved queries.

@@ -14,6 +14,8 @@ import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/pan
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import { createPortal } from 'react-dom';
 import { DatasetsState } from '../../../models/state/AppState';
+import { setDatasetSelected } from '../../../actions/datasets';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import './AddDatasetButton.css';
 
 interface Props {
@@ -25,8 +27,6 @@ interface Props {
 }
 
 interface State {
-    categoryIdx: number;
-    datasetIdx: number;
     selectedDates: DateBoundary;
     showSelectorModal: boolean;
 }
@@ -50,8 +50,6 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     constructor(props: Props) {
         super(props);
         this.state = {
-            categoryIdx: 0,
-            datasetIdx: 0,
             selectedDates: dates[4],
             showSelectorModal: false
         }
@@ -75,7 +73,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     public render() {
         const c = this.className;
-        const { categoryIdx, datasetIdx, selectedDates, showSelectorModal } = this.state;
+        const { selectedDates, showSelectorModal } = this.state;
         const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
@@ -107,10 +105,8 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                     <AddDatasetSelectors 
                         dates={dates}
                         dispatch={dispatch} 
-                        categoryIdx={categoryIdx}
                         configuration={configuration} 
-                        className={c} 
-                        datasetIdx={datasetIdx}
+                        className={c}
                         datasets={datasets}
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
@@ -123,23 +119,22 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     
     private getButtonContent = () => {
         const c = this.className;
-        const { categoryIdx, datasetIdx, showSelectorModal } = this.state;
+        const { showSelectorModal } = this.state;
         const { datasets, configuration } = this.props;
-        const cat = datasets.display[categoryIdx];
-        const ds = cat ? cat.datasets[datasetIdx] : undefined;
         let selectedName = '';
 
-        if (ds) {
-            if (ds.name.length > 30) {
-                selectedName = ds.name.substring(0, 30) + '...';
+        if (datasets.selected) {
+            const name = datasets.all.get(datasets.selected)!.name;
+            if (name.length > 30) {
+                selectedName = name.substring(0, 30) + '...';
             } else {
-                selectedName = ds.name;
+                selectedName = name;
             }
         }
 
         if (configuration.isFetching) {
             return <div className={`${c}-button-dataset`}>Loading data...</div>;
-        } else if (showSelectorModal && datasets.display.length) {
+        } else if (showSelectorModal && datasets.display.size && datasets.selected) {
             return <div className={`${c}-button-dataset`}>+ {selectedName}</div>;
         } else {
             return <span>+ Add More Data</span>;
@@ -150,8 +145,9 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         this.setState({ selectedDates: opt });
     }
 
-    private handleDatasetOptionClick = (categoryIdx: number, datasetIdx: number) => {
-        this.setState({ categoryIdx, datasetIdx });
+    private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
+        const { dispatch } = this.props;
+        dispatch(setDatasetSelected(dataset));
     }
 
     private handleClick = () => {
