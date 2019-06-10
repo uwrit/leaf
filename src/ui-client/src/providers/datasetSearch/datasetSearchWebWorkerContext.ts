@@ -41,8 +41,9 @@ var defaultOrder = new Map();
 var allowDemographics = function (payload) {
     var requestId = payload.requestId, allow = payload.allow;
     if (allow) {
+        const clone = new Map(allDs);
         excluded.delete(demographics.id);
-        allDs.set(demographicsCat.category, demographicsCat);
+        allDs = new Map([ ...new Map([[ demographicsCat.category, demographicsCat ]]), ...clone ]);
     }
     else {
         excluded.add(demographics.id);
@@ -171,6 +172,9 @@ var dedupeAndSort = function (refs) {
                 includesDemographics = true;
             }
             else {
+                if (!ref.category) {
+                    ref.category = '';
+                }
                 addedRefs.push(ref);
                 addedDatasets.add(ref.id);
             }
@@ -208,6 +212,7 @@ var dedupeAndSort = function (refs) {
             out.set(ref.category, { category: ref.category, datasets: new Map([[ref.id, ref]]) });
         }
     }
+    console.log('test');
     return { categories: out, displayOrder: displayOrder };
 };
 /*
@@ -220,7 +225,7 @@ var addDatasetsToCache = function (payload) {
      * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
      */
     var all = datasets.slice().filter(function (ds) { return ds.shape !== 3; });
-    all.push(demographics);
+    all.unshift(demographics);
     firstCharCache.clear();
     /*
      * Foreach dataset
@@ -261,7 +266,7 @@ var addDatasetsToCache = function (payload) {
         }
     }
     if (!demographicsAllowed) {
-        all.pop();
+        all.shift();
         excluded.add(demographics.id);
     }
     var sorted = dedupeAndSort(all);

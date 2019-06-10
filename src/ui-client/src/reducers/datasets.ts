@@ -39,10 +39,10 @@ const setDatasets = (state: DatasetsState, action: DatasetAction): DatasetsState
 
     return Object.assign({}, state, {
         all,
-        allCategorized: action.result!.categories,
-        allOrder: action.result!.displayOrder,
-        display: action.result!.categories,
-        displayOrder: action.result!.displayOrder
+        allCategorized: new Map(action.result!.categories),
+        allOrder: new Map(action.result!.displayOrder),
+        display: new Map(action.result!.categories),
+        displayOrder: new Map(action.result!.displayOrder)
     });
 };
 

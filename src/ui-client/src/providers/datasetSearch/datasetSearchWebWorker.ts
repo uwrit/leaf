@@ -148,8 +148,9 @@ export default class DatasetSearchEngineWebWorker {
             const { requestId, allow } = payload;
 
             if (allow) {
+                const clone = new Map(allDs);
                 excluded.delete(demographics.id);
-                allDs.set(demographicsCat.category, demographicsCat);
+                allDs = new Map([ ...new Map([[ demographicsCat.category, demographicsCat ]]), ...clone ]);
             } else {
                 excluded.add(demographics.id);
                 allDs.delete(demographicsCat.category);
@@ -292,6 +293,9 @@ export default class DatasetSearchEngineWebWorker {
                     if (ref.shape === 3) {
                         includesDemographics = true;
                     } else {
+                        if (!ref.category) {
+                            ref.category = '';
+                        }
                         addedRefs.push(ref);
                         addedDatasets.add(ref.id);
                     }
@@ -343,7 +347,7 @@ export default class DatasetSearchEngineWebWorker {
              * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
              */
             const all = datasets!.slice().filter((ds) => ds.shape !== 3);
-            all.push(demographics);
+            all.unshift(demographics);
             firstCharCache.clear();
         
             /* 
@@ -380,7 +384,7 @@ export default class DatasetSearchEngineWebWorker {
             }
 
             if (!demographicsAllowed) {
-                all.pop();
+                all.shift();
                 excluded.add(demographics.id);
             }
 

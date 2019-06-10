@@ -154,9 +154,11 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                         />
                     </Col>
                     <Col md={6}>
+                        {/*
                         <Section header='Access Restrictions'>
                             <Constraints dataset={dataset} changeHandler={this.handleInputChange} locked={locked}/>
                         </Section>
+                        */}
                     </Col>
                 </Row>
             </div>
@@ -327,7 +329,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             constraints: [],
             name,
             shape,
-            sql: '',
+            sqlStatement: '',
             tags: [],
             unsaved: true
         };

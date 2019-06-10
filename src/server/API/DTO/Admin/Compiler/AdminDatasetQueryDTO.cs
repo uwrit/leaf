@@ -37,7 +37,7 @@ namespace API.DTO.Admin.Compiler
             return new AdminDatasetQueryDTO
             {
                 Id = q.Id,
-                UniversalId = q.UniversalId.ToString(),
+                UniversalId = q.UniversalId?.ToString(),
                 Shape = q.Shape,
                 Name = q.Name,
                 CategoryId = q.CategoryId,

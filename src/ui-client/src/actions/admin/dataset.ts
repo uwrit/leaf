@@ -42,11 +42,10 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             /*
              * Reindex search engine.
              */
-            const datasets: PatientListDatasetQuery[] = [];
             const userDataset = deriveUserDatasetFromAdmin(state, dataset);
-
-            state.datasets.allMap.set(dataset.id, userDataset);
-            state.datasets.allMap.forEach((ds) => datasets.push(ds));
+            state.datasets.all.set(dataset.id, userDataset);
+            const datasets: PatientListDatasetQuery[] = [ ...state.datasets.all.values() ];
+            
             await indexDatasets(datasets);
             dispatch(setDataset(userDataset));
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
@@ -99,11 +98,10 @@ export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
             .then(
                 async (response) => {
                     const userDataset = deriveUserDatasetFromAdmin(state, dataset);
+                    const datasets: PatientListDatasetQuery[] = [ ...state.datasets.all.values() ];
                     dispatch(removeDataset(userDataset));
-                    state = getState();
 
-                    const datasets: PatientListDatasetQuery[] = [];
-                    state.datasets.allMap.forEach((ds) => datasets.push(ds));
+                    state = getState();
                     await indexDatasets(datasets);
                     dispatch(setAdminDataset(undefined, false));
                     dispatch(setNoClickModalState({ message: "Dataset Deleted", state: NoClickModalStates.Complete }));
@@ -158,11 +156,12 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
             dispatch(setAdminDataset(admDataset!, false));
             dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADED));
         } catch (err) {
+            console.log(err);
             const info : InformationModalState = {
                 header: "Error Loading Dataset",
                 body: "Leaf encountered an error while attempting to fetch a Dataset. Check the Leaf log file for details.",
                 show: true
-            }
+            };
             dispatch(showInfoModal(info));
             dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.ERROR));
         }

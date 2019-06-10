@@ -16,17 +16,17 @@ import { sleep } from '../../utils/Sleep';
 export const getDatasetQueryCategories = async (state: AppState): Promise<DatasetQueryCategory[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-
-    /*
-    const resp = await http.get('api/admin/datasetquerycategory');
+    const resp = await http.get('api/admin/datasetcategory');
     const cats = resp.data as DatasetQueryCategory[];
-    */
+    return cats;
+    /*
     const cats: DatasetQueryCategory[] = [
         { id: 1, category: 'Encounters' },
         { id: 2, category: 'Labs' },
         { id: 3, category: 'Procedures' },
     ];
     return cats;
+    */
 };
 
 /*
@@ -35,13 +35,9 @@ export const getDatasetQueryCategories = async (state: AppState): Promise<Datase
 export const updateDatasetQueryCategory = async (state: AppState, cat: DatasetQueryCategory): Promise<DatasetQueryCategory> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    /*
-    const resp = await http.put(`api/admin/datasetquerycategory/${cat.id}`, cat);
+    const resp = await http.put(`api/admin/datasetcategory/${cat.id}`, cat);
     const updated = resp.data as DatasetQueryCategory;
     return updated;
-    */
-    await sleep(2000);
-    return cat;
 };
 
 /*
@@ -50,16 +46,12 @@ export const updateDatasetQueryCategory = async (state: AppState, cat: DatasetQu
 export const createDatasetQueryCategory = async (state: AppState, cat: DatasetQueryCategory): Promise<DatasetQueryCategory> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    /*
-    const resp = await http.post(`api/admin/datasetquerycategory`, {
+    const resp = await http.post(`api/admin/datasetcategory`, {
         ...cat,
         id: null
     });
     const newCat = resp.data as DatasetQueryCategory;
     return newCat;
-    */
-    await sleep(2000);
-    return cat;
 };
 
 /*
@@ -68,6 +60,5 @@ export const createDatasetQueryCategory = async (state: AppState, cat: DatasetQu
 export const deleteDatasetQueryCategory = async (state: AppState, cat: DatasetQueryCategory) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    // return http.delete(`api/admin/datasetquerycategory/${cat.id}`);
-    await sleep(2000);
+    await http.delete(`api/admin/datasetcategory/${cat.id}`);
 };
