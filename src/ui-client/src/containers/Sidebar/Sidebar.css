@@ -188,6 +188,7 @@
 
 .sidebar-subroute:hover,
 .sidebar-subroute.selected {
+    background-color: rgba(0,0,0,0.01);
     border-left-color: rgb(28,168,221);
     color: black;
 }

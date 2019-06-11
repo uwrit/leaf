@@ -153,7 +153,10 @@ export default class DatasetSearchEngineWebWorker {
                 allDs = new Map([ ...new Map([[ demographicsCat.category, demographicsCat ]]), ...clone ]);
             } else {
                 excluded.add(demographics.id);
-                allDs.delete(demographicsCat.category);
+                const cat = allDs.get(demographicsCat.category);
+                if (cat) {
+                    cat.datasets.delete(demographics.id);
+                }
             }
             demographicsAllowed = allow!;
             return { requestId, result: { categories: allDs, displayOrder: defaultOrder } };

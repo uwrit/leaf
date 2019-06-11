@@ -346,4 +346,15 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         dispatch(setAdminDataset(newAdminDs, true));
         dispatch(setAdminDatasetSql('SELECT FROM dbo.table'));
     }
+
+    private sqlMeetsRequirements = (): boolean => {
+        const { sqlColumns, currentDataset, expectedColumns } = this.props.data.datasets;
+        if (!currentDataset) { return false; }
+
+        const missingCols = expectedColumns.filter((c) => !c.optional && !sqlColumns.has(c.id));
+        if (missingCols.length) {
+            return false;
+        }
+        return true;
+    }
 }
