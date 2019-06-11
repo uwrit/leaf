@@ -123,15 +123,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
+            console.log('initial datasets categorized', datasetsCategorized);
             dispatch(setDatasets(datasets, datasetsCategorized));
             
             /*
              * Load saved queries.
              */
             dispatch(setSessionLoadState('Loading Saved Queries', 80));
-            const savedCohortsResp = await getSavedQueries(getState());
-            const savedCohortConcepts = await getQueriesAsConcepts(savedCohortsResp.data) as ConceptExtensionInitializer;
-            dispatch(addSavedQueries(savedCohortsResp.data));
+            const savedCohorts = await getSavedQueries(getState());
+            const savedCohortConcepts = await getQueriesAsConcepts(savedCohorts) as ConceptExtensionInitializer;
+            dispatch(addSavedQueries(savedCohorts));
             dispatch(setExtensionConcepts(savedCohortConcepts.concepts, savedCohortConcepts.roots));
 
             /* 

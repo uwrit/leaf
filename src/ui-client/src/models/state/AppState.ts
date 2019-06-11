@@ -56,8 +56,6 @@ export interface MapState {
 
 export interface DatasetsState {
     all: Map<string, PatientListDatasetQuery>;
-    allCategorized: Map<string, CategorizedDatasetRef>;
-    allOrder: Map<string, PatientListDatasetQueryIndex>;
     display: Map<string, CategorizedDatasetRef>;
     displayOrder: Map<string, PatientListDatasetQueryIndex>;
     searchTerm: string;

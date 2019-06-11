@@ -18,16 +18,20 @@ interface Props {
 }
 
 export class Identifiers extends React.PureComponent<Props> {
+    private uidBase = 'urn:leaf:dataset:';
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
         const { dataset, handleInputChange, locked } = this.props;
+        const uid = dataset && dataset.universalId
+        ? dataset.universalId.replace(this.uidBase,'')
+        : '';
         return (
             <Section header='Identifiers'>
                 <TextArea 
-                    changeHandler={handleInputChange} propName={'universalId'} value={dataset ? dataset.universalId : ''}
+                    changeHandler={this.handleUniversalIdChange} propName={'universalId'} value={uid} className={"dataset-editor-dataset-universalid"}
                     label='Universal Id' subLabel='Used if Leaf is querying multiple instances. This Id must match at all institutions in order for queries to be mapped correctly.' locked={locked}
                 />
                 <Tagger
@@ -35,5 +39,16 @@ export class Identifiers extends React.PureComponent<Props> {
                 />
             </Section>
         );
+    }
+
+    private handleUniversalIdChange = (val: any, propName: string) => {
+        const { handleInputChange } = this.props;
+        let value = val;
+        if (value && !value.startsWith(this.uidBase)) {
+            value = this.uidBase + val;
+        } else if (!value || value === this.uidBase) {
+            value = null;
+        }
+        handleInputChange(value, propName);
     }
 };

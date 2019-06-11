@@ -26,10 +26,11 @@ const worker = new ExtensionConceptsWebWorker();
  * that these are pointers to queries (i.e., they contain the UniversaliId),
  * but not the logic that the queries are actually composed of (i.e., panels, Concepts, etc.)
  */
-export const getSavedQueries = async (state: AppState) => {
+export const getSavedQueries = async (state: AppState): Promise<SavedQueryRef[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.get('api/query');
+    const resp = await http.get('api/query');
+    return resp.data as SavedQueryRef[];
 };
 
 /*

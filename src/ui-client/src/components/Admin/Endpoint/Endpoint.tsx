@@ -48,7 +48,7 @@ export class Endpoint extends React.PureComponent<Props,State> {
                             />
                             <TextArea 
                                 changeHandler={this.handleInputChange} propName={'address'} value={endpoint.address}
-                                label='URL' subLabel='Web address to direct API calls (eg, https://leaf.university.org/api)' required={true}
+                                label='URL' subLabel='Web address (eg, https://leaf.university.edu)' required={true}
                             />
                         </Col>
                         <Col md={6}>

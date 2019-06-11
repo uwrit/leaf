@@ -37,9 +37,11 @@ export class SqlEditor extends React.PureComponent<Props> {
             <Section header='SQL'>
                 <div className={`${c}-sql-container`}>
                     <div className={`${c}-column-container`}>
+                        <div className={`${c}-title`}>Expected Columns</div>
                         {expectedColumns.map((col) => this.getColumnContent(col))}
                     </div>
                     <div className={`${c}-sql`}>
+                        <div className={`${c}-title`}>SQL Query</div>
                         <SqlBox sql={sql} height={350} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
                         <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
                     </div>

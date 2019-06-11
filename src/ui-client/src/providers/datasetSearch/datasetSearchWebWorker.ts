@@ -113,7 +113,7 @@ export default class DatasetSearchEngineWebWorker {
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case INDEX_DATASETS:
-                    return addDatasetsToCache(payload);
+                    return reindexCacheFromExternal(payload);
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
                 case ALLOW_DATASET_IN_SEARCH:
@@ -129,14 +129,11 @@ export default class DatasetSearchEngineWebWorker {
 
         // Dataset cache
         const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-        const demographicsCat: CategorizedDatasetRef = { 
-            category: '', 
-            datasets: new Map([[ demographics.id, demographics ]])
-        };
         const excluded: Set<string> = new Set([ demographics.id ]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let demographicsAllowed = false;
-        let allDs: Map<string, CategorizedDatasetRef> = new Map();
+        let allDs: PatientListDatasetQuery[] = [];
+        let allDsMap: Map<string, CategorizedDatasetRef> = new Map();
         let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
         
         /*
@@ -148,18 +145,13 @@ export default class DatasetSearchEngineWebWorker {
             const { requestId, allow } = payload;
 
             if (allow) {
-                const clone = new Map(allDs);
                 excluded.delete(demographics.id);
-                allDs = new Map([ ...new Map([[ demographicsCat.category, demographicsCat ]]), ...clone ]);
             } else {
                 excluded.add(demographics.id);
-                const cat = allDs.get(demographicsCat.category);
-                if (cat) {
-                    cat.datasets.delete(demographics.id);
-                }
             }
             demographicsAllowed = allow!;
-            return { requestId, result: { categories: allDs, displayOrder: defaultOrder } };
+            reindexCacheFromLocal(payload);
+            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
         }
 
         /* 
@@ -173,7 +165,7 @@ export default class DatasetSearchEngineWebWorker {
             if (!demographicsAllowed) {
                 excluded.add(demographics.id);
             }
-            return { requestId, result: { categories: allDs, displayOrder: defaultOrder } };
+            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
         };
 
         /*
@@ -203,7 +195,7 @@ export default class DatasetSearchEngineWebWorker {
             const dsOut: TokenizedDatasetRef[] = [];
 
             if (!searchString) {
-                return { requestId, result: { categories: allDs, displayOrder: defaultOrder }}; 
+                return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder }}; 
             }
             if (!datasets) { 
                 return { requestId, result: { categories: new Map(), displayOrder: new Map() } }; 
@@ -339,18 +331,30 @@ export default class DatasetSearchEngineWebWorker {
             return { categories: out, displayOrder };
         };
 
+        const reindexCacheFromLocal = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            const sorted = addDatasetsToCache(allDs);
+            return { requestId, result: sorted }
+        }   
+
+        const reindexCacheFromExternal = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, datasets } = payload;
+            const sorted = addDatasetsToCache(datasets!);
+            return { requestId, result: sorted }
+        }   
+
         /*
          * Resets the dataset search cache and (re)loads
          * it with inbound datasets.
          */
-        const addDatasetsToCache = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { datasets, requestId } = payload;
-
+        const addDatasetsToCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {
             /*
              * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
              */
             const all = datasets!.slice().filter((ds) => ds.shape !== 3);
             all.unshift(demographics);
+            allDsMap.clear();
+            allDsMap.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
             firstCharCache.clear();
         
             /* 
@@ -392,10 +396,11 @@ export default class DatasetSearchEngineWebWorker {
             }
 
             const sorted = dedupeAndSort(all);
-            allDs = sorted.categories;
+            allDs = datasets;
+            allDsMap = sorted.categories;
             defaultOrder = sorted.displayOrder;
 
-            return { requestId, result: sorted };
+            return sorted;
         };
     };
 }

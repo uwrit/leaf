@@ -68,15 +68,24 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { data, datasets, dispatch } = this.props;
-        const { currentDataset, changed } = data.datasets;
+        const { currentDataset, changed, expectedColumns } = data.datasets;
+        const { shapes } = this.state;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
+        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
+        let currentCategory = undefined;
         const c = this.className;
+
+        if (currentDataset && currentDataset.categoryId) {
+            currentCategory = data.datasetQueryCategories.categories.get(currentDataset.categoryId);
+        }
 
         return (
             <div className={c}>
                 <Container fluid={true}>
                     <Row className={`${c}-container-row`}>
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
+
+                            {/* Dataset list shown on the left */}
                             <DatasetContainer 
                                 autoSelectOnSearch={false}
                                 datasets={datasets}
@@ -86,12 +95,16 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 searchEnabled={!changed}
                                 selected={datasets.selected}
                             />
+                            
                         </Col>
                         <div className={`${c}-column-right admin-panel-editor`}>
+
+                            {/* Failure messages, etc. */}
                             {this.getStatusDependentContent(data.datasets.state, 'concept-editor')}
+
                             <div className={`${c}-main`}>
 
-                                {/* New, Undo, Save, Delete buttons */}
+                                {/* Header */}
                                 {datasets.display.size > 0 &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
@@ -103,9 +116,42 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
                                 {/* Editor */}
                                 {currentDataset &&
-                                    this.getDatasetEditorContent(currentDataset)
+                                    <div>
+                                        <Display
+                                            categoryChangeHandler={this.handleCategoryChange}
+                                            category={currentCategory}
+                                            categories={data.datasetQueryCategories.categories}
+                                            dataset={currentDataset}
+                                            dispatch={dispatch}
+                                            inputChangeHandler={this.handleInputChange}
+                                            locked={locked}
+                                            shapeChangeHandler={this.handleShapeClick}
+                                            shape={data.datasets.currentDataset!.shape}
+                                            shapes={shapes}
+                                        />
+                                        <SqlEditor
+                                            dataset={currentDataset}
+                                            dispatch={dispatch}
+                                            expectedColumns={expectedColumns}
+                                            handleInputChange={this.handleInputChange}
+                                        />
+                                        <Row>
+                                            <Col md={6}>
+                                                <Identifiers
+                                                    dataset={currentDataset}
+                                                    handleInputChange={this.handleInputChange}
+                                                />
+                                            </Col>
+                                            <Col md={6}>
+                                                {/*
+                                                <Section header='Access Restrictions'>
+                                                    <Constraints dataset={dataset} changeHandler={this.handleInputChange} locked={locked}/>
+                                                </Section>
+                                                */}
+                                            </Col>
+                                        </Row>
+                                    </div>
                                 }
-
                             </div>
                         </div>
                     </Row>
@@ -114,61 +160,11 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         );
     }
 
-    private getDatasetEditorContent = (dataset: AdminDatasetQuery) => {
-        const { dispatch, data } = this.props;
-        const { shapes } = this.state;
-        const { currentDataset, expectedColumns } = data.datasets;
-        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
-        const c = this.className;
-        let currentCategory = undefined;
-
-        if (dataset && dataset.categoryId) {
-            currentCategory = data.datasetQueryCategories.categories.get(dataset.categoryId);
-        }
-
-        return (
-           <div>
-                <Display
-                    categoryChangeHandler={this.handleCategoryChange}
-                    category={currentCategory}
-                    categories={data.datasetQueryCategories.categories}
-                    dataset={dataset}
-                    dispatch={dispatch}
-                    inputChangeHandler={this.handleInputChange}
-                    locked={locked}
-                    shapeChangeHandler={this.handleShapeClick}
-                    shape={data.datasets.currentDataset!.shape}
-                    shapes={shapes}
-                />
-                <SqlEditor
-                    dataset={currentDataset}
-                    dispatch={dispatch}
-                    expectedColumns={expectedColumns}
-                    handleInputChange={this.handleInputChange}
-                />
-                <Row>
-                    <Col md={6}>
-                        <Identifiers
-                            dataset={currentDataset}
-                            handleInputChange={this.handleInputChange}
-                        />
-                    </Col>
-                    <Col md={6}>
-                        {/*
-                        <Section header='Access Restrictions'>
-                            <Constraints dataset={dataset} changeHandler={this.handleInputChange} locked={locked}/>
-                        </Section>
-                        */}
-                    </Col>
-                </Row>
-            </div>
-        );
-    }
-
     /* 
      * Set optional content.
      */
     private getStatusDependentContent = (state: AdminPanelLoadState, c: string) => {
+        const { data } = this.props;
         if (state === AdminPanelLoadState.LOADING) {
             return (
                 <div>
@@ -178,10 +174,10 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     <div className={`${c}-loading-overlay`}/>
                 </div>
             );
-        } else if (state === AdminPanelLoadState.ERROR) {
+        } else if (state === AdminPanelLoadState.ERROR && !data.datasets.currentDataset) {
             return (
                 <div className={`${c}-error`}>
-                    <p>Leaf encountered an error while trying to fetch this concept.</p>
+                    <p>Leaf encountered an error while trying to fetch this dataset.</p>
                 </div>
             );
         }
@@ -203,6 +199,31 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     private handleSaveChanges = () => {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
+        const missingCols = datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
+
+        if (missingCols.length) {
+            const confirm: ConfirmationModalState = {
+                body: [
+                    <p>Your current SQL Query appears to be missing the following required columns: {missingCols.join(', ')}. </p>,
+                    <p>Are you sure you want to save the current dataset? If not all expected columns are returned after running the query,
+                       Leaf will throw an error in the Patient List.</p>
+                ],
+                header: 'Potential missing columns',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                    } else {
+                        dispatch(saveAdminDataset(datasets.currentDataset!));
+                    }
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, I'm sure`
+            };
+            dispatch(showConfirmationModal(confirm));
+            return;
+        }
 
         if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
             dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
@@ -345,16 +366,5 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         dispatch(setAdminDataset(newAdminDs, false));
         dispatch(setAdminDataset(newAdminDs, true));
         dispatch(setAdminDatasetSql('SELECT FROM dbo.table'));
-    }
-
-    private sqlMeetsRequirements = (): boolean => {
-        const { sqlColumns, currentDataset, expectedColumns } = this.props.data.datasets;
-        if (!currentDataset) { return false; }
-
-        const missingCols = expectedColumns.filter((c) => !c.optional && !sqlColumns.has(c.id));
-        if (missingCols.length) {
-            return false;
-        }
-        return true;
     }
 }

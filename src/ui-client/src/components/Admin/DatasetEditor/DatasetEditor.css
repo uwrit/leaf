@@ -11,6 +11,10 @@
     padding-right: 30px !important;
 }
 
+.dataset-editor-column-left .patientlist-add-dataset-select-datasets-list {
+    height: 90vh !important;
+}
+
 /* Right Column */
 .dataset-editor-column-right {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
@@ -65,18 +69,12 @@
 .dataset-editor-sql {
     border-left: 1px solid rgb(240,240,240);
     overflow-x: hidden;
-    padding: 30px 10px 0;
+    padding: 8px 8px;
     position: relative;
 }
 
-.dataset-editor-sql::after {
-    border-bottom: 1px solid rgb(240,240,240);
-    content: 'SQL Query';
-    font-size: 1.0rem;
-    left: 0;
-    margin: -4px 0 0 4px;
-    position: absolute;
-    top: 0;
+.dataset-editor-title {
+    margin: -10px 0 10px;
 }
 
 /* Columns */
@@ -84,18 +82,8 @@
     height: 370px;
     min-width: 200px;
     overflow: auto;
-    padding: 30px 8px 8px;
+    padding: 8px 8px;
     position: relative;
-}
-
-.dataset-editor-column-container::after {
-    border-bottom: 1px solid rgb(240,240,240);
-    content: 'Expected Columns';
-    font-size: 1.0rem;
-    left: 0;
-    margin: 4px;
-    position: absolute;
-    top: 0;
 }
 
 .dataset-editor-column-container svg {
@@ -252,4 +240,20 @@
 .dataset-editor-demographics-dataset.selected  {
     background-color: rgba(28, 170, 221, 0.1);
     border-left-color: #1CA8DD; 
+}
+
+.dataset-editor-dataset-universalid {
+    margin-left: 110px;
+}
+
+.dataset-editor-dataset-universalid::after {
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    content: 'urn:leaf:dataset:';
+    font-size: 0.9rem;
+    left: 0;
+    margin-top: 3px;
+    padding: 4px 8px;
+    position: absolute;
 }

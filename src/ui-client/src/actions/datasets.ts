@@ -17,6 +17,7 @@ export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASETS_DISPLAY_ALL';
 export const SET_DATASETS = 'SET_DATASETS';
 export const SET_DATASETS_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
 export const SET_DATASETS_SEARCH_RESULT = 'SET_DATASET_SEARCH_RESULT';
+export const SWITCH_DATASET_OLD_FOR_NEW = 'SWITCH_DATASET_OLD_FOR_NEW';
 export const REMOVE_DATASET = 'REMOVE_DATASET';
 export const ADD_DATASET = 'ADD_DATASET';
 export const MOVE_DATASET_CATEGORY = 'MOVE_DATASET_CATEGORY';
@@ -27,6 +28,7 @@ export interface DatasetAction {
     datasetsAvailableCount?: number;
     dataset?: PatientListDatasetQuery;
     datasets?: PatientListDatasetQuery[];
+    newDataset?: PatientListDatasetQuery;
     result?: DatasetSearchResult;
     searchTerm?: string;
     type: string;
@@ -36,7 +38,7 @@ export interface DatasetAction {
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await searchDatasets(searchTerm);
-        console.log('search results order', results);
+        console.log('search results', results);
         dispatch(setDatasetSearchResult(results));
     };
 };
@@ -44,6 +46,7 @@ export const searchPatientListDatasets = (searchTerm: string) => {
 export const resetPatientListDatasets = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowAllDatasets();
+        console.log('datasets reset requested', results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -52,6 +55,7 @@ export const resetPatientListDatasets = () => {
 export const allowDemographicsDatasetInSearch = (allow: boolean) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowDemographics(allow);
+        console.log('allow demographics', allow, results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -69,6 +73,14 @@ export const setDataset = (dataset: PatientListDatasetQuery): DatasetAction  => 
     return {
         dataset,
         type: SET_DATASET
+    };
+};
+
+export const switchDatasetOldForNew = (dataset: PatientListDatasetQuery, newDataset: PatientListDatasetQuery): DatasetAction => {
+    return {
+        dataset,
+        newDataset,
+        type: SWITCH_DATASET_OLD_FOR_NEW
     };
 };
 
