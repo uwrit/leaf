@@ -49,7 +49,7 @@ namespace Model.Search
 
         public async Task<Query> GetQueryAsync(QueryUrn urn)
         {
-            log.LogInformation("Getting query UId:{UId}", urn);
+            log.LogInformation("Getting query. UId:{UId}", urn);
             try
             {
                 return await service.GetQueryAsync(urn);
@@ -67,7 +67,16 @@ namespace Model.Search
             log.LogInformation("Deleting query. Query:{Query} Force:{Force}", urn, force);
             try
             {
-                return await service.DeleteAsync(urn, force);
+                var result = await service.DeleteAsync(urn, force);
+                if (result.Ok)
+                {
+                    log.LogInformation("Deleted query. Query:{Query}", urn);
+                }
+                else
+                {
+                    log.LogInformation("Could not delete query due to conflict. Query:{Query} Result:{@Result}", urn, result);
+                }
+                return result;
             }
             catch (DbException de)
             {
@@ -79,9 +88,11 @@ namespace Model.Search
 
         public async Task<SaveResult> SaveAsync(Guid id, IQuerySaveDTO ast, Func<IQueryDefinition, string> json, CancellationToken cancel)
         {
+            log.LogInformation("Saving query. Id:{Id} Ast:{Ast}", id, ast);
 
-            log.LogInformation("Starting query save. Query:{Query}", id);
             var ctx = await converter.GetPanelsAsync(ast, cancel);
+            log.LogInformation("Save query panel validation context. Context:{@Context}", ctx);
+
             if (!ctx.PreflightPassed)
             {
                 return new SaveResult { State = SaveState.Preflight, Preflight = ctx.PreflightCheck };
@@ -93,6 +104,7 @@ namespace Model.Search
             if (!user.IsInstutional)
             {
                 converter.LocalizeDefinition(ast, query);
+                log.LogInformation("Localized federated query. Id:{Id} Ast:{Ast}", id, ast);
             }
 
             var toSave = new QuerySave
@@ -104,6 +116,8 @@ namespace Model.Search
                 Definition = json(ast),
                 Resources = query.Panels.GetResources()
             };
+
+            // if ast already has an assive version, use it
             if (ast.Ver.HasValue)
             {
                 toSave.Ver = ast.Ver.Value;

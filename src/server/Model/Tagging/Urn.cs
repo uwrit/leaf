@@ -14,7 +14,7 @@ namespace Model.Tagging
     {
         protected const string prefix = "urn:leaf:";
 
-        protected string Value { get; set; }
+        public string Value { get; protected set; }
 
         protected Urn(string urn)
         {

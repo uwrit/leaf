@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model.Validation;
+using Microsoft.Extensions.Logging;
 
 namespace Model.Search
 {
@@ -25,10 +26,12 @@ namespace Model.Search
         }
 
         readonly IConceptHintSearchService searcher;
+        readonly ILogger<ConceptHintSearcher> log;
 
-        public ConceptHintSearcher(IConceptHintSearchService searchService)
+        public ConceptHintSearcher(IConceptHintSearchService searchService, ILogger<ConceptHintSearcher> log)
         {
             searcher = searchService;
+            this.log = log;
         }
 
         /// <summary>
@@ -44,7 +47,10 @@ namespace Model.Search
             Ensure.NotNull(term, nameof(term));
 
             var terms = term.Split(' ');
-            return await searcher.HintsAsync(root, terms);
+            log.LogInformation("Searching hints by terms. Terms:{Terms}", terms);
+            var hints = await searcher.HintsAsync(root, terms);
+            log.LogInformation("Found hints. Hints:{Hints}", hints);
+            return hints;
         }
 
         /// <summary>
@@ -58,7 +64,10 @@ namespace Model.Search
         {
             Ensure.NotNull(term, nameof(term));
 
-            return await searcher.SynonymAsync(term);
+            log.LogInformation("Searching synonyms by term. Term:{Term}", term);
+            var syn = await searcher.SynonymAsync(term);
+            log.LogInformation("Found synonym. Syn:{Syn}", syn);
+            return syn;
         }
     }
 }
