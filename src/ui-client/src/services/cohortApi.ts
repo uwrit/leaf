@@ -93,8 +93,9 @@ const procedure: PatientListDatasetQueryDTO = {
 export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return [ platelet, encounter, procedure ];
-    // return http.get(`/api/dataset`);
+    const resp = await http.get(`/api/dataset`);
+    const ds = resp.data as PatientListDatasetQueryDTO[];
+    return ds;
 };
 
 /*

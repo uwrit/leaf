@@ -85,6 +85,18 @@ GO
 ALTER TABLE [app].[DatasetQuery] CHECK CONSTRAINT [FK_DatasetQuery_CategoryId]
 GO
 
+IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IXUniq_DatasetQuery_UniversalId')
+	DROP INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
+GO
+
+CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
+(
+	[UniversalId] ASC
+)
+WHERE ([UniversalId] IS NOT NULL)
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+
 -- Update network sprocs.
 IF OBJECT_ID('network.sp_UpdateEndpoint', 'P') IS NOT NULL
 	DROP PROCEDURE [network].[sp_UpdateEndpoint]

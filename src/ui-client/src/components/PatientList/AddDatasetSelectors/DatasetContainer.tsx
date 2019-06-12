@@ -43,7 +43,9 @@ export default class DatasetContainer extends React.PureComponent<Props> {
 
         if (displayOrder.size) {
             const firstDs = this.getFirstDataset();
-            handleDatasetSelect(firstDs);
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
+            }
         }
     }
 
@@ -53,7 +55,9 @@ export default class DatasetContainer extends React.PureComponent<Props> {
 
         if (autoSelectOnSearch && displayOrder.size && !datasets.displayOrder.get(datasets.selected)) {
             const firstDs = this.getFirstDataset();
-            handleDatasetSelect(firstDs);
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
+            }
         }
         return null;
     }
@@ -118,10 +122,13 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         )
     }
 
-    private getFirstDataset = (): PatientListDatasetQuery => {
+    private getFirstDataset = (): PatientListDatasetQuery | undefined => {
         const { datasets } = this.props;
         const firstCat = [ ...datasets.display.values() ][0];
-        return [ ...firstCat.datasets.values() ][0];
+        if (firstCat) {
+            return [ ...firstCat.datasets.values() ][0];
+        }
+        return;
     }
 
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
@@ -151,10 +158,14 @@ export default class DatasetContainer extends React.PureComponent<Props> {
             let seq = key === keys.ArrowUp
                 ? datasets.all.get(order.prevId)!
                 : datasets.all.get(order.nextId)!;
-            handleDatasetSelect(seq);
+            if (seq) {
+                handleDatasetSelect(seq);
+            }
         } else if (!datasets.displayOrder.get(selected) && hasData && key === keys.ArrowDown) {
             const firstDs = this.getFirstDataset();
-            handleDatasetSelect(firstDs);
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
+            }
         }
     }
 

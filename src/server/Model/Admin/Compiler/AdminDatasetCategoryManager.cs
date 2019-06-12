@@ -67,7 +67,7 @@ namespace Model.Admin.Compiler
 
             try
             {
-                var updated = await svc.CreateCategoryAsync(cat);
+                var updated = await svc.UpdateCategoryAsync(cat);
                 log.LogInformation("Updated DatasetQueryCategory. DatasetQueryCategory:{@DatasetQueryCategory}", updated);
                 return updated;
             }

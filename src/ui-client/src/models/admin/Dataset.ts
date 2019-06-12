@@ -19,7 +19,7 @@ export interface AdminDatasetQuery {
     description?: string;
     name: string;
     shape: PatientListDatasetShape;
-    sql: string;
+    sqlStatement: string;
     tags: string[];
     universalId?: string;
     unsaved?: boolean;

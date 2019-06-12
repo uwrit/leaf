@@ -148,9 +148,9 @@ namespace Model.Admin.Network
 
             try
             {
-                var udpated = await updater.UpdateIdentityAsync(id);
-                log.LogInformation("Update NetworkIdentity. Swap:{@Swap}", udpated);
-                return udpated;
+                var updated = await updater.UpdateIdentityAsync(id);
+                log.LogInformation("Update NetworkIdentity. Swap:{@Swap}", updated);
+                return updated;
             }
             catch (DbException de)
             {

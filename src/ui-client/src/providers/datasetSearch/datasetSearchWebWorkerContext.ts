@@ -9,7 +9,7 @@ export const workerContext = `
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
         case INDEX_DATASETS:
-            return addDatasetsToCache(payload);
+            return reindexCacheFromExternal(payload);
         case SEARCH_DATASETS:
             return searchDatasets(payload);
         case ALLOW_DATASET_IN_SEARCH:
@@ -24,14 +24,11 @@ var handleWorkMessage = function (payload) {
 };
 // Dataset cache
 var demographics = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-var demographicsCat = {
-    category: '',
-    datasets: new Map([[demographics.id, demographics]])
-};
 var excluded = new Set([demographics.id]);
 var firstCharCache = new Map();
 var demographicsAllowed = false;
-var allDs = new Map();
+var allDs = [];
+var allDsMap = new Map();
 var defaultOrder = new Map();
 /*
  * Sets the special demographics dataset to be included in
@@ -42,14 +39,13 @@ var allowDemographics = function (payload) {
     var requestId = payload.requestId, allow = payload.allow;
     if (allow) {
         excluded.delete(demographics.id);
-        allDs.set(demographicsCat.category, demographicsCat);
     }
     else {
         excluded.add(demographics.id);
-        allDs.delete(demographicsCat.category);
     }
     demographicsAllowed = allow;
-    return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
+    reindexCacheFromLocal(payload);
+    return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
 };
 /*
  * Resets excluded datasets cache. Called when users
@@ -61,7 +57,7 @@ var allowAllDatasets = function (payload) {
     if (!demographicsAllowed) {
         excluded.add(demographics.id);
     }
-    return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
+    return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
 };
 /*
  * Allows or disallows a dataset to be included in search results.
@@ -88,7 +84,7 @@ var searchDatasets = function (payload) {
     var datasets = firstCharCache.get(firstTerm[0]);
     var dsOut = [];
     if (!searchString) {
-        return { requestId: requestId, result: { categories: allDs, displayOrder: defaultOrder } };
+        return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
     }
     if (!datasets) {
         return { requestId: requestId, result: { categories: new Map(), displayOrder: new Map() } };
@@ -162,8 +158,8 @@ var dedupeAndSort = function (refs) {
     var displayOrder = new Map();
     var includesDemographics = false;
     /*
-    * Get unique only.
-    */
+     * Get unique only.
+     */
     for (var i = 0; i < refs.length; i++) {
         var ref = refs[i];
         if (!addedDatasets.has(ref.id)) {
@@ -171,14 +167,17 @@ var dedupeAndSort = function (refs) {
                 includesDemographics = true;
             }
             else {
+                if (!ref.category) {
+                    ref.category = '';
+                }
                 addedRefs.push(ref);
                 addedDatasets.add(ref.id);
             }
         }
     }
     /*
-    * Sort.
-    */
+     * Sort.
+     */
     var sortedRefs = addedRefs.sort(function (a, b) {
         if (a.category === b.category) {
             return a.name > b.name ? 1 : -1;
@@ -191,8 +190,8 @@ var dedupeAndSort = function (refs) {
     var len = sortedRefs.length;
     var lastIdx = len - 1;
     /*
-    * Add to map.
-    */
+     * Add to map.
+     */
     for (var i = 0; i < len; i++) {
         var ref = sortedRefs[i];
         var catObj = out.get(ref.category);
@@ -210,17 +209,28 @@ var dedupeAndSort = function (refs) {
     }
     return { categories: out, displayOrder: displayOrder };
 };
+var reindexCacheFromLocal = function (payload) {
+    var requestId = payload.requestId;
+    var sorted = addDatasetsToCache(allDs);
+    return { requestId: requestId, result: sorted };
+};
+var reindexCacheFromExternal = function (payload) {
+    var requestId = payload.requestId, datasets = payload.datasets;
+    var sorted = addDatasetsToCache(datasets);
+    return { requestId: requestId, result: sorted };
+};
 /*
  * Resets the dataset search cache and (re)loads
  * it with inbound datasets.
  */
-var addDatasetsToCache = function (payload) {
-    var datasets = payload.datasets, requestId = payload.requestId;
+var addDatasetsToCache = function (datasets) {
     /*
      * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
      */
     var all = datasets.slice().filter(function (ds) { return ds.shape !== 3; });
-    all.push(demographics);
+    all.unshift(demographics);
+    allDsMap.clear();
+    allDsMap.set('', { category: '', datasets: new Map([[demographics.id, demographics]]) });
     firstCharCache.clear();
     /*
      * Foreach dataset
@@ -261,12 +271,13 @@ var addDatasetsToCache = function (payload) {
         }
     }
     if (!demographicsAllowed) {
-        all.pop();
+        all.shift();
         excluded.add(demographics.id);
     }
     var sorted = dedupeAndSort(all);
-    allDs = sorted.categories;
+    allDs = datasets;
+    allDsMap = sorted.categories;
     defaultOrder = sorted.displayOrder;
-    return { requestId: requestId, result: sorted };
+    return sorted;
 };
 `;

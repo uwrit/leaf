@@ -31,15 +31,17 @@ export class SqlEditor extends React.PureComponent<Props> {
         const { expectedColumns, dataset } = this.props;
         const c = this.className;
         const width = this.getSqlWidth();
-        const sql = dataset ? dataset.sql : '';
+        const sql = dataset ? dataset.sqlStatement : '';
 
         return (
             <Section header='SQL'>
                 <div className={`${c}-sql-container`}>
                     <div className={`${c}-column-container`}>
+                        <div className={`${c}-title`}>Expected Columns</div>
                         {expectedColumns.map((col) => this.getColumnContent(col))}
                     </div>
                     <div className={`${c}-sql`}>
+                        <div className={`${c}-title`}>SQL Query</div>
                         <SqlBox sql={sql} height={350} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
                         <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
                     </div>
@@ -54,8 +56,8 @@ export class SqlEditor extends React.PureComponent<Props> {
     private handleAutoFormatClick = () => {
         const { dataset, handleInputChange } = this.props;
         if (dataset) {
-            const pretty = formatSql(dataset.sql);
-            handleInputChange(pretty, 'sql');
+            const pretty = formatSql(dataset.sqlStatement);
+            handleInputChange(pretty, 'sqlStatement');
         }
     }
 

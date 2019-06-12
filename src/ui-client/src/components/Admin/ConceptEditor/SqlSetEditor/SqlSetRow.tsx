@@ -185,9 +185,19 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         }
     }
 
+    /* 
+     * Generate a random ID for a new specialization group.
+     */
     private generateRandomIntegerId = () => {
-        const min = 1;
-        const max = 100000;
+        const { specializationGroups } = this.props.set;
+
+        /* 
+         * Ensure the value is greater than the max specialization group id so it appears sorted below it.
+         */
+        const min = specializationGroups.size > 0
+            ? Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) 
+            : 1;
+        const max = 10000;
         return Math.ceil(Math.random() * (max - min) + min);
     }
 

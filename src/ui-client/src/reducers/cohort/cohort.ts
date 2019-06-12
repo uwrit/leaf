@@ -37,7 +37,7 @@ import {
     VISUALIZATION_SET_AGGREGATE,
     VISUALIZATION_SET_NETWORK
 } from '../../actions/cohort/visualize';
-import { DISABLE_Responder, ENABLE_Responder } from '../../actions/networkResponders';
+import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
 import { 
     ADD_PANEL_ITEM, 
@@ -303,9 +303,9 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkPatientListDatasetNotImplemented(state, action);
 
         // Enabled/disabling responders after data loaded
-        case ENABLE_Responder:
+        case ENABLE_RESPONDER:
             return recalculateCohortCount(state, action.id, true);
-        case DISABLE_Responder:
+        case DISABLE_RESPONDER:
             return recalculateCohortCount(state, action.id, false);
 
         // Any change to panel query definition resets the cohort

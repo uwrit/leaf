@@ -47,14 +47,6 @@ interface State {
     width: number;
 }
 
-// Default the map frame to the US for now
-const defaultBounds = [ [47.6062, -122.3321], [25.7617, -80.1918] ];
-let internalViewport: any = {
-    bounds: null,
-    center: null,
-    zoom: 0
-}
-
 export class LeafMap extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -70,7 +62,6 @@ export class LeafMap extends React.Component<Props, State> {
             return;
         }
         v.bounds = this.state.ref.current.leafletElement.getBounds();
-        internalViewport = v;
     }
 
     public updateDimensions = () => {

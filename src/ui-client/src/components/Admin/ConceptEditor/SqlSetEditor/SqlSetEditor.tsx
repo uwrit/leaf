@@ -39,11 +39,8 @@ export class SqlSetEditor extends React.PureComponent<Props> {
     public render() {
         const { data, dispatch } = this.props;
         const c = this.className;
-        const evs: ConceptEvent[] = [];
-        const sets: ConceptSqlSet[] = [];
-        data.sqlSets.sets.forEach((s) => sets.push(s));
-        data.conceptEvents.events.forEach((ev) => evs.push(ev));
-
+        const evs: ConceptEvent[] = [ ...data.conceptEvents.events.values() ];
+        
         return (
             <div className={`${c}-container`}>
                 <div className={`${c}-toprow`}>
@@ -53,7 +50,7 @@ export class SqlSetEditor extends React.PureComponent<Props> {
                     <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
                 </div>
                 <Container className={`${c}-table`}>
-                    {sets
+                    {[ ...data.sqlSets.sets.values() ]
                         .sort((a,b) => a.id > b.id ? 1 : -1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs}/>)
                     }
@@ -63,8 +60,15 @@ export class SqlSetEditor extends React.PureComponent<Props> {
     }
 
     private generateRandomIntegerId = () => {
-        const min = 1;
-        const max = 100000;
+        const { sets } = this.props.data.sqlSets;
+
+        /* 
+         * Ensure the value is greater than the max set id so it appears sorted below it.
+         */
+        const min = sets.size > 0
+            ? Math.max.apply(Math, [ ...sets.values() ].map((s) => s.id)) 
+            : 1;
+        const max = 10000;
         return Math.ceil(Math.random() * (max - min) + min);
     }
 

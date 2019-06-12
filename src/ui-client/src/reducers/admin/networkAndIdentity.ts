@@ -43,25 +43,23 @@ export const setAdminNetworkIdentity = (state: AdminState, action: AdminNetworkA
 };
 
 export const setAdminNetworkEndpoint = (state: AdminState, action: AdminNetworkAndIdentityAction): AdminState => {
-    let unedited = state.networkAndIdentity.uneditedEndpoints;
     state.networkAndIdentity.endpoints.set(action.endpoint!.id, action.endpoint!);
-
-    if (!action.changed) {
-        unedited = new Map(state.networkAndIdentity.endpoints);
-    }
 
     return Object.assign({}, state, {
         networkAndIdentity: {
             ...state.networkAndIdentity,
             changed: action.changed,
             endpoints: new Map(state.networkAndIdentity.endpoints),
-            uneditedEndpoints: unedited
+            uneditedEndpoints: action.changed 
+                ? state.networkAndIdentity.uneditedEndpoints 
+                : new Map(state.networkAndIdentity.endpoints)
         }
     });
 };
 
 export const removeAdminNetworkEndpoint = (state: AdminState, action: AdminNetworkAndIdentityAction): AdminState => {
     state.networkAndIdentity.endpoints.delete(action.endpoint!.id);
+    state.networkAndIdentity.uneditedEndpoints.delete(action.endpoint!.id);
 
     return Object.assign({}, state, {
         networkAndIdentity: {
@@ -79,7 +77,7 @@ export const setAdminNetworkEndpoints = (state: AdminState, action: AdminNetwork
         networkAndIdentity: {
             ...state.networkAndIdentity,
             endpoints,
-            uneditedEndpoints: endpoints
+            uneditedEndpoints: new Map(endpoints)
         }
     });
 };
@@ -89,7 +87,7 @@ export const revertAdminNetworkChanges = (state: AdminState, action: AdminNetwor
         networkAndIdentity: {
             ...state.networkAndIdentity,
             changed: false,
-            endpoints: state.networkAndIdentity.uneditedEndpoints,
+            endpoints: new Map(state.networkAndIdentity.uneditedEndpoints),
             identity: state.networkAndIdentity.uneditedIdentity
         }
     });

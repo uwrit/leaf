@@ -5,7 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { DISABLE_Responder, ENABLE_Responder, ERROR_Responder, NetworkRespondersAction, SET_ResponderS } from '../actions/networkResponders';
+import { 
+    DISABLE_RESPONDER, 
+    ENABLE_RESPONDER, 
+    ERROR_RESPONDER, 
+    NetworkRespondersAction, 
+    SET_RESPONDERS
+} from '../actions/networkResponders';
 import { NetworkIdentity, NetworkResponderMap } from '../models/NetworkResponder';
 
 export function defaultRespondersState(): NetworkResponderMap {
@@ -13,7 +19,7 @@ export function defaultRespondersState(): NetworkResponderMap {
 }
 
 function setResponders(state: NetworkResponderMap, eps: NetworkIdentity[]): NetworkResponderMap {
-    const newState = new Map<number, NetworkIdentity>();
+    const newState = new Map(state);
     eps!.forEach(e => {
         // Leaflet expect longitudes to be negative
         if (e.longitude && e.longitude < 0) { e.longitude = -e.longitude; }
@@ -23,7 +29,6 @@ function setResponders(state: NetworkResponderMap, eps: NetworkIdentity[]): Netw
 }
 
 function setResponderError(state: NetworkResponderMap, id: number): NetworkResponderMap {
-    // TODO: need to indicate error state for responder
     return state;
 }
 
@@ -38,13 +43,13 @@ function toggleEnabled(state: NetworkResponderMap, id: number, enabled: boolean)
 export const responders = (state: NetworkResponderMap = defaultRespondersState(), action: NetworkRespondersAction): NetworkResponderMap => {
 
     switch (action.type) {
-        case SET_ResponderS:
+        case SET_RESPONDERS:
             return setResponders(state, action.responders!);
-        case ERROR_Responder:
+        case ERROR_RESPONDER:
             return setResponderError(state, action.id!);
-        case ENABLE_Responder:
+        case ENABLE_RESPONDER:
             return toggleEnabled(state, action.id!, true);
-        case DISABLE_Responder:
+        case DISABLE_RESPONDER:
             return toggleEnabled(state, action.id!, false);
         default:
             return state;

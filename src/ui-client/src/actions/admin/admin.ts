@@ -82,7 +82,7 @@ export const loadAdminPanelDataIfNeeded = () => {
 };
 
 /*
- * Handles switching between Admin Panel views. Prevents
+ * Handle switching between Admin Panel Concept & Concept SQL Set views. Prevents
  * view pane changes if admin has unsaved Concept changes.
  */
 export const checkIfAdminPanelUnsavedAndSetSubPane = (subPane: number) => {
@@ -97,6 +97,31 @@ export const checkIfAdminPanelUnsavedAndSetSubPane = (subPane: number) => {
             dispatch(showInfoModal(info));
         } else {
             dispatch(setAdminPanelSubPane(subPane));
+        }
+    };
+};
+
+/*
+ * Handle switching between Admin Panel views. Prevents
+ * view pane changes if admin has unsaved changes.
+ */
+export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelPane) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const admin = getState().admin!;
+        if (
+            admin.concepts.changed || 
+            admin.sqlSets.changed ||
+            admin.datasets.changed ||
+            admin.networkAndIdentity.changed
+        ) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        } else {
+            dispatch(setAdminPanelPane(pane));
         }
     };
 };

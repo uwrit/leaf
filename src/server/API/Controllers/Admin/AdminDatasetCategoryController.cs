@@ -78,7 +78,7 @@ namespace API.Controllers.Admin
                     model.Id = id;
                 }
 
-                var updated = await manager.CreateCategoryAsync(model);
+                var updated = await manager.UpdateCategoryAsync(model);
                 return Ok(updated);
             }
             catch (ArgumentException ae)
