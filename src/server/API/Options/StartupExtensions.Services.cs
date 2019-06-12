@@ -116,6 +116,7 @@ namespace API.Options
             services.AddTransient<AdminNetworkEndpointManager.IAdminNetworkUpdater, AdminNetworkEndpointUpdater>();
             services.AddTransient<AdminDatasetQueryManager.IAdminDatasetQueryService, AdminDatasetQueryService>();
             services.AddTransient<AdminDatasetCategoryManager.IAdminDatasetCategoryService, AdminDatasetCategoryService>();
+            services.AddTransient<AdminDemographicsManager.IAdminDemographicQueryService, AdminDemographicQueryService>();
 
             return services;
         }

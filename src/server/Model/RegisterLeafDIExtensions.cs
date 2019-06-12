@@ -44,6 +44,7 @@ namespace Model
             services.AddTransient<AdminNetworkEndpointManager>();
             services.AddTransient<AdminDatasetQueryManager>();
             services.AddTransient<AdminDatasetCategoryManager>();
+            services.AddTransient<AdminDemographicsManager>();
 
             return services;
         }
