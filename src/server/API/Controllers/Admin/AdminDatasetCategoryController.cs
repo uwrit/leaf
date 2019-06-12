@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Model.Admin.Compiler;
 using API.DTO.Admin.Compiler;
 using Model.Error;
+using API.DTO.Admin;
 
 namespace API.Controllers.Admin
 {
@@ -98,10 +99,26 @@ namespace API.Controllers.Admin
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(int id)
+        public async Task<ActionResult<DatasetQueryCategoryDeleteResponse>> DeleteAsync(int id)
         {
-            // TODO(cspital) START HERE
-            return NotFound();
+            try
+            {
+                var result = await manager.DeleteCategoryAsync(id);
+                if (!result.Ok)
+                {
+                    return Conflict(new DatasetQueryCategoryDeleteResponse(result));
+                }
+                return Ok();
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to delete DatasetQueryCategory. Id:{Id} Error:{Error}", id, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
     }
 }

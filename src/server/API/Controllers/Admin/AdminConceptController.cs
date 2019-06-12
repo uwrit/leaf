@@ -103,7 +103,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ConceptDeleteResult>> Delete(Guid id)
+        public async Task<ActionResult<ConceptDeleteResponse>> Delete(Guid id)
         {
             try
             {
