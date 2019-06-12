@@ -9,14 +9,16 @@
 4) Create an Application pool to run the site and API.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_app_pool.png" /></p>
 
-5) Create the website to host the Leaf browser application.
+5) In the new Application pool's Advanced Settings, set `Load User Profile` to `true` and recycle the pool.
+
+6) Create the website to host the Leaf browser application.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_website.png" /></p>
 
-6) Create an application behind the site to host the API.
+7) Create an application behind the site to host the API.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_api.png" /></p>
 
    - Note: Do NOT name the API application "api", this will cause the rewrite rule to apply recursively until the request fails. At UW we name the backing application "leafapi".
-7) Create a URL rewrite rule on the site with the following template.
+8) Create a URL rewrite rule on the site with the following template.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_url_rewrite.png" /></p>
 
 web.config
@@ -34,7 +36,7 @@ web.config
     </rewrite>
 </system.webServer>
 ```
-8) If the WebDAV module is installed in your IIS instance, you need to either uninstall it or disable it for this site. It inteferes with PUT/DELETE HTTP verbs.
+9) If the WebDAV module is installed in your IIS instance, you need to either uninstall it or disable it for this site. It inteferes with PUT/DELETE HTTP verbs.
 
 web.config
 
@@ -46,5 +48,5 @@ web.config
     ...additional configuration
 </system.webServer>
 ```
-9) Configure Shibboleth SP3 for the site and api.
+10) Configure Shibboleth SP3 for the site and api.
    - See [SAML2](https://github.com/uwrit/leaf/tree/master/docs/deploy/saml2) configuration documentation.
