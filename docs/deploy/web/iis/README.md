@@ -34,5 +34,17 @@ web.config
     </rewrite>
 </system.webServer>
 ```
-8) Configure Shibboleth SP3 for the site and api.
+8) If the WebDAV module is installed in your IIS instance, you need to either uninstall it or disable it for this site. It inteferes with PUT/DELETE HTTP verbs.
+
+web.config
+
+```xml
+<system.webServer>
+    <modules runAllManagedModulesForAllRequests="true">
+        <remove name="WebDAVModule" />
+    </modules>
+    ...additional configuration
+</system.webServer>
+```
+9) Configure Shibboleth SP3 for the site and api.
    - See [SAML2](https://github.com/uwrit/leaf/tree/master/docs/deploy/saml2) configuration documentation.
