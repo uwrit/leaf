@@ -12,7 +12,7 @@ using Model.Admin.Compiler;
 
 namespace API.DTO.Admin.Compiler
 {
-    public class ConceptDTO
+    public class AdminConceptDTO
     {
         public Guid Id { get; set; }
         public string UniversalId { get; set; }
@@ -37,16 +37,16 @@ namespace API.DTO.Admin.Compiler
         public IEnumerable<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
 
-        public IEnumerable<ConceptConstraint> Constraints { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
 
         public IEnumerable<SpecializationGroupRelationship> SpecializationGroups { get; set; }
 
-        public ConceptDTO()
+        public AdminConceptDTO()
         {
 
         }
 
-        public ConceptDTO(Model.Admin.Compiler.AdminConcept c)
+        public AdminConceptDTO(AdminConcept c)
         {
             Id = c.Id;
             UniversalId = c.UniversalId?.ToString();
@@ -77,10 +77,10 @@ namespace API.DTO.Admin.Compiler
 
     public static class ConceptExtensions
     {
-        public static Model.Admin.Compiler.AdminConcept Concept(this ConceptDTO dto)
+        public static AdminConcept Concept(this AdminConceptDTO dto)
         {
             if (dto == null) return null;
-            return new Model.Admin.Compiler.AdminConcept
+            return new AdminConcept
             {
                 Id = dto.Id,
                 UniversalId = ConceptUrn.From(dto.UniversalId),

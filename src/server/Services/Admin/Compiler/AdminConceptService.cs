@@ -66,7 +66,7 @@ namespace Services.Admin.Compiler
                             uiDisplayTooltip = c.UiDisplayTooltip,
                             uiDisplayPatientCount = c.UiDisplayPatientCount,
                             uiNumericDefaultText = c.UiNumericDefaultText,
-                            constraints = ConceptConstraintTable.From(c),
+                            constraints = ResourceConstraintTable.From(c),
                             specializationGroups = ConceptSpecializationGroupTable.From(c),
                             user = user.UUID
                         },
@@ -143,7 +143,7 @@ namespace Services.Admin.Compiler
                             uiDisplayTooltip = c.UiDisplayTooltip,
                             uiDisplayPatientCount = c.UiDisplayPatientCount,
                             uiNumericDefaultText = c.UiNumericDefaultText,
-                            constraints = ConceptConstraintTable.From(c),
+                            constraints = ResourceConstraintTable.From(c),
                             specializationGroups = ConceptSpecializationGroupTable.From(c),
                             user = user.UUID
                         },
@@ -246,7 +246,7 @@ namespace Services.Admin.Compiler
                 UiDisplayPatientCountByYear = ConceptPatientYearCountSerde.Deserialize(UiDisplayPatientCountByYear),
                 UiNumericDefaultText = UiNumericDefaultText,
                 SpecializationGroups = groups ?? new List<SpecializationGroupRelationship>(),
-                Constraints = constraints?.Select(c => c.Constraint()) ?? new List<ConceptConstraint>()
+                Constraints = constraints?.Select(c => c.Constraint()) ?? new List<Model.Admin.Compiler.Constraint>()
             };
         }
     }
@@ -257,12 +257,12 @@ namespace Services.Admin.Compiler
         public int ConstraintId { get; set; }
         public string ConstraintValue { get; set; }
 
-        public ConceptConstraint Constraint()
+        public Model.Admin.Compiler.Constraint Constraint()
         {
-            return new ConceptConstraint
+            return new Model.Admin.Compiler.Constraint
             {
-                ConceptId = ConceptId,
-                ConstraintId = ConceptConstraint.TypeFrom(ConstraintId),
+                ResourceId = ConceptId,
+                ConstraintId = Model.Admin.Compiler.Constraint.TypeFrom(ConstraintId),
                 ConstraintValue = ConstraintValue
             };
         }

@@ -85,7 +85,7 @@ GO
 ALTER TABLE [app].[DatasetQuery] CHECK CONSTRAINT [FK_DatasetQuery_CategoryId]
 GO
 
-IF EXISTS (SELECT * FROM sys.indexes WHERE name = 'IXUniq_DatasetQuery_UniversalId')
+IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IXUniq_DatasetQuery_UniversalId')
 	DROP INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 GO
 
@@ -581,6 +581,270 @@ END
 GO
 
 
+-- Create generic ResourceConstraintTable
+IF TYPE_ID('[auth].[ResourceConstraintTable]') IS NOT NULL
+	DROP TYPE [auth].[ResourceConstraintTable];
+GO
+CREATE TYPE [auth].[ResourceConstraintTable] AS TABLE
+(
+    ResourceId uniqueidentifier not null,
+    ConstraintId int not null,
+    ConstraintValue nvarchar(1000) not null
+)
+GO
+
+
+-- Cut Concept over to generic constraint table
+IF OBJECT_ID('adm.sp_CreateConcept', 'P') IS NOT NULL
+	DROP PROCEDURE [adm].[sp_CreateConcept]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/3/29
+-- Description: Creates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
+-- =======================================
+CREATE PROCEDURE [adm].[sp_CreateConcept]
+    @universalId nvarchar(200),
+    @parentId uniqueidentifier,
+    @rootId uniqueidentifier,
+    @externalId nvarchar(200),
+    @externalParentId nvarchar(200),
+    @isPatientCountAutoCalculated bit,
+    @isNumeric bit,
+    @isParent bit,
+    @isRoot bit,
+    @isSpecializable bit,
+    @sqlSetId int,
+    @sqlSetWhere nvarchar(1000),
+    @sqlFieldNumeric nvarchar(1000),
+    @uiDisplayName nvarchar(400),
+    @uiDisplayText nvarchar(1000),
+    @uiDisplaySubtext nvarchar(100),
+	@uiDisplayUnits nvarchar(50),
+	@uiDisplayTooltip nvarchar(max),
+	@uiDisplayPatientCount int,
+	@uiNumericDefaultText nvarchar(50),
+    @constraints auth.ResourceConstraintTable READONLY,
+    @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@parentId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @parentId))
+    BEGIN;
+        THROW 70404, N'Parent concept not found.', 1;
+    END;
+
+    IF (@rootId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @rootId))
+    BEGIN;
+        THROW 70404, N'Root concept not found.', 1;
+    END;
+
+    IF ((SELECT COUNT(*) FROM app.SpecializationGroup WHERE Id IN (SELECT SpecializationGroupId FROM @specializationGroups)) != (SELECT COUNT(*) FROM @specializationGroups))
+    BEGIN;
+        THROW 70404, N'SpecializationGroup not found.', 1;
+    END;
+
+    BEGIN TRAN;
+    BEGIN TRY
+        DECLARE @ids app.ResourceIdTable;
+
+        INSERT INTO app.Concept (
+            UniversalId,
+            ParentId,
+            RootId,
+            ExternalId,
+            ExternalParentId,
+            IsPatientCountAutoCalculated,
+            [IsNumeric],
+            IsParent,
+            IsRoot,
+            IsSpecializable,
+            SqlSetId,
+            SqlSetWhere,
+            SqlFieldNumeric,
+            UiDisplayName,
+            UiDisplayText,
+            UiDisplaySubtext,
+            UiDisplayUnits,
+            UiDisplayTooltip,
+            UiDisplayPatientCount,
+            UiNumericDefaultText,
+            ContentLastUpdateDateTime,
+            PatientCountLastUpdateDateTime
+        )
+        OUTPUT inserted.Id INTO @ids
+        SELECT
+            UniversalId = @universalId,
+            ParentId = @parentId,
+            RootId = @rootId,
+            ExternalId = @externalId,
+            ExternalParentId = @externalParentId,
+            IsPatientCountAutoCalculated = @isPatientCountAutoCalculated,
+            [IsNumeric] = @isNumeric,
+            IsParent = @isParent,
+            IsRoot = @isRoot,
+            IsSpecializable = @isSpecializable,
+            SqlSetId = @sqlSetId,
+            SqlSetWhere = @sqlSetWhere,
+            SqlFieldNumeric = @sqlFieldNumeric,
+            UiDisplayName = @uiDisplayName,
+            UiDisplayText = @uiDisplayText,
+            UiDisplaySubtext = @uiDisplaySubtext,
+            UiDisplayUnits = @uiDisplayUnits,
+            UiDisplayTooltip = @uiDisplayTooltip,
+            UiDisplayPatientCount = @uiDisplayPatientCount,
+            UiNumericDefaultText = @uiNumericDefaultText,
+            ContentLastUpdateDateTime = GETDATE(),
+            PatientCountLastUpdateDateTime = GETDATE();
+
+        DECLARE @id UNIQUEIDENTIFIER;
+        SELECT TOP 1 @id = Id FROM @ids;
+
+        INSERT INTO auth.ConceptConstraint
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        INSERT INTO rela.ConceptSpecializationGroup
+        SELECT @id, SpecializationGroupId, OrderId
+        FROM @specializationGroups;
+
+		IF (@isRoot = 1)
+		BEGIN
+			UPDATE app.Concept
+			SET RootId = @id
+			WHERE Id = @id
+		END
+
+        COMMIT;
+
+        EXEC adm.sp_GetConceptById @id;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+END
+GO
+
+
+IF OBJECT_ID('adm.sp_UpdateConcept', 'P') IS NOT NULL
+	DROP PROCEDURE [adm].[sp_UpdateConcept]
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/3/29
+-- Description: Updates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
+-- =======================================
+CREATE PROCEDURE [adm].[sp_UpdateConcept]
+    @id uniqueidentifier,
+    @universalId nvarchar(200),
+    @parentId uniqueidentifier,
+    @rootId uniqueidentifier,
+    @externalId nvarchar(200),
+    @externalParentId nvarchar(200),
+    @isPatientCountAutoCalculated bit,
+    @isNumeric bit,
+    @isParent bit,
+    @isRoot bit,
+    @isSpecializable bit,
+    @sqlSetId int,
+    @sqlSetWhere nvarchar(1000),
+    @sqlFieldNumeric nvarchar(1000),
+    @uiDisplayName nvarchar(400),
+    @uiDisplayText nvarchar(1000),
+    @uiDisplaySubtext nvarchar(100),
+	@uiDisplayUnits nvarchar(50),
+	@uiDisplayTooltip nvarchar(max),
+	@uiDisplayPatientCount int,
+	@uiNumericDefaultText nvarchar(50),
+    @constraints auth.ResourceConstraintTable READONLY,
+    @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @id)
+    BEGIN;
+        THROW 70404, N'Concept not found.', 1;
+    END;
+
+    IF (@parentId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @parentId))
+    BEGIN;
+        THROW 70404, N'Parent concept not found.', 1;
+    END;
+
+    IF (@rootId IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.Concept WHERE Id = @rootId))
+    BEGIN;
+        THROW 70404, N'Root concept not found.', 1;
+    END;
+
+    IF ((SELECT COUNT(*) FROM app.SpecializationGroup WHERE Id IN (SELECT SpecializationGroupId FROM @specializationGroups)) != (SELECT COUNT(*) FROM @specializationGroups))
+    BEGIN;
+        THROW 70404, N'SpecializationGroup not found.', 1;
+    END;
+
+    BEGIN TRAN;
+    BEGIN TRY
+        UPDATE app.Concept
+        SET
+            UniversalId = @universalId,
+            ParentId = @parentId,
+            RootId = @rootId,
+            ExternalId = @externalId,
+            ExternalParentId = @externalParentId,
+            IsPatientCountAutoCalculated = @isPatientCountAutoCalculated,
+            [IsNumeric] = @isNumeric,
+            IsParent = @isParent,
+            IsRoot = @isRoot,
+            IsSpecializable = @isSpecializable,
+            SqlSetId = @sqlSetId,
+            SqlSetWhere = @sqlSetWhere,
+            SqlFieldNumeric = @sqlFieldNumeric,
+            UiDisplayName = @uiDisplayName,
+            UiDisplayText = @uiDisplayText,
+            UiDisplaySubtext = @uiDisplaySubtext,
+            UiDisplayUnits = @uiDisplayUnits,
+            UiDisplayTooltip = @uiDisplayTooltip,
+            UiDisplayPatientCount = @uiDisplayPatientCount,
+            UiNumericDefaultText = @uiNumericDefaultText,
+            ContentLastUpdateDateTime = GETDATE(),
+            PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
+        WHERE Id = @id;
+
+        DELETE FROM auth.ConceptConstraint
+        WHERE ConceptId = @id;
+
+        INSERT INTO auth.ConceptConstraint
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        DELETE FROM rela.ConceptSpecializationGroup
+        WHERE ConceptId = @id;
+
+        INSERT INTO rela.ConceptSpecializationGroup
+        SELECT @id, SpecializationGroupId, OrderId
+        FROM @specializationGroups;
+
+        COMMIT;
+
+        EXEC adm.sp_GetConceptById @id;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+END
+GO
+
+IF TYPE_ID('[auth].[ConceptConstraintTable]') IS NOT NULL
+    DROP TYPE [auth].[ConceptConstraintTable]
+GO
+
+
+
 -- Create admin DatasetQuery management stored procedures.
 IF OBJECT_ID('app.sp_GetDatasetQueries', 'P') IS NOT NULL
         DROP PROCEDURE [app].[sp_GetDatasetQueries]
@@ -697,6 +961,14 @@ BEGIN
         Tag
     FROM app.DatasetQueryTag
     WHERE DatasetQueryId = @id;
+
+    -- Get constraints
+    SELECT
+        DatasetQueryId,
+        ConstraintId,
+        ConstraintValue
+    FROM auth.DatasetQueryConstraint
+    WHERE DatasetQueryId = @id;
 END
 GO
 
@@ -729,6 +1001,7 @@ CREATE PROCEDURE adm.sp_UpdateDatasetQuery
     @desc nvarchar(max),
     @sql nvarchar(4000),
     @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
 BEGIN
@@ -780,7 +1053,7 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
-        WHERE Id = @id 
+        WHERE Id = @id;
 
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
@@ -789,6 +1062,14 @@ BEGIN
         OUTPUT inserted.DatasetQueryId, inserted.Tag
         SELECT @id, Tag
         FROM @tags;
+
+        DELETE FROM auth.DatasetQueryConstraint
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
 
         COMMIT;
     END TRY
@@ -817,6 +1098,7 @@ CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
     @desc nvarchar(max),
     @sql nvarchar(4000),
     @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
 BEGIN
@@ -891,6 +1173,11 @@ BEGIN
         OUTPUT inserted.DatasetQueryId, inserted.Tag
         SELECT @id, Tag
         FROM @tags;
+
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
 
         COMMIT;
     END TRY
