@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [app].[DatasetQueryTagTable]    Script Date: 6/12/19 9:23:03 AM ******/
+/****** Object:  UserDefinedTableType [app].[DatasetQueryTagTable]    Script Date: 6/12/19 12:20:53 PM ******/
 CREATE TYPE [app].[DatasetQueryTagTable] AS TABLE(
 	[Tag] [nvarchar](100) NOT NULL
 )
