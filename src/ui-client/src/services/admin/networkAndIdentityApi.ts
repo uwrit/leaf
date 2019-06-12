@@ -6,7 +6,6 @@
  */ 
 
 import { AppState } from "../../models/state/AppState";
-import { fetchHomeIdentityAndResponders } from "../networkRespondersApi";
 import { NetworkEndpoint, Certificate } from "../../models/admin/Network";
 import { HttpFactory } from "../HttpFactory";
 import { NetworkIdentity } from "../../models/NetworkResponder";
@@ -15,42 +14,10 @@ import { NetworkIdentity } from "../../models/NetworkResponder";
  * Get all current network endpoints with admin metadata.
  */
 export const getNetworkEndpoints = async (state: AppState): Promise<NetworkEndpoint[]> => {
-    const endpoints: NetworkEndpoint[] = [];
-
-    /* Use for testing only, replace when API call available */
-    const resp = await fetchHomeIdentityAndResponders(state);
-
-    for (const responder of resp.responders) {
-        const cert = await getCertificate(state, responder.address);
-        const endpoint: NetworkEndpoint = {
-            ...responder,
-            keyId: cert.keyId,
-            issuer: cert.issuer,
-            certificate: cert.data,
-            updated: new Date(),
-            created: new Date(),
-            isInterrogator: true,
-            isResponder: true
-        };
-        endpoints.push(endpoint);
-    }
-
-    const cert = await getCertificate(state, '');
-    const test: NetworkEndpoint = {
-        address: '',
-        id: 0,
-        name: 'test',
-        keyId: cert.keyId,
-        issuer: cert.issuer,
-        certificate: cert.data,
-        updated: new Date(),
-        created: new Date(),
-        isInterrogator: true,
-        isResponder: true
-    };
-    endpoints.push(test);
-
-    return endpoints;
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.get(`api/admin/network/endpoint`);
+    return resp.data;
 };
 
 /*

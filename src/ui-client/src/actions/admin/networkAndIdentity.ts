@@ -8,10 +8,11 @@
 import { NetworkIdentity } from "../../models/NetworkResponder";
 import { NetworkEndpoint } from "../../models/admin/Network";
 import { AppState } from "../../models/state/AppState";
-import { createEndpoint, updateEndpoint, deleteEndpoint } from "../../services/admin/networkAndIdentityApi";
+import { createEndpoint, updateEndpoint, deleteEndpoint, getCertificate } from "../../services/admin/networkAndIdentityApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { getApiUpdateQueue } from "../../utils/admin/networkAndidentity";
+import { setResponder } from "../networkResponders";
 
 export const SET_ADMIN_NETWORK_IDENTITY = 'SET_ADMIN_NETWORK_IDENTITY';
 export const SET_ADMIN_NETWORK_ENDPOINT = 'SET_ADMIN_NETWORK_ENDPOINT';
@@ -43,6 +44,7 @@ export const processApiUpdateQueue = () => {
             }
 
             // All done!
+            dispatch(setResponder(state.admin!.networkAndIdentity.identity));
             dispatch(setAdminNetworkIdentity(state.admin!.networkAndIdentity.identity, false));
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
@@ -99,6 +101,23 @@ export const deleteNetworkEndpoint = (endpoint: NetworkEndpoint) => {
                 });
         } catch (err) {
             console.log(err);
+        }
+    }
+};
+
+/*
+ * Test and attempt to load remote Leaf instance cert
+ * info based on current URL.
+ */
+export const attemptRemoteLeafCertCall = (endpoint: NetworkEndpoint) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        try {
+            dispatch(setNoClickModalState({ message: "Phoning a friend...", state: NoClickModalStates.CallingServer }));
+            const cert = await getCertificate(getState(), endpoint.address);
+            console.log(cert);
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
+        } catch (err) {
+            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
         }
     }
 };

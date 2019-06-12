@@ -95,7 +95,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 searchEnabled={!changed}
                                 selected={datasets.selected}
                             />
-                            
+
                         </Col>
                         <div className={`${c}-column-right admin-panel-editor`}>
 
@@ -140,6 +140,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                                 <Identifiers
                                                     dataset={currentDataset}
                                                     handleInputChange={this.handleInputChange}
+                                                    locked={locked}
                                                 />
                                             </Col>
                                             <Col md={6}>

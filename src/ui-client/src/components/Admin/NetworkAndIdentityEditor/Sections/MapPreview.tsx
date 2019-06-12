@@ -62,7 +62,7 @@ export class MapPreview extends React.Component<Props, State> {
                 >
                 <TileLayer url={tileUrl} />
                 <EndpointMarker position={latLng} queryState={CohortStateType.LOADED} />
-                <EndpointPopup id={identity} count={100} />
+                <EndpointPopup id={identity} count={1000} />
             </LeafletMap>
         );
     }

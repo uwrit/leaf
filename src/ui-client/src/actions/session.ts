@@ -67,7 +67,6 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Finding Home Leaf server', 20));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
-            homeBase.identity.address = '';
             if (getState().auth.userContext!.isAdmin) {
                 dispatch(setAdminNetworkIdentity(homeBase.identity, false));
             }
@@ -80,9 +79,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Fetch network responders if not in identified mode.
              */
-            const responders: NetworkIdentity[] = [
-                { ...homeBase.identity, enabled: true, id: 0, isHomeNode: true, isGateway: homeBase.identity.runtime === RuntimeMode.Gateway }
-            ];
+            const responders: NetworkIdentity[] = [ homeBase.identity ];
             
             if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
                 await Promise.all(

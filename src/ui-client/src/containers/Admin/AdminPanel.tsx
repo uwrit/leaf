@@ -12,7 +12,7 @@ import AdminState, { AdminPanelPane } from '../../models/state/AdminState';
 import { AppState, DatasetsState } from '../../models/state/AppState';
 import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEditor';
 import './AdminPanel.css';
-import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdentity/NetworkAndIdentityEditor';
+import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdentityEditor/NetworkAndIdentityEditor';
 
 interface StateProps { 
     admin?: AdminState;

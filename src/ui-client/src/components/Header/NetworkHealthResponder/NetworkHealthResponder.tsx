@@ -24,7 +24,7 @@ interface Props {
     totalActiveResponders: number;
 }
 
-export default class NetworkHealthResponder extends React.Component<Props> {
+export default class NetworkHealthResponder extends React.PureComponent<Props> {
     private className = 'header-networkhealth-responder';
 
     constructor(props: Props) {
@@ -33,18 +33,6 @@ export default class NetworkHealthResponder extends React.Component<Props> {
 
     public static defaultProps = {
         forceUpdate: false
-    }
-
-    public shouldComponentUpdate(nextProps: Props) {
-        const { forceUpdate, identity } = this.props;
-
-        if (forceUpdate) {
-            return true;
-        }
-        if (nextProps.identity.enabled !== identity.enabled) {
-            return true;
-        }
-        return false;
     }
 
     public render() {
