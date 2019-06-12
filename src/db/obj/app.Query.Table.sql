@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[Query]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  Table [app].[Query]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -27,7 +27,7 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Index [IX_Query_Nonce]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  Index [IX_Query_Nonce]    Script Date: 6/12/19 9:23:03 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 (
 	[Nonce] ASC
@@ -35,7 +35,7 @@ CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_Owner]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  Index [IX_Query_Owner]    Script Date: 6/12/19 9:23:03 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 (
 	[Owner] ASC
@@ -43,7 +43,7 @@ CREATE NONCLUSTERED INDEX [IX_Query_Owner] ON [app].[Query]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Query_UniversalId]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  Index [IX_Query_UniversalId]    Script Date: 6/12/19 9:23:03 AM ******/
 CREATE NONCLUSTERED INDEX [IX_Query_UniversalId] ON [app].[Query]
 (
 	[UniversalId] ASC

@@ -13,7 +13,7 @@ using Model.Admin.Compiler;
 
 namespace Services.Tables
 {
-    public class ConceptConstraintTable : ISqlTableType
+    public class ResourceConstraintTable : ISqlTableType
     {
         public DataTable Value
         {
@@ -21,15 +21,15 @@ namespace Services.Tables
             private set;
         }
 
-        public const string Type = "auth.ConceptConstraintTable";
-        const string conceptId = "ConceptId";
+        public const string Type = "auth.ResourceConstraintTable";
+        const string resourceId = "ResourceId";
         const string constraintId = "ConstraintId";
         const string constraintValue = "ConstraintValue";
 
-        ConceptConstraintTable(Guid conceptId, IEnumerable<ConceptConstraint> cons)
+        ResourceConstraintTable(Guid rid, IEnumerable<Model.Admin.Compiler.Constraint> cons)
         {
             var table = Schema();
-            Fill(table, conceptId, cons);
+            Fill(table, rid, cons);
             Value = table;
         }
 
@@ -38,34 +38,34 @@ namespace Services.Tables
             var dt = new DataTable();
             var cols = dt.Columns;
 
-            cols.Add(new DataColumn(conceptId, typeof(Guid)));
+            cols.Add(new DataColumn(resourceId, typeof(Guid)));
             cols.Add(new DataColumn(constraintId, typeof(int)));
             cols.Add(new DataColumn(constraintValue, typeof(string)));
 
             return dt;
         }
 
-        void Fill(DataTable table, Guid cid, IEnumerable<ConceptConstraint> cons)
+        void Fill(DataTable table, Guid rid, IEnumerable<Model.Admin.Compiler.Constraint> cons)
         {
             foreach (var c in cons)
             {
                 var row = table.NewRow();
-                row[conceptId] = cid;
+                row[resourceId] = rid;
                 row[constraintId] = c.ConstraintId;
                 row[constraintValue] = c.ConstraintValue;
                 table.Rows.Add(row);
             }
         }
 
-        public static DataTable From(Guid conceptId, IEnumerable<ConceptConstraint> cons)
+        public static DataTable From(Guid rid, IEnumerable<Model.Admin.Compiler.Constraint> cons)
         {
-            var cs = cons ?? new List<ConceptConstraint>();
-            return new ConceptConstraintTable(conceptId, cs).Value;
+            var cs = cons ?? new List<Model.Admin.Compiler.Constraint>();
+            return new ResourceConstraintTable(rid, cs).Value;
         }
 
-        public static DataTable From(AdminConcept concept)
+        public static DataTable From(IConstrainedResource resource)
         {
-            return From(concept.Id, concept.Constraints);
+            return From(resource.Id, resource.Constraints);
         }
     }
 }

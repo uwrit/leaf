@@ -67,6 +67,7 @@ namespace Services.Admin.Compiler
                         desc = query.Description,
                         sql = query.SqlStatement,
                         tags = DatasetQueryTagTable.From(query.Tags),
+                        constraints = ResourceConstraintTable.From(query),
                         user = user.UUID
                     },
                     commandType: CommandType.StoredProcedure,
@@ -94,6 +95,7 @@ namespace Services.Admin.Compiler
                         desc = query.Description,
                         sql = query.SqlStatement,
                         tags = DatasetQueryTagTable.From(query.Tags),
+                        constraints = ResourceConstraintTable.From(query),
                         user = user.UUID
                     },
                     commandType: CommandType.StoredProcedure,
@@ -148,6 +150,23 @@ namespace Services.Admin.Compiler
             public string Tag { get; set; }
         }
 
+        class DatasetQueryConstraintRecord
+        {
+            public Guid DatasetQueryId { get; set; }
+            public int ConstraintId { get; set; }
+            public string ConstraintValue { get; set; }
+
+            public Model.Admin.Compiler.Constraint Constraint()
+            {
+                return new Model.Admin.Compiler.Constraint
+                {
+                    ResourceId = DatasetQueryId,
+                    ConstraintId = Model.Admin.Compiler.Constraint.TypeFrom(ConstraintId),
+                    ConstraintValue = ConstraintValue
+                };
+            }
+        }
+
         static class DbReader
         {
             public static AdminDatasetQuery Read(SqlMapper.GridReader grid)
@@ -158,6 +177,7 @@ namespace Services.Admin.Compiler
                     return null;
                 }
                 var tags = grid.Read<DatasetQueryTag>();
+                var cons = grid.Read<DatasetQueryConstraintRecord>();
                 return new AdminDatasetQuery
                 {
                     Id = query.Id,
@@ -171,7 +191,8 @@ namespace Services.Admin.Compiler
                     CreatedBy = query.CreatedBy,
                     Updated = query.Updated,
                     UpdatedBy = query.UpdatedBy,
-                    Tags = tags.Select(t => t.Tag)
+                    Tags = tags.Select(t => t.Tag),
+                    Constraints = cons.Select(c => c.Constraint())
                 };
             }
         }

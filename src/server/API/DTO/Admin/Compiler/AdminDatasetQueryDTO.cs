@@ -27,6 +27,8 @@ namespace API.DTO.Admin.Compiler
         public string UpdatedBy { get; set; }
 
         public IEnumerable<string> Tags { get; set; }
+
+        public IEnumerable<Constraint> Constraints { get; set; }
     }
 
     public static class AdminDatasetQueryExt
