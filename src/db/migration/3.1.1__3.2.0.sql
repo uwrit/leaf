@@ -88,7 +88,6 @@ GO
 IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = 'IXUniq_DatasetQuery_UniversalId')
 	DROP INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 GO
-
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
 	[UniversalId] ASC
@@ -1753,7 +1752,79 @@ BEGIN
     SELECT Id = NULL
     WHERE 0 = 1;
 END
+GO
 
+-- Demographic query fetch
+IF OBJECT_ID('adm.sp_GetDemographicQuery', 'P') IS NOT NULL
+    DROP PROCEDURE adm.sp_GetDemographicQuery;
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/12
+-- Description: Fetch the app.DemographicQuery record for an admin.
+-- =======================================
+CREATE PROCEDURE adm.sp_GetDemographicQuery
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT
+        SqlStatement,
+        LastChanged,
+        ChangedBy
+    FROM app.DemographicQuery;
+END
+GO
+
+
+IF OBJECT_ID('adm.sp_UpdateDemographicQuery', 'P') IS NOT NULL
+    DROP PROCEDURE adm.sp_UpdateDemographicQuery;
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2019/6/12
+-- Description: Update the app.DemographicQuery record
+-- =======================================
+CREATE PROCEDURE adm.sp_UpdateDemographicQuery
+    @sql nvarchar(4000),
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
+        THROW 70400, N'DemographicQuery.SqlStatement is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+        
+        IF EXISTS (SELECT Lock FROM app.DemographicQuery)
+        BEGIN;
+            UPDATE app.DemographicQuery
+            SET
+                SqlStatement = @sql,
+                LastChanged = GETDATE(),
+                ChangedBy = @user
+            OUTPUT
+                inserted.SqlStatement,
+                inserted.LastChanged,
+                inserted.ChangedBy;
+        END;
+        ELSE
+        BEGIN;
+            INSERT INTO app.DemographicQuery (SqlStatement, LastChanged, ChangedBy)
+            OUTPUT inserted.SqlStatement, inserted.LastChanged, inserted.ChangedBy
+            VALUES (@sql, GETDATE(), @user);
+        END;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
 GO
 
 -- set version

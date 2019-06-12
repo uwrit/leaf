@@ -5,6 +5,6 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedDataType [app].[UniversalId]    Script Date: 6/12/19 9:23:03 AM ******/
+/****** Object:  UserDefinedDataType [app].[UniversalId]    Script Date: 6/12/19 12:20:53 PM ******/
 CREATE TYPE [app].[UniversalId] FROM [nvarchar](200) NOT NULL
 GO
