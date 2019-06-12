@@ -18,7 +18,7 @@ import { Panel } from "../panel/Panel";
 import { SavedQueriesState } from "../Query";
 import { SessionState } from "../Session";
 import AdminState from "./AdminState";
-import { CategorizedDatasetRef, PatientListDatasetQuery } from "../patientList/Dataset";
+import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -55,11 +55,11 @@ export interface MapState {
 }
 
 export interface DatasetsState {
-    allMap: Map<string, PatientListDatasetQuery>;
-    allCategorized: CategorizedDatasetRef[];
-    display: CategorizedDatasetRef[];
-    displayCount: number;
+    all: Map<string, PatientListDatasetQuery>;
+    display: Map<string, CategorizedDatasetRef>;
+    displayOrder: Map<string, PatientListDatasetQueryIndex>;
     searchTerm: string;
+    selected: string;
 }
 
 export interface AppState {

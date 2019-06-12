@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
+import { Section } from '../../Section/Section';
 import { SectionProps } from '../Props';
 import { ConstraintType, ConceptConstraint, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
 import { Constraint } from './Constraint';

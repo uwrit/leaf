@@ -43,6 +43,7 @@ namespace Model
             services.AddTransient<AdminConceptManager>();
             services.AddTransient<AdminNetworkEndpointManager>();
             services.AddTransient<AdminDatasetQueryManager>();
+            services.AddTransient<AdminDatasetCategoryManager>();
 
             return services;
         }

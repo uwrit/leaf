@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO } from '../models/NetworkResponder';
+import { NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO, RuntimeMode } from '../models/NetworkResponder';
 import { HttpFactory } from './HttpFactory';
 
 /*
@@ -18,7 +18,17 @@ export const fetchHomeIdentityAndResponders = async (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get('api/network/responders');
-    return resp.data as NetworkIdentityRespondersDTO;
+    const response = resp.data as NetworkIdentityRespondersDTO;
+
+    /*
+     * Set homebase defaults;
+     */
+    response.identity.id = 0;
+    response.identity.address = '';
+    response.identity.isHomeNode = true;
+    response.identity.enabled = true;
+    response.identity.isGateway = response.identity.runtime === RuntimeMode.Gateway;
+    return response;
 };
 
 /*

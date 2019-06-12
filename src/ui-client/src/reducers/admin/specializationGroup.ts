@@ -7,7 +7,7 @@
 
 import AdminState from "../../models/state/AdminState";
 import { AdminSpecializationGroupAction } from "../../actions/admin/specializationGroup";
-import { conceptSqlSetsChanged } from "../../utils/admin";
+import { conceptSqlSetsChanged } from "../../utils/admin/concept";
 
 export const setAdminConceptSpecializationGroups = (state: AdminState, action: AdminSpecializationGroupAction) => {
     const groups = action.groups!;

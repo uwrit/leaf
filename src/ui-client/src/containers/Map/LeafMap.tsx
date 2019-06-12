@@ -47,14 +47,6 @@ interface State {
     width: number;
 }
 
-// Default the map frame to the US for now
-const defaultBounds = [ [47.6062, -122.3321], [25.7617, -80.1918] ];
-let internalViewport: any = {
-    bounds: null,
-    center: null,
-    zoom: 0
-}
-
 export class LeafMap extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -70,7 +62,6 @@ export class LeafMap extends React.Component<Props, State> {
             return;
         }
         v.bounds = this.state.ref.current.leafletElement.getBounds();
-        internalViewport = v;
     }
 
     public updateDimensions = () => {
@@ -96,28 +87,21 @@ export class LeafMap extends React.Component<Props, State> {
         const markers: any[] = [];
         const popups: any[] = [];
         const paths: any[] = [];
-        const home: NetworkIdentity = networkResponders.get(0)!;
+        const home = networkResponders.get(0);
         const responders: NetworkIdentity[] = networkResponders.size > 0 && cohort.networkCohorts.size > 0
-            ? Array
-                .from(networkResponders.keys())
-                .map((k: number) => networkResponders.get(k)!)
-                .filter((n: NetworkIdentity) => n.enabled)
+            ? [ ...networkResponders.values() ].filter((n: NetworkIdentity) => n.enabled && n.latitude && n.longitude)
             : [];
+
         for (const nr of responders) {
             const netCohort = cohort.networkCohorts.get(nr.id);
-            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude, nr.longitude)} queryState={netCohort!.count.state} />);
+            markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude!, nr.longitude!)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 
-            if (nr.id > 0) {
+            if (home && nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;
+                const line = CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ]);
                 if (home.enabled) {
-                    paths.push(
-                        <AntPath 
-                            key={nr.id} 
-                            options={opts} 
-                            positions={CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ])} 
-                        />
-                    )
+                    paths.push(<AntPath key={nr.id} options={opts} positions={line}/>);
                 }
             }
         }

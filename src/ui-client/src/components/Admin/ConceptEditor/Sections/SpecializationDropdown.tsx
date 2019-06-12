@@ -15,7 +15,7 @@ interface Props {
 }
 
 export class SpecializationDropdown extends React.PureComponent<Props> {
-    private className = "concept-editor"
+    private className = 'concept-editor';
     public render() {
         const c = this.className;
         const { specializationGroup, enabled } = this.props;

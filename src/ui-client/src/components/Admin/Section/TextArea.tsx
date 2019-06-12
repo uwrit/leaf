@@ -8,7 +8,7 @@
 import React from 'react';
 import { FormGroup, Label, FormText } from 'reactstrap';
 import TextareaAutosize from 'react-textarea-autosize'
-import { PropertyProps } from '../Props';
+import { PropertyProps } from '../ConceptEditor/Props';
 
 interface Props extends PropertyProps {
     overrideTabKeyDown?: boolean;

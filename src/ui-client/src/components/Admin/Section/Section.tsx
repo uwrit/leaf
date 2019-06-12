@@ -12,7 +12,7 @@ interface Props {
 }
 
 export class Section extends React.PureComponent<Props> {
-    private className = "concept-editor"
+    private className = "admin-panel"
     constructor(props: Props) {
         super(props);
     }

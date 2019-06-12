@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateEndpoint]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateEndpoint]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -29,19 +28,19 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    IF (@name IS NULL)
+    IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'NetworkEndpoint.Name is required.', 1;
     
-    IF (@addr IS NULL)
+    IF (app.fn_NullOrWhitespace(@addr) = 1)
         THROW 70400, N'NetworkEndpoint.Address is required.', 1;
     
-    IF (@iss IS NULL)
+    IF (app.fn_NullOrWhitespace(@iss) = 1)
         THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
-    
-    IF (@kid IS NULL)
+
+    IF (app.fn_NullOrWhitespace(@kid) = 1)
         THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
     
-    IF (@cert IS NULL)
+    IF (app.fn_NullOrWhitespace(@cert) = 1)
         THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
     
     IF (@isInterrogator IS NULL)
@@ -50,11 +49,20 @@ BEGIN
     IF (@isResponder IS NULL)
         THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
     
-    INSERT INTO network.Endpoint ([Name], [Address], Issuer, KeyId, [Certificate], Created, Updated, IsInterrogator, IsResponder)
-    OUTPUT inserted.Id, inserted.Name, inserted.Address, inserted.Issuer, inserted.KeyId, inserted.Certificate, inserted.Created, inserted.Updated, inserted.IsInterrogator, inserted.IsResponder
-    VALUES (@name, @addr, @iss, @kid, @cert, getdate(), getdate(), @isInterrogator, @isResponder);
+    BEGIN TRAN;
+    BEGIN TRY
+        IF EXISTS (SELECT 1 FROM network.Endpoint WHERE Name = @name OR KeyId = @kid OR Issuer = @iss)
+            THROW 70409, N'NetworkEndpoint already exists with that name, key id, or issuer value.', 1;
+
+        INSERT INTO network.Endpoint ([Name], [Address], Issuer, KeyId, [Certificate], Created, Updated, IsInterrogator, IsResponder)
+        OUTPUT inserted.Id, inserted.Name, inserted.Address, inserted.Issuer, inserted.KeyId, inserted.Certificate, inserted.Created, inserted.Updated, inserted.IsInterrogator, inserted.IsResponder
+        VALUES (@name, @addr, @iss, @kid, @cert, getdate(), getdate(), @isInterrogator, @isResponder);
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
 
 END
-
-
 GO

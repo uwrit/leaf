@@ -14,19 +14,22 @@ import { searchPatientListDatasets, setDatasetSearchTerm } from '../../../action
 
 interface Props {
     autoSelectOnSearch: boolean;
-    categoryIdx: number;
-    datasetIdx: number;
     datasets: DatasetsState;
     dispatch: any;
-    handleDatasetSelect: (categoryIdx: number, datasetIdx: number) => void;
+    handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
     handleDatasetRequest: () => any;
     searchEnabled: boolean;
+    selected: string;
 }
 
 export default class DatasetContainer extends React.PureComponent<Props> {
     private className = 'patientlist-add-dataset';
     constructor(props: Props) {
         super(props);
+        this.state = {
+            categoryIndex: 0,
+            datasetIndex: 0
+        }
     }
 
     public static defaultProps = {
@@ -34,14 +37,26 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         searchEnabled: true
     }
 
+    public componentDidMount() {
+        const { datasets, handleDatasetSelect } = this.props;
+        const { displayOrder } = datasets;
+
+        if (displayOrder.size) {
+            const firstDs = this.getFirstDataset();
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
+            }
+        }
+    }
+
     public getSnapshotBeforeUpdate(prevProps: Props) {
         const { datasets, handleDatasetSelect, autoSelectOnSearch } = this.props;
+        const { displayOrder } = datasets;
 
-        if (datasets.displayCount && datasets.displayCount !== prevProps.datasets.displayCount) {
-            if (autoSelectOnSearch) {
-                handleDatasetSelect(0, 0);
-            } else {
-                handleDatasetSelect(0, -1);
+        if (autoSelectOnSearch && displayOrder.size && !datasets.displayOrder.get(datasets.selected)) {
+            const firstDs = this.getFirstDataset();
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
             }
         }
         return null;
@@ -61,6 +76,8 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         const c = this.className;
         return (
             <div>
+
+                {/* Search */}
                 <Input
                     className={`${c}-input leaf-input`} 
                     disabled={!searchEnabled}
@@ -70,21 +87,27 @@ export default class DatasetContainer extends React.PureComponent<Props> {
                     spellCheck={false}
                     value={datasets.searchTerm} />
                 <div className={`${c}-select-datasets-list`}>
-                    {datasets.display.length === 0 &&
+
+                    {/* No datasets found */}
+                    {datasets.display.size === 0 &&
                     <div className={`${c}-select-nodatasets`}>
                         No datasets found. Try refining your search.
                     </div>
                     }
-                    {datasets.display.map((cat: CategorizedDatasetRef, catIdx: number) => {
+
+                    {/* Categories */}
+                    {[ ...datasets.display.values() ].map((cat: CategorizedDatasetRef) => {
                         return (
                         <div className={`${c}-select-category`} key={cat.category}>
                             <div className={`${c}-select-category-name`}>{cat.category}</div>
-                            {cat.datasets.map((d: PatientListDatasetQuery, dsIdx: number) => {
+
+                            {/* Datasets */}
+                            {[ ...cat.datasets.values() ].map((d: PatientListDatasetQuery) => {
                                 return (
                                     <div 
                                         key={d.id} 
-                                        className={this.setDatasetOptionClass(d, catIdx, dsIdx)} 
-                                        onClick={this.handleDatasetOptionClick.bind(null, catIdx, dsIdx)}
+                                        className={this.setDatasetOptionClass(d)} 
+                                        onClick={this.handleDatasetOptionClick.bind(null, d)}
                                         onDoubleClick={handleDatasetRequest}
                                         onKeyDown={this.handleSearchKeydown}
                                         tabIndex={0}>
@@ -99,10 +122,19 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         )
     }
 
+    private getFirstDataset = (): PatientListDatasetQuery | undefined => {
+        const { datasets } = this.props;
+        const firstCat = [ ...datasets.display.values() ][0];
+        if (firstCat) {
+            return [ ...firstCat.datasets.values() ][0];
+        }
+        return;
+    }
+
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
         const { datasets, handleDatasetRequest } = this.props;
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
-        if (!key || !datasets.display.length) { return; }
+        if (!key || !datasets.displayOrder.size) { return; }
 
         switch (key) {
             case keys.ArrowUp: 
@@ -118,76 +150,36 @@ export default class DatasetContainer extends React.PureComponent<Props> {
 
     private handleArrowUpDownKeyPress = (key: number) => {
         const { handleDatasetSelect } = this.props;
+        const { datasets, selected } = this.props;
+        const order = datasets.displayOrder.get(selected);
+        const hasData = datasets.displayOrder.size > 0;
 
-        const newIdxs = this.calculateNewDatasetAfterKeypress(key);
-        handleDatasetSelect(newIdxs[0], newIdxs[1]);
-    }
-
-    private calculateNewDatasetAfterKeypress = (key: number): [ number, number ] => {
-        const { datasets, categoryIdx, datasetIdx } = this.props;
-
-        const totalCategories = datasets.display.length;
-        const minDs = 0;
-        const minCat = 0;
-        const maxCat = totalCategories - 1;
-
-        let newCatIdx = categoryIdx;
-        let newDsIdx = datasetIdx;
-
-        if (totalCategories > 1) {
-            if (key === keys.ArrowUp) {
-                if (categoryIdx === minCat) {
-                    newCatIdx = datasetIdx === minDs ? maxCat : categoryIdx;
-                } else {
-                    newCatIdx = datasetIdx === minDs ? categoryIdx - 1 : categoryIdx;
-                }
-            } else if (key === keys.ArrowDown) {
-                const maxDs = datasets.display[categoryIdx].datasets.length - 1;
-                if (categoryIdx === maxCat) {
-                    newCatIdx = datasetIdx === maxDs ? minCat : categoryIdx
-                } else {
-                    newCatIdx = datasetIdx === maxDs ? categoryIdx + 1 : categoryIdx;
-                }
+        if (hasData && order) {
+            let seq = key === keys.ArrowUp
+                ? datasets.all.get(order.prevId)!
+                : datasets.all.get(order.nextId)!;
+            if (seq) {
+                handleDatasetSelect(seq);
+            }
+        } else if (!datasets.displayOrder.get(selected) && hasData && key === keys.ArrowDown) {
+            const firstDs = this.getFirstDataset();
+            if (firstDs) {
+                handleDatasetSelect(firstDs);
             }
         }
-
-        const cat = datasets.display[newCatIdx];
-        if (!cat) { return [categoryIdx, datasetIdx]; }
-
-        const totalDatasets = cat.datasets.length;
-        const maxDs = totalDatasets - 1;
-
-        if (totalDatasets > 1) {
-            if (newCatIdx === categoryIdx + 1) {
-                newDsIdx = 0;
-            } else if (newCatIdx > categoryIdx) {
-                newDsIdx = maxDs;
-            } else if (newCatIdx === categoryIdx - 1) {
-                newDsIdx = maxDs;
-            } else if (newCatIdx < categoryIdx) {
-                newDsIdx = 0;
-            } else {
-                newDsIdx = key === keys.ArrowUp
-                    ? datasetIdx === minDs ? maxDs : datasetIdx - 1
-                    : datasetIdx === maxDs ? minDs : datasetIdx + 1;
-            }
-        } else {
-            newDsIdx = 0;
-        }
-        return [ newCatIdx, newDsIdx ]; 
     }
 
-    private handleDatasetOptionClick = (categoryIdx: number, datasetIdx: number) => {
+    private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
         const { handleDatasetSelect } = this.props;
-        handleDatasetSelect(categoryIdx, datasetIdx);
+        handleDatasetSelect(dataset);
     }
 
-    private setDatasetOptionClass = (dataset: PatientListDatasetQuery, catIdx: number, dsIdx: number) => {
-        const { categoryIdx, datasetIdx } = this.props;
+    private setDatasetOptionClass = (dataset: PatientListDatasetQuery) => {
+        const { selected } = this.props;
         const c = this.className;
         const classes = [ `${c}-select-dataset-option` ];
 
-        if (catIdx === categoryIdx && dsIdx === datasetIdx) { classes.push('selected'); }
+        if (dataset.id === selected) { classes.push('selected'); }
         if (dataset.unsaved) { classes.push('unsaved'); }
 
         return classes.join(' ');

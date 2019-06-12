@@ -43,7 +43,7 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     let sqlColumns = datasets.sqlColumns;
 
     if (ds && !action.changed) {
-        const cols = getShapeColumns(ds.sql, ds.shape);
+        const cols = getShapeColumns(ds.sqlStatement, ds.shape);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;
 
@@ -77,7 +77,7 @@ export const setAdminPanelDemographicsDataset = (state: AdminState, action: Admi
 export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { shape: action.shape }) as AdminDatasetQuery;
-    const { expectedColumns, sqlColumns } = getShapeColumns(ds.sql, action.shape!);
+    const { expectedColumns, sqlColumns } = getShapeColumns(ds.sqlStatement, action.shape!);
 
     return Object.assign({}, state, { 
         datasets: { 
@@ -92,7 +92,7 @@ export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatase
 
 export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
-    const ds = Object.assign({}, datasets.currentDataset, { sql: action.sql }) as AdminDatasetQuery;
+    const ds = Object.assign({}, datasets.currentDataset, { sqlStatement: action.sql }) as AdminDatasetQuery;
     const sqlColumns = new Set(getSqlColumns(action.sql!));
     datasets.expectedColumns.forEach((c) => c.present = sqlColumns.has(c.id));
 

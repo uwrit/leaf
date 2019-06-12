@@ -38,7 +38,7 @@ namespace API.Controllers.Admin
             try
             {
                 var concept = await manager.GetAsync(id);
-                return Ok(new ConceptDTO(concept));
+                return Ok(new AdminConceptDTO(concept));
             }
             catch (Exception ex)
             {
@@ -48,7 +48,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ConceptDTO>> Update(Guid id, [FromBody] ConceptDTO o)
+        public async Task<ActionResult<AdminConceptDTO>> Update(Guid id, [FromBody] AdminConceptDTO o)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace API.Controllers.Admin
 
                 var c = o.Concept();
                 var updated = await manager.UpdateAsync(c);
-                return Ok(new ConceptDTO(updated));
+                return Ok(new AdminConceptDTO(updated));
             }
             catch (ArgumentException ae)
             {
@@ -78,13 +78,13 @@ namespace API.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<ActionResult<ConceptDTO>> Create([FromBody] ConceptDTO o)
+        public async Task<ActionResult<AdminConceptDTO>> Create([FromBody] AdminConceptDTO o)
         {
             try
             {
                 var c = o.Concept();
                 var updated = await manager.CreateAsync(c);
-                return Ok(new ConceptDTO(updated));
+                return Ok(new AdminConceptDTO(updated));
             }
             catch (ArgumentException ae)
             {
@@ -103,7 +103,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ConceptDeleteResult>> Delete(Guid id)
+        public async Task<ActionResult<ConceptDeleteResponse>> Delete(Guid id)
         {
             try
             {

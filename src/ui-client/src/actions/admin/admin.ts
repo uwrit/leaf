@@ -11,6 +11,8 @@ import { getAdminDemographicsDataset } from "../../services/admin/datasetApi";
 import { setAdminDemographicsDataset } from "./dataset";
 import { getDatasetQueryCategories } from "../../services/admin/datasetQueryCategoryApi";
 import { setAdminDatasetQueryCategories } from "./datasetQueryCategory";
+import { getNetworkEndpoints } from "../../services/admin/networkAndIdentityApi";
+import { setAdminNetworkEndpoints } from "./networkAndIdentity";
 
 export const SET_ADMIN_PANEL_PANE = 'SET_ADMIN_PANEL_PANE';
 export const SET_ADMIN_PANEL_SUBPANE = 'SET_ADMIN_PANEL_SUBPANE';
@@ -44,12 +46,26 @@ export const loadAdminPanelDataIfNeeded = () => {
                  */ 
                 const sqlSets = await getSqlSets(state);
                 const conceptEvents = await getConceptEvents(state);
-                const demographics = await getAdminDemographicsDataset(state);
-                const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminConceptEvents(conceptEvents));
+
+                /*
+                 * Load datasets data.
+                 */
+                const demographics = await getAdminDemographicsDataset(state);
+                const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminDemographicsDataset(demographics, false));
                 dispatch(setAdminDatasetQueryCategories(datasetQueryCategories));
+
+                /*
+                 * Load network & identity data.
+                 */
+                const endpoints = await getNetworkEndpoints(state);
+                dispatch(setAdminNetworkEndpoints(endpoints));
+
+                /*
+                 * Finish.
+                 */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
             } catch (err) {
@@ -66,7 +82,7 @@ export const loadAdminPanelDataIfNeeded = () => {
 };
 
 /*
- * Handles switching between Admin Panel views. Prevents
+ * Handle switching between Admin Panel Concept & Concept SQL Set views. Prevents
  * view pane changes if admin has unsaved Concept changes.
  */
 export const checkIfAdminPanelUnsavedAndSetSubPane = (subPane: number) => {
@@ -81,6 +97,31 @@ export const checkIfAdminPanelUnsavedAndSetSubPane = (subPane: number) => {
             dispatch(showInfoModal(info));
         } else {
             dispatch(setAdminPanelSubPane(subPane));
+        }
+    };
+};
+
+/*
+ * Handle switching between Admin Panel views. Prevents
+ * view pane changes if admin has unsaved changes.
+ */
+export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelPane) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const admin = getState().admin!;
+        if (
+            admin.concepts.changed || 
+            admin.sqlSets.changed ||
+            admin.datasets.changed ||
+            admin.networkAndIdentity.changed
+        ) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        } else {
+            dispatch(setAdminPanelPane(pane));
         }
     };
 };

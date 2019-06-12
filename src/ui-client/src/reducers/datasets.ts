@@ -10,193 +10,172 @@ import {
     DatasetAction, 
     SET_DATASET,
     SET_DATASETS,
-    SET_DATASETS_DISPLAY_ALL,
     SET_DATASETS_SEARCH_TERM,
     SET_DATASETS_SEARCH_RESULT,
     REMOVE_DATASET,
     ADD_DATASET,
     MOVE_DATASET_CATEGORY,
-    SET_DATASET_DISPLAY
+    SET_DATASET_DISPLAY,
+    SET_DATASET_SELECTED,
+    SWITCH_DATASET_OLD_FOR_NEW
 } from "../actions/datasets";
-import { PatientListDatasetQuery, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, PatientListDatasetShape } from "../models/patientList/Dataset";
 
 export const defaultDatasetsState = (): DatasetsState => {
     return {
-        allMap: new Map(),
-        allCategorized: [],
-        display: [],
-        displayCount: 0,
-        searchTerm: ''
+        all: new Map(),
+        display: new Map(),
+        displayOrder: new Map(),
+        searchTerm: '',
+        selected: ''
     };
 };
 
-const setDatasets = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    const allMap: Map<string,PatientListDatasetQuery> = new Map();
-    action.datasets!.forEach((ds) => allMap.set(ds.id, ds));
+const demographics: PatientListDatasetQuery = { id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', name: 'Basic Demographics', tags: [] };
+
+const switchDatasetOldForNew = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+    const oldDs = action.dataset!;
+    const newDs = action.newDataset!;
+    let cat: any;
+    let datasets;
+    let index = -1;
+    let ord;
+
+    /* 
+     * Update [all].
+     */
+    state.all.delete(oldDs.id);
+    state.all.set(newDs.id, newDs);
+
+    /* 
+     * Update [display].
+     */
+    cat = state.display.get(oldDs.category);
+    if (cat) {
+        datasets = [ ...cat.datasets.values() ];
+        index = datasets.findIndex((ds) => ds.id === oldDs.id);
+        if (index > -1) {
+            datasets[index] = newDs;
+            cat.datasets.clear();
+            datasets.forEach((ds) => cat.datasets.set(ds.id, ds));
+        }
+    }
+
+    /* 
+     * Update [displayOrder].
+     */
+    ord = state.displayOrder.get(oldDs.id);
+    if (ord) {
+        state.displayOrder.set(newDs.id, ord!)
+        state.displayOrder.delete(oldDs.id);
+    }
+    state.displayOrder.forEach((ord) => {
+        if (ord.nextId === oldDs.id) { ord.nextId = newDs.id; }
+        if (ord.prevId === oldDs.id) { ord.prevId = newDs.id; }
+    });
 
     return Object.assign({}, state, {
-        allMap,
-        allCategorized: action.categories!,
-        display: action.categories!,
-        displayCount: action.datasets!.length
+        all: new Map(state.all),
+        display: new Map(state.display),
+        displayOrder: new Map(state.displayOrder)
     });
 };
 
-const setDatasetsDisplayAll = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+const setDatasets = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+    const all: Map<string,PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
+    action.datasets!.forEach((ds) => all.set(ds.id, ds));
+
     return Object.assign({}, state, {
-        display: state.allCategorized,
-        displayCount: state.allMap.size
+        all,
+        display: new Map(action.result!.categories),
+        displayOrder: new Map(action.result!.displayOrder)
     });
 };
 
 const setDatasetsSearchTermResult = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     return Object.assign({}, state, {
         display: action.result!.categories,
-        displayCount: action.result!.datasetCount
+        displayOrder: action.result!.displayOrder
     });
 };
 
 const setDatasetDisplay = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    const categories = state.display.slice();
-    const category = Object.assign({}, categories[action.datasetCategoryIndex!]);
-
-    category.datasets[action.datasetIndex!] = action.dataset!;
-    categories[action.datasetCategoryIndex!] = category;
+    const ds = action.dataset!;
+    state.display.get(ds.category)!.datasets.set(ds.id, ds);
 
     return Object.assign({}, state, {
-        allMap: new Map(state.allMap),
-        display: categories
+        display: new Map(state.display)
+    });
+};
+
+const setDatasetSelected = (state: DatasetsState, action: DatasetAction): DatasetsState => {
+    return Object.assign({}, state, {
+        selected: action.dataset!.id
     });
 };
 
 const setDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    state.allMap.set(action.dataset!.id, action.dataset!);
+    const ds = action.dataset!;
+    state.all.set(ds.id, ds);
 
     return Object.assign({}, state, {
-        allMap: new Map(state.allMap)
+        all: new Map(state.all)
     });
 };
 
 const removeDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    let categoryIdx = -1;
-    let dsIdx = -1;
+    const ds = action.dataset!;
+    state.all.delete(ds.id);
+    state.display.get(ds.category)!.datasets.delete(ds.id);
 
-    /*
-     * Remove from 'all'
-     */
-    const allCategorized = state.allCategorized.slice();
-    categoryIdx = allCategorized.findIndex((cat) => cat.category === action.dataset!.category);
-
-    if (categoryIdx > -1) {
-        const categoryAll = allCategorized[categoryIdx];
-        dsIdx = categoryAll.datasets.findIndex((d) => d.id === action.dataset!.id);
-        if (dsIdx > -1) {
-            categoryAll.datasets.splice(dsIdx, 1);
-            if (!categoryAll.datasets.length) {
-                allCategorized.splice(categoryIdx, 1);
-            }
-        }
+    if (!state.display.has(ds.category)) {
+        state.display.delete(ds.category);
     }
-
-    /*
-     * Remove from 'display'
-     */
-    const display = state.display.slice();
-    categoryIdx = display.findIndex((cat) => cat.category === action.dataset!.category);
-
-    if (categoryIdx > -1) {
-        const categoryDisplay = display[categoryIdx];
-        dsIdx = categoryDisplay.datasets.findIndex((d) => d.id === action.dataset!.id);
-        if (dsIdx > -1) {
-            categoryDisplay.datasets.splice(dsIdx, 1);
-            if (!categoryDisplay.datasets.length) {
-                display.splice(categoryIdx, 1);
-            }
-        }
-    }
-    state.allMap.delete(action.dataset!.id);
 
     return Object.assign({}, state, {
-        allMap: new Map(state.allMap),
-        allCategorized,
-        display,
-        displayCount: state.displayCount - 1
+        all: new Map(state.all),
+        display: new Map(state.display)
     });
 };
 
 const addDataset = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    state.allMap.set(action.dataset!.id, action.dataset!);
-
-    /* 
-     * Add to the 'all' array.
-     */
-    const allCategorized = state.allCategorized.slice();
-    let emptyCategoryIdx = state.allCategorized.findIndex((cat) => !cat.category);
-
-    if (emptyCategoryIdx > -1) {
-        allCategorized[emptyCategoryIdx].datasets.unshift(action.dataset!);
+    const ds = action.dataset!;
+    let displayCat = state.display.get(ds.category);
+    if (displayCat) {
+        displayCat.datasets.set(ds.id, ds);
     } else {
-        allCategorized.unshift({ category: '', datasets: [ action.dataset! ]});
-    }
-
-    /* 
-     * Add to the 'display' array.
-     */
-    const display = state.display.slice();
-    emptyCategoryIdx = state.display.findIndex((cat) => !cat.category);
-
-    if (emptyCategoryIdx > -1) {
-        display[emptyCategoryIdx].datasets.unshift(action.dataset!);
-    } else {
-        display.unshift({ category: '', datasets: [ action.dataset! ]});
+        displayCat = { category: ds.category, datasets: new Map([[ ds.id, ds ]])};
+        state.display.set(displayCat.category, displayCat);
     }
 
     return Object.assign({}, state, {
-        allMap: new Map(state.allMap),
-        allCategorized,
-        display,
-        displayCount: state.displayCount + 1
+        display: new Map(state.display)
     });
 };
 
 const moveDatasetCategory = (state: DatasetsState, action: DatasetAction): DatasetsState => {
-    const { dataset, category } = action;
+    const ds = action.dataset!;
+    const category = action.category!; // new catgory
 
-    return Object.assign({}, state, {
-        allCategorized: moveDatasetFromCategorizedArray(dataset!, category!, state.allCategorized),
-        display: moveDatasetFromCategorizedArray(dataset!, category!, state.display)
-    });
-};
-
-const moveDatasetFromCategorizedArray = (dataset: PatientListDatasetQuery, newCategory: string, categories: CategorizedDatasetRef[]): CategorizedDatasetRef[] => {
-    const clone = Object.assign({}, dataset, { category: newCategory });
-
-    /* 
-     * Remove from old category array.
-     */
-    let newCategories = categories.slice();
-    const oldCatIdx = newCategories.findIndex((cat) => cat.category === dataset.category);
-    if (oldCatIdx > -1) {
-        const oldCat = newCategories[oldCatIdx];
-        const oldDsIdx = oldCat.datasets.findIndex((ds) => ds.id === dataset.id)!;
-        oldCat.datasets.splice(oldDsIdx, 1);
-        if (!oldCat.datasets.length) {
-            newCategories.splice(oldCatIdx, 1);
+    const oldCategory = state.display.get(ds.category);
+    if (oldCategory) { 
+        oldCategory.datasets.delete(ds.id);
+        if (!oldCategory.datasets.size) {
+            state.display.delete(oldCategory.category);
         }
     }
-    /*
-     * Add into new category array.
-     */
-    const newCatIdx = newCategories.findIndex((cat) => cat.category === newCategory);
-    if (newCatIdx > -1) {
-        const newCat = newCategories[newCatIdx];
-        newCat.datasets.unshift(clone);
+
+    let newCategory = state.display.get(category);
+    if (newCategory) {
+        newCategory.datasets.set(ds.id, ds);
     } else {
-        const newCat: CategorizedDatasetRef = { category: newCategory, datasets: [ clone ] };
-        newCategories.push(newCat);
-        newCategories = newCategories.sort((a,b) => a.category > b.category ? 1 : -1);
+        newCategory = { category, datasets: new Map([[ ds.id, ds ]])};
+        state.display.set(newCategory.category, newCategory);
     }
-    return newCategories;
+
+    return Object.assign({}, state, {
+        display: new Map(state.display)
+    });
 };
 
 const setDatasetsSearchTerm = (state: DatasetsState, action: DatasetAction): DatasetsState => {
@@ -212,10 +191,10 @@ export const datasets = (state: DatasetsState = defaultDatasetsState(), action: 
             return setDatasets(state, action);
         case SET_DATASET:
             return setDataset(state, action);
+        case SET_DATASET_SELECTED:
+            return setDatasetSelected(state, action);
         case SET_DATASET_DISPLAY:
             return setDatasetDisplay(state, action);
-        case SET_DATASETS_DISPLAY_ALL:
-            return setDatasetsDisplayAll(state, action);
         case SET_DATASETS_SEARCH_TERM:
             return setDatasetsSearchTerm(state, action);
         case SET_DATASETS_SEARCH_RESULT:
@@ -226,6 +205,8 @@ export const datasets = (state: DatasetsState = defaultDatasetsState(), action: 
             return addDataset(state, action);
         case MOVE_DATASET_CATEGORY:
             return moveDatasetCategory(state, action);
+        case SWITCH_DATASET_OLD_FOR_NEW:
+            return switchDatasetOldForNew(state, action);
 
         default:
             return state;

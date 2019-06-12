@@ -6,13 +6,13 @@
  */ 
 
 import React from 'react';
-import { TextArea } from '../Sections/TextArea';
+import { TextArea } from '../../Section/TextArea';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, removeAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Specialization, SpecializationGroup } from '../../../../models/admin/Concept';
 import { Row, Col, Container } from 'reactstrap';
-import { Input } from '../Sections/Input';
+import { Input } from '../../Section/Input';
 
 interface Props {
     dispatch: any;

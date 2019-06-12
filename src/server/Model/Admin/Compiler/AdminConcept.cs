@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminConcept
+    public class AdminConcept : IConstrainedResource
     {
         public Guid Id { get; set; }
         public ConceptUrn UniversalId { get; set; }
@@ -35,7 +35,7 @@ namespace Model.Admin.Compiler
         public IEnumerable<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
 
-        public IEnumerable<ConceptConstraint> Constraints { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
 
         public IEnumerable<SpecializationGroupRelationship> SpecializationGroups { get; set; }
     }
@@ -44,31 +44,5 @@ namespace Model.Admin.Compiler
     {
         public int SpecializationGroupId { get; set; }
         public int? OrderId { get; set; }
-    }
-
-    public enum ConstraintType
-    {
-        User = 1,
-        Group = 2
-    }
-
-    public class ConceptConstraint
-    {
-        public Guid ConceptId { get; set; }
-        public ConstraintType ConstraintId { get; set; }
-        public string ConstraintValue { get; set; }
-
-        public static ConstraintType TypeFrom(int code)
-        {
-            switch (code)
-            {
-                case 1:
-                    return ConstraintType.User;
-                case 2:
-                    return ConstraintType.Group;
-                default:
-                    throw new InvalidOperationException($"{code} is not a valid ConstraintType.");
-            }
-        }
     }
 }

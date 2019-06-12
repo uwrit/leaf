@@ -16,9 +16,8 @@ import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AuthConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import AdminPanel from '../containers/Admin/AdminPanel';
-import AdminState, { AdminPanelPane } from '../models/state/AdminState';
-import { ConceptEditor } from '../components/Admin/ConceptEditor/ConceptEditor';
-import { setAdminPanelSubPane, setAdminPanelPane } from '../actions/admin/admin';
+import { AdminPanelPane } from '../models/state/AdminState';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../actions/admin/admin';
 
 export interface RouteConfig {
     display: string;
@@ -82,11 +81,14 @@ const admin = (): RouteConfig => {
         path: '/admin',
         render: () => <AdminPanel />,
         subRoutes: [{
-            clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.CONCEPTS)),
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.CONCEPTS)),
             display: 'Concepts',
         }, {
-            clickHandler: (dispatch: any) => dispatch(setAdminPanelPane(AdminPanelPane.DATASETS)),
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.DATASETS)),
             display: 'Datasets',
+        }, {
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.NETWORK)),
+            display: 'Network and Identity',
         }]
     };
 }

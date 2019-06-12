@@ -1,0 +1,162 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.identity-editor {
+    
+}
+
+/* Header */
+.identity-editor-header {
+    text-align: right;
+}
+
+.identity-editor-header .leaf-button {
+    margin: 14px 10px 4px !important;
+}
+
+.identity-editor-header .leaf-button-secondary {
+    background-color: white;
+}
+
+/* Main */
+.identity-editor-column-left {
+    background-color: rgb(248,248,248);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100vh;
+    z-index: 101;
+}
+
+.identity-editor-column-right {
+    background-color: rgb(240,240,240);
+    padding-top: 15px;
+    z-index: 100;
+}
+
+.identity-editor .admin-panel-section {
+    border: 1px solid rgb(245,245,245);
+    margin-top: 15px;
+}
+
+.identity-preview {
+    display: flex;
+    padding: 24px 0;
+    position: relative;
+}
+
+.identity-preview-left {
+    background-color: rgba(0, 48, 66, 1);
+    flex: 1;
+}
+
+.identity-preview::after {
+    color: rgb(180,180,180);;
+    content: 'PREVIEW';
+    left: 0;
+    margin: 2px 4px;
+    position: absolute;
+    top: 0;
+}
+
+.identity-preview .header-networkhealth-responder {
+    border-color: transparent !important;
+    color: white;
+    
+}
+
+/* Endpoints */
+.identity-network-column-right .endpoint-container {
+    margin-bottom: 10px;
+}
+
+.identity-network-endpoint {
+    background-color: white;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    padding: 30px 10px 10px;
+    transition: box-shadow 0.3s;
+}
+
+.identity-network-endpoint:hover {
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.identity-network-endpoint-cert-test {
+    float: right;
+}
+
+.identity-network-endpoint-cert-test:hover {
+    text-decoration: underline !important; 
+}
+
+.identity-network-endpoint-dropdown-toggle,
+.identity-network-endpoint-cert-test {
+    color: rgb(24, 142, 185);
+    cursor: pointer;
+    display: inline-block;
+    margin-bottom: 8px;
+}
+
+.identity-network-endpoint-dropdown-toggle svg {
+    margin-left: 4px;
+    padding-top: 4px;
+    transform: scale(1.2);
+    transition: all 0.5s;
+}
+
+.identity-network-endpoint-dropdown-toggle.open svg {
+    margin-bottom: -4px;
+    transform: rotate(180deg) scale(1.2);
+}
+
+.identity-network-endpoint-cert-container {
+    border-top: 1px solid rgb(0,0,0,0.05);
+    margin-top: 5px;
+    padding-top: 10px;
+}
+
+.identity-network-endpoint-delete {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    float: right;
+    font-size: 0.8rem;
+    margin-right: -8px;
+    margin-top: -23px;
+}
+
+.identity-network-endpoint-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+} 
+
+.identity-network-endpoint-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: 0;
+    margin-left: 20px;
+    margin-top: -23px;
+    padding: 2px 4px;
+    position: absolute;
+}
+
+.identity-network-endpoint-relation-toggles {
+    margin-bottom: 12px;
+}
+
+.identity-network-endpoint .admin-panel-checkbox {
+    border: none !important;
+}
+
+.identity-network-endpoint .admin-panel-checkbox-text {
+    padding-left: 20px;
+}
+
+.identity-network-endpoint .checkbox-slider-container {
+    padding-right: 50px;
+}

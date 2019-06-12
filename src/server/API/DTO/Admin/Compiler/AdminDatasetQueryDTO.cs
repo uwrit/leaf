@@ -27,6 +27,8 @@ namespace API.DTO.Admin.Compiler
         public string UpdatedBy { get; set; }
 
         public IEnumerable<string> Tags { get; set; }
+
+        public IEnumerable<Constraint> Constraints { get; set; }
     }
 
     public static class AdminDatasetQueryExt
@@ -37,7 +39,7 @@ namespace API.DTO.Admin.Compiler
             return new AdminDatasetQueryDTO
             {
                 Id = q.Id,
-                UniversalId = q.UniversalId.ToString(),
+                UniversalId = q.UniversalId?.ToString(),
                 Shape = q.Shape,
                 Name = q.Name,
                 CategoryId = q.CategoryId,

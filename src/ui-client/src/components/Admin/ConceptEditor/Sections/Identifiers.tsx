@@ -6,10 +6,10 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
-import { Input } from './Input';
+import { Section } from '../../Section/Section';
+import { Input } from '../../Section/Input';
 import { SectionProps } from '../Props';
-import { TextArea } from './TextArea';
+import { TextArea } from '../../Section/TextArea';
 
 interface Props {
     data: SectionProps;

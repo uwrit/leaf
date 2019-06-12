@@ -11,6 +11,8 @@ import { ConceptEditor } from '../../components/Admin/ConceptEditor/ConceptEdito
 import AdminState, { AdminPanelPane } from '../../models/state/AdminState';
 import { AppState, DatasetsState } from '../../models/state/AppState';
 import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEditor';
+import './AdminPanel.css';
+import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdentityEditor/NetworkAndIdentityEditor';
 
 interface StateProps { 
     admin?: AdminState;
@@ -25,16 +27,19 @@ interface OwnProps {
 type Props = StateProps & DispatchProps & OwnProps;
 
 class AdminPanel extends React.PureComponent<Props> {
-    private className = "admin-panel"
+    private className = 'admin-panel';
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
         const { admin } = this.props;
+        const c = this.className;
+
         if (!admin) { return null; }
+
         return (
-            <div>
+            <div className={c}>
                 {this.getContent()}
            </div>
         )
@@ -48,6 +53,8 @@ class AdminPanel extends React.PureComponent<Props> {
                 return <ConceptEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.DATASETS:
                 return <DatasetEditor data={admin!} dispatch={dispatch} datasets={datasets}/>;
+            case AdminPanelPane.NETWORK:
+                return <NetworkAndIdentityEditor data={admin!} dispatch={dispatch} />
             default: 
                 return null;
         }

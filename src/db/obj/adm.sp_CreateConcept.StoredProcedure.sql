@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConcept]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConcept]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/29
@@ -37,7 +36,7 @@ CREATE PROCEDURE [adm].[sp_CreateConcept]
 	@uiDisplayTooltip nvarchar(max),
 	@uiDisplayPatientCount int,
 	@uiNumericDefaultText nvarchar(50),
-    @constraints auth.ConceptConstraintTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
     @user auth.[User]
 AS
@@ -139,4 +138,5 @@ BEGIN
         THROW;
     END CATCH;
 END
+
 GO

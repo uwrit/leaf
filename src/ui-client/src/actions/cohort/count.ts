@@ -23,7 +23,7 @@ import { setAggregateVisualizationData, setNetworkVisualizationData } from './vi
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
-import { setDatasetsDisplayAll } from '../datasets';
+import { setDatasetDisplay, setDatasetDisplayAll } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -63,7 +63,7 @@ export const getCounts = () => {
         const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
         const responders: NetworkIdentity[] = [];
         state.responders.forEach((nr: NetworkIdentity) => { 
-            if (nr.enabled && (nr.isHomeNode || !runLocalOnly)) { 
+            if (nr.enabled && (nr.isHomeNode || !runLocalOnly) && !nr.isGateway) { 
                 responders.push(nr); 
             } 
         });
@@ -138,12 +138,13 @@ const getDemographics = () => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
         const responders: NetworkIdentity[] = [];
+        let atLeastOneSucceeded = false;
         state.responders.forEach((nr: NetworkIdentity) => { 
-            if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED) { 
+            if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED && !nr.isGateway) { 
                 responders.push(nr); 
             } 
         });
-        dispatch(setDatasetsDisplayAll());
+        dispatch(setDatasetDisplayAll());
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
         Promise.all(
@@ -159,6 +160,7 @@ const getDemographics = () => {
                                 
                                 // Make sure query hasn't been reset
                                 if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
+                                atLeastOneSucceeded = true;
                                 const demographics = demResponse.data as DemographicDTO;
 
                                 dispatch(setNetworkVisualizationData(nr.id, demographics.statistics));
@@ -176,7 +178,11 @@ const getDemographics = () => {
             })                
         ).then(() => {
             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
-            dispatch(setCohortDemographicsFinished())
+            if (atLeastOneSucceeded) {
+                dispatch(setCohortDemographicsFinished());
+            } else {
+                dispatch(setCohortDemographicsErrored())
+            }
         });
     };
 };
@@ -269,6 +275,13 @@ export const setCohortDemographicsFinished = (): CohortCountAction => {
     return {
         id: 0,
         type: COHORT_DEMOGRAPHICS_FINISH
+    };
+};
+
+export const setCohortDemographicsErrored = (): CohortCountAction => {
+    return {
+        id: 0,
+        type: COHORT_DEMOGRAPHICS_ERROR
     };
 };
 

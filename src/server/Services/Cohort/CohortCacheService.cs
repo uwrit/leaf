@@ -57,9 +57,8 @@ namespace Services.Cohort
                     commandTimeout: dbOptions.DefaultTimeout
                 );
 
-                if (cohort.Count <= cohortOptions.RowLimit)
+                if (cohort.Any() && cohort.Count <= cohortOptions.RowLimit)
                 {
-
                     var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(cohortOptions.ExportLimit, queryId));
 
                     using (var bc = new SqlBulkCopy(cn))
@@ -95,11 +94,11 @@ namespace Services.Cohort
         Guid NonceOrThrowIfNull(IUserContext user)
         {
             var nonce = user?.SessionNonce;
-            if (nonce == null)
+            if (!nonce.HasValue)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new ArgumentNullException(nameof(nonce));
             }
-            return (Guid)nonce;
+            return nonce.Value;
         }
     }
 }

@@ -8,7 +8,7 @@
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownToggle, DropdownMenu, FormGroup } from 'reactstrap';
 import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
-import { TextArea } from './TextArea';
+import { TextArea } from '../../Section/TextArea';
 import { FaChevronDown } from 'react-icons/fa';
 
 interface Props {
@@ -38,11 +38,11 @@ export class Constraint extends React.PureComponent<Props,State> {
 
         return (
             <FormGroup>
-                <div className={`${c}-dropdown ${c}-constraint-dropdown`}>
+                <div className={`admin-panel-dropdown ${c}-constraint-dropdown`}>
                     <Dropdown isOpen={isOpen} toggle={this.toggle}>
                         <DropdownToggle>
                             {constraint.constraintId === ConstraintType.User ? 'User' : 'Group'}
-                            <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                            <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                         </DropdownToggle>
                         <DropdownMenu>
                             <DropdownItem>

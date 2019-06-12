@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,6 +23,7 @@ CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
     @desc nvarchar(max),
     @sql nvarchar(4000),
     @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
 BEGIN
@@ -34,14 +35,17 @@ BEGIN
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
     
-    IF (@name IS NULL)
+    IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
-    IF (@sql IS NULL)
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
     
     BEGIN TRAN;
     BEGIN TRY
+
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE @uid = UniversalId OR @name = Name)
+            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
 
         DECLARE @ins TABLE (
             Id uniqueidentifier,
@@ -95,6 +99,11 @@ BEGIN
         SELECT @id, Tag
         FROM @tags;
 
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
         COMMIT;
     END TRY
     BEGIN CATCH
@@ -103,5 +112,4 @@ BEGIN
     END CATCH;
 
 END
-
 GO

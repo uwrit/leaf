@@ -143,17 +143,25 @@ export interface TokenizedDatasetRef {
 }
 
 /*
+ * Cache index of the preceding and following dataset IDs currently shown.
+ */
+export interface PatientListDatasetQueryIndex {
+    nextId: string;
+    prevId: string;
+}
+
+/*
  * Datasets organized by category, used for display in DatasetContainer component.
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: PatientListDatasetQuery[];
+    datasets: Map<string, PatientListDatasetQuery>;
 }
 
 /*
  * Return object from the dataset search web worker.
  */
 export interface DatasetSearchResult {
-    categories: CategorizedDatasetRef[];
-    datasetCount: number;
+    categories: Map<string, CategorizedDatasetRef>;
+    displayOrder: Map<string, PatientListDatasetQueryIndex>;
 }

@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 6/6/19 11:15:59 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptSqlSet]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/8/3
@@ -29,10 +28,10 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    IF (@id IS NULL OR @id = 0)
+    IF (@id IS NULL)
         THROW 70400, N'ConceptSqlSet.Id is required.', 1;
     
-    IF (@sqlSetFrom IS NULL OR LEN(@sqlSetFrom) = 0)
+    IF (app.fn_NullOrWhitespace(@sqlSetFrom) = 1)
         THROW 70400, N'ConceptSqlSet.SqlSetFrom is required.', 1;
 
     UPDATE app.ConceptSqlSet
@@ -48,10 +47,5 @@ BEGIN
     OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent, inserted.EventId
     WHERE Id = @id;
 END
-
-
-
-
-
 
 GO

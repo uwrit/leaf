@@ -7,7 +7,7 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
 const INDEX_DATASETS = 'INDEX_DATASETS';
@@ -50,7 +50,7 @@ export default class DatasetSearchEngineWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([INDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, ALLOW_DEMOGRAPHICS])}
-            ${this.stripFunctionToContext(this.workerContext)}
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -113,7 +113,7 @@ export default class DatasetSearchEngineWebWorker {
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case INDEX_DATASETS:
-                    return addDatasetsToCache(payload);
+                    return reindexCacheFromExternal(payload);
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
                 case ALLOW_DATASET_IN_SEARCH:
@@ -129,11 +129,12 @@ export default class DatasetSearchEngineWebWorker {
 
         // Dataset cache
         const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-        const demographicsCat: CategorizedDatasetRef = { category: '', datasets: [ demographics ]};
         const excluded: Set<string> = new Set([ demographics.id ]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let demographicsAllowed = false;
-        let allDs: CategorizedDatasetRef[] = [];
+        let allDs: PatientListDatasetQuery[] = [];
+        let allDsMap: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
         
         /*
          * Sets the special demographics dataset to be included in 
@@ -145,15 +146,12 @@ export default class DatasetSearchEngineWebWorker {
 
             if (allow) {
                 excluded.delete(demographics.id);
-                allDs.unshift(demographicsCat);
             } else {
                 excluded.add(demographics.id);
-                if (allDs.length && allDs[0].datasets.length && allDs[0].datasets[0].shape === 3) {
-                    allDs.shift();
-                }
             }
             demographicsAllowed = allow!;
-            return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+            reindexCacheFromLocal(payload);
+            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
         }
 
         /* 
@@ -167,15 +165,8 @@ export default class DatasetSearchEngineWebWorker {
             if (!demographicsAllowed) {
                 excluded.add(demographics.id);
             }
-            return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) } };
+            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
         };
-
-        /*
-         * Returns the count of datasets present in a categorized dataset array.
-         */
-        const getDatasetCount = (categories: CategorizedDatasetRef[]): number => {
-            return categories.reduce((sum, cat) => sum + cat.datasets.length, 0);
-        }
 
         /*
          * Allows or disallows a dataset to be included in search results.
@@ -204,10 +195,10 @@ export default class DatasetSearchEngineWebWorker {
             const dsOut: TokenizedDatasetRef[] = [];
 
             if (!searchString) {
-                return { requestId, result: { categories: allDs, datasetCount: getDatasetCount(allDs) }}; 
+                return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder }}; 
             }
             if (!datasets) { 
-                return { requestId, result: { categories: [], datasetCount: 0 } }; 
+                return { requestId, result: { categories: new Map(), displayOrder: new Map() } }; 
             }
             
             // ******************
@@ -282,68 +273,88 @@ export default class DatasetSearchEngineWebWorker {
          * returns a displayable categorized array of datasets.
          */
         const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
-            const added: Set<string> = new Set();
-            const catIdxMap: Map<string,number> = new Map();
-            let out: CategorizedDatasetRef[] = [];
+            const addedDatasets: Set<string> = new Set();
+            const addedRefs: PatientListDatasetQuery[] = [];
+            const out: Map<string, CategorizedDatasetRef> = new Map();
+            const displayOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
+            let includesDemographics = false;
 
+            /*
+             * Get unique only.
+             */
             for (let i = 0; i < refs.length; i++) {
                 const ref = refs[i];
-                const cat = ref.category ? ref.category : '';
-
-                /*
-                 * Add the dataset.
-                 */
-                if (!added.has(ref.id)) {
-                    /*
-                     * Add the category.
-                     */
-                    let catIdx = catIdxMap.get(cat);
-                    if (catIdx !== undefined) {
-                        out[catIdx].datasets.push(ref);
+                if (!addedDatasets.has(ref.id)) {
+                    if (ref.shape === 3) {
+                        includesDemographics = true;
                     } else {
-                        catIdxMap.set(cat, out.length);
-                        out.push({
-                            category: cat,
-                            datasets: [ ref ]
-                        });
+                        if (!ref.category) {
+                            ref.category = '';
+                        }
+                        addedRefs.push(ref);
+                        addedDatasets.add(ref.id);
                     }
-                    added.add(ref.id);
                 }
             }
-            return { 
-                categories: out.sort(categorySorter), 
-                datasetCount: refs.length 
-            };
+
+            /*
+             * Sort.
+             */
+            const sortedRefs = addedRefs.sort((a,b) => {
+                if (a.category === b.category) { 
+                    return a.name > b.name ? 1 : -1;
+                }
+                return a.category > b.category ? 1 : -1;
+            });
+            if (includesDemographics) { sortedRefs.unshift(demographics); }
+            const len = sortedRefs.length;
+            const lastIdx = len-1;
+
+            /*
+             * Add to map.
+             */
+            for (let i = 0; i < len; i++) {
+                const ref = sortedRefs[i];
+                const catObj = out.get(ref.category);
+                const order: PatientListDatasetQueryIndex = {
+                    prevId: i > 0 ? sortedRefs[i-1].id : sortedRefs[lastIdx].id,
+                    nextId: i < lastIdx ? sortedRefs[i+1].id : sortedRefs[0].id
+                }
+                displayOrder.set(ref.id, order);
+                
+                if (catObj) {
+                    catObj.datasets.set(ref.id, ref);
+                } else {
+                    out.set(ref.category, { category: ref.category, datasets: new Map([[ ref.id, ref ]]) })
+                }
+            }
+            return { categories: out, displayOrder };
         };
 
-        /* 
-         * Sorts categories alphabetically.
-         */
-        const categorySorter = (a: CategorizedDatasetRef, b: CategorizedDatasetRef) => {
-            a.datasets.sort(datasetSorter);
-            b.datasets.sort(datasetSorter);
-            return a.category.localeCompare(b.category);
-        };
+        const reindexCacheFromLocal = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            const sorted = addDatasetsToCache(allDs);
+            return { requestId, result: sorted }
+        }   
 
-        /*
-         * Sorts datasets alphabetically by name.
-         */
-        const datasetSorter = (a: PatientListDatasetQuery, b: PatientListDatasetQuery) => {
-            return a.name.localeCompare(b.name);
-        };
+        const reindexCacheFromExternal = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, datasets } = payload;
+            const sorted = addDatasetsToCache(datasets!);
+            return { requestId, result: sorted }
+        }   
 
         /*
          * Resets the dataset search cache and (re)loads
          * it with inbound datasets.
          */
-        const addDatasetsToCache = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { datasets, requestId } = payload;
-
+        const addDatasetsToCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {
             /*
              * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
              */
             const all = datasets!.slice().filter((ds) => ds.shape !== 3);
-            all.push(demographics);
+            all.unshift(demographics);
+            allDsMap.clear();
+            allDsMap.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
             firstCharCache.clear();
         
             /* 
@@ -380,14 +391,16 @@ export default class DatasetSearchEngineWebWorker {
             }
 
             if (!demographicsAllowed) {
-                all.pop();
+                all.shift();
                 excluded.add(demographics.id);
             }
 
             const sorted = dedupeAndSort(all);
-            allDs = sorted.categories;
+            allDs = datasets;
+            allDsMap = sorted.categories;
+            defaultOrder = sorted.displayOrder;
 
-            return { requestId, result: sorted };
+            return sorted;
         };
     };
 }

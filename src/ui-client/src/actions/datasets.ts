@@ -11,23 +11,24 @@ import { Dispatch } from "redux";
 import { searchDatasets, allowAllDatasets, allowDemographics } from "../services/datasetSearchApi";
 
 export const SET_DATASET = 'SET_DATASET';
+export const SET_DATASET_SELECTED = 'SET_DATASET_SELECTED';
 export const SET_DATASET_DISPLAY = 'SET_DATASET_DISPLAY';
+export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASETS_DISPLAY_ALL';
 export const SET_DATASETS = 'SET_DATASETS';
-export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASET_DISPLAY_ALL';
 export const SET_DATASETS_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
 export const SET_DATASETS_SEARCH_RESULT = 'SET_DATASET_SEARCH_RESULT';
+export const SWITCH_DATASET_OLD_FOR_NEW = 'SWITCH_DATASET_OLD_FOR_NEW';
 export const REMOVE_DATASET = 'REMOVE_DATASET';
 export const ADD_DATASET = 'ADD_DATASET';
 export const MOVE_DATASET_CATEGORY = 'MOVE_DATASET_CATEGORY';
 
 export interface DatasetAction {
     category?: string;
-    categories?: CategorizedDatasetRef[];
+    categories?: Map<string, CategorizedDatasetRef>;
     datasetsAvailableCount?: number;
     dataset?: PatientListDatasetQuery;
-    datasetCategoryIndex?: number;
-    datasetIndex?: number;
     datasets?: PatientListDatasetQuery[];
+    newDataset?: PatientListDatasetQuery;
     result?: DatasetSearchResult;
     searchTerm?: string;
     type: string;
@@ -37,6 +38,7 @@ export interface DatasetAction {
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await searchDatasets(searchTerm);
+        console.log('search results', results);
         dispatch(setDatasetSearchResult(results));
     };
 };
@@ -44,6 +46,7 @@ export const searchPatientListDatasets = (searchTerm: string) => {
 export const resetPatientListDatasets = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowAllDatasets();
+        console.log('datasets reset requested', results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -52,6 +55,7 @@ export const resetPatientListDatasets = () => {
 export const allowDemographicsDatasetInSearch = (allow: boolean) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowDemographics(allow);
+        console.log('allow demographics', allow, results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -72,12 +76,31 @@ export const setDataset = (dataset: PatientListDatasetQuery): DatasetAction  => 
     };
 };
 
-export const setDatasetDisplay = (dataset: PatientListDatasetQuery, datasetCategoryIndex: number, datasetIndex: number): DatasetAction  => {
+export const switchDatasetOldForNew = (dataset: PatientListDatasetQuery, newDataset: PatientListDatasetQuery): DatasetAction => {
     return {
         dataset,
-        datasetCategoryIndex,
-        datasetIndex,
+        newDataset,
+        type: SWITCH_DATASET_OLD_FOR_NEW
+    };
+};
+
+export const setDatasetSelected = (dataset: PatientListDatasetQuery): DatasetAction  => {
+    return {
+        dataset,
+        type: SET_DATASET_SELECTED
+    };
+};
+
+export const setDatasetDisplay = (dataset: PatientListDatasetQuery): DatasetAction  => {
+    return {
+        dataset,
         type: SET_DATASET_DISPLAY
+    };
+};
+
+export const setDatasetDisplayAll = (): DatasetAction  => {
+    return {
+        type: SET_DATASETS_DISPLAY_ALL
     };
 };
 
@@ -90,17 +113,11 @@ export const moveDatasetCategory = (dataset: PatientListDatasetQuery, category: 
 };
 
 
-export const setDatasets = (datasets: PatientListDatasetQuery[], categories: CategorizedDatasetRef[]): DatasetAction => {
+export const setDatasets = (datasets: PatientListDatasetQuery[], result: DatasetSearchResult): DatasetAction => {
     return {
-        categories,
+        result,
         datasets,
         type: SET_DATASETS
-    };
-};
-
-export const setDatasetsDisplayAll = (): DatasetAction => {
-    return {
-        type: SET_DATASETS_DISPLAY_ALL
     };
 };
 

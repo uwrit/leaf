@@ -165,34 +165,34 @@
     display: block;
 }
 
+/* Subroutes */
 .sidebar-subroute-container {
     background-color: white;
     box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.2), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
-    color: rgb(205, 238, 255);
     cursor: pointer;
     display: none;
     position: absolute;
     left: 100%;
     top: 0;
+    width: 200px;
 }
 
 .sidebar-subroute {
     border-bottom: 1px solid rgb(240,240,240);
-    color: black;
+    border-left: 4px solid transparent;
+    color: rgb(150,150,150);
     font-size: 1.1rem !important;
     padding: 10px 20px;
-    transition: background-color 0.2s;
+    transition: all 0.2s;
+}
+
+.sidebar-subroute:hover,
+.sidebar-subroute.selected {
+    background-color: rgba(0,0,0,0.01);
+    border-left-color: rgb(28,168,221);
+    color: black;
 }
 
 .sidebar-subroute:nth-last-child() {
     border-bottom: none;
-}
-
-.sidebar-subroute:hover {
-    background-color: rgba(28,168,221,0.2) !important;
-}
-
-.sidebar-subroute:active {
-    background-color: rgba(28,168,221,0.4) !important;
-    color: rgb(96, 90, 102) !important;
 }

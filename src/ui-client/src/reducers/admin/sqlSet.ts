@@ -8,7 +8,7 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminSqlSetAction } from "../../actions/admin/sqlSet";
 import { ConceptSqlSet } from "../../models/admin/Concept";
-import { conceptSqlSetsChanged } from "../../utils/admin";
+import { conceptSqlSetsChanged } from "../../utils/admin/concept";
 
 export const setAdminConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const sets = action.sets!;

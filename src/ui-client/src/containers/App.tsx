@@ -26,8 +26,9 @@ import ConfirmationModal from '../components/Modals/ConfirmationModal/Confirmati
 import NoClickModal from '../components/Modals/NoClickModal/NoClickModal';
 import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
+import { CohortStateType } from '../models/state/CohortState';
+import { AdminPanelConceptEditorPane } from '../models/state/AdminState';
 import './App.css';
-
 
 interface OwnProps {
 }
@@ -36,7 +37,9 @@ interface DispatchProps {
 }
 interface StateProps {
     auth?: AuthorizationState;
+    cohortCountState: CohortStateType;
     confirmationModal: ConfirmationModalState;
+    currentAdminPane: AdminPanelConceptEditorPane;
     currentRoute: Routes;
     exportState: ExportState;
     informationModal: InformationModalState;
@@ -53,6 +56,7 @@ class App extends React.Component<Props> {
     private sessionTokenRefreshPaddingMinutes = 2;
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
+    private heartbeatBegun = false;
 
     constructor(props: Props) {
         super(props);
@@ -70,14 +74,14 @@ class App extends React.Component<Props> {
 
     public getSnapshotBeforeUpdate(nextProps: Props) {
         const { sessionContext } = nextProps;
-        if (sessionContext) {
+        if (!this.heartbeatBegun && sessionContext) {
             this.handleSessionTokenRefresh(sessionContext);
         }
         return null;
     }
 
     public render() {
-        const { auth, currentRoute, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
+        const { auth, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
             : null;
@@ -87,7 +91,7 @@ class App extends React.Component<Props> {
                 <Attestation />
                 <CohortCountBox />
                 <Header />
-                <Sidebar currentRoute={currentRoute} />
+                <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
@@ -125,6 +129,7 @@ class App extends React.Component<Props> {
      * Refresh user session token (should be short interval, e.g., 4 minutes).
      */
     private handleSessionTokenRefresh(ctx: SessionContext) {
+        this.heartbeatBegun = true;
         const { dispatch } = this.props;
         const refreshDtTm = moment(ctx.expirationDate).add(-this.sessionTokenRefreshPaddingMinutes, 'minute').toDate();
         const diffMs = refreshDtTm.getTime() - new Date().getTime();
@@ -162,7 +167,9 @@ class App extends React.Component<Props> {
 const mapStateToProps = (state: AppState) => {
     return {
         auth: state.auth,
+        cohortCountState: state.cohort.count.state,
         confirmationModal: state.generalUi.confirmationModal,
+        currentAdminPane: state.admin ? state.admin!.activePane : 0, 
         currentRoute: state.generalUi.currentRoute,
         exportState: state.dataExport,
         informationModal: state.generalUi.informationModal,

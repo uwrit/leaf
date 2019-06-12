@@ -56,7 +56,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<Specialization> CreateAsync(Specialization spec)
         {
-            ThrowIfMissing(spec);
+            ThrowIfInvalid(spec);
 
             try
             {
@@ -82,7 +82,7 @@ namespace Model.Admin.Compiler
         /// <exception cref="DbException"/>
         public async Task<Specialization> UpdateAsync(Specialization spec)
         {
-            ThrowIfMissing(spec);
+            ThrowIfInvalid(spec);
 
             try
             {
@@ -137,10 +137,9 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfMissing(Specialization spec)
+        void ThrowIfInvalid(Specialization spec)
         {
             Ensure.NotNull(spec, nameof(spec));
-            Ensure.NotDefault(spec.SpecializationGroupId, nameof(spec.SpecializationGroupId));
             Ensure.NotNullOrWhitespace(spec.UiDisplayText, nameof(spec.UiDisplayText));
             Ensure.NotNullOrWhitespace(spec.SqlSetWhere, nameof(spec.SqlSetWhere));
         }

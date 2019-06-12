@@ -10,7 +10,7 @@ using Model.Compiler;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminDatasetQuery
+    public class AdminDatasetQuery : IConstrainedResource
     {
         public Guid Id { get; set; }
         public DatasetQueryUrn UniversalId { get; set; }
@@ -25,11 +25,7 @@ namespace Model.Admin.Compiler
         public string UpdatedBy { get; set; }
 
         public IEnumerable<string> Tags { get; set; }
-    }
 
-    public class DatasetQueryCategory
-    {
-        public int Id { get; set; }
-        public string Category { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
     }
 }
