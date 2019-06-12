@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/6/19 4:01:12 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 6/12/19 9:23:03 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -24,6 +24,7 @@ CREATE PROCEDURE [adm].[sp_UpdateDatasetQuery]
     @desc nvarchar(max),
     @sql nvarchar(4000),
     @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
 BEGIN
@@ -75,7 +76,7 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
-        WHERE Id = @id 
+        WHERE Id = @id;
 
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
@@ -85,6 +86,14 @@ BEGIN
         SELECT @id, Tag
         FROM @tags;
 
+        DELETE FROM auth.DatasetQueryConstraint
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
         COMMIT;
     END TRY
     BEGIN CATCH
@@ -93,5 +102,4 @@ BEGIN
     END CATCH;
 
 END
-
 GO
