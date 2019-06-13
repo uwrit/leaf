@@ -44,9 +44,8 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
         const { editId, isOpen } = this.state;
         const c = this.className;
         const display = currentCategory ? currentCategory.category : 'None';
-        let cats: DatasetQueryCategory[] = [];
-        categories.forEach((c) => cats.push(c));
-        cats = cats.sort((a,b) => a.id > b.id ? 1 : -1);
+        let cats: DatasetQueryCategory[] = [ ...categories.values() ]
+            .sort((a,b) => a.id === editId ? 1 : a.category.localeCompare(b.category.toLowerCase()));
 
         return (
             <FormGroup>

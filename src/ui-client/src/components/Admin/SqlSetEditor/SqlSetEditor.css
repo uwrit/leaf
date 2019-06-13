@@ -40,7 +40,7 @@
 /* Header */
 .sqlset-editor-toprow {
     margin-bottom: 20px;
-    padding-left: 10px;
+    padding: 0 10px;
 }
 
 .sqlset-editor-toprow .leaf-button {
@@ -61,6 +61,10 @@
 }
 
 /* Table */
+.sqlset-editor-table {
+    overflow-x: hidden;
+}
+
 .sqlset-editor-table-row-container {
     background-color: white;
     border-bottom: 1px solid rgb(230,230,230);
