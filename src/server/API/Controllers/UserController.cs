@@ -172,6 +172,7 @@ namespace API.Controllers
             var token = BlacklistedToken.FromUTCTicks(nonce, ticks);
             try
             {
+                logger.LogInformation("Blacklisting Token: {@Token}", token);
                 await blacklistService.Blacklist(token);
             }
             catch (Exception e)

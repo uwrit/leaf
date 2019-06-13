@@ -82,8 +82,6 @@ namespace Services.Cohort
 
         IReadOnlyCollection<LeafQuery> GetLeafQueries(IEnumerable<Panel> panels)
         {
-            var newline = Environment.NewLine;
-            var clientSql = new StringBuilder();
             var queries = new List<LeafQuery>();
 
             foreach (var p in panels)
@@ -94,12 +92,10 @@ namespace Services.Cohort
                     SqlStatement = compiler.BuildPanelSql(p)
                 };
 
-                var status = q.IsInclusionCriteria ? "Included" : "Excluded";
-                clientSql.Append($"/* {p.Domain} - {status} */ {newline}{q.SqlStatement}{newline}{newline}");
                 queries.Add(q);
             }
 
-            log.LogInformation("SqlStatements:{Sql}", clientSql.ToString());
+            log.LogInformation("Parallel SqlStatements:{Sql}", queries);
 
             return queries;
         }

@@ -58,8 +58,7 @@ namespace API.Controllers
         [HttpGet("search/equivalent")]
         public async Task<ActionResult<ConceptEquivalentHint>> SearchEquivalent(
             string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {
