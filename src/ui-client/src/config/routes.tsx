@@ -85,7 +85,7 @@ const admin = (): RouteConfig => {
             display: 'Concepts',
         }, {
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.SQL_SETS)),
-            display: 'SQL Sets',
+            display: 'Concept SQL Sets',
         },{
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.DATASETS)),
             display: 'Datasets',

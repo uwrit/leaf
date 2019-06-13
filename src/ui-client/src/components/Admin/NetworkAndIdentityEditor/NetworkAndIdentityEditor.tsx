@@ -8,7 +8,7 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
-import { Display } from './Sections/Display';
+import { Identity } from './Sections/Identity';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
 import { setAdminNetworkIdentity, processApiUpdateQueue, revertAdminNetworkChanges, setAdminNetworkEndpoint } from '../../../actions/admin/networkAndIdentity';
 import { IdentityPreview } from './Sections/IdentityPreview';
@@ -56,7 +56,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
 
                             {/* Identity */}
                             <div>
-                                <Display
+                                <Identity
                                     changeHandler={this.handleInputChange}
                                     identity={identity}
                                 />

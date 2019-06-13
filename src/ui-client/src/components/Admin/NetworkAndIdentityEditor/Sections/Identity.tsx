@@ -17,7 +17,7 @@ interface Props {
     identity: NetworkIdentity;
 }
 
-export class Display extends React.PureComponent<Props> {
+export class Identity extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
     }

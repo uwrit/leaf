@@ -22,7 +22,7 @@ import { DatasetsState } from '../../../models/state/AppState';
 import { allowDemographicsDatasetInSearch, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
 import { generate as generateId } from 'shortid';
 import { Display } from './Sections/Display';
-import { SqlEditor } from './Sections/SqlEditor';
+import { SqlEditor } from './SqlEditor/SqlEditor';
 import { Identifiers } from './Sections/Identifiers';
 import './DatasetEditor.css';
 
@@ -203,8 +203,8 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         if (missingCols.length) {
             const confirm: ConfirmationModalState = {
                 body: [
-                    <p>Your current SQL Query appears to be missing the following required columns: {missingCols.join(', ')}. </p>,
-                    <p>Are you sure you want to save the current dataset? If not all expected columns are returned after running the query,
+                    <p key={1}>Your current SQL Query appears to be missing the following required columns: {missingCols.join(', ')}. </p>,
+                    <p key={2}>Are you sure you want to save the current dataset? If not all expected columns are returned after running the query,
                        Leaf will throw an error in the Patient List.</p>
                 ],
                 header: 'Potential missing columns',

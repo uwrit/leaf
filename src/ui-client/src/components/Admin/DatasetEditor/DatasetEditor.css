@@ -80,7 +80,7 @@
 /* Columns */
 .dataset-editor-column-container {
     height: 370px;
-    min-width: 200px;
+    min-width: 230px;
     overflow: auto;
     padding: 8px 8px;
     position: relative;
@@ -100,8 +100,16 @@
     transition: background-color 0.3s;
 }
 
-.dataset-editor-column > span {
+.dataset-editor-column-name {
     margin-left: 20px;
+}
+
+.dataset-editor-column-type {
+    color: rgb(180,180,180) !important;
+    float: right;
+    font-size: 0.8rem;
+    margin: 0 4px;
+    padding-top: 3px;
 }
 
 .dataset-editor-column svg {

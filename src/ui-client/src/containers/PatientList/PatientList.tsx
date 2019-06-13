@@ -92,7 +92,19 @@ class PatientList extends React.PureComponent<Props, State> {
                     <LoaderIcon size={100} />
                 </div>
             );
-        }
+        /*
+         * Show the failure .
+         */
+        } else if (cohort.patientList.state === CohortStateType.IN_ERROR) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>
+                        Whoops! An error occurred while loading the patient list.
+                        We are sorry for the inconvenience. Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
+            );
+       }
 
         return (    
             <div className={classes.join(' ')}>
