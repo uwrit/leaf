@@ -131,6 +131,7 @@ namespace Model.Search
                 var saved = await ImplSaveAsync(toSave);
                 if (saved == null)
                 {
+                    log.LogError("Could not save query, not found. Query:{Query}", id);
                     return new SaveResult
                     {
                         State = SaveState.NotFound,
@@ -138,6 +139,7 @@ namespace Model.Search
                         Result = null
                     };
                 }
+                log.LogInformation("Saved query. Query:{@Query}", toSave);
                 return new SaveResult
                 {
                     State = SaveState.Ok,
