@@ -6,17 +6,22 @@
  */ 
 
 import React from 'react';
-import { ConceptSqlSet, ConceptEvent } from '../../../../models/admin/Concept';
+import { ConceptSqlSet, ConceptEvent } from '../../../models/admin/Concept';
 import { Button, Container } from 'reactstrap';
-import { checkIfAdminPanelUnsavedAndSetSubPane } from '../../../../actions/admin/admin';
-import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
-import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
-import { EditorPaneProps as Props } from '../Props';
-import { conceptEditorValid } from '../../../../utils/admin/concept';
+import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../actions/admin/sqlSet';
+import { conceptEditorValid } from '../../../utils/admin/concept';
 import { SqlSetRow } from './SqlSetRow';
-import { InformationModalState } from '../../../../models/state/GeneralUiState';
-import { showInfoModal } from '../../../../actions/generalUi';
+import { InformationModalState } from '../../../models/state/GeneralUiState';
+import { showInfoModal } from '../../../actions/generalUi';
+import AdminState, { AdminPanelPane } from '../../../models/state/AdminState';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../actions/admin/admin';
 import './SqlSetEditor.css';
+import { FiCornerUpLeft } from 'react-icons/fi';
+
+interface Props {
+    data: AdminState;
+    dispatch: any;
+}
 
 export class SqlSetEditor extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
@@ -43,18 +48,32 @@ export class SqlSetEditor extends React.PureComponent<Props> {
         
         return (
             <div className={`${c}-container`}>
+
+                {/* Header */}
                 <div className={`${c}-toprow`}>
-                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>+ Create New SQL Set</Button>
-                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
-                    <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>
+                        + Create New SQL Set
+                    </Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>
+                        Undo Changes
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>
+                        Save
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>
+                        <FiCornerUpLeft /> 
+                        Go to Concept Editor
+                    </Button>
                 </div>
+
+                {/* Sets */}
                 <Container className={`${c}-table`}>
                     {[ ...data.sqlSets.sets.values() ]
                         .sort((a,b) => a.id > b.id ? 1 : -1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs}/>)
                     }
                 </Container>
+                
             </div>
         );
     }
@@ -112,6 +131,6 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     private handleBackToConceptEditorClick = () => {
         const { dispatch } = this.props;
-        dispatch(checkIfAdminPanelUnsavedAndSetSubPane(AdminPanelConceptEditorPane.MAIN));
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.CONCEPTS));
     }
 };

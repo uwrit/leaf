@@ -144,11 +144,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                                 />
                                             </Col>
                                             <Col md={6}>
-                                                {/*
                                                 <Section header='Access Restrictions'>
-                                                    <Constraints dataset={dataset} changeHandler={this.handleInputChange} locked={locked}/>
+                                                    <Constraints dataset={currentDataset} changeHandler={this.handleInputChange} locked={locked}/>
                                                 </Section>
-                                                */}
                                             </Col>
                                         </Row>
                                     </div>

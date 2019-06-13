@@ -49,7 +49,8 @@ namespace API.DTO.Admin.Compiler
                 CreatedBy = q.CreatedBy,
                 Updated = q.Updated,
                 UpdatedBy = q.UpdatedBy,
-                Tags = q.Tags
+                Tags = q.Tags,
+                Constraints = q.Constraints
             };
         }
 
@@ -69,7 +70,8 @@ namespace API.DTO.Admin.Compiler
                 CreatedBy = q.CreatedBy,
                 Updated = q.Updated,
                 UpdatedBy = q.UpdatedBy,
-                Tags = q.Tags
+                Tags = q.Tags,
+                Constraints = q.Constraints
             };
         }
     }

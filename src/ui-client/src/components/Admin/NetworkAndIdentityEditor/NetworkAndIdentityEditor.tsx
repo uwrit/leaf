@@ -8,13 +8,13 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
-import './NetworkAndIdentityEditor.css';
 import { Display } from './Sections/Display';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
 import { setAdminNetworkIdentity, processApiUpdateQueue, revertAdminNetworkChanges, setAdminNetworkEndpoint } from '../../../actions/admin/networkAndIdentity';
 import { IdentityPreview } from './Sections/IdentityPreview';
 import { Endpoint } from './Endpoint/Endpoint';
 import { NetworkEndpoint } from '../../../models/admin/Network';
+import './NetworkAndIdentityEditor.css';
 
 
 interface Props {

@@ -13,7 +13,7 @@ var handleWorkMessage = function (payload) {
         case SEARCH_DATASETS:
             return searchDatasets(payload);
         case ALLOW_DATASET_IN_SEARCH:
-            return allowDatasetInSearch(payload);
+            return allowDataset(payload);
         case ALLOW_ALL_DATASETS:
             return allowAllDatasets(payload);
         case ALLOW_DEMOGRAPHICS:
@@ -24,7 +24,7 @@ var handleWorkMessage = function (payload) {
 };
 // Dataset cache
 var demographics = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-var excluded = new Set([demographics.id]);
+var excluded = new Map([[demographics.id, demographics]]);
 var firstCharCache = new Map();
 var demographicsAllowed = false;
 var allDs = [];
@@ -41,7 +41,7 @@ var allowDemographics = function (payload) {
         excluded.delete(demographics.id);
     }
     else {
-        excluded.add(demographics.id);
+        excluded.set(demographics.id, demographics);
     }
     demographicsAllowed = allow;
     reindexCacheFromLocal(payload);
@@ -55,22 +55,37 @@ var allowAllDatasets = function (payload) {
     var requestId = payload.requestId;
     excluded.clear();
     if (!demographicsAllowed) {
-        excluded.add(demographics.id);
+        excluded.set(demographics.id, demographics);
     }
+    var resorted = dedupeAndSort(allDs);
+    allDsMap = resorted.categories;
+    defaultOrder = resorted.displayOrder;
     return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
 };
 /*
  * Allows or disallows a dataset to be included in search results.
  * Called as users add/remove datasets from the patient list screen.
  */
-var allowDatasetInSearch = function (payload) {
+var allowDataset = function (payload) {
     var requestId = payload.requestId, datasetId = payload.datasetId, allow = payload.allow;
     if (allow) {
+        var ds = excluded.get(datasetId);
+        if (ds) {
+            allDs.push(ds);
+        }
         excluded.delete(datasetId);
     }
     else {
-        excluded.add(datasetId);
+        var dsIdx = allDs.findIndex(function (d) { return d.id === datasetId; });
+        if (dsIdx > -1) {
+            var ds = allDs[dsIdx];
+            excluded.set(ds.id, ds);
+            allDs.splice(dsIdx, 1);
+        }
     }
+    var resorted = dedupeAndSort(allDs);
+    allDsMap = resorted.categories;
+    defaultOrder = resorted.displayOrder;
     return { requestId: requestId };
 };
 /*
@@ -272,7 +287,7 @@ var addDatasetsToCache = function (datasets) {
     }
     if (!demographicsAllowed) {
         all.shift();
-        excluded.add(demographics.id);
+        excluded.set(demographics.id, demographics);
     }
     var sorted = dedupeAndSort(all);
     allDs = datasets;

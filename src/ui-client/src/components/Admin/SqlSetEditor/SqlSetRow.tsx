@@ -7,17 +7,17 @@
 
 import React from 'react';
 import { Row, Col, Container } from 'reactstrap';
-import { Checkbox } from '../../Section/Checkbox';
-import { TextArea } from '../../Section/TextArea';
-import { ConceptSqlSet, SpecializationGroup, ConceptEvent } from '../../../../models/admin/Concept';
+import { Checkbox } from '../Section/Checkbox';
+import { TextArea } from '../Section/TextArea';
+import { ConceptSqlSet, SpecializationGroup, ConceptEvent } from '../../../models/admin/Concept';
 import { Collapse } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import { SpecializationGroupDropdownPreview } from './SpecializationGroupDropdownPreview';
-import AdminState from '../../../../models/state/AdminState';
-import { setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { setAdminConceptSqlSet, removeAdminConceptSqlSet, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
-import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
-import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
+import AdminState from '../../../models/state/AdminState';
+import { setAdminConceptSpecializationGroup } from '../../../actions/admin/specializationGroup';
+import { setAdminConceptSqlSet, removeAdminConceptSqlSet, deleteAdminConceptSqlSet } from '../../../actions/admin/sqlSet';
+import { ConfirmationModalState, InformationModalState } from '../../../models/state/GeneralUiState';
+import { showConfirmationModal, showInfoModal } from '../../../actions/generalUi';
 import { ConceptEventTypeDropdown } from './ConceptEventTypeDropdown';
 
 interface Props {

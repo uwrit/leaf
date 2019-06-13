@@ -971,6 +971,14 @@ BEGIN
 END
 GO
 
+-- DROP relying sprocs ahead of DROP - CREATE of tag type
+IF OBJECT_ID('adm.sp_UpdateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_UpdateDatasetQuery]
+GO
+IF OBJECT_ID('adm.sp_CreateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_CreateDatasetQuery]
+GO
+
 IF TYPE_ID('[app].[DatasetQueryName]') IS NOT NULL
 	DROP TYPE [app].[DatasetQueryName];
 GO

@@ -55,6 +55,11 @@
     float: right;
 }
 
+.sqlset-editor-toprow .back-to-editor svg {
+    margin-bottom: -2px;
+    margin-right: 4px;
+}
+
 /* Table */
 .sqlset-editor-table-row-container {
     background-color: white;

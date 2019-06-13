@@ -117,7 +117,7 @@ export default class DatasetSearchEngineWebWorker {
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
                 case ALLOW_DATASET_IN_SEARCH:
-                    return allowDatasetInSearch(payload);
+                    return allowDataset(payload);
                 case ALLOW_ALL_DATASETS:
                     return allowAllDatasets(payload);
                 case ALLOW_DEMOGRAPHICS:
@@ -129,7 +129,7 @@ export default class DatasetSearchEngineWebWorker {
 
         // Dataset cache
         const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-        const excluded: Set<string> = new Set([ demographics.id ]);
+        const excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let demographicsAllowed = false;
         let allDs: PatientListDatasetQuery[] = [];
@@ -147,12 +147,12 @@ export default class DatasetSearchEngineWebWorker {
             if (allow) {
                 excluded.delete(demographics.id);
             } else {
-                excluded.add(demographics.id);
+                excluded.set(demographics.id, demographics);
             }
             demographicsAllowed = allow!;
             reindexCacheFromLocal(payload);
             return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
-        }
+        };
 
         /* 
          * Resets excluded datasets cache. Called when users
@@ -163,8 +163,12 @@ export default class DatasetSearchEngineWebWorker {
             excluded.clear()
 
             if (!demographicsAllowed) {
-                excluded.add(demographics.id);
+                excluded.set(demographics.id, demographics);
             }
+            const resorted = dedupeAndSort(allDs);
+            allDsMap = resorted.categories;
+            defaultOrder = resorted.displayOrder;
+
             return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
         };
 
@@ -172,14 +176,27 @@ export default class DatasetSearchEngineWebWorker {
          * Allows or disallows a dataset to be included in search results.
          * Called as users add/remove datasets from the patient list screen.
          */
-        const allowDatasetInSearch = (payload: InboundMessagePayload): OutboundMessagePayload => {
+        const allowDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, datasetId, allow } = payload;
 
             if (allow) {
+                const ds = excluded.get(datasetId!);
+                if (ds) {
+                    allDs.push(ds);
+                }
                 excluded.delete(datasetId!);
             } else {
-                excluded.add(datasetId!);
+                const dsIdx = allDs.findIndex((d) => d.id === datasetId);
+                if (dsIdx > -1) {
+                    const ds = allDs[dsIdx];
+                    excluded.set(ds.id, ds);
+                    allDs.splice(dsIdx, 1);
+                }
             }
+            const resorted = dedupeAndSort(allDs);
+            allDsMap = resorted.categories;
+            defaultOrder = resorted.displayOrder;
+            
             return { requestId };
         };
 
@@ -392,7 +409,7 @@ export default class DatasetSearchEngineWebWorker {
 
             if (!demographicsAllowed) {
                 all.shift();
-                excluded.add(demographics.id);
+                excluded.set(demographics.id, demographics);
             }
 
             const sorted = dedupeAndSort(all);

@@ -6,12 +6,12 @@
  */ 
 
 import React from 'react';
-import { TextArea } from '../../Section/TextArea';
-import { SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
-import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
-import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
-import { setAdminConceptSpecialization } from '../../../../actions/admin/specialization';
+import { TextArea } from '../Section/TextArea';
+import { SpecializationGroup, Specialization } from '../../../models/admin/Concept';
+import { ConfirmationModalState, InformationModalState } from '../../../models/state/GeneralUiState';
+import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../actions/admin/specializationGroup';
+import { showConfirmationModal, showInfoModal } from '../../../actions/generalUi';
+import { setAdminConceptSpecialization } from '../../../actions/admin/specialization';
 import { SpecializationDropdownOption } from './SpecializationDropdownOption';
 import { generate as generateId } from 'shortid';
 import { Row, Col, Container } from 'reactstrap';
