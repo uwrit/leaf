@@ -52,7 +52,16 @@ namespace Model.Search
             log.LogInformation("Getting query. UId:{UId}", urn);
             try
             {
-                return await service.GetQueryAsync(urn);
+                var query = await service.GetQueryAsync(urn);
+                if (query == null)
+                {
+                    log.LogError("Could not find query. UId:{UId}", urn);
+                }
+                else
+                {
+                    log.LogInformation("Found query. Id:{Id} UId:{UId}", query.Id, query.UniversalId);
+                }
+                return query;
             }
             catch (DbException de)
             {
