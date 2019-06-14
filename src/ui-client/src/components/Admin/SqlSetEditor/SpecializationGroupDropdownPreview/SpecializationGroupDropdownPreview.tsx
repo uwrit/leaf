@@ -12,7 +12,7 @@ import { ConfirmationModalState, InformationModalState } from '../../../../model
 import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
 import { setAdminConceptSpecialization } from '../../../../actions/admin/specialization';
-import { SpecializationDropdownOption } from './SpecializationDropdownOption';
+import { SpecializationDropdownOption } from '../SpecializationDropdownOption/SpecializationDropdownOption';
 import { generate as generateId } from 'shortid';
 import { Row, Col, Container } from 'reactstrap';
 

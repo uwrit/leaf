@@ -8,13 +8,13 @@
 import React from 'react';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
-import './NetworkAndIdentityEditor.css';
-import { Display } from './Sections/Display';
+import { Identity } from './Sections/Identity';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
 import { setAdminNetworkIdentity, processApiUpdateQueue, revertAdminNetworkChanges, setAdminNetworkEndpoint } from '../../../actions/admin/networkAndIdentity';
 import { IdentityPreview } from './Sections/IdentityPreview';
 import { Endpoint } from './Endpoint/Endpoint';
 import { NetworkEndpoint } from '../../../models/admin/Network';
+import './NetworkAndIdentityEditor.css';
 
 
 interface Props {
@@ -56,7 +56,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
 
                             {/* Identity */}
                             <div>
-                                <Display
+                                <Identity
                                     changeHandler={this.handleInputChange}
                                     identity={identity}
                                 />
@@ -124,15 +124,8 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
      */
     private generateRandomIntegerId = () => {
         const { endpoints } = this.props.data.networkAndIdentity;
-
-        /* 
-         * Ensure the value is greater than the max endpoint id so it appears sorted below it.
-         */
-        const min = endpoints.size > 0
-            ? Math.max.apply(Math, [ ...endpoints.values() ].map((s) => s.id)) 
-            : 1;
-        const max = 10000;
-        return Math.ceil(Math.random() * (max - min) + min);
+        const max = Math.max.apply(Math, [ ...endpoints.values() ].map((s) => s.id));
+        return max + 1;
     }
 
     /*

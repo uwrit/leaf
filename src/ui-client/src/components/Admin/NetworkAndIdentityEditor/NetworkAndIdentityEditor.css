@@ -10,10 +10,6 @@
 }
 
 /* Header */
-.identity-editor-header {
-    text-align: right;
-}
-
 .identity-editor-header .leaf-button {
     margin: 14px 10px 4px !important;
 }
@@ -64,7 +60,6 @@
 .identity-preview .header-networkhealth-responder {
     border-color: transparent !important;
     color: white;
-    
 }
 
 /* Endpoints */

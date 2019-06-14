@@ -12,6 +12,12 @@ export interface DatasetQueryConstraint extends Constraint {
     datasetQueryId: string;
 }
 
+export interface AdminDemographicQuery {
+    sqlStatement: string;
+    lastChanged: string;
+    changedBy: string;
+}
+
 export interface AdminDatasetQuery {
     id: string;
     categoryId?: number;

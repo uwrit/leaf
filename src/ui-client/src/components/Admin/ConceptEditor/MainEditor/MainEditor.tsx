@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Row, Col, Button } from 'reactstrap';
-import { AdminPanelLoadState, AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
+import { AdminPanelLoadState, AdminPanelPane } from '../../../../models/state/AdminState';
 import LoaderIcon from '../../../Other/LoaderIcon/LoaderIcon';
 import { Display } from '../Sections/Display';
 import { Identifiers } from '../Sections/Identifiers';
@@ -23,7 +23,7 @@ import { Constraints } from '../Sections/Contraints';
 import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin/concept';
 import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
-import { setAdminPanelSubPane } from '../../../../actions/admin/admin';
+import { setAdminPanelPane } from '../../../../actions/admin/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -151,7 +151,7 @@ export class MainEditor extends React.PureComponent<Props> {
             unsaved: true
         }
         dispatch(setAdminConceptSqlSet(newSet, true));
-        dispatch(setAdminPanelSubPane(AdminPanelConceptEditorPane.SQL_SET));
+        dispatch(setAdminPanelPane(AdminPanelPane.SQL_SETS));
     }
 
     /* 

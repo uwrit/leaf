@@ -78,29 +78,6 @@ export const saveOrUpdateAdminConceptSqlSet = async (set: ConceptSqlSet, dispatc
 };
 
 /*
- * Fetch SQL Sets.
- */
-export const getAdminConceptSqlSets = () => {
-    return async (dispatch: any, getState: () => AppState) => {
-        try {
-            dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
-            const state = getState();
-            const sets = await getSqlSets(state);
-            dispatch(setAdminConceptSqlSets(sets, false));
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
-        } catch (err) {
-            const info: InformationModalState = {
-                body: "An error occurred while attempting to load SQL Sets. Please see the Leaf error logs for details.",
-                header: "Error Loading SQL Sets",
-                show: true
-            };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-            dispatch(showInfoModal(info));
-        }
-    };
-};
-
-/*
  * Delete an existing SQL Set.
  */
 export const deleteAdminConceptSqlSet = (set: ConceptSqlSet) => {
@@ -151,13 +128,6 @@ export const setAdminConceptSqlSets = (sets: ConceptSqlSet[], changed: boolean):
         changed,
         sets,
         type: SET_ADMIN_SQL_SETS
-    };
-};
-
-export const setAdminUneditedConceptSqlSets = (mappedSets: Map<number,ConceptSqlSet>): AdminSqlSetAction => {
-    return {
-        mappedSets,
-        type: SET_ADMIN_UNEDITED_SQL_SETS
     };
 };
 

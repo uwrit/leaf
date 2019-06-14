@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Section } from '../../Section/Section';
-import { AdminPanelPatientListColumnTemplate } from '../../../../models/patientList/Column';
+import { AdminPanelPatientListColumnTemplate, PatientListColumnType } from '../../../../models/patientList/Column';
 import { SqlBox } from '../../../Other/SqlBox/SqlBox';
 import { AdminDatasetQuery } from '../../../../models/admin/Dataset';
 import formatSql from '../../../../utils/formatSql';
@@ -42,7 +42,7 @@ export class SqlEditor extends React.PureComponent<Props> {
                     </div>
                     <div className={`${c}-sql`}>
                         <div className={`${c}-title`}>SQL Query</div>
-                        <SqlBox sql={sql} height={350} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
+                        <SqlBox sql={sql} height={400} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
                         <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
                     </div>
                 </div>
@@ -90,14 +90,16 @@ export class SqlEditor extends React.PureComponent<Props> {
      * Get React elements depending on whether columns are present, optional, etc.
      */
     private getColumnContent = (col: AdminPanelPatientListColumnTemplate) => {
-        const classes = [ `${this.className}-column` ];
+        const c = this.className;
+        const classes = [ `${c}-column` ];
 
         if (col.optional) { classes.push('optional'); }
         if (col.present)  { classes.push('present'); }
         return (
             <div key={col.id} className={classes.join(' ')}>
                 <FiCheck />
-                <span>{col.id}</span>
+                <span className={`${c}-column-name`}>{col.id}</span>
+                <span className={`${c}-column-type`}>{PatientListColumnType[col.type]}</span>
             </div>
         );
     }

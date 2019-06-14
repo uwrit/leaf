@@ -62,17 +62,24 @@ export class MapPreview extends React.Component<Props, State> {
                 >
                 <TileLayer url={tileUrl} />
                 <EndpointMarker position={latLng} queryState={CohortStateType.LOADED} />
-                <EndpointPopup id={identity} count={1000} />
+                <EndpointPopup id={{ ...identity, latitude: latLng.lat, longitude: latLng.lng }} count={1000} />
             </LeafletMap>
         );
     }
 
     private getLatLng = () => {
         const { identity } = this.props;
-        const lat = identity.latitude ? +identity.latitude : 0;
-        const lng = identity.longitude
-            ? (identity.longitude > 0 ? -identity.longitude : identity.longitude)
-            : 0;
+        let lat = identity.latitude;
+        let lng = identity.longitude;
+
+        if (!lat) { lat = 0; } 
+        else { lat = +lat; }
+
+        if (!lng) { lng = 0; }
+        else {
+            lng = +lng;
+            if (lng > 0) { lng = -lng; }
+        } 
 
         return new LatLng(lat, lng);
     }

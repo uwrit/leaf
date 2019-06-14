@@ -12,13 +12,13 @@ import { TextArea } from '../../Section/TextArea';
 import { ConceptSqlSet, SpecializationGroup, ConceptEvent } from '../../../../models/admin/Concept';
 import { Collapse } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
-import { SpecializationGroupDropdownPreview } from './SpecializationGroupDropdownPreview';
+import { SpecializationGroupDropdownPreview } from '../SpecializationGroupDropdownPreview/SpecializationGroupDropdownPreview';
 import AdminState from '../../../../models/state/AdminState';
 import { setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
 import { setAdminConceptSqlSet, removeAdminConceptSqlSet, deleteAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
-import { ConceptEventTypeDropdown } from './ConceptEventTypeDropdown';
+import { ConceptEventTypeDropdown } from '../ConceptEventTypeDropdown/ConceptEventTypeDropdown';
 
 interface Props {
     dispatch: any;
@@ -62,7 +62,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         set.specializationGroups.forEach((g) => spcGrps.push(g));
 
         return (
-            <Container className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
+            <div className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
 
                 {/* Unsaved notifier */}
                 {unsaved &&
@@ -122,7 +122,8 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                 <div className={`${c}-specializationgroups-container`}>
                     {this.renderSpecializationData(spcGrps)}
                 </div>
-            </Container>
+                
+            </div>
         );
     }
 
@@ -190,15 +191,8 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
      */
     private generateRandomIntegerId = () => {
         const { specializationGroups } = this.props.set;
-
-        /* 
-         * Ensure the value is greater than the max specialization group id so it appears sorted below it.
-         */
-        const min = specializationGroups.size > 0
-            ? Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) 
-            : 1;
-        const max = 10000;
-        return Math.ceil(Math.random() * (max - min) + min);
+        const max = Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) ;
+        return max + 1;
     }
 
     /*

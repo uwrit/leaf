@@ -6,34 +6,27 @@
  */ 
 
 import React from 'react';
-import { ConceptSqlSet, ConceptEvent } from '../../../../models/admin/Concept';
-import { Button, Container } from 'reactstrap';
-import { checkIfAdminPanelUnsavedAndSetSubPane } from '../../../../actions/admin/admin';
-import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
-import { setAdminConceptSqlSet, setAdminUneditedConceptSqlSets, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../../actions/admin/sqlSet';
-import { EditorPaneProps as Props } from '../Props';
-import { conceptEditorValid } from '../../../../utils/admin/concept';
-import { SqlSetRow } from './SqlSetRow';
-import { InformationModalState } from '../../../../models/state/GeneralUiState';
-import { showInfoModal } from '../../../../actions/generalUi';
+import { ConceptSqlSet, ConceptEvent } from '../../../models/admin/Concept';
+import { Button, Container, Row, Col } from 'reactstrap';
+import { setAdminConceptSqlSet, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../actions/admin/sqlSet';
+import { conceptEditorValid } from '../../../utils/admin/concept';
+import { SqlSetRow } from './SqlSetRow/SqlSetRow';
+import { InformationModalState } from '../../../models/state/GeneralUiState';
+import { showInfoModal } from '../../../actions/generalUi';
+import AdminState, { AdminPanelPane } from '../../../models/state/AdminState';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../actions/admin/admin';
+import { FiCornerUpLeft } from 'react-icons/fi';
 import './SqlSetEditor.css';
+
+interface Props {
+    data: AdminState;
+    dispatch: any;
+}
 
 export class SqlSetEditor extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
     constructor(props: Props) {
         super(props);
-    }
-
-    public componentDidMount() {
-        const { dispatch, data } = this.props;
-        const { sets } = data.sqlSets;
-        const firstSet = sets.get(Array.from(sets.keys())[0]);
-
-        if (sets.size === 1 && firstSet!.unsaved) {
-            dispatch(setAdminUneditedConceptSqlSets(new Map()));
-        } else {
-            dispatch(setAdminUneditedConceptSqlSets(data.sqlSets.sets));
-        }
     }
 
     public render() {
@@ -43,33 +36,40 @@ export class SqlSetEditor extends React.PureComponent<Props> {
         
         return (
             <div className={`${c}-container`}>
+
+                {/* Header */}
                 <div className={`${c}-toprow`}>
-                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>+ Create New SQL Set</Button>
-                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>Undo Changes</Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>Save</Button>
-                    <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>Back to Concept Editor</Button>
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddSqlSetClick}>
+                        + Create New SQL Set
+                    </Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!data.sqlSets.changed} onClick={this.handleUndoChangesClick}>
+                        Undo Changes
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!data.sqlSets.changed} onClick={this.handleSaveChangesClick}>
+                        Save
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary back-to-editor' onClick={this.handleBackToConceptEditorClick}>
+                        <FiCornerUpLeft /> 
+                        Go to Concept Editor
+                    </Button>
                 </div>
-                <Container className={`${c}-table`}>
+
+                {/* Sets */}
+                <div className={`${c}-table`}>
                     {[ ...data.sqlSets.sets.values() ]
-                        .sort((a,b) => a.id > b.id ? 1 : -1)
+                        .sort((a,b) => a.id > b.id ? -1 : 1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs}/>)
                     }
-                </Container>
+                </div>
+
             </div>
         );
     }
 
     private generateRandomIntegerId = () => {
         const { sets } = this.props.data.sqlSets;
-
-        /* 
-         * Ensure the value is greater than the max set id so it appears sorted below it.
-         */
-        const min = sets.size > 0
-            ? Math.max.apply(Math, [ ...sets.values() ].map((s) => s.id)) 
-            : 1;
-        const max = 10000;
-        return Math.ceil(Math.random() * (max - min) + min);
+        const max = Math.max.apply(Math, [ ...sets.values() ].map((s) => s.id));
+        return max + 1;
     }
 
     /*
@@ -112,6 +112,6 @@ export class SqlSetEditor extends React.PureComponent<Props> {
 
     private handleBackToConceptEditorClick = () => {
         const { dispatch } = this.props;
-        dispatch(checkIfAdminPanelUnsavedAndSetSubPane(AdminPanelConceptEditorPane.MAIN));
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.CONCEPTS));
     }
 };

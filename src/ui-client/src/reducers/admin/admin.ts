@@ -5,10 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import AdminState, { AdminPanelLoadState, AdminPanelConceptEditorPane, AdminPanelPane } from "../../models/state/AdminState";
+import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
 import {
     SET_ADMIN_PANEL_PANE,
-    SET_ADMIN_PANEL_SUBPANE,
     SET_ADMIN_PANEL_LOAD_STATE,
     AdminPanelAction
 } from '../../actions/admin/admin';
@@ -89,7 +88,6 @@ import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, s
 export const defaultAdminState = (): AdminState => {
     return {
         activePane: AdminPanelPane.CONCEPTS,
-        activeSubPane: AdminPanelConceptEditorPane.MAIN,
         configuration: {
             sql: {
                 alias: '',
@@ -153,12 +151,6 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
     });
 }; 
 
-const setAdminPanelSubPane = (state: AdminState, action: AdminPanelAction): AdminState => {
-    return Object.assign({}, state, {
-        activeSubPane: action.subPane
-    });
-}; 
-
 type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
 export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
@@ -167,8 +159,6 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
         // UI
         case SET_ADMIN_PANEL_PANE:
             return setAdminPanelPane(state, action);
-        case SET_ADMIN_PANEL_SUBPANE:
-            return setAdminPanelSubPane(state, action);
 
         // Concepts
         case SET_ADMIN_CONCEPT:
