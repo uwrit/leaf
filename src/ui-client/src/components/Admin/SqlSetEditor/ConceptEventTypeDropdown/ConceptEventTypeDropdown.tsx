@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownToggle, DropdownMenu, FormGroup } from 'reactstrap';
-import { ConceptEvent } from '../../../models/admin/Concept';
+import { ConceptEvent } from '../../../../models/admin/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import Label from 'reactstrap/lib/Label';
-import { setAdminConceptEvent, saveAdminConceptEvent, deleteAdminConceptEvent, removeAdminConceptEvent, setAdminUneditedConceptEvent, undoAdminConceptEventChange } from '../../../actions/admin/conceptEvent';
-import { TextArea } from '../Section/TextArea';
-import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
-import { showConfirmationModal } from '../../../actions/generalUi';
+import { setAdminConceptEvent, saveAdminConceptEvent, deleteAdminConceptEvent, removeAdminConceptEvent, setAdminUneditedConceptEvent, undoAdminConceptEventChange } from '../../../../actions/admin/conceptEvent';
+import { TextArea } from '../../Section/TextArea';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../../actions/generalUi';
 
 interface Props {
     currentType?: ConceptEvent;

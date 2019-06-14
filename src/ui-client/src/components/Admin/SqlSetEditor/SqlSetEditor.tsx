@@ -10,7 +10,7 @@ import { ConceptSqlSet, ConceptEvent } from '../../../models/admin/Concept';
 import { Button, Container, Row, Col } from 'reactstrap';
 import { setAdminConceptSqlSet, undoAdminSqlSetChanges, processApiUpdateQueue } from '../../../actions/admin/sqlSet';
 import { conceptEditorValid } from '../../../utils/admin/concept';
-import { SqlSetRow } from './SqlSetRow';
+import { SqlSetRow } from './SqlSetRow/SqlSetRow';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
 import AdminState, { AdminPanelPane } from '../../../models/state/AdminState';
@@ -57,7 +57,7 @@ export class SqlSetEditor extends React.PureComponent<Props> {
                 {/* Sets */}
                 <div className={`${c}-table`}>
                     {[ ...data.sqlSets.sets.values() ]
-                        .sort((a,b) => a.id > b.id ? 1 : -1)
+                        .sort((a,b) => a.id > b.id ? -1 : 1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs}/>)
                     }
                 </div>
