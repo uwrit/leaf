@@ -102,7 +102,7 @@ export enum ConstraintType {
 }
 
 export interface Constraint {
-    resourceId: string;
+    resourceId?: string;
     constraintId: ConstraintType;
     constraintValue: string;
 }

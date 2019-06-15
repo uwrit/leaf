@@ -64,7 +64,11 @@ export class Constraints extends React.PureComponent<Props> {
 
     private handleAddNewClick = () => {
         const { changeHandler, adminConcept } = this.props.data;
-        const newConstraint: ConstraintModel = { resourceId: adminConcept!.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const newConstraint: ConstraintModel = { 
+            resourceId: adminConcept!.unsaved ? undefined : adminConcept!.id, 
+            constraintId: ConstraintType.User, 
+            constraintValue: '' 
+        };
         const constraints = adminConcept!.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);

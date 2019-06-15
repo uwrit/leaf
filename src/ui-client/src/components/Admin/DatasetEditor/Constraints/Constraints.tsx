@@ -66,7 +66,11 @@ export class Constraints extends React.PureComponent<Props> {
 
     private handleAddNewClick = () => {
         const { changeHandler, dataset } = this.props;
-        const newConstraint: ConstraintModel = { resourceId: dataset.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const newConstraint: ConstraintModel = { 
+            resourceId: dataset.unsaved ? undefined : dataset.id, 
+            constraintId: ConstraintType.User, 
+            constraintValue: '' 
+        };
         const constraints = dataset.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);
