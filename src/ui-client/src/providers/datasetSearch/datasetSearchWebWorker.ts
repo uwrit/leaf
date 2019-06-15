@@ -129,15 +129,16 @@ export default class DatasetSearchEngineWebWorker {
 
         // Dataset cache
         const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-        const excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
+        let shadowExcluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
+        let excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
         let demographicsAllowed = false;
         let allDs: PatientListDatasetQuery[] = [];
         let allDsMap: Map<string, CategorizedDatasetRef> = new Map();
         let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
         
         /*
-         * Sets the special demographics dataset to be included in 
+         * Set the special demographics dataset to be included in 
          * search results. This is used in the admin panel and ensure
          * that users don't see demographics when navigating the patient list.
          */
@@ -145,8 +146,10 @@ export default class DatasetSearchEngineWebWorker {
             const { requestId, allow } = payload;
 
             if (allow) {
-                excluded.delete(demographics.id);
+                shadowExcluded = new Map(excluded);
+                excluded.clear();
             } else {
+                excluded = new Map(shadowExcluded);
                 excluded.set(demographics.id, demographics);
             }
             demographicsAllowed = allow!;
@@ -155,7 +158,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         /* 
-         * Resets excluded datasets cache. Called when users
+         * Reset excluded datasets cache. Called when users
          * reset the cohort and the patient list too is reset.
          */
         const allowAllDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
@@ -178,7 +181,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         /*
-         * Allows or disallows a dataset to be included in search results.
+         * Allow or disallow a dataset to be included in search results.
          * Called as users add/remove datasets from the patient list screen.
          */
         const allowDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
@@ -206,7 +209,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         /*
-         * Searches through available datasets.
+         * Search through available datasets.
          */
         const searchDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { searchString, requestId } = payload;
@@ -228,12 +231,25 @@ export default class DatasetSearchEngineWebWorker {
             // ******************
         
             /* 
-             * Foreach dataset compare with search term one
+             * Foreach dataset compare with search term one. If demographics
+             * are disabled this is for a user, so leave out excluded datasets.
              */
-            for (let i1 = 0; i1 < datasets.length; i1++) {
-                const ds = datasets[i1];
-                if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
-                    dsOut.push(ds);
+            if (!demographicsAllowed) {
+                for (let i1 = 0; i1 < datasets.length; i1++) {
+                    const ds = datasets[i1];
+                    if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
+                        dsOut.push(ds);
+                    }
+                }
+            /* 
+             * Else this is for an admin in the admin panel, so there are no exclusions.
+             */
+            } else {
+                for (let i1 = 0; i1 < datasets.length; i1++) {
+                    const ds = datasets[i1];
+                    if (ds.token.startsWith(firstTerm)) {
+                        dsOut.push(ds);
+                    }
                 }
             }
 
@@ -282,7 +298,7 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         /*
-         * Extracts datasets from tokenized refs and returns
+         * Extract datasets from tokenized refs and returns
          * a sorted, deduped result array.
          */
         const dedupeAndSortTokenized = (refs: TokenizedDatasetRef[]): DatasetSearchResult => {
@@ -291,8 +307,8 @@ export default class DatasetSearchEngineWebWorker {
         };
 
         /*
-         * Removes duplicates, sorts alphabetically, and
-         * returns a displayable categorized array of datasets.
+         * Remove duplicates, sort alphabetically, and
+         * return a displayable categorized array of datasets.
          */
         const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
             const addedDatasets: Set<string> = new Set();
@@ -366,7 +382,7 @@ export default class DatasetSearchEngineWebWorker {
         }   
 
         /*
-         * Resets the dataset search cache and (re)loads
+         * Reset the dataset search cache and (re)load
          * it with inbound datasets.
          */
         const addDatasetsToCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {

@@ -20,6 +20,10 @@
     padding: 8px;
 }
 
+.sqlset-editor-input-container .checkbox-slider-container label {
+    margin-right: 20px;
+}
+
 .sqlset-editor-unsaved {
     background-color: rgba(255, 248, 145, 0.5);
     border-radius: 8px;
@@ -71,7 +75,7 @@
     margin-bottom: 10px;
     min-height: 50px;
     min-width: 650px;
-    padding: 10px 20px;
+    padding: 4px 20px 0;
     position: relative;
     transition: box-shadow 0.3s;
 }
@@ -81,7 +85,7 @@
 }
 
 .sqlset-editor-table-row {
-    padding: 10px 8px 0;
+    padding: 0px 8px 0;
 }
 
 .sqlset-editor-row-id {
@@ -118,6 +122,10 @@
 }
 
 /* Add New Specialization Group */
+.sqlset-editor-specializationgroups-container {
+    margin-top: -6px;
+}
+
 .sqlset-editor-subtable-header {
     text-align: center;
 }
@@ -217,6 +225,11 @@
 .sqlset-editor-input-container.col-md-4 {
     padding: 4px 8px;
 }
+
+.sqlset-editor-input-column .position-relative.form-group {
+    margin-top: 0px;
+}
+
 
 .sqlset-editor-input-column:first-child .position-relative.form-group {
     margin-top: 6px;

@@ -75,12 +75,13 @@ export const getAdminDemographicsDataset = async (state: AppState): Promise<Admi
     const resp = await http.get(`api/admin/demographics`);
     const ds = resp.data as AdminDemographicQuery;
     const converted: AdminDatasetQuery = {
-        ...ds,
         id: 'demographics',
         constraints: [],
         name: 'Basic Demographics',
         shape: PatientListDatasetShape.Demographics,
-        tags: []
+        sqlStatement: ds.sqlStatement ? ds.sqlStatement : '',
+        tags: [],
+        unsaved: new Date(ds.lastChanged).getFullYear() === 0
     };
     return converted;
 };

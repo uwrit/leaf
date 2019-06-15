@@ -24,23 +24,26 @@ var handleWorkMessage = function (payload) {
 };
 // Dataset cache
 var demographics = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-var excluded = new Map([[demographics.id, demographics]]);
 var firstCharCache = new Map();
+var shadowExcluded = new Map([[demographics.id, demographics]]);
+var excluded = new Map([[demographics.id, demographics]]);
 var demographicsAllowed = false;
 var allDs = [];
 var allDsMap = new Map();
 var defaultOrder = new Map();
 /*
- * Sets the special demographics dataset to be included in
+ * Set the special demographics dataset to be included in
  * search results. This is used in the admin panel and ensure
  * that users don't see demographics when navigating the patient list.
  */
 var allowDemographics = function (payload) {
     var requestId = payload.requestId, allow = payload.allow;
     if (allow) {
-        excluded.delete(demographics.id);
+        shadowExcluded = new Map(excluded);
+        excluded.clear();
     }
     else {
+        excluded = new Map(shadowExcluded);
         excluded.set(demographics.id, demographics);
     }
     demographicsAllowed = allow;
@@ -48,16 +51,18 @@ var allowDemographics = function (payload) {
     return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
 };
 /*
- * Resets excluded datasets cache. Called when users
+ * Reset excluded datasets cache. Called when users
  * reset the cohort and the patient list too is reset.
  */
 var allowAllDatasets = function (payload) {
     var requestId = payload.requestId;
     if (demographicsAllowed) {
-        allDs = allDs.concat([ ...excluded.values() ]);
+        allDs = allDs.concat(excluded.values().slice());
         excluded.clear();
-    } else {
-        excluded.forEach((d) => { if (d.shape !== 3) allDs.push(d) });
+    }
+    else {
+        excluded.forEach(function (d) { if (d.shape !== 3)
+            allDs.push(d); });
         excluded.clear();
         excluded.set(demographics.id, demographics);
     }
@@ -67,7 +72,7 @@ var allowAllDatasets = function (payload) {
     return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
 };
 /*
- * Allows or disallows a dataset to be included in search results.
+ * Allow or disallow a dataset to be included in search results.
  * Called as users add/remove datasets from the patient list screen.
  */
 var allowDataset = function (payload) {
@@ -93,7 +98,7 @@ var allowDataset = function (payload) {
     return searchDatasets(payload);
 };
 /*
- * Searches through available datasets.
+ * Search through available datasets.
  */
 var searchDatasets = function (payload) {
     var searchString = payload.searchString, requestId = payload.requestId;
@@ -112,12 +117,26 @@ var searchDatasets = function (payload) {
     // First term
     // ******************
     /*
-     * Foreach dataset compare with search term one
+     * Foreach dataset compare with search term one. If demographics
+     * are disabled this is for a user, so leave out excluded datasets.
      */
-    for (var i1 = 0; i1 < datasets.length; i1++) {
-        var ds = datasets[i1];
-        if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
-            dsOut.push(ds);
+    if (!demographicsAllowed) {
+        for (var i1 = 0; i1 < datasets.length; i1++) {
+            var ds = datasets[i1];
+            if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
+                dsOut.push(ds);
+            }
+        }
+        /*
+         * Else this is for an admin in the admin panel, so there are no exclusions.
+         */
+    }
+    else {
+        for (var i1 = 0; i1 < datasets.length; i1++) {
+            var ds = datasets[i1];
+            if (ds.token.startsWith(firstTerm)) {
+                dsOut.push(ds);
+            }
         }
     }
     if (terms.length === 1) {
@@ -159,7 +178,7 @@ var searchDatasets = function (payload) {
     return { requestId: requestId, result: dedupeAndSortTokenized(dsFinal) };
 };
 /*
- * Extracts datasets from tokenized refs and returns
+ * Extract datasets from tokenized refs and returns
  * a sorted, deduped result array.
  */
 var dedupeAndSortTokenized = function (refs) {
@@ -167,8 +186,8 @@ var dedupeAndSortTokenized = function (refs) {
     return dedupeAndSort(ds);
 };
 /*
- * Removes duplicates, sorts alphabetically, and
- * returns a displayable categorized array of datasets.
+ * Remove duplicates, sort alphabetically, and
+ * return a displayable categorized array of datasets.
  */
 var dedupeAndSort = function (refs) {
     var addedDatasets = new Set();
@@ -239,7 +258,7 @@ var reindexCacheFromExternal = function (payload) {
     return { requestId: requestId, result: sorted };
 };
 /*
- * Resets the dataset search cache and (re)loads
+ * Reset the dataset search cache and (re)load
  * it with inbound datasets.
  */
 var addDatasetsToCache = function (datasets) {

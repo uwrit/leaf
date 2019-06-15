@@ -64,7 +64,7 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
                 {/* Sets */}
                 <div className={`${c}-table`}>
                     {[ ...data.sqlSets.sets.values() ]
-                        .sort((a,b) => a.id > b.id ? -1 : 1)
+                        .sort((a,b) => a.id > b.id ? 1 : -1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs} forceValidation={forceValidation} />)
                     }
                 </div>
