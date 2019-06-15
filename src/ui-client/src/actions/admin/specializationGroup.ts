@@ -48,15 +48,15 @@ export const getAdminConceptSpecializationGroups = () => {
             const state = getState();
             const sets = await getSpecializationGroups(state);
             dispatch(setAdminConceptSpecializationGroups(sets));
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Complete }));
         } catch (err) {
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to load Concept Specialization Groups. Please see the Leaf error logs for details.",
                 header: "Error Loading Concept Specialization Groups",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     };
@@ -92,7 +92,7 @@ export const deleteAdminConceptSpecializationGroup = (group: SpecializationGroup
                                 "An error occurred while attempting to delete the Concept Specialization Group. " +
                                 "Please see the Leaf error logs for details.";
                         }
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {

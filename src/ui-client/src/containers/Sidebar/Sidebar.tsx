@@ -11,12 +11,12 @@ import { SidebarTab} from '../../components/Sidebar/SidebarTab';
 import { RouteConfig } from '../../config/routes';
 import { CohortStateType } from '../../models/state/CohortState';
 import { Routes } from '../../models/state/GeneralUiState';
-import { AdminPanelConceptEditorPane } from '../../models/state/AdminState';
+import { AdminPanelPane } from '../../models/state/AdminState';
 import './Sidebar.css';
 
 interface Props {
     cohortCountState: CohortStateType;
-    currentAdminPane: AdminPanelConceptEditorPane;
+    currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
     dispatch: any;
     routes: RouteConfig[];

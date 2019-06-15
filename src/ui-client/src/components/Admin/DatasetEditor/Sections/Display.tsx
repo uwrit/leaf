@@ -20,6 +20,7 @@ interface Props {
     categories: Map<number, DatasetQueryCategory>;
     dataset: AdminDatasetQuery;
     dispatch: any;
+    forceValidation: boolean;
     inputChangeHandler: (val: any, propName: string) => any;
     locked?: boolean;
     shapeChangeHandler: (shape: PatientListDatasetShape) => any;
@@ -33,7 +34,7 @@ export class Display extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { category, categories, categoryChangeHandler, dataset, dispatch, inputChangeHandler, locked, shape, shapes, shapeChangeHandler } = this.props;
+        const { category, categories, categoryChangeHandler, dataset, dispatch, inputChangeHandler, locked, forceValidation, shapes, shapeChangeHandler } = this.props;
         return (
             <Section header='Display'>
                 <Row>
@@ -41,6 +42,7 @@ export class Display extends React.PureComponent<Props> {
                     <TextArea 
                         changeHandler={inputChangeHandler} propName={'name'} value={dataset.name}
                         label='Name' required={true} subLabel='Text for this Dataset' locked={locked}
+                        forceValidation={forceValidation} errorText='Enter a Name'
                     />
                     </Col>
                     <Col md={4}>

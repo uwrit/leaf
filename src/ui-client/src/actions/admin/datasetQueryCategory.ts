@@ -43,7 +43,7 @@ export const saveAdminDatasetQueryCategory = (cat: DatasetQueryCategory) => {
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset Query Category. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset Query Category",
@@ -68,13 +68,13 @@ export const deleteAdminDatasetQueryCategory = (cat: DatasetQueryCategory) => {
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminDatasetQueryCategory(cat));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Dataset Query Category. Please see the Leaf error logs for details.",
                             header: "Error Deleting Dataset Query Category",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {

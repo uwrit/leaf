@@ -53,8 +53,12 @@ var allowDemographics = function (payload) {
  */
 var allowAllDatasets = function (payload) {
     var requestId = payload.requestId;
-    excluded.clear();
-    if (!demographicsAllowed) {
+    if (demographicsAllowed) {
+        allDs = allDs.concat([ ...excluded.values() ]);
+        excluded.clear();
+    } else {
+        excluded.forEach((d) => { if (d.shape !== 3) allDs.push(d) });
+        excluded.clear();
         excluded.set(demographics.id, demographics);
     }
     var resorted = dedupeAndSort(allDs);
@@ -67,7 +71,7 @@ var allowAllDatasets = function (payload) {
  * Called as users add/remove datasets from the patient list screen.
  */
 var allowDataset = function (payload) {
-    var requestId = payload.requestId, datasetId = payload.datasetId, allow = payload.allow;
+    var datasetId = payload.datasetId, allow = payload.allow;
     if (allow) {
         var ds = excluded.get(datasetId);
         if (ds) {
@@ -86,7 +90,7 @@ var allowDataset = function (payload) {
     var resorted = dedupeAndSort(allDs);
     allDsMap = resorted.categories;
     defaultOrder = resorted.displayOrder;
-    return { requestId: requestId };
+    return searchDatasets(payload);
 };
 /*
  * Searches through available datasets.

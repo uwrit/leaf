@@ -25,7 +25,7 @@ const decodeToken = (token: string): SessionContext => {
         rawDecoded: decoded,
         token
     }
-    console.log('session', ctx);
+    console.log('Session Token', ctx);
     return ctx;
 };
 

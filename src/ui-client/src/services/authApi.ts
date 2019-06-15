@@ -49,7 +49,8 @@ const decodeToken = (token: string): UserContext => {
         token,
         version: decoded['leaf-version']
     }
-    console.log('user', ctx);
+    console.info(`Leaf server API running version ${ctx.version}`);
+    console.log('User Token', ctx);
     return ctx;
 };
 

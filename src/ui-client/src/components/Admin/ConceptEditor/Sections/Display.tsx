@@ -21,12 +21,12 @@ export class Display extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { changeHandler, adminConcept, togglePanelPreview } = this.props.data;
+        const { changeHandler, adminConcept, togglePanelPreview, forceValidation } = this.props.data;
         return (
             <Section header='General Display'>
                 <TextArea 
-                    changeHandler={changeHandler} propName={'uiDisplayName'} value={adminConcept!.uiDisplayName}
-                    label='Name' subLabel='Text shown in Concept Tree' required={true}
+                    changeHandler={changeHandler} propName={'uiDisplayName'} value={adminConcept!.uiDisplayName} errorText='Enter a name'
+                    label='Name' subLabel='Text shown in Concept Tree' required={true} forceValidation={forceValidation}
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplaySubtext'} value={adminConcept!.uiDisplaySubtext}
@@ -34,8 +34,8 @@ export class Display extends React.PureComponent<Props> {
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplayText'} value={adminConcept!.uiDisplayText}
-                    focusToggle={togglePanelPreview} required={true}
-                    label='Full Text' subLabel='Descriptive text shown when dragged in query'
+                    focusToggle={togglePanelPreview} required={true} forceValidation={forceValidation}
+                    label='Full Text' subLabel='Descriptive text shown when dragged in query' errorText='Enter a text to display'
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiDisplayTooltip'} value={adminConcept!.uiDisplayTooltip} overrideTabKeyDown={true}
@@ -51,7 +51,7 @@ export class Display extends React.PureComponent<Props> {
                 />
                 <TextArea 
                     changeHandler={changeHandler} propName={'uiNumericDefaultText'} value={adminConcept!.uiNumericDefaultText}
-                    focusToggle={togglePanelPreview}
+                    focusToggle={togglePanelPreview} forceValidation={forceValidation}
                     label='Numeric default text' subLabel='Text shown if no numeric filter selected'
                 />
             </Section>

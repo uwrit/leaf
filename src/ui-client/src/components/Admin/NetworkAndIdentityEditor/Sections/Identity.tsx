@@ -14,6 +14,7 @@ import { Input } from '../../Section/Input';
 
 interface Props {
     changeHandler: (val: any, propName: string) => any;
+    forceValidation: boolean;
     identity: NetworkIdentity;
 }
 
@@ -23,7 +24,7 @@ export class Identity extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { changeHandler, identity } = this.props;
+        const { changeHandler, identity, forceValidation } = this.props;
         return (
             <Section header={'Instance Identity & Display'}>
 
@@ -31,14 +32,14 @@ export class Identity extends React.PureComponent<Props> {
                 <Row>
                     <Col md={6}>
                         <TextArea 
-                            changeHandler={changeHandler} propName={'name'} value={identity.name}
-                            label='Full Name' subLabel='Name shown to users' required={true}
+                            changeHandler={changeHandler} propName={'name'} value={identity.name} forceValidation={forceValidation}
+                            label='Full Name' subLabel='Name shown to users' required={true} errorText='Enter a Name'
                         />
                     </Col>
                     <Col md={6}>
                         <TextArea 
-                            changeHandler={changeHandler} propName={'abbreviation'} value={identity.abbreviation}
-                            label='Abbreviation' subLabel='Abbreviated name shown next to query results' required={true}
+                            changeHandler={changeHandler} propName={'abbreviation'} value={identity.abbreviation}  forceValidation={forceValidation}
+                            label='Abbreviation' subLabel='Abbreviated name shown next to query results' required={true} errorText='Enter an Abbreviation'
                         />
                     </Col>
                 </Row>
@@ -61,8 +62,9 @@ export class Identity extends React.PureComponent<Props> {
                             label='Total Patients' subLabel='Approximate number of total patients' type='number'
                         />
                         <Input 
-                            changeHandler={changeHandler} propName={'primaryColor'} value={identity.primaryColor}
+                            changeHandler={changeHandler} propName={'primaryColor'} value={identity.primaryColor} forceValidation={forceValidation}
                             label='Primary Color' subLabel={`Primary color shown next to name, such as '#bf5700' or 'rgb(75,46,131)'`} required={true}
+                            errorText='Enter a Primary Color'
                         />
                     </Col>
                     <Col md={6}>

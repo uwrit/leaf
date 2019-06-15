@@ -112,22 +112,16 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
             });
         }))
         .then( async () => {
-            if (atLeastOneSucceeded) { 
-
-                /*
-                 * Disallow the added dataset from search results,
-                 * then update the currently shown datasets.
-                 */
-                await allowDatasetInSearch(dataset.id, false);
-                const newDatasets = await searchDatasets(state.datasets.searchTerm);
-                dispatch(setDatasetSearchResult(newDatasets));
+            if (atLeastOneSucceeded) {
+                const visibleDatasets = await allowDatasetInSearch(dataset.id, false, state.datasets.searchTerm);
+                dispatch(setDatasetSearchResult(visibleDatasets));
             } else if (responders.length) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
                     header: "Error Loading Dataset",
                     show: true
                 };
-                dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                 dispatch(showInfoModal(info));
             }
         })
@@ -147,8 +141,7 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
         newPl.configuration.multirowDatasets.delete(def.id);
         newPl.configuration.singletonDatasets.delete(def.id);
         newPl.display = await removeDataset(newPl.configuration, def) as PatientListRow[];
-        await allowDatasetInSearch(def.id, true);
-        const newDatasets = await searchDatasets(state.datasets.searchTerm);
+        const newDatasets = await allowDatasetInSearch(def.id, true, state.datasets.searchTerm);
         dispatch(setDatasetSearchResult(newDatasets));
         dispatch(setPatientListDisplay(newPl));
     };

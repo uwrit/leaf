@@ -120,7 +120,6 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
-            console.log('initial datasets categorized', datasetsCategorized);
             dispatch(setDatasets(datasets, datasetsCategorized));
             
             /*

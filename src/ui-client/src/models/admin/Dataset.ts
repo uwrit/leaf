@@ -8,10 +8,6 @@
 import { PatientListDatasetShape } from "../patientList/Dataset";
 import { Constraint } from "./Concept";
 
-export interface DatasetQueryConstraint extends Constraint {
-    datasetQueryId: string;
-}
-
 export interface AdminDemographicQuery {
     sqlStatement: string;
     lastChanged: string;
@@ -21,7 +17,7 @@ export interface AdminDemographicQuery {
 export interface AdminDatasetQuery {
     id: string;
     categoryId?: number;
-    constraints: DatasetQueryConstraint[];
+    constraints: Constraint[];
     description?: string;
     name: string;
     shape: PatientListDatasetShape;

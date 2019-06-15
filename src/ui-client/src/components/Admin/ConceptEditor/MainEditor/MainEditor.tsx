@@ -27,10 +27,17 @@ import { setAdminPanelPane } from '../../../../actions/admin/admin';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
-export class MainEditor extends React.PureComponent<Props> {
+interface State {
+    forceValidation: boolean;
+}
+
+export class MainEditor extends React.PureComponent<Props,State> {
     private className = 'concept-editor';
     constructor(props: Props) {
         super(props);
+        this.state = {
+            forceValidation: false
+        }
     }
 
     public render() {
@@ -45,6 +52,7 @@ export class MainEditor extends React.PureComponent<Props> {
             changed,
             changeHandler: this.handleInputChange,
             dispatch,
+            forceValidation: this.state.forceValidation,
             sqlSets: sets,
             sqlConfig: configuration.sql,
             toggleOverlay: toggleOverlay,
@@ -58,10 +66,18 @@ export class MainEditor extends React.PureComponent<Props> {
                 {/* Header */}
                 {sets.size > 0 &&
                 <div className={`${c}-column-right-header`}>
-                    <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddConceptClick}>+ Create New Concept</Button>
-                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
-                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>Delete</Button>
+                    <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddConceptClick}>
+                        + Create New Concept
+                    </Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>
+                        Undo Changes
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>
+                        Save
+                    </Button>
+                    <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>
+                        Delete
+                    </Button>
                 </div>
                 }
 
@@ -108,7 +124,7 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     /* 
-     * Sets optional content if a edit-able Concept is not selected.
+     * Set optional content if a edit-able Concept is not selected.
      */
     private getStatusDependentContent = (state: AdminPanelLoadState, c: string) => {
         if (state === AdminPanelLoadState.LOADING) {
@@ -136,8 +152,20 @@ export class MainEditor extends React.PureComponent<Props> {
         return null;
     }
 
+    /*
+     * Validate that current admin Concept is valid. Called on 'Save' click.
+     */
+    private currentConceptIsValid = (): boolean => {
+        const { currentAdminConcept } = this.props.data.concepts;
+
+        if (!currentAdminConcept) { return false; }
+        if (!currentAdminConcept.uiDisplayName) { return false; }
+        if (!currentAdminConcept.uiDisplayText) { return false; }
+        return true;
+    }
+
     /* 
-     * Handles click on initial startup if no SQL Sets exist.
+     * Handle click on initial startup if no SQL Sets exist.
      */
     private handleCreateSqlSetClick = () => {
         const { dispatch } = this.props;
@@ -155,7 +183,7 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     /* 
-     * Handles tracking of input changes to the Concept, generating cloned, updated
+     * Handle tracking of input changes to the Concept, generating cloned, updated
      * copies of the User and Admin Concepts to the store as edits are made.
      */
     private handleInputChange = (val: any, propName: string) => {
@@ -173,7 +201,7 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     /*
-     * Triggers a fallback to the uneditedSet, undoing any current changes.
+     * Trigger a fallback to the unedited Concept, undoing any current changes.
      */
     private handleUndoChanges = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
@@ -184,10 +212,11 @@ export class MainEditor extends React.PureComponent<Props> {
         } else {
             dispatch(revertAdminAndUserConceptChanges(currentAdminConcept!, currentUserConcept!));
         }
+        this.setState({ forceValidation: false });
     }
 
     /*
-     * Removes an unedited Admin Concept, basically refreshing the left admin pane.
+     * Remove an unedited Admin Concept, basically refreshing the left admin pane.
      */
     private removeUnsavedAdminConcept = () => {
         const { currentUserConcept } = this.props.data.concepts;
@@ -197,16 +226,35 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     /*
-     * Handles initiation of saving async changes and syncing with the DB.
+     * Handle initiation of saving async changes and syncing with the DB.
      */
     private handleSaveChanges = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;
         const { dispatch } = this.props;
-        dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
+        const isValid = this.currentConceptIsValid();
+
+        if (isValid) {
+            dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `One or more fields are missing necessary data. Are you sure you want to save this Concept?`,
+                header: 'Missing Concept data',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
+                    this.setState({ forceValidation: false });
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Save Concept`
+            };
+            dispatch(showConfirmationModal(confirm));
+            this.setState({ forceValidation: true });
+        }
     }
 
     /*
-     * Creates a new unsaved Concept which the admin can immmediately edit and save.
+     * Create a new unsaved Concept which the admin can immmediately edit and save.
      */
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
@@ -228,7 +276,7 @@ export class MainEditor extends React.PureComponent<Props> {
     }
 
     /*
-     * Deletes a Concept, or warns if their are children under it.
+     * Delete a Concept, or warns if their are children under it.
      */
     private handleDeleteConceptClick = () => {
         const { currentAdminConcept, currentUserConcept } = this.props.data.concepts;

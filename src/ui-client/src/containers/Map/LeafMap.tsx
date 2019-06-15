@@ -5,8 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { LatLng, LatLngBounds } from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { LatLng } from 'leaflet';
 import React from 'react';
 import { Map as LeafletMap, TileLayer } from 'react-leaflet';
 import AntPath from 'react-leaflet-ant-path';
@@ -17,12 +16,13 @@ import { antPathOptionTypes } from '../../components/Map/AntPathTypes';
 import EndpointMarker from '../../components/Map/EndpointMarker';
 import EndpointPopup from '../../components/Map/EndpointPopup';
 import { AppState, MapState } from '../../models/state/AppState';
-import { CohortStateType, NetworkCohortState } from '../../models/state/CohortState';
+import { CohortStateType } from '../../models/state/CohortState';
 import { CohortState } from '../../models/state/CohortState';
 import { Viewport} from '../../models/state/Map';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import { CalculateGeodesicLine } from '../../utils/calculateGeodesicLine';
 import computeDimensions from '../../utils/computeDimensions';
+import 'leaflet/dist/leaflet.css';
 import './LeafMap.css'
 
 interface OwnProps {
@@ -97,7 +97,7 @@ export class LeafMap extends React.Component<Props, State> {
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude!, nr.longitude!)} queryState={netCohort!.count.state} />);
             popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
 
-            if (home && nr.id > 0) {
+            if (home && !home.isGateway && nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;
                 const line = CalculateGeodesicLine([ home.latitude, home.longitude ], [ nr.latitude, nr.longitude ]);
                 if (home.enabled) {

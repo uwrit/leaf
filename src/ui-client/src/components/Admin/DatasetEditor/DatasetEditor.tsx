@@ -33,6 +33,7 @@ interface Props {
 }
 
 interface State {
+    forceValidation: boolean;
     shapes: PatientListDatasetShape[];
 }
 
@@ -41,6 +42,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            forceValidation: false,
             shapes: []
         }
     }
@@ -69,7 +71,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     public render() {
         const { data, datasets, dispatch } = this.props;
         const { currentDataset, changed, expectedColumns } = data.datasets;
-        const { shapes } = this.state;
+        const { shapes, forceValidation } = this.state;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
         const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
         let currentCategory = undefined;
@@ -123,6 +125,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                             categories={data.datasetQueryCategories.categories}
                                             dataset={currentDataset}
                                             dispatch={dispatch}
+                                            forceValidation={forceValidation}
                                             inputChangeHandler={this.handleInputChange}
                                             locked={locked}
                                             shapeChangeHandler={this.handleShapeClick}
@@ -184,12 +187,29 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
+     * Validate that current admin Concept is valid. Called on 'Save' click.
+     */
+    private currentDatasetIsValid = (): boolean => {
+        const { currentDataset } = this.props.data.datasets;
+
+        if (!currentDataset) { return false; }
+        if (!currentDataset.name) { return false; }
+
+        /*
+         * No need to check the [sqlStatement], as the missing SQL column
+         * check following this will return granular information on those.
+         */
+        return true;
+    }
+
+    /*
      * Trigger a fallback to unedited, undoing any current changes.
      */
     private handleUndoChanges = () => {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
         dispatch(revertAdminDatasetChanges(datasets.currentDataset!));
+        this.setState({ forceValidation: false });
     }
 
     /*
@@ -199,8 +219,45 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
         const missingCols = datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
+        const isValid = this.currentDatasetIsValid();
+        
+        /*
+         * It's valid and has no missing columns, so save.
+         */
+        if (isValid && !missingCols.length) {
+            if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+            } else {
+                dispatch(saveAdminDataset(datasets.currentDataset!));
+            }
 
-        if (missingCols.length) {
+        /*
+         * One or more fields are missing data.
+         */
+        } else if (!isValid) {
+            const confirm: ConfirmationModalState = {
+                body: `One or more fields are missing necessary data. Are you sure you want to save this Dataset?`,
+                header: 'Missing Dataset data',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                    } else {
+                        dispatch(saveAdminDataset(datasets.currentDataset!));
+                    }
+                    this.setState({ forceValidation: false });
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Save Dataset`
+            };
+            dispatch(showConfirmationModal(confirm));
+            this.setState({ forceValidation: true });
+
+        /*
+         * One or more expected columns are missing.
+         */
+        } else if (missingCols.length) {
             const confirm: ConfirmationModalState = {
                 body: [
                     <p key={1}>Your current SQL Query appears to be missing the following required columns: {missingCols.join(', ')}. </p>,
@@ -221,14 +278,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 yesButtonText: `Yes, I'm sure`
             };
             dispatch(showConfirmationModal(confirm));
-            return;
-        }
-
-        if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
-            dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
-        } else {
-            dispatch(saveAdminDataset(datasets.currentDataset!));
-        }
+        } 
     }
 
     /* 

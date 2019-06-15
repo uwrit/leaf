@@ -8,11 +8,11 @@
 import React from 'react';
 import { Tooltip } from 'reactstrap';
 import { RouteConfig } from '../../config/routes';
-import { AdminPanelConceptEditorPane } from '../../models/state/AdminState';
+import { AdminPanelPane } from '../../models/state/AdminState';
 
 interface Props {
     config: RouteConfig;
-    currentAdminPane: AdminPanelConceptEditorPane;
+    currentAdminPane: AdminPanelPane;
     dispatch: any;
     isActive: boolean;
     clickHandler: (i: number) => void;

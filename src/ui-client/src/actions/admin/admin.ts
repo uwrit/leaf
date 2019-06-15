@@ -65,14 +65,14 @@ export const loadAdminPanelDataIfNeeded = () => {
                  * Finish.
                  */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
-                dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             } catch (err) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error while attempting to load Admin data. Please check the Leaf log files for more information.",
                     header: "Error Loading Admin Data",
                     show: true
                 };
-                dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                 dispatch(showInfoModal(info));
             }
         }

@@ -26,10 +26,10 @@ export const searchDatasets = (searchTerm: string): Promise<DatasetSearchResult>
     });
 };
 
-export const allowDatasetInSearch = (datasetId: string, include: boolean) => {
+export const allowDatasetInSearch = (datasetId: string, include: boolean, searchString: string): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        await engine.allowDatasetInSearch(datasetId, include);
-        resolve();
+        const result = await engine.allowDatasetInSearch(datasetId, include, searchString) as DatasetSearchResult;
+        resolve(result);
     });
 };
 

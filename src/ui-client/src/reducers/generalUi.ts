@@ -39,7 +39,6 @@ import {
  } from '../actions/panels';
 import { GeneralUiState, Routes, NoClickModalStates } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
-import { SET_DATASETS_DISPLAY_ALL } from '../actions/datasets';
 
 export const defaultGeneralUiState = (): GeneralUiState => {
     return {
@@ -129,7 +128,6 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case SET_PANEL_DATE_FILTER:
         case SET_SUBPANEL_INCLUSION:
         case SET_SUBPANEL_MINCOUNT:
-        case SET_DATASETS_DISPLAY_ALL:
         case SET_SUBPANEL_JOIN_SEQUENCE:
         case SELECT_CONCEPT_SPECIALIZATION:
         case DESELECT_CONCEPT_SPECIALIZATION:

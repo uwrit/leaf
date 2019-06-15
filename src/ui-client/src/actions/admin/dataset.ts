@@ -57,7 +57,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
@@ -82,7 +82,7 @@ export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
@@ -117,7 +117,7 @@ export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
                         header: "Error Deleting Dataset",
                         show: true
                     };
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
             );
@@ -196,7 +196,7 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
             }
             dispatch(removeAdminDataset(dataset));
             dispatch(setDatasetSearchResult(results));
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
         }
     };
 };

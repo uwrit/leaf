@@ -65,8 +65,8 @@ export default class DatasetSearchEngineWebWorker {
         return this.postMessage({ message: INDEX_DATASETS, datasets });
     }
 
-    public allowDatasetInSearch = (datasetId: string, allow: boolean) => {
-        return this.postMessage({ message: ALLOW_DATASET_IN_SEARCH, datasetId, allow });
+    public allowDatasetInSearch = (datasetId: string, allow: boolean, searchString: string) => {
+        return this.postMessage({ message: ALLOW_DATASET_IN_SEARCH, datasetId, allow, searchString });
     }
 
     public allowAllDatasets = () => {
@@ -160,11 +160,16 @@ export default class DatasetSearchEngineWebWorker {
          */
         const allowAllDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
-            excluded.clear()
 
-            if (!demographicsAllowed) {
+            if (demographicsAllowed) {
+                allDs = allDs.concat([ ...excluded.values() ]);
+                excluded.clear();
+            } else {
+                excluded.forEach((d) => { if (d.shape !== 3) allDs.push(d) });
+                excluded.clear();
                 excluded.set(demographics.id, demographics);
             }
+            
             const resorted = dedupeAndSort(allDs);
             allDsMap = resorted.categories;
             defaultOrder = resorted.displayOrder;
@@ -177,7 +182,7 @@ export default class DatasetSearchEngineWebWorker {
          * Called as users add/remove datasets from the patient list screen.
          */
         const allowDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, datasetId, allow } = payload;
+            const { datasetId, allow } = payload;
 
             if (allow) {
                 const ds = excluded.get(datasetId!);
@@ -197,7 +202,7 @@ export default class DatasetSearchEngineWebWorker {
             allDsMap = resorted.categories;
             defaultOrder = resorted.displayOrder;
             
-            return { requestId };
+            return searchDatasets(payload);
         };
 
         /*

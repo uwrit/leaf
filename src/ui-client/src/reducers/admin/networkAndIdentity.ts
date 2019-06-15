@@ -92,3 +92,28 @@ export const revertAdminNetworkChanges = (state: AdminState, action: AdminNetwor
         }
     });
 };
+
+export const setAdminNetworkCertModalContent = (state: AdminState, action: AdminNetworkAndIdentityAction): AdminState => {
+    return Object.assign({}, state, {
+        networkAndIdentity: {
+            ...state.networkAndIdentity,
+            modal: {
+                show: true,
+                cert: action.cert,
+                endpoint: action.endpoint
+            }
+        }
+    });
+};
+
+export const setAdminNetworkCertModalShown = (state: AdminState, action: AdminNetworkAndIdentityAction): AdminState => {
+    return Object.assign({}, state, {
+        networkAndIdentity: {
+            ...state.networkAndIdentity,
+            modal: {
+                ...state.networkAndIdentity.modal,
+                show: action.show
+            }
+        }
+    });
+};

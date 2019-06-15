@@ -13,7 +13,6 @@ import { searchDatasets, allowAllDatasets, allowDemographics } from "../services
 export const SET_DATASET = 'SET_DATASET';
 export const SET_DATASET_SELECTED = 'SET_DATASET_SELECTED';
 export const SET_DATASET_DISPLAY = 'SET_DATASET_DISPLAY';
-export const SET_DATASETS_DISPLAY_ALL = 'SET_DATASETS_DISPLAY_ALL';
 export const SET_DATASETS = 'SET_DATASETS';
 export const SET_DATASETS_SEARCH_TERM = 'SET_DATASET_SEARCH_TERM';
 export const SET_DATASETS_SEARCH_RESULT = 'SET_DATASET_SEARCH_RESULT';
@@ -38,7 +37,6 @@ export interface DatasetAction {
 export const searchPatientListDatasets = (searchTerm: string) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await searchDatasets(searchTerm);
-        console.log('search results', results);
         dispatch(setDatasetSearchResult(results));
     };
 };
@@ -46,7 +44,6 @@ export const searchPatientListDatasets = (searchTerm: string) => {
 export const resetPatientListDatasets = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowAllDatasets();
-        console.log('datasets reset requested', results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -55,7 +52,6 @@ export const resetPatientListDatasets = () => {
 export const allowDemographicsDatasetInSearch = (allow: boolean) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const results = await allowDemographics(allow);
-        console.log('allow demographics', allow, results);
         dispatch(setDatasetSearchResult(results));
         dispatch(setDatasetSearchTerm(''));
     };
@@ -95,12 +91,6 @@ export const setDatasetDisplay = (dataset: PatientListDatasetQuery): DatasetActi
     return {
         dataset,
         type: SET_DATASET_DISPLAY
-    };
-};
-
-export const setDatasetDisplayAll = (): DatasetAction  => {
-    return {
-        type: SET_DATASETS_DISPLAY_ALL
     };
 };
 

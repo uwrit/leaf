@@ -47,7 +47,7 @@ export interface ConfirmationModalState {
 }
 
 export interface NoClickModalState {
-    message: string;
+    message?: string;
     state: NoClickModalStates;
 }
 

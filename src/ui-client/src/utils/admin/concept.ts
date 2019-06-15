@@ -67,17 +67,6 @@ export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, 
 };
 
 /*
- * Check if a concept is valid by checking for
- * errored inputs in the DOM. 
- * TODO: this is quite a flawed approach, make a proper
- * analysis method of the object in the future.
- */
-export const conceptEditorValid = () => {
-    const errors = document.querySelectorAll('.concept-editor .leaf-input.error');
-    return errors.length === 0;
-};
-
-/*
  * Check if there are any changes to a ConceptSqlSet.
  * Note that because calling 'return' in Map.forEach doesn't
  * actually finish the function (as it does in a normal 

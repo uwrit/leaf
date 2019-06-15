@@ -8,7 +8,7 @@
 import React from 'react';
 import { Section } from '../../Section/Section';
 import { SectionProps } from '../Props';
-import { ConstraintType, ConceptConstraint, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
+import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
 import { Constraint } from './Constraint';
 
 interface Props {
@@ -58,13 +58,13 @@ export class Constraints extends React.PureComponent<Props> {
     private handleConstraintChange = (idx: number, newConstraint: ConstraintModel) => {
         const { changeHandler, adminConcept } = this.props.data;
         const constraints = adminConcept!.constraints.slice();
-        constraints.splice(idx, 1, (newConstraint as ConceptConstraint));
+        constraints.splice(idx, 1, (newConstraint as ConstraintModel));
         changeHandler(constraints, this.propName);
     }
 
     private handleAddNewClick = () => {
         const { changeHandler, adminConcept } = this.props.data;
-        const newConstraint: ConceptConstraint = { conceptId: adminConcept!.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const newConstraint: ConstraintModel = { resourceId: adminConcept!.id, constraintId: ConstraintType.User, constraintValue: '' };
         const constraints = adminConcept!.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);

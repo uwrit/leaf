@@ -6,9 +6,9 @@
  */
 
 import React from 'react';
-import { Container, Row, Col, Collapse } from 'reactstrap';
+import { Container, Row, Col, Collapse, Button } from 'reactstrap';
 import { TextArea } from '../../Section/TextArea';
-import { setAdminNetworkEndpoint, removeAdminNetworkEndpoint, deleteNetworkEndpoint, attemptRemoteLeafCertCall } from '../../../../actions/admin/networkAndIdentity';
+import { setAdminNetworkEndpoint, removeAdminNetworkEndpoint, deleteNetworkEndpoint, attemptLoadRemoteLeafCert } from '../../../../actions/admin/networkAndIdentity';
 import { Checkbox } from '../../Section/Checkbox';
 import { FaChevronDown } from 'react-icons/fa';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
@@ -18,6 +18,7 @@ import { NetworkEndpoint } from '../../../../models/admin/Network';
 interface Props {
     endpoint: NetworkEndpoint;
     dispatch: any;
+    forceValidation: boolean;
 }
 
 interface State {
@@ -34,7 +35,7 @@ export class Endpoint extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { endpoint } = this.props;
+        const { endpoint, forceValidation } = this.props;
         const { showDetails } = this.state;
         const c = this.className;
         const toggleClasses = [ `${c}-dropdown-toggle` ];
@@ -63,14 +64,14 @@ export class Endpoint extends React.PureComponent<Props,State> {
                     <Row>
                         <Col md={6}>
                             <TextArea
-                                changeHandler={this.handleInputChange} propName={'name'} value={endpoint.name}
-                                label='Name' subLabel='Name of endpoint (not shown to users)' required={true}
+                                changeHandler={this.handleInputChange} propName={'name'} value={endpoint.name} forceValidation={forceValidation}
+                                label='Name' subLabel='Name of endpoint (not shown to users)' required={true} errorText='Enter a Name'
                             />
                         </Col>
                         <Col md={6}>
                             <TextArea 
-                                changeHandler={this.handleInputChange} propName={'address'} value={endpoint.address}
-                                label='URL' subLabel='Web address (eg, https://leaf.university.edu)' required={true}
+                                changeHandler={this.handleInputChange} propName={'address'} value={endpoint.address} forceValidation={forceValidation}
+                                label='URL' subLabel='Web address (eg, https://leaf.university.edu)' required={true} errorText='Enter a URL'
                             />
                         </Col>
                     </Row>
@@ -102,31 +103,31 @@ export class Endpoint extends React.PureComponent<Props,State> {
                     </div>
 
                     {/* Test Connection */}
-                    <div className={`${c}-cert-test`} onClick={this.handleLoadCertInfoTest}>
-                        <span>Load Certificate Information</span>
-                    </div>
+                    <Button className={`${c}-cert-test leaf-button leaf-button-addnew`} onClick={this.handleLoadCertInfoTest}>
+                        Load Certificate Information
+                    </Button>
 
                     {/* Certs */}
                     <Collapse isOpen={showDetails} className={`${c}-cert-collapse`}>
                         <Row className={`${c}-cert-container`}>
                             <Col md={6}>
                                 <TextArea
-                                    changeHandler={this.handleInputChange} propName={'keyId'} value={endpoint.keyId}
-                                    label='Key ID' subLabel='Key ID for this endpoint' required={true} locked={true}
+                                    changeHandler={this.handleInputChange} propName={'keyId'} value={endpoint.keyId} forceValidation={forceValidation}
+                                    label='Key ID' subLabel='Key ID for this endpoint' required={true} locked={true} errorText='Load a Key ID'
                                 />
                             </Col>
                             <Col md={6}>
                                 <TextArea
-                                    changeHandler={this.handleInputChange} propName={'issuer'} value={endpoint.issuer}
-                                    label='Issuer' subLabel='Issuer for this endpoint' required={true} locked={true}
+                                    changeHandler={this.handleInputChange} propName={'issuer'} value={endpoint.issuer} forceValidation={forceValidation}
+                                    label='Issuer' subLabel='Issuer for this endpoint' required={true} locked={true} errorText='Load an Issuer'
                                 />
                             </Col>
                         </Row>
                         <Row>
                             <Col md={12}>
                                 <TextArea
-                                    changeHandler={this.handleInputChange} propName={'certificate'} value={endpoint.certificate}
-                                    label='Certificate' subLabel='Certificate for this endpoint' required={true} locked={true}
+                                    changeHandler={this.handleInputChange} propName={'certificate'} value={endpoint.certificate} forceValidation={forceValidation}
+                                    label='Certificate' subLabel='Certificate for this endpoint' required={true} locked={true} errorText='Load a Certificate'
                                 />
                             </Col>
                         </Row>
@@ -182,6 +183,6 @@ export class Endpoint extends React.PureComponent<Props,State> {
      */
     private handleLoadCertInfoTest = () => {
         const { endpoint, dispatch } = this.props;
-        dispatch(attemptRemoteLeafCertCall(endpoint));
+        dispatch(attemptLoadRemoteLeafCert(endpoint));
     }
 }

@@ -111,3 +111,9 @@
     color: rgba(221, 41, 28, 0.699);
     margin-left: 4px;
 }
+
+/* Error */
+.admin-panel .validation-error {
+    color: rgba(221, 41, 28, 0.699);
+    font-size: 0.9rem;
+}
