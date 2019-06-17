@@ -20,6 +20,7 @@ using Services;
 using Services.Authorization;
 using API.Jwt;
 using API.DTO.User;
+using API.DTO.Config;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers

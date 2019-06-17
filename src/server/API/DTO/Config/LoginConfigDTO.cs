@@ -6,7 +6,7 @@
 using System;
 using Model.Options;
 
-namespace API.DTO.User
+namespace API.DTO.Config
 {
     public class LoginConfigDTO
     {
