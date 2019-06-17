@@ -309,8 +309,8 @@ SQL Columns ([source](https://github.com/uwrit/leaf/blob/master/src/server/Model
 | personId          | nvarchar  | X        | X      |
 | addressPostalCode | nvarchar  | X        |        |
 | addressState      | nvarchar  | X        |        |
-| birthDate         | datetime  | X        |        |
-| deceasedDateTime  | datetime  | X        |        |
+| birthDate         | datetime  | X        | X      |
+| deceasedDateTime  | datetime  | X        | X      |
 | ethnicity         | nvarchar  | X        |        |
 | gender            | nvarchar  | X        |        |
 | deceasedBoolean   | bit       | X        |        |
