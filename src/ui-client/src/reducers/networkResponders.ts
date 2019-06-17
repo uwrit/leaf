@@ -22,8 +22,9 @@ function setResponders(state: NetworkResponderMap, eps: NetworkIdentity[]): Netw
     const newState = new Map(state);
     eps!.forEach(e => {
         // Leaflet expect longitudes to be negative
-        if (e.longitude && e.longitude < 0) { e.longitude = -e.longitude; }
-        newState.set(e.id, e)
+        let longitude = e.longitude;
+        if (longitude && longitude > 0) { longitude = -longitude; }
+        newState.set(e.id, { ...e, longitude })
     });
     return newState;
 }

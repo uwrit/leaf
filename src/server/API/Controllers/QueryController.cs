@@ -108,6 +108,11 @@ namespace API.Controllers
                     Query = new QuerySaveResultDTO(result.Result)
                 });
             }
+            catch (ArgumentException ae)
+            {
+                log.LogError("Invalid save query model. Model:{Model} Error:{Error}", querySave, ae.Message);
+                return BadRequest();
+            }
             catch (LeafCompilerException ce)
             {
                 log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);

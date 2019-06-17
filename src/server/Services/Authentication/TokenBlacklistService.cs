@@ -24,18 +24,15 @@ namespace Services.Authentication
 
         readonly AppDbOptions opts;
         readonly ITokenBlacklistCache blacklistCache;
-        readonly ILogger<TokenBlacklistService> logger;
 
-        public TokenBlacklistService(IOptions<AppDbOptions> dbOpts, ITokenBlacklistCache blacklistCache, ILogger<TokenBlacklistService> logger)
+        public TokenBlacklistService(IOptions<AppDbOptions> dbOpts, ITokenBlacklistCache blacklistCache)
         {
             opts = dbOpts.Value;
             this.blacklistCache = blacklistCache;
-            this.logger = logger;
         }
 
         public async Task Blacklist(BlacklistedToken token)
         {
-            logger.LogInformation("Blacklisting Token: {@Token}", token);
             blacklistCache.Blacklist(token);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -52,7 +49,6 @@ namespace Services.Authentication
 
         public async Task<IEnumerable<BlacklistedToken>> GetBlacklist()
         {
-            logger.LogInformation("Getting fresh TokenBlacklist");
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();

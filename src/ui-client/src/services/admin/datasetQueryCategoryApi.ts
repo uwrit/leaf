@@ -8,7 +8,6 @@
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from '../HttpFactory';
 import { DatasetQueryCategory } from '../../models/admin/Dataset';
-import { sleep } from '../../utils/Sleep';
 
 /*
  * Gets all current Dataset Query Categories.
@@ -19,14 +18,6 @@ export const getDatasetQueryCategories = async (state: AppState): Promise<Datase
     const resp = await http.get('api/admin/datasetcategory');
     const cats = resp.data as DatasetQueryCategory[];
     return cats;
-    /*
-    const cats: DatasetQueryCategory[] = [
-        { id: 1, category: 'Encounters' },
-        { id: 2, category: 'Labs' },
-        { id: 3, category: 'Procedures' },
-    ];
-    return cats;
-    */
 };
 
 /*

@@ -20,6 +20,7 @@ using Services;
 using Services.Authorization;
 using API.Jwt;
 using API.DTO.User;
+using API.DTO.Config;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
@@ -172,6 +173,7 @@ namespace API.Controllers
             var token = BlacklistedToken.FromUTCTicks(nonce, ticks);
             try
             {
+                logger.LogInformation("Blacklisting Token: {@Token}", token);
                 await blacklistService.Blacklist(token);
             }
             catch (Exception e)

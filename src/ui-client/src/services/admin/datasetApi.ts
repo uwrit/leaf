@@ -7,7 +7,7 @@
 
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
-import { AdminDatasetQuery } from '../../models/admin/Dataset';
+import { AdminDatasetQuery, AdminDemographicQuery } from '../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../models/patientList/Dataset';
 import { sleep } from '../../utils/Sleep';
 
@@ -72,8 +72,17 @@ export const deleteDataset = async (state: AppState, dataset: AdminDatasetQuery)
 export const getAdminDemographicsDataset = async (state: AppState): Promise<AdminDatasetQuery> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    await sleep(1000);
-    return demographics;
+    const resp = await http.get(`api/admin/demographics`);
+    const ds = resp.data as AdminDemographicQuery;
+    const converted: AdminDatasetQuery = {
+        ...ds,
+        id: 'demographics',
+        constraints: [],
+        name: 'Basic Demographics',
+        shape: PatientListDatasetShape.Demographics,
+        tags: []
+    };
+    return converted;
 };
 
 /*
@@ -82,6 +91,13 @@ export const getAdminDemographicsDataset = async (state: AppState): Promise<Admi
 export const upsertDemographicsDataset = async (state: AppState, dataset: AdminDatasetQuery): Promise<AdminDatasetQuery> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    await sleep(1000);
-    return dataset;
+    const resp = await http.put(`api/admin/demographics`, {
+        sqlStatement: dataset.sqlStatement
+    });
+    const ds = resp.data as AdminDemographicQuery;
+    const converted: AdminDatasetQuery = {
+        ...dataset,
+        ...ds,
+    };
+    return converted;
 };

@@ -26,13 +26,9 @@ export enum AdminPanelLoadState {
 
 export enum AdminPanelPane {
     CONCEPTS = 1,
-    DATASETS = 2,
-    NETWORK = 3
-}
-
-export enum AdminPanelConceptEditorPane {
-    MAIN = 1,
-    SQL_SET = 2
+    SQL_SETS = 2,
+    DATASETS = 3,
+    NETWORK = 4
 }
 
 export interface AdminConceptState {
@@ -88,7 +84,6 @@ export interface AdminNetworkAndIdentityState {
 
 export default interface AdminState {
     activePane: AdminPanelPane;
-    activeSubPane: number;
     concepts: AdminConceptState;
     conceptEvents: AdminConceptEventState;
     configuration: AdminConfiguration;

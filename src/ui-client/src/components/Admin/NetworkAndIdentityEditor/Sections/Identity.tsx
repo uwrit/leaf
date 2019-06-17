@@ -17,7 +17,7 @@ interface Props {
     identity: NetworkIdentity;
 }
 
-export class Display extends React.PureComponent<Props> {
+export class Identity extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
     }
@@ -25,7 +25,7 @@ export class Display extends React.PureComponent<Props> {
     public render() {
         const { changeHandler, identity } = this.props;
         return (
-            <Section header='Display'>
+            <Section header={'Instance Identity & Display'}>
 
                 {/* Name and Abbreviation */}
                 <Row>

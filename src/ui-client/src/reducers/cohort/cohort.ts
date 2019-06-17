@@ -224,21 +224,38 @@ const setNetworkCohortDemographic = (state: CohortState, action: CohortVisualiza
 
 const errorCohortDemographics = (state: CohortState, action: CohortCountAction): CohortState => {
     const network = new Map(state.networkCohorts);
-    const clone = Object.assign({}, network.get(action.id)!, {
-        patientList: {
-            ...defaultPatientListState(),
-            state: CohortStateType.IN_ERROR
-        },
-        visualization: {
-            ...defaultVisualizationState,
-            state: CohortStateType.IN_ERROR
-        }
-    });
-    network.set(clone.id, clone); 
 
-    return Object.assign({}, state, {
-        networkCohorts: network
-    }) as CohortState;
+    /*
+     * If it has an ID, then an individual node failed.
+     */
+    if (action.id) {
+        const clone = Object.assign({}, network.get(action.id)!, {
+            patientList: {
+                ...defaultPatientListState(),
+                state: CohortStateType.IN_ERROR
+            },
+            visualization: {
+                ...defaultVisualizationState,
+                state: CohortStateType.IN_ERROR
+            }
+        });
+        network.set(clone.id, clone);
+        return Object.assign({}, state, { networkCohorts: network }) as CohortState;
+    /*
+     * Else all nodes failed.
+     */
+    } else {
+        return Object.assign({}, state, {
+            patientList: {
+                ...state.patientList,
+                state: CohortStateType.IN_ERROR
+            },
+            visualization: {
+                ...state.visualization,
+                state: CohortStateType.IN_ERROR
+            }
+        }) as CohortState;
+    };
 };
 
 type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction;

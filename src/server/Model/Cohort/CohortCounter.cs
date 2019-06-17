@@ -98,11 +98,11 @@ namespace Model.Cohort
         /// <exception cref="System.Data.Common.DbException"/>
         async Task<Result> GatewayCount(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
-            log.LogInformation("CohortCounter.GatewayCount starting. DTO:{@DTO}", queryDTO);
+            log.LogInformation("GatewayCount starting. DTO:{@DTO}", queryDTO);
             Ensure.NotNull(queryDTO, nameof(queryDTO));
 
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
-            log.LogInformation("CohortCounter.GatewayCount conversion done. ValidationContext:{@ValidationContext}", ctx);
+            log.LogInformation("GatewayCount panel validation context. Context:{@Context}", ctx);
 
             if (!ctx.PreflightPassed)
             {
@@ -148,11 +148,11 @@ namespace Model.Cohort
         /// <exception cref="System.Data.Common.DbException"/>
         async Task<Result> FullCount(IPatientCountQueryDTO queryDTO, CancellationToken token)
         {
-            log.LogInformation("CohortCounter.FullCount starting. DTO:{@DTO}", queryDTO);
+            log.LogInformation("FullCount starting. DTO:{@DTO}", queryDTO);
             Ensure.NotNull(queryDTO, nameof(queryDTO));
 
             var ctx = await converter.GetPanelsAsync(queryDTO, token);
-            log.LogInformation("CohortCounterl.FullCount conversion done. ValidationContext:{@ValidationContext}", ctx);
+            log.LogInformation("FullCount panel validation context. Context:{@Context}", ctx);
 
             if (!ctx.PreflightPassed)
             {
@@ -164,8 +164,9 @@ namespace Model.Cohort
 
             var query = validator.Validate(ctx);
 
+            log.LogInformation("FullCount cohort started.");
             var cohort = await counter.GetPatientCohortAsync(query, token);
-            log.LogInformation("CohortCounter.FullCount cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
+            log.LogInformation("FullCount cohort retrieved. Cohort:{@Cohort}", new { cohort.Count, cohort.SqlStatements });
 
             token.ThrowIfCancellationRequested();
 
@@ -187,8 +188,9 @@ namespace Model.Cohort
         {
             try
             {
+                log.LogInformation("Cohort caching started.");
                 var qid = await cohortCache.CreateUnsavedQueryAsync(cohort, user);
-                log.LogInformation("CohortCounter caching complete. QueryId:{QueryId}", qid);
+                log.LogInformation("Cohort caching complete. QueryId:{QueryId}", qid);
                 return qid;
             }
             catch (InvalidOperationException ie)

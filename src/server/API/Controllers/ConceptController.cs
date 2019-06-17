@@ -35,8 +35,7 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptHint>>> SearchHints(
             [FromQuery] Guid? rootParentId,
             [FromQuery] string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {
@@ -58,8 +57,7 @@ namespace API.Controllers
         [HttpGet("search/equivalent")]
         public async Task<ActionResult<ConceptEquivalentHint>> SearchEquivalent(
             string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {

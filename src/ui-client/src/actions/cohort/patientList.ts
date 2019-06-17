@@ -113,7 +113,12 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
         }))
         .then( async () => {
             if (atLeastOneSucceeded) { 
-                allowDatasetInSearch(dataset.id, false);
+
+                /*
+                 * Disallow the added dataset from search results,
+                 * then update the currently shown datasets.
+                 */
+                await allowDatasetInSearch(dataset.id, false);
                 const newDatasets = await searchDatasets(state.datasets.searchTerm);
                 dispatch(setDatasetSearchResult(newDatasets));
             } else if (responders.length) {
