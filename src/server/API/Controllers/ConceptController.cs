@@ -35,8 +35,7 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptHint>>> SearchHints(
             [FromQuery] Guid? rootParentId,
             [FromQuery] string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {
