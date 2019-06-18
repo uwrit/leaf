@@ -7,7 +7,7 @@
 
 /* Concept Tree */
 .concept-tree {
-    height: 85vh;
+    height: calc(100vh - 115px);
     text-align: left;
     overflow-y: auto;
 }
