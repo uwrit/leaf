@@ -49,7 +49,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-column-left-overlay ${showSqlPreview || showPanelPreview ? 'show' : ''}`}></div>
                             <ConceptColumnContainer />
                         </Col>
-                        <div className={`${c}-column-right admin-panel-editor`}>
+                        <div className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
                             <MainEditor 
                                 data={data} dispatch={dispatch} 
                                 togglePanelPreview={this.togglePanelPreview} 

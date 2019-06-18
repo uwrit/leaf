@@ -97,7 +97,7 @@ class Visualize extends React.Component<Props, State> {
         } 
 
         return  (
-            <div className={`${c}-container`}>
+            <div className={`${c}-container scrollable-offset-by-header`}>
                 <AggregateDemographics 
                     cohort={cohort} 
                     height={demogHeight}

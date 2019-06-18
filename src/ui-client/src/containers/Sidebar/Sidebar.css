@@ -11,6 +11,7 @@
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;  
     float: left;
     height: 100%;
+    margin-top: 55px;
     position: fixed;
     z-index: 99;
 }

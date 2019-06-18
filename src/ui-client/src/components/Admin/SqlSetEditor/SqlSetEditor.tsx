@@ -43,7 +43,7 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
         const evs: ConceptEvent[] = [ ...data.conceptEvents.events.values() ];
         
         return (
-            <div className={`${c}-container admin-panel-editor`}>
+            <div className={`${c}-container admin-panel-editor scrollable-offset-by-header`}>
 
                 {/* Header */}
                 <div className={`${c}-toprow`}>

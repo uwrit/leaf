@@ -20,7 +20,7 @@ export class FindPatients extends React.PureComponent {
                     <Col md={4} lg={4} xl={5} className="find-patients-column-left">
                         <ConceptColumnContainer />
                     </Col>
-                    <Col md={8} lg={8} xl={7} className="find-patients-column-right">
+                    <Col md={8} lg={8} xl={7} className="find-patients-column-right scrollable-offset-by-header">
                         <PanelGroupColumn />
                     </Col>
                 </Row>

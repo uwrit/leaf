@@ -71,7 +71,6 @@
 /* Right Column */
 .concept-editor-column-right {
     box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
-    height: 100vh !important;
     outline: none;
     padding: 0;
     position: fixed;

@@ -99,7 +99,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             />
 
                         </Col>
-                        <div className={`${c}-column-right admin-panel-editor`}>
+                        <div className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
 
                             {/* Failure messages, etc. */}
                             {this.getStatusDependentContent(data.datasets.state, 'concept-editor')}
