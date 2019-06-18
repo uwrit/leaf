@@ -62,7 +62,7 @@ class PatientList extends React.PureComponent<Props, State> {
     public render() {
         const { auth, exportState, cohort, datasets, isIdentified, patientList, responders, dispatch, showExportModal } = this.props;
         const c = this.className;
-        const classes = [ `${c}-container` ];
+        const classes = [ `${c}-container`, 'scrollable-offset-by-header' ];
         const datasetDefs: PatientListDatasetDefinition[] = [];
         patientList.configuration.singletonDatasets.forEach((d: PatientListDatasetDefinition) => datasetDefs.push(d));
         

@@ -39,6 +39,7 @@
 .sqlset-editor-toprow {
     background-color: rgb(250, 250, 250);
     box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 75.5px;
     margin-bottom: 6px;
     padding: 20px;
     z-index: 101;
@@ -63,6 +64,7 @@
 
 /* Table */
 .sqlset-editor-table {
+    height: calc(100vh - 55px - 75.5px);
     overflow-x: hidden;
     padding: 0 20% !important;
 }

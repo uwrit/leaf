@@ -68,11 +68,11 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                         </Col>
 
                         {/* Endpoints */}
-                        <Col md={5} className={`${c}-column-right admin-panel-editor`}>
+                        <Col md={5} className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
                             <div>
                                 <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddEndpointClick}>+ Add New Networked Leaf Instance</Button>
                             </div>
-                            <div className={`${c}-column-right endpoint-container`}>
+                            <div className={`${c}-endpoint-container`}>
                                 {[ ...endpoints.values() ].map((e) => (
                                     <Endpoint key={e.id} dispatch={dispatch} endpoint={e} forceValidation={forceValidation} />
                                 ))}
