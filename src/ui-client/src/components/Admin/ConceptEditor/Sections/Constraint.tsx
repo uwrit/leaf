@@ -16,6 +16,7 @@ interface Props {
     deleteHandler: (idx: number) => any;
     constraint: ConstraintModel;
     index: number;
+    forceValidation: boolean;
 }
 
 interface State {
@@ -32,9 +33,12 @@ export class Constraint extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { constraint } = this.props;
+        const { constraint, forceValidation } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
+        const placeholder = forceValidation && !constraint.constraintValue
+            ? 'Enter a valid name'
+            : '';
 
         return (
             <FormGroup>
@@ -55,7 +59,7 @@ export class Constraint extends React.PureComponent<Props,State> {
                     </Dropdown>
                     <TextArea 
                         changeHandler={this.handleConstraintValueChange} propName={'constraintValue'} 
-                        value={constraint.constraintValue} required={true}
+                        value={constraint.constraintValue} required={true} placeholder={placeholder}
                     />
                     <div className={`${c}-constraint-delete`} onClick={this.handleDeleteClick}>
                         <span>Delete</span>

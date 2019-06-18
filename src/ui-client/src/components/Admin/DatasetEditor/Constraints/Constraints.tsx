@@ -13,6 +13,7 @@ import { Constraint } from '../../ConceptEditor/Sections/Constraint';
 interface Props {
     changeHandler: (constraints: ConstraintModel[], propName: string) => any;
     dataset: AdminDatasetQuery;
+    forceValidation: boolean;
     locked?: boolean;
 }
 
@@ -24,7 +25,7 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { dataset, locked } = this.props;
+        const { dataset, locked, forceValidation } = this.props;
         const c = this.className;
 
         return (
@@ -34,7 +35,7 @@ export class Constraints extends React.PureComponent<Props> {
                     <div className={`${c}-constraints-container`}>
                         {dataset.constraints.map((constraint, i) => 
                             <Constraint 
-                                constraint={constraint} index={i} key={i}
+                                constraint={constraint} index={i} key={i} forceValidation={forceValidation}
                                 changeHandler={this.handleConstraintChange} deleteHandler={this.handleConstraintDelete} 
                             />
                         )}

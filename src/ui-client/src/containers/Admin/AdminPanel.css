@@ -53,6 +53,10 @@
     margin-top: 6px !important;
 }
 
+.admin-panel-editor .leaf-input.error::placeholder {
+    color: rgba(255, 0, 0, 0.527) !important;
+}
+
 /* Checkbox */
 .admin-panel-checkbox {
     border-bottom: 1px solid rgba(0,0,0,0.04);

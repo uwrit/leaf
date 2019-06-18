@@ -12,8 +12,8 @@ import { Concept, PatientCountPerYear, PatientCountPerYearGrouped, DisplayablePa
 import { formatLargeNumber, formatSmallNumber } from '../../../utils/formatNumber';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import TextareaAutosize from 'react-textarea-autosize';
-import './LearnMoreButton.css';
 import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
+import './LearnMoreButton.css';
 
 interface Props {
     concept: Concept;
@@ -102,7 +102,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             <ResponsiveContainer height={this.height}>
                             <BarChart 
                                 data={data} 
-                                barCategoryGap={1} 
+                                barCategoryGap={5} 
                                 className={`${c}-chart`}
                                 margin={this.margin}>
                                 <XAxis 
