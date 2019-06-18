@@ -160,7 +160,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                             </Col>
                                             <Col md={6}>
                                                 <Section header='Access Restrictions'>
-                                                    <Constraints dataset={currentDataset} changeHandler={this.handleInputChange} locked={locked}/>
+                                                    <Constraints 
+                                                        dataset={currentDataset} 
+                                                        changeHandler={this.handleInputChange} 
+                                                        forceValidation={forceValidation}
+                                                        locked={locked}
+                                                    />
                                                 </Section>
                                             </Col>
                                         </Row>
@@ -214,6 +219,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
         if (!currentDataset) { return false; }
         if (!currentDataset.name) { return false; }
+        for (const constraint of currentDataset.constraints) {
+            if (!constraint.constraintValue) { return false; }
+        }
 
         /*
          * No need to check the [sqlStatement], as the missing SQL column

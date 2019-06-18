@@ -161,6 +161,9 @@ export class MainEditor extends React.PureComponent<Props,State> {
         if (!currentAdminConcept) { return false; }
         if (!currentAdminConcept.uiDisplayName) { return false; }
         if (!currentAdminConcept.uiDisplayText) { return false; }
+        for (const constraint of currentAdminConcept.constraints) {
+            if (!constraint.constraintValue) { return false; }
+        }
         return true;
     }
 

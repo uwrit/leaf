@@ -23,7 +23,7 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { adminConcept } = this.props.data;
+        const { adminConcept, forceValidation } = this.props.data;
         const c = this.className;
 
         return (
@@ -34,7 +34,7 @@ export class Constraints extends React.PureComponent<Props> {
                     <div className={`${c}-constraints-container`}>
                         {adminConcept!.constraints.map((constraint, i) => 
                             <Constraint 
-                                constraint={constraint} index={i} key={i}
+                                constraint={constraint} index={i} key={i} forceValidation={forceValidation}
                                 changeHandler={this.handleConstraintChange} deleteHandler={this.handleConstraintDelete} 
                             />
                         )}

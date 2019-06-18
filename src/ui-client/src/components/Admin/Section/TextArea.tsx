@@ -20,7 +20,7 @@ export class TextArea extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { className, label, subLabel, locked, value, required, onClick, forceValidation, errorText } = this.props;
+        const { className, label, subLabel, locked, value, required, onClick, forceValidation, errorText, placeholder } = this.props;
         const classes = [ 'leaf-input' ];
         const valid = !required ? true : !!value;
         let val = value || '';
@@ -52,6 +52,7 @@ export class TextArea extends React.PureComponent<Props> {
                         onClick={onClick}
                         onFocus={this.handleFocus}
                         onKeyDown={this.handleKeydown}
+                        placeholder={placeholder}
                         readOnly={locked}
                         spellCheck={false}
                         value={val}
