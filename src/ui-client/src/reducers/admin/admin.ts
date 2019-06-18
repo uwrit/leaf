@@ -85,6 +85,7 @@ import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventCh
 import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql } from "./dataset";
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
 import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, removeAdminNetworkEndpoint, setAdminNetworkCertModalContent, setAdminNetworkCertModalShown, revertAdminNetworkChanges } from "./networkAndIdentity";
+import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -114,6 +115,14 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             expectedColumns: [],
             datasets: new Map(),
+            demographicsDataset: { 
+                id: '',
+                constraints: [],
+                name: 'Basic Demographics',
+                shape: PatientListDatasetShape.Demographics,
+                sqlStatement: '',
+                tags: []
+            },
             sqlColumns: new Set(),
             state: AdminPanelLoadState.NOT_LOADED
         },
