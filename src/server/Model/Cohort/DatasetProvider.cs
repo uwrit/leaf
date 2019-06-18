@@ -74,7 +74,7 @@ namespace Model.Cohort
             result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
-                log.LogError("Demographics compiler context error. State:{State}", validationContext.State);
+                log.LogError("Dataset compiler context error. State:{State}", validationContext.State);
                 return result;
             }
 

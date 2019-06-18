@@ -10,13 +10,14 @@ import { generate as generateId } from 'shortid';
 import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
-const INDEX_DATASETS = 'INDEX_DATASETS';
+const REINDEX_DATASETS = 'REINDEX_DATASETS';
 const ALLOW_DATASET_IN_SEARCH = 'ALLOW_DATASET_IN_SEARCH';
 const ALLOW_ALL_DATASETS = 'ALLOW_ALL_DATASETS';
-const ALLOW_DEMOGRAPHICS = 'ALLOW_DEMOGRAPHICS';
+const SET_ADMIN_MODE = 'SET_ADMIN_MODE';
 const SEARCH_DATASETS = 'SEARCH_DATASETS';
 
 interface InboundMessagePartialPayload {
+    admin?: boolean;
     allow?: boolean;
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
@@ -49,7 +50,7 @@ export default class DatasetSearchEngineWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([INDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, ALLOW_DEMOGRAPHICS])}
+            ${this.addMessageTypesToContext([REINDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, SET_ADMIN_MODE])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -61,8 +62,8 @@ export default class DatasetSearchEngineWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public indexDatasets = (datasets: PatientListDatasetQuery[]) => {
-        return this.postMessage({ message: INDEX_DATASETS, datasets });
+    public reindexDatasets = (datasets: PatientListDatasetQuery[]) => {
+        return this.postMessage({ message: REINDEX_DATASETS, datasets });
     }
 
     public allowDatasetInSearch = (datasetId: string, allow: boolean, searchString: string) => {
@@ -73,8 +74,8 @@ export default class DatasetSearchEngineWebWorker {
         return this.postMessage({ message: ALLOW_ALL_DATASETS });
     }
 
-    public allowDemographics = (allow: boolean) => {
-        return this.postMessage({ message: ALLOW_DEMOGRAPHICS, allow });
+    public setAdminMode = (admin: boolean) => {
+        return this.postMessage({ message: SET_ADMIN_MODE, admin });
     }
 
     public searchDatasets = (searchString: string) => {
@@ -112,7 +113,7 @@ export default class DatasetSearchEngineWebWorker {
 
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
-                case INDEX_DATASETS:
+                case REINDEX_DATASETS:
                     return reindexCacheFromExternal(payload);
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
@@ -120,43 +121,63 @@ export default class DatasetSearchEngineWebWorker {
                     return allowDataset(payload);
                 case ALLOW_ALL_DATASETS:
                     return allowAllDatasets(payload);
-                case ALLOW_DEMOGRAPHICS:
-                    return allowDemographics(payload);
+                case SET_ADMIN_MODE:
+                    return setAdminMode(payload);
                 default:
                     return null;
             }
         };
 
-        // Dataset cache
+        /*
+         * Shared cache.
+         */
         const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
-        let shadowExcluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
         let excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
-        let demographicsAllowed = false;
-        let allDs: PatientListDatasetQuery[] = [];
-        let allDsMap: Map<string, CategorizedDatasetRef> = new Map();
-        let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
-        
-        /*
-         * Set the special demographics dataset to be included in 
-         * search results. This is used in the admin panel and ensure
-         * that users don't see demographics when navigating the patient list.
-         */
-        const allowDemographics = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, allow } = payload;
+        let allDs: Map<string, PatientListDatasetQuery> = new Map();
 
-            if (allow) {
-                shadowExcluded = new Map(excluded);
-                excluded.clear();
-            } else {
-                excluded = new Map(shadowExcluded);
-                excluded.set(demographics.id, demographics);
-            }
-            demographicsAllowed = allow!;
-            reindexCacheFromLocal(payload);
-            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
+        /*
+         * Admin-facing cache.
+         */
+        let isAdmin = false;
+        let allCatDsAdmin: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrderAdmin: Map<string, PatientListDatasetQueryIndex> = new Map();
+
+        /*
+         * User-facing cache.
+         */
+        let allCatDs: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
+
+        /*
+         * Set whether the worker should return search results to an admin (i.e., no exclusions),
+         * or to a user.
+         */
+        const setAdminMode = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, admin } = payload;
+            isAdmin = admin!;
+            return { requestId, result: returnDefault() };
         };
 
+        /*
+         * Return the default display depending on whether the current mode is admin or user.
+         */
+
+        const returnDefault = (): DatasetSearchResult => {
+            if (isAdmin) {
+                return { categories: allCatDsAdmin, displayOrder: defaultOrderAdmin };
+            }
+            return { categories: allCatDs, displayOrder: defaultOrder };
+        };
+
+        /*
+         * Flatten categorized datasets map into an array of datasets.
+         */
+        const getDatasetsArray = (): PatientListDatasetQuery[] => {
+            return [ ...allCatDs.values() ]
+                .reduce((prev: PatientListDatasetQuery[], curr) => prev = prev.concat([ ...curr.datasets.values() ]), []);
+        };
+        
         /* 
          * Reset excluded datasets cache. Called when users
          * reset the cohort and the patient list too is reset.
@@ -164,20 +185,16 @@ export default class DatasetSearchEngineWebWorker {
         const allowAllDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
 
-            if (demographicsAllowed) {
-                allDs = allDs.concat([ ...excluded.values() ]);
-                excluded.clear();
-            } else {
-                excluded.forEach((d) => { if (d.shape !== 3) allDs.push(d) });
-                excluded.clear();
-                excluded.set(demographics.id, demographics);
-            }
-            
-            const resorted = dedupeAndSort(allDs);
-            allDsMap = resorted.categories;
-            defaultOrder = resorted.displayOrder;
+            excluded.clear();
+            excluded.set(demographics.id, demographics);
+            /*
+             * Get default display and sort order.
+             */
+            const reSorted = dedupeAndSort(getDatasetsArray());
+            allCatDs = reSorted.categories;
+            defaultOrder = reSorted.displayOrder;
 
-            return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
+            return { requestId, result: returnDefault() };
         };
 
         /*
@@ -188,21 +205,15 @@ export default class DatasetSearchEngineWebWorker {
             const { datasetId, allow } = payload;
 
             if (allow) {
-                const ds = excluded.get(datasetId!);
-                if (ds) {
-                    allDs.push(ds);
-                }
                 excluded.delete(datasetId!);
             } else {
-                const dsIdx = allDs.findIndex((d) => d.id === datasetId);
-                if (dsIdx > -1) {
-                    const ds = allDs[dsIdx];
+                const ds = allDs.get(datasetId!);
+                if (ds) {
                     excluded.set(ds.id, ds);
-                    allDs.splice(dsIdx, 1);
                 }
             }
-            const resorted = dedupeAndSort(allDs);
-            allDsMap = resorted.categories;
+            const resorted = dedupeAndSort(getDatasetsArray());
+            allCatDs = resorted.categories;
             defaultOrder = resorted.displayOrder;
             
             return searchDatasets(payload);
@@ -220,7 +231,7 @@ export default class DatasetSearchEngineWebWorker {
             const dsOut: TokenizedDatasetRef[] = [];
 
             if (!searchString) {
-                return { requestId, result: { categories: allDsMap, displayOrder: defaultOrder }}; 
+                return { requestId, result: returnDefault() }; 
             }
             if (!datasets) { 
                 return { requestId, result: { categories: new Map(), displayOrder: new Map() } }; 
@@ -234,7 +245,7 @@ export default class DatasetSearchEngineWebWorker {
              * Foreach dataset compare with search term one. If demographics
              * are disabled this is for a user, so leave out excluded datasets.
              */
-            if (!demographicsAllowed) {
+            if (!isAdmin) {
                 for (let i1 = 0; i1 < datasets.length; i1++) {
                     const ds = datasets[i1];
                     if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
@@ -369,15 +380,9 @@ export default class DatasetSearchEngineWebWorker {
             return { categories: out, displayOrder };
         };
 
-        const reindexCacheFromLocal = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId } = payload;
-            const sorted = addDatasetsToCache(allDs);
-            return { requestId, result: sorted }
-        }   
-
         const reindexCacheFromExternal = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, datasets } = payload;
-            const sorted = addDatasetsToCache(datasets!);
+            const sorted = reindexCacheCache(datasets!);
             return { requestId, result: sorted }
         }   
 
@@ -385,25 +390,26 @@ export default class DatasetSearchEngineWebWorker {
          * Reset the dataset search cache and (re)load
          * it with inbound datasets.
          */
-        const addDatasetsToCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {
+        const reindexCacheCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {
+            
             /*
              * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
              */
             const all = datasets!.slice().filter((ds) => ds.shape !== 3);
             all.unshift(demographics);
-            allDsMap.clear();
-            allDsMap.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
+            allCatDs.clear();
+            allCatDsAdmin.clear();
+            allCatDsAdmin.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
             firstCharCache.clear();
+            excluded.clear();
+            excluded.set(demographics.id, demographics);
         
             /* 
              * Foreach dataset
              */
             for (let i = 0; i < all.length; i++) {
                 const ds = all[i];
-                let tokens = ds.name
-                    .toLowerCase()
-                    .split(' ')
-                    .concat(ds.tags);
+                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
 
@@ -418,7 +424,7 @@ export default class DatasetSearchEngineWebWorker {
                     const firstChar = token[0];
             
                     /* 
-                     * Cache the first first character for quick lookup
+                     * Cache the first first character for quick lookup.
                      */
                     if (!firstCharCache.has(firstChar)) {
                         firstCharCache.set(firstChar, [ ref ]);
@@ -428,17 +434,22 @@ export default class DatasetSearchEngineWebWorker {
                 }
             }
 
-            if (!demographicsAllowed) {
-                all.shift();
-                excluded.set(demographics.id, demographics);
-            }
+            /*
+             * Set admin search default display.
+             */
+            const adminSorted = dedupeAndSort(all);
+            allCatDsAdmin = adminSorted.categories;
+            defaultOrderAdmin = adminSorted.displayOrder;
 
-            const sorted = dedupeAndSort(all);
-            allDs = datasets;
-            allDsMap = sorted.categories;
-            defaultOrder = sorted.displayOrder;
+            /*
+             * Set user search default display.
+             */
+            all.shift();
+            const userSorted = dedupeAndSort(all);
+            allCatDs = userSorted.categories;
+            defaultOrder = userSorted.displayOrder;
 
-            return sorted;
+            return userSorted;
         };
     };
 }

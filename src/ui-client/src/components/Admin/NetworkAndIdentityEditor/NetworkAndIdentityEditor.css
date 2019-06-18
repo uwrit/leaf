@@ -126,7 +126,6 @@
     padding: 2px 4px;
 }
 
-
 .identity-network-endpoint-delete:hover {
     background-color: rgba(244, 67, 54, 0.08);
     border-radius: 8px;
@@ -167,4 +166,8 @@
     font-size: 0.9rem;
     font-weight: 500;
     margin-bottom: -2px;
+}
+
+.identity-network-endpoint-certificate-preview .modal-body textarea {
+    margin-top: -2px;
 }

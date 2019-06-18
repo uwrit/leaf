@@ -196,7 +196,7 @@ export const logout = () => {
             window.location = (logoutUri as any);
         }
         else {
-            window.location = window.location;
+            window.location.reload(true);
         }
     };
 }

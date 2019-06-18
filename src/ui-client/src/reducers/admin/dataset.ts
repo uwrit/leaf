@@ -42,7 +42,7 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     let expectedColumns = datasets.expectedColumns;
     let sqlColumns = datasets.sqlColumns;
 
-    if (ds && !action.changed) {
+    if (ds && action.analyzeColumns) {
         const cols = getShapeColumns(ds.sqlStatement, ds.shape);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;

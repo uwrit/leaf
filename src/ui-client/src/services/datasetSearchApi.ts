@@ -13,7 +13,7 @@ const engine = new DatasetSearchEngineWebWorker();
 
 export const indexDatasets = (datasets: PatientListDatasetQuery[]): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.indexDatasets(datasets) as DatasetSearchResult;
+        const result = await engine.reindexDatasets(datasets) as DatasetSearchResult;
         resolve(result);
     });
 };
@@ -40,9 +40,9 @@ export const allowAllDatasets = (): Promise<DatasetSearchResult> => {
     });
 };
 
-export const allowDemographics = (allow: boolean): Promise<DatasetSearchResult> => {
+export const setAdminMode = (admin: boolean): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.allowDemographics(allow) as DatasetSearchResult;
+        const result = await engine.setAdminMode(admin) as DatasetSearchResult;
         resolve(result);
     });
 };

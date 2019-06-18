@@ -121,10 +121,11 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         const c = this.className;
         const { showSelectorModal } = this.state;
         const { datasets, configuration } = this.props;
+        const selected = datasets.all.get(datasets.selected);
         let selectedName = '';
 
-        if (datasets.selected) {
-            const name = datasets.all.get(datasets.selected)!.name;
+        if (selected) {
+            const name = selected.name;
             if (name.length > 30) {
                 selectedName = name.substring(0, 30) + '...';
             } else {

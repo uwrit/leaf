@@ -24,7 +24,7 @@ import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
 import { allowAllDatasets } from '../../services/datasetSearchApi';
-import { setDatasetSearchResult } from '../datasets';
+import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -121,6 +121,7 @@ export const getCounts = () => {
             if (atLeastOneSucceeded) {
                 const visibleDatasets = await allowAllDatasets();
                 dispatch(setDatasetSearchResult(visibleDatasets));
+                dispatch(setDatasetSearchTerm(''));
             } else {
                 const info : InformationModalState = {
                     header: "Error Running Query",

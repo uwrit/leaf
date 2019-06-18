@@ -9,17 +9,6 @@ import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
 import { AdminDatasetQuery, AdminDemographicQuery } from '../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../models/patientList/Dataset';
-import { sleep } from '../../utils/Sleep';
-
-// DEV EXAMPLES
-const demographics: AdminDatasetQuery = {
-    id: 'demographics',
-    constraints: [],
-    name: 'Basic Demographics',
-    shape: PatientListDatasetShape.Demographics,
-    sqlStatement: "SELECT personId = cast(p.person_id as nvarchar), addressPostalCode = l.zip, addressState = p.location_state, ethnicity = p.ethnicity, gender = CASE WHEN p.gender = 'F' THEN 'female' WHEN p.gender = 'M' THEN 'male' ELSE 'other' END, [language] = 'Unknown', maritalStatus = 'Unknown', race = p.race, religion = 'Unknown', marriedBoolean = cast(0 as bit), hispanicBoolean = cast(CASE WHEN p.ethnicity_code = 38003563 THEN 1 ELSE 0 END as bit), deceasedBoolean = cast(CASE WHEN p.death_date IS NULL THEN 0 ELSE 1 END as bit), birthDate = p.birth_datetime, deceasedDateTime = p.death_date, [name] = 'Unknown Unknown', mrn = 'abc12345' FROM v_person p JOIN person ps on p.person_id = ps.person_id LEFT JOIN [location] l on ps.location_id = l.location_id",
-    tags: []
-};
 
 /*
  * Gets a Dataset.
@@ -99,6 +88,7 @@ export const upsertDemographicsDataset = async (state: AppState, dataset: AdminD
     const converted: AdminDatasetQuery = {
         ...dataset,
         ...ds,
+        unsaved: false
     };
     return converted;
 };

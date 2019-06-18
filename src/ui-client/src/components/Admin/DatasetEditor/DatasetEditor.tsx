@@ -19,7 +19,7 @@ import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
-import { allowDemographicsDatasetInSearch, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
+import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
 import { generate as generateId } from 'shortid';
 import { Display } from './Sections/Display';
 import { SqlEditor } from './SqlEditor/SqlEditor';
@@ -59,13 +59,13 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         shapes = shapes.sort((a,b) => PatientListDatasetShape[a] > PatientListDatasetShape[b] ? 1 : -1);
 
         this.setState({ shapes });
-        dispatch(allowDemographicsDatasetInSearch(true));
+        dispatch(setAdminDatasetSearchMode(true));
     }
 
     public componentWillUnmount() {
         const { dispatch } = this.props;
-        dispatch(allowDemographicsDatasetInSearch(false));
-        dispatch(setAdminDataset(undefined, false));
+        dispatch(setAdminDatasetSearchMode(false));
+        dispatch(setAdminDataset(undefined, false, false));
     }
 
     public render() {
@@ -107,14 +107,26 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* Header */}
-                                {datasets.display.size > 0 &&
+                                {data.datasets.demographicsDataset && !data.datasets.demographicsDataset.unsaved &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
                                     <Button className='leaf-button leaf-button-warning' disabled={allowDelete} onClick={this.handleDeleteClick}>Delete</Button>
                                 </div>
-                                }        
+                                }
+
+                                {/* Create a SQL Set link, used at initial setup */}
+                                {data.state === AdminPanelLoadState.LOADED && data.datasets.demographicsDataset.unsaved && !currentDataset &&
+                                <div className={`${c}-start`}>
+                                    <p>It looks like you haven't created a Basic Demographics query to populate the Visualize and Patient List screens.</p>
+                                    <p>
+                                        <a onClick={this.handleInitialBasicDemographicsSetupClick}>
+                                            Click here to start creating a SQL query to return demographics data.
+                                        </a>
+                                    </p>
+                                </div>
+                                }
 
                                 {/* Editor */}
                                 {currentDataset &&
@@ -160,6 +172,14 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 </Container>
             </div>
         );
+    }
+
+    /*
+     * Handle initial click to create a Basic Demographics query.
+     */
+    private handleInitialBasicDemographicsSetupClick = () => {
+        const { dispatch, data } = this.props;
+        dispatch(setAdminDataset(data.datasets.demographicsDataset, true, true));
     }
 
     /* 
@@ -298,7 +318,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         };
 
         dispatch(setDatasetDisplay(newDs));
-        dispatch(setAdminDataset(newAdminDs, true));
+        dispatch(setAdminDataset(newAdminDs, true, false));
     }
 
     /*
@@ -323,7 +343,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     : ''
             }
             dispatch(moveDatasetCategory(ds, newCategoryText));
-            dispatch(setAdminDataset(adminDs, true));
+            dispatch(setAdminDataset(adminDs, true, false));
         }
     }
 
@@ -399,7 +419,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             constraints: [],
             name,
             shape,
-            sqlStatement: '',
+            sqlStatement: 'SELECT FROM dbo.table',
             tags: [],
             unsaved: true
         };
@@ -412,8 +432,8 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             unsaved: true
         };
         dispatch(addDataset(newUserDs));
-        dispatch(setAdminDataset(newAdminDs, false));
-        dispatch(setAdminDataset(newAdminDs, true));
-        dispatch(setAdminDatasetSql('SELECT FROM dbo.table'));
+        dispatch(setAdminDataset(newAdminDs, true, true));
+        dispatch(setDatasetSelected(newUserDs));
+
     }
 }

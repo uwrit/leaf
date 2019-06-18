@@ -156,8 +156,9 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     /*
      * Generate a random integer id greater than the current max endpoint id.
      */
-    private generateRandomIntegerId = () => {
+    private generateSequentialIntegerId = () => {
         const { endpoints } = this.props.data.networkAndIdentity;
+        if (!endpoints.size) { return 1; }
         const max = Math.max.apply(Math, [ ...endpoints.values() ].map((s) => s.id));
         return max + 1;
     }
@@ -168,7 +169,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     private handleAddEndpointClick = () => {
         const { dispatch, data } = this.props;
         const newEndpoint: NetworkEndpoint = {
-            id: this.generateRandomIntegerId(),
+            id: this.generateSequentialIntegerId(),
             created: new Date(),
             updated: new Date(),
             name: 'New Endpoint',

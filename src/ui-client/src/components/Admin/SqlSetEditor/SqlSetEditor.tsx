@@ -28,6 +28,7 @@ interface State {
 
 export class SqlSetEditor extends React.PureComponent<Props,State> {
     private className = 'sqlset-editor';
+    private bottomDivRef: any = React.createRef();
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -64,11 +65,11 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
                 {/* Sets */}
                 <div className={`${c}-table`}>
                     {[ ...data.sqlSets.sets.values() ]
-                        .sort((a,b) => a.id > b.id ? 1 : -1)
+                        .sort((a,b) => a.id > b.id ? -1 : 1)
                         .map((s) => <SqlSetRow set={s} dispatch={dispatch} key={s.id} state={data} eventTypes={evs} forceValidation={forceValidation} />)
                     }
+                    <div ref={this.bottomDivRef}></div>
                 </div>
-
             </div>
         );
     }
@@ -104,8 +105,9 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
      * Generate the an integer 1 higher than the max
      * of the current sets.
      */
-    private generateNextIntegerId = () => {
+    private generateSequentialIntegerId = () => {
         const { sets } = this.props.data.sqlSets;
+        if (!sets.size) { return 1; }
         const max = Math.max.apply(Math, [ ...sets.values() ].map((s) => s.id));
         return max + 1;
     }
@@ -117,7 +119,7 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
     private handleAddSqlSetClick = () => {
         const { dispatch } = this.props;
         const newSet: ConceptSqlSet = {
-            id: this.generateNextIntegerId(),
+            id: this.generateSequentialIntegerId(),
             isEncounterBased: false,
             isEventBased: false,
             sqlFieldDate: '',

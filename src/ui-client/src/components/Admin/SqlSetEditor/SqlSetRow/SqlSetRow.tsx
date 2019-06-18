@@ -201,8 +201,9 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     /* 
      * Generate a random ID for a new specialization group.
      */
-    private generateRandomIntegerId = () => {
+    private generateSequentialIntegerId = () => {
         const { specializationGroups } = this.props.set;
+        if (!specializationGroups.size) { return 1; }
         const max = Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) ;
         return max + 1;
     }
@@ -253,7 +254,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     private handleAddSpecializationGroupDropdownClick = () => {
         const { set, dispatch } = this.props;
         const grp: SpecializationGroup = {
-            id: this.generateRandomIntegerId(),
+            id: this.generateSequentialIntegerId(),
             sqlSetId: set.id,
             specializations: new Map(),
             uiDefaultText: '',
