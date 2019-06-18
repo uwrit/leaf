@@ -218,7 +218,7 @@ The field-level information for each Concept is (making sure to nest `Inpatient`
 And that's it!
 
 ## Making Concepts Searchable
-So you've been able to make Concepts that users can query - great! Over time you'll likely find that your Concept tree will grow as you find new use cases and data sources, and may because more cumbersome for users to manually traverse.
+So you've been able to make Concepts that users can query - great! Over time you'll likely find that your Concept tree will grow as you find new use cases and data sources, and may become cumbersome for users to manually traverse.
 
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/concept_search.gif"/></p>
 

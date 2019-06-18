@@ -1,43 +1,105 @@
 # Configuring the Leaf App Server
 The application server hosts the [Leaf REST API](https://github.com/uwrit/leaf/tree/master/src/server), and serves as the intermediary between the [client app](https://github.com/uwrit/leaf/tree/master/src/ui-client) and [databases](https://github.com/uwrit/leaf/tree/master/src/db).
 
-The API is written in C# and .NET Core, and can run in either Linux or Windows environments.
+The API is written in C# and .NET Core, and can run in either Linux or Windows environments. Unless otherwise noted, examples below assume a CentOS7 server.
+
+
+## Prerequisites
+
+CentOS requires .NET to be installed prior to building the application. Refer to Microsoft's current instructions for installing .NET Core framework.
+https://dotnet.microsoft.com/download/linux-package-manager/rhel/sdk-current
+
+
+Currently installing .NET on CentOS/RHEL looks like this:
+
+```bash
+rpm -Uvh https://packages.microsoft.com/config/rhel/7/packages-microsoft-prod.rpm
+yum install -y dotnet-sdk-2.2
+```
+
+
+We'll be using the following example folder layout for organizing the api deployment as outlined below:  
+
+- /var/opt/leafapi/leaf_download       
+- /var/opt/leafapi/.keys              
+- /var/opt/leafapi/api                
+- /var/opt/leafapi/services            
+- /var/log/leaf           
+
+
+
+Provided you've got a github account and have setup your SSH key, downloading the source with git is as simple as:
+
+```
+mkdir /var/opt/leafapi/leaf_download
+cd /var/opt/leafapi/leaf_download
+git clone git@github.com:uwrit/leaf.git
+```
+
+Once the source is downloaded you can proceed to build and configure an API instance.
+
 
 ## Installation
 1) [Creating a JWT Signing Key](#creating-a-jwt-signing-key)
 2) [Setting Environment Variables](#setting-environment-variables)
 3) [Configuring the appsettings.json file](#configuring-the-appsettingsjson-file)
 4) [Building the API](#building-the-api)
+5) [Deploying the API as a Service](#deploying-the-api-as-a-service)
+
 
 ## Creating a JWT Signing Key
 The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt.io/introduction/) (pronounced "JA-ts"). In a bash terminal, start by creating a JWT signing key. This allows the JWT recipient to verify the sender is who they say they are.
 ```bash
-openssl req -nodes -x509 -newkey rsa:2048 -keyout key.pem \
-    -out cert.pem -days 3650 -subj \
+openssl req -nodes -x509 -newkey rsa:2048 -keyout /var/opt/leafapi/.keys/key.pem \
+    -out /var/opt/leafapi/.keys/cert.pem -days 3650 -subj \
     "/CN=urn:leaf:issuer:leaf.<your_institution>.<tld>"
 ```
 ```bash
-openssl pkcs12 -in cert.pem -inkey key.pem \
-    -export -out leaf.pfx -password pass:<your_pass>
+openssl pkcs12 -in /var/opt/leafapi/.keys/cert.pem -inkey key.pem \
+    -export -out /var/opt/leafapi/.keys/leaf.pfx -password pass:<your_pass>
 ```
 
 ## Setting Environment Variables
-Sensitive configuration data are stored in [environment variables](https://en.wikipedia.org/wiki/Environment_variable). Set environment variables on your server based on the examples below (making sure that the file paths, password, and connection strings are appropriate for your environment). The paths are relative to the path selected during key creation.
+Sensitive configuration data specifying data sources and passwords are stored environmental variables defined in a .conf file. 
+
 ```bash
-LEAF_JWT_CERT=/.keys/leaf/cert.pem
-LEAF_JWT_KEY=/.keys/leaf/leaf.pfx
+# Contents for api service conf file: /var/opt/leafapi/services/leaf_api.service.conf
+
+LEAF_JWT_CERT=/var/opt/leafapi/.keys/cert.pem
+LEAF_JWT_KEY=/var/opt/leafapi/.keys/leaf.pfx
 LEAF_JWT_KEY_PW=<insertpass>
 LEAF_APP_DB=<leaf_app_db_connection_string>
 LEAF_CLIN_DB=<clinical_db_connection_string>
-SERILOG_DIR=/var/log/leaf
+SERILOG_DIR=/var/log/leaf/
+ASPNETCORE_URLS=http://0.0.0.0:5001
+LEAF_REDCAP_SUPERTOKEN='token goes here'
 ```
+
+It's recommended that you use full paths when referencing locations on the filesystem.
+
+LEAF_REDCAP_SUPERTOKEN is not needed if appsettings.json has the REDCap export variable set to 'false'.
+
+The ASPNETCORE_URLS parameter determines what port and IP the API service listens on.
+
 Note that the connection string variables `LEAF_APP_DB` and `LEAF_CLIN_DB` should be of the form:
 ```
 Server=<server>;Database=<dbname>;uid=sa;Password=<dbpassword>;
 ```
 
+
 ## Configuring the appsettings.json file
-The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. This file can be found under `src/server/API/` relative to the Leaf repo root directory.
+The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. 
+
+Key tasks to complete when setting up a Leaf instance for the first time:
+- Set Jwt/Issuer to match JAWT issuer parameter set during JAWT creation above
+- Define LogoutURI 
+- Set Authorization/Mechanism/SAML2/HeaderMapping/Entitlements variables to define the SAML2 header containing group membership, and the delimiter separating group names
+- Authorization/Mechanism/SAML2/RoleMapping roles to match group names provided by SAML2 
+- Define Client/Help variables
+- Ensure Export/REDCap/Enabled is set to false
+
+Pre-build this file can be found under `src/server/API/` relative to the Leaf git repository root directory. After the API is built and deployed, it can be found and further customized at the top level of the API dll directory.
+
 - [Runtime](#runtime)
   - [Mode](#mode): `"FULL"`
 - [Jwt](#jwt)
@@ -88,7 +150,7 @@ The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server
   - [ExportLimit](#exportlimit): `5000`
 - [Export](#export)
   - [REDCap](#redcap)
-    - [Enabled](#enabled): `true`
+    - [Enabled](#enabled): `false`
     - [ApiURI](#apiuri): `"https://<your_redcap_instance>.org/api"`
     - [BatchSize](#batchsize): `10`
     - [RowLimit](#rowlimit): `50000`
@@ -308,6 +370,31 @@ Similar to [Email](#email), but instead a URL to direct users to if clicked, suc
 ## Building the API
 There are a variety of ways to build the API, as the `dotnet` CLI tool supports both self-contained builds as well as runtime dependent targets. Although .NET Core is cross-platform, some targets have quirks that should be noted. If you're curious, you can review the [build.sh](https://github.com/uwrit/leaf/blob/master/build.sh) script in the project's root directory. Self-contained builds produce an executable and embed the entire .NET runtime in the build artifacts, resulting in a much larger deployment payload but removing the need to install the .NET Core runtime on your target machine. Conversely, runtime dependent builds assume that the .NET Core runtime will be installed on your target machine and only includes the application and its 3rd party dependencies in the artifact folder.
 
+
+
+
+### Red Hat Enterprise Linux (RHEL)/CentOS
+RHEL7 and Cent7 only support runtime dependent builds.
+
+On RHEL7 or Cent7 with .NET Core installed:
+```bash
+dotnet publish -c Release -o <output_dir>
+```
+
+First we change directory into where we downloaded leaf (unzipped) from github. Then targeting our example folder structure, as outline above, our build command would be:
+
+```bash
+cd /var/opt/leaf/leaf_download/leaf/
+dotnet publish -c Release -o /var/opt/leafapi/api
+```
+
+
+To build on Windows/MacOS building for RHEL/Cent:
+```bash
+dotnet publish -c Release -o <output_dir> -r rhel.7-x64 --self-contained false /p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App
+```
+
+
 ### Windows
 Windows fully supports both self-contained builds as well as runtime dependent builds.
 
@@ -319,14 +406,72 @@ Runtime dependent:
 ```bash
 dotnet publish -c Release -o <output_dir>
 ```
-### Red Hat Enterprise Linux (RHEL)/CentOS
-RHEL7 and Cent7 only support runtime dependent builds.
 
-On RHEL7 or Cent7 with .NET Core installed:
+
+## Deploying the API as a Service
+
+Once built the API service should be run with a service account that is not an administrative user.
+
+The API host firewall will need to allow inbound communication on the chosen port to the apache web server.
+
+
+
+### Defining a *nix style service with CentOS7/RHEL Linux
+
+First create a nologin user account to isolate the service from the operating system, and give that account ownership over the API -related folders.
+
 ```bash
-dotnet publish -c Release -o <output_dir>
+useradd -r api_svc_account
+chown /var/log/leaf/
+chown -R /var/opt/leaf/
 ```
-On Windows/MacOS building for RHEL/Cent:
+
+Next create a service file for the API instance. The WorkingDirectory must be the directory where API.dll resides.
+
 ```bash
-dotnet publish -c Release -o <output_dir> -r rhel.7-x64 --self-contained false /p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App
+## /var/opt/leafapi/services/leaf_api.service
+
+[Unit]
+Description=Leaf API Service
+
+[Service]
+EnvironmentFile=/var/opt/leafapi/services/leaf_api.service.conf
+User=api_svc_account
+Type=idle
+TimeoutStartSec=300
+TimeoutStopSec=30
+WorkingDirectory=/var/opt/leafapi/api/
+ExecStart=/usr/bin/dotnet API.dll 
+
+[Install]
+WantedBy=multi-user.target
 ```
+
+Lastly, link your service file with systemd, and make it aware of the service:
+
+```bash
+# Create a symbolic link into the systemd directory
+ln -s /var/opt/leafapi/services/leaf_api.service /etc/systemd/system/leaf_api.service
+
+#Make the systemd aware of the service
+systemctl daemon-reload
+```
+
+To start the service:
+
+```bash
+systemctl start leaf_api.service
+```
+
+
+### Defining a Windows Service
+
+Review Microsoft's official instructions for guidance on defining a Windows service with Powershell:
+https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-service?view=powershell-6
+
+
+
+## Reviewing API Logs
+Provided that the permissions are correct for your API Service account user, logs will be located in the folder defined via the SERILOG_DIR variable in the service's leaf_api.service.conf file created earlier.
+
+Logs are also logged to /var/log/messages.
