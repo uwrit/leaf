@@ -25,7 +25,7 @@ const decodeToken = (token: string): SessionContext => {
         rawDecoded: decoded,
         token
     }
-    console.log('session', ctx);
+    console.log('Session Token', ctx);
     return ctx;
 };
 
@@ -90,7 +90,7 @@ export const saveSessionAndForceReLogin = (state: AppState) => {
     if (hasData) {
         sessionStorage.setItem(key, JSON.stringify(currState));
     }
-    window.location = window.location;
+    window.location.reload(true);
 };
 
 /*
@@ -123,7 +123,7 @@ export const attemptLoginRetryIfPossible = () => {
     const retry = sessionStorage.getItem(key);
     if (!retry) {
         sessionStorage.setItem(key, 'X');
-        window.location = window.location;
+        window.location.reload(true);
     } else {
         sessionStorage.removeItem(key);
     }

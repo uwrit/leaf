@@ -15,6 +15,9 @@ import { IdentityPreview } from './Sections/IdentityPreview';
 import { Endpoint } from './Endpoint/Endpoint';
 import { NetworkEndpoint } from '../../../models/admin/Network';
 import './NetworkAndIdentityEditor.css';
+import CertModal from './CertModal/CertModal';
+import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../actions/generalUi';
 
 
 interface Props {
@@ -23,6 +26,7 @@ interface Props {
 }
 
 interface State {
+    forceValidation: boolean;
 }
 
 export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
@@ -30,21 +34,23 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            categoryIdx: 0,
-            datasetIdx: -1,
-            shapes: []
+            forceValidation: false
         }
     }
 
     public render() {
         const { dispatch, data } = this.props;
+        const { forceValidation } = this.state;
         const { identity, endpoints, changed } = data.networkAndIdentity;
         const c = this.className;
 
         return (
             <div className={c}>
-                <Container fluid={true}>
 
+                {/* Certificate info modal */}
+                <CertModal dispatch={dispatch} data={data.networkAndIdentity.modal} />
+
+                <Container fluid={true}>
                     <Row>
                         <Col md={7} className={`${c}-column-left admin-panel-editor`}>
 
@@ -56,14 +62,8 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
 
                             {/* Identity */}
                             <div>
-                                <Identity
-                                    changeHandler={this.handleInputChange}
-                                    identity={identity}
-                                />
-                                <IdentityPreview 
-                                    dispatch={dispatch}
-                                    identity={identity}
-                                />
+                                <Identity changeHandler={this.handleInputChange} identity={identity} forceValidation={forceValidation} />
+                                <IdentityPreview dispatch={dispatch} identity={identity} />
                             </div>
                         </Col>
 
@@ -74,11 +74,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                             </div>
                             <div className={`${c}-column-right endpoint-container`}>
                                 {[ ...endpoints.values() ].map((e) => (
-                                    <Endpoint
-                                        key={e.id}
-                                        dispatch={dispatch}
-                                        endpoint={e}
-                                    />
+                                    <Endpoint key={e.id} dispatch={dispatch} endpoint={e} forceValidation={forceValidation} />
                                 ))}
                             </div>
                         </Col>
@@ -86,6 +82,27 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                 </Container>
             </div>
         );
+    }
+
+    /*
+     * Validate that current networks and Identity are valid. Called on 'Save' click.
+     */
+    private currentNetworkAndIdentityValid = (): boolean => {
+        const { endpoints, identity } = this.props.data.networkAndIdentity;
+
+        if (!identity.name) { return false; }
+        if (!identity.abbreviation) { return false; }
+        if (!identity.primaryColor) { return false; }
+        for (const endpoint of [ ...endpoints.values() ]) {
+            if (endpoint.changed || endpoint.unsaved) {
+                if (!endpoint.address) { return false; }
+                if (!endpoint.name) { return false; }
+                if (!endpoint.keyId) { return false; }
+                if (!endpoint.issuer) { return false; }
+                if (!endpoint.certificate) { return false; }
+            }
+        }
+        return true;
     }
 
     /* 
@@ -106,24 +123,42 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     private handleUndoChanges = () => {
         const { dispatch } = this.props;
         dispatch(revertAdminNetworkChanges());
+        this.setState({ forceValidation: false });
     }
 
     /*
      * Handle saving any identity or network changes.
      */
     private handleSaveChanges = () => {
-        const { dispatch, data } = this.props;
-        const { changed } = data.networkAndIdentity;
-        if (changed) {
+        const { dispatch } = this.props;
+        const isValid = this.currentNetworkAndIdentityValid();
+
+        if (isValid) {
             dispatch(processApiUpdateQueue());
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `One or more Identity fields or networked Leaf instances are missing necessary data. Are you sure you want to save?`,
+                header: 'Missing Identity or Network data',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    dispatch(processApiUpdateQueue());
+                    this.setState({ forceValidation: false });
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Save Concept`
+            };
+            dispatch(showConfirmationModal(confirm));
+            this.setState({ forceValidation: true });
         }
     }
 
     /*
      * Generate a random integer id greater than the current max endpoint id.
      */
-    private generateRandomIntegerId = () => {
+    private generateSequentialIntegerId = () => {
         const { endpoints } = this.props.data.networkAndIdentity;
+        if (!endpoints.size) { return 1; }
         const max = Math.max.apply(Math, [ ...endpoints.values() ].map((s) => s.id));
         return max + 1;
     }
@@ -134,7 +169,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     private handleAddEndpointClick = () => {
         const { dispatch, data } = this.props;
         const newEndpoint: NetworkEndpoint = {
-            id: this.generateRandomIntegerId(),
+            id: this.generateSequentialIntegerId(),
             created: new Date(),
             updated: new Date(),
             name: 'New Endpoint',

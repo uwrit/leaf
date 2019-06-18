@@ -13,7 +13,7 @@ import { Panel } from '../panel/Panel';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 import { NetworkIdentity } from '../NetworkResponder';
-import { NetworkEndpoint } from '../admin/Network';
+import { NetworkEndpoint, Certificate } from '../admin/Network';
 
 
 export enum AdminPanelLoadState {
@@ -63,7 +63,7 @@ export interface AdminDatasetState {
     expectedColumns: AdminPanelPatientListColumnTemplate[];
     currentDataset?: AdminDatasetQuery;
     datasets: Map<string, AdminDatasetQuery>;
-    demographicsDataset?: AdminDatasetQuery;
+    demographicsDataset: AdminDatasetQuery;
     sqlColumns: Set<string>;
     state: AdminPanelLoadState;
 }
@@ -78,8 +78,15 @@ export interface AdminNetworkAndIdentityState {
     changed: boolean;
     endpoints: Map<number,NetworkEndpoint>;
     identity: NetworkIdentity;
+    modal: AdminNetworkCertificateModalState;
     uneditedEndpoints: Map<number,NetworkEndpoint>;
     uneditedIdentity: NetworkIdentity;
+}
+
+export interface AdminNetworkCertificateModalState {
+    cert?: Certificate;
+    endpoint?: NetworkEndpoint;
+    show: boolean;
 }
 
 export default interface AdminState {

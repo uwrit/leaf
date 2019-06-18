@@ -7,66 +7,82 @@
 
 import React from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Container, Row, Col } from 'reactstrap';
-import { Certificate } from '../../../../models/admin/Network';
+import { Certificate, NetworkEndpoint } from '../../../../models/admin/Network';
 import { TextArea } from '../../Section/TextArea';
+import { AdminNetworkCertificateModalState } from '../../../../models/state/AdminState';
+import { setAdminNetworkCertModalShown, setAdminNetworkEndpoint } from '../../../../actions/admin/networkAndIdentity';
 
 interface Props { 
-    data: Certificate;
-    onClickNo: () => void;
-    onClickYes: () => void;
-    show: boolean;
+    data: AdminNetworkCertificateModalState;
+    dispatch: any;
 }
 
-export default class InformationModal extends React.PureComponent<Props> {
+export default class CertModal extends React.PureComponent<Props> {
     private className = 'identity-network-endpoint-certificate-preview';
     constructor(props: Props) {
         super(props);
     }
 
     public render() {
-        const { show, onClickNo, onClickYes, data } = this.props;
+        const { data } = this.props;
         const c = this.className;
 
         return (
-            <Modal isOpen={show} className={'leaf-modal'} backdrop={true}>
+            <Modal isOpen={data.show} className={`leaf-modal ${c}`} backdrop={true} size={'lg'}>
                 <ModalHeader>Certificate Information</ModalHeader>
                 <ModalBody>
+                    {data.endpoint &&
                     <p>
-                        The certificate request call to the Leaf endpoint {} returned the below information.
+                        The certificate request call to the Leaf endpoint "{data.endpoint.address}" returned the below information.
                         Do you wish to load this data?
                     </p>
-                    <Container>
-                        <Row className={c}>
-                            <Col md={6}>
-                                <TextArea
-                                    changeHandler={this.dummyHandler} propName={'keyId'} value={data.keyId}
-                                    label='Key ID' locked={true}
-                                />
-                            </Col>
-                            <Col md={6}>
-                                <TextArea
-                                    changeHandler={this.dummyHandler} propName={'issuer'} value={data.issuer}
-                                    label='Issuer' locked={true}
-                                />
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={12}>
-                                <TextArea
-                                    changeHandler={this.dummyHandler} propName={'certificate'} value={data.data}
-                                    label='Certificate' locked={true}
-                                />
-                            </Col>
-                        </Row>
-                    </Container>              
+                    }
+                    {data.cert &&
+                    <div>
+                        <div>
+                            <TextArea
+                                changeHandler={this.dummyHandler} propName={'keyId'} value={data.cert.keyId}
+                                label='Key ID' locked={true}
+                            />
+                        </div>
+                        <div>
+                            <TextArea
+                                changeHandler={this.dummyHandler} propName={'issuer'} value={data.cert.issuer}
+                                label='Issuer' locked={true}
+                            />
+                        </div>
+                        <div>
+                            <TextArea
+                                changeHandler={this.dummyHandler} propName={'certificate'} value={data.cert.data}
+                                label='Certificate' locked={true}
+                            />
+                        </div>
+                    </div>
+                    }
                 </ModalBody>
                 <ModalFooter>
-                    <Button className="leaf-button leaf-button-primary" onClick={onClickNo}>Nevermind</Button>
-                    <Button className="leaf-button leaf-button-primary" onClick={onClickYes}>Yes, load this certifcate</Button>
+                    <Button className="leaf-button leaf-button-secondary" onClick={this.onClickNo}>Nevermind</Button>
+                    <Button className="leaf-button leaf-button-primary" onClick={this.onClickYes}>Yes, load this certifcate</Button>
                 </ModalFooter>
             </Modal>
         );
     }
 
     private dummyHandler = () => null;
+
+    private onClickNo = () => {
+        const { dispatch } = this.props;
+        dispatch(setAdminNetworkCertModalShown(false));
+    };
+
+    private onClickYes = () => {
+        const { dispatch, data } = this.props;
+        const newEndpoint: NetworkEndpoint = Object.assign({}, data.endpoint, { 
+            keyId: data.cert!.keyId,
+            issuer: data.cert!.issuer,
+            certificate: data.cert!.data
+        });
+        dispatch(setAdminNetworkEndpoint(newEndpoint, true));
+        dispatch(setAdminNetworkCertModalShown(false));
+    };
 }

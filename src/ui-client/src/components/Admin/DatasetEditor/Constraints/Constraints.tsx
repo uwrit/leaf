@@ -7,11 +7,11 @@
 
 import React from 'react';
 import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
-import { DatasetQueryConstraint, AdminDatasetQuery } from '../../../../models/admin/Dataset';
+import { AdminDatasetQuery } from '../../../../models/admin/Dataset';
 import { Constraint } from '../../ConceptEditor/Sections/Constraint';
 
 interface Props {
-    changeHandler: (constraints: DatasetQueryConstraint[], propName: string) => any;
+    changeHandler: (constraints: ConstraintModel[], propName: string) => any;
     dataset: AdminDatasetQuery;
     locked?: boolean;
 }
@@ -60,13 +60,17 @@ export class Constraints extends React.PureComponent<Props> {
     private handleConstraintChange = (idx: number, newConstraint: ConstraintModel) => {
         const { changeHandler, dataset } = this.props;
         const constraints = dataset.constraints.slice();
-        constraints.splice(idx, 1, (newConstraint as DatasetQueryConstraint));
+        constraints.splice(idx, 1, (newConstraint as ConstraintModel));
         changeHandler(constraints, this.propName);
     }
 
     private handleAddNewClick = () => {
         const { changeHandler, dataset } = this.props;
-        const newConstraint: DatasetQueryConstraint = { datasetQueryId: dataset.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const newConstraint: ConstraintModel = { 
+            resourceId: dataset.unsaved ? undefined : dataset.id, 
+            constraintId: ConstraintType.User, 
+            constraintValue: '' 
+        };
         const constraints = dataset.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);

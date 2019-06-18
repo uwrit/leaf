@@ -6,7 +6,7 @@ import { showInfoModal, setNoClickModalState } from "../generalUi";
 import { PatientListDatasetQuery, PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { indexDatasets, searchDatasets } from "../../services/datasetSearchApi";
-import { setDataset, removeDataset, setDatasetSearchResult, switchDatasetOldForNew } from "../datasets";
+import { setDataset, removeDataset, setDatasetSearchResult, switchDatasetOldForNew, setDatasetSelected } from "../datasets";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
 export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
@@ -16,6 +16,7 @@ export const SET_ADMIN_PANEL_DATASET_LOAD_STATE = 'SET_ADMIN_PANEL_DATASET_LOAD_
 export const REMOVE_ADMIN_DATASET = 'REMOVE_ADMIN_DATASET';
 
 export interface AdminDatasetAction {
+    analyzeColumns?: boolean;
     changed?: boolean;
     dataset?: AdminDatasetQuery;
     shape?: PatientListDatasetShape;
@@ -37,7 +38,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             const newAdminDataset = dataset.unsaved
                 ? await createDataset(state, dataset)
                 : await updateDataset(state, dataset);
-            dispatch(setAdminDataset(newAdminDataset, false));
+            dispatch(setAdminDataset(newAdminDataset, false, false));
 
             /*
              * Swap old for new in UI.
@@ -54,10 +55,11 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             
             await indexDatasets(datasets);
             dispatch(setDataset(userDataset));
+            dispatch(setDatasetSelected(userDataset));
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
@@ -82,7 +84,7 @@ export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
@@ -104,12 +106,12 @@ export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
             .then(
                 async (response) => {
                     const userDataset = deriveUserDatasetFromAdmin(state, dataset);
-                    const datasets: PatientListDatasetQuery[] = [ ...state.datasets.all.values() ];
                     dispatch(removeDataset(userDataset));
-
                     state = getState();
+                    const datasets: PatientListDatasetQuery[] = [ ...state.datasets.all.values() ];
+
                     await indexDatasets(datasets);
-                    dispatch(setAdminDataset(undefined, false));
+                    dispatch(setAdminDataset(undefined, false, false));
                     dispatch(setNoClickModalState({ message: "Dataset Deleted", state: NoClickModalStates.Complete }));
                 }, error => {
                     const info: InformationModalState = {
@@ -117,7 +119,7 @@ export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
                         header: "Error Deleting Dataset",
                         show: true
                     };
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
             );
@@ -143,7 +145,7 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
              * If demographics, set that and short-circuit.
              */
             if (dataset.shape === PatientListDatasetShape.Demographics) {
-                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false));
+                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false, true));
                 return;
             }
 
@@ -159,7 +161,7 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
                 dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADING));
                 admDataset = await getAdminDataset(state, dataset.id);
             } 
-            dispatch(setAdminDataset(admDataset!, false));
+            dispatch(setAdminDataset(admDataset!, false, true));
             dispatch(setAdminPanelDatasetLoadState(AdminPanelLoadState.LOADED));
         } catch (err) {
             console.log(err);
@@ -180,7 +182,7 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
         const { currentDataset, datasets, demographicsDataset } = state.admin!.datasets;
 
         if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
-            dispatch(setAdminDataset(demographicsDataset, false));
+            dispatch(setAdminDataset(demographicsDataset, false, true));
         } else {
             dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
             const originalAdminDataset = datasets.get(dataset.id)!;
@@ -188,24 +190,25 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
             const results = await searchDatasets(state.datasets.searchTerm);
 
             if (dataset.unsaved) {
-                dispatch(setAdminDataset(undefined, false));
+                dispatch(setAdminDataset(undefined, false, false));
                 dispatch(removeDataset(userDataset));
             } else {
-                dispatch(setAdminDataset(originalAdminDataset, false));
+                dispatch(setAdminDataset(originalAdminDataset, false, true));
                 dispatch(setDataset(userDataset));
             }
             dispatch(removeAdminDataset(dataset));
             dispatch(setDatasetSearchResult(results));
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
         }
     };
 };
 
 // Synchonous
-export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed: boolean): AdminDatasetAction => {
+export const setAdminDataset = (dataset: AdminDatasetQuery | undefined, changed: boolean, analyzeColumns: boolean): AdminDatasetAction => {
     return {
         dataset,
         changed,
+        analyzeColumns,
         type: SET_ADMIN_DATASET
     };
 };

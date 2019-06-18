@@ -7,7 +7,7 @@
 
  .sqlset-editor-container {
     background-color: rgb(240,240,240);
-    padding: 20px 0 75px 10px;
+    padding: 0 0 75px 0;
 }
 
 .sqlset-editor-input-column {
@@ -20,10 +20,8 @@
     padding: 8px;
 }
 
-.sqlset-editor-table {
-    height: 85vh;
-    overflow-y: auto;
-    padding: 0 10px 0 10px !important;
+.sqlset-editor-input-container .checkbox-slider-container label {
+    margin-right: 20px;
 }
 
 .sqlset-editor-unsaved {
@@ -32,15 +30,18 @@
     color: rgb(117, 109, 0);
     font-size: 0.8rem;
     left: -0.5%;
-    margin: 4px 0 0 10px;
+    margin: -4px 0 0 10px;
     padding: 2px 4px;
     position: absolute;
 }
 
 /* Header */
 .sqlset-editor-toprow {
-    margin-bottom: 20px;
-    padding: 0 10px;
+    background-color: rgb(250, 250, 250);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    margin-bottom: 6px;
+    padding: 20px;
+    z-index: 101;
 }
 
 .sqlset-editor-toprow .leaf-button {
@@ -63,7 +64,7 @@
 /* Table */
 .sqlset-editor-table {
     overflow-x: hidden;
-    padding: 0 50px !important;
+    padding: 0 20% !important;
 }
 
 .sqlset-editor-table-row-container {
@@ -71,7 +72,9 @@
     border-bottom: 1px solid rgb(230,230,230);
     border-radius: 4px;
     margin-bottom: 10px;
-    padding: 10px 20px;
+    min-height: 50px;
+    min-width: 650px;
+    padding: 4px 20px 0;
     position: relative;
     transition: box-shadow 0.3s;
 }
@@ -81,8 +84,7 @@
 }
 
 .sqlset-editor-table-row {
-    min-height: 50px;
-    padding: 18px 8px 0;
+    padding: 0px 8px 0;
 }
 
 .sqlset-editor-row-id {
@@ -96,47 +98,19 @@
 
 /* Delete button */
 .sqlset-editor-sqlset-delete {
+    margin-top: -8px;
     position: absolute;
     right: 0;
     z-index: 100;
 }
 
 /* Input */
-.sqlset-editor-table .leaf-input {
-    background-color: rgba(28, 168, 221, 0.07) !important;
-    border: 1px solid transparent !important;
-    border-radius: 4px !important;
-}
-
-.sqlset-editor-table .leaf-input:hover,
-.sqlset-editor-table .leaf-input:focus {
-    background-color:rgba(28, 168, 221, 0.15) !important;
-}
-
-.sqlset-editor-input-container .concept-editor-checkbox-text,
-.sqlset-editor-input-container label {
-    color: rgb(50,50,50);
-}
-
 .sqlset-editor-specializationgroup-specialization label {
     display: none;
 }
 
 .sqlset-editor-specializationgroup-default .leaf-input {
     text-align: center !important;
-}
-
-/* Checkbox */
-.sqlset-editor-input-container-checkbox {
-    position: relative;
-}
-
-.sqlset-editor-input-container-checkbox .concept-editor-checkbox {
-    border-bottom: none !important;
-    left: 40%;
-    position: absolute;
-    top: 70%;
-    transform: translateY(-50%);
 }
 
 /* Add New Set */
@@ -147,6 +121,10 @@
 }
 
 /* Add New Specialization Group */
+.sqlset-editor-specializationgroups-container {
+    margin-top: -6px;
+}
+
 .sqlset-editor-subtable-header {
     text-align: center;
 }
@@ -212,6 +190,10 @@
     text-align: center;
 }
 
+.sqlset-editor-specializationgroup-container .sqlset-editor-unsaved {
+    margin-top: 2px !important;
+}
+
 .sqlset-editor-specializationgroup-container .leaf-input {
     font-size: 1.0rem !important;
 }
@@ -227,6 +209,7 @@
 
 .sqlset-editor-specializationgroup-specialization {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 4px;
 }
 
 .sqlset-editor-specializationgroup-container label small {
@@ -242,6 +225,11 @@
     padding: 4px 8px;
 }
 
+.sqlset-editor-input-column .position-relative.form-group {
+    margin-top: 0px;
+}
+
+
 .sqlset-editor-input-column:first-child .position-relative.form-group {
     margin-top: 6px;
 }
@@ -252,7 +240,7 @@
 
 
 .sqlset-editor-specialization-universalid {
-    margin-left: 140px;
+    margin-left: 132px;
 }
 
 .sqlset-editor-specialization-universalid::after {
@@ -262,7 +250,7 @@
     content: 'urn:leaf:specialization:';
     font-size: 0.85rem;
     left: 0;
-    margin-top: 2px;
+    margin-top: 3px;
     padding: 4px 8px;
     position: absolute;
 }

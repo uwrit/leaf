@@ -8,7 +8,7 @@
 export const workerContext = `
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
-        case INDEX_DATASETS:
+        case REINDEX_DATASETS:
             return reindexCacheFromExternal(payload);
         case SEARCH_DATASETS:
             return searchDatasets(payload);
@@ -16,80 +16,93 @@ var handleWorkMessage = function (payload) {
             return allowDataset(payload);
         case ALLOW_ALL_DATASETS:
             return allowAllDatasets(payload);
-        case ALLOW_DEMOGRAPHICS:
-            return allowDemographics(payload);
+        case SET_ADMIN_MODE:
+            return setAdminMode(payload);
         default:
             return null;
     }
 };
-// Dataset cache
+/*
+ * Shared cache.
+ */
 var demographics = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-var excluded = new Map([[demographics.id, demographics]]);
 var firstCharCache = new Map();
-var demographicsAllowed = false;
-var allDs = [];
-var allDsMap = new Map();
+var excluded = new Map([[demographics.id, demographics]]);
+var allDs = new Map();
+/*
+ * Admin-facing cache.
+ */
+var isAdmin = false;
+var allCatDsAdmin = new Map();
+var defaultOrderAdmin = new Map();
+/*
+ * User-facing cache.
+ */
+var allCatDs = new Map();
 var defaultOrder = new Map();
 /*
- * Sets the special demographics dataset to be included in
- * search results. This is used in the admin panel and ensure
- * that users don't see demographics when navigating the patient list.
+ * Set whether the worker should return search results to an admin (i.e., no exclusions),
+ * or to a user.
  */
-var allowDemographics = function (payload) {
-    var requestId = payload.requestId, allow = payload.allow;
-    if (allow) {
-        excluded.delete(demographics.id);
-    }
-    else {
-        excluded.set(demographics.id, demographics);
-    }
-    demographicsAllowed = allow;
-    reindexCacheFromLocal(payload);
-    return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
+var setAdminMode = function (payload) {
+    var requestId = payload.requestId, admin = payload.admin;
+    isAdmin = admin;
+    return { requestId: requestId, result: returnDefault() };
 };
 /*
- * Resets excluded datasets cache. Called when users
+ * Return the default display depending on whether the current mode is admin or user.
+ */
+var returnDefault = function () {
+    if (isAdmin) {
+        return { categories: allCatDsAdmin, displayOrder: defaultOrderAdmin };
+    }
+    return { categories: allCatDs, displayOrder: defaultOrder };
+};
+/*
+ * Flatten categorized datasets map into an array of datasets.
+ */
+var getDatasetsArray = function () {
+    return [ ...allCatDs.values() ]
+        .reduce((prev, curr) => prev = prev.concat([ ...curr.datasets.values() ]), []);
+};
+/*
+ * Reset excluded datasets cache. Called when users
  * reset the cohort and the patient list too is reset.
  */
 var allowAllDatasets = function (payload) {
     var requestId = payload.requestId;
     excluded.clear();
-    if (!demographicsAllowed) {
-        excluded.set(demographics.id, demographics);
-    }
-    var resorted = dedupeAndSort(allDs);
-    allDsMap = resorted.categories;
-    defaultOrder = resorted.displayOrder;
-    return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
+    excluded.set(demographics.id, demographics);
+    /*
+     * Get default display and sort order.
+     */
+    var reSorted = dedupeAndSort(getDatasetsArray());
+    allCatDs = reSorted.categories;
+    defaultOrder = reSorted.displayOrder;
+    return { requestId: requestId, result: returnDefault() };
 };
 /*
- * Allows or disallows a dataset to be included in search results.
+ * Allow or disallow a dataset to be included in search results.
  * Called as users add/remove datasets from the patient list screen.
  */
 var allowDataset = function (payload) {
-    var requestId = payload.requestId, datasetId = payload.datasetId, allow = payload.allow;
+    var datasetId = payload.datasetId, allow = payload.allow;
     if (allow) {
-        var ds = excluded.get(datasetId);
-        if (ds) {
-            allDs.push(ds);
-        }
         excluded.delete(datasetId);
     }
     else {
-        var dsIdx = allDs.findIndex(function (d) { return d.id === datasetId; });
-        if (dsIdx > -1) {
-            var ds = allDs[dsIdx];
+        var ds = allDs.get(datasetId);
+        if (ds) {
             excluded.set(ds.id, ds);
-            allDs.splice(dsIdx, 1);
         }
     }
-    var resorted = dedupeAndSort(allDs);
-    allDsMap = resorted.categories;
+    var resorted = dedupeAndSort(getDatasetsArray());
+    allCatDs = resorted.categories;
     defaultOrder = resorted.displayOrder;
-    return { requestId: requestId };
+    return searchDatasets(payload);
 };
 /*
- * Searches through available datasets.
+ * Search through available datasets.
  */
 var searchDatasets = function (payload) {
     var searchString = payload.searchString, requestId = payload.requestId;
@@ -99,7 +112,7 @@ var searchDatasets = function (payload) {
     var datasets = firstCharCache.get(firstTerm[0]);
     var dsOut = [];
     if (!searchString) {
-        return { requestId: requestId, result: { categories: allDsMap, displayOrder: defaultOrder } };
+        return { requestId: requestId, result: returnDefault() };
     }
     if (!datasets) {
         return { requestId: requestId, result: { categories: new Map(), displayOrder: new Map() } };
@@ -108,12 +121,26 @@ var searchDatasets = function (payload) {
     // First term
     // ******************
     /*
-     * Foreach dataset compare with search term one
+     * Foreach dataset compare with search term one. If demographics
+     * are disabled this is for a user, so leave out excluded datasets.
      */
-    for (var i1 = 0; i1 < datasets.length; i1++) {
-        var ds = datasets[i1];
-        if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
-            dsOut.push(ds);
+    if (!isAdmin) {
+        for (var i1 = 0; i1 < datasets.length; i1++) {
+            var ds = datasets[i1];
+            if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
+                dsOut.push(ds);
+            }
+        }
+        /*
+         * Else this is for an admin in the admin panel, so there are no exclusions.
+         */
+    }
+    else {
+        for (var i1 = 0; i1 < datasets.length; i1++) {
+            var ds = datasets[i1];
+            if (ds.token.startsWith(firstTerm)) {
+                dsOut.push(ds);
+            }
         }
     }
     if (terms.length === 1) {
@@ -155,7 +182,7 @@ var searchDatasets = function (payload) {
     return { requestId: requestId, result: dedupeAndSortTokenized(dsFinal) };
 };
 /*
- * Extracts datasets from tokenized refs and returns
+ * Extract datasets from tokenized refs and returns
  * a sorted, deduped result array.
  */
 var dedupeAndSortTokenized = function (refs) {
@@ -163,8 +190,8 @@ var dedupeAndSortTokenized = function (refs) {
     return dedupeAndSort(ds);
 };
 /*
- * Removes duplicates, sorts alphabetically, and
- * returns a displayable categorized array of datasets.
+ * Remove duplicates, sort alphabetically, and
+ * return a displayable categorized array of datasets.
  */
 var dedupeAndSort = function (refs) {
     var addedDatasets = new Set();
@@ -224,38 +251,33 @@ var dedupeAndSort = function (refs) {
     }
     return { categories: out, displayOrder: displayOrder };
 };
-var reindexCacheFromLocal = function (payload) {
-    var requestId = payload.requestId;
-    var sorted = addDatasetsToCache(allDs);
-    return { requestId: requestId, result: sorted };
-};
 var reindexCacheFromExternal = function (payload) {
     var requestId = payload.requestId, datasets = payload.datasets;
-    var sorted = addDatasetsToCache(datasets);
+    var sorted = reindexCacheCache(datasets);
     return { requestId: requestId, result: sorted };
 };
 /*
- * Resets the dataset search cache and (re)loads
+ * Reset the dataset search cache and (re)load
  * it with inbound datasets.
  */
-var addDatasetsToCache = function (datasets) {
+var reindexCacheCache = function (datasets) {
     /*
      * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
      */
     var all = datasets.slice().filter(function (ds) { return ds.shape !== 3; });
     all.unshift(demographics);
-    allDsMap.clear();
-    allDsMap.set('', { category: '', datasets: new Map([[demographics.id, demographics]]) });
+    allCatDs.clear();
+    allCatDsAdmin.clear();
+    allCatDsAdmin.set('', { category: '', datasets: new Map([[demographics.id, demographics]]) });
     firstCharCache.clear();
+    excluded.clear();
+    excluded.set(demographics.id, demographics);
     /*
      * Foreach dataset
      */
     for (var i = 0; i < all.length; i++) {
         var ds = all[i];
-        var tokens = ds.name
-            .toLowerCase()
-            .split(' ')
-            .concat(ds.tags);
+        var tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
         if (ds.category) {
             tokens = tokens.concat(ds.category.toLowerCase().split(' '));
         }
@@ -272,7 +294,7 @@ var addDatasetsToCache = function (datasets) {
             };
             var firstChar = token[0];
             /*
-             * Cache the first first character for quick lookup
+             * Cache the first first character for quick lookup.
              */
             if (!firstCharCache.has(firstChar)) {
                 firstCharCache.set(firstChar, [ref]);
@@ -285,14 +307,19 @@ var addDatasetsToCache = function (datasets) {
             _loop_1(j);
         }
     }
-    if (!demographicsAllowed) {
-        all.shift();
-        excluded.set(demographics.id, demographics);
-    }
-    var sorted = dedupeAndSort(all);
-    allDs = datasets;
-    allDsMap = sorted.categories;
-    defaultOrder = sorted.displayOrder;
-    return sorted;
+    /*
+     * Set admin search default display.
+     */
+    var adminSorted = dedupeAndSort(all);
+    allCatDsAdmin = adminSorted.categories;
+    defaultOrderAdmin = adminSorted.displayOrder;
+    /*
+     * Set user search default display.
+     */
+    all.shift();
+    var userSorted = dedupeAndSort(all);
+    allCatDs = userSorted.categories;
+    defaultOrder = userSorted.displayOrder;
+    return userSorted;
 };
 `;

@@ -80,11 +80,14 @@
 }
 
 .identity-network-endpoint-cert-test {
+    margin-top: -10px;
     float: right;
 }
 
 .identity-network-endpoint-cert-test:hover {
-    text-decoration: underline !important; 
+    background-color: rgb(12, 168, 93) !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: rgb(245, 245, 245) !important;
 }
 
 .identity-network-endpoint-dropdown-toggle,
@@ -120,6 +123,7 @@
     font-size: 0.8rem;
     margin-right: -8px;
     margin-top: -23px;
+    padding: 2px 4px;
 }
 
 .identity-network-endpoint-delete:hover {
@@ -154,4 +158,16 @@
 
 .identity-network-endpoint .checkbox-slider-container {
     padding-right: 50px;
+}
+
+/* Modal */
+.identity-network-endpoint-certificate-preview .modal-body label {
+    color: rgb(150,150,150);
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: -2px;
+}
+
+.identity-network-endpoint-certificate-preview .modal-body textarea {
+    margin-top: -2px;
 }

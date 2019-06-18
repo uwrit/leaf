@@ -56,7 +56,7 @@ export const processApiUpdateQueue = () => {
                 header: "Error Applying Changes",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     }
@@ -105,7 +105,7 @@ export const deleteAdminConceptSqlSet = (set: ConceptSqlSet) => {
                     } else {
                         info.body = "An error occurred while attempting to delete the SQL Set. Please see the Leaf error logs for details.";
                     }
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 });
         } catch (err) {

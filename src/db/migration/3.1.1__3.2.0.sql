@@ -53,6 +53,14 @@ GO
 IF EXISTS (SELECT 1 FROM sys.objects WHERE name = 'FK_DatasetQuery_CategoryId' and [type] = 'F')
     ALTER TABLE [app].[DatasetQuery] DROP CONSTRAINT FK_DatasetQuery_CategoryId
 GO
+
+-- Copy any existing rows
+BEGIN TRY DROP TABLE #DatasetQueryCategory END TRY BEGIN CATCH END CATCH
+CREATE TABLE #DatasetQueryCategory ([Id] [int] NOT NULL, [Category] [nvarchar](200) NOT NULL, [Created] [datetime] NOT NULL)
+INSERT INTO #DatasetQueryCategory
+SELECT Id, Category, Created
+FROM app.DatasetQueryCategory
+
 IF OBJECT_ID('app.DatasetQueryCategory') IS NOT NULL
     DROP TABLE [app].[DatasetQueryCategory]
 GO
@@ -65,6 +73,14 @@ CREATE TABLE [app].[DatasetQueryCategory](
 	[UpdatedBy] [nvarchar](1000) NOT NULL
 ) ON [PRIMARY]
 GO
+
+SET IDENTITY_INSERT app.DatasetQueryCategory ON
+INSERT INTO app.DatasetQueryCategory (Id, Category, Created, CreatedBy, Updated, UpdatedBy)
+SELECT Id, Category, Created, '', GETDATE(), ''
+FROM #DatasetQueryCategory
+SET IDENTITY_INSERT app.DatasetQueryCategory OFF
+
+
 ALTER TABLE [app].[DatasetQueryCategory] ADD PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -79,7 +95,7 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQueryCategory_Category] ON [app]
 GO
 ALTER TABLE [app].[DatasetQueryCategory] ADD  CONSTRAINT [DF_DatasetQueryCategory_Created]  DEFAULT (getdate()) FOR [Created]
 GO
-ALTER TABLE [app].[DatasetQuery]  WITH CHECK ADD  CONSTRAINT [FK_DatasetQuery_CategoryId] FOREIGN KEY([CategoryId])
+ALTER TABLE [app].[DatasetQuery]  WITH CHECK ADD CONSTRAINT [FK_DatasetQuery_CategoryId] FOREIGN KEY([CategoryId])
 REFERENCES [app].[DatasetQueryCategory] ([Id])
 GO
 ALTER TABLE [app].[DatasetQuery] CHECK CONSTRAINT [FK_DatasetQuery_CategoryId]
@@ -579,6 +595,21 @@ BEGIN
 END
 GO
 
+
+-- Drop any stored procedures that require ResourceConstraintTable (they'll be 
+-- added back in below).
+IF OBJECT_ID('adm.sp_CreateConcept', 'P') IS NOT NULL
+	DROP PROCEDURE [adm].[sp_CreateConcept]
+GO
+IF OBJECT_ID('adm.sp_UpdateConcept', 'P') IS NOT NULL
+	DROP PROCEDURE [adm].[sp_UpdateConcept]
+GO
+IF OBJECT_ID('adm.sp_CreateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_CreateDatasetQuery]
+GO
+IF OBJECT_ID('adm.sp_UpdateDatasetQuery', 'P') IS NOT NULL
+        DROP PROCEDURE [adm].[sp_UpdateDatasetQuery]
+GO
 
 -- Create generic ResourceConstraintTable
 IF TYPE_ID('[auth].[ResourceConstraintTable]') IS NOT NULL
@@ -1216,6 +1247,9 @@ BEGIN
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
 
+		DELETE FROM auth.DatasetQueryConstraint
+		WHERE DatasetQueryId = @id
+
         DELETE FROM app.DatasetQuery
         OUTPUT deleted.Id
         WHERE Id = @id;
@@ -1321,8 +1355,8 @@ END
 GO
 
 
-IF OBJECT_ID('adm.sp_CreateConceptSqlSet', 'P') IS NOT NULL
-    DROP PROCEDURE [adm].[sp_CreateConceptSqlSet];
+IF OBJECT_ID('adm.sp_CreateConceptEvent', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_CreateConceptEvent];
 GO
 -- =======================================
 -- Author:      Nic Dobbins

@@ -17,6 +17,7 @@ import { Input } from '../../Section/Input';
 interface Props {
     dispatch: any;
     group: SpecializationGroup;
+    forceValidation: boolean;
     specialization: Specialization;
 }
 
@@ -28,7 +29,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { specialization } = this.props;
+        const { specialization, forceValidation } = this.props;
         const unsaved = specialization.unsaved || specialization.changed;
         const c = this.className;
         const uid = specialization.universalId
@@ -54,6 +55,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
                     <Col className={`${c}-input-container`} md={4}>
                         <TextArea
                             changeHandler={this.handleDropdownOptionEdit} propName={'uiDisplayText'} value={specialization.uiDisplayText}
+                            required={true} errorText='Enter Text to display' forceValidation={forceValidation}
                         />
                     </Col>
 
@@ -67,6 +69,7 @@ export class SpecializationDropdownOption extends React.PureComponent<Props> {
 
                         <TextArea
                             changeHandler={this.handleDropdownOptionEdit} propName={'sqlSetWhere'} value={specialization.sqlSetWhere}
+                            required={true} errorText='Enter a valid SQL WHERE clause' forceValidation={forceValidation}
                         />
                     </Col>
                 </Row>

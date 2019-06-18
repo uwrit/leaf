@@ -68,7 +68,9 @@ import {
     SET_ADMIN_NETWORK_ENDPOINT, 
     SET_ADMIN_NETWORK_ENDPOINTS, 
     REVERT_ADMIN_NETWORK_CHANGES, 
-    REMOVE_ADMIN_NETWORK_ENDPOINT
+    REMOVE_ADMIN_NETWORK_ENDPOINT,
+    SET_ADMIN_NETWORK_CERT_MODAL,
+    TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN
 } from "../../actions/admin/networkAndIdentity";
 import { 
     SET_ADMIN_SQL_CONFIGURATION, 
@@ -82,7 +84,7 @@ import { setAdminConceptSpecialization, removeAdminConceptSpecialization, syncAd
 import { setAdminConceptEvents, removeAdminConceptEvent, undoAdminConceptEventChange, setAdminUneditedConceptEvent } from "./conceptEvent";
 import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPanelDemographicsDataset, setAdminPanelDatasetShape, setAdminPanelDatasetSql } from "./dataset";
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
-import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, revertAdminNetworkChanges, removeAdminNetworkEndpoint } from "./networkAndIdentity";
+import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, removeAdminNetworkEndpoint, setAdminNetworkCertModalContent, setAdminNetworkCertModalShown, revertAdminNetworkChanges } from "./networkAndIdentity";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -123,6 +125,9 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             endpoints: new Map(),
             identity: getDefaultIdentity(),
+            modal: {
+                show: false  
+            },
             uneditedEndpoints: new Map(),
             uneditedIdentity: getDefaultIdentity()
         },
@@ -255,6 +260,10 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminNetworkEndpoint(state, action);
         case REVERT_ADMIN_NETWORK_CHANGES:
             return revertAdminNetworkChanges(state, action);
+        case SET_ADMIN_NETWORK_CERT_MODAL:
+            return setAdminNetworkCertModalContent(state, action);
+        case TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN:
+            return setAdminNetworkCertModalShown(state, action);
 
         default:
             return state;

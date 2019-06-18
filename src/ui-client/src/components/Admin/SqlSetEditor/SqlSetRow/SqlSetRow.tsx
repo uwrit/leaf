@@ -23,6 +23,7 @@ import { ConceptEventTypeDropdown } from '../ConceptEventTypeDropdown/ConceptEve
 interface Props {
     dispatch: any;
     eventTypes: ConceptEvent[];
+    forceValidation: boolean;
     set: ConceptSqlSet;
     state: AdminState;
 }
@@ -54,12 +55,11 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { set, eventTypes, dispatch } = this.props;
+        const { set, eventTypes, dispatch, forceValidation } = this.props;
         const c = this.className;
         const unsaved = set.unsaved || set.changed;
         const currentEventType = set.eventId ? eventTypes.find((ev) => ev.id === set.eventId) : undefined;
-        const spcGrps: SpecializationGroup[] = [];
-        set.specializationGroups.forEach((g) => spcGrps.push(g));
+        const spcGrps: SpecializationGroup[] = [ ...set.specializationGroups.values() ];
 
         return (
             <div className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
@@ -79,14 +79,17 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
 
                 <Row className={`${c}-table-row`}>
 
-                    {/* SQL Set and Date */}
+                    {/* SQL Set */}
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
-                            <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} label='SQL FROM'/>
+                            <TextArea 
+                                changeHandler={this.handleSqlSetEdit} propName={'sqlSetFrom'} value={set.sqlSetFrom} label='SQL FROM'
+                                required={true} errorText='Enter a valid SQL Set' forceValidation={forceValidation}
+                            />
                         </div>
                     </Col>
 
-                    {/* SQL Event */}
+                    {/* SQL Date Field */}
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
                             <Container>
@@ -95,13 +98,13 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                             {set.isEncounterBased &&
                             <TextArea 
                                 changeHandler={this.handleSqlSetEdit} propName={'sqlFieldDate'} value={set.sqlFieldDate} 
-                                label='Date Field'
+                                label='Date Field' required={set.isEncounterBased} errorText='Enter a valid SQL Date Field' forceValidation={forceValidation}
                             />
                             }
                         </div>
                     </Col>
 
-                    {/* Checkboxes */}
+                    {/* SQL Event Field */}
                     <Col md={4} className={`${c}-input-column`}>
                         <div className={`${c}-input-container`}>
                             <Container>
@@ -109,13 +112,18 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                             </Container>
                             {set.isEventBased &&
                             <div>
-                                <TextArea changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'/>
-                                <ConceptEventTypeDropdown changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType} dispatch={dispatch}/>
+                                <TextArea 
+                                    changeHandler={this.handleSqlSetEdit} propName={'sqlFieldEvent'} value={set.sqlFieldEvent} label='Event Field'
+                                    required={set.isEventBased} errorText='Enter a valid SQL Event Field' forceValidation={forceValidation}
+                                />
+                                <ConceptEventTypeDropdown 
+                                    changeHandler={this.handleSqlSetEdit} eventTypes={eventTypes} currentType={currentEventType} dispatch={dispatch}
+                                />
                             </div>
                             }
+
                         </div>
                     </Col>
-
                 </Row>
                 
                 {/* Specialization Groups */}
@@ -131,7 +139,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
      * Render Specialization dropdowns specific to this set.
      */
     private renderSpecializationData = (spcGrps: SpecializationGroup[]) => {
-        const { dispatch, set } = this.props;
+        const { dispatch, set, forceValidation } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
 
@@ -168,7 +176,11 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
                         */}
                         {spcGrps
                             .sort((a,b) => a.id > b.id ? 1 : -1)
-                            .map((g) => <SpecializationGroupDropdownPreview changeHandler={this.handleSqlSetEdit} dispatch={dispatch} specializationGroup={g} key={g.id}/>)
+                            .map((g) => (
+                                <SpecializationGroupDropdownPreview 
+                                    changeHandler={this.handleSqlSetEdit} dispatch={dispatch} specializationGroup={g} key={g.id} forceValidation={forceValidation}
+                                />
+                            ))
                         }
                         <div className={`${c}-add-specializationgroup`} onClick={this.handleAddSpecializationGroupDropdownClick}>
                             <span>+Add New Dropdown</span>
@@ -189,8 +201,9 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     /* 
      * Generate a random ID for a new specialization group.
      */
-    private generateRandomIntegerId = () => {
+    private generateSequentialIntegerId = () => {
         const { specializationGroups } = this.props.set;
+        if (!specializationGroups.size) { return 1; }
         const max = Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) ;
         return max + 1;
     }
@@ -241,7 +254,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     private handleAddSpecializationGroupDropdownClick = () => {
         const { set, dispatch } = this.props;
         const grp: SpecializationGroup = {
-            id: this.generateRandomIntegerId(),
+            id: this.generateSequentialIntegerId(),
             sqlSetId: set.id,
             specializations: new Map(),
             uiDefaultText: '',

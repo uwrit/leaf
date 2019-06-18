@@ -6,7 +6,7 @@
  */ 
 
 import { NetworkIdentity } from "../../models/NetworkResponder";
-import { NetworkEndpoint } from "../../models/admin/Network";
+import { NetworkEndpoint, Certificate } from "../../models/admin/Network";
 import { AppState } from "../../models/state/AppState";
 import { createEndpoint, updateEndpoint, deleteEndpoint, getCertificate } from "../../services/admin/networkAndIdentityApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
@@ -17,14 +17,18 @@ import { setResponder } from "../networkResponders";
 export const SET_ADMIN_NETWORK_IDENTITY = 'SET_ADMIN_NETWORK_IDENTITY';
 export const SET_ADMIN_NETWORK_ENDPOINT = 'SET_ADMIN_NETWORK_ENDPOINT';
 export const SET_ADMIN_NETWORK_ENDPOINTS = 'SET_ADMIN_NETWORK_ENDPOINTS';
+export const SET_ADMIN_NETWORK_CERT_MODAL = 'SET_ADMIN_NETWORK_CERT_MODAL';
+export const TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN = 'TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN';
 export const REMOVE_ADMIN_NETWORK_ENDPOINT = 'REMOVE_ADMIN_NETWORK_ENDPOINT';
 export const REVERT_ADMIN_NETWORK_CHANGES = 'REVERT_ADMIN_NETWORK_CHANGES';
 
 export interface AdminNetworkAndIdentityAction {
     changed?: boolean;
+    cert?: Certificate;
     endpoint?: NetworkEndpoint;
     endpoints?: NetworkEndpoint[];
     identity?: NetworkIdentity;
+    show?: boolean;
     type: string;
 }
 
@@ -54,7 +58,7 @@ export const processApiUpdateQueue = () => {
                 header: "Error Applying Changes",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     }
@@ -90,13 +94,13 @@ export const deleteNetworkEndpoint = (endpoint: NetworkEndpoint) => {
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminNetworkEndpoint(endpoint));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept Specialization. Please see the Leaf error logs for details.",
                             header: "Error Deleting Concept Specialization",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {
@@ -109,16 +113,21 @@ export const deleteNetworkEndpoint = (endpoint: NetworkEndpoint) => {
  * Test and attempt to load remote Leaf instance cert
  * info based on current URL.
  */
-export const attemptRemoteLeafCertCall = (endpoint: NetworkEndpoint) => {
+export const attemptLoadRemoteLeafCert = (endpoint: NetworkEndpoint) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             dispatch(setNoClickModalState({ message: "Phoning a friend...", state: NoClickModalStates.CallingServer }));
             const cert = await getCertificate(getState(), endpoint.address);
-            console.log(cert);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
+            dispatch(setAdminNetworkCertModalContent(cert, endpoint));
         } catch (err) {
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            const info: InformationModalState = {
+                body: `No remote Leaf instance was found at ${endpoint.address}. Check that the address is correct and try again.`,
+                header: "No Leaf Instance found",
+                show: true
+            };
+            dispatch(showInfoModal(info));
         }
+        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
     }
 };
 
@@ -158,3 +167,18 @@ export const revertAdminNetworkChanges = (): AdminNetworkAndIdentityAction => {
         type: REVERT_ADMIN_NETWORK_CHANGES
     };
 };
+
+export const setAdminNetworkCertModalContent = (cert: Certificate, endpoint: NetworkEndpoint): AdminNetworkAndIdentityAction => {
+    return {
+        cert,
+        endpoint,
+        type: SET_ADMIN_NETWORK_CERT_MODAL
+    }
+}
+
+export const setAdminNetworkCertModalShown = (show: boolean): AdminNetworkAndIdentityAction => {
+    return {
+        show,
+        type: TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN
+    }
+}

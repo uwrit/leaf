@@ -7,6 +7,7 @@
 
 import moment from 'moment';
 import React from 'react';
+
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
 import { refreshSession, saveSessionAndLogout } from '../actions/session';
@@ -27,8 +28,10 @@ import NoClickModal from '../components/Modals/NoClickModal/NoClickModal';
 import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
 import { CohortStateType } from '../models/state/CohortState';
-import { AdminPanelConceptEditorPane } from '../models/state/AdminState';
+import { AdminPanelPane } from '../models/state/AdminState';
+import { version } from '../../package.json'
 import './App.css';
+
 
 interface OwnProps {
 }
@@ -39,7 +42,7 @@ interface StateProps {
     auth?: AuthorizationState;
     cohortCountState: CohortStateType;
     confirmationModal: ConfirmationModalState;
-    currentAdminPane: AdminPanelConceptEditorPane;
+    currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
     exportState: ExportState;
     informationModal: InformationModalState;
@@ -56,7 +59,6 @@ class App extends React.Component<Props> {
     private sessionTokenRefreshPaddingMinutes = 2;
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
-    private heartbeatBegun = false;
 
     constructor(props: Props) {
         super(props);
@@ -66,6 +68,7 @@ class App extends React.Component<Props> {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         dispatch(getIdToken());
+        console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 
@@ -74,7 +77,7 @@ class App extends React.Component<Props> {
 
     public getSnapshotBeforeUpdate(nextProps: Props) {
         const { sessionContext } = nextProps;
-        if (!this.heartbeatBegun && sessionContext) {
+        if (sessionContext) {
             this.handleSessionTokenRefresh(sessionContext);
         }
         return null;
@@ -129,7 +132,6 @@ class App extends React.Component<Props> {
      * Refresh user session token (should be short interval, e.g., 4 minutes).
      */
     private handleSessionTokenRefresh(ctx: SessionContext) {
-        this.heartbeatBegun = true;
         const { dispatch } = this.props;
         const refreshDtTm = moment(ctx.expirationDate).add(-this.sessionTokenRefreshPaddingMinutes, 'minute').toDate();
         const diffMs = refreshDtTm.getTime() - new Date().getTime();

@@ -2257,6 +2257,9 @@ BEGIN
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
 
+		DELETE FROM auth.DatasetQueryConstraint
+		WHERE DatasetQueryId = @id
+
         DELETE FROM app.DatasetQuery
         OUTPUT deleted.Id
         WHERE Id = @id;

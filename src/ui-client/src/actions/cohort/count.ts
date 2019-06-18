@@ -23,7 +23,8 @@ import { setAggregateVisualizationData, setNetworkVisualizationData } from './vi
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
-import { setDatasetDisplay, setDatasetDisplayAll } from '../datasets';
+import { allowAllDatasets } from '../../services/datasetSearchApi';
+import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -112,11 +113,16 @@ export const getCounts = () => {
                         .then(() => resolve());
                 })
             })                
-        ).then(() => {
+        ).then( async () => {
+
             if (getState().cohort.count.state !== CohortStateType.REQUESTING) { return; }
             dispatch(setCohortCountFinished(atLeastOneSucceeded));
 
-            if (!atLeastOneSucceeded) {
+            if (atLeastOneSucceeded) {
+                const visibleDatasets = await allowAllDatasets();
+                dispatch(setDatasetSearchResult(visibleDatasets));
+                dispatch(setDatasetSearchTerm(''));
+            } else {
                 const info : InformationModalState = {
                     header: "Error Running Query",
                     body: "Leaf encountered an error while running your query. If this continues, please contact your Leaf administrator.",
@@ -144,7 +150,6 @@ const getDemographics = () => {
                 responders.push(nr); 
             } 
         });
-        dispatch(setDatasetDisplayAll());
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
         Promise.all(

@@ -19,6 +19,7 @@ import { Row, Col, Container } from 'reactstrap';
 interface Props {
     changeHandler: (val: any, propName: string) => any;
     dispatch: any;
+    forceValidation: boolean;
     specializationGroup: SpecializationGroup;
 }
 
@@ -29,7 +30,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
     }
 
     public render() {
-        const { specializationGroup, dispatch } = this.props;
+        const { specializationGroup, dispatch, forceValidation } = this.props;
         const c = this.className;
         const unsaved = specializationGroup.unsaved || specializationGroup.changed;
         const spcs: Specialization[] = [];
@@ -52,7 +53,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 <div className={`${c}-specializationgroup-default`}>
                     <TextArea 
                         changeHandler={this.handleSpecializationGroupEdit} propName={'uiDefaultText'} value={specializationGroup.uiDefaultText} 
-                        label=' ' subLabel='Default Text'
+                        label=' ' subLabel='Default Text' required={true} errorText='Enter a Default Name to display' forceValidation={forceValidation}
                     />
                 </div>
 
@@ -66,7 +67,9 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
                 </Container>
                 
                 {/* Specializations */}
-                {spcs.sort(this.sortSpecializations).map((s) => <SpecializationDropdownOption dispatch={dispatch} specialization={s} key={s.id} group={specializationGroup} />)}
+                {spcs.sort(this.sortSpecializations).map((s) => (
+                    <SpecializationDropdownOption dispatch={dispatch} specialization={s} key={s.id} group={specializationGroup} forceValidation={forceValidation}/>
+                ))}
 
                 {/* Add Specialization Button */}
                 <div className={`${c}-add-specialization-container`}>

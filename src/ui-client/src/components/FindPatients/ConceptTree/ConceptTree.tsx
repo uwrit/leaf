@@ -30,7 +30,7 @@ export default class ConceptTree extends React.Component<Props> {
         const { tree, allowReparent, allowRerender, dispatch, selectedId } = this.props;
         const roots = this.props.roots
             .map(id => tree.get(id)!)
-            .sort((a: Concept, b: Concept) => a.uiDisplayName.localeCompare(b.uiDisplayName));
+            .sort((a: Concept, b: Concept) => a.uiDisplayName > b.uiDisplayName ? 1 : -1);
 
         return (
             <div className="concept-tree">

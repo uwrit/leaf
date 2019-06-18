@@ -48,7 +48,7 @@ export const revertAdminAndUserConceptChanges = (adminConcept: AdminConcept, use
         } catch (err) {
             console.log(err);
         }
-        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
     };
 };
 
@@ -87,7 +87,7 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
             if (!state.admin!.concepts.currentAdminConcept) {
                 dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
                 adminConcept =  Object.assign({}, await getAdminConcept(state, userConcept.id), { parentId, newRootId });
-                dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
+                dispatch(setNoClickModalState({ state: NoClickModalStates.Complete }));
             }
 
             /*
@@ -191,7 +191,7 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Concept. Please see the Leaf error logs for details.",
                 header: "Error Saving Concept",
@@ -247,7 +247,7 @@ export const deleteAdminConceptFromServer = (concept: Concept, userConcept: User
                     } else {
                         info.body = "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.";
                     }
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
             );

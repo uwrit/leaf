@@ -14,22 +14,15 @@ interface Props extends PropertyProps {
     overrideTabKeyDown?: boolean;
 }
 
-interface State {
-    valid: boolean;
-}
-
-export class TextArea extends React.PureComponent<Props,State> {
+export class TextArea extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
-        this.state = {
-            valid: true
-        }
     }
 
     public render() {
-        const { className, label, subLabel, locked, value, required, onClick } = this.props;
-        const { valid } = this.state;
+        const { className, label, subLabel, locked, value, required, onClick, forceValidation, errorText } = this.props;
         const classes = [ 'leaf-input' ];
+        const valid = !required ? true : !!value;
         let val = value || '';
 
         if (!valid) {
@@ -64,6 +57,9 @@ export class TextArea extends React.PureComponent<Props,State> {
                         value={val}
                     />
                 </div>
+                {forceValidation && !valid && errorText &&
+                <span className='validation-error'>{errorText}</span>
+                }
             </FormGroup>
         );
     }
@@ -94,8 +90,5 @@ export class TextArea extends React.PureComponent<Props,State> {
         const { changeHandler, propName, required } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);
-        if (required) {
-            this.setState({ valid: !!newVal });
-        }
     };
 };

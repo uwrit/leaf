@@ -19,7 +19,7 @@ import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
-import { allowDemographicsDatasetInSearch, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
+import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
 import { generate as generateId } from 'shortid';
 import { Display } from './Sections/Display';
 import { SqlEditor } from './SqlEditor/SqlEditor';
@@ -33,6 +33,7 @@ interface Props {
 }
 
 interface State {
+    forceValidation: boolean;
     shapes: PatientListDatasetShape[];
 }
 
@@ -41,6 +42,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            forceValidation: false,
             shapes: []
         }
     }
@@ -57,19 +59,19 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         shapes = shapes.sort((a,b) => PatientListDatasetShape[a] > PatientListDatasetShape[b] ? 1 : -1);
 
         this.setState({ shapes });
-        dispatch(allowDemographicsDatasetInSearch(true));
+        dispatch(setAdminDatasetSearchMode(true));
     }
 
     public componentWillUnmount() {
         const { dispatch } = this.props;
-        dispatch(allowDemographicsDatasetInSearch(false));
-        dispatch(setAdminDataset(undefined, false));
+        dispatch(setAdminDatasetSearchMode(false));
+        dispatch(setAdminDataset(undefined, false, false));
     }
 
     public render() {
         const { data, datasets, dispatch } = this.props;
         const { currentDataset, changed, expectedColumns } = data.datasets;
-        const { shapes } = this.state;
+        const { shapes, forceValidation } = this.state;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
         const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
         let currentCategory = undefined;
@@ -105,14 +107,26 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* Header */}
-                                {datasets.display.size > 0 &&
+                                {data.datasets.demographicsDataset && !data.datasets.demographicsDataset.unsaved &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
                                     <Button className='leaf-button leaf-button-warning' disabled={allowDelete} onClick={this.handleDeleteClick}>Delete</Button>
                                 </div>
-                                }        
+                                }
+
+                                {/* Create a SQL Set link, used at initial setup */}
+                                {data.state === AdminPanelLoadState.LOADED && data.datasets.demographicsDataset.unsaved && !currentDataset &&
+                                <div className={`${c}-start`}>
+                                    <p>It looks like you haven't created a Basic Demographics query to populate the Visualize and Patient List screens.</p>
+                                    <p>
+                                        <a onClick={this.handleInitialBasicDemographicsSetupClick}>
+                                            Click here to start creating a SQL query to return demographics data.
+                                        </a>
+                                    </p>
+                                </div>
+                                }
 
                                 {/* Editor */}
                                 {currentDataset &&
@@ -123,6 +137,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                             categories={data.datasetQueryCategories.categories}
                                             dataset={currentDataset}
                                             dispatch={dispatch}
+                                            forceValidation={forceValidation}
                                             inputChangeHandler={this.handleInputChange}
                                             locked={locked}
                                             shapeChangeHandler={this.handleShapeClick}
@@ -159,6 +174,14 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         );
     }
 
+    /*
+     * Handle initial click to create a Basic Demographics query.
+     */
+    private handleInitialBasicDemographicsSetupClick = () => {
+        const { dispatch, data } = this.props;
+        dispatch(setAdminDataset(data.datasets.demographicsDataset, true, true));
+    }
+
     /* 
      * Set optional content.
      */
@@ -184,12 +207,29 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
+     * Validate that current admin Concept is valid. Called on 'Save' click.
+     */
+    private currentDatasetIsValid = (): boolean => {
+        const { currentDataset } = this.props.data.datasets;
+
+        if (!currentDataset) { return false; }
+        if (!currentDataset.name) { return false; }
+
+        /*
+         * No need to check the [sqlStatement], as the missing SQL column
+         * check following this will return granular information on those.
+         */
+        return true;
+    }
+
+    /*
      * Trigger a fallback to unedited, undoing any current changes.
      */
     private handleUndoChanges = () => {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
         dispatch(revertAdminDatasetChanges(datasets.currentDataset!));
+        this.setState({ forceValidation: false });
     }
 
     /*
@@ -199,8 +239,45 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { datasets} = this.props.data;
         const { dispatch } = this.props;
         const missingCols = datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
+        const isValid = this.currentDatasetIsValid();
+        
+        /*
+         * It's valid and has no missing columns, so save.
+         */
+        if (isValid && !missingCols.length) {
+            if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+            } else {
+                dispatch(saveAdminDataset(datasets.currentDataset!));
+            }
 
-        if (missingCols.length) {
+        /*
+         * One or more fields are missing data.
+         */
+        } else if (!isValid) {
+            const confirm: ConfirmationModalState = {
+                body: `One or more fields are missing necessary data. Are you sure you want to save this Dataset?`,
+                header: 'Missing Dataset data',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
+                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                    } else {
+                        dispatch(saveAdminDataset(datasets.currentDataset!));
+                    }
+                    this.setState({ forceValidation: false });
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Save Dataset`
+            };
+            dispatch(showConfirmationModal(confirm));
+            this.setState({ forceValidation: true });
+
+        /*
+         * One or more expected columns are missing.
+         */
+        } else if (missingCols.length) {
             const confirm: ConfirmationModalState = {
                 body: [
                     <p key={1}>Your current SQL Query appears to be missing the following required columns: {missingCols.join(', ')}. </p>,
@@ -221,14 +298,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 yesButtonText: `Yes, I'm sure`
             };
             dispatch(showConfirmationModal(confirm));
-            return;
-        }
-
-        if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
-            dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
-        } else {
-            dispatch(saveAdminDataset(datasets.currentDataset!));
-        }
+        } 
     }
 
     /* 
@@ -248,7 +318,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         };
 
         dispatch(setDatasetDisplay(newDs));
-        dispatch(setAdminDataset(newAdminDs, true));
+        dispatch(setAdminDataset(newAdminDs, true, false));
     }
 
     /*
@@ -273,7 +343,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     : ''
             }
             dispatch(moveDatasetCategory(ds, newCategoryText));
-            dispatch(setAdminDataset(adminDs, true));
+            dispatch(setAdminDataset(adminDs, true, false));
         }
     }
 
@@ -349,7 +419,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             constraints: [],
             name,
             shape,
-            sqlStatement: '',
+            sqlStatement: 'SELECT FROM dbo.table',
             tags: [],
             unsaved: true
         };
@@ -362,8 +432,8 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             unsaved: true
         };
         dispatch(addDataset(newUserDs));
-        dispatch(setAdminDataset(newAdminDs, false));
-        dispatch(setAdminDataset(newAdminDs, true));
-        dispatch(setAdminDatasetSql('SELECT FROM dbo.table'));
+        dispatch(setAdminDataset(newAdminDs, true, true));
+        dispatch(setDatasetSelected(newUserDs));
+
     }
 }
