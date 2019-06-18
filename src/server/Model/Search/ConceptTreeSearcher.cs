@@ -57,7 +57,7 @@ namespace Model.Search
         {
             Ensure.NotNull(term, nameof(term));
 
-            log.LogInformation("Getting concept with ancestry by search. Term:{Term}", term);
+            log.LogInformation("Getting concept with ancestry by term. Root:{Root} Term:{Term}", root, term);
             var terms = term.Split(' ');
             return await reader.GetWithParentsBySearchTermAsync(root, terms);
         }
@@ -74,7 +74,7 @@ namespace Model.Search
         {
             Ensure.NotNull(ids, nameof(ids));
 
-            log.LogInformation("Getting parent concepts for Ids:{Ids}", ids);
+            log.LogInformation("Getting parent concepts. Ids:{Ids}", ids);
 
             try
             {
@@ -82,7 +82,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get rooted concepts of children ids {Ids}. Error:{Error}", ids, de.Message);
+                log.LogError("Failed to get rooted concepts of children ids. ID:{Ids} Error:{Error}", ids, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -104,7 +104,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get child concepts. ParentId:{ParentId} Error:{Error}", parent, de.Message);
+                log.LogError("Failed to get child concepts. ParentId:{ParentId} Error:{Error}", parent, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -133,7 +133,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not get concept by Id. Id:{Id} Error:{Error}", id, de.Message);
+                log.LogError("Failed to get concept by Id. Id:{Id} Error:{Error}", id, de.Message);
                 de.MapThrow();
                 throw;
             }

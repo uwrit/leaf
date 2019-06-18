@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Model.Compiler;
@@ -52,7 +53,6 @@ namespace Model.Cohort
         /// <param name="cancel">Cancelcellation token.</param>
         /// <param name="early">Early time bound.</param>
         /// <param name="late">Late time bound.</param>
-        /// <exception cref="LeafPreflightException"/>
         /// <exception cref="LeafRPCException"/>
         /// <exception cref="OperationCanceledException"/>
         /// <exception cref="LeafCompilerException"/>
@@ -60,25 +60,32 @@ namespace Model.Cohort
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null)
         {
+            log.LogInformation("Dataset starting. QueryRef:{QueryRef} DatasetRef:{DatasetRef}", query, datasetQuery);
             Ensure.NotNull(query, nameof(query));
             Ensure.NotNull(datasetQuery, nameof(datasetQuery));
 
             var request = new DatasetExecutionRequest(query, datasetQuery, early, late);
             var result = new Result();
 
+            log.LogInformation("Dataset execution request. Request:{@Request}", request);
             var validationContext = await contextProvider.GetCompilerContextAsync(request);
+            log.LogInformation("Dataset compiler validation context. Context:{@Context}", validationContext);
+
             result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
+                log.LogError("Dataset compiler context error. State:{State}", validationContext.State);
                 return result;
             }
 
             cancel.ThrowIfCancellationRequested();
 
             var exeContext = compiler.BuildDatasetSql(validationContext.Context);
-            log.LogInformation("Compiled Dataset Execution Context. Context:{@Context}", exeContext);
+            log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
+            log.LogInformation("Dataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
+            
             result.Dataset = data;
 
             return result;

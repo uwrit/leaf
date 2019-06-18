@@ -12,7 +12,7 @@ import { PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';
 import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Date';
-import { PatientListDatasetQueryDTO, PatientListDatasetDTO } from '../models/patientList/Dataset';
+import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetShape, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import moment from 'moment'
 
 /*
@@ -43,7 +43,7 @@ export function fetchDemographics(state: AppState, nr: NetworkIdentity, queryId:
 /*
  * Fetch a dataset, which may or may not have date boundaries.
  */
-export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQueryDTO, dates: DateBoundary) => {
+export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQuery, dates: DateBoundary) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = {
@@ -67,10 +67,35 @@ export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId
  * Fetch an array of all datasets potentially available 
  * to the user.
  */
-export function fetchAvailableDatasets(state: AppState) {
+const platelet: PatientListDatasetQueryDTO = {
+    id: '7d90433e-f36b-1410-8127-00ffffffffff',
+    category: 'Labs',
+    name: 'Platelet Count',
+    shape: PatientListDatasetShape.Observation,
+    tags: []
+};
+const encounter: PatientListDatasetQueryDTO = {
+    id: '8490433e-f36b-1410-8127-00ffffffffff',
+    category: 'Encounters',
+    name: 'Encounters',
+    shape: PatientListDatasetShape.Encounter,
+    tags: []
+};
+const procedure: PatientListDatasetQueryDTO = {
+    id: 'b18e4b63-be42-e911-9d09-b886875607d2',
+    category: 'Procedures',
+    name: 'Procedures',
+    shape: PatientListDatasetShape.Procedure,
+    tags: []
+};
+
+
+export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.get(`/api/dataset`);
+    const resp = await http.get(`/api/dataset`);
+    const ds = resp.data as PatientListDatasetQueryDTO[];
+    return ds;
 };
 
 /*

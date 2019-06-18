@@ -13,10 +13,10 @@ import { NetworkIdentity } from '../models/NetworkResponder';
 import { aggregateStatistics } from '../services/cohortAggregatorApi';
 import { setAggregateVisualizationData } from './cohort/visualize';
 
-export const SET_ResponderS = 'SET_ResponderS';
-export const ERROR_Responder = 'ERROR_ResponderS';
-export const ENABLE_Responder = 'ENABLE_Responder';
-export const DISABLE_Responder = 'DISABLE_Responder';
+export const SET_RESPONDERS = 'SET_RESPONDERS';
+export const ERROR_RESPONDER = 'ERROR_RESPONDER';
+export const ENABLE_RESPONDER = 'ENABLE_RESPONDER';
+export const DISABLE_RESPONDER = 'DISABLE_RESPONDER';
 
 export interface NetworkRespondersAction {
     responders?: NetworkIdentity[];
@@ -53,21 +53,28 @@ export const handleResponderToggle = (id: NetworkIdentity) => {
 export const enableResponder = (id: number): NetworkRespondersAction => {
     return {
         id,
-        type: ENABLE_Responder
+        type: ENABLE_RESPONDER
     };
 };
 
 export const disableResponder = (id: number): NetworkRespondersAction => {
     return {
         id,
-        type: DISABLE_Responder
+        type: DISABLE_RESPONDER
+    };
+};
+
+export const setResponder = (responder: NetworkIdentity): NetworkRespondersAction => {
+    return {
+        responders: [ responder ],
+        type: SET_RESPONDERS
     };
 };
 
 export const setResponders = (responders: NetworkIdentity[]): NetworkRespondersAction => {
     return {
         responders,
-        type: SET_ResponderS
+        type: SET_RESPONDERS
     };
 };
 
@@ -75,6 +82,6 @@ export const errorResponder = (id: number, error: string): NetworkRespondersActi
     return {
         error,
         id,
-        type: ERROR_Responder
+        type: ERROR_RESPONDER
     };
 };

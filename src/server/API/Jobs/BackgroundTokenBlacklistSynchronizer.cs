@@ -47,7 +47,7 @@ namespace API.Jobs
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("Could not refresh TokenBlacklistCache. Error: {Error}", e.ToString());
+                    logger.LogError("Failed to refresh TokenBlacklistCache. Error: {Error}", e.ToString());
                 }
                 finally
                 {

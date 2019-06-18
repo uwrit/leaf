@@ -7,6 +7,7 @@
 
 import moment from 'moment';
 import React from 'react';
+
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
 import { refreshSession, saveSessionAndLogout } from '../actions/session';
@@ -26,6 +27,9 @@ import ConfirmationModal from '../components/Modals/ConfirmationModal/Confirmati
 import NoClickModal from '../components/Modals/NoClickModal/NoClickModal';
 import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
+import { CohortStateType } from '../models/state/CohortState';
+import { AdminPanelPane } from '../models/state/AdminState';
+import { version } from '../../package.json'
 import './App.css';
 
 
@@ -36,7 +40,9 @@ interface DispatchProps {
 }
 interface StateProps {
     auth?: AuthorizationState;
+    cohortCountState: CohortStateType;
     confirmationModal: ConfirmationModalState;
+    currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
     exportState: ExportState;
     informationModal: InformationModalState;
@@ -62,6 +68,7 @@ class App extends React.Component<Props> {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         dispatch(getIdToken());
+        console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 
@@ -77,7 +84,7 @@ class App extends React.Component<Props> {
     }
 
     public render() {
-        const { auth, currentRoute, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
+        const { auth, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
             : null;
@@ -87,7 +94,7 @@ class App extends React.Component<Props> {
                 <Attestation />
                 <CohortCountBox />
                 <Header />
-                <Sidebar currentRoute={currentRoute} />
+                <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
@@ -162,7 +169,9 @@ class App extends React.Component<Props> {
 const mapStateToProps = (state: AppState) => {
     return {
         auth: state.auth,
+        cohortCountState: state.cohort.count.state,
         confirmationModal: state.generalUi.confirmationModal,
+        currentAdminPane: state.admin ? state.admin!.activePane : 0, 
         currentRoute: state.generalUi.currentRoute,
         exportState: state.dataExport,
         informationModal: state.generalUi.informationModal,

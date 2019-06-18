@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using Xunit;
-using Model.Admin;
+using Model.Admin.Compiler;
 using Model.Tagging;
 using System.Collections.Generic;
 using System.Linq;

@@ -13,6 +13,7 @@ namespace Model.Schema
         const string Varchar = "varchar";
         const string Nvarchar = "nvarchar";
         const string DateTime = "datetime";
+        const string DateTime2 = "datetime2";
         const string Date = "date";
         const string Bit = "bit";
         const string UniqueIdentifier = "uniqueidentifier";
@@ -35,6 +36,7 @@ namespace Model.Schema
 
                 case Date:
                 case DateTime:
+                case DateTime2:
                     return LeafType.DateTime;
 
                 case Bit:

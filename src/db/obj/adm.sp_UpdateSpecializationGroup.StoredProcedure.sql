@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateSpecializationGroup]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateSpecializationGroup]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/14
@@ -28,10 +27,10 @@ BEGIN
     IF (@id IS NULL)
         THROW 70400, N'SpecializationGroup.Id is required.', 1;
 
-    IF (@sqlSetId IS NULL)
-        THROW 70400, N'SpecializationGroup.SqlSetId is required.', 1;
-
-    IF (@uiDefaultText IS NULL OR LEN(@uiDefaultText) = 0)
+    IF (app.fn_NullOrWhitespace(@sqlSetId) = 1)
+        THROW 70400, N'SpecializationGroup.SqlSetId is missing.', 1;
+    
+    IF (app.fn_NullOrWhitespace(@uiDefaultText) = 1)
         THROW 70400, N'SpecializationGroup.UiDefaultText is required.', 1;
 
     IF NOT EXISTS(SELECT 1 FROM app.ConceptSqlSet WHERE Id = @sqlSetId)
@@ -46,7 +45,5 @@ BEGIN
     OUTPUT inserted.Id, inserted.SqlSetId, inserted.UiDefaultText
     WHERE Id = @id;
 END
-
-
 
 GO

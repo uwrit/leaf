@@ -9,6 +9,7 @@ using System.Data;
 using Dapper;
 using Model.Admin;
 using System.Collections.Generic;
+using Model.Admin.Compiler;
 
 namespace Services.Tables
 {
@@ -65,7 +66,7 @@ namespace Services.Tables
             return new ConceptSpecializationGroupTable(conceptId, rs).Value;
         }
 
-        public static DataTable From(Concept concept)
+        public static DataTable From(AdminConcept concept)
         {
             return From(concept.Id, concept.SpecializationGroups);
         }

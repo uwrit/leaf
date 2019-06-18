@@ -18,15 +18,13 @@ import DatasetColumnSelector from '../../components/PatientList/DatasetColumnSel
 import ExportDataModal from '../../components/PatientList/ExportDataModal/ExportDataModal';
 import Paginate from '../../components/PatientList/Paginate';
 import PatientListTable from '../../components/PatientList/PatientListTable';
-import { AppState, AuthorizationState } from '../../models/state/AppState';
+import { AppState, AuthorizationState, DatasetsState } from '../../models/state/AppState';
 import { CohortStateType, NetworkCohortState, PatientListState, CohortState } from '../../models/state/CohortState';
 import ExportState from '../../models/state/Export';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
-import { getCsvs } from '../../services/patientListApi';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { RowCount } from '../../components/PatientList/RowCount';
-import { PatientListDatasetQueryDTO, PatientListDatasetDefinition, CategorizedDatasetRef } from '../../models/patientList/Dataset';
-import { DatasetsState } from '../../models/state/GeneralUiState';
+import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import './PatientList.css';
 
 interface OwnProps {
@@ -64,7 +62,7 @@ class PatientList extends React.PureComponent<Props, State> {
     public render() {
         const { auth, exportState, cohort, datasets, isIdentified, patientList, responders, dispatch, showExportModal } = this.props;
         const c = this.className;
-        const classes = [ `${c}-container` ];
+        const classes = [ `${c}-container`, 'scrollable-offset-by-header' ];
         const datasetDefs: PatientListDatasetDefinition[] = [];
         patientList.configuration.singletonDatasets.forEach((d: PatientListDatasetDefinition) => datasetDefs.push(d));
         
@@ -94,7 +92,19 @@ class PatientList extends React.PureComponent<Props, State> {
                     <LoaderIcon size={100} />
                 </div>
             );
-        }
+        /*
+         * Show the failure .
+         */
+        } else if (cohort.patientList.state === CohortStateType.IN_ERROR) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>
+                        Whoops! An error occurred while loading the patient list.
+                        We are sorry for the inconvenience. Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
+            );
+       }
 
         return (    
             <div className={classes.join(' ')}>
@@ -112,7 +122,7 @@ class PatientList extends React.PureComponent<Props, State> {
                             {datasetDefs.map((d: PatientListDatasetDefinition) => (
                                 <DatasetColumnSelector className={c} data={d} dispatch={dispatch} key={d.id} />
                             ))}
-                            {datasetDefs.length <= datasets.unfilteredAvailableCount &&
+                            {datasetDefs.length <= datasets.all.size &&
                             <AddDatasetButton 
                                 cohortMap={cohort.networkCohorts}
                                 configuration={patientList.configuration} 
@@ -182,7 +192,7 @@ class PatientList extends React.PureComponent<Props, State> {
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
         auth: state.auth,
-        datasets: state.generalUi.datasets,
+        datasets: state.datasets,
         exportState: state.dataExport,
         cohort: state.cohort,
         isIdentified: state.session.attestation!.isIdentified,

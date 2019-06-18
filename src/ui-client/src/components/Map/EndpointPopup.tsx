@@ -17,9 +17,6 @@ interface Props {
 }
 
 export default class EndpointPopup extends React.PureComponent<Props> {
-
-    public formatNumber = (value: number) => value.toLocaleString();
-
     public render() {
         const { id } = this.props;
         const countDisplay = 
@@ -31,8 +28,11 @@ export default class EndpointPopup extends React.PureComponent<Props> {
                 formattingFn={this.formatNumber} 
             />;
 
+        if (!id.latitude || !id.longitude) { return null; }
+        
+
         return (
-            <Popup position={[ id.latitude + 0.1, id.longitude ]} 
+            <Popup position={[ +id.latitude, +id.longitude ]} 
                    closeOnClick={false} 
                    autoClose={false} 
                    closeButton={false} 
@@ -50,4 +50,6 @@ export default class EndpointPopup extends React.PureComponent<Props> {
             </Popup>
         );
     }
+
+    private formatNumber = (value: number) => value.toLocaleString();
 }

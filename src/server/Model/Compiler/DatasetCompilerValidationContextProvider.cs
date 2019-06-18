@@ -55,7 +55,7 @@ namespace Model.Compiler
             }
             catch (DbException de)
             {
-                log.LogError("Could not get dataset query context. Context:{@Context} Code:{Code} Error:{Error}", request, de.ErrorCode, de.Message);
+                log.LogError("Failed to get dataset query context. Context:{@Context} Code:{Code} Error:{Error}", request, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }

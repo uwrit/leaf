@@ -8,51 +8,48 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using System.Linq;
-using Model.Results;
 
 namespace Model.Network
 {
-    // TODO(cspital) migrate update to future admin service
-    public interface INetworkEndpointService
-    {
-        Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync();
-        Task<UpdateResult<NetworkEndpoint>> UpdateAsync(NetworkEndpoint endpoint);
-        Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync();
-        Task<NetworkIdentity> GetIdentityAsync();
-    }
-
     public class NetworkEndpointProvider
     {
-        protected readonly INetworkEndpointService service;
+        public interface INetworkEndpointReader
+        {
+            Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync();
+            Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync();
+            Task<NetworkIdentity> GetIdentityAsync();
+        }
+
+        protected readonly INetworkEndpointReader reader;
         protected readonly NetworkValidator validator;
         protected readonly ILogger<NetworkEndpointProvider> log;
 
         public NetworkEndpointProvider(
-            INetworkEndpointService service,
+            INetworkEndpointReader reader,
             NetworkValidator validator,
             ILogger<NetworkEndpointProvider> log)
         {
-            this.service = service;
+            this.reader = reader;
             this.validator = validator;
             this.log = log;
         }
 
         public virtual async Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
         {
-            var eps = await service.GetEndpointsAsync();
-            return ValidateEndpoints(eps.Where(e => e.IsResponder || e.IsInterrogator));
+            var eps = await reader.GetEndpointsAsync();
+            return FilterInvalidEndpoints(eps.Where(e => e.IsResponder || e.IsInterrogator));
         }
 
         public virtual async Task<NetworkIdentityEndpoints> GetEndpointsWithIdentityAsync()
         {
-            var nie = await service.GetEndpointsWithIdentityAsync();
-            nie.Endpoints = ValidateEndpoints(nie.Endpoints.Where(e => e.IsResponder || e.IsInterrogator));
+            var nie = await reader.GetEndpointsWithIdentityAsync();
+            nie.Endpoints = FilterInvalidEndpoints(nie.Endpoints.Where(e => e.IsResponder || e.IsInterrogator));
             return nie;
         }
 
         public virtual async Task<NetworkIdentity> GetIdentityAsync()
         {
-            return await service.GetIdentityAsync();
+            return await reader.GetIdentityAsync();
         }
 
         public virtual async Task<IEnumerable<NetworkEndpoint>> GetRespondersAsync()
@@ -78,18 +75,18 @@ namespace Model.Network
 
         async Task<NetworkIdentityEndpoints> GetValidIdentityEndpointsAsync(Func<NetworkEndpoint, bool> predicate)
         {
-            var nie = await service.GetEndpointsWithIdentityAsync();
-            nie.Endpoints = ValidateEndpoints(nie.Endpoints.Where(predicate));
+            var nie = await reader.GetEndpointsWithIdentityAsync();
+            nie.Endpoints = FilterInvalidEndpoints(nie.Endpoints.Where(predicate));
             return nie;
         }
 
         async Task<IEnumerable<NetworkEndpoint>> GetValidEndpointsAsync(Func<NetworkEndpoint, bool> predicate)
         {
-            var endpoints = await service.GetEndpointsAsync();
-            return ValidateEndpoints(endpoints.Where(predicate));
+            var endpoints = await reader.GetEndpointsAsync();
+            return FilterInvalidEndpoints(endpoints.Where(predicate));
         }
 
-        IEnumerable<NetworkEndpoint> ValidateEndpoints(IEnumerable<NetworkEndpoint> endpoints)
+        IEnumerable<NetworkEndpoint> FilterInvalidEndpoints(IEnumerable<NetworkEndpoint> endpoints)
         {
             var ok = new List<NetworkEndpoint>();
             foreach (var ep in endpoints)

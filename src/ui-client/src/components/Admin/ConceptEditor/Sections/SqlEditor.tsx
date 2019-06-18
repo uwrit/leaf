@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
-import { TextArea } from './TextArea';
-import { generateSampleSql } from '../../../../utils/admin';
+import { Section } from '../../Section/Section';
+import { TextArea } from '../../Section/TextArea';
+import { generateSampleSql } from '../../../../utils/admin/concept';
 import { setAdminConceptExampleSql } from '../../../../actions/admin/concept';
 import { SectionProps } from '../Props';
 import { SqlSetDropdown } from './SqlSetDropdown';

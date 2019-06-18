@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <TieredCompilation>true</TieredCompilation>
-    <ReleaseVersion>3.1.3</ReleaseVersion>
+    <ReleaseVersion>3.2.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -24,6 +24,9 @@
     <Folder Include="DTO\Export\" />
     <Folder Include="DTO\Network\" />
     <Folder Include="DTO\User\" />
+    <Folder Include="DTO\Admin\Compiler\" />
+    <Folder Include="DTO\Admin\Network\" />
+    <Folder Include="DTO\Config\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Serilog.AspNetCore" Version="2.1.1" />

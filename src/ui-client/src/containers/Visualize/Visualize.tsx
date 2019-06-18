@@ -78,10 +78,11 @@ class Visualize extends React.Component<Props, State> {
         if (cohort.visualization.state === CohortStateType.IN_ERROR) {
             return (
                 <div className={`${c}-error`}>
-                <p>
-                    An error occurred while loading patient visualizations. We are sorry for the inconvenience.
-                </p>
-            </div>
+                    <p>
+                        Whoops! An error occurred while loading patient visualizations. We are sorry for the inconvenience. 
+                        Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
             );
         } 
         /*
@@ -96,7 +97,7 @@ class Visualize extends React.Component<Props, State> {
         } 
 
         return  (
-            <div className={`${c}-container`}>
+            <div className={`${c}-container scrollable-offset-by-header`}>
                 <AggregateDemographics 
                     cohort={cohort} 
                     height={demogHeight}

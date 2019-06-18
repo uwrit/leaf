@@ -29,10 +29,10 @@ export interface AuthorizationAction {
 export const getIdToken = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         // Get authorization config and version
-        getAuthConfig().then(
-            config => {
-                dispatch(receiveAuthConfig(config));
-
+        getAuthConfig()
+            .then(
+                config => {
+                    dispatch(receiveAuthConfig(config));
                 // Get user id token
                 getUserTokenAndContext(config)
                 .then((token) => {

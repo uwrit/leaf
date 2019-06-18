@@ -19,6 +19,7 @@ import { panels } from './panels';
 import { queries } from './queries';
 import { session } from './session';
 import { admin } from './admin/admin';
+import { datasets } from './datasets';
 
 const rootReducer = combineReducers({
     admin,
@@ -27,6 +28,7 @@ const rootReducer = combineReducers({
     conceptSearch,
     concepts,
     dataExport,
+    datasets,
     generalUi,
     map,
     panelFilters,

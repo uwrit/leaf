@@ -9,8 +9,6 @@ using System.Linq;
 using Model.Network;
 using Model.Options;
 
-// TODO(cspital) rename Respondents to responders
-
 namespace API.DTO.Network
 {
     public class NetworkIdentityRespondersDTO

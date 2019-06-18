@@ -3,7 +3,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <TieredCompilation>true</TieredCompilation>
-    <ReleaseVersion>3.1</ReleaseVersion>
+    <ReleaseVersion>3.2</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -15,8 +15,9 @@
     <Folder Include="Validation\" />
     <Folder Include="Schema\" />
     <Folder Include="Search\" />
-    <Folder Include="Results\" />
     <Folder Include="Error\" />
+    <Folder Include="Admin\Network\" />
+    <Folder Include="Admin\Compiler\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.1.1" />

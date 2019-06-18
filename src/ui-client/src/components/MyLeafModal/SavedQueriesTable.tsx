@@ -36,7 +36,7 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
         const classes = [ `${c}-container` ];
         const saved: SavedQueryRef[] = [];
         queries.saved.forEach((s: SavedQueryRef) => saved.push(s));
-        const cols = [ "name", "category", "owner", "count", "created", "updated" ];
+        const cols = [ "name", "category", "count", "created", "updated" ];
         const headerClass = `${c}-header`;
         const rowClass = `${c}-row`;
         const openButtonClass = `${c}-open`;
@@ -44,19 +44,26 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
 
         return  (
             <div className={classes.join(' ')}>
+
                 {/* Table */}
                 <table className={`${c}-table`}>
+
                     {/* Header */}
                     <thead className={`${c}-header`}>
                         <tr>
+
                             {/* Columns */}
                             {cols.map((col: string) => <th className={headerClass} key={col}>{col}</th>)}
+
                             {/* 'Open' and '✖' button columns */}
                             <th />
+
                         </tr>
                     </thead>
+
                     {/* Body */}
                     <tbody className={`${c}-body`}>
+
                         {/* Rows */}
                         {saved.map((s: SavedQueryRef) => {
                             return (
@@ -72,6 +79,7 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
                                 </tr>)
                             );
                         })}
+                        
                     </tbody>
                 </table>
             </div>

@@ -8,18 +8,27 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminSqlSetAction } from "../../actions/admin/sqlSet";
 import { ConceptSqlSet } from "../../models/admin/Concept";
-import { conceptSqlSetsChanged } from "../../utils/admin";
+import { conceptSqlSetsChanged } from "../../utils/admin/concept";
 
 export const setAdminConceptSqlSets = (state: AdminState, action: AdminSqlSetAction): AdminState => {
     const sets = action.sets!;
+    let uneditedSets;
     for (const set of sets) {
         state.sqlSets.sets.set(set.id, Object.assign({}, set));
     }
+
+    if (!action.changed) {
+        uneditedSets = new Map(state.sqlSets.sets);
+    } else if (state.sqlSets.uneditedSets) {
+        uneditedSets = state.sqlSets.uneditedSets;
+    }
+
     return Object.assign({}, state, {
         sqlSets: {
             ...state.sqlSets,
             sets: new Map(state.sqlSets.sets),
-            changed: action.changed
+            changed: action.changed,
+            uneditedSets
         },
     });
 };

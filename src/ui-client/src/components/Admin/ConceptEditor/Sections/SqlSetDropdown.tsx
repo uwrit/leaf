@@ -11,8 +11,8 @@ import { PropertyProps } from '../Props';
 import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/concept';
-import { AdminPanelConceptEditorPane } from '../../../../models/state/AdminState';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../../../../actions/admin/admin';
+import { AdminPanelPane } from '../../../../models/state/AdminState';
 
 interface Props extends PropertyProps {
     dispatch: any;
@@ -61,16 +61,16 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                     <FormText color="muted">{subLabel}</FormText>
                     }
                 </Label>
-                <div className={`${c}-dropdown`} ref={this.state.ref} onBlur={this.handleBlur} tabIndex={0}>
+                <div className={`admin-panel-dropdown`} ref={this.state.ref} onBlur={this.handleBlur} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c} onFocus={this.handleFocus}>
                         <DropdownToggle>
                             <div>
                                 {displayText} 
-                                <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                                <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                             </div>
                         </DropdownToggle>
                         <DropdownMenu>
-                            <div className={`${c}-dropdown-item-container`}>
+                            <div className={`admin-panel-dropdown-item-container`}>
                             {sets.map((s) => {
                                 return (
                                     <DropdownItem 
@@ -97,7 +97,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
 
     private handleManageSqlSetsClick = () => {
         const { dispatch, focusToggle } = this.props;
-        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelConceptEditorPane.SQL_SET));
+        dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.SQL_SETS));
         if (focusToggle) {
             focusToggle(false);
         }
@@ -110,7 +110,7 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
     private handleBlur = (e: any) => {
         const { focusToggle } = this.props;
         if (focusToggle) { 
-            if (e.currentTarget.className === "concept-editor-dropdown" && divFocused) {
+            if (e.currentTarget.className === 'admin-panel-dropdown' && divFocused) {
                 divFocused = false;
                 focusToggle(false); 
             }

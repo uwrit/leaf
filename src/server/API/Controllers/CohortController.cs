@@ -33,45 +33,6 @@ namespace API.Controllers
             log = logger;
         }
 
-        [HttpPost("count")]
-        public async Task<ActionResult<CohortCountDTO>> Count(
-            [FromBody] PatientCountQueryDTO patientCountQuery,
-            [FromServices] CohortCounter counter,
-            CancellationToken cancelToken)
-        {
-            try
-            {
-                var cohort = await counter.Count(patientCountQuery, cancelToken);
-                var resp = new CohortCountDTO(cohort);
-                if (!cohort.ValidationContext.PreflightPassed)
-                {
-                    return BadRequest(resp);
-                }
-
-                return Ok(resp);
-            }
-            catch (ArgumentNullException ane)
-            {
-                log.LogError("Missing argument. Error:{Error}", ane.Message);
-                return BadRequest();
-            }
-            catch (OperationCanceledException)
-            {
-                log.LogInformation("Request cancelled.");
-                return NoContent();
-            }
-            catch (InvalidOperationException ie)
-            {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ie.Message);
-                return BadRequest();
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Could not execute query. Error:{Error}", ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         [HttpGet("{queryid}/demographics")]
         public async Task<ActionResult<Demographic>> Demographics(
             string queryid,
@@ -114,7 +75,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not fetch demographics. QueryID:{QueryID} Error:{Error}", queryid, ex.ToString());
+                log.LogError("Failed to fetch demographics. QueryID:{QueryID} Error:{Error}", queryid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -152,11 +113,6 @@ namespace API.Controllers
                 log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
                 return BadRequest();
             }
-            catch (LeafPreflightException lpe)
-            {
-                log.LogInformation("Dataset query failed preflight check. Error:{Error}", lpe.Message);
-                return BadRequest();
-            }
             catch (OperationCanceledException)
             {
                 log.LogInformation("Request cancelled. QueryID:{QueryID} DatasetId:{DatasetId}", queryid, datasetid);
@@ -172,7 +128,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
+                log.LogError("Failed to fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

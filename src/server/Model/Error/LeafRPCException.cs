@@ -52,6 +52,7 @@ namespace Model.Error
         BadArgument = 70_400,
         Forbidden = 70_403,
         NotFound = 70_404,
-        Conflict = 70_409
+        Conflict = 70_409,
+        Internal = 70_500
     }
 }

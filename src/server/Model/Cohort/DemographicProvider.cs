@@ -11,6 +11,7 @@ using Model.Authorization;
 using Model.Compiler;
 using Model.Validation;
 using Model.Error;
+using System.Linq;
 
 namespace Model.Cohort
 {
@@ -62,23 +63,29 @@ namespace Model.Cohort
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<Result> GetDemographicsAsync(QueryRef query, CancellationToken token)
         {
+            log.LogInformation("Demographics starting. QueryRef:{QueryRef}", query);
             Ensure.NotNull(query, nameof(query));
             var result = new Result();
 
             var validationContext = await contextProvider.GetCompilerContextAsync(query);
+            log.LogInformation("Demographics compiler validation context. Context:{@Context}", validationContext);
+
             result.Context = validationContext;
             if (validationContext.State != CompilerContextState.Ok)
             {
+                log.LogError("Demographics compiler context error. State:{State}", validationContext.State);
                 return result;
             }
 
             token.ThrowIfCancellationRequested();
 
             var exeContext = compiler.BuildDemographicSql(validationContext.Context, user.Anonymize());
-            log.LogInformation("Compiled Demographic Execution Context. Context:{@Context}", exeContext);
+            log.LogInformation("Compiled demographic execution context. Context:{@Context}", exeContext);
 
             var ctx = await executor.ExecuteDemographicsAsync(exeContext, token);
             var stats = new DemographicAggregator(ctx).Aggregate();
+
+            log.LogInformation("Demographics complete. Exported:{Exported} Total:{Total}", ctx.Exported.Count(), ctx.Cohort.Count());
 
             result.Demographics = new Demographic
             {

@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConceptEvent]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConceptEvent]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2019/4/8
@@ -27,21 +26,30 @@ BEGIN
     IF (@id IS NULL)
         THROW 70400, N'ConceptSqlEvent.Id is required.', 1;
 
-    IF (@uiDisplayEventName IS NULL OR LEN(@uiDisplayEventName) = 0)
+    IF (app.fn_NullOrWhitespace(@uiDisplayEventName) = 1)
         THROW 70400, N'ConceptSqlEvent.UiDisplayEventName is required', 1;
 
-    UPDATE app.ConceptEvent
-    SET
-        UiDisplayEventName = @uiDisplayEventName,
-        Updated = GETDATE(),
-        UpdatedBy = @user
-    OUTPUT inserted.Id, inserted.UiDisplayEventName
-    WHERE
-        Id = @id;
+    BEGIN TRAN;
+    BEGIN TRY
+
+        IF EXISTS (SELECT 1 FROM app.ConceptEvent WHERE Id != @id AND UiDisplayEventName = @uiDisplayEventName)
+            THROW 70409, N'ConceptEvent already exists with that UiDisplayEventName.', 1;
+
+        UPDATE app.ConceptEvent
+        SET
+            UiDisplayEventName = @uiDisplayEventName,
+            Updated = GETDATE(),
+            UpdatedBy = @user
+        OUTPUT inserted.Id, inserted.UiDisplayEventName
+        WHERE
+            Id = @id;
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
 
 END
-
-
-
 
 GO

@@ -62,7 +62,7 @@ namespace Services.Cohort
         ISqlStatement GetCteQuery(IEnumerable<Panel> panels)
         {
             var query = compiler.BuildCteSql(panels);
-            log.LogInformation("SqlStatement:{Sql}", query.SqlStatement);
+            log.LogInformation("CTE SqlStatement:{Sql}", query.SqlStatement);
             return query;
         }
     }

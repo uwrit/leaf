@@ -60,7 +60,7 @@ class Header extends React.PureComponent<Props> {
         const allowDisable = this.props.responders.size > 1;
         const username = user ? user.name : '';
         let totalActiveResponders = 0;
-        this.props.responders.forEach((ni: NetworkIdentity) => { 
+        responders.forEach((ni: NetworkIdentity) => { 
             resps.push(ni.id);
             if (ni.enabled) { totalActiveResponders += 1; }
         });
@@ -158,7 +158,7 @@ class Header extends React.PureComponent<Props> {
                                         </div>}
 
                                         {/* Quarantined */}
-                                        {!user.isFederatedOkay &&
+                                        {!user.isFederatedOkay && resps.length > 1 &&
                                         <div className={`${c}-role`}>
                                             <FiAlertOctagon className="myleaf-menu-icon header-role-icon-quarantine" />
                                             <span>Local Only</span>

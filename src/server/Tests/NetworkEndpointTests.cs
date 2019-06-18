@@ -11,14 +11,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Network;
 using Model.Options;
-using Model.Results;
+using Model.Admin.Network;
 using Xunit;
 
 namespace Tests
 {
     public class NetworkEndpointProviderTests
     {
-        // TODO(cspital) start tests here to ensure validation and correct filtering occurs
         [Fact]
         public void GetEndpoints_Should_Only_Return_Active_HTTPS_Endpoints()
         {
@@ -171,7 +170,7 @@ namespace Tests
         public void UpdateEndpointAsync_Should_Throw_On_NonHTTPS()
         {
             var manager = GetManager(MixedEndpoints);
-            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Address = new Uri("http://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("http://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
 
             Assert.ThrowsAsync<UriFormatException>(() => manager.UpdateEndpointAsync(update));
         }
@@ -180,13 +179,21 @@ namespace Tests
         public void UpdateEndpointAsync_Should_Update_HTTPS_Endpoint()
         {
             var manager = GetManager(MixedEndpoints);
-            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Address = new Uri("https://leaf.site4.tld"), IsResponder = true, IsInterrogator = true };
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("https://leaf.site4.tld"), KeyId = "12309123khjg423khj4g", Certificate = new byte[] { }, IsResponder = true, IsInterrogator = true };
 
-            var result = manager.UpdateEndpointAsync(update).Result;
+            var updated = manager.UpdateEndpointAsync(update).Result;
 
-            Assert.Equal(update.Id, result.Old.Id);
-            Assert.Equal(update.Address, result.New.Address);
-            Assert.True(result.New.IsInterrogator);
+            Assert.Equal(4, update.Id);
+            Assert.True(updated.IsInterrogator);
+        }
+
+        [Fact]
+        public void UpdateEndpointAsync_Should_Throw_On_Null_Address()
+        {
+            var manager = GetManager(MixedEndpoints);
+            var update = new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = null, IsResponder = true, IsInterrogator = true };
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => manager.UpdateEndpointAsync(update));
         }
 
         static readonly LoggerFactory factory = new LoggerFactory();
@@ -194,8 +201,11 @@ namespace Tests
 
         static AdminNetworkEndpointManager GetManager(IEnumerable<NetworkEndpoint> endpoints = null, NetworkIdentity identity = null)
         {
+            var svc = new MockNetworkEndpointService(endpoints, identity);
             return new AdminNetworkEndpointManager(
-                new MockNetworkEndpointService(endpoints, identity),
+                svc,
+                svc,
+                new NetworkEndpointCache(endpoints),
                 new NetworkValidator(Options.Create(new NetworkValidationOptions
                 {
                     EnsureHttps = true
@@ -206,24 +216,37 @@ namespace Tests
 
         static readonly IEnumerable<NetworkEndpoint> MixedEndpoints = new NetworkEndpoint[]
             {
-                new NetworkEndpoint { Id = 1, Name = "Site1", Address = new Uri("https://leaf.site1.tld"), IsResponder = true, IsInterrogator = true },
-                new NetworkEndpoint { Id = 2, Name = "Site2", Address = new Uri("https://leaf.site2.tld"), IsResponder = true, IsInterrogator = true },
-                new NetworkEndpoint { Id = 3, Name = "Site3", Address = new Uri("https://leaf.site3.tld"), IsResponder = false, IsInterrogator = true },
-                new NetworkEndpoint { Id = 4, Name = "Site4", Address = new Uri("https://leaf.site4.tld"), IsResponder = true, IsInterrogator = false },
-                new NetworkEndpoint { Id = 5, Name = "Site5", Address = new Uri("http://leaf.site5.tld"), IsResponder = true, IsInterrogator = true },
-                new NetworkEndpoint { Id = 6, Name = "Site6", Address = new Uri("https://leaf.site6.tld"), IsResponder = false, IsInterrogator = false },
+                new NetworkEndpoint { Id = 1, Name = "Site1", Issuer = "urn:leaf:iss:site1", Address = new Uri("https://leaf.site1.tld"), IsResponder = true, IsInterrogator = true },
+                new NetworkEndpoint { Id = 2, Name = "Site2", Issuer = "urn:leaf:iss:site2", Address = new Uri("https://leaf.site2.tld"), IsResponder = true, IsInterrogator = true },
+                new NetworkEndpoint { Id = 3, Name = "Site3", Issuer = "urn:leaf:iss:site3", Address = new Uri("https://leaf.site3.tld"), IsResponder = false, IsInterrogator = true },
+                new NetworkEndpoint { Id = 4, Name = "Site4", Issuer = "urn:leaf:iss:site4", Address = new Uri("https://leaf.site4.tld"), IsResponder = true, IsInterrogator = false },
+                new NetworkEndpoint { Id = 5, Name = "Site5", Issuer = "urn:leaf:iss:site5", Address = new Uri("http://leaf.site5.tld"), IsResponder = true, IsInterrogator = true },
+                new NetworkEndpoint { Id = 6, Name = "Site6", Issuer = "urn:leaf:iss:site6", Address = new Uri("https://leaf.site6.tld"), IsResponder = false, IsInterrogator = false },
             };
     }
 
-    class MockNetworkEndpointService : INetworkEndpointService
+    class MockNetworkEndpointService : NetworkEndpointProvider.INetworkEndpointReader, AdminNetworkEndpointManager.IAdminNetworkUpdater
     {
         readonly Dictionary<int, NetworkEndpoint> endpoints;
-        readonly NetworkIdentity identity;
+        NetworkIdentity identity;
 
         public MockNetworkEndpointService(IEnumerable<NetworkEndpoint> endpoints, NetworkIdentity identity)
         {
             this.endpoints = endpoints.ToDictionary(e => e.Id);
             this.identity = identity;
+        }
+
+        public Task<NetworkEndpoint> CreateEndpointAsync(NetworkEndpoint endpoint)
+        {
+            endpoints.Add(endpoint.Id, endpoint);
+            return Task.FromResult(endpoint);
+        }
+
+        public Task<NetworkEndpoint> DeleteEndpointAsync(int id)
+        {
+            endpoints.TryGetValue(id, out var ep);
+            endpoints.Remove(id);
+            return Task.FromResult(ep);
         }
 
         public Task<IEnumerable<NetworkEndpoint>> GetEndpointsAsync()
@@ -245,16 +268,18 @@ namespace Tests
             return Task.FromResult(identity);
         }
 
-        public Task<UpdateResult<NetworkEndpoint>> UpdateAsync(NetworkEndpoint endpoint)
+        public Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint endpoint)
         {
-            var old = endpoints[endpoint.Id];
             endpoints[endpoint.Id] = endpoint;
 
-            return Task.FromResult(new UpdateResult<NetworkEndpoint>
-            {
-                Old = old,
-                New = endpoint
-            });
+            return Task.FromResult(endpoint);
+        }
+
+        public Task<NetworkIdentity> UpdateIdentityAsync(NetworkIdentity identity)
+        {
+            this.identity = identity;
+
+            return Task.FromResult(identity);
         }
     }
 }

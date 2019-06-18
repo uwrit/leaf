@@ -13,7 +13,7 @@ namespace Model.Compiler
     public class QueryRef
     {
         public Guid? Id { get; set; }
-        public Urn UniversalId { get; set; }
+        public QueryUrn UniversalId { get; set; }
 
         public QueryRef()
         {

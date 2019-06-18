@@ -22,6 +22,7 @@ import { defaultPanelFiltersState } from '../reducers/panelFilters';
 import { defaultPanelState } from '../reducers/panels';
 import { defaultQueriesState } from '../reducers/queries';
 import { defaultSessionState } from '../reducers/session';
+import { defaultDatasetsState } from '../reducers/datasets';
 import configureStore from '../store/configureStore';
 import App from './App';
 
@@ -31,6 +32,7 @@ const beginState: AppState = {
     conceptSearch: defaultConceptSearchState(),
     concepts: defaultConceptsState(),
     dataExport: defaultExportState(),
+    datasets: defaultDatasetsState(),
     generalUi: defaultGeneralUiState(),
     map: defaultMapState(),
     panelFilters: defaultPanelFiltersState(),

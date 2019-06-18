@@ -32,7 +32,6 @@ namespace Model.Cohort
         public async Task<PatientCohort> GetPatientCohortAsync(PatientCountQuery query, CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            log.LogInformation("Patient count query starting");
 
             var cohort = await GetCohortAsync(query, token);
 

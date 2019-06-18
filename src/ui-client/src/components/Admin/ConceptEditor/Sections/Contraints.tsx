@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
+import { Section } from '../../Section/Section';
 import { SectionProps } from '../Props';
-import { ConstraintType, ConceptConstraint } from '../../../../models/admin/Concept';
+import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
 import { Constraint } from './Constraint';
 
 interface Props {
@@ -23,7 +23,7 @@ export class Constraints extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { adminConcept } = this.props.data;
+        const { adminConcept, forceValidation } = this.props.data;
         const c = this.className;
 
         return (
@@ -34,7 +34,7 @@ export class Constraints extends React.PureComponent<Props> {
                     <div className={`${c}-constraints-container`}>
                         {adminConcept!.constraints.map((constraint, i) => 
                             <Constraint 
-                                constraint={constraint} index={i} key={i}
+                                constraint={constraint} index={i} key={i} forceValidation={forceValidation}
                                 changeHandler={this.handleConstraintChange} deleteHandler={this.handleConstraintDelete} 
                             />
                         )}
@@ -55,16 +55,20 @@ export class Constraints extends React.PureComponent<Props> {
         changeHandler(constraints, this.propName);
     }
 
-    private handleConstraintChange = (idx: number, newConstraint: ConceptConstraint) => {
+    private handleConstraintChange = (idx: number, newConstraint: ConstraintModel) => {
         const { changeHandler, adminConcept } = this.props.data;
         const constraints = adminConcept!.constraints.slice();
-        constraints.splice(idx, 1, newConstraint);
+        constraints.splice(idx, 1, (newConstraint as ConstraintModel));
         changeHandler(constraints, this.propName);
     }
 
     private handleAddNewClick = () => {
         const { changeHandler, adminConcept } = this.props.data;
-        const newConstraint: ConceptConstraint = { conceptId: adminConcept!.id, constraintId: ConstraintType.User, constraintValue: '' };
+        const newConstraint: ConstraintModel = { 
+            resourceId: adminConcept!.unsaved ? undefined : adminConcept!.id, 
+            constraintId: ConstraintType.User, 
+            constraintValue: '' 
+        };
         const constraints = adminConcept!.constraints.slice();
         constraints.push(newConstraint);
         changeHandler(constraints, this.propName);

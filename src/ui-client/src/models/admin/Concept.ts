@@ -73,21 +73,16 @@ export interface Concept {
     externalId?: string;
     externalParentId?: string;
     universalId?: string;
-    
     isNumeric: boolean;
     isParent: boolean;
     isRoot: boolean;
     isPatientCountAutoCalculated: boolean;
     isSpecializable: boolean;
-
-    constraints: ConceptConstraint[];
-
+    constraints: Constraint[];
     specializationGroups: SpecializationGroupRelationship[];
-
     sqlSetId?: number;
     sqlSetWhere?: string;
     sqlFieldNumeric?: string;
-
     uiDisplayName: string;
     uiDisplayText: string;
     uiDisplaySubtext?: string;
@@ -106,8 +101,8 @@ export enum ConstraintType {
     Group = 2
 }
 
-export interface ConceptConstraint {
-    conceptId: string;
+export interface Constraint {
+    resourceId?: string;
     constraintId: ConstraintType;
     constraintValue: string;
 }

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [app].[ResourceIdTable]    Script Date: 5/9/19 8:47:55 AM ******/
+/****** Object:  UserDefinedTableType [app].[ResourceIdTable]    Script Date: 6/12/19 12:20:53 PM ******/
 CREATE TYPE [app].[ResourceIdTable] AS TABLE(
 	[Id] [uniqueidentifier] NULL
 )

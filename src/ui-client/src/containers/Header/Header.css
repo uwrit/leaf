@@ -274,7 +274,7 @@
 /* Roles */
 .header-roles {
     background-color: rgb(0, 75, 102);
-    border: 1px solid rgba(255,255,255,0.3);
+    border: 1px solid rgb(0, 90, 122);
     border-radius: 4px;
     color: rgb(240,240,240);
     padding: 20px 0 8px;

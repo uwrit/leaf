@@ -4,19 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
+using API.DTO.Admin;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Model.Admin;
 using Model.Authorization;
 using Model.Error;
-using Services.Admin;
-using Model.Admin;
-using API.DTO.Admin;
-using Services;
+using Model.Admin.Compiler;
+using API.DTO.Admin.Compiler;
 
 namespace API.Controllers.Admin
 {
@@ -26,43 +24,47 @@ namespace API.Controllers.Admin
     public class AdminConceptController : Controller
     {
         readonly ILogger<AdminConceptController> logger;
-        readonly IAdminConceptService cService;
+        readonly AdminConceptManager manager;
 
-        public AdminConceptController(ILogger<AdminConceptController> logger, IAdminConceptService cService)
+        public AdminConceptController(ILogger<AdminConceptController> logger, AdminConceptManager manager)
         {
             this.logger = logger;
-            this.cService = cService;
+            this.manager = manager;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Concept>> Get(Guid id)
+        public async Task<ActionResult<AdminConcept>> Get(Guid id)
         {
             try
             {
-                var concept = await cService.Get(id);
-                return Ok(new ConceptDTO(concept));
+                var concept = await manager.GetAsync(id);
+                return Ok(new AdminConceptDTO(concept));
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not get concept. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to get concept. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<ConceptDTO>> Update(Guid id, [FromBody] ConceptDTO o)
+        public async Task<ActionResult<AdminConceptDTO>> Update(Guid id, [FromBody] AdminConceptDTO o)
         {
             try
             {
-                if (o == null)
+                if (o != null)
                 {
-                    return BadRequest(CRUDError.From("Concept missing."));
+                    o.Id = id;
                 }
-                o.Id = id;
 
                 var c = o.Concept();
-                var updated = await cService.Update(c);
-                return Ok(new ConceptDTO(updated));
+                var updated = await manager.UpdateAsync(c);
+                return Ok(new AdminConceptDTO(updated));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminConcept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -70,24 +72,24 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not update concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                logger.LogError("Failed to update concept. Concept:{@Concept} Error:{Error}", o, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<ConceptDTO>> Create([FromBody] ConceptDTO o)
+        public async Task<ActionResult<AdminConceptDTO>> Create([FromBody] AdminConceptDTO o)
         {
             try
             {
-                if (o == null)
-                {
-                    return BadRequest(CRUDError.From("Concept missing."));
-                }
-
                 var c = o.Concept();
-                var updated = await cService.Create(c);
-                return Ok(new ConceptDTO(updated));
+                var updated = await manager.CreateAsync(c);
+                return Ok(new AdminConceptDTO(updated));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid create Concept model. Model:{@Model} Error:{Error}", o, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminConcept)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -95,17 +97,17 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not create concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
+                logger.LogError("Failed to create concept. Concept:{@Concept}, Error:{Error}", o, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<ConceptDeleteResult>> Delete(Guid id)
+        public async Task<ActionResult<ConceptDeleteResponse>> Delete(Guid id)
         {
             try
             {
-                var result = await cService.Delete(id);
+                var result = await manager.DeleteAsync(id);
                 if (!result.Ok)
                 {
                     return Conflict(new ConceptDeleteResponse(result));
@@ -118,7 +120,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Could not delete concept. Id:{Id} Error:{Error}", id, ex.ToString());
+                logger.LogError("Failed to delete concept. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

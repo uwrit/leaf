@@ -6,7 +6,7 @@
  */ 
 
 import { CohortStateType } from '../state/CohortState';
-import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, PatientListColumnType, ValueByColumnKey } from './Column';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, ValueByColumnKey } from './Column';
 import { PatientListRowDTO } from './Patient';
 import { DateBoundary } from '../panel/Date';
 
@@ -29,6 +29,7 @@ export enum PatientListDatasetSummaryType {
  * what columns to expect and how to compute summary statistics.
  */
 export enum PatientListDatasetShape {
+    Dynamic = -1,
     Summary = 0,
     Observation = 1,
     Encounter = 2,
@@ -82,7 +83,12 @@ export interface PatientListDatasetQueryDTO {
     description?: string;
     name: string;
     shape: PatientListDatasetShape;
+    tags: string[];
     universalId?: string;
+}
+
+export interface PatientListDatasetQuery extends PatientListDatasetQueryDTO {
+    unsaved?: boolean;
 }
 
 /*
@@ -131,15 +137,31 @@ export interface PatientListDatasetDefinition extends PatientListDatasetDefiniti
  */
 export interface TokenizedDatasetRef {
     id: PatientListDatasetId;
-    dataset: PatientListDatasetQueryDTO;
+    dataset: PatientListDatasetQuery;
     token: string;
     tokenArray: string[];
 }
 
 /*
- * Return object from the dataset search web worker.
+ * Cache index of the preceding and following dataset IDs currently shown.
+ */
+export interface PatientListDatasetQueryIndex {
+    nextId: string;
+    prevId: string;
+}
+
+/*
+ * Datasets organized by category, used for display in DatasetContainer component.
  */
 export interface CategorizedDatasetRef {
     category: string;
-    datasets: PatientListDatasetQueryDTO[];
+    datasets: Map<string, PatientListDatasetQuery>;
+}
+
+/*
+ * Return object from the dataset search web worker.
+ */
+export interface DatasetSearchResult {
+    categories: Map<string, CategorizedDatasetRef>;
+    displayOrder: Map<string, PatientListDatasetQueryIndex>;
 }
