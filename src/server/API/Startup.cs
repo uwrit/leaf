@@ -52,7 +52,6 @@ namespace API
                                     .Build();
                     config.Filters.Add(new AuthorizeFilter(policy));
                 })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
                 .AddJsonOptions(settings =>
                 {
                     settings.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
