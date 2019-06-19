@@ -30,7 +30,7 @@ BEGIN
         q.[Owner],
         q.Created,
         q.Updated,
-        [Count] = COUNT(*)
+        [Count] = COUNT(c.QueryId)
     FROM
         app.Query q
     LEFT JOIN app.Cohort c on q.Id = c.QueryId
