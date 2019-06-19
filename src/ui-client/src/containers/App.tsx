@@ -17,7 +17,7 @@ import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
 import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
-import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState } from '../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType } from '../models/state/GeneralUiState';
 import { SessionContext } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
@@ -40,6 +40,7 @@ interface DispatchProps {
 }
 interface StateProps {
     auth?: AuthorizationState;
+    browser?: Browser;
     cohortCountState: CohortStateType;
     confirmationModal: ConfirmationModalState;
     currentAdminPane: AdminPanelPane;
@@ -84,13 +85,19 @@ class App extends React.Component<Props> {
     }
 
     public render() {
-        const { auth, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
+        const { auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
             : null;
+        const classes = [ 'app-container' ];
+
+        /* 
+         * Add the browser name as an app-level CSS class.
+         */
+        if (browser) { classes.push(BrowserType[browser.type].toLowerCase())};
 
         return (
-            <div className="app-container" onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+            <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
                 <Attestation />
                 <CohortCountBox />
                 <Header />
@@ -169,6 +176,7 @@ class App extends React.Component<Props> {
 const mapStateToProps = (state: AppState) => {
     return {
         auth: state.auth,
+        browser: state.generalUi.browser,
         cohortCountState: state.cohort.count.state,
         confirmationModal: state.generalUi.confirmationModal,
         currentAdminPane: state.admin ? state.admin!.activePane : 0, 

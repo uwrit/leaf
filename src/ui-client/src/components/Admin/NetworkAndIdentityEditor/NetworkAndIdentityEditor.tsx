@@ -73,7 +73,9 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                                 <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddEndpointClick}>+ Add New Networked Leaf Instance</Button>
                             </div>
                             <div className={`${c}-endpoint-container`}>
-                                {[ ...endpoints.values() ].map((e) => (
+                                {[ ...endpoints.values() ]
+                                .sort((a,b) => a.id > b.id ? -1 : 1)
+                                .map((e) => (
                                     <Endpoint key={e.id} dispatch={dispatch} endpoint={e} forceValidation={forceValidation} />
                                 ))}
                             </div>

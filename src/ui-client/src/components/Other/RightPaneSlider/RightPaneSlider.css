@@ -36,3 +36,11 @@
     background-color: rgba(0,0,0,0.5);
     display: block;
 }
+
+/*
+ * Don't display the overlay on Edge, as there is some
+ * z-index bug which causes it to cover the right pane as well.
+ */
+.app-container.edge .right-pane-slider-overlay {
+    display: none !important;
+}

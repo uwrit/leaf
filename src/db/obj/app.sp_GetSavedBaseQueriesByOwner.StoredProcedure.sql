@@ -33,7 +33,7 @@ BEGIN
         [Count] = COUNT(*)
     FROM
         app.Query q
-    JOIN app.Cohort c on q.Id = c.QueryId
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
     WHERE [Owner] = @user
     AND UniversalId IS NOT NULL
     AND Nonce IS NULL

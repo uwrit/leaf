@@ -1869,6 +1869,98 @@ BEGIN
 END
 GO
 
+IF OBJECT_ID('app.sp_GetSavedBaseQueriesByConstraint', 'P') IS NOT NULL
+    DROP PROCEDURE app.sp_GetSavedBaseQueriesByConstraint;
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/10/29
+-- Description: Retrieves all saved query pointers owned by the given user.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetSavedBaseQueriesByConstraint]
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    WITH permitted (QueryId) AS (
+        -- user based constraint
+        SELECT
+            QueryId
+        FROM auth.QueryConstraint
+        WHERE ConstraintId = 1
+        AND ConstraintValue = @user
+        UNION
+        -- group base constraint
+        SELECT
+            QueryId
+        FROM auth.QueryConstraint
+        WHERE ConstraintId = 2
+        AND ConstraintValue IN (SELECT [Group] FROM @groups)
+    )
+    SELECT
+        q.Id,
+        q.UniversalId,
+        q.[Name],
+        q.[Category],
+        q.[Owner],
+        q.Created,
+        q.Updated,
+        [Count] = COUNT(*)
+    FROM app.Query q
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
+    WHERE (q.[Owner] = @user OR q.Id IN (SELECT QueryId FROM permitted))
+    AND UniversalId IS NOT NULL
+    AND Nonce IS NULL
+    GROUP BY q.Id,
+        q.UniversalId,
+        q.[Name],
+        q.[Category],
+        q.[Owner],
+        q.Created,
+        q.Updated;
+END
+GO
+
+IF OBJECT_ID('app.sp_GetSavedBaseQueriesByOwner', 'P') IS NOT NULL
+    DROP PROCEDURE app.sp_GetSavedBaseQueriesByOwner;
+GO
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/10/29
+-- Description: Retrieves all saved query pointers owned by the given user.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetSavedBaseQueriesByOwner]
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT
+        q.Id,
+        q.UniversalId,
+        q.[Name],
+        q.[Category],
+        q.[Owner],
+        q.Created,
+        q.Updated,
+        [Count] = COUNT(*)
+    FROM
+        app.Query q
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
+    WHERE [Owner] = @user
+    AND UniversalId IS NOT NULL
+    AND Nonce IS NULL
+    GROUP BY q.Id,
+        q.UniversalId,
+        q.[Name],
+        q.[Category],
+        q.[Owner],
+        q.Created,
+        q.Updated;
+END
+
 -- set version
 INSERT INTO [ref].[Version] (Lock, [Version])
 SELECT 'X', N'3.2.0';

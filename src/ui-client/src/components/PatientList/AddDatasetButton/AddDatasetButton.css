@@ -59,6 +59,14 @@
     background-color: rgba(0,0,0,0.5);
 }
 
+/*
+ * Don't display the overlay on Edge, as there is some
+ * z-index bug which causes it to cover the modal as well.
+ */
+ .app-container.edge .patientlist-add-dataset-overlay {
+    display: none !important;
+}
+
 .patientlist-add-dataset-select-container.show {
     margin-top: 12px;
     pointer-events: all;

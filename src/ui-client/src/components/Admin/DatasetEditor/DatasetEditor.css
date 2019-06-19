@@ -93,6 +93,7 @@
 .dataset-editor-sql-container {
     background-color: white;
     display: flex;
+    height: 455px;
     padding: 8px;
     position: relative;
 }
@@ -110,7 +111,7 @@
 
 /* Columns */
 .dataset-editor-column-container {
-    height: 370px;
+    height: 100%;
     min-width: 230px;
     overflow: auto;
     padding: 8px 8px;

@@ -64,7 +64,7 @@ export const getCounts = () => {
         const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
         const responders: NetworkIdentity[] = [];
         state.responders.forEach((nr: NetworkIdentity) => { 
-            if (nr.enabled && (nr.isHomeNode || !runLocalOnly) && !nr.isGateway) { 
+            if (nr.enabled && (nr.isHomeNode || !runLocalOnly)) { 
                 responders.push(nr); 
             } 
         });

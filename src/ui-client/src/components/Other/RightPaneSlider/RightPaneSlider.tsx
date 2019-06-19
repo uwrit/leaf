@@ -11,12 +11,16 @@ import './RightPaneSlider.css';
 interface Props {
     show: boolean;
     toggle: () => any;
-    overlay: boolean;
+    overlay?: boolean;
 }
 
 export default class RightPaneSlider extends React.Component<Props> {
     private className = 'right-pane-slider';
     private mouseOut = true;
+
+    public static defaultProps = {
+        overlay: true
+    }
 
     constructor(props: Props) {
         super(props);
