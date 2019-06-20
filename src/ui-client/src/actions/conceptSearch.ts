@@ -53,8 +53,9 @@ export const requestConceptHints = (term: string) => {
         const state = getState();
         getHints(state, term).then(
             (response: any) => {
-                dispatch(setSearchHints(response));
-                if (term === getState().conceptSearch.term) { }
+                if (term === getState().conceptSearch.term) {
+                    dispatch(setSearchHints(response));
+                }
             },
             (error: any) => console.log(error)        
         );
