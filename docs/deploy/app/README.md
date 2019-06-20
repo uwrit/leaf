@@ -77,7 +77,7 @@ Make sure the following variables are defined:
 - LEAF_APP_DB=<leaf_app_db_connection_string>
 - LEAF_CLIN_DB=<clinical_db_connection_string>
 - SERILOG_DIR=<your_logging_path>
-- LEAF_REDCAP_SUPERTOKEN=<token>
+- LEAF_REDCAP_SUPERTOKEN=<your_token>
 
 
 ### Linux
@@ -93,7 +93,7 @@ LEAF_APP_DB=<leaf_app_db_connection_string>
 LEAF_CLIN_DB=<clinical_db_connection_string>
 SERILOG_DIR=/var/log/leaf/
 ASPNETCORE_URLS=http://0.0.0.0:5001
-LEAF_REDCAP_SUPERTOKEN='<token>'
+LEAF_REDCAP_SUPERTOKEN='<your_token>'
 ```
 
 It's recommended that you use full paths when referencing locations on the filesystem.
