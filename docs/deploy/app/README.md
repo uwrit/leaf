@@ -48,19 +48,40 @@ Once the source is downloaded you can proceed to build and configure an API inst
 
 
 ## Creating a JWT Signing Key
-The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt.io/introduction/) (pronounced "JA-ts"). In a bash terminal, start by creating a JWT signing key. This allows the JWT recipient to verify the sender is who they say they are.
+The Leaf client and server communicate by [JSON Web Tokens, or JWTs](https://jwt.io/introduction/) (pronounced "JAh-ts"). In a bash terminal, start by creating a JWT signing key. This allows the JWT recipient to verify the sender is who they say they are.
+
+Note that the output paths and password can be whatever you'd like, and you'll need to reference them in the environment variables in the next step.
+
 ```bash
-openssl req -nodes -x509 -newkey rsa:2048 -keyout /var/opt/leafapi/.keys/key.pem \
-    -out /var/opt/leafapi/.keys/cert.pem -days 3650 -subj \
+openssl req -nodes -x509 -newkey rsa:2048 -keyout <your_key_path>/key.pem \
+    -out <your_cert_path>/cert.pem -days 3650 -subj \
     "/CN=urn:leaf:issuer:leaf.<your_institution>.<tld>"
 ```
 ```bash
-openssl pkcs12 -in /var/opt/leafapi/.keys/cert.pem -inkey key.pem \
-    -export -out /var/opt/leafapi/.keys/leaf.pfx -password pass:<your_pass>
+openssl pkcs12 -in <your_key_path>/cert.pem -inkey key.pem \
+    -export -out <your_key_path>/leaf.pfx -password pass:<your_pass>
 ```
 
 ## Setting Environment Variables
-Sensitive configuration data specifying data sources and passwords are stored environmental variables defined in a .conf file. 
+
+### Windows 
+Sensitive configuration data specifying data sources and passwords are stored in environmental variables. 
+
+![Environment Variables](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/windows_env_vars.png "Environment Variables")
+
+Make sure the following variables are defined:
+
+- LEAF_JWT_CERT=<your_cert_path>/cert.pem
+- LEAF_JWT_KEY=<your_key_path>/leaf.pfx
+- LEAF_JWT_KEY_PW=<your_pass>
+- LEAF_APP_DB=<leaf_app_db_connection_string>
+- LEAF_CLIN_DB=<clinical_db_connection_string>
+- SERILOG_DIR=<your_logging_path>
+- LEAF_REDCAP_SUPERTOKEN=<token>
+
+
+### Linux
+Sensitive configuration data specifying data sources and passwords are stored in environmental variables defined in a .conf file. 
 
 ```bash
 # Contents for api service conf file: /var/opt/leafapi/services/leaf_api.service.conf
@@ -72,20 +93,18 @@ LEAF_APP_DB=<leaf_app_db_connection_string>
 LEAF_CLIN_DB=<clinical_db_connection_string>
 SERILOG_DIR=/var/log/leaf/
 ASPNETCORE_URLS=http://0.0.0.0:5001
-LEAF_REDCAP_SUPERTOKEN='token goes here'
+LEAF_REDCAP_SUPERTOKEN='<token>'
 ```
 
 It's recommended that you use full paths when referencing locations on the filesystem.
 
-LEAF_REDCAP_SUPERTOKEN is not needed if appsettings.json has the REDCap export variable set to 'false'.
-
-The ASPNETCORE_URLS parameter determines what port and IP the API service listens on.
-
-Note that the connection string variables `LEAF_APP_DB` and `LEAF_CLIN_DB` should be of the form:
+Note:
+- LEAF_REDCAP_SUPERTOKEN is not needed if appsettings.json has the REDCap export variable set to 'false'.
+- The ASPNETCORE_URLS parameter determines what port and IP the API service listens on, and **is only needed for Linux installations**.
+- The connection string variables `LEAF_APP_DB` and `LEAF_CLIN_DB` should be of the form:
 ```
 Server=<server>;Database=<dbname>;uid=sa;Password=<dbpassword>;
 ```
-
 
 ## Configuring the appsettings.json file
 The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. 

@@ -18,10 +18,13 @@
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_api.png" /></p>
 
    - Note: Do NOT name the API application "api", this will cause the rewrite rule to apply recursively until the request fails. At UW we name the backing application "leafapi".
+   
 8) Create a URL rewrite rule on the site with the following template.
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_url_rewrite.png" /></p>
 
-web.config
+   - Note: Be sure the `Append query string` box is checked. If not, API calls for Concept search will fail.
+
+**web.config**
 
 ```xml
 <system.webServer>
@@ -38,7 +41,7 @@ web.config
 ```
 9) If the WebDAV module is installed in your IIS instance, you need to either uninstall it or disable it for this site. It inteferes with PUT/DELETE HTTP verbs.
 
-web.config
+**web.config**
 
 ```xml
 <system.webServer>
