@@ -92,6 +92,10 @@ BEGIN
             PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
         WHERE Id = @id;
 
+        UPDATE app.Concept
+        SET RootId = @rootId
+        WHERE ParentId = @id;
+
         DELETE FROM auth.ConceptConstraint
         WHERE ConceptId = @id;
 
