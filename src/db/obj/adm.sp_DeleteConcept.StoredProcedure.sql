@@ -71,6 +71,12 @@ BEGIN
             DELETE FROM rela.ConceptSpecializationGroup
             WHERE ConceptId = @id;
 
+            DELETE FROM app.ConceptForwardIndex
+            WHERE ConceptId = @id;
+
+            DELETE FROM app.ConceptTokenizedIndex
+            WHERE ConceptId = @id;
+
             DELETE FROM app.Concept
             WHERE Id = @id;
 
