@@ -34,6 +34,11 @@ export interface AdminConceptAction {
     type: string;
 }
 
+interface AdminParentSavePayload {
+    adminParentConcept: Concept;
+    userParentConcept: UserConcept;
+}
+
 // Asynchronous
 export const revertAdminAndUserConceptChanges = (adminConcept: AdminConcept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
@@ -86,7 +91,8 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
             let adminConcept = Object.assign({}, state.admin!.concepts.currentAdminConcept, { parentId, rootId: newRootId });
             if (!state.admin!.concepts.currentAdminConcept) {
                 dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
-                adminConcept =  Object.assign({}, await getAdminConcept(state, userConcept.id), { parentId, newRootId });
+                const serverAdminConcept = await getAdminConcept(state, userConcept.id);
+                adminConcept =  Object.assign({}, serverAdminConcept, { parentId, rootId: newRootId });
                 dispatch(setNoClickModalState({ state: NoClickModalStates.Complete }));
             }
 
@@ -179,15 +185,24 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
                 : await updateAdminConcept(state, adminConcept);
             const newUserConcept = await fetchConcept(state, newAdminConcept.id);
 
+            /*
+             * Update changed Concept.
+             */
             dispatch(removeConcept(userConcept));
             dispatch(createConcept(newUserConcept));
-            dispatch(setAdminConcept(newAdminConcept, false));
             dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
-            
+
             /*
              * Update parent Concept if needed.
              */
-            await updateAdminParentOnSaveIfNeeded(newAdminConcept, newUserConcept, getState());
+            const parent = shouldUpdateAdminParentConcept(newAdminConcept, newUserConcept, getState());
+            if (parent) {
+                dispatch(setConcept(parent.userParentConcept));
+                dispatch(setAdminConcept(parent.adminParentConcept, false));
+                await updateAdminConcept(state, parent.adminParentConcept);
+            }
+            dispatch(setAdminConcept(newAdminConcept, false));
+
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
@@ -208,17 +223,22 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
  * it here behind the scenes just to be safe (else when users
  * log in the newly-saved Concept may be hidden).
  */
-export const updateAdminParentOnSaveIfNeeded = async (adminConcept: Concept, userConcept: UserConcept, state: AppState) => {
+export const shouldUpdateAdminParentConcept = (adminConcept: Concept, userConcept: UserConcept, state: AppState): AdminParentSavePayload | undefined => {
     if (adminConcept.parentId && userConcept.parentId) {
         const adminParentConcept = state.admin!.concepts.concepts.get(adminConcept.parentId);
         const userParentConcept = state.concepts.currentTree.get(userConcept.parentId);
         if (adminParentConcept && userParentConcept) {
-            if (userParentConcept.childrenIds && userParentConcept.childrenIds.size === 1) {
-                const parent = Object.assign({}, adminParentConcept, { isParent: true });
-                await updateAdminConcept(state, parent);
+            if (userParentConcept.childrenIds) {
+                const copyAdminParent = Object.assign({}, adminParentConcept, { isParent: true });
+                const copyUserParent = Object.assign({}, userParentConcept, { isParent: true });
+                return { 
+                    adminParentConcept: copyAdminParent,
+                    userParentConcept: copyUserParent
+                }
             }
         }
     }
+    return;
 };
 
 /*
