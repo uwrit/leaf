@@ -198,7 +198,7 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
             /*
              * Update parent Concept if needed.
              */
-            const parent = shouldUpdateAdminParentConcept(newAdminConcept, newUserConcept, getState());
+            const parent = await shouldUpdateAdminParentConcept(newUserConcept, getState());
             if (parent) {
                 dispatch(setConcept(parent.userParentConcept));
                 dispatch(setAdminConcept(parent.adminParentConcept, false));
@@ -221,23 +221,20 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
 };
 
 /*
- * After saving an Admin Concept, if the parent has only
- * one child 'IsParent' in the DB may not be set, so set
- * it here behind the scenes just to be safe (else when users
- * log in the newly-saved Concept may be hidden).
+ * After saving an Admin Concept, if the parent has just had a child parented to it
+ * and it was not previously a parent, [IsParent] in the DB may not be set. If so, set
+ * it here behind the scenes just to be safe (else when users log in the newly-saved Concept may be hidden).
  */
-export const shouldUpdateAdminParentConcept = (adminConcept: Concept, userConcept: UserConcept, state: AppState): AdminParentSavePayload | undefined => {
-    if (adminConcept.parentId && userConcept.parentId) {
-        const adminParentConcept = state.admin!.concepts.concepts.get(adminConcept.parentId);
+export const shouldUpdateAdminParentConcept = async (userConcept: UserConcept, state: AppState): Promise<AdminParentSavePayload | undefined> => {
+    if (userConcept.parentId) {
         const userParentConcept = state.concepts.currentTree.get(userConcept.parentId);
-        if (adminParentConcept && userParentConcept) {
-            if (userParentConcept.childrenIds) {
-                const copyAdminParent = Object.assign({}, adminParentConcept, { isParent: true });
-                const copyUserParent = Object.assign({}, userParentConcept, { isParent: true });
-                return { 
-                    adminParentConcept: copyAdminParent,
-                    userParentConcept: copyUserParent
-                }
+        if (userParentConcept && userParentConcept.childrenIds) {
+            const adminParent = await getAdminConcept(state, userConcept.parentId);
+            const copyAdminParent = Object.assign({}, adminParent, { isParent: true });
+            const copyUserParent = Object.assign({}, userParentConcept, { isParent: true });
+            return { 
+                adminParentConcept: copyAdminParent,
+                userParentConcept: copyUserParent
             }
         }
     }
