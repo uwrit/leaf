@@ -198,7 +198,11 @@ export const getDemographicsIfNeeded = () => {
         const state = getState();
         if (state.cohort.count.state === CohortStateType.LOADED && 
             state.cohort.patientList.state === CohortStateType.NOT_LOADED &&
-            state.cohort.count.value <= state.auth.config!.cacheLimit) {
+            (
+                (state.cohort.networkCohorts.size === 1 && state.cohort.count.value <= state.auth.config!.cacheLimit) ||
+                state.cohort.networkCohorts.size > 1
+            )
+        ) {
             dispatch(getDemographics());
         }
     };

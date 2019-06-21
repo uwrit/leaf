@@ -69,7 +69,7 @@ class Visualize extends React.Component<Props, State> {
         /*
          * If too many patients for caching, let user know.
          */
-        if (data.length === 1 && cohort.count.value > auth.config!.cacheLimit) {
+        if (cohort.networkCohorts.size === 1 && cohort.count.value > auth.config!.cacheLimit) {
             return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
         }
         /*
