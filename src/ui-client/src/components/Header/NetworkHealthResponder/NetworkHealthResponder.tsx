@@ -9,7 +9,7 @@ import React from 'react';
 import { handleResponderToggle } from '../../../actions/networkResponders';
 import GlowingButton, { GLOWING_BUTTON_STATE } from '../../Other/GlowingButton/GlowingButton';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
-import { formatLargeNumber } from '../../../utils/formatNumber';
+import { formatLargeNumber, formatSmallNumber } from '../../../utils/formatNumber';
 import { showInfoModal } from '../../../actions/generalUi';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { CohortStateType } from '../../../models/state/CohortState';
@@ -58,7 +58,7 @@ export default class NetworkHealthResponder extends React.PureComponent<Props> {
                             {r.name}
                         </div>
                         <div className={`${c}-title-patients`}>
-                            {r.totalPatients && `${formatLargeNumber(r.totalPatients)} patients`}
+                            {this.formatPatientCount(r.totalPatients)}
                         </div>
                     </div>
                     {this.props.allowDisable &&
@@ -77,6 +77,13 @@ export default class NetworkHealthResponder extends React.PureComponent<Props> {
                 </div>
             </div>
         )
+    }
+
+    private formatPatientCount = (totalPatients?: number): string => {
+        if (!totalPatients) return '';
+        if (totalPatients < 1000) { return `${totalPatients} patients`; }
+        if (totalPatients < 10000) { return `${formatSmallNumber(totalPatients)} patients`; }
+        return `${formatLargeNumber(totalPatients)} patients`;
     }
 
     private handleClick = () => {

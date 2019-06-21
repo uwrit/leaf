@@ -43,7 +43,6 @@ export class Input extends React.PureComponent<Props> {
                     className={classes.join(' ')}
                     onBlur={this.handleBlur}
                     onChange={this.handleChange}
-                    on
                     onFocus={this.handleFocus}
                     placeholder={placeholder}
                     readOnly={locked}
