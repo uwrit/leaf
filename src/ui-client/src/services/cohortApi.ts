@@ -43,7 +43,7 @@ export function fetchDemographics(state: AppState, nr: NetworkIdentity, queryId:
 /*
  * Fetch a dataset, which may or may not have date boundaries.
  */
-export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQuery, dates: DateBoundary) => {
+export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQuery, dates: DateBoundary): Promise<PatientListDatasetDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = {

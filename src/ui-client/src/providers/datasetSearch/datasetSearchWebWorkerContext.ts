@@ -61,9 +61,12 @@ var returnDefault = function () {
 /*
  * Flatten categorized datasets map into an array of datasets.
  */
-var getDatasetsArray = function () {
-    return [ ...allCatDs.values() ]
-        .reduce((prev, curr) => prev = prev.concat([ ...curr.datasets.values() ]), []);
+var getAllDatasetsArray = function () {
+    var copy = new Map(allDs);
+    if (!isAdmin) {
+        copy.delete(demographics.id);
+    }
+    return [ ...copy.values() ];
 };
 /*
  * Reset excluded datasets cache. Called when users
@@ -76,7 +79,7 @@ var allowAllDatasets = function (payload) {
     /*
      * Get default display and sort order.
      */
-    var reSorted = dedupeAndSort(getDatasetsArray());
+    var reSorted = dedupeAndSort(getAllDatasetsArray());
     allCatDs = reSorted.categories;
     defaultOrder = reSorted.displayOrder;
     return { requestId: requestId, result: returnDefault() };
@@ -96,9 +99,10 @@ var allowDataset = function (payload) {
             excluded.set(ds.id, ds);
         }
     }
-    var resorted = dedupeAndSort(getDatasetsArray());
-    allCatDs = resorted.categories;
-    defaultOrder = resorted.displayOrder;
+    var datasets = getAllDatasetsArray().filter((ds) => !excluded.has(ds.id));
+    var reSorted = dedupeAndSort(datasets);
+    allCatDs = reSorted.categories;
+    defaultOrder = reSorted.displayOrder;
     return searchDatasets(payload);
 };
 /*
@@ -266,6 +270,7 @@ var reindexCacheCache = function (datasets) {
      */
     var all = datasets.slice().filter(function (ds) { return ds.shape !== 3; });
     all.unshift(demographics);
+    allDs.clear();
     allCatDs.clear();
     allCatDsAdmin.clear();
     allCatDsAdmin.set('', { category: '', datasets: new Map([[demographics.id, demographics]]) });
@@ -284,6 +289,7 @@ var reindexCacheCache = function (datasets) {
         if (ds.description) {
             tokens = tokens.concat(ds.description.toLowerCase().split(' '));
         }
+        allDs.set(ds.id, ds);
         var _loop_1 = function (j) {
             var token = tokens[j];
             var ref = {

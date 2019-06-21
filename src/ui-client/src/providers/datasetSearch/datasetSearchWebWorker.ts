@@ -173,9 +173,12 @@ export default class DatasetSearchEngineWebWorker {
         /*
          * Flatten categorized datasets map into an array of datasets.
          */
-        const getDatasetsArray = (): PatientListDatasetQuery[] => {
-            return [ ...allCatDs.values() ]
-                .reduce((prev: PatientListDatasetQuery[], curr) => prev = prev.concat([ ...curr.datasets.values() ]), []);
+        const getAllDatasetsArray = (): PatientListDatasetQuery[] => {
+            const copy = new Map(allDs);
+            if (!isAdmin) {
+                copy.delete(demographics.id);
+            }
+            return [ ...copy.values() ];
         };
         
         /* 
@@ -190,7 +193,7 @@ export default class DatasetSearchEngineWebWorker {
             /*
              * Get default display and sort order.
              */
-            const reSorted = dedupeAndSort(getDatasetsArray());
+            const reSorted = dedupeAndSort(getAllDatasetsArray());
             allCatDs = reSorted.categories;
             defaultOrder = reSorted.displayOrder;
 
@@ -212,9 +215,10 @@ export default class DatasetSearchEngineWebWorker {
                     excluded.set(ds.id, ds);
                 }
             }
-            const resorted = dedupeAndSort(getDatasetsArray());
-            allCatDs = resorted.categories;
-            defaultOrder = resorted.displayOrder;
+            const datasets = getAllDatasetsArray().filter((ds) => !excluded.has(ds.id));
+            const reSorted = dedupeAndSort(datasets);
+            allCatDs = reSorted.categories;
+            defaultOrder = reSorted.displayOrder;
             
             return searchDatasets(payload);
         };
@@ -397,6 +401,7 @@ export default class DatasetSearchEngineWebWorker {
              */
             const all = datasets!.slice().filter((ds) => ds.shape !== 3);
             all.unshift(demographics);
+            allDs.clear();
             allCatDs.clear();
             allCatDsAdmin.clear();
             allCatDsAdmin.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
@@ -412,6 +417,7 @@ export default class DatasetSearchEngineWebWorker {
                 let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
+                allDs.set(ds.id, ds);
 
                 for (let j = 0; j <= tokens.length - 1; j++) {
                     const token = tokens[j];
