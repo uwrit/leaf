@@ -15,7 +15,7 @@ GO
 -- Create date: 2019/3/29
 -- Description: Updates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateConcept]
+ALTER PROCEDURE [adm].[sp_UpdateConcept]
     @id uniqueidentifier,
     @universalId nvarchar(200),
     @parentId uniqueidentifier,
@@ -66,6 +66,9 @@ BEGIN
 
     BEGIN TRAN;
     BEGIN TRY
+
+		DECLARE @oldRootId UNIQUEIDENTIFIER = (SELECT TOP 1 RootId FROM app.Concept WHERE Id = @id)
+
         UPDATE app.Concept
         SET
             UniversalId = @universalId,
@@ -92,23 +95,37 @@ BEGIN
             PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
         WHERE Id = @id;
 
-        UPDATE app.Concept
-        SET RootId = @rootId
-        WHERE ParentId = @id
-              AND RootId != @rootId;
+		IF (@rootId != @oldRootId)
 
-        UPDATE app.ConceptForwardIndex
-        SET RootId = @rootId
-        WHERE ConceptId = @id
-              AND RootId != @rootId
+		BEGIN
+			; WITH descendents AS
+			(
+				SELECT Id = @id
+				UNION ALL
+				SELECT C2.Id
+				FROM descendents AS D
+					 INNER JOIN app.Concept AS C2
+						ON C2.ParentId = D.Id
+			)
+			SELECT DISTINCT Id
+			INTO #descendents
+			FROM descendents
 
-        UPDATE app.ConceptForwardIndex
-        SET RootId = @rootId
-        FROM app.Concept C
-             INNER JOIN app.ConceptForwardIndex FI
-                ON C.Id = FI.ConceptId
-        WHERE C.ParentId = @id
-              AND C.RootId != @rootId
+			UPDATE app.Concept
+			SET RootId = @rootId
+			FROM app.Concept AS C
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			UPDATE app.ConceptForwardIndex
+			SET RootId = @rootId
+			FROM app.Concept C
+				 INNER JOIN app.ConceptForwardIndex FI
+					ON C.Id = FI.ConceptId
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			DROP TABLE #descendents
+
+		END
 
         DELETE FROM auth.ConceptConstraint
         WHERE ConceptId = @id;
@@ -133,7 +150,6 @@ BEGIN
         THROW;
     END CATCH;
 END
-
 
 
 

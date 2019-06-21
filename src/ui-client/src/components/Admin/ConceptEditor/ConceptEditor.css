@@ -163,6 +163,10 @@
 }
 
 /* Dropdown */
+.concept-editor .dropdown-menu {
+    width: 100%;
+}
+
 .concept-editor-sqlset-date {
     color: rgb(0, 162, 184);
     font-size: 0.9rem;

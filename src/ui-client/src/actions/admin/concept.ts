@@ -15,13 +15,14 @@ import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
 import { generateSampleSql, getRootId } from '../../utils/admin/concept';
-import { setConcept, removeConcept, reparentConcept, createConcept } from '../concepts';
+import { setConcept, removeConcept, reparentConcept, createConcept, switchConcepts } from '../concepts';
 import { fetchConcept } from '../../services/conceptApi'
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
 export const SET_ADMIN_CONCEPT_EXAMPLE_SQL = 'SET_ADMIN_CONCEPT_EXAMPLE_SQL';
 export const SET_ADMIN_PANEL_CONCEPT_LOAD_STATE = 'SET_ADMIN_PANEL_CONCEPT_LOAD_STATE';
 export const SET_ADMIN_PANEL_CURRENT_USER_CONCEPT = 'SET_ADMIN_PANEL_CURRENT_USER_CONCEPT';
+export const RESET_ADMIN_CONCEPT_CACHE = 'RESET_ADMIN_CONCEPT_CACHE';
 export const CREATE_ADMIN_CONCEPT = 'CREATE_ADMIN_CONCEPT';
 export const REMOVE_UNSAVED_ADMIN_CONCEPT = 'REMOVE_UNSAVED_ADMIN_CONCEPT';
 
@@ -104,7 +105,10 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
                       `This will take effect immediately and be visible to users`,
                 header: 'Re-parent Concept',
                 onClickNo: () => null,
-                onClickYes: () => dispatch(saveAdminConcept(adminConcept, userConcept)),
+                onClickYes: () => {
+                    dispatch(saveAdminConcept(adminConcept, userConcept));
+                    dispatch(resetAdminConceptCache());
+                },
                 show: true,
                 noButtonText: `No`,
                 yesButtonText: `Yes, move the Concept`
@@ -188,8 +192,9 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
             /*
              * Update changed Concept.
              */
-            dispatch(removeConcept(userConcept));
-            dispatch(createConcept(newUserConcept));
+            dispatch(switchConcepts(userConcept, newUserConcept));
+            // dispatch(removeConcept(userConcept));
+            // dispatch(createConcept(newUserConcept));
             dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
 
             /*
@@ -315,5 +320,11 @@ export const createNewAdminConcept = (adminConcept: AdminConcept): AdminConceptA
 export const removeUnsavedAdminConcept = (): AdminConceptAction => {
     return {
         type: REMOVE_UNSAVED_ADMIN_CONCEPT
+    };
+};
+
+export const resetAdminConceptCache = (): AdminConceptAction => {
+    return {
+        type: RESET_ADMIN_CONCEPT_CACHE
     };
 };

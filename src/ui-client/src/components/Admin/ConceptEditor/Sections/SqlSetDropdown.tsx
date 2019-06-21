@@ -43,12 +43,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
         const { isOpen } = this.state;
         const selected = sqlSets.get((value));
         const c = this.className;
-        const sets: ConceptSqlSet[] = [];
+        const sets: ConceptSqlSet[] = [ ...sqlSets.values() ];
         const displayText = selected 
             ? selected.sqlSetFrom.length > 30 ? (selected.sqlSetFrom.substr(0,30) + '...') : selected.sqlSetFrom
             : 'No SQL Set Selected';
-
-        sqlSets.forEach((s) => sets.push(s));
 
         return (
             <FormGroup>
@@ -75,13 +73,10 @@ export class SqlSetDropdown extends React.PureComponent<Props,State> {
                                 return (
                                     <DropdownItem 
                                         key={s.id}
-                                        onClick={this.handleChange.bind(null, s.id)}>
-                                        <div className={`${c}-sqlset`}>
+                                        onClick={this.handleChange.bind(null, s.id)}
+                                        className={`${c}-sqlset ${selected === s ? 'selected' : ''}`}>
                                             <span className={`${c}-sqlset-set`}>{s.sqlSetFrom}</span>
-                                            {s.sqlFieldDate &&
                                             <span className={`${c}-sqlset-date`}>{s.sqlFieldDate}</span>
-                                            }
-                                        </div>
                                     </DropdownItem>
                                 );
                             })}
