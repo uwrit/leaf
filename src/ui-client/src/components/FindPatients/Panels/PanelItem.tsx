@@ -84,6 +84,8 @@ export class PanelItem extends React.Component<Props> {
         const { concept, specializations } = panelItem;
         const c = this.className;
         const classes = [ c ]; 
+        if (!panelItem.concept) { return null; }
+        
         const eventJoin = subPanel.joinSequenceEventType;
         const eventId = panelItem.concept.eventTypeId;
         const invalidEventId = 
