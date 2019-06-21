@@ -2834,7 +2834,21 @@ BEGIN
 
         UPDATE app.Concept
         SET RootId = @rootId
-        WHERE ParentId = @id;
+        WHERE ParentId = @id
+              AND RootId != @rootId;
+
+        UPDATE app.ConceptForwardIndex
+        SET RootId = @rootId
+        WHERE ConceptId = @id
+              AND RootId != @rootId
+
+        UPDATE app.ConceptForwardIndex
+        SET RootId = @rootId
+        FROM app.Concept C
+             INNER JOIN app.ConceptForwardIndex FI
+                ON C.Id = FI.ConceptId
+        WHERE C.ParentId = @id
+              AND C.RootId != @rootId
 
         DELETE FROM auth.ConceptConstraint
         WHERE ConceptId = @id;
