@@ -2755,7 +2755,7 @@ GO
 -- Create date: 2019/3/29
 -- Description: Updates an app.Concept along with auth.ConceptConstraint and rela.ConceptSpecializationGroup.
 -- =======================================
-ALTER PROCEDURE [adm].[sp_UpdateConcept]
+CREATE PROCEDURE [adm].[sp_UpdateConcept]
     @id uniqueidentifier,
     @universalId nvarchar(200),
     @parentId uniqueidentifier,

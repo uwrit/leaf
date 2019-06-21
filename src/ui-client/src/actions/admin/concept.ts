@@ -15,7 +15,7 @@ import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
 import { generateSampleSql, getRootId } from '../../utils/admin/concept';
-import { setConcept, removeConcept, reparentConcept, createConcept, switchConcepts } from '../concepts';
+import { setConcept, removeConcept, reparentConcept, switchConcepts } from '../concepts';
 import { fetchConcept } from '../../services/conceptApi'
 
 export const SET_ADMIN_CONCEPT = 'SET_ADMIN_CONCEPT';
@@ -193,8 +193,6 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
              * Update changed Concept.
              */
             dispatch(switchConcepts(userConcept, newUserConcept));
-            // dispatch(removeConcept(userConcept));
-            // dispatch(createConcept(newUserConcept));
             dispatch(setAdminPanelCurrentUserConcept(newUserConcept));
 
             /*
