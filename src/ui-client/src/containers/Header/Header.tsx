@@ -61,8 +61,10 @@ class Header extends React.PureComponent<Props> {
         const username = user ? user.name : '';
         let totalActiveResponders = 0;
         responders.forEach((ni: NetworkIdentity) => { 
-            resps.push(ni.id);
-            if (ni.enabled) { totalActiveResponders += 1; }
+            if (!ni.isGateway) {
+                resps.push(ni.id);
+                if (ni.enabled) { totalActiveResponders += 1; }
+            }
         });
 
         return (

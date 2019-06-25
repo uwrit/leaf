@@ -82,7 +82,9 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
         state.responders.forEach((nr: NetworkIdentity) => { 
             const crt = state.cohort.networkCohorts.get(nr.id)!;
             if (nr.enabled && 
-                !nr.isGateway &&
+                (
+                    (nr.isHomeNode && !nr.isGateway) || !nr.isHomeNode
+                ) &&
                 crt.count.state === CohortStateType.LOADED && 
                 crt.patientList.state === CohortStateType.LOADED
             ) { 

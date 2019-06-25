@@ -6,12 +6,13 @@
  */ 
 
 import React from 'react';
-import { CohortState } from '../../models/state/CohortState';
+import { NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
 import { CohortCountQuerySites } from './CohortCountQuerySites';
 import { CohortCountQueryTimer } from './CohortCountQueryTimer';
 
 interface Props { 
-    cohort: CohortState;
+    cohort: NetworkCohortState[];
+    state: CohortStateType
 }
 
 export class CohortCountQueryDetail extends React.PureComponent<Props> {
@@ -20,10 +21,12 @@ export class CohortCountQueryDetail extends React.PureComponent<Props> {
     }
 
     public render() {
+        const { cohort, state } = this.props;
+
         return (
             <div>
-                <CohortCountQuerySites network={this.props.cohort.networkCohorts} />
-                <CohortCountQueryTimer countState={this.props.cohort.count.state} />
+                <CohortCountQuerySites cohorts={cohort} />
+                <CohortCountQueryTimer countState={state} />
             </div>
         );
     }

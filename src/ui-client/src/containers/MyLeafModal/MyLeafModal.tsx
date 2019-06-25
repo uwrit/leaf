@@ -13,11 +13,13 @@ import { toggleMyLeafModal } from '../../actions/generalUi';
 import SavedQueriesTable from '../../components/MyLeafModal/SavedQueriesTable';
 import { AppState } from '../../models/state/AppState';
 import { SavedQueriesState } from '../../models/Query';
-import './MyLeafModal.css';
 import { Panel } from '../../models/panel/Panel';
 import { CohortStateType } from '../../models/state/CohortState';
+import { NetworkIdentity } from '../../models/NetworkResponder';
+import './MyLeafModal.css';
 
 interface StateProps {
+    home?: NetworkIdentity;
     queryState: CohortStateType;
     panels: Panel[];
     queries: SavedQueriesState;
@@ -40,7 +42,8 @@ class MyLeafModal extends React.PureComponent<Props> {
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];
-        const { queries, dispatch, panels, queryState } = this.props;
+        const { queries, dispatch, panels, queryState, home } = this.props;
+        const isGateway = home ? home.isGateway : false;
 
         return (
             <Modal isOpen={this.props.show} className={classes.join(' ')} keyboard={true}>
@@ -60,7 +63,7 @@ class MyLeafModal extends React.PureComponent<Props> {
                 <ModalBody>
                     <TabContent activeTab="1">
                         <TabPane tabId="1">
-                            <SavedQueriesTable dispatch={dispatch} panels={panels} queries={queries} queryState={queryState}/>
+                            <SavedQueriesTable dispatch={dispatch} panels={panels} queries={queries} queryState={queryState} isGateway={isGateway}/>
                         </TabPane>
                     </TabContent>
                 </ModalBody>
@@ -76,6 +79,7 @@ class MyLeafModal extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
+        home: state.responders.get(0), 
         queryState: state.cohort.count.state,
         panels: state.panels,
         queries: state.queries,

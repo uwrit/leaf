@@ -10,12 +10,12 @@ import { connect } from 'react-redux'
 import AggregateDemographics from '../../components/Visualize/AggregateDemographics';
 import ResponderDemographics from '../../components/Visualize/ResponderDemographics';
 import { AppState, AuthorizationState } from '../../models/state/AppState';
-import { CohortMap, CohortState, NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
+import { CohortState, NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import computeDimensions from '../../utils/computeDimensions';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
-import './Visualize.css';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
+import './Visualize.css';
 
 interface OwnProps { }
 interface StateProps {
