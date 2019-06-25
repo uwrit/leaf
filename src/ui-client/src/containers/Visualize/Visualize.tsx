@@ -10,12 +10,12 @@ import { connect } from 'react-redux'
 import AggregateDemographics from '../../components/Visualize/AggregateDemographics';
 import ResponderDemographics from '../../components/Visualize/ResponderDemographics';
 import { AppState, AuthorizationState } from '../../models/state/AppState';
-import { CohortMap, CohortState, NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
+import { CohortState, NetworkCohortState, CohortStateType } from '../../models/state/CohortState';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import computeDimensions from '../../utils/computeDimensions';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
-import './Visualize.css';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
+import './Visualize.css';
 
 interface OwnProps { }
 interface StateProps {
@@ -69,7 +69,7 @@ class Visualize extends React.Component<Props, State> {
         /*
          * If too many patients for caching, let user know.
          */
-        if (data.length === 1 && cohort.count.value > auth.config!.cacheLimit) {
+        if (cohort.networkCohorts.size === 1 && cohort.count.value > auth.config!.cacheLimit) {
             return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
         }
         /*
@@ -78,10 +78,11 @@ class Visualize extends React.Component<Props, State> {
         if (cohort.visualization.state === CohortStateType.IN_ERROR) {
             return (
                 <div className={`${c}-error`}>
-                <p>
-                    An error occurred while loading patient visualizations. We are sorry for the inconvenience.
-                </p>
-            </div>
+                    <p>
+                        Whoops! An error occurred while loading patient visualizations. We are sorry for the inconvenience. 
+                        Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
             );
         } 
         /*
@@ -96,7 +97,7 @@ class Visualize extends React.Component<Props, State> {
         } 
 
         return  (
-            <div className={`${c}-container`}>
+            <div className={`${c}-container scrollable-offset-by-header`}>
                 <AggregateDemographics 
                     cohort={cohort} 
                     height={demogHeight}

@@ -16,6 +16,8 @@ import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AuthConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import AdminPanel from '../containers/Admin/AdminPanel';
+import { AdminPanelPane } from '../models/state/AdminState';
+import { checkIfAdminPanelUnsavedAndSetPane } from '../actions/admin/admin';
 
 export interface RouteConfig {
     display: string;
@@ -23,6 +25,12 @@ export interface RouteConfig {
     index: Routes;
     path: string;
     render: any;
+    subRoutes?: SubRouteConfig[];
+}
+
+interface SubRouteConfig {
+    clickHandler: any;
+    display: string;
 }
 
 const findPatients = (): RouteConfig => {
@@ -71,7 +79,20 @@ const admin = (): RouteConfig => {
         icon: <MdSecurity />,
         index: Routes.AdminPanel,
         path: '/admin',
-        render: () => <AdminPanel />
+        render: () => <AdminPanel />,
+        subRoutes: [{
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.CONCEPTS)),
+            display: 'Concepts',
+        }, {
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.SQL_SETS)),
+            display: 'Concept SQL Sets',
+        },{
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.DATASETS)),
+            display: 'Datasets',
+        }, {
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.NETWORK)),
+            display: 'Network and Identity',
+        }]
     };
 }
 

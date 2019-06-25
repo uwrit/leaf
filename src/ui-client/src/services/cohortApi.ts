@@ -12,7 +12,7 @@ import { PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';
 import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Date';
-import { PatientListDatasetQueryDTO, PatientListDatasetDTO } from '../models/patientList/Dataset';
+import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetShape, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import moment from 'moment'
 
 /*
@@ -43,7 +43,7 @@ export function fetchDemographics(state: AppState, nr: NetworkIdentity, queryId:
 /*
  * Fetch a dataset, which may or may not have date boundaries.
  */
-export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQueryDTO, dates: DateBoundary) => {
+export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQuery, dates: DateBoundary): Promise<PatientListDatasetDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = {
@@ -63,14 +63,12 @@ export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId
     return result.data as PatientListDatasetDTO
 };
 
-/*
- * Fetch an array of all datasets potentially available 
- * to the user.
- */
-export function fetchAvailableDatasets(state: AppState) {
+export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.get(`/api/dataset`);
+    const resp = await http.get(`/api/dataset`);
+    const ds = resp.data as PatientListDatasetQueryDTO[];
+    return ds;
 };
 
 /*

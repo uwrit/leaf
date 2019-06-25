@@ -23,12 +23,13 @@ import {
     SHOW_DRILL_TREE,
     TOGGLE_CONCEPT_OPEN,
     REMOVE_CONCEPT,
-    CREATE_CONCEPT
+    CREATE_CONCEPT,
+    SWITCH_CONCEPTS
 } from '../actions/concepts';
 import { ConceptsAction } from '../actions/concepts';
 import { ConceptMap, ConceptsState } from '../models/state/AppState';
 import { Concept, ExtensionConcept } from '../models/concept/Concept';
-import { getRootId } from '../utils/admin';
+import { getRootId } from '../utils/admin/concept';
 
 export const defaultConceptsState = (): ConceptsState => {
     return {
@@ -322,6 +323,77 @@ const reparentConcept = (state: ConceptsState, concept: Concept, parentId: strin
     });
 };
 
+const switchConcepts = (state: ConceptsState, concepts: Concept[]): ConceptsState => {
+    const [ oldConcept, newConcept ] = concepts;
+
+    if (oldConcept.parentId && oldConcept.parentId === newConcept.parentId) {
+
+        /*
+         * Update Current tree.
+         */
+        let parent = state.currentTree.get(oldConcept.parentId);
+
+        if (parent && parent.childrenIds) {
+            const children = [ ...parent.childrenIds ];
+            const oldIdx = children.slice().findIndex((c) => oldConcept.id === c);
+            if (oldIdx > -1) {
+                children.splice(oldIdx, 1, newConcept.id);
+            } else {
+                children.unshift(newConcept.id);
+            }
+            parent.childrenIds = new Set(children);
+        }
+
+        /*
+         * Update Search tree.
+         */
+        parent = state.searchTree.get(oldConcept.parentId);
+
+        if (parent && parent.childrenIds) {
+            const children = [ ...parent.childrenIds ];
+            const oldIdx = children.slice().findIndex((c) => oldConcept.id === c);
+            if (oldIdx > -1) {
+                children.splice(oldIdx, 1, newConcept.id);
+            } else {
+                children.unshift(newConcept.id);
+            }
+            parent.childrenIds = new Set(children);
+        }
+
+        /*
+         * Update Drilldown tree.
+         */
+        parent = state.drillTree.get(oldConcept.parentId);
+
+        if (parent && parent.childrenIds) {
+            const children = [ ...parent.childrenIds ];
+            const oldIdx = children.slice().findIndex((c) => oldConcept.id === c);
+            if (oldIdx > -1) {
+                children.splice(oldIdx, 1, newConcept.id);
+            } else {
+                children.unshift(newConcept.id);
+            }
+            parent.childrenIds = new Set(children);
+        }
+
+        state.currentTree.delete(oldConcept.id);
+        state.searchTree.delete(oldConcept.id);
+        state.drillTree.delete(oldConcept.id);
+        state.currentTree.set(newConcept.id, newConcept);
+        state.searchTree.set(newConcept.id, newConcept);
+        state.drillTree.set(newConcept.id, newConcept);
+
+        return Object.assign({}, state, {
+            currentTree: new Map(state.currentTree)
+        });
+
+    } else {
+        if (oldConcept.parentId) { state.roots = state.roots.slice().filter((r) => r !== oldConcept.id) }
+        if (newConcept.parentId) { state.roots = state.roots.slice().filter((r) => r !== newConcept.id) }
+        return createConcept( removeConcept(state, oldConcept), newConcept);
+    }
+};
+
 export const concepts = (state: ConceptsState = defaultConceptsState(), action: ConceptsAction): ConceptsState => {
     switch (action.type) {
         case TOGGLE_CONCEPT_OPEN:
@@ -357,6 +429,8 @@ export const concepts = (state: ConceptsState = defaultConceptsState(), action: 
             return reparentConcept(state, action.concept!, action.parentId!);
         case CREATE_CONCEPT:
             return createConcept(state, action.concept!);
+        case SWITCH_CONCEPTS:
+            return switchConcepts(state, action.concepts!);
         case ERROR_CONCEPTS:
         default:
             return state;

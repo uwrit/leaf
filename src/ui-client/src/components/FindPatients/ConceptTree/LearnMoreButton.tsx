@@ -8,12 +8,12 @@
 import React from 'react';
 import { FiBarChart2 } from 'react-icons/fi';
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis } from 'recharts';
-import { Concept, PatientCountPerYear } from '../../../models/concept/Concept';
+import { Concept, PatientCountPerYear, PatientCountPerYearGrouped, DisplayablePatientCountPerYear } from '../../../models/concept/Concept';
 import { formatLargeNumber, formatSmallNumber } from '../../../utils/formatNumber';
 import PopupBox from '../../Other/PopupBox/PopupBox';
-import './LearnMoreButton.css';
-import { TextArea } from '../../Admin/ConceptEditor/Sections/TextArea';
 import TextareaAutosize from 'react-textarea-autosize';
+import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
+import './LearnMoreButton.css';
 
 interface Props {
     concept: Concept;
@@ -22,79 +22,95 @@ interface Props {
 interface State {
     DOMRect?: DOMRect;
     showInfoBox: boolean;
+    ShowAllYears: boolean;
 }
 
-const className = 'concept-tree-learn-more'
-
 export default class LearnMoreButton extends React.PureComponent<Props,State> {
+    private className = 'concept-tree-learn-more';
+    private startYear = 1995;
+    private currYear = new Date().getFullYear();
+    private height = 250;
+    private margin = {top: 20, right: 20, left: 20, bottom: 20};
+    private minWidth = 300;
+    private maxWidth = 1000;
     constructor(props: Props) {
         super(props);
         this.state = {
-            showInfoBox: false
+            showInfoBox: false,
+            ShowAllYears: false
         }
     }
 
-    public handleClick = (e: any) => { 
-        if (e.target.className === e.currentTarget.className || !this.state.showInfoBox) {
-            const domRect: DOMRect = e.target.getBoundingClientRect();
-            this.setState({ showInfoBox: !this.state.showInfoBox, DOMRect: domRect });
-        }
-    }
+    public getYearData = () => {
+        const { concept } = this.props;
+        const formatterThreshold = 10000;
 
-    public handleInfoBoxClickedOutside = () => {
-        this.setState({ showInfoBox: !this.state.showInfoBox });
+        if (concept.uiDisplayPatientCountByYear) {
+            let data: DisplayablePatientCountPerYear[] = [];
+            if (!this.state.ShowAllYears) {
+                data = this.groupYears(concept.uiDisplayPatientCountByYear);
+            } else {
+                data = concept.uiDisplayPatientCountByYear;
+            }
+            return data.map((p: DisplayablePatientCountPerYear) => ({ 
+                ...p, 
+                label: !p.year ? '?' :
+                    p.patientCount >= formatterThreshold 
+                        ? formatLargeNumber(p.patientCount)
+                        : formatSmallNumber(p.patientCount)
+            }))
+        }
+        return [];
     }
 
     public render(): any {
         const { concept } = this.props;
+        const { showInfoBox, ShowAllYears, DOMRect } = this.state;
+        const c = this.className;
         const countsByYear = concept.uiDisplayPatientCountByYear;
-        const height = 250;
-        const margin = {top: 20, right: 20, left: 20, bottom: 20};
-        const minWidth = 200;
-        const calcWidth = countsByYear ? (countsByYear.length * 40) : 200;
-        const width = calcWidth < minWidth ? minWidth : calcWidth;
-        const formatterThreshold = 10000;
-        const data = countsByYear
-            ? countsByYear!
-                .map((p: PatientCountPerYear) => ({ ...p, label: p.patientCount >= formatterThreshold 
-                    ? formatLargeNumber(p.patientCount)
-                    : formatSmallNumber(p.patientCount)
-                }))
-            : countsByYear;
+        const calcWidth = countsByYear ? (countsByYear.length * 40) : this.minWidth;
+        const data = this.getYearData();
+        const width = calcWidth < this.minWidth 
+            ? this.minWidth : calcWidth > this.maxWidth 
+            ? this.maxWidth : calcWidth;
 
         return (
-            <span className={`${className}-button`} onClick={this.handleClick}>
+            <span className={`${c}-button`} onClick={this.handleClick}>
                 <FiBarChart2 />
                 <div>
                     Learn More
-                    {this.state.showInfoBox &&
+
+                    {/* Popup Box */}
+                    {showInfoBox &&
                     <PopupBox 
-                        parentDomRect={this.state.DOMRect!} 
+                        parentDomRect={DOMRect!} 
                         toggle={this.handleInfoBoxClickedOutside}>
-                        <div className={`${className}`}>
-                            <div className={`${className}-title`}>
+                        <div className={`${c}`} style={{ width }}>
+                            <div className={`${c}-title`}>
                                 <p>{concept.uiDisplayName}</p>
-                                <p className={`${className}-universalid`}>
+                                <p className={`${c}-universalid`}>
                                     {concept.universalId
-                                        ? <span className={`${className}-universalid-value`}>{concept.universalId}</span> 
-                                        : <span className={`${className}-universalid-none`}>local concept only</span> 
+                                        ? <span className={`${c}-universalid-value`}>{concept.universalId}</span> 
+                                        : <span className={`${c}-universalid-none`}>local concept only</span> 
                                     }
                                 </p>
                             </div>
-                            <div className={`${className}-separator`} />
+                            <div className={`${c}-separator`} />
+
+                            {/* Counts by Year chart */}
                             {countsByYear &&
-                            <ResponsiveContainer height={height}>
+                            <ResponsiveContainer height={this.height}>
                             <BarChart 
                                 data={data} 
-                                barCategoryGap={1} 
-                                className={`${className}-chart`}
-                                margin={margin}>
+                                barCategoryGap={5} 
+                                className={`${c}-chart`}
+                                margin={this.margin}>
                                 <XAxis 
                                     dataKey="year" 
                                     interval={0} 
                                     axisLine={false} 
                                     tickLine={false} 
-                                    label={{ value: 'Unique patients by Year', position: 'bottom', className:`${className}-axis-label` }}/>
+                                    label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
                                 <Bar 
                                     barSize={35}
                                     dataKey="patientCount" 
@@ -106,9 +122,21 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                                 </Bar>
                             </BarChart>
                             </ResponsiveContainer>}
-                            {countsByYear && <div className={`${className}-separator-long`} />}
+
+                            {countsByYear && 
+                                <div className={`${c}-show-all-years`}>
+                                    <div className={`${c}-show-all-years-text`}>
+                                        Show all years
+                                    </div>
+                                    <CheckboxSlider checked={ShowAllYears} onClick={this.handleShowAllYearsClick} />
+                                </div>
+                            }
+
+                            {countsByYear && <div className={`${c}-separator-long`} />}
+
+                            {/* Tooltip / Info */}
                             {concept.uiDisplayTooltip &&
-                            <div className={`${className}-info`}>
+                            <div className={`${c}-info`}>
                                 <TextareaAutosize
                                     readOnly={true}
                                     spellCheck={false}
@@ -117,15 +145,50 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             </div>
                             }
                             {!concept.uiDisplayTooltip &&
-                            <p className={`${className}-noinfo`}>
+                            <p className={`${c}-noinfo`}>
                                 No information provided for this concept
                             </p>
                             }
+
                         </div>    
                     </PopupBox>
                     }
                 </div>
             </span>
         )       
+    }
+
+    private handleClick = (e: any) => { 
+        if (e.target.className === e.currentTarget.className || !this.state.showInfoBox) {
+            const domRect: DOMRect = e.target.getBoundingClientRect();
+            this.setState({ showInfoBox: !this.state.showInfoBox, DOMRect: domRect });
+        }
+    }
+
+    private handleShowAllYearsClick = () => {
+        this.setState({ ShowAllYears: !this.state.ShowAllYears });
+    }
+
+    private handleInfoBoxClickedOutside = () => {
+        this.setState({ showInfoBox: !this.state.showInfoBox });
+    }
+
+    private groupYears = (ungrouped: PatientCountPerYear[]): PatientCountPerYearGrouped[] => {
+        const output: PatientCountPerYearGrouped[] = [];
+        const nullYear: PatientCountPerYearGrouped = { year: '?', patientCount: 0 };
+        const startYear: PatientCountPerYearGrouped = { year: `<${this.startYear}`, patientCount: 0 };
+        const greaterThanCurrentYear: PatientCountPerYearGrouped = { year: `>${this.currYear}`, patientCount: 0 };
+
+        for (const bar of ungrouped) {
+            if (!bar.year)                      { nullYear.patientCount += bar.patientCount; }
+            else if (bar.year < this.startYear) { startYear.patientCount += bar.patientCount; }
+            else if (bar.year > this.currYear)  { greaterThanCurrentYear.patientCount += bar.patientCount; }
+            else                                { output.push({ year: `${bar.year}`, patientCount: bar.patientCount }); }
+        }
+
+        if (startYear.patientCount)              { output.splice(0, 0, startYear); }
+        if (nullYear.patientCount)               { output.splice(0, 0, nullYear); }
+        if (greaterThanCurrentYear.patientCount) { output.push(greaterThanCurrentYear); }
+        return output;
     }
 }

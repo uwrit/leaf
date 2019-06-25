@@ -69,7 +69,12 @@ export const getBrowser = (): Browser => {
     }
 
     return {
-        error: ![ BrowserType.Chrome, BrowserType.Firefox, BrowserType.Edge, BrowserType.Safari ].includes(browserName),
+        error: !(
+            (browserName === BrowserType.Chrome && majorVersion >= 72) ||
+            (browserName === BrowserType.Firefox && majorVersion >= 65) ||
+            (browserName === BrowserType.Edge && majorVersion >= 44) ||
+            (browserName === BrowserType.Safari && majorVersion >= 12)
+        ),
         type: browserName,
         majorVersion,
         version: fullVersion

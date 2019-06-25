@@ -25,6 +25,7 @@ export interface SectionProps {
     changed: boolean;
     changeHandler: (val: any, propName: string) => any;
     dispatch: any;
+    forceValidation: boolean;
     sqlSets: Map<number, ConceptSqlSet>;
     sqlConfig: SqlConfiguration;
     toggleSqlPreview: (show: boolean) => any;
@@ -35,14 +36,16 @@ export interface SectionProps {
 export interface PropertyProps {
     changeHandler: (val: any, propName: string) => any;
     className?: string;
+    errorText?: string;
     label?: string;
     locked?: boolean;
+    forceValidation?: boolean;
     focusToggle?: (show: boolean) => void;
     onClick?: (e: React.MouseEvent<HTMLElement>) => any;
     placeholder?: string;
     propName: string;
     required?: boolean;
     subLabel?: string;
-    type?: string;
+    type?: 'text' | 'number';
     value?: any;
 }

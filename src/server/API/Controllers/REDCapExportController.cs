@@ -47,7 +47,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not fetch REDCap version. Error:{Error}", ex.Message);
+                log.LogError("Failed to fetch REDCap version. Error:{Error}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -66,7 +66,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not create REDCap project. Error:{Error}", ex.Message);
+                log.LogError("Failed to create REDCap project. Error:{Error}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

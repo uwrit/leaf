@@ -25,6 +25,7 @@ export const SET_SEARCH_TREE = 'SET_SEARCH_TREE';
 export const SET_SELECTED_CONCEPT = 'SET_SELECTED_CONCEPT';
 export const CREATE_CONCEPT = 'CREATE_CONCEPT';
 export const REPARENT_CONCEPT = 'REPARENT_CONCEPT';
+export const SWITCH_CONCEPTS = 'SWITCH_CONCEPTS';
 export const REMOVE_CONCEPT = 'REMOVE_CONCEPT';
 export const MERGE_EXTENSION_CONCEPTS = 'MERGE_EXTENSION_CONCEPTS';
 export const REMOVE_EXTENSION_CONCEPT = 'REMOVE_EXTENSION_CONCEPT';
@@ -242,6 +243,13 @@ export const addConcepts = (concepts: Concept[]): ConceptsAction => {
     return {
         concepts,
         type: SET_CONCEPTS
+    };
+};
+
+export const switchConcepts = (oldConcept: Concept, newConcept: Concept): ConceptsAction => {
+    return {
+        concepts: [ oldConcept, newConcept ],
+        type: SWITCH_CONCEPTS
     };
 };
 

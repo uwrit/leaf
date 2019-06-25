@@ -49,14 +49,23 @@ namespace Model.Search
 
         public async Task<Query> GetQueryAsync(QueryUrn urn)
         {
-            log.LogInformation("Getting query UId:{UId}", urn);
+            log.LogInformation("Getting query. UId:{UId}", urn);
             try
             {
-                return await service.GetQueryAsync(urn);
+                var query = await service.GetQueryAsync(urn);
+                if (query == null)
+                {
+                    log.LogError("Could not find query. UId:{UId}", urn);
+                }
+                else
+                {
+                    log.LogInformation("Found query. Id:{Id} UId:{UId}", query.Id, query.UniversalId);
+                }
+                return query;
             }
             catch (DbException de)
             {
-                log.LogError("Could not get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
+                log.LogError("Failed to get query. UniversalId:{UniversalId} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -67,11 +76,20 @@ namespace Model.Search
             log.LogInformation("Deleting query. Query:{Query} Force:{Force}", urn, force);
             try
             {
-                return await service.DeleteAsync(urn, force);
+                var result = await service.DeleteAsync(urn, force);
+                if (result.Ok)
+                {
+                    log.LogInformation("Deleted query. Query:{Query}", urn);
+                }
+                else
+                {
+                    log.LogInformation("Could not delete query due to conflict. Query:{Query} Result:{@Result}", urn, result);
+                }
+                return result;
             }
             catch (DbException de)
             {
-                log.LogError("Could not delete query. Query:{Query} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
+                log.LogError("Failed to delete query. Query:{Query} Code:{Code} Error:{Error}", urn, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -79,9 +97,11 @@ namespace Model.Search
 
         public async Task<SaveResult> SaveAsync(Guid id, IQuerySaveDTO ast, Func<IQueryDefinition, string> json, CancellationToken cancel)
         {
+            log.LogInformation("Saving query. Id:{Id} Ast:{Ast}", id, ast);
 
-            log.LogInformation("Starting query save. Query:{Query}", id);
             var ctx = await converter.GetPanelsAsync(ast, cancel);
+            log.LogInformation("Save query panel validation context. Context:{@Context}", ctx);
+
             if (!ctx.PreflightPassed)
             {
                 return new SaveResult { State = SaveState.Preflight, Preflight = ctx.PreflightCheck };
@@ -93,6 +113,7 @@ namespace Model.Search
             if (!user.IsInstutional)
             {
                 converter.LocalizeDefinition(ast, query);
+                log.LogInformation("Localized federated query. Id:{Id} Ast:{Ast}", id, ast);
             }
 
             var toSave = new QuerySave
@@ -104,6 +125,8 @@ namespace Model.Search
                 Definition = json(ast),
                 Resources = query.Panels.GetResources()
             };
+
+            // if ast already has an assive version, use it
             if (ast.Ver.HasValue)
             {
                 toSave.Ver = ast.Ver.Value;
@@ -117,6 +140,7 @@ namespace Model.Search
                 var saved = await ImplSaveAsync(toSave);
                 if (saved == null)
                 {
+                    log.LogError("Could not save query, not found. Query:{Query}", id);
                     return new SaveResult
                     {
                         State = SaveState.NotFound,
@@ -124,6 +148,7 @@ namespace Model.Search
                         Result = null
                     };
                 }
+                log.LogInformation("Saved query. Query:{@Query}", toSave);
                 return new SaveResult
                 {
                     State = SaveState.Ok,
@@ -133,7 +158,7 @@ namespace Model.Search
             }
             catch (DbException de)
             {
-                log.LogError("Could not save query. Query:{@Query} Code:{Code} Error:{Error}", toSave, de.ErrorCode, de.Message);
+                log.LogError("Failed to save query. Query:{@Query} Code:{Code} Error:{Error}", toSave, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }

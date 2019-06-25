@@ -20,9 +20,11 @@ import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
 import { getPatientListFromNewBaseDataset } from './patientList';
 import { setAggregateVisualizationData, setNetworkVisualizationData } from './visualize';
-import { showInfoModal, getAllPatientListDatasets } from '../generalUi';
+import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
+import { allowAllDatasets } from '../../services/datasetSearchApi';
+import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -111,11 +113,16 @@ export const getCounts = () => {
                         .then(() => resolve());
                 })
             })                
-        ).then(() => {
+        ).then( async () => {
+
             if (getState().cohort.count.state !== CohortStateType.REQUESTING) { return; }
             dispatch(setCohortCountFinished(atLeastOneSucceeded));
 
-            if (!atLeastOneSucceeded) {
+            if (atLeastOneSucceeded) {
+                const visibleDatasets = await allowAllDatasets();
+                dispatch(setDatasetSearchResult(visibleDatasets));
+                dispatch(setDatasetSearchTerm(''));
+            } else {
                 const info : InformationModalState = {
                     header: "Error Running Query",
                     body: "Leaf encountered an error while running your query. If this continues, please contact your Leaf administrator.",
@@ -137,12 +144,12 @@ const getDemographics = () => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
         const responders: NetworkIdentity[] = [];
+        let atLeastOneSucceeded = false;
         state.responders.forEach((nr: NetworkIdentity) => { 
-            if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED) { 
+            if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED && !nr.isGateway) { 
                 responders.push(nr); 
             } 
         });
-        dispatch(getAllPatientListDatasets());
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
         Promise.all(
@@ -158,6 +165,7 @@ const getDemographics = () => {
                                 
                                 // Make sure query hasn't been reset
                                 if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
+                                atLeastOneSucceeded = true;
                                 const demographics = demResponse.data as DemographicDTO;
 
                                 dispatch(setNetworkVisualizationData(nr.id, demographics.statistics));
@@ -175,7 +183,11 @@ const getDemographics = () => {
             })                
         ).then(() => {
             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
-            dispatch(setCohortDemographicsFinished())
+            if (atLeastOneSucceeded) {
+                dispatch(setCohortDemographicsFinished());
+            } else {
+                dispatch(setCohortDemographicsErrored())
+            }
         });
     };
 };
@@ -186,7 +198,11 @@ export const getDemographicsIfNeeded = () => {
         const state = getState();
         if (state.cohort.count.state === CohortStateType.LOADED && 
             state.cohort.patientList.state === CohortStateType.NOT_LOADED &&
-            state.cohort.count.value <= state.auth.config!.cacheLimit) {
+            (
+                (state.cohort.networkCohorts.size === 1 && state.cohort.count.value <= state.auth.config!.cacheLimit) ||
+                state.cohort.networkCohorts.size > 1
+            )
+        ) {
             dispatch(getDemographics());
         }
     };
@@ -268,6 +284,13 @@ export const setCohortDemographicsFinished = (): CohortCountAction => {
     return {
         id: 0,
         type: COHORT_DEMOGRAPHICS_FINISH
+    };
+};
+
+export const setCohortDemographicsErrored = (): CohortCountAction => {
+    return {
+        id: 0,
+        type: COHORT_DEMOGRAPHICS_ERROR
     };
 };
 

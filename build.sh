@@ -34,8 +34,7 @@ class Runtime:
 
     @staticmethod
     def rhel7(env: FSEnv):
-        return Runtime('rhel7', os.path.join(env.bin_dir, 'rhel7'), [
-            '-r', 'rhel.7-x64', '--self-contained', 'false', '/p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App'])
+        return Runtime('rhel7', os.path.join(env.bin_dir, 'rhel7'), ['-r', 'rhel.7-x64', '--self-contained', 'false', '/p:MicrosoftNETPlatformLibrary=Microsoft.NETCore.App'])
 
     @staticmethod
     def win(env: FSEnv):

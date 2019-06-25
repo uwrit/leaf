@@ -15,16 +15,22 @@ body {
     font-family: Roboto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    padding: 55px 0 0 0;
+    padding: 0 0 0 0;
 }
 
 #main-content {
-    height: 101vh;
+    padding-top: 55px;
     overflow-x: hidden;
-    overflow-y: auto;
+    overflow-y: hidden;
     transition: margin-left 0.5s;
     width: 100%;
     z-index: 98;
+}
+
+.scrollable-offset-by-header {
+    height: calc(100vh - 55px);
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 #sidebar-container,

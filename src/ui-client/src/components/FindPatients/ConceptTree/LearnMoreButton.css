@@ -149,3 +149,18 @@
 .concept-tree-learn-more-info-tab {
     margin-left: 14px;
 }
+
+.concept-tree-learn-more-show-all-years {
+    text-align: right;
+}
+
+.concept-tree-learn-more-show-all-years > div {
+    display: inline-block;
+}
+
+.concept-tree-learn-more-show-all-years-text {
+    color: rgb(50, 50, 50);
+    font-size: 1.0rem;
+    margin-right: 8px;
+    vertical-align: top;
+}

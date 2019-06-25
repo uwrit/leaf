@@ -59,6 +59,14 @@
     background-color: rgba(0,0,0,0.5);
 }
 
+/*
+ * Don't display the overlay on Edge, as there is some
+ * z-index bug which causes it to cover the modal as well.
+ */
+ .app-container.edge .patientlist-add-dataset-overlay {
+    display: none !important;
+}
+
 .patientlist-add-dataset-select-container.show {
     margin-top: 12px;
     pointer-events: all;
@@ -110,6 +118,7 @@
     color: rgb(70,70,70);
     cursor: pointer;
     font-size: 1.0rem;
+    min-height: 29px;
     outline: none;
     padding: 4px 8px; 
 }
@@ -120,6 +129,12 @@
 .patientlist-add-dataset-select-date-option.selected {
     background-color: rgba(28, 170, 221, 0.1);
     border-left-color: #1CA8DD; 
+}
+
+.patientlist-add-dataset-select-dataset-option.unsaved {
+    background-color: rgba(6, 192, 0, 0.05) !important;
+    border-left-color: rgb(6, 192, 0);
+    color: rgb(6, 192, 0);
 }
 
 .patientlist-add-dataset-select-footer {

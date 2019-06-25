@@ -11,7 +11,7 @@ namespace Model.Cohort
 {
     public abstract class ShapedDataset
     {
-        [Field(Name = "personId", Type = LeafType.String, Required = true, Phi = true, Mask = true)]
+        [Field(Name = DatasetColumns.PersonId, Type = LeafType.String, Required = true, Phi = true, Mask = true)]
         public string PersonId { get; set; }
     }
 }

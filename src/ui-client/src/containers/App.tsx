@@ -7,6 +7,7 @@
 
 import moment from 'moment';
 import React from 'react';
+
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
 import { refreshSession, saveSessionAndLogout } from '../actions/session';
@@ -16,7 +17,7 @@ import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
 import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
-import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState } from '../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType } from '../models/state/GeneralUiState';
 import { SessionContext } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
@@ -26,6 +27,9 @@ import ConfirmationModal from '../components/Modals/ConfirmationModal/Confirmati
 import NoClickModal from '../components/Modals/NoClickModal/NoClickModal';
 import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
+import { CohortStateType } from '../models/state/CohortState';
+import { AdminPanelPane } from '../models/state/AdminState';
+import { version } from '../../package.json'
 import './App.css';
 
 
@@ -36,7 +40,10 @@ interface DispatchProps {
 }
 interface StateProps {
     auth?: AuthorizationState;
+    browser?: Browser;
+    cohortCountState: CohortStateType;
     confirmationModal: ConfirmationModalState;
+    currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
     exportState: ExportState;
     informationModal: InformationModalState;
@@ -62,6 +69,7 @@ class App extends React.Component<Props> {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         dispatch(getIdToken());
+        console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 
@@ -70,24 +78,30 @@ class App extends React.Component<Props> {
 
     public getSnapshotBeforeUpdate(nextProps: Props) {
         const { sessionContext } = nextProps;
-        if (sessionContext) {
+        if (sessionContext && !sessionTimer) {
             this.handleSessionTokenRefresh(sessionContext);
         }
         return null;
     }
 
     public render() {
-        const { auth, currentRoute, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
+        const { auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
             : null;
+        const classes = [ 'app-container' ];
+
+        /* 
+         * Add the browser name as an app-level CSS class.
+         */
+        if (browser) { classes.push(BrowserType[browser.type].toLowerCase())};
 
         return (
-            <div className="app-container" onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+            <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
                 <Attestation />
                 <CohortCountBox />
                 <Header />
-                <Sidebar currentRoute={currentRoute} />
+                <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
@@ -162,7 +176,10 @@ class App extends React.Component<Props> {
 const mapStateToProps = (state: AppState) => {
     return {
         auth: state.auth,
+        browser: state.generalUi.browser,
+        cohortCountState: state.cohort.count.state,
         confirmationModal: state.generalUi.confirmationModal,
+        currentAdminPane: state.admin ? state.admin!.activePane : 0, 
         currentRoute: state.generalUi.currentRoute,
         exportState: state.dataExport,
         informationModal: state.generalUi.informationModal,

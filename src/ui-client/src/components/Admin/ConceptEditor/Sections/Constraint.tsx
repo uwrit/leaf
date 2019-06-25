@@ -7,15 +7,16 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownToggle, DropdownMenu, FormGroup } from 'reactstrap';
-import { ConstraintType, ConceptConstraint } from '../../../../models/admin/Concept';
-import { TextArea } from './TextArea';
+import { ConstraintType, Constraint as ConstraintModel } from '../../../../models/admin/Concept';
+import { TextArea } from '../../Section/TextArea';
 import { FaChevronDown } from 'react-icons/fa';
 
 interface Props {
-    changeHandler: (idx: number, newConstraint: ConceptConstraint) => any;
+    changeHandler: (idx: number, newConstraint: ConstraintModel) => any;
     deleteHandler: (idx: number) => any;
-    constraint: ConceptConstraint;
+    constraint: ConstraintModel;
     index: number;
+    forceValidation: boolean;
 }
 
 interface State {
@@ -32,17 +33,20 @@ export class Constraint extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { constraint } = this.props;
+        const { constraint, forceValidation } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
+        const placeholder = forceValidation && !constraint.constraintValue
+            ? 'Enter a valid name'
+            : '';
 
         return (
             <FormGroup>
-                <div className={`${c}-dropdown ${c}-constraint-dropdown`}>
+                <div className={`admin-panel-dropdown ${c}-constraint-dropdown`}>
                     <Dropdown isOpen={isOpen} toggle={this.toggle}>
                         <DropdownToggle>
                             {constraint.constraintId === ConstraintType.User ? 'User' : 'Group'}
-                            <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                            <FaChevronDown className={`admin-panel-dropdown-chevron`}/>
                         </DropdownToggle>
                         <DropdownMenu>
                             <DropdownItem>
@@ -55,7 +59,7 @@ export class Constraint extends React.PureComponent<Props,State> {
                     </Dropdown>
                     <TextArea 
                         changeHandler={this.handleConstraintValueChange} propName={'constraintValue'} 
-                        value={constraint.constraintValue} required={true}
+                        value={constraint.constraintValue} required={true} placeholder={placeholder}
                     />
                     <div className={`${c}-constraint-delete`} onClick={this.handleDeleteClick}>
                         <span>Delete</span>

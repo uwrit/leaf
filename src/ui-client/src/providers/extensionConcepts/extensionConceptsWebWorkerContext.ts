@@ -89,7 +89,7 @@ var cohortToConcept = function (categoryId, query, rootId) {
     concept.rootId = rootId;
     concept.uiDisplayName = query.name;
     concept.uiDisplayText = 'Included in cohort "' + query.name + '"';
-    concept.uiDisplayPatientCount = query.count;
+    concept.uiDisplayPatientCount = query.count ? query.count : undefined;
     return concept;
 };
 /*

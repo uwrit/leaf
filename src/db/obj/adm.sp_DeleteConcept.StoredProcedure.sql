@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -69,6 +69,12 @@ BEGIN
             WHERE ConceptId = @id;
 
             DELETE FROM rela.ConceptSpecializationGroup
+            WHERE ConceptId = @id;
+
+            DELETE FROM app.ConceptForwardIndex
+            WHERE ConceptId = @id;
+
+            DELETE FROM app.ConceptTokenizedIndex
             WHERE ConceptId = @id;
 
             DELETE FROM app.Concept

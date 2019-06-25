@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { CohortCountSiteDetail, SiteCountDetail } from '../../components/CohortCountBox/CohortCountSiteDetail';
-import { CohortState, NetworkCohortState } from '../../models/state/CohortState';
+import { NetworkCohortState } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 
 interface Props { 
-    cohort: CohortState;
-    networkResponders: Map<number, NetworkIdentity>;
+    cohorts: NetworkCohortState[];
+    network: Map<number,NetworkIdentity>;
     show: boolean;
 }
 
@@ -22,25 +22,21 @@ export class CohortCountSiteContainer extends React.PureComponent<Props> {
     }
 
     public render() {
-        const cohort = this.props.cohort;
-        const siteData: any = []; 
+        const { cohorts, network, show } = this.props;
+        const sites: any = []; 
         let max: number = 0;
-        cohort.networkCohorts
-            .forEach((nc: NetworkCohortState, i: number) => {
-                const responder: NetworkIdentity = this.props.networkResponders.get(nc.id)!;
-                if (responder.enabled) {
-                    const site = {
-                        countResults: nc.count,
-                        id: responder
-                    } as SiteCountDetail;
-                    max = nc.count.value > max ? nc.count.value : max;
-                    siteData.push(site);
-                }
-            });
+        cohorts.forEach((nc: NetworkCohortState) => {
+            const responder = network.get(nc.id)!;
+            if (responder.enabled) {
+                const site = { countResults: nc.count, id: responder } as SiteCountDetail;
+                max = nc.count.value > max ? nc.count.value : max;
+                sites.push(site);
+            }
+        });
 
         return (
             <div className="cohort-count-site-container">    
-                {this.props.show && siteData.map((s: SiteCountDetail) => {
+                {show && sites.map((s: SiteCountDetail) => {
                     return <CohortCountSiteDetail data={s} max={max} key={s.id.id} />
                 })}
             </div>

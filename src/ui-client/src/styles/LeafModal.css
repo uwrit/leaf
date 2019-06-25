@@ -51,11 +51,6 @@ body.modal-open {
     overflow: visible !important;
 }
 
-body.modal-open #main-content,
-body.modal-open #sidebar-container {
-    margin-top: 55px;
-}
-
 body.modal-open .app-container {
     filter: blur(1px);
 }

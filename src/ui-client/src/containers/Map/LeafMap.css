@@ -12,15 +12,15 @@
 
 /* Odd, but these are needed to center the pulse */
 .pulse-icon-wrapper {
-    margin-left: -10.4px !important;
-    margin-top: -11.4px !important;
+    margin-left: -14.5px !important;
+    margin-top: -14.5px !important;
 }
 
 .pulse-icon {	
-    border: 3px solid rgba(0, 0, 255, 0.3);
-    border-radius: 30px;
-    height: 18px;
-    width: 18px;		
+    border: 3px solid rgba(0, 0, 255, 0.5);
+    border-radius: 42px;
+    height: 30px;
+    width: 30px;		
     animation: pulsate 1s ease-out;
     animation-iteration-count: infinite; 
 }

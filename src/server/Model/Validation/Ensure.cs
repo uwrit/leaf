@@ -17,5 +17,27 @@ namespace Model.Validation
             if (value == null)
                 throw new ArgumentNullException(name);
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
+        public static void NotNullOrWhitespace(string value, string name)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                throw new ArgumentNullException(name);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
+        public static void NotDefault<T>(T value, string name)
+        {
+            if (value == default)
+                throw new ArgumentException($"Value cannot be default.{Environment.NewLine}Parameter name: {name}");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
+        public static void Defined<T>(object value, string name) where T : Enum
+        {
+            var ty = typeof(T);
+            if (!Enum.IsDefined(ty, value))
+                throw new ArgumentException($"Value not defined in {ty.ToString()}.{Environment.NewLine}Value: {value.ToString()}.{Environment.NewLine}Parameter name: {name}");
+        }
     }
 }

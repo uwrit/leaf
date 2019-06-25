@@ -58,6 +58,22 @@ export const setExampleSql = (state: AdminState, action: AdminConceptAction): Ad
     });
 }; 
 
+export const resetAdminConceptCache = (state: AdminState, action: AdminConceptAction): AdminState => {
+    const concepts = state.concepts;
+    concepts.concepts.clear();
+
+    if (concepts.currentAdminConcept) {
+        concepts.concepts.set(concepts.currentAdminConcept.id, concepts.currentAdminConcept);
+    }
+
+    return Object.assign({}, state, {
+        concepts: { 
+            ...state.concepts,
+            concepts: new Map(concepts.concepts)
+        }
+    });
+}; 
+
 export const removeUnsavedAdminConcept = (state: AdminState, action: AdminConceptAction): AdminState => {
     return Object.assign({}, state, {
         concepts: { 
@@ -79,15 +95,6 @@ export const deleteAdminConceptFromCache = (state: AdminState, action: AdminConc
         }
     });
 };
-
-export const setAdminPanelConceptEditorPane = (state: AdminState, action: AdminConceptAction): AdminState => {
-    return Object.assign({}, state, {
-        concepts: { 
-            ...state.concepts,
-            pane: action.pane
-        }
-    });
-}; 
 
 export const createAdminConcept = (state: AdminState,  action: AdminConceptAction): AdminState => {
     const adminConcept = action.adminConcept!;

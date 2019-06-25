@@ -44,7 +44,11 @@ namespace Services.Network
                 Address = ne.Address,
                 Issuer = ne.Issuer,
                 KeyId = cert.KeyId,
-                Certificate = Convert.FromBase64String(cert.Data)
+                Certificate = Convert.FromBase64String(cert.Data),
+                IsResponder = ne.IsResponder,
+                IsInterrogator = ne.IsInterrogator,
+                Created = ne.Created,
+                Updated = DateTime.Now
             };
         }
     }

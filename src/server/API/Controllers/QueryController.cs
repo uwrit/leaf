@@ -49,7 +49,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogInformation("Could not get saved queries. Error:{Error}", e.ToString());
+                log.LogInformation("Failed to get saved queries. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -73,7 +73,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not get query. Identifier:{Identifier} Error:{Error}", ident, e.ToString());
+                log.LogError("Failed to get query. Identifier:{Identifier} Error:{Error}", ident, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -82,8 +82,7 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
-            CancellationToken cancelToken
-        )
+            CancellationToken cancelToken)
         {
             try
             {
@@ -109,9 +108,14 @@ namespace API.Controllers
                     Query = new QuerySaveResultDTO(result.Result)
                 });
             }
-            catch (InvalidOperationException ie)
+            catch (ArgumentException ae)
             {
-                log.LogError("Unrecoverable validation error in query. Error:{Error}", ie.Message);
+                log.LogError("Invalid save query model. Model:{Model} Error:{Error}", querySave, ae.Message);
+                return BadRequest();
+            }
+            catch (LeafCompilerException ce)
+            {
+                log.LogError("Unrecoverable validation error in query. Error:{Error}", ce.Message);
                 return BadRequest();
             }
             catch (FormatException fe)
@@ -130,7 +134,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not save query. QueryId:{QueryId} Query:{@Query} Error:{Error}", id, querySave, e.ToString());
+                log.LogError("Failed to save query. QueryId:{QueryId} Query:{@Query} Error:{Error}", id, querySave, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -161,7 +165,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not delete query. UniversalId:{UniversalId} Error:{Error}", ident, e.ToString());
+                log.LogError("Failed to delete query. UniversalId:{UniversalId} Error:{Error}", ident, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -184,7 +188,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not preflight resource. Resource:{@Resource} Error:{Error}", resourceRef, e.ToString());
+                log.LogError("Failed to preflight resource. Resource:{@Resource} Error:{Error}", resourceRef, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -7,12 +7,13 @@
 
 import React from 'react';
 import { Tooltip } from 'reactstrap';
+import { RouteConfig } from '../../config/routes';
+import { AdminPanelPane } from '../../models/state/AdminState';
 
 interface Props {
-    display: string;
-    path: string;
-    icon: any;
-    index: number;
+    config: RouteConfig;
+    currentAdminPane: AdminPanelPane;
+    dispatch: any;
     isActive: boolean;
     clickHandler: (i: number) => void;
     selectable: boolean;
@@ -31,20 +32,20 @@ export class SidebarTab extends React.PureComponent<Props, State> {
     }
     
     public render () {
-        const { selectable, isActive, icon, index, display } = this.props;
+        const { selectable, isActive, config, clickHandler, dispatch, currentAdminPane } = this.props;
         const c = 'sidebar';
-        const id = `${c}-tab_${index}`;
+        const id = `${c}-tab_${config.index}`;
         const classes = [ `${c}-tab` ];
 
         if (selectable) { classes.push('enabled') }
         if (isActive)   { classes.push('selected'); }
            
         return (
-            <div className={`${c}-tab-link ${display.replace(' ','').toLowerCase()}`} 
-                 onClick={this.props.clickHandler.bind(null, index)}>
+            <div className={`${c}-tab-link ${config.display.replace(' ','').toLowerCase()}`} 
+                 onClick={clickHandler.bind(null, config.index)}>
                 <li className={classes.join(' ')} id={id}>
-                    <span className={`${c}-icon`}>{icon}</span>
-                    <span className={`${c}-text`}>{display}</span>
+                    <span className={`${c}-icon`}>{config.icon}</span>
+                    <span className={`${c}-text`}>{config.display}</span>
                     <Tooltip 
                         autohide={true}
                         className={`${c}-tooltip`}
@@ -54,10 +55,25 @@ export class SidebarTab extends React.PureComponent<Props, State> {
                         target={id} 
                         toggle={this.toggleTooltip}
                     >
-                        {display}
+                        {config.display}
                     </Tooltip>
                 </li>
                 <div className={`${c}-tab-divider`} />
+
+                {config.subRoutes &&
+                    <div className={`${c}-subroute-container`}>
+                        {config.subRoutes.map((r,i) => {
+                            return (
+                                <div 
+                                    className={`${c}-subroute ${isActive && i+1 === currentAdminPane ? 'selected' : ''}`} 
+                                    key={i} onClick={r.clickHandler.bind(null, dispatch)}>
+                                    {r.display}
+                                </div>
+                            );
+                        })}
+                    </div>
+                }
+
             </div>
         );
     }

@@ -7,10 +7,11 @@
 
 import React from 'react';
 import { CohortStateType } from '../../models/state/CohortState';
-import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
+import { NetworkCohortState } from '../../models/state/CohortState';
+import { NetworkIdentity } from '../../models/NetworkResponder';
 
 interface CCQueryQuerySitesProps { 
-    network: CohortMap;
+    cohorts: NetworkCohortState[];
 }
 
 export class CohortCountQuerySites extends React.PureComponent<CCQueryQuerySitesProps> {
@@ -19,17 +20,13 @@ export class CohortCountQuerySites extends React.PureComponent<CCQueryQuerySites
     }
 
     public render() {
-        let totalSites: number = this.props.network.size;
+        const { cohorts } = this.props;
+        let totalSites: number = cohorts.length;
         let completedSites: number = 0; 
-        this.props.network
-            .forEach((cs: NetworkCohortState) => { 
-                if (cs.count.state === CohortStateType.NOT_LOADED) {
-                    totalSites--;
-                }
-                else if (cs.count.state === CohortStateType.LOADED) {
-                    completedSites += 1;
-                }
-            });
+        cohorts.forEach((cs: NetworkCohortState) => {
+            if (cs.count.state === CohortStateType.NOT_LOADED) { totalSites--; }
+            else if (cs.count.state === CohortStateType.LOADED) { completedSites += 1; }
+        });
 
         return (
             <div className="cohort-count-detail-sites">

@@ -128,7 +128,7 @@ namespace Tests
         public void Should_Throw_On_NonNull_Unmaskable_Phi()
         {
             var pepper = Guid.NewGuid();
-            Assert.Throws<InvalidOperationException>(() => new Anonymizer<BadMapping>(pepper));
+            Assert.Throws<LeafAnonymizerException>(() => new Anonymizer<BadMapping>(pepper));
         }
     }
 

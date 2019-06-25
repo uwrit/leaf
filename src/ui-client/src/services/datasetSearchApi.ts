@@ -6,36 +6,43 @@
  */ 
 
 import DatasetSearchEngineWebWorker from "../providers/datasetSearch/datasetSearchWebWorker";
-import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from "../models/patientList/Dataset";
+import { PatientListDatasetQuery, DatasetSearchResult } from "../models/patientList/Dataset";
 
 
 const engine = new DatasetSearchEngineWebWorker();
 
-export const addDatasets = (datasets: PatientListDatasetQueryDTO[]): Promise<CategorizedDatasetRef[]> => {
+export const indexDatasets = (datasets: PatientListDatasetQuery[]): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.addDatasets(datasets) as CategorizedDatasetRef[];
+        const result = await engine.reindexDatasets(datasets) as DatasetSearchResult;
         resolve(result);
     });
 };
 
-export const searchDatasets = (searchTerm: string): Promise<CategorizedDatasetRef[]> => {
+export const searchDatasets = (searchTerm: string): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
         const term = searchTerm.trim().toLowerCase();
-        const result = await engine.searchDatasets(term) as CategorizedDatasetRef[];
+        const result = await engine.searchDatasets(term) as DatasetSearchResult;
         resolve(result);
     });
 };
 
-export const allowDatasetInSearch = (datasetId: string, include: boolean) => {
+export const allowDatasetInSearch = (datasetId: string, include: boolean, searchString: string): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        await engine.allowDatasetInSearch(datasetId, include);
-        resolve();
+        const result = await engine.allowDatasetInSearch(datasetId, include, searchString) as DatasetSearchResult;
+        resolve(result);
     });
 };
 
-export const allowAllDatasets = (): Promise<CategorizedDatasetRef[]> => {
+export const allowAllDatasets = (): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.allowAllDatasets() as CategorizedDatasetRef[];
+        const result = await engine.allowAllDatasets() as DatasetSearchResult;
+        resolve(result);
+    });
+};
+
+export const setAdminMode = (admin: boolean): Promise<DatasetSearchResult> => {
+    return new Promise( async (resolve, reject) => {
+        const result = await engine.setAdminMode(admin) as DatasetSearchResult;
         resolve(result);
     });
 };

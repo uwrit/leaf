@@ -42,7 +42,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve export options. Error:{Error}", ex.Message);
+                log.LogError("Failed to retrieve export options. Error:{Error}", ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

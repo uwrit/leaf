@@ -19,6 +19,7 @@ export const DemographicsDefTemplate: PatientListDatasetDefinitionTemplate = {
         ['age', { datasetId: 'demographics', id: 'age', autoDisplayOnLoad: true, type: PatientListColumnType.number }],
         ['ethnicity', { datasetId: 'demographics', id: 'ethnicity', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['birthDate', { datasetId: 'demographics', id: 'birthDate', autoDisplayOnLoad: true, type: PatientListColumnType.date, optional: true }],
+        ['deceasedDateTime', { datasetId: 'demographics', id: 'deceasedDateTime', autoDisplayOnLoad: true, type: PatientListColumnType.date, optional: true }],
         ['gender', { datasetId: 'demographics', id: 'gender', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['language', { datasetId: 'demographics', id: 'language', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['maritalStatus', { datasetId: 'demographics', id: 'maritalStatus', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
@@ -26,6 +27,28 @@ export const DemographicsDefTemplate: PatientListDatasetDefinitionTemplate = {
         ['name', { datasetId: 'demographics', id: 'name', autoDisplayOnLoad: true, type: PatientListColumnType.date, optional: true }],
         ['race', { datasetId: 'demographics', id: 'race', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['religion', { datasetId: 'demographics', id: 'religion', autoDisplayOnLoad: true, type: PatientListColumnType.string }]
+    ]),
+    multirow: false,
+    shape: PatientListDatasetShape.Demographics
+};
+
+export const DemographicsAdminSqlDefTemplate: PatientListDatasetDefinitionTemplate = {
+    columns: new Map([
+        ['addressPostalCode', { datasetId: 'demographics', id: 'addressPostalCode', type: PatientListColumnType.string }],
+        ['addressState', { datasetId: 'demographics', id: 'addressState', type: PatientListColumnType.string }],
+        ['birthDate', { datasetId: 'demographics', id: 'birthDate', type: PatientListColumnType.date }],
+        ['deceasedDateTime', { datasetId: 'demographics', id: 'deceasedDateTime', autoDisplayOnLoad: true, type: PatientListColumnType.date }],
+        ['ethnicity', { datasetId: 'demographics', id: 'ethnicity', type: PatientListColumnType.string }],
+        ['gender', { datasetId: 'demographics', id: 'gender', type: PatientListColumnType.string }],
+        ['deceasedBoolean', { datasetId: 'demographics', id: 'deceasedBoolean', type: PatientListColumnType.boolean }],
+        ['hispanicBoolean', { datasetId: 'demographics', id: 'hispanicBoolean', type: PatientListColumnType.boolean }],
+        ['marriedBoolean', { datasetId: 'demographics', id: 'marriedBoolean', type: PatientListColumnType.boolean }],
+        ['language', { datasetId: 'demographics', id: 'language', type: PatientListColumnType.string }],
+        ['maritalStatus', { datasetId: 'demographics', id: 'maritalStatus', type: PatientListColumnType.string }],
+        ['mrn', { datasetId: 'demographics', id: 'mrn', type: PatientListColumnType.date }],
+        ['name', { datasetId: 'demographics', id: 'name', type: PatientListColumnType.date }],
+        ['race', { datasetId: 'demographics', id: 'race', type: PatientListColumnType.string }],
+        ['religion', { datasetId: 'demographics', id: 'religion', type: PatientListColumnType.string }]
     ]),
     multirow: false,
     shape: PatientListDatasetShape.Demographics

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByConstraint]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByConstraint]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -46,9 +46,9 @@ BEGIN
         q.[Owner],
         q.Created,
         q.Updated,
-        [Count] = COUNT(*)
+        [Count] = COUNT(c.QueryId)
     FROM app.Query q
-    JOIN app.Cohort c on q.Id = c.QueryId
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
     WHERE (q.[Owner] = @user OR q.Id IN (SELECT QueryId FROM permitted))
     AND UniversalId IS NOT NULL
     AND Nonce IS NULL

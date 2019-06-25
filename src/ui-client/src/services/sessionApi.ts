@@ -9,7 +9,7 @@ import jwt_decode from 'jwt-decode';
 import { AppState } from '../models/state/AppState';
 import { AccessTokenDTO, Attestation, DecodedAccessToken, SessionContext, StoredSessionState } from '../models/Session';
 import { HttpFactory } from './HttpFactory';
-import { AuthConfig, LogoutDTO } from '../models/Auth';
+import { LogoutDTO } from '../models/Auth';
 import { getPanelItemCount } from '../utils/panelUtils';
 
 /*
@@ -25,7 +25,7 @@ const decodeToken = (token: string): SessionContext => {
         rawDecoded: decoded,
         token
     }
-    console.log('session', ctx);
+    console.log('Session Token', ctx);
     return ctx;
 };
 
@@ -33,18 +33,16 @@ const decodeToken = (token: string): SessionContext => {
  * Requests initial session token and submits user attestation.
  */
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
-    return new Promise( async (resolve, reject) => {
-        const http = HttpFactory.authenticated(state.auth.userContext!.token);
-        const request = http.get('api/user/attest', {
-            params: {
-                attestation
-            }
-        });
-        const response = await request;
-        const respData = response.data as AccessTokenDTO;
-        const ctx = decodeToken(respData.accessToken);
-        resolve(ctx);
+    const http = HttpFactory.authenticated(state.auth.userContext!.token);
+    const request = http.get('api/user/attest', {
+        params: {
+            attestation
+        }
     });
+    const response = await request;
+    const respData = response.data as AccessTokenDTO;
+    const ctx = decodeToken(respData.accessToken);
+    return ctx;
 };
 
 /*
@@ -92,7 +90,7 @@ export const saveSessionAndForceReLogin = (state: AppState) => {
     if (hasData) {
         sessionStorage.setItem(key, JSON.stringify(currState));
     }
-    window.location = window.location;
+    window.location.reload(true);
 };
 
 /*

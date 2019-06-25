@@ -1,0 +1,372 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .sqlset-editor-container {
+    background-color: rgb(240,240,240);
+    padding: 0 0 75px 0;
+}
+
+.sqlset-editor-input-column {
+    padding: 0 4px !important; 
+}
+
+.sqlset-editor-input-container {
+    border-radius: 4px;
+    height: 100%;
+    padding: 8px;
+}
+
+.sqlset-editor-input-container .checkbox-slider-container label {
+    margin-right: 20px;
+}
+
+.sqlset-editor-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: -0.5%;
+    margin: -4px 0 0 10px;
+    padding: 2px 4px;
+    position: absolute;
+}
+
+/* Header */
+.sqlset-editor-toprow {
+    background-color: rgb(250, 250, 250);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 75.5px;
+    margin-bottom: 1px;
+    padding: 20px;
+    z-index: 101;
+}
+
+.sqlset-editor-toprow .leaf-button {
+    margin-right: 20px !important;
+}
+
+.sqlset-editor-toprow .leaf-button-secondary {
+    background-color: white;
+}
+
+.sqlset-editor-toprow .back-to-editor {
+    float: right;
+}
+
+.sqlset-editor-toprow .back-to-editor svg {
+    margin-bottom: -2px;
+    margin-right: 4px;
+}
+
+/* Table */
+.sqlset-editor-table {
+    height: calc(100vh - 55px - 75.5px);
+    overflow-x: hidden;
+    padding: 0 20% !important;
+    z-index: 100;
+}
+
+.sqlset-editor-table-row-container {
+    background-color: white;
+    border-bottom: 1px solid rgb(230,230,230);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    min-height: 50px;
+    min-width: 650px;
+    padding: 4px 20px 0;
+    position: relative;
+    transition: box-shadow 0.3s;
+}
+
+.sqlset-editor-table-row-container:hover {
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.sqlset-editor-table-row {
+    padding: 0px 8px 0;
+}
+
+.sqlset-editor-row-id {
+    bottom: 0;
+    color: rgb(180,180,180);
+    font-size: 1rem;
+    margin: 0 8px 4px;
+    right: 0;
+    position: absolute;
+}
+
+/* Delete button */
+.sqlset-editor-sqlset-delete {
+    margin-top: -8px;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+}
+
+/* Input */
+.sqlset-editor-specializationgroup-specialization label {
+    display: none;
+}
+
+.sqlset-editor-specializationgroup-default .leaf-input {
+    text-align: center !important;
+}
+
+/* Add New Set */
+.sqlset-editor-add-sqlset svg {
+    transform: scale(1.4);
+    margin-right: 4px;
+    margin-top: 5px;
+}
+
+/* Add New Specialization Group */
+.sqlset-editor-specializationgroups-container {
+    margin-top: -6px;
+}
+
+.sqlset-editor-subtable-header {
+    text-align: center;
+}
+
+.sqlset-editor-dropdown-toggle,
+.sqlset-editor-add-specializationgroup {
+    margin: 0 0 8px;
+}
+
+.sqlset-editor-add-specialization-container {
+    padding: 10px 20px;
+    text-align: left;
+}
+
+.sqlset-editor-add-specialization {
+    margin: 4px 0;
+}
+
+.sqlset-editor-dropdown-toggle {
+    color: rgb(24, 142, 185);
+    cursor: pointer;
+    display: inline-block;
+}
+
+.sqlset-editor-dropdown-toggle svg {
+    margin-left: 4px;
+    padding-top: 4px;
+    transform: scale(1.2);
+    transition: all 0.5s;
+}
+
+.sqlset-editor-dropdown-toggle.open svg {
+    margin-bottom: -4px;
+    transform: rotate(180deg) scale(1.2);
+}
+
+.sqlset-editor-add-specializationgroup,
+.sqlset-editor-add-specialization {
+    color: rgba(13,195,106);
+    cursor: pointer;
+    display: inline-block;
+}
+
+.sqlset-editor-add-specializationgroup:hover,
+.sqlset-editor-add-specialization:hover {
+    text-decoration: underline;
+}
+
+/* Specialization Group Header */
+.sqlset-editor-specialization-header {
+    background-color: rgb(0, 130, 177);
+    border-bottom: 1px solid rgb(220,220,220);
+    color: white;
+}
+
+/* Specialization Group */
+.sqlset-editor-specializationgroup-container {
+    border: 0px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
+    margin: 0 20px 50px;
+    position: relative;
+    text-align: center;
+}
+
+.sqlset-editor-specializationgroup-container .sqlset-editor-unsaved {
+    margin-top: 2px !important;
+}
+
+.sqlset-editor-specializationgroup-container .leaf-input {
+    font-size: 1.0rem !important;
+}
+
+.sqlset-editor-specializationgroup-default {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sqlset-editor-specializationgroup-default .leaf-input {
+    font-size: 1.1rem;
+    max-width: 500px;
+}
+
+.sqlset-editor-specializationgroup-specialization {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-top: 4px;
+}
+
+.sqlset-editor-specializationgroup-container label small {
+    color: rgb(180,180,180) !important;
+}
+
+.sqlset-editor-input-container .position-relative.form-group {
+    margin-bottom: 0;
+    margin-top: 15px;
+}
+
+.sqlset-editor-input-container.col-md-4 {
+    padding: 4px 8px;
+}
+
+.sqlset-editor-input-column .position-relative.form-group {
+    margin-top: 0px;
+}
+
+
+.sqlset-editor-input-column:first-child .position-relative.form-group {
+    margin-top: 6px;
+}
+
+.sqlset-editor-input-container > .container {
+    margin-top: 4px;
+}
+
+
+.sqlset-editor-specialization-universalid {
+    margin-left: 132px;
+}
+
+.sqlset-editor-specialization-universalid::after {
+    background-color: rgba(0,0,0,0.03);
+    border-radius: 2px;
+    color: rgba(0,0,0,0.5);
+    content: 'urn:leaf:specialization:';
+    font-size: 0.85rem;
+    left: 0;
+    margin-top: 3px;
+    padding: 4px 8px;
+    position: absolute;
+}
+
+/* Delete Specialization Group */
+.sqlset-editor-specializationgroup-delete {
+    margin-top: -5px;
+    position: absolute;
+    right: 0;
+    z-index: 100;
+}
+
+.sqlset-editor-specializationgroup-container > .sqlset-editor-specializationgroup-delete {
+    margin-top: 0;
+}
+
+.sqlset-editor-sqlset-delete > span,
+.sqlset-editor-specializationgroup-delete > span {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-right: 4px;
+    margin-top: 2px;
+    padding: 2px 4px;
+}
+
+.sqlset-editor-sqlset-delete > span:hover,
+.sqlset-editor-specializationgroup-delete > span:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+} 
+
+/* Text */
+.sqlset-editor-text {
+    border-bottom: 1px solid rgb(220,220,220);
+    border-radius: 4px;
+    color: rgb(100,100,100);
+    margin-bottom: 20px;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.sqlset-editor-text-emphasis {
+    color: #1CA8DD;
+}
+
+/* Events */
+.concept-editor-concept-event-dropdown .dropdown-item {
+    margin-right: 70px;
+    padding: 6px 20px;
+    position: relative;
+}
+
+.concept-editor-concept-event-edit-container {
+    padding: 4px 8px;
+    position: relative;
+}
+
+.concept-editor-concept-event-edit-container > div {
+    margin-top: 0 !important;
+}
+
+.concept-editor-concept-event-edit-container > div > div {
+    width: 60%;
+}
+
+.concept-editor-concept-event-edit-container .leaf-input {
+    border: none !important
+}
+
+.concept-editor-concept-event-delete, 
+.concept-editor-concept-event-edit, 
+.concept-editor-concept-event-edit-undo, 
+.concept-editor-concept-event-edit-done {
+    border-radius: 4px 8px;
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 8px 6px 0 0;
+    padding: 2px 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.concept-editor-concept-event-edit {
+    margin-right: 50px;
+}
+
+.concept-editor-concept-event-edit:hover {
+    color: rgb(28, 168, 221);
+}
+
+.concept-editor-concept-event-edit,
+.concept-editor-concept-event-delete {
+    margin-top: 6px;
+}
+
+.concept-editor-concept-event-delete:hover {
+    color: rgb(244, 67, 54);
+}
+
+.concept-editor-concept-event-edit-done {
+    color: rgb(28, 168, 221);
+    margin-right: 50px;
+}
+
+.concept-editor-concept-event-edit-done:hover {
+    background-color: rgb(240,240,240);
+}
+
+.concept-editor-concept-event-edit-undo:hover{
+    background-color: rgb(240,240,240);
+    color: rgb(28, 168, 221);
+}

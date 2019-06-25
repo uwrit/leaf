@@ -11,6 +11,7 @@
     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 20px 0px;  
     float: left;
     height: 100%;
+    margin-top: 55px;
     position: fixed;
     z-index: 99;
 }
@@ -64,6 +65,7 @@
 .sidebar-tab-link {
     color: inherit;
     cursor: default;
+    position: relative;
     text-align: left;
     text-decoration: none !important;
 }
@@ -158,4 +160,40 @@
 .sidebar-cd2h-logo {
     height: auto;
     width: 150px;
+}
+
+.sidebar-tab-link:hover .sidebar-subroute-container {
+    display: block;
+}
+
+/* Subroutes */
+.sidebar-subroute-container {
+    background-color: white;
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.2), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    display: none;
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 200px;
+}
+
+.sidebar-subroute {
+    border-bottom: 1px solid rgb(240,240,240);
+    border-left: 4px solid transparent;
+    color: rgb(150,150,150);
+    font-size: 1.1rem !important;
+    padding: 10px 20px;
+    transition: all 0.2s;
+}
+
+.sidebar-subroute:hover,
+.sidebar-subroute.selected {
+    background-color: rgba(0,0,0,0.01);
+    border-left-color: rgb(28,168,221);
+    color: black;
+}
+
+.sidebar-subroute:nth-last-child() {
+    border-bottom: none;
 }

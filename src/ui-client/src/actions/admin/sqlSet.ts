@@ -10,7 +10,7 @@ import { ConceptSqlSet, ConceptSqlSetDeleteResponse } from "../../models/admin/C
 import { getSqlSets, createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { getApiUpdateQueue } from "../../utils/admin";
+import { getApiUpdateQueue } from "../../utils/admin/concept";
 
 export const SET_ADMIN_SQL_SETS = 'SET_ADMIN_SQL_SETS';
 export const SET_ADMIN_UNEDITED_SQL_SETS = 'SET_ADMIN_UNEDITED_SQL_SETS';
@@ -56,7 +56,7 @@ export const processApiUpdateQueue = () => {
                 header: "Error Applying Changes",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     }
@@ -75,29 +75,6 @@ export const saveOrUpdateAdminConceptSqlSet = async (set: ConceptSqlSet, dispatc
     }
     dispatch(syncAdminConceptSqlSetUnsavedWithSaved(set, newSet));
     return newSet;
-};
-
-/*
- * Fetch SQL Sets.
- */
-export const getAdminConceptSqlSets = () => {
-    return async (dispatch: any, getState: () => AppState) => {
-        try {
-            dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
-            const state = getState();
-            const sets = await getSqlSets(state);
-            dispatch(setAdminConceptSqlSets(sets, false));
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Complete }));
-        } catch (err) {
-            const info: InformationModalState = {
-                body: "An error occurred while attempting to load SQL Sets. Please see the Leaf error logs for details.",
-                header: "Error Loading SQL Sets",
-                show: true
-            };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
-            dispatch(showInfoModal(info));
-        }
-    };
 };
 
 /*
@@ -128,7 +105,7 @@ export const deleteAdminConceptSqlSet = (set: ConceptSqlSet) => {
                     } else {
                         info.body = "An error occurred while attempting to delete the SQL Set. Please see the Leaf error logs for details.";
                     }
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 });
         } catch (err) {
@@ -151,13 +128,6 @@ export const setAdminConceptSqlSets = (sets: ConceptSqlSet[], changed: boolean):
         changed,
         sets,
         type: SET_ADMIN_SQL_SETS
-    };
-};
-
-export const setAdminUneditedConceptSqlSets = (mappedSets: Map<number,ConceptSqlSet>): AdminSqlSetAction => {
-    return {
-        mappedSets,
-        type: SET_ADMIN_UNEDITED_SQL_SETS
     };
 };
 

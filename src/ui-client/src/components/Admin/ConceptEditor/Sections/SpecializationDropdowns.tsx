@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { Section } from './Section';
+import { Section } from '../../Section/Section';
 import { SectionProps } from '../Props';
 import { SpecializationDropdown } from './SpecializationDropdown';
 import { ConceptSqlSet } from '../../../../models/admin/Concept';

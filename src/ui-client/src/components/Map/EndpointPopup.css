@@ -35,8 +35,9 @@
 }
 
 .leaflet-popup-content {
-    margin: 0;
+    margin: 0 !important; 
     padding: 0 6px;
+    text-align: center;
     width: auto !important;
 }
 

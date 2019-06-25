@@ -7,18 +7,20 @@
 
 // tslint:disable
 import { generate as generateId } from 'shortid';
-import { TokenizedDatasetRef, PatientListDatasetQueryDTO, CategorizedDatasetRef } from '../../models/patientList/Dataset';
+import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
 
-const ADD_DATASETS = 'ADD_DATASETS';
+const REINDEX_DATASETS = 'REINDEX_DATASETS';
 const ALLOW_DATASET_IN_SEARCH = 'ALLOW_DATASET_IN_SEARCH';
 const ALLOW_ALL_DATASETS = 'ALLOW_ALL_DATASETS';
+const SET_ADMIN_MODE = 'SET_ADMIN_MODE';
 const SEARCH_DATASETS = 'SEARCH_DATASETS';
 
 interface InboundMessagePartialPayload {
+    admin?: boolean;
+    allow?: boolean;
     datasetId?: string;
-    datasets?: PatientListDatasetQueryDTO[];
-    include?: boolean;
+    datasets?: PatientListDatasetQuery[];
     message: string;
     searchString?: string;
 }
@@ -29,7 +31,7 @@ interface InboundMessagePayload extends InboundMessagePartialPayload {
 
 interface OutboundMessagePayload {
     requestId: string;
-    result?: any;
+    result?: DatasetSearchResult;
 }
 
 interface WorkerReturnPayload {
@@ -48,7 +50,7 @@ export default class DatasetSearchEngineWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ADD_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS])}
+            ${this.addMessageTypesToContext([REINDEX_DATASETS, SEARCH_DATASETS, ALLOW_DATASET_IN_SEARCH, ALLOW_ALL_DATASETS, SET_ADMIN_MODE])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -60,16 +62,20 @@ export default class DatasetSearchEngineWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public addDatasets = (datasets: PatientListDatasetQueryDTO[]) => {
-        return this.postMessage({ message: ADD_DATASETS, datasets });
+    public reindexDatasets = (datasets: PatientListDatasetQuery[]) => {
+        return this.postMessage({ message: REINDEX_DATASETS, datasets });
     }
 
-    public allowDatasetInSearch = (datasetId: string, include: boolean) => {
-        return this.postMessage({ message: ALLOW_DATASET_IN_SEARCH, datasetId, include });
+    public allowDatasetInSearch = (datasetId: string, allow: boolean, searchString: string) => {
+        return this.postMessage({ message: ALLOW_DATASET_IN_SEARCH, datasetId, allow, searchString });
     }
 
     public allowAllDatasets = () => {
         return this.postMessage({ message: ALLOW_ALL_DATASETS });
+    }
+
+    public setAdminMode = (admin: boolean) => {
+        return this.postMessage({ message: SET_ADMIN_MODE, admin });
     }
 
     public searchDatasets = (searchString: string) => {
@@ -107,92 +113,158 @@ export default class DatasetSearchEngineWebWorker {
 
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
-                case ADD_DATASETS:
-                    return addDatasetsToCache(payload);
+                case REINDEX_DATASETS:
+                    return reindexCacheFromExternal(payload);
                 case SEARCH_DATASETS:
                     return searchDatasets(payload);
                 case ALLOW_DATASET_IN_SEARCH:
-                    return allowDatasetInSearch(payload);
+                    return allowDataset(payload);
                 case ALLOW_ALL_DATASETS:
                     return allowAllDatasets(payload);
+                case SET_ADMIN_MODE:
+                    return setAdminMode(payload);
                 default:
                     return null;
             }
         };
 
-        // Dataset cache
-        const datasetCache: Map<string, PatientListDatasetQueryDTO> = new Map();
-        const excluded: Set<string> = new Set();
-        let allDatasets: CategorizedDatasetRef[] = [];
-        let allowedDatasets: CategorizedDatasetRef[] = [];
-
-        // Map of first char of full terms
+        /*
+         * Shared cache.
+         */
+        const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
+        let excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
+        let allDs: Map<string, PatientListDatasetQuery> = new Map();
 
+        /*
+         * Admin-facing cache.
+         */
+        let isAdmin = false;
+        let allCatDsAdmin: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrderAdmin: Map<string, PatientListDatasetQueryIndex> = new Map();
+
+        /*
+         * User-facing cache.
+         */
+        let allCatDs: Map<string, CategorizedDatasetRef> = new Map();
+        let defaultOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
+
+        /*
+         * Set whether the worker should return search results to an admin (i.e., no exclusions),
+         * or to a user.
+         */
+        const setAdminMode = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, admin } = payload;
+            isAdmin = admin!;
+            return { requestId, result: returnDefault() };
+        };
+
+        /*
+         * Return the default display depending on whether the current mode is admin or user.
+         */
+
+        const returnDefault = (): DatasetSearchResult => {
+            if (isAdmin) {
+                return { categories: allCatDsAdmin, displayOrder: defaultOrderAdmin };
+            }
+            return { categories: allCatDs, displayOrder: defaultOrder };
+        };
+
+        /*
+         * Flatten categorized datasets map into an array of datasets.
+         */
+        const getAllDatasetsArray = (): PatientListDatasetQuery[] => {
+            const copy = new Map(allDs);
+            if (!isAdmin) {
+                copy.delete(demographics.id);
+            }
+            return [ ...copy.values() ];
+        };
+        
+        /* 
+         * Reset excluded datasets cache. Called when users
+         * reset the cohort and the patient list too is reset.
+         */
         const allowAllDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
-            excluded.clear()
-            allowedDatasets = allDatasets.slice();
-            return { requestId, result: allDatasets };
+
+            excluded.clear();
+            excluded.set(demographics.id, demographics);
+            /*
+             * Get default display and sort order.
+             */
+            const reSorted = dedupeAndSort(getAllDatasetsArray());
+            allCatDs = reSorted.categories;
+            defaultOrder = reSorted.displayOrder;
+
+            return { requestId, result: returnDefault() };
         };
 
-        const allowDatasetInSearch = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, datasetId, include } = payload;
+        /*
+         * Allow or disallow a dataset to be included in search results.
+         * Called as users add/remove datasets from the patient list screen.
+         */
+        const allowDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { datasetId, allow } = payload;
 
-            if (include) {
+            if (allow) {
                 excluded.delete(datasetId!);
             } else {
-                excluded.add(datasetId!);
-            }
-            updateAllowedDatasets();
-            return { requestId };
-        };
-
-        const updateAllowedDatasets = () => {
-            allowedDatasets = [];
-
-            for (let i = 0; i < allDatasets.length; i++) {
-                const datasets: PatientListDatasetQueryDTO[] = [];
-                const cat = allDatasets[i];
-                for (let j = 0; j < cat.datasets.length; j++) {
-                    const ds = cat.datasets[j];
-                    if (!excluded.has(ds.id)) {
-                        datasets.push(ds);
-                    }
-                }
-                if (datasets.length) {
-                    allowedDatasets.push({ 
-                        category: cat.category,
-                        datasets
-                    });
+                const ds = allDs.get(datasetId!);
+                if (ds) {
+                    excluded.set(ds.id, ds);
                 }
             }
+            const datasets = getAllDatasetsArray().filter((ds) => !excluded.has(ds.id));
+            const reSorted = dedupeAndSort(datasets);
+            allCatDs = reSorted.categories;
+            defaultOrder = reSorted.displayOrder;
+            
+            return searchDatasets(payload);
         };
 
+        /*
+         * Search through available datasets.
+         */
         const searchDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { searchString, requestId } = payload;
             const terms = searchString!.trim().split(' ');
             const termCount = terms.length;
             const firstTerm = terms[0];
-            const allDs = firstCharCache.get(firstTerm[0]);
+            const datasets = firstCharCache.get(firstTerm[0]);
             const dsOut: TokenizedDatasetRef[] = [];
 
             if (!searchString) {
-                return { requestId, result: allowedDatasets }; 
+                return { requestId, result: returnDefault() }; 
             }
-            if (!allDs) { 
-                return { requestId, result: [] }; 
+            if (!datasets) { 
+                return { requestId, result: { categories: new Map(), displayOrder: new Map() } }; 
             }
             
             // ******************
             // First term
             // ******************
         
-            // Foreach dataset compare with search term one
-            for (let i1 = 0; i1 < allDs.length; i1++) {
-                const ds = allDs[i1];
-                if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
-                    dsOut.push(ds);
+            /* 
+             * Foreach dataset compare with search term one. If demographics
+             * are disabled this is for a user, so leave out excluded datasets.
+             */
+            if (!isAdmin) {
+                for (let i1 = 0; i1 < datasets.length; i1++) {
+                    const ds = datasets[i1];
+                    if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
+                        dsOut.push(ds);
+                    }
+                }
+            /* 
+             * Else this is for an admin in the admin panel, so there are no exclusions.
+             */
+            } else {
+                for (let i1 = 0; i1 < datasets.length; i1++) {
+                    const ds = datasets[i1];
+                    if (ds.token.startsWith(firstTerm)) {
+                        dsOut.push(ds);
+                    }
                 }
             }
 
@@ -204,18 +276,24 @@ export default class DatasetSearchEngineWebWorker {
             // Following terms
             // ******************
 
-            // For datasets found in loop one
+            /*
+             * For datasets found in loop one
+             */
             const dsFinal: TokenizedDatasetRef[] = []
             for (let dsIdx = 0; dsIdx < dsOut.length; dsIdx++) {
                 const otherTokens = dsOut[dsIdx].tokenArray.slice();
                 let hitCount = 1;
 
-                // Foreach term after the first (e.g. [ 'white', 'blood' ])
-                // filter what first loop found and remove if no hit
+                /* 
+                 * Foreach term after the first (e.g. [ 'white', 'blood' ])
+                 * filter what first loop found and remove if no hit
+                 */
                 for (let i2 = 1; i2 < termCount; i2++) {
                     const term = terms[i2];
 
-                    // For each other term associated with the dataset name
+                    /* 
+                     * For each other term associated with the dataset name
+                     */
                     for (let j = 0; j < otherTokens.length; j++) {
                         if (otherTokens[j].startsWith(term)) { 
                             hitCount++;
@@ -230,67 +308,116 @@ export default class DatasetSearchEngineWebWorker {
                     dsFinal.push(dsOut[dsIdx])
                 }
             }
-            
+
             return { requestId, result: dedupeAndSortTokenized(dsFinal) };
         };
 
-        const dedupeAndSortTokenized = (refs: TokenizedDatasetRef[]): CategorizedDatasetRef[] => {
+        /*
+         * Extract datasets from tokenized refs and returns
+         * a sorted, deduped result array.
+         */
+        const dedupeAndSortTokenized = (refs: TokenizedDatasetRef[]): DatasetSearchResult => {
             const ds = refs.map((r) => r.dataset);
             return dedupeAndSort(ds);
         };
 
-        const dedupeAndSort = (refs: PatientListDatasetQueryDTO[]): CategorizedDatasetRef[] => {
-            const added: Set<string> = new Set();
-            const catIdxMap: Map<string,number> = new Map();
-            let out: CategorizedDatasetRef[] = [];
+        /*
+         * Remove duplicates, sort alphabetically, and
+         * return a displayable categorized array of datasets.
+         */
+        const dedupeAndSort = (refs: PatientListDatasetQuery[]): DatasetSearchResult => {
+            const addedDatasets: Set<string> = new Set();
+            const addedRefs: PatientListDatasetQuery[] = [];
+            const out: Map<string, CategorizedDatasetRef> = new Map();
+            const displayOrder: Map<string, PatientListDatasetQueryIndex> = new Map();
+            let includesDemographics = false;
 
+            /*
+             * Get unique only.
+             */
             for (let i = 0; i < refs.length; i++) {
                 const ref = refs[i];
-                const cat = ref.category ? ref.category : '';
-
-                /*
-                 * Add the dataset.
-                 */
-                if (!added.has(ref.id)) {
-                    /*
-                     * Add the category.
-                     */
-                    let catIdx = catIdxMap.get(cat);
-                    if (catIdx !== undefined) {
-                        out[catIdx].datasets.push(ref);
+                if (!addedDatasets.has(ref.id)) {
+                    if (ref.shape === 3) {
+                        includesDemographics = true;
                     } else {
-                        catIdxMap.set(cat, out.length);
-                        out.push({
-                            category: cat,
-                            datasets: [ ref ]
-                        })
+                        if (!ref.category) {
+                            ref.category = '';
+                        }
+                        addedRefs.push(ref);
+                        addedDatasets.add(ref.id);
                     }
-                    added.add(ref.id);
                 }
             }
-            return out.sort(categorySorter);
+
+            /*
+             * Sort.
+             */
+            const sortedRefs = addedRefs.sort((a,b) => {
+                if (a.category === b.category) { 
+                    return a.name > b.name ? 1 : -1;
+                }
+                return a.category > b.category ? 1 : -1;
+            });
+            if (includesDemographics) { sortedRefs.unshift(demographics); }
+            const len = sortedRefs.length;
+            const lastIdx = len-1;
+
+            /*
+             * Add to map.
+             */
+            for (let i = 0; i < len; i++) {
+                const ref = sortedRefs[i];
+                const catObj = out.get(ref.category);
+                const order: PatientListDatasetQueryIndex = {
+                    prevId: i > 0 ? sortedRefs[i-1].id : sortedRefs[lastIdx].id,
+                    nextId: i < lastIdx ? sortedRefs[i+1].id : sortedRefs[0].id
+                }
+                displayOrder.set(ref.id, order);
+                
+                if (catObj) {
+                    catObj.datasets.set(ref.id, ref);
+                } else {
+                    out.set(ref.category, { category: ref.category, datasets: new Map([[ ref.id, ref ]]) })
+                }
+            }
+            return { categories: out, displayOrder };
         };
 
-        const categorySorter = (a: CategorizedDatasetRef, b: CategorizedDatasetRef) => {
-            a.datasets.sort(datasetSorter);
-            b.datasets.sort(datasetSorter);
-            return a.category.localeCompare(b.category);
-        };
+        const reindexCacheFromExternal = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, datasets } = payload;
+            const sorted = reindexCacheCache(datasets!);
+            return { requestId, result: sorted }
+        }   
 
-        const datasetSorter = (a: PatientListDatasetQueryDTO, b: PatientListDatasetQueryDTO) => {
-            return a.name.localeCompare(b.name);
-        };
-
-        const addDatasetsToCache = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { datasets, requestId } = payload;
-            const allDs = [];
+        /*
+         * Reset the dataset search cache and (re)load
+         * it with inbound datasets.
+         */
+        const reindexCacheCache = (datasets: PatientListDatasetQuery[]): DatasetSearchResult => {
+            
+            /*
+             * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
+             */
+            const all = datasets!.slice().filter((ds) => ds.shape !== 3);
+            all.unshift(demographics);
+            allDs.clear();
+            allCatDs.clear();
+            allCatDsAdmin.clear();
+            allCatDsAdmin.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
+            firstCharCache.clear();
+            excluded.clear();
+            excluded.set(demographics.id, demographics);
         
-            // Foreach dataset
-            for (let i = 0; i < datasets!.length; i++) {
-                const ds = datasets![i];
-                let tokens = ds.name.toLowerCase().split(' ');
+            /* 
+             * Foreach dataset
+             */
+            for (let i = 0; i < all.length; i++) {
+                const ds = all[i];
+                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
+                allDs.set(ds.id, ds);
 
                 for (let j = 0; j <= tokens.length - 1; j++) {
                     const token = tokens[j];
@@ -302,20 +429,33 @@ export default class DatasetSearchEngineWebWorker {
                     }
                     const firstChar = token[0];
             
-                    // Cache the first first character for quick lookup
+                    /* 
+                     * Cache the first first character for quick lookup.
+                     */
                     if (!firstCharCache.has(firstChar)) {
                         firstCharCache.set(firstChar, [ ref ]);
-                    }
-                    else {
+                    } else {
                         firstCharCache.get(firstChar)!.push(ref);
                     }
                 }
-                datasetCache.set(ds.id, ds);
-                allDs.push(ds);
             }
-            allDatasets = dedupeAndSort(allDs);
-            updateAllowedDatasets();
-            return { requestId, result: allDatasets };
+
+            /*
+             * Set admin search default display.
+             */
+            const adminSorted = dedupeAndSort(all);
+            allCatDsAdmin = adminSorted.categories;
+            defaultOrderAdmin = adminSorted.displayOrder;
+
+            /*
+             * Set user search default display.
+             */
+            all.shift();
+            const userSorted = dedupeAndSort(all);
+            allCatDs = userSorted.categories;
+            defaultOrder = userSorted.displayOrder;
+
+            return userSorted;
         };
     };
 }

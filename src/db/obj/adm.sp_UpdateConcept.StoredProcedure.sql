@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateConcept]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/29
@@ -38,7 +37,7 @@ CREATE PROCEDURE [adm].[sp_UpdateConcept]
 	@uiDisplayTooltip nvarchar(max),
 	@uiDisplayPatientCount int,
 	@uiNumericDefaultText nvarchar(50),
-    @constraints auth.ConceptConstraintTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
     @specializationGroups rela.ConceptSpecializationGroupTable READONLY,
     @user auth.[User]
 AS
@@ -67,6 +66,9 @@ BEGIN
 
     BEGIN TRAN;
     BEGIN TRY
+
+		DECLARE @oldRootId UNIQUEIDENTIFIER = (SELECT TOP 1 RootId FROM app.Concept WHERE Id = @id)
+
         UPDATE app.Concept
         SET
             UniversalId = @universalId,
@@ -93,6 +95,38 @@ BEGIN
             PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
         WHERE Id = @id;
 
+		IF (@rootId != @oldRootId)
+
+		BEGIN
+			; WITH descendents AS
+			(
+				SELECT Id = @id
+				UNION ALL
+				SELECT C2.Id
+				FROM descendents AS D
+					 INNER JOIN app.Concept AS C2
+						ON C2.ParentId = D.Id
+			)
+			SELECT DISTINCT Id
+			INTO #descendents
+			FROM descendents
+
+			UPDATE app.Concept
+			SET RootId = @rootId
+			FROM app.Concept AS C
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			UPDATE app.ConceptForwardIndex
+			SET RootId = @rootId
+			FROM app.Concept C
+				 INNER JOIN app.ConceptForwardIndex FI
+					ON C.Id = FI.ConceptId
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			DROP TABLE #descendents
+
+		END
+
         DELETE FROM auth.ConceptConstraint
         WHERE ConceptId = @id;
 
@@ -116,7 +150,6 @@ BEGIN
         THROW;
     END CATCH;
 END
-
 
 
 

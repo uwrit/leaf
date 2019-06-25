@@ -47,6 +47,11 @@ textarea.leaf-input::placeholder {
     cursor: default;
 }
 
+.leaf-input:disabled {
+    border-radius: 4px !important;
+    cursor: not-allowed;
+}
+
 textarea.leaf-input {
     margin-top: 2px;
     outline: none;

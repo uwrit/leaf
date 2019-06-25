@@ -67,7 +67,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
                 header: "Error Loading Query",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     };
@@ -101,7 +101,7 @@ export const requestQuerySave = () => {
                         header: "Recursive query error",
                         show: true
                     };
-                    dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                     return;
                 }
@@ -160,7 +160,7 @@ export const requestQuerySave = () => {
                 header: "Error Saving Query",
                 show: true
             };
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     }
@@ -237,7 +237,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 header: "Error Deleting Query",
                                 show: true
                             };
-                            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                             dispatch(showInfoModal(info));
                             return;
                         }
@@ -260,7 +260,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 header: "Error Deleting Query",
                                 show: true
                             };
-                            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                             dispatch(showInfoModal(info));
                             return;
                         }
@@ -287,7 +287,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 noButtonText: `No`,
                                 yesButtonText: `Yes, delete all queries`
                             };
-                            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                             dispatch(showConfirmationModal(confirm));
                             return;
                         }

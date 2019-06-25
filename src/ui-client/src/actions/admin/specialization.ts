@@ -54,13 +54,13 @@ export const deleteAdminConceptSpecialization = (spc: Specialization) => {
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptSpecialization(spc));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept Specialization. Please see the Leaf error logs for details.",
                             header: "Error Deleting Concept Specialization",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {

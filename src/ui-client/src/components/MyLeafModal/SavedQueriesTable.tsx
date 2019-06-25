@@ -17,6 +17,7 @@ import './SavedQueriesTable.css';
 
 interface Props {
     dispatch: any;
+    isGateway: boolean;
     queryState: CohortStateType;
     panels: Panel[];
     queries: SavedQueriesState;
@@ -28,35 +29,45 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { queries } = this.props;
+        const { queries, isGateway } = this.props;
 
         if (!queries.saved.size) { return <div>No saved queries to display</div>; }
 
         const c = "myleaf-saved-queries";
         const classes = [ `${c}-container` ];
-        const saved: SavedQueryRef[] = [];
-        queries.saved.forEach((s: SavedQueryRef) => saved.push(s));
-        const cols = [ "name", "category", "owner", "count", "created", "updated" ];
+        const saved: SavedQueryRef[] = [ ...queries.saved.values() ];
         const headerClass = `${c}-header`;
         const rowClass = `${c}-row`;
         const openButtonClass = `${c}-open`;
         const delButtonClass = `${c}-delete`;
+        let cols = [ "name", "category", "count", "owner", "created", "updated" ];
+
+        if (isGateway) {
+            cols = cols.filter((c) => c !== "count");
+        }
 
         return  (
             <div className={classes.join(' ')}>
+
                 {/* Table */}
                 <table className={`${c}-table`}>
+
                     {/* Header */}
                     <thead className={`${c}-header`}>
                         <tr>
+
                             {/* Columns */}
                             {cols.map((col: string) => <th className={headerClass} key={col}>{col}</th>)}
+
                             {/* 'Open' and '✖' button columns */}
                             <th />
+
                         </tr>
                     </thead>
+
                     {/* Body */}
                     <tbody className={`${c}-body`}>
+
                         {/* Rows */}
                         {saved.map((s: SavedQueryRef) => {
                             return (
@@ -72,6 +83,7 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
                                 </tr>)
                             );
                         })}
+                        
                     </tbody>
                 </table>
             </div>

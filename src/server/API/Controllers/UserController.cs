@@ -20,6 +20,7 @@ using Services;
 using Services.Authorization;
 using API.Jwt;
 using API.DTO.User;
+using API.DTO.Config;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
@@ -70,7 +71,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                logger.LogError("Could not produce identity token. Error:{Error}", e.ToString());
+                logger.LogError("Failed to produce identity token. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -91,15 +92,19 @@ namespace API.Controllers
             {
                 if (blacklistCache.IsBlacklisted(userContext.IdNonce))
                 {
+                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce, attestation);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
                 var token = jwtProvider.AccessToken(HttpContext, attestation);
+
+                logger.LogInformation("Created Access Token. Attestation:{@Attestation} Token:{Token}", attestation, token);
+
                 return Ok(new AccessTokenDTO { AccessToken = token });
             }
             catch (Exception e)
             {
-                logger.LogError("Could not produce access token. Error:{Error}", e.ToString());
+                logger.LogError("Failed to produce access token. Attestation:{@Attestation} Error:{Error}", attestation, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -118,15 +123,19 @@ namespace API.Controllers
             {
                 if (blacklistCache.IsBlacklisted(userContext.IdNonce))
                 {
+                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
                 var token = jwtProvider.AccessToken(HttpContext);
+
+                logger.LogInformation("Refreshed Access Token. Token:{Token}", token);
+
                 return Ok(new AccessTokenDTO { AccessToken = token });
             }
             catch (Exception e)
             {
-                logger.LogError("Could not refresh access token. Error:{Error}", e.ToString());
+                logger.LogError("Failed to refresh access token. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -164,11 +173,12 @@ namespace API.Controllers
             var token = BlacklistedToken.FromUTCTicks(nonce, ticks);
             try
             {
+                logger.LogInformation("Blacklisting Token: {@Token}", token);
                 await blacklistService.Blacklist(token);
             }
             catch (Exception e)
             {
-                logger.LogError("Could not logout user. Error:{Error}", e.ToString());
+                logger.LogError("Failed to logout user. Error:{Error}", e.ToString());
             }
 
             return Ok(new LogoutDTO { LogoutURI = authenticationOptions.LogoutURI?.AbsoluteUri });

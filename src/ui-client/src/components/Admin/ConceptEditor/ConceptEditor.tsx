@@ -8,11 +8,10 @@
 import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import ConceptColumnContainer from '../../../containers/FindPatients/ConceptColumnContainer';
-import AdminState, { AdminPanelConceptEditorPane } from '../../../models/state/AdminState';
+import AdminState from '../../../models/state/AdminState';
 import { MainEditor } from './MainEditor/MainEditor';
 import { SqlPreview } from './Previews/SqlPreview/SqlPreview';
 import { PanelPreview } from './Previews/PanelPreview/PanelPreview';
-import { SqlSetEditor } from './SqlSetEditor/SqlSetEditor';
 import './ConceptEditor.css';
 
 interface Props { 
@@ -39,7 +38,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { showPanelPreview, showSqlPreview } = this.state;
-        const { data } = this.props;
+        const { data, dispatch } = this.props;
         const c = this.className;
 
         return (
@@ -50,8 +49,13 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-column-left-overlay ${showSqlPreview || showPanelPreview ? 'show' : ''}`}></div>
                             <ConceptColumnContainer />
                         </Col>
-                        <div className={`${c}-column-right`}>
-                            {this.getCurrentPane()}
+                        <div className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
+                            <MainEditor 
+                                data={data} dispatch={dispatch} 
+                                togglePanelPreview={this.togglePanelPreview} 
+                                toggleSqlPreview={this.toggleSqlPreview} 
+                                toggleOverlay={this.toggleOverlay}
+                            />
                         </div>
                     </Row>
                 </Container>
@@ -63,31 +67,6 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                 }
             </div>
         );
-    }
-
-    private getCurrentPane = (): any => {
-        const { data, dispatch } = this.props;
-        switch (data.concepts.pane) {
-            case AdminPanelConceptEditorPane.MAIN:
-                return  (
-                    <MainEditor 
-                        data={data} dispatch={dispatch} 
-                        togglePanelPreview={this.togglePanelPreview} 
-                        toggleSqlPreview={this.toggleSqlPreview} 
-                        toggleOverlay={this.toggleOverlay}
-                    />
-                );
-            case AdminPanelConceptEditorPane.SQL_SET:
-                return (
-                    <SqlSetEditor
-                        data={data} dispatch={dispatch}
-                        togglePanelPreview={this.togglePanelPreview} 
-                        toggleSqlPreview={this.toggleSqlPreview} 
-                        toggleOverlay={this.toggleOverlay}
-                    />
-                );
-        }
-        return null;
     }
 
     private toggleSqlPreview = (show: boolean): void => {

@@ -10,6 +10,11 @@ import { Concept as UserConcept } from '../concept/Concept';
 import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
+import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
+import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
+import { NetworkIdentity } from '../NetworkResponder';
+import { NetworkEndpoint, Certificate } from '../admin/Network';
+
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -19,9 +24,11 @@ export enum AdminPanelLoadState {
     NOT_APPLICABLE = 5
 }
 
-export enum AdminPanelConceptEditorPane {
-    MAIN = 1,
-    SQL_SET = 2
+export enum AdminPanelPane {
+    CONCEPTS = 1,
+    SQL_SETS = 2,
+    DATASETS = 3,
+    NETWORK = 4
 }
 
 export interface AdminConceptState {
@@ -29,7 +36,6 @@ export interface AdminConceptState {
     concepts: Map<string, AdminConcept>;
     currentAdminConcept?: AdminConcept;
     currentUserConcept?: UserConcept;
-    pane: AdminPanelConceptEditorPane;
     examplePanel: Panel;
     exampleSql: string;
     state: AdminPanelLoadState;
@@ -53,15 +59,44 @@ export interface AdminPanelFilterState {
 }
 
 export interface AdminDatasetState {
-    
+    changed: boolean;
+    expectedColumns: AdminPanelPatientListColumnTemplate[];
+    currentDataset?: AdminDatasetQuery;
+    datasets: Map<string, AdminDatasetQuery>;
+    demographicsDataset: AdminDatasetQuery;
+    sqlColumns: Set<string>;
+    state: AdminPanelLoadState;
+}
+
+export interface AdminDatasetQueryCategoryState {
+    changed: boolean;
+    categories: Map<number,DatasetQueryCategory>;
+    uneditedCategory?: DatasetQueryCategory;
+}
+
+export interface AdminNetworkAndIdentityState {
+    changed: boolean;
+    endpoints: Map<number,NetworkEndpoint>;
+    identity: NetworkIdentity;
+    modal: AdminNetworkCertificateModalState;
+    uneditedEndpoints: Map<number,NetworkEndpoint>;
+    uneditedIdentity: NetworkIdentity;
+}
+
+export interface AdminNetworkCertificateModalState {
+    cert?: Certificate;
+    endpoint?: NetworkEndpoint;
+    show: boolean;
 }
 
 export default interface AdminState {
-    activeTab: number;
+    activePane: AdminPanelPane;
     concepts: AdminConceptState;
     conceptEvents: AdminConceptEventState;
     configuration: AdminConfiguration;
     datasets: AdminDatasetState;
+    datasetQueryCategories: AdminDatasetQueryCategoryState;
+    networkAndIdentity: AdminNetworkAndIdentityState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
     state: AdminPanelLoadState;

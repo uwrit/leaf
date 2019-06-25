@@ -43,7 +43,7 @@ export const saveAdminConceptEvent = (ev: ConceptEvent) => {
             dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Concept Event. Please see the Leaf error logs for details.",
                 header: "Error Saving Concept Event",
@@ -68,13 +68,13 @@ export const deleteAdminConceptEvent = (ev: ConceptEvent) => {
                         dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptEvent(ev));
                 },  error => {
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept Event. Please see the Leaf error logs for details.",
                             header: "Error Deleting Concept Event",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ message: "", state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {

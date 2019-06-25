@@ -11,15 +11,17 @@ import 'brace/mode/sqlserver';
 import 'brace/theme/sqlserver';
 
 interface Props {
+    changeHandler?: (value:string, evt: any) => void;
     height: number;
     fontSize?: string | number;
+    readonly: boolean;
     sql: string;
     width: number;
 }
 
 export class SqlBox extends React.PureComponent<Props> {
     public render() {
-        const { sql, height, width, fontSize } = this.props;
+        const { sql, height, width, fontSize, readonly, changeHandler } = this.props;
         const c = 'sql-box';
         
         return (
@@ -32,7 +34,8 @@ export class SqlBox extends React.PureComponent<Props> {
                     width={`${width}px`}
                     mode="sqlserver"
                     theme="sqlserver"
-                    readOnly={true}
+                    onChange={changeHandler}
+                    readOnly={readonly}
                     showPrintMargin={false}
                     value={sql}
                     setOptions={{

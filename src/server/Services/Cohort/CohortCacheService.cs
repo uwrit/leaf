@@ -29,23 +29,19 @@ namespace Services.Cohort
 
         readonly AppDbOptions dbOptions;
         readonly CohortOptions cohortOptions;
-        readonly ILogger<CohortCacheService> log;
 
         public CohortCacheService(
             IOptions<AppDbOptions> appDbOptions,
-            IOptions<CohortOptions> cohortOptions,
-            ILogger<CohortCacheService> logger
+            IOptions<CohortOptions> cohortOptions
         )
         {
             dbOptions = appDbOptions.Value;
             this.cohortOptions = cohortOptions.Value;
-            log = logger;
         }
 
         public async Task<Guid> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user)
         {
             var nonce = NonceOrThrowIfNull(user);
-            log.LogInformation("Creating Unsaved Cohort.");
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -57,9 +53,8 @@ namespace Services.Cohort
                     commandTimeout: dbOptions.DefaultTimeout
                 );
 
-                if (cohort.Count <= cohortOptions.RowLimit)
+                if (cohort.Any() && cohort.Count <= cohortOptions.RowLimit)
                 {
-
                     var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(cohortOptions.ExportLimit, queryId));
 
                     using (var bc = new SqlBulkCopy(cn))
@@ -78,7 +73,6 @@ namespace Services.Cohort
         {
             var nonce = NonceOrThrowIfNull(user);
 
-            log.LogInformation("Deleting Unsaved Cohort");
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -95,11 +89,11 @@ namespace Services.Cohort
         Guid NonceOrThrowIfNull(IUserContext user)
         {
             var nonce = user?.SessionNonce;
-            if (nonce == null)
+            if (!nonce.HasValue)
             {
-                throw new ArgumentNullException(nameof(user));
+                throw new ArgumentNullException(nameof(nonce));
             }
-            return (Guid)nonce;
+            return nonce.Value;
         }
     }
 }

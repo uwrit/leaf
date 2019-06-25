@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQueryDTO, CategorizedDatasetRef } from "../patientList/Dataset";
+import { PatientListDatasetQuery, CategorizedDatasetRef } from "../patientList/Dataset";
 import { RouteConfig } from "../../config/routes";
 
 
@@ -47,22 +47,17 @@ export interface ConfirmationModalState {
 }
 
 export interface NoClickModalState {
-    message: string;
+    message?: string;
     state: NoClickModalStates;
 }
 
-export interface DatasetsState {
-    available: CategorizedDatasetRef[];
-    unfilteredAvailableCount: number;
-    searchTerm: string;
-}
+
 
 export interface GeneralUiState {
     browser?: Browser;
     cohortCountBox: CohortCountBoxState;
     confirmationModal: ConfirmationModalState;
     currentRoute: Routes;
-    datasets: DatasetsState;
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
     routes: RouteConfig[];

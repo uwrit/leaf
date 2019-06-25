@@ -15,14 +15,12 @@ import RightPaneSlider from '../../components/Other/RightPaneSlider/RightPaneSli
 import { AppState } from '../../models/state/AppState';
 import { SavedQueriesState, Query, SavedQuery } from '../../models/Query';
 import './SaveQueryPanel.css';
-import { Browser, BrowserType } from '../../models/state/GeneralUiState';
 
 interface State {
     categoryError: boolean;
     nameError: boolean;
 }
 interface StateProps {
-    browser: Browser;
     queries: SavedQueriesState;
     show: boolean;
 }
@@ -64,8 +62,7 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
         return (
             <RightPaneSlider
                 show={this.props.show}
-                toggle={this.toggle}
-                overlay={this.props.browser.type !== BrowserType.Edge}>
+                toggle={this.toggle}>
                 <div className={`${c}-container`}>
                     <FormGroup>
                         <Label for={`${c}-name`}>
@@ -196,7 +193,6 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
-        browser: state.generalUi.browser!,
         queries: state.queries,
         show: state.generalUi.showSaveQueryPane
     };

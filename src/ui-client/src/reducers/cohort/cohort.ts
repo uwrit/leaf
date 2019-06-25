@@ -37,7 +37,7 @@ import {
     VISUALIZATION_SET_AGGREGATE,
     VISUALIZATION_SET_NETWORK
 } from '../../actions/cohort/visualize';
-import { DISABLE_Responder, ENABLE_Responder } from '../../actions/networkResponders';
+import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
 import { 
     ADD_PANEL_ITEM, 
@@ -73,16 +73,16 @@ import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
 
- export function defaultCohortState(): CohortState {
+export const defaultCohortState = (): CohortState => {
     return {
         count: defaultCountState(),
         networkCohorts: new Map<number, NetworkCohortState>(),
         patientList: defaultPatientListState(),
         visualization: defaultVisualizationState()
     } as CohortState;
-}
+};
 
-function registerCohorts(state: CohortState, action: CohortCountAction): CohortState {
+const registerCohorts = (state: CohortState, action: CohortCountAction): CohortState => {
     const newState = Object.assign({}, state);
     for (const r of action.cohorts!) {
         const newCohort: NetworkCohortState = {
@@ -94,9 +94,9 @@ function registerCohorts(state: CohortState, action: CohortCountAction): CohortS
         newState.networkCohorts.set(r.id, newCohort)
     }
     return newState;
-}
+};
 
-function cancelCountQuery(state: CohortState): CohortState {
+const cancelCountQuery = (state: CohortState): CohortState => {
     const stateClone = Object.assign({}, state);
     const cancelToken = stateClone.cancel;
     if (cancelToken) {
@@ -104,9 +104,9 @@ function cancelCountQuery(state: CohortState): CohortState {
         console.log('query cancelled');
     }
     return resetCohorts(stateClone);
-}
+};
 
-function resetCohorts(state: CohortState): CohortState {
+const resetCohorts = (state: CohortState): CohortState => {
     const network = new Map();
     state.networkCohorts.forEach((n: NetworkCohortState) => { 
         n.count = defaultCountState();
@@ -121,9 +121,9 @@ function resetCohorts(state: CohortState): CohortState {
         patientList: defaultPatientListState(),
         visualization: defaultVisualizationState()
     });
-}
+};
 
-function startCountQuery(state: CohortState, action: CohortCountAction): CohortState {
+const startCountQuery = (state: CohortState, action: CohortCountAction): CohortState => {
     const network = new Map(state.networkCohorts);
     const responders = action.responders!;
     network.forEach((n: NetworkCohortState) => { 
@@ -147,16 +147,16 @@ function startCountQuery(state: CohortState, action: CohortCountAction): CohortS
     }) as CohortState;
 };
 
-function finishCountQuery(state: CohortState, action: CohortCountAction): CohortState {
+const finishCountQuery = (state: CohortState, action: CohortCountAction): CohortState => {
     return Object.assign({}, state, {
         count: {
             ...state.count,
             state: action.success ? CohortStateType.LOADED : CohortStateType.NOT_LOADED,
         }
     });
-}
+};
 
-function startDemographicQuery(state: CohortState, action: CohortCountAction): CohortState {
+const startDemographicQuery = (state: CohortState, action: CohortCountAction): CohortState => {
     const network = new Map(state.networkCohorts);
     const responders = action.responders!;
     network.forEach((n: NetworkCohortState) => { 
@@ -189,8 +189,7 @@ function startDemographicQuery(state: CohortState, action: CohortCountAction): C
     }) as CohortState;
 };
 
-function finishDemographicQuery(state: CohortState): CohortState {
-
+const finishDemographicQuery = (state: CohortState): CohortState => {
     return Object.assign({}, state, {
         patientList: {
             ...state.patientList,
@@ -201,9 +200,9 @@ function finishDemographicQuery(state: CohortState): CohortState {
             state: CohortStateType.LOADED
         }
     });
-}
+};
 
-export function setNetworkCohortDemographic(state: CohortState, action: CohortVisualizationAction): CohortState {
+const setNetworkCohortDemographic = (state: CohortState, action: CohortVisualizationAction): CohortState => {
     const c: NetworkCohortState = state.networkCohorts.get(action.id)!;
     const networkCohort: NetworkCohortState = Object.assign({}, c, {
         patientList: {
@@ -221,26 +220,43 @@ export function setNetworkCohortDemographic(state: CohortState, action: CohortVi
     return Object.assign({}, state, {
         networkCohorts: networkClone
     });
-}
+};
 
-export function errorCohortDemographics(state: CohortState, action: CohortCountAction): CohortState {
+const errorCohortDemographics = (state: CohortState, action: CohortCountAction): CohortState => {
     const network = new Map(state.networkCohorts);
-    const clone = Object.assign({}, network.get(action.id)!, {
-        patientList: {
-            ...defaultPatientListState(),
-            state: CohortStateType.IN_ERROR
-        },
-        visualization: {
-            ...defaultVisualizationState,
-            state: CohortStateType.IN_ERROR
-        }
-    });
-    network.set(clone.id, clone); 
 
-    return Object.assign({}, state, {
-        networkCohorts: network
-    }) as CohortState;
-}
+    /*
+     * If it has an ID, then an individual node failed.
+     */
+    if (action.id) {
+        const clone = Object.assign({}, network.get(action.id)!, {
+            patientList: {
+                ...defaultPatientListState(),
+                state: CohortStateType.IN_ERROR
+            },
+            visualization: {
+                ...defaultVisualizationState,
+                state: CohortStateType.IN_ERROR
+            }
+        });
+        network.set(clone.id, clone);
+        return Object.assign({}, state, { networkCohorts: network }) as CohortState;
+    /*
+     * Else all nodes failed.
+     */
+    } else {
+        return Object.assign({}, state, {
+            patientList: {
+                ...state.patientList,
+                state: CohortStateType.IN_ERROR
+            },
+            visualization: {
+                ...state.visualization,
+                state: CohortStateType.IN_ERROR
+            }
+        }) as CohortState;
+    };
+};
 
 type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction;
 
@@ -304,9 +320,9 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkPatientListDatasetNotImplemented(state, action);
 
         // Enabled/disabling responders after data loaded
-        case ENABLE_Responder:
+        case ENABLE_RESPONDER:
             return recalculateCohortCount(state, action.id, true);
-        case DISABLE_Responder:
+        case DISABLE_RESPONDER:
             return recalculateCohortCount(state, action.id, false);
 
         // Any change to panel query definition resets the cohort
@@ -329,4 +345,4 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
         default:
             return state;
     }
-}
+};

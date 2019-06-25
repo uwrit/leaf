@@ -14,7 +14,8 @@ export enum PatientListColumnType {
     string = 1,
     number = 2, 
     date = 3,
-    sparkline = 4
+    sparkline = 4,
+    boolean = 5
 }
 
 export interface PatientListColumnTemplate {
@@ -23,6 +24,10 @@ export interface PatientListColumnTemplate {
     id: PatientListColumnId;
     optional?: boolean;
     type: PatientListColumnType;
+}
+
+export interface AdminPanelPatientListColumnTemplate extends PatientListColumnTemplate {
+    present: boolean;
 }
 
 export interface PatientListColumn extends PatientListColumnTemplate {

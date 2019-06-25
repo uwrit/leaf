@@ -59,6 +59,16 @@ namespace Model.Search
         public async Task<PreflightConcepts> GetConceptsAsync(ConceptRef cr)
         {
             log.LogInformation("Getting preflight concept check. Ref:{@Ref}", cr);
+            var pc = await GetConceptsAsyncImpl(cr);
+            if (!pc.Ok)
+            {
+                log.LogError("Preflight concept check failed. Check:{@Check}", pc);
+            }
+            return pc;
+        }
+
+        async Task<PreflightConcepts> GetConceptsAsyncImpl(ConceptRef cr)
+        {
             if (user.IsInstutional)
             {
                 return await reader.GetConceptsByIdAsync(cr.Id.Value);
@@ -74,7 +84,17 @@ namespace Model.Search
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<PreflightConcepts> GetConceptsAsync(HashSet<ConceptRef> crs)
         {
-            log.LogInformation("Getting preflight check concepts. Refs:{@Refs}", crs);
+            log.LogInformation("Getting preflight concepts check. Refs:{@Refs}", crs);
+            var pc = await GetConceptsAsyncImpl(crs);
+            if (!pc.Ok)
+            {
+                log.LogError("Preflight concepts check failed. Check:{@Check}", pc);
+            }
+            return pc;
+        }
+
+        async Task<PreflightConcepts> GetConceptsAsyncImpl(HashSet<ConceptRef> crs)
+        {
             if (user.IsInstutional)
             {
                 return await reader.GetConceptsByIdsAsync(crs.Select(c => c.Id.Value).ToHashSet());
@@ -90,7 +110,17 @@ namespace Model.Search
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<PreflightResources> GetResourcesAsync(ResourceRefs refs)
         {
-            log.LogInformation("Getting preflight resource check. Refs:{@Refs}", refs);
+            log.LogInformation("Getting preflight resources check. Refs:{@Refs}", refs);
+            var pr = await GetResourcesAsyncImpl(refs);
+            if (!pr.Ok)
+            {
+                log.LogError("Preflight resources check failed. Check:{@Check}", pr);
+            }
+            return pr;
+        }
+
+        async Task<PreflightResources> GetResourcesAsyncImpl(ResourceRefs refs)
+        {
             if (user.IsInstutional)
             {
                 return await reader.GetResourcesByIdsAsync(refs);

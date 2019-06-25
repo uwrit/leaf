@@ -19,15 +19,17 @@ import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { setPatientListDatasets, showConfirmationModal, setPatientListTotalDatasetsAvailableCount } from '../actions/generalUi';
+import { showConfirmationModal } from '../actions/generalUi';
 import { getSavedQueries, getQueriesAsConcepts } from '../services/queryApi';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
-import { setPanelFilters, setPanelFilterActiveStates } from './panelFilter';
-import { addDatasets } from '../services/datasetSearchApi';
+import { setPanelFilterActiveStates } from './panelFilter';
+import { indexDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
+import { setDatasets } from './datasets';
+import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -65,7 +67,9 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Finding Home Leaf server', 20));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
-            homeBase.identity.address = '';
+            if (getState().auth.userContext!.isAdmin) {
+                dispatch(setAdminNetworkIdentity(homeBase.identity, false));
+            }
 
             /* 
              * Get responders.
@@ -75,10 +79,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Fetch network responders if not in identified mode.
              */
-            const responders: NetworkIdentity[] = [];
-            if (homeBase.identity.runtime === RuntimeMode.Full) {
-                responders.push({ ...homeBase.identity, enabled: true, id: 0, isHomeNode: true });
-            }
+            const responders: NetworkIdentity[] = [ homeBase.identity ];
             
             if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
                 await Promise.all(
@@ -91,7 +92,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
                                 .then(() => resolve())
                         })
                     })
-                ) 
+                ); 
             }         
 
             /* 
@@ -117,18 +118,17 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Load datasets.
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
-            const datasetsResp = await fetchAvailableDatasets(getState());
-            const datasetsCategorized = await addDatasets(datasetsResp.data);
-            dispatch(setPatientListDatasets(datasetsCategorized));
-            dispatch(setPatientListTotalDatasetsAvailableCount(datasetsResp.data.length));
+            const datasets = await fetchAvailableDatasets(getState());
+            const datasetsCategorized = await indexDatasets(datasets);
+            dispatch(setDatasets(datasets, datasetsCategorized));
             
             /*
              * Load saved queries.
              */
             dispatch(setSessionLoadState('Loading Saved Queries', 80));
-            const savedCohortsResp = await getSavedQueries(getState());
-            const savedCohortConcepts = await getQueriesAsConcepts(savedCohortsResp.data) as ConceptExtensionInitializer;
-            dispatch(addSavedQueries(savedCohortsResp.data));
+            const savedCohorts = await getSavedQueries(getState());
+            const savedCohortConcepts = await getQueriesAsConcepts(savedCohorts) as ConceptExtensionInitializer;
+            dispatch(addSavedQueries(savedCohorts));
             dispatch(setExtensionConcepts(savedCohortConcepts.concepts, savedCohortConcepts.roots));
 
             /* 
@@ -196,7 +196,7 @@ export const logout = () => {
             window.location = (logoutUri as any);
         }
         else {
-            window.location = window.location;
+            window.location.reload(true);
         }
     };
 }

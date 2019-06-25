@@ -18,3 +18,14 @@ INSERT [auth].[Constraint] ([Id], [Type]) VALUES (1, N'User')
 INSERT [auth].[Constraint] ([Id], [Type]) VALUES (2, N'Group')
 SET IDENTITY_INSERT [auth].[Constraint] OFF
 
+INSERT INTO [network].[Identity] ([Lock], [Name], [Abbreviation], [Description], [TotalPatients], [Latitude], [Longitude], [PrimaryColor], [SecondaryColor])
+SELECT 
+    [Lock] = 'X'
+   ,[Name] = 'University of Example'
+   ,[Abbreviation] = 'UE'
+   ,[Description] = 'The University of Example Medical Center is a large medical system representing two hospitals and over 400 regional clinics.'
+   ,[TotalPatients] = 2200000
+   ,[Latitude] = 47.6062
+   ,[Longitude] = 122.3321
+   ,[PrimaryColor] = 'rgb(75, 46, 131)'
+   ,[SecondaryColor] = 'rgb(183, 165, 122)'

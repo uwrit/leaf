@@ -313,7 +313,7 @@ export default class PatientListWebWorker {
             }
 
             // Rows are added to the patient map, now compute stats for each patient
-            const derivedDef = def.numericValueColumn
+            const derivedDef = def.numericValueColumn && dataset!.data.schema.fields.indexOf(def.numericValueColumn) > -1
                 ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
                 : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
             derivedDef.totalRows = rowCount;
@@ -613,6 +613,7 @@ export default class PatientListWebWorker {
                 displayName: def.displayName,
                 id: def.id,
                 multirow: false,
+                numericValueColumn: def.numericValueColumn,
                 responderStates: new Map(),
                 shape: 0,
                 totalRows: ids.length

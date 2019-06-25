@@ -34,7 +34,7 @@ namespace Model.Compiler
 
                 var encounterBased = concepts.Where(c => c.IsEncounterBased && c.UiDisplayPatientCountByYear != null)
                                              .SelectMany(c => c.UiDisplayPatientCountByYear)
-                                             .Where(y => y != null && years.Contains(y.Year))
+                                             .Where(y => y?.Year != null && years.Contains(y.Year.Value))
                                              .Sum(count => count.PatientCount);
 
                 var notEncounterBased = concepts.Where(c => !c.IsEncounterBased && c.UiDisplayPatientCountByYear != null)

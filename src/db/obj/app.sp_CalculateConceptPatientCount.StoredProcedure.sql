@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_CalculateConceptPatientCount]    Script Date: 5/9/19 8:47:56 AM ******/
+/****** Object:  StoredProcedure [app].[sp_CalculateConceptPatientCount]    Script Date: 6/12/19 12:20:53 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -77,10 +77,7 @@ BEGIN
 								'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 								 
 								 WITH year_calculation AS
-									  (SELECT PatientYear = CASE WHEN YEAR(' + @Date + ') < 1995 THEN ''<1995''
-																	   WHEN YEAR(' + @Date + ') > YEAR(GETDATE()) THEN ''z>'' + CONVERT(NVARCHAR(10),YEAR(GETDATE()))
-																	   WHEN ' + @Date + ' IS NULL THEN ''_?''
-																	   ELSE CONVERT(NVARCHAR(10),YEAR(' + @Date + ')) END
+									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
 									   FROM ' + @From + ' _T 
 									   WHERE ' + ISNULL(@Where,'') + ')
@@ -133,6 +130,7 @@ BEGIN
 		END 
 
 END
+
 
 
 

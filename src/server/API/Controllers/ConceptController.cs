@@ -35,8 +35,7 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ConceptHint>>> SearchHints(
             [FromQuery] Guid? rootParentId,
             [FromQuery] string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {
@@ -50,7 +49,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not search concept hints. Term:{Term} Error:{Error}", term, ex.ToString());
+                log.LogError("Failed to search concept hints. Term:{Term} Error:{Error}", term, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -58,8 +57,7 @@ namespace API.Controllers
         [HttpGet("search/equivalent")]
         public async Task<ActionResult<ConceptEquivalentHint>> SearchEquivalent(
             string term,
-            [FromServices] ConceptHintSearcher searchEngine
-        )
+            [FromServices] ConceptHintSearcher searchEngine)
         {
             try
             {
@@ -73,7 +71,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not search concept equivalent hint. Term:{Term} Error:{Error}", term, ex.ToString());
+                log.LogError("Failed to search concept equivalent hint. Term:{Term} Error:{Error}", term, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -97,7 +95,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not search for concepts by term. Term:{Term} RootId:{RootId} Error:{Error}", searchTerm, rootId, ex.Message);
+                log.LogError("Failed to search for concepts by term. Term:{Term} RootId:{RootId} Error:{Error}", searchTerm, rootId, ex.Message);
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -114,7 +112,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Could not retrieve concept treetop. Error:{Error}", e.ToString());
+                log.LogError("Failed to retrieve concept treetop. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -142,7 +140,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve Concept:{Id}. Error:{Error}", ident, ex.ToString());
+                log.LogError("Failed to retrieve Concept:{Id}. Error:{Error}", ident, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -164,7 +162,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve children of Concept:{Id}. Error:{Error}", ident, ex.ToString());
+                log.LogError("Failed to retrieve children of Concept:{Id}. Error:{Error}", ident, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -191,7 +189,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Could not retrieve parents of Concepts:{Ids}. Error:{Error}", idents, ex.ToString());
+                log.LogError("Failed to retrieve parents of Concepts:{Ids}. Error:{Error}", idents, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
