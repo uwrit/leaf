@@ -24,7 +24,7 @@ namespace API.Authorization
         readonly string issuer;
         public HttpUserContext(IHttpContextAccessor accessor, IOptions<JwtVerifyingOptions> jwtOptions)
         {
-            user = accessor.HttpContext.User;
+            user = accessor.HttpContext?.User;
             issuer = jwtOptions.Value.Issuer;
             identifiedSet = false;
         }
