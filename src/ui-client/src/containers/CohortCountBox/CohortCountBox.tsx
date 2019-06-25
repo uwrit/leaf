@@ -11,12 +11,12 @@ import { connect } from 'react-redux'
 import { setCohortCountBoxState } from '../../actions/generalUi';
 import { CohortCountQueryDetail } from '../../components/CohortCountBox/CohortCountQueryDetail';
 import { AppState } from '../../models/state/AppState';
-import { CohortStateType } from '../../models/state/CohortState';
+import { CohortStateType, NetworkCohortState } from '../../models/state/CohortState';
 import { CohortState } from '../../models/state/CohortState'
 import { CohortCountBoxState } from '../../models/state/GeneralUiState'
 import { NetworkIdentity } from '../../models/NetworkResponder';
-import './CohortCountBox.css';
 import { CohortCountSiteContainer } from './CohortCountSiteContainer';
+import './CohortCountBox.css';
 
 interface StateProps { 
     cohort: CohortState;
@@ -105,12 +105,21 @@ class CohortCountBox extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const cohort = this.props.cohort!;
-        const { boxMinimized, boxVisible, infoButtonVisible } = this.props.cohortCountBox;
+        const { cohort, cohortCountBox, networkResponders}  = this.props;
+        const { showDetail } = this.state;
+        const { boxMinimized, boxVisible } = cohortCountBox;
         const classes = [ 'cohort-count-detail-container' ];
+        const cohorts: NetworkCohortState[] = [];
+
+        cohort.networkCohorts.forEach((nc) => {
+            const nr = networkResponders.get(nc.id)!;
+            if (nr.enabled && !nr.isGateway) {
+                cohorts.push(nc);
+            }
+        });
         
         if (boxVisible && !boxMinimized) { classes.push('show') };
-        if (this.state.showDetail)       { classes.push('show-detail') };
+        if (showDetail)                  { classes.push('show-detail') };
 
         return (
             <div 
@@ -119,20 +128,25 @@ class CohortCountBox extends React.PureComponent<Props, State> {
                 tabIndex={0} 
                 onClick={this.handleClick}
                 onMouseLeave={this.handleMouseLeave} 
-                onMouseEnter={this.handleMouseEnter} 
-                >
-                <CohortCountQueryDetail cohort={cohort}/>
+                onMouseEnter={this.handleMouseEnter}
+            >
+ 
+                <CohortCountQueryDetail cohort={cohorts} state={cohort.count.state} />
+
                 <div className="cohort-count-detail-show">
                     <a onClick={this.handleShowDetailClick}>
-                        {this.state.showDetail ? 'hide detail' : 'show detail'}
+                        {showDetail ? 'hide detail' : 'show detail'}
                     </a>
                 </div>
+
                 {!boxMinimized && 
                 <CohortCountSiteContainer 
-                    cohort={cohort} 
-                    networkResponders={this.props.networkResponders!} 
-                    show={this.state.showDetail} />
+                    cohorts={cohorts} 
+                    network={networkResponders!} 
+                    show={showDetail} 
+                />
                 }
+
             </div>
         );
     }

@@ -63,33 +63,6 @@ export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId
     return result.data as PatientListDatasetDTO
 };
 
-/*
- * Fetch an array of all datasets potentially available 
- * to the user.
- */
-const platelet: PatientListDatasetQueryDTO = {
-    id: '7d90433e-f36b-1410-8127-00ffffffffff',
-    category: 'Labs',
-    name: 'Platelet Count',
-    shape: PatientListDatasetShape.Observation,
-    tags: []
-};
-const encounter: PatientListDatasetQueryDTO = {
-    id: '8490433e-f36b-1410-8127-00ffffffffff',
-    category: 'Encounters',
-    name: 'Encounters',
-    shape: PatientListDatasetShape.Encounter,
-    tags: []
-};
-const procedure: PatientListDatasetQueryDTO = {
-    id: 'b18e4b63-be42-e911-9d09-b886875607d2',
-    category: 'Procedures',
-    name: 'Procedures',
-    shape: PatientListDatasetShape.Procedure,
-    tags: []
-};
-
-
 export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);

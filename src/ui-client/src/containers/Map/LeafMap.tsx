@@ -87,9 +87,9 @@ export class LeafMap extends React.Component<Props, State> {
         const markers: any[] = [];
         const popups: any[] = [];
         const paths: any[] = [];
-        const home = networkResponders.get(0);
+        const home = networkResponders.get(0)!;
         const responders: NetworkIdentity[] = networkResponders.size > 0 && cohort.networkCohorts.size > 0
-            ? [ ...networkResponders.values() ].filter((n: NetworkIdentity) => n.enabled && n.latitude && n.longitude)
+            ? [ ...networkResponders.values() ].filter((n: NetworkIdentity) => n.enabled && !n.isGateway && n.latitude && n.longitude)
             : [];
 
         for (const nr of responders) {
