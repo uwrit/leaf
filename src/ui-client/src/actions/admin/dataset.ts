@@ -145,7 +145,8 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
              * If demographics, set that and short-circuit.
              */
             if (dataset.shape === PatientListDatasetShape.Demographics) {
-                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false, true));
+                const { demographicsDataset } = state.admin!.datasets;
+                dispatch(setAdminDataset(demographicsDataset, demographicsDataset.unsaved === true, true));
                 return;
             }
 

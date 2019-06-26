@@ -107,7 +107,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* Header */}
-                                {data.datasets.demographicsDataset && !data.datasets.demographicsDataset.unsaved &&
+                                {data.datasets.currentDataset &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
