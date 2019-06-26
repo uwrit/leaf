@@ -59,6 +59,7 @@
 }
 
 /* Get Started, Error, and Not Applicable message boxes */
+.dataset-editor-na, 
 .dataset-editor-start {
     border-radius: 8px;
     color: rgb(50,50,50);
@@ -75,16 +76,19 @@
     width: 450px;
 }
 
+.dataset-editor-na,
 .dataset-editor-start {
     background-color: white;
     border: 2px dashed rgba(28, 170, 221, 0.699);
 }
 
+.dataset-editor-na a,
 .dataset-editor-start a {
     color: rgb(0, 130, 177) !important;
     cursor: pointer;
 }
 
+.dataset-editor-na a:hover,
 .dataset-editor-start a:hover {
     text-decoration: underline !important;
 }
