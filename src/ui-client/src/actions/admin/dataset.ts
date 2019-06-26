@@ -145,7 +145,8 @@ export const fetchAdminDatasetIfNeeded = (dataset: PatientListDatasetQuery) => {
              * If demographics, set that and short-circuit.
              */
             if (dataset.shape === PatientListDatasetShape.Demographics) {
-                dispatch(setAdminDataset(state.admin!.datasets.demographicsDataset, false, true));
+                const { demographicsDataset } = state.admin!.datasets;
+                dispatch(setAdminDataset(demographicsDataset, demographicsDataset.unsaved === true, true));
                 return;
             }
 
@@ -182,7 +183,11 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
         const { currentDataset, datasets, demographicsDataset } = state.admin!.datasets;
 
         if (currentDataset!.shape === PatientListDatasetShape.Demographics) {
-            dispatch(setAdminDataset(demographicsDataset, false, true));
+            if (demographicsDataset.unsaved) {
+                dispatch(setAdminDataset(undefined, false, false));    
+            } else {
+                dispatch(setAdminDataset(demographicsDataset, false, true));
+            }
         } else {
             dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
             const originalAdminDataset = datasets.get(dataset.id)!;

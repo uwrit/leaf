@@ -107,7 +107,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-main`}>
 
                                 {/* Header */}
-                                {data.datasets.demographicsDataset && !data.datasets.demographicsDataset.unsaved &&
+                                {(data.datasets.datasets.size > 0 || currentDataset) &&
                                 <div className={`${c}-column-right-header`}>
                                     <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleCreateDatasetClick}>+ Create New Dataset</Button>
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
@@ -117,7 +117,10 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 }
 
                                 {/* Create a SQL Set link, used at initial setup */}
-                                {data.state === AdminPanelLoadState.LOADED && data.datasets.demographicsDataset.unsaved && !currentDataset &&
+                                {
+                                    data.state === AdminPanelLoadState.LOADED && 
+                                    data.datasets.demographicsDataset.unsaved && 
+                                    !currentDataset &&
                                 <div className={`${c}-start`}>
                                     <p>It looks like you haven't created a Basic Demographics query to populate the Visualize and Patient List screens.</p>
                                     <p>
@@ -125,6 +128,13 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                             Click here to start creating a SQL query to return demographics data.
                                         </a>
                                     </p>
+                                </div>
+                                }
+
+                                {/* Hint to click on a Dataset to edit */}
+                                {!currentDataset && !data.datasets.demographicsDataset.unsaved &&
+                                <div className={`${c}-na`}>
+                                    <p>Click on a Dataset to the left to edit <br></br> or <a onClick={this.handleCreateDatasetClick}>create a new one</a></p>
                                 </div>
                                 }
 
@@ -442,6 +452,5 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         dispatch(addDataset(newUserDs));
         dispatch(setAdminDataset(newAdminDs, true, true));
         dispatch(setDatasetSelected(newUserDs));
-
     }
 }
