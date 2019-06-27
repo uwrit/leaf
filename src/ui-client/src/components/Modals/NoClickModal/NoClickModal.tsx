@@ -11,7 +11,7 @@ import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { FiCheckCircle } from 'react-icons/fi';
 import { setNoClickModalState } from '../../../actions/generalUi';
 import './NoClickModal.css';
-import { NoClickModalState, NoClickModalStates } from '../../../models/state/GeneralUiState';
+import { NoClickModalState, NotificationStates } from '../../../models/state/GeneralUiState';
 
 interface Props { 
     dispatch: any;
@@ -28,10 +28,10 @@ export default class NoClickModal extends React.Component<Props> {
         const currState = this.props.state;
         const { dispatch } = this.props;
 
-        if (currState.state === NoClickModalStates.Complete) {
+        if (currState.state === NotificationStates.Complete) {
             const noclickState: NoClickModalState = {
                 ...currState,
-                state: NoClickModalStates.Hidden
+                state: NotificationStates.Hidden
             }
 
             // Auto-hide the modal after timeout
@@ -41,10 +41,10 @@ export default class NoClickModal extends React.Component<Props> {
 
     public render() {
         const { state } = this.props;
-        const classes = [ 'leaf-modal', 'noclick-modal', (state.state === NoClickModalStates.Complete ? 'complete' : '') ];
+        const classes = [ 'leaf-modal', 'noclick-modal', (state.state === NotificationStates.Complete ? 'complete' : '') ];
 
         return (
-            <Modal isOpen={state.state !== NoClickModalStates.Hidden} className={classes.join(' ')}>
+            <Modal isOpen={state.state !== NotificationStates.Hidden} className={classes.join(' ')}>
                 <ModalBody>
                     {this.getModalBody()}                    
                 </ModalBody>
@@ -56,7 +56,7 @@ export default class NoClickModal extends React.Component<Props> {
         const { state } = this.props;
 
         switch (state.state) {
-            case NoClickModalStates.CallingServer:
+            case NotificationStates.Working:
                 return (
                     <Row>
                         <Col md={4}><LoaderIcon size={100} /></Col>
@@ -65,7 +65,7 @@ export default class NoClickModal extends React.Component<Props> {
                         </Col>
                     </Row>
                 );
-            case NoClickModalStates.Complete:
+            case NotificationStates.Complete:
                 return (
                     <Row>
                         <Col md={4}><FiCheckCircle size="8rem" /></Col>

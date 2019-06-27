@@ -12,7 +12,7 @@ import { panelToDto } from '../models/panel/Panel';
 import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getQueriesAsConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { setNoClickModalState, showInfoModal, toggleSaveQueryPane, hideMyLeafModal, showConfirmationModal, setRoute } from './generalUi';
-import { NoClickModalStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
+import { NotificationStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
 import { NetworkIdentity } from '../models/NetworkResponder';
 import { mergeExtensionConcepts } from './concepts';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
@@ -48,13 +48,13 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
         if (state.queries.current.id && state.queries.current.id === ref.id) { return; }
 
         try {
-            dispatch(setNoClickModalState({ message: "Loading Query", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Loading Query", state: NotificationStates.Working }));
             const saved = await loadSavedQuery(ref.universalId, state);
 
             /* 
              * Update UI with the new query.
              */
-            dispatch(setNoClickModalState({ message: "Query Loaded", state: NoClickModalStates.Complete }));
+            dispatch(setNoClickModalState({ message: "Query Loaded", state: NotificationStates.Complete }));
             dispatch(setCurrentQuery(saved, true));
             dispatch(addSavedQuery(saved));
             dispatch(openSavedQuery(saved));
@@ -67,7 +67,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
                 header: "Error Loading Query",
                 show: true
             };
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     };
@@ -87,7 +87,7 @@ export const requestQuerySave = () => {
             const panels = state.panels.map(p => panelToDto(p));
             const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
 
-            dispatch(setNoClickModalState({ message: "Saving Query", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving Query", state: NotificationStates.Working }));
 
             /*
              * Check for recursion errors.
@@ -101,7 +101,7 @@ export const requestQuerySave = () => {
                         header: "Recursive query error",
                         show: true
                     };
-                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                     dispatch(showInfoModal(info));
                     return;
                 }
@@ -141,7 +141,7 @@ export const requestQuerySave = () => {
                     );
                 });
             }));
-            dispatch(setNoClickModalState({ message: "Query Saved", state: NoClickModalStates.Complete }));
+            dispatch(setNoClickModalState({ message: "Query Saved", state: NotificationStates.Complete }));
             dispatch(toggleSaveQueryPane());
 
             /*
@@ -160,7 +160,7 @@ export const requestQuerySave = () => {
                 header: "Error Saving Query",
                 show: true
             };
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             dispatch(showInfoModal(info));
         }
     }
@@ -179,7 +179,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
             const user = state.auth.userContext!.name;
             const homeNode = state.responders.get(0)!;
 
-            dispatch(setNoClickModalState({ message: "Deleting Query", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Deleting Query", state: NotificationStates.Working }));
 
             /*
              * Initial query delete attempt.
@@ -222,7 +222,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                     .then(response => resolve(), error => resolve());
                                 });
                             })
-                        ).then(() => dispatch(setNoClickModalState({ message: "Query Deleted", state: NoClickModalStates.Complete })));
+                        ).then(() => dispatch(setNoClickModalState({ message: "Query Deleted", state: NotificationStates.Complete })));
                     },
                     error => {
                         /*
@@ -237,7 +237,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 header: "Error Deleting Query",
                                 show: true
                             };
-                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                             dispatch(showInfoModal(info));
                             return;
                         }
@@ -260,7 +260,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 header: "Error Deleting Query",
                                 show: true
                             };
-                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                             dispatch(showInfoModal(info));
                             return;
                         }
@@ -287,7 +287,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                 noButtonText: `No`,
                                 yesButtonText: `Yes, delete all queries`
                             };
-                            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                             dispatch(showConfirmationModal(confirm));
                             return;
                         }

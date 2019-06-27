@@ -32,6 +32,9 @@ var groupSearchResults = function (results) {
     var thresholdMet = false;
     var _loop_1 = function (i) {
         var match = results[i];
+        if (!match.remainingTerms.size) {
+            match.remainingTerms.add('');
+        }
         /*
          * Add to matched rows to be returned
          * if this ref has same matched tokens.
@@ -44,7 +47,7 @@ var groupSearchResults = function (results) {
         /*
          * Try to add suggestions if still under threshold.
          */
-        var suggestions = Array.from(match.remainingTerms);
+        var suggestions = [ ...match.remainingTerms.values() ];
         for (var j = 0; j < suggestions.length && !thresholdMet; j++) {
             var suggestion = suggestions[j];
             var rowIdx = match.matchedTerms + suggestion;
@@ -70,8 +73,7 @@ var groupSearchResults = function (results) {
     for (var i = 0; i < results.length; i++) {
         _loop_1(i);
     }
-    var out = [];
-    agg.forEach(function (val) { return out.push(val); });
+    var out = [ ...agg.values() ];
     return out;
 };
 var search = function (payload) {

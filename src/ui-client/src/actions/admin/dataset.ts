@@ -1,8 +1,8 @@
 import { AdminDatasetQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
-import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
-import { showInfoModal, setNoClickModalState } from "../generalUi";
+import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
+import { showInfoModal, setNoClickModalState, setSideNotificationState } from "../generalUi";
 import { PatientListDatasetQuery, PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { indexDatasets, searchDatasets } from "../../services/datasetSearchApi";
@@ -34,7 +34,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
         let state = getState();
 
         try {
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newAdminDataset = dataset.unsaved
                 ? await createDataset(state, dataset)
                 : await updateDataset(state, dataset);
@@ -56,16 +56,17 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             await indexDatasets(datasets);
             dispatch(setDataset(userDataset));
             dispatch(setDatasetSelected(userDataset));
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Saved' }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
                 show: true
             };
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -78,19 +79,20 @@ export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
         const state = getState();
 
         try {
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newAdminDataset = await upsertDemographicsDataset(state, dataset);
             dispatch(setAdminDemographicsDataset(newAdminDataset, false));
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Saved' }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset",
                 show: true
             };
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -101,7 +103,7 @@ export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
 export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         let state = getState();
-        dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+        dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
         deleteDataset(state, dataset)
             .then(
                 async (response) => {
@@ -112,18 +114,16 @@ export const deleteAdminDataset = (dataset: AdminDatasetQuery) => {
 
                     await indexDatasets(datasets);
                     dispatch(setAdminDataset(undefined, false, false));
-                    dispatch(setNoClickModalState({ message: "Dataset Deleted", state: NoClickModalStates.Complete }));
+                    dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Deleted' }));
                 }, error => {
                     const info: InformationModalState = {
                         body: "An error occurred while attempting to delete the Dataset. Please see the Leaf error logs for details.",
                         header: "Error Deleting Dataset",
                         show: true
                     };
-                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
-            );
-        
+            ).then(() => dispatch(setNoClickModalState({ state: NotificationStates.Hidden })));
     }
 };
 
@@ -189,7 +189,7 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
                 dispatch(setAdminDataset(demographicsDataset, false, true));
             }
         } else {
-            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Undoing", state: NotificationStates.Working }));
             const originalAdminDataset = datasets.get(dataset.id)!;
             const userDataset = deriveUserDatasetFromAdmin(state, originalAdminDataset);
             const results = await searchDatasets(state.datasets.searchTerm);
@@ -203,7 +203,7 @@ export const revertAdminDatasetChanges = (dataset: AdminDatasetQuery) => {
             }
             dispatch(removeAdminDataset(dataset));
             dispatch(setDatasetSearchResult(results));
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     };
 };

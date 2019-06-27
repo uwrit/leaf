@@ -33,6 +33,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
     private margin = {top: 20, right: 20, left: 20, bottom: 20};
     private minWidth = 300;
     private maxWidth = 1000;
+    private hasOutOfBoundYears = false;
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -41,26 +42,16 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
         }
     }
 
-    public getYearData = () => {
+    public componentDidMount() {
         const { concept } = this.props;
-        const formatterThreshold = 10000;
 
         if (concept.uiDisplayPatientCountByYear) {
-            let data: DisplayablePatientCountPerYear[] = [];
-            if (!this.state.ShowAllYears) {
-                data = this.groupYears(concept.uiDisplayPatientCountByYear);
-            } else {
-                data = concept.uiDisplayPatientCountByYear;
+            const data = concept.uiDisplayPatientCountByYear;
+            const outOfBounds = data.find((d) => !d.year || d.year < this.startYear || d.year > this.currYear)
+            if (outOfBounds) {
+                this.hasOutOfBoundYears = true;
             }
-            return data.map((p: DisplayablePatientCountPerYear) => ({ 
-                ...p, 
-                label: !p.year ? '?' :
-                    p.patientCount >= formatterThreshold 
-                        ? formatLargeNumber(p.patientCount)
-                        : formatSmallNumber(p.patientCount)
-            }))
         }
-        return [];
     }
 
     public render(): any {
@@ -123,7 +114,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             </BarChart>
                             </ResponsiveContainer>}
 
-                            {countsByYear && 
+                            {this.hasOutOfBoundYears && 
                                 <div className={`${c}-show-all-years`}>
                                     <div className={`${c}-show-all-years-text`}>
                                         Show all years
@@ -171,6 +162,28 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
 
     private handleInfoBoxClickedOutside = () => {
         this.setState({ showInfoBox: !this.state.showInfoBox });
+    }
+
+    private getYearData = () => {
+        const { concept } = this.props;
+        const formatterThreshold = 10000;
+
+        if (concept.uiDisplayPatientCountByYear) {
+            let data: DisplayablePatientCountPerYear[] = [];
+            if (!this.state.ShowAllYears) {
+                data = this.groupYears(concept.uiDisplayPatientCountByYear);
+            } else {
+                data = concept.uiDisplayPatientCountByYear;
+            }
+            return data.map((p: DisplayablePatientCountPerYear) => ({ 
+                ...p, 
+                label: !p.year ? '?' :
+                    p.patientCount >= formatterThreshold 
+                        ? formatLargeNumber(p.patientCount)
+                        : formatSmallNumber(p.patientCount)
+            }))
+        }
+        return [];
     }
 
     private groupYears = (ungrouped: PatientCountPerYear[]): PatientCountPerYearGrouped[] => {

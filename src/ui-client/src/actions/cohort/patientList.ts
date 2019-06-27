@@ -18,7 +18,7 @@ import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch, searchDatasets } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
-import { InformationModalState, NoClickModalStates } from '../../models/state/GeneralUiState';
+import { InformationModalState, NotificationStates } from '../../models/state/GeneralUiState';
 import { setDatasetSearchResult } from '../datasets';
 
 // Cohort patient list actions
@@ -123,7 +123,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                     header: "Error Loading Dataset",
                     show: true
                 };
-                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                 dispatch(showInfoModal(info));
             }
         })

@@ -70,9 +70,12 @@ export const fetchConceptAncestorsBySearchTerm = (term: string, state: AppState)
  * request a concept tree.
  */
 export const fetchConceptAncestorsByConceptIds = (conceptIds: string[], state: AppState) => {
+    const threshold = 20;
     return makeRequest(state, 'api/concept/parents', {
         params: {
-            idents: conceptIds
+            idents: conceptIds.length > threshold
+                ? conceptIds.slice(0, threshold)
+                : conceptIds
         },
         paramsSerializer: (params: any) => {
             return params.idents.map((i: string) => `idents=${i}`).join('&');

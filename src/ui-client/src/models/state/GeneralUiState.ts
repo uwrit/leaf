@@ -17,8 +17,8 @@ export enum Routes {
     AdminPanel = 5
 }
 
-export enum NoClickModalStates {
-    CallingServer = 1,
+export enum NotificationStates {
+    Working = 1,
     Complete = 2,
     Hidden = 3
 }
@@ -48,10 +48,13 @@ export interface ConfirmationModalState {
 
 export interface NoClickModalState {
     message?: string;
-    state: NoClickModalStates;
+    state: NotificationStates;
 }
 
-
+export interface SideNotificationState {
+    message?: string;
+    state: NotificationStates;
+}
 
 export interface GeneralUiState {
     browser?: Browser;
@@ -64,6 +67,7 @@ export interface GeneralUiState {
     showMyLeafModal: boolean;
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;
+    sideNotification: SideNotificationState;
 }
 
 export enum BrowserType { 

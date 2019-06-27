@@ -6,8 +6,8 @@
  */ 
 
 import { AppState } from "../../models/state/AppState";
-import { setNoClickModalState, showInfoModal } from "../generalUi";
-import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
+import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { DatasetQueryCategory } from "../../models/admin/Dataset";
 import { createDatasetQueryCategory, updateDatasetQueryCategory, deleteDatasetQueryCategory } from "../../services/admin/datasetQueryCategoryApi";
 
@@ -33,23 +33,24 @@ export const saveAdminDatasetQueryCategory = (cat: DatasetQueryCategory) => {
         const state = getState();
 
         try {
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newCat = cat.unsaved
                 ? await createDatasetQueryCategory(state, cat)
                 : await updateDatasetQueryCategory(state, cat);
 
             dispatch(removeAdminDatasetQueryCategory(cat));
             dispatch(setAdminDatasetQueryCategory(newCat, false));
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Category Saved' }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Dataset Query Category. Please see the Leaf error logs for details.",
                 header: "Error Saving Dataset Query Category",
                 show: true
             };
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -61,22 +62,20 @@ export const deleteAdminDatasetQueryCategory = (cat: DatasetQueryCategory) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
-            dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
             deleteDatasetQueryCategory(state, cat)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminDatasetQueryCategory(cat));
+                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Category Deleted' }));
                 },  error => {
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Dataset Query Category. Please see the Leaf error logs for details.",
                             header: "Error Deleting Dataset Query Category",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
-                });
+                }).then(() => dispatch(setNoClickModalState({ state: NotificationStates.Hidden })));
         } catch (err) {
             console.log(err);
         }

@@ -139,6 +139,9 @@ export default class ConceptSearchEngineWebWorker {
              */
             for (let i = 0; i < results.length; i++) {
                 const match = results[i];
+                if (!match.remainingTerms.size) {
+                    match.remainingTerms.add('');
+                }
 
                 /*
                  * Add to matched rows to be returned 
@@ -153,7 +156,7 @@ export default class ConceptSearchEngineWebWorker {
                 /*
                  * Try to add suggestions if still under threshold.
                  */
-                const suggestions = Array.from(match.remainingTerms);
+                const suggestions = [ ...match.remainingTerms.values() ];
                 for (let j = 0; j < suggestions.length && !thresholdMet; j++) {
                     const suggestion = suggestions[j];
                     const rowIdx = match.matchedTerms + suggestion;
@@ -175,8 +178,7 @@ export default class ConceptSearchEngineWebWorker {
                     }
                 }
             }
-            const out: AggregateConceptHintRef[] = [];
-            agg.forEach((val) => out.push(val));
+            const out: AggregateConceptHintRef[] = [ ...agg.values() ];
             return out;
         };
 

@@ -34,18 +34,20 @@ export default class ConceptTree extends React.Component<Props> {
 
         return (
             <div className="concept-tree">
-                {roots.map((concept: Concept) => (
-                    <ConceptTreeNode 
-                        allowReparent={allowReparent}
-                        allowRerender={allowRerender}
-                        key={concept.id} 
-                        concept={concept}
-                        concepts={tree}
-                        dispatch={dispatch}
-                        parentShown={true}
-                        selectedId={selectedId} 
-                    />
-                ))}
+                {roots.map((concept: Concept) => {
+                    if (!concept) { return null; }
+                    return (
+                        <ConceptTreeNode 
+                            allowReparent={allowReparent}
+                            allowRerender={allowRerender}
+                            key={concept.id} 
+                            concept={concept}
+                            concepts={tree}
+                            dispatch={dispatch}
+                            parentShown={true}
+                            selectedId={selectedId} 
+                        />
+                )})}
             </div>
         );
     }
