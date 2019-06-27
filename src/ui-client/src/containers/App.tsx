@@ -80,7 +80,7 @@ class App extends React.Component<Props> {
 
     public getSnapshotBeforeUpdate(nextProps: Props) {
         const { sessionContext } = nextProps;
-        if (sessionContext && !sessionTimer) {
+        if (sessionContext) {
             this.handleSessionTokenRefresh(sessionContext);
         }
         return null;
