@@ -9,6 +9,7 @@ import React from 'react';
 import { Tooltip } from 'reactstrap';
 import { RouteConfig } from '../../config/routes';
 import { AdminPanelPane } from '../../models/state/AdminState';
+import { Routes } from '../../models/state/GeneralUiState';
 
 interface Props {
     config: RouteConfig;
@@ -46,6 +47,7 @@ export class SidebarTab extends React.PureComponent<Props, State> {
                 <li className={classes.join(' ')} id={id}>
                     <span className={`${c}-icon`}>{config.icon}</span>
                     <span className={`${c}-text`}>{config.display}</span>
+                    {config.index !== Routes.AdminPanel &&
                     <Tooltip 
                         autohide={true}
                         className={`${c}-tooltip`}
@@ -53,10 +55,10 @@ export class SidebarTab extends React.PureComponent<Props, State> {
                         isOpen={this.state.tooltipOpen} 
                         placement="right" 
                         target={id} 
-                        toggle={this.toggleTooltip}
-                    >
+                        toggle={this.toggleTooltip}>
                         {config.display}
                     </Tooltip>
+                    }
                 </li>
                 <div className={`${c}-tab-divider`} />
 

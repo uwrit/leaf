@@ -48,6 +48,7 @@ export class HintContainer extends React.PureComponent<Props> {
 
                 {/* Main suggested hints */}
                 {currentHints.map((hint: AggregateConceptHintRef, i: number) => {
+                    const len = hint.ids.length;
                     return (
                     <div 
                         className={`${c}-hint-item leaf-dropdown-item ${i === selectedHintIndex ? 'selected' : ''}`} 
@@ -60,18 +61,9 @@ export class HintContainer extends React.PureComponent<Props> {
                             }
                             <span><strong>{hint.suggestion}</strong></span>
 
-                            {/*
-                            {rootId === '' && 
-                             hint.rootIds.length &&
-                            <span className={`${c}-hint-item-root`}>
-                                in {hint.rootIds.map((r: string) => { const d = tree.get(r); return d && d.uiDisplayName }).join(', ')}
-                            </span>
-                            }
-                            */}
-
                             {/* Matching concepts count */}
                             <span className={`${c}-hint-item-count`}>
-                                <strong>{hint.ids.length > 20 ? '20+' : hint.ids.length}</strong> concept(s)
+                                <strong>{len > 20 ? '20+' : len}</strong> concept{len > 1 && 's'}
                             </span>
                     </div>)
                 })}
