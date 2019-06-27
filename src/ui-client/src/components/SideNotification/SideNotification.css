@@ -1,0 +1,50 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .side-notification {
+    background-color: white;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.35);
+    bottom: 0;
+    height: 50px;
+    font-family: Roboto;
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin: 0 -500px 20px 0;
+    padding: 10px;
+    position: absolute;
+    right: 0;
+    transition: margin-right 0.75s;
+    z-index: 100;
+}
+
+.side-notification.show {
+    margin-right: 20px;
+}
+
+.side-notification-container {
+    display: flex;
+}
+
+.side-notification-icon-container {
+    margin-right: 8px;
+}
+
+.side-notification svg circle {
+    stroke-width: 2px !important;
+}
+
+.side-notification path,
+.side-notification polyline {
+    stroke: rgb(7, 192, 69);
+}
+
+.side-notification-text {
+    color: rgb(50,50,50);
+    margin-top: 2px;
+}

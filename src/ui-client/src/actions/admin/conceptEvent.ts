@@ -7,8 +7,8 @@
 
 import { AppState } from "../../models/state/AppState";
 import { ConceptEvent } from "../../models/admin/Concept";
-import { setNoClickModalState, showInfoModal } from "../generalUi";
-import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
+import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { createConceptEvent, deleteConceptEvent, updateConceptEvent } from "../../services/admin/conceptEventApi";
 
 export const SET_ADMIN_CONCEPT_EVENTS = 'SET_ADMIN_CONCEPT_EVENTS';
@@ -33,23 +33,23 @@ export const saveAdminConceptEvent = (ev: ConceptEvent) => {
         const state = getState();
 
         try {
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newEv = ev.unsaved
                 ? await createConceptEvent(state, ev)
                 : await updateConceptEvent(state, ev);
 
             dispatch(removeAdminConceptEvent(ev));
             dispatch(setAdminConceptEvent(newEv, false));
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Concept Event. Please see the Leaf error logs for details.",
                 header: "Error Saving Concept Event",
                 show: true
             };
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -61,24 +61,24 @@ export const deleteAdminConceptEvent = (ev: ConceptEvent) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
-            dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
             deleteConceptEvent(state, ev)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptEvent(ev));
+                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Concept Event Deleted' }));
                 },  error => {
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept Event. Please see the Leaf error logs for details.",
                             header: "Error Deleting Concept Event",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
                 });
         } catch (err) {
             console.log(err);
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };

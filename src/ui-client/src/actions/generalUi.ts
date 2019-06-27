@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState } from '../models/state/GeneralUiState';
+import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState } from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -23,11 +23,12 @@ export const TOGGLE_MY_LEAF_MODAL = 'TOGGLE_MY_LEAF_MODAL';
 export const MY_LEAF_MODAL_HIDE = 'MY_LEAF_MODAL_HIDE';
 export const MY_LEAF_MODAL_SHOW = 'MY_LEAF_MODAL_SHOW';
 export const TOGGLE_EXPORT_DATA_MODAL = 'TOGGLE_EXPORT_DATA_MODAL';
-export const INFO_MODAL_SHOW = "INFO_MODAL_SHOW";
-export const INFO_MODAL_HIDE = "INFO_MODAL_HIDE";
-export const CONFIRM_MODAL_SHOW = "CONFIRM_MODAL_SHOW";
-export const CONFIRM_MODAL_HIDE = "CONFIRM_MODAL_HIDE";
-export const NOCLICK_MODAL_SET_STATE = "NOCLICK_MODAL_SET_STATE";
+export const INFO_MODAL_SHOW = 'INFO_MODAL_SHOW';
+export const INFO_MODAL_HIDE = 'INFO_MODAL_HIDE';
+export const CONFIRM_MODAL_SHOW = 'CONFIRM_MODAL_SHOW';
+export const CONFIRM_MODAL_HIDE = 'CONFIRM_MODAL_HIDE';
+export const NOCLICK_MODAL_SET_STATE = 'NOCLICK_MODAL_SET_STATE';
+export const SIDE_NOTIFICATION_SET_STATE = 'SIDE_NOTIFICATION_SET_STATE';
 
 export interface GeneralUiAction {
     browser?: Browser;
@@ -41,6 +42,7 @@ export interface GeneralUiAction {
     route?: Routes;
     routeConfig?: RouteConfig[];
     selectable?: boolean;
+    sideNotification?: SideNotificationState;
     type: string;
 }
 
@@ -87,6 +89,13 @@ export const setNoClickModalState = (noclickModal: NoClickModalState): GeneralUi
         noclickModal,
         type: NOCLICK_MODAL_SET_STATE
     }
+};
+
+export const setSideNotificationState = (sideNotification: SideNotificationState): GeneralUiAction => {
+    return {
+        sideNotification,
+        type: SIDE_NOTIFICATION_SET_STATE
+    };
 };
 
 export const setCohortCountBoxState = (cohortCountBoxVisible: boolean, cohortCountBoxMinimized: boolean, cohortInfoButtonVisible: boolean): GeneralUiAction => {

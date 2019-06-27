@@ -17,7 +17,7 @@ import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
 import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
-import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType } from '../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState } from '../models/state/GeneralUiState';
 import { SessionContext } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
@@ -31,6 +31,7 @@ import { CohortStateType } from '../models/state/CohortState';
 import { AdminPanelPane } from '../models/state/AdminState';
 import { version } from '../../package.json'
 import './App.css';
+import SideNotification from '../components/SideNotification/SideNotification';
 
 
 interface OwnProps {
@@ -50,6 +51,7 @@ interface StateProps {
     noclickModal: NoClickModalState;
     routes: RouteConfig[];
     sessionContext?: SessionContext;
+    sideNotification: SideNotificationState;
 }
 
 type Props = StateProps & DispatchProps & OwnProps;
@@ -85,7 +87,10 @@ class App extends React.Component<Props> {
     }
 
     public render() {
-        const { auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, informationModal, dispatch, noclickModal, routes } = this.props;
+        const { 
+            auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, 
+            informationModal, dispatch, noclickModal, routes, sideNotification
+        } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
             : null;
@@ -106,6 +111,7 @@ class App extends React.Component<Props> {
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
                 <HelpButton auth={auth} />
+                <SideNotification dispatch={dispatch} state={sideNotification} />
                 {this.props.sessionContext &&
                 <div id="main-content">
                     <SaveQueryPanel />
@@ -185,7 +191,8 @@ const mapStateToProps = (state: AppState) => {
         informationModal: state.generalUi.informationModal,
         noclickModal: state.generalUi.noclickModal,
         routes: state.generalUi.routes,
-        sessionContext: state.session.context
+        sessionContext: state.session.context,
+        sideNotification: state.generalUi.sideNotification
     };
 };
 

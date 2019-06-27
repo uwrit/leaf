@@ -9,11 +9,11 @@ import { Concept, ConceptDeleteResponse } from '../../models/admin/Concept';
 import { Concept as UserConcept } from '../../models/concept/Concept';
 import { Concept as AdminConcept } from '../../models/admin/Concept';
 import { AppState } from '../../models/state/AppState';
-import { InformationModalState, NoClickModalStates, ConfirmationModalState } from '../../models/state/GeneralUiState';
+import { InformationModalState, NotificationStates, ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { getAdminConcept, updateAdminConcept, createAdminConcept, deleteAdminConcept } from '../../services/admin/conceptApi';
 import { isEmbeddedQuery } from '../../utils/panelUtils';
 import { AdminPanelLoadState } from '../../models/state/AdminState';
-import { showInfoModal, setNoClickModalState, showConfirmationModal } from '../generalUi';
+import { showInfoModal, setNoClickModalState, showConfirmationModal, setSideNotificationState } from '../generalUi';
 import { generateSampleSql, getRootId } from '../../utils/admin/concept';
 import { setConcept, removeConcept, reparentConcept, switchConcepts } from '../concepts';
 import { fetchConcept } from '../../services/conceptApi'
@@ -44,7 +44,7 @@ interface AdminParentSavePayload {
 export const revertAdminAndUserConceptChanges = (adminConcept: AdminConcept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
-            dispatch(setNoClickModalState({ message: "Undoing", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Undoing", state: NotificationStates.Working }));
             const state = getState();
             const serverAdminConcept = await getAdminConcept(state, adminConcept.id);
             const serverUserConcept = await fetchConcept(state, adminConcept.id);
@@ -54,7 +54,7 @@ export const revertAdminAndUserConceptChanges = (adminConcept: AdminConcept, use
         } catch (err) {
             console.log(err);
         }
-        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     };
 };
 
@@ -91,10 +91,10 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
             const newRootId = getRootId(newParent, getState().concepts.currentTree);
             let adminConcept = Object.assign({}, state.admin!.concepts.currentAdminConcept, { parentId, rootId: newRootId });
             if (!state.admin!.concepts.currentAdminConcept) {
-                dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
+                dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
                 const serverAdminConcept = await getAdminConcept(state, userConcept.id);
                 adminConcept =  Object.assign({}, serverAdminConcept, { parentId, rootId: newRootId });
-                dispatch(setNoClickModalState({ state: NoClickModalStates.Complete }));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             }
 
             /*
@@ -183,7 +183,7 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
         const state = getState();
 
         try {
-            dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newAdminConcept = adminConcept.unsaved
                 ? await createAdminConcept(state, adminConcept)
                 : await updateAdminConcept(state, adminConcept);
@@ -205,17 +205,18 @@ export const saveAdminConcept = (adminConcept: Concept, userConcept: UserConcept
                 await updateAdminConcept(state, parent.adminParentConcept);
             }
             dispatch(setAdminConcept(newAdminConcept, false));
-
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Concept Saved' }));
         } catch (err) {
             console.log(err);
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+            
             const info: InformationModalState = {
                 body: "An error occurred while attempting to save the Concept. Please see the Leaf error logs for details.",
                 header: "Error Saving Concept",
                 show: true
             };
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -247,12 +248,13 @@ export const shouldUpdateAdminParentConcept = async (userConcept: UserConcept, s
 export const deleteAdminConceptFromServer = (concept: Concept, userConcept: UserConcept) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+        dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
         deleteAdminConcept(state, concept.id)
             .then(
                 response => {
-                    dispatch(setNoClickModalState({ message: "Concept Deleted", state: NoClickModalStates.Complete }));
                     dispatch(removeConcept(userConcept));
+                    dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+                    dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Concept Deleted' }));
                 }, error => {
                     const info: InformationModalState = {
                         body: "",
@@ -267,7 +269,7 @@ export const deleteAdminConceptFromServer = (concept: Concept, userConcept: User
                     } else {
                         info.body = "An error occurred while attempting to delete the Concept. Please see the Leaf error logs for details.";
                     }
-                    dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                    dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
             );

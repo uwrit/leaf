@@ -1,5 +1,5 @@
 import { showInfoModal, setNoClickModalState } from "../generalUi";
-import { InformationModalState, NoClickModalStates } from "../../models/state/GeneralUiState";
+import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { getAdminSqlConfiguration } from "./configuration";
@@ -32,7 +32,7 @@ export const loadAdminPanelDataIfNeeded = () => {
         const state = getState();
         if (state.auth.userContext!.isAdmin && state.admin!.state === AdminPanelLoadState.NOT_LOADED) {
             try {
-                dispatch(setNoClickModalState({ message: "Loading", state: NoClickModalStates.CallingServer }));
+                dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
                 /*
                  * Load Leaf instance configuration.
@@ -65,14 +65,14 @@ export const loadAdminPanelDataIfNeeded = () => {
                  * Finish.
                  */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
-                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error while attempting to load Admin data. Please check the Leaf log files for more information.",
                     header: "Error Loading Admin Data",
                     show: true
                 };
-                dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                 dispatch(showInfoModal(info));
             }
         }

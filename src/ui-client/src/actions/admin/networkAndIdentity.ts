@@ -9,8 +9,8 @@ import { NetworkIdentity } from "../../models/NetworkResponder";
 import { NetworkEndpoint, Certificate } from "../../models/admin/Network";
 import { AppState } from "../../models/state/AppState";
 import { createEndpoint, updateEndpoint, deleteEndpoint, getCertificate } from "../../services/admin/networkAndIdentityApi";
-import { setNoClickModalState, showInfoModal } from "../generalUi";
-import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
+import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { getApiUpdateQueue } from "../../utils/admin/networkAndidentity";
 import { setResponder } from "../networkResponders";
 
@@ -39,7 +39,7 @@ export interface AdminNetworkAndIdentityAction {
 export const processApiUpdateQueue = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        dispatch(setNoClickModalState({ message: "Saving", state: NoClickModalStates.CallingServer }));
+        dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
 
         try {
             const queue = getApiUpdateQueue(state.admin!.networkAndIdentity, dispatch, state);
@@ -50,7 +50,7 @@ export const processApiUpdateQueue = () => {
             // All done!
             dispatch(setResponder(state.admin!.networkAndIdentity.identity));
             dispatch(setAdminNetworkIdentity(state.admin!.networkAndIdentity.identity, false));
-            dispatch(setNoClickModalState({ message: "Saved", state: NoClickModalStates.Complete }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Changes Saved' }));
         } catch (err) {
             console.log(err);
             const info: InformationModalState = {
@@ -58,8 +58,9 @@ export const processApiUpdateQueue = () => {
                 header: "Error Applying Changes",
                 show: true
             };
-            dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
             dispatch(showInfoModal(info));
+        } finally {
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     }
 };
@@ -87,25 +88,24 @@ export const deleteNetworkEndpoint = (endpoint: NetworkEndpoint) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
-            dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
             deleteEndpoint(state, endpoint)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminNetworkEndpoint(endpoint));
+                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Endpoint Deleted' }));
                 },  error => {
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+                        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                         const info: InformationModalState = {
-                            body: "An error occurred while attempting to delete the Concept Specialization. Please see the Leaf error logs for details.",
-                            header: "Error Deleting Concept Specialization",
+                            body: "An error occurred while attempting to delete the Network Endpoint. Please see the Leaf error logs for details.",
+                            header: "Error Deleting Network Endpoint",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
-                });
+                }).then(() => dispatch(setNoClickModalState({ state: NotificationStates.Hidden })));
         } catch (err) {
             console.log(err);
-        }
+        } 
     }
 };
 
@@ -116,7 +116,7 @@ export const deleteNetworkEndpoint = (endpoint: NetworkEndpoint) => {
 export const attemptLoadRemoteLeafCert = (endpoint: NetworkEndpoint) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
-            dispatch(setNoClickModalState({ message: "Phoning a friend...", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Phoning a friend...", state: NotificationStates.Working }));
             const cert = await getCertificate(getState(), endpoint.address);
             dispatch(setAdminNetworkCertModalContent(cert, endpoint));
         } catch (err) {
@@ -127,7 +127,7 @@ export const attemptLoadRemoteLeafCert = (endpoint: NetworkEndpoint) => {
             };
             dispatch(showInfoModal(info));
         }
-        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
+        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     }
 };
 

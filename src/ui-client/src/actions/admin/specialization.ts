@@ -8,8 +8,8 @@
 import { AppState } from "../../models/state/AppState";
 import { Specialization } from "../../models/admin/Concept";
 import { createSpecialization, updateSpecialization, deleteSpecialization } from "../../services/admin/specializationApi";
-import { setNoClickModalState, showInfoModal } from "../generalUi";
-import { NoClickModalStates, InformationModalState } from "../../models/state/GeneralUiState";
+import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
+import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 
 export const SET_ADMIN_SPECIALIZATIONS = 'SET_ADMIN_SPECIALIZATIONS';
 export const REMOVE_ADMIN_SPECIALIZATION = 'REMOVE_ADMIN_SPECIALIZATION';
@@ -47,22 +47,20 @@ export const deleteAdminConceptSpecialization = (spc: Specialization) => {
     return async (dispatch: any, getState: () => AppState) => {
         try {
             const state = getState();
-            dispatch(setNoClickModalState({ message: "Deleting", state: NoClickModalStates.CallingServer }));
+            dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
             deleteSpecialization(state, spc)
                 .then(
                     response => {
-                        dispatch(setNoClickModalState({ message: "Deleted", state: NoClickModalStates.Complete }));
                         dispatch(removeAdminConceptSpecialization(spc));
+                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Specialization Deleted' }));
                 },  error => {
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Concept Specialization. Please see the Leaf error logs for details.",
                             header: "Error Deleting Concept Specialization",
                             show: true
                         };
-                        dispatch(setNoClickModalState({ state: NoClickModalStates.Hidden }));
                         dispatch(showInfoModal(info));
-                });
+                }).then(() => dispatch(setNoClickModalState({ state: NotificationStates.Hidden })));
         } catch (err) {
             console.log(err);
         }

@@ -21,7 +21,8 @@ import {
     INFO_MODAL_HIDE,
     CONFIRM_MODAL_SHOW,
     CONFIRM_MODAL_HIDE,
-    NOCLICK_MODAL_SET_STATE
+    NOCLICK_MODAL_SET_STATE,
+    SIDE_NOTIFICATION_SET_STATE
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -37,7 +38,7 @@ import {
     SELECT_CONCEPT_SPECIALIZATION,
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
-import { GeneralUiState, Routes, NoClickModalStates } from '../models/state/GeneralUiState';
+import { GeneralUiState, Routes, NotificationStates } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
 
 export const defaultGeneralUiState = (): GeneralUiState => {
@@ -64,12 +65,15 @@ export const defaultGeneralUiState = (): GeneralUiState => {
         currentRoute: Routes.FindPatients,
         noclickModal: {
             message: "",
-            state: NoClickModalStates.Hidden
+            state: NotificationStates.Hidden
         },
         routes: [],
         showExportDataModal: false,
         showMyLeafModal: false,
-        showSaveQueryPane: false
+        showSaveQueryPane: false,
+        sideNotification: {
+            state: NotificationStates.Hidden
+        }
     };
 };
 
@@ -118,6 +122,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { confirmationModal: { ...state.confirmationModal, show: false } });
         case NOCLICK_MODAL_SET_STATE:
             return Object.assign({}, state, { noclickModal: action.noclickModal! });
+        case SIDE_NOTIFICATION_SET_STATE:
+            return Object.assign({}, state, { sideNotification: { ...state.sideNotification, ...action.sideNotification! } });
         case SET_BROWSER:
             return Object.assign({}, state, { browser: action.browser! });
         
