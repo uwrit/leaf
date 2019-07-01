@@ -14,7 +14,7 @@ Though you should probably take into consideration storage and so on first. The 
 
 3) Populate the initialization data using the [LeafDB.Init.sql](https://github.com/uwrit/leaf/blob/master/src/db/build/LeafDB.Init.sql) script.
 
-4) Populate the [CMS General Equivalence Mapping (GEMs)](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs.html) data using the [LeafDB.GEMs.sql](https://github.com/uwrit/leaf/blob/master/src/db/build/LeafDB.GEMs.sql) script. These allow the Concept search box to suggest ICD10 -> ICD9 or ICD9 -> ICD10 equivalents if users search for a specific ICD10/9 code.
+4) Populate the [CMS General Equivalence Mapping (GEMs)](https://www.cms.gov/Medicare/Coding/ICD10/2018-ICD-10-CM-and-GEMs.html) data using the [LeafDB.GEMs.sql](https://github.com/uwrit/leaf-scripts/blob/master/GEMs/LeafDB.GEMs.sql) script. These allow the Concept search box to suggest ICD10 -> ICD9 or ICD9 -> ICD10 equivalents if users search for a specific ICD10/9 code.
 
 ## Defining the instance Name, Description, and Colorset
 <p align="center"><img src="https://github.com/uwrit/leaf/blob/master/docs/admin/images/identity.gif"/></p>
