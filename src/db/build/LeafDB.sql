@@ -3179,9 +3179,9 @@ BEGIN
         END;
         ELSE
         BEGIN;
-            INSERT INTO app.DemographicQuery (SqlStatement, LastChanged, ChangedBy)
-            OUTPUT inserted.SqlStatement, inserted.LastChanged, inserted.ChangedBy
-            VALUES (@sql, GETDATE(), @user);
+            INSERT INTO app.DemographicQuery (SqlStatement, LastChanged, ChangedBy, Shape)
+            OUTPUT inserted.SqlStatement, inserted.LastChanged, inserted.ChangedBy, inserted.Shape
+            VALUES (@sql, GETDATE(), @user, 3);
         END;
 
         COMMIT;

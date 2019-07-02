@@ -29,3 +29,6 @@ SELECT
    ,[Longitude] = 122.3321
    ,[PrimaryColor] = 'rgb(75, 46, 131)'
    ,[SecondaryColor] = 'rgb(183, 165, 122)'
+
+INSERT INTO [ref].[Version] (Lock, [Version])
+SELECT 'X', N'3.2.2';
