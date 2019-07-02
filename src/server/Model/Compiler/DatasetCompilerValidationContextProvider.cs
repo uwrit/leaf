@@ -38,7 +38,7 @@ namespace Model.Compiler
         /// </summary>
         /// <returns>The compiler validation context.</returns>
         /// <param name="request">Execution request.</param>
-        /// <exception cref="Validation.LeafRPCException"/>
+        /// <exception cref="LeafRPCException"/>
         /// <exception cref="System.Data.Common.DbException"/>
         public async Task<CompilerValidationContext<DatasetCompilerContext>> GetCompilerContextAsync(DatasetExecutionRequest request)
         {
