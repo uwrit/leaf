@@ -4,6 +4,9 @@
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+
+
+-- Update app.sp_GetDatasetContextById
 IF OBJECT_ID('app.sp_GetDatasetContextById') IS NOT NULL
     DROP PROCEDURE app.sp_GetDatasetContextById;
 GO
@@ -65,6 +68,10 @@ GO
 
 
 
-
-UPDATE ref.[Version]
-SET [Version] = '3.3.0';
+-- Update Version
+IF EXISTS (SELECT 1 FROM ref.Version)
+    UPDATE ref.Version
+    SET [Version] = '3.3.0'
+ELSE 
+    INSERT INTO ref.[Version] (Lock, Version)
+    SELECT 'X', '3.3.0'
