@@ -2005,6 +2005,12 @@ BEGIN
             DELETE FROM rela.ConceptSpecializationGroup
             WHERE ConceptId = @id;
 
+            DELETE FROM app.ConceptForwardIndex
+            WHERE ConceptId = @id;
+
+            DELETE FROM app.ConceptTokenizedIndex
+            WHERE ConceptId = @id;
+
             DELETE FROM app.Concept
             WHERE Id = @id;
 
@@ -2179,6 +2185,9 @@ BEGIN
     BEGIN TRY
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
+
+		DELETE FROM auth.DatasetQueryConstraint
+		WHERE DatasetQueryId = @id
 
         DELETE FROM app.DatasetQuery
         OUTPUT deleted.Id
@@ -2720,6 +2729,9 @@ BEGIN
 
     BEGIN TRAN;
     BEGIN TRY
+
+		DECLARE @oldRootId UNIQUEIDENTIFIER = (SELECT TOP 1 RootId FROM app.Concept WHERE Id = @id)
+
         UPDATE app.Concept
         SET
             UniversalId = @universalId,
@@ -2745,6 +2757,38 @@ BEGIN
             ContentLastUpdateDateTime = GETDATE(),
             PatientCountLastUpdateDateTime = CASE WHEN UiDisplayPatientCount = @uiDisplayPatientCount THEN PatientCountLastUpdateDateTime ELSE GETDATE() END
         WHERE Id = @id;
+
+		IF (@rootId != @oldRootId)
+
+		BEGIN
+			; WITH descendents AS
+			(
+				SELECT Id = @id
+				UNION ALL
+				SELECT C2.Id
+				FROM descendents AS D
+					 INNER JOIN app.Concept AS C2
+						ON C2.ParentId = D.Id
+			)
+			SELECT DISTINCT Id
+			INTO #descendents
+			FROM descendents
+
+			UPDATE app.Concept
+			SET RootId = @rootId
+			FROM app.Concept AS C
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			UPDATE app.ConceptForwardIndex
+			SET RootId = @rootId
+			FROM app.Concept C
+				 INNER JOIN app.ConceptForwardIndex FI
+					ON C.Id = FI.ConceptId
+			WHERE EXISTS (SELECT 1 FROM #descendents AS D WHERE C.Id = D.Id)
+
+			DROP TABLE #descendents
+
+		END
 
         DELETE FROM auth.ConceptConstraint
         WHERE ConceptId = @id;
@@ -3343,7 +3387,7 @@ BEGIN
 			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 			
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
-															 'FROM ' + @TargetDatabaseName + '.' + @From + ' _T ' +
+															 'FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' +
 															  ISNULL('WHERE ' + @Where,'') + 
 															')'
 
@@ -3373,7 +3417,6 @@ BEGIN
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Patient Count by Year
 			------------------------------------------------------------------------------------------------------------------------------
-
 			IF (@isEncounterBased = 1 AND TRY_CONVERT(INT, @Result) > 0)
 			
 				BEGIN
@@ -3385,8 +3428,8 @@ BEGIN
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @From + ' _T 
-									   WHERE ' + ISNULL(@Where,'') + ')
+									   FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' + 
+									   ISNULL('WHERE ' + @Where,'') + ')
 									  
 									, year_grouping AS
 									  (SELECT PatientYear
@@ -3405,16 +3448,14 @@ BEGIN
 										'']'')'
 	
 					BEGIN TRY 
-
-						PRINT(@ExecuteSql)
-			
+						
 						EXECUTE sp_executesql 
 							@ExecuteSql,
 							@PatientsByYearParameterDefinition,
 							@TotalPatientsByYearOUT = @Result OUTPUT
 
 						-- Clean up JSON by removing last unnecessary comma
-						SET @Result = REPLACE(REPLACE(LEFT(@Result, LEN(@Result) - 2) + ']','_',''),'z','')
+						SET @Result = LEFT(@Result, LEN(@Result) - 2) + ']'
 
 						UPDATE app.Concept
 						SET UiDisplayPatientCountByYear = @Result
@@ -3440,7 +3481,6 @@ END
 
 
 
-
 GO
 /****** Object:  StoredProcedure [app].[sp_CalculatePatientCounts]    Script Date: 6/12/19 12:20:44 PM ******/
 SET ANSI_NULLS ON
@@ -3454,7 +3494,6 @@ GO
 -- Description: Loops through Concepts and auto-calculates patient counts.
 -- =======================================
 CREATE PROCEDURE [app].[sp_CalculatePatientCounts]
-
 @PersonIdField NVARCHAR(50),
 @TargetDataBaseName NVARCHAR(50),
 @TotalAllowedRuntimeInMinutes INT,
@@ -3517,6 +3556,7 @@ BEGIN
 		ORDER BY PatientCountLastUpdateDateTime ASC
 
 		SET @TotalConcepts = @@ROWCOUNT
+		SET @CurrentConcept = 1
 
 		------------------------------------------------------------------------------------------------------------------------------
 		-- ForEach concept in concepts
@@ -5473,9 +5513,9 @@ BEGIN
         q.[Owner],
         q.Created,
         q.Updated,
-        [Count] = COUNT(*)
+        [Count] = COUNT(c.QueryId)
     FROM app.Query q
-    JOIN app.Cohort c on q.Id = c.QueryId
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
     WHERE (q.[Owner] = @user OR q.Id IN (SELECT QueryId FROM permitted))
     AND UniversalId IS NOT NULL
     AND Nonce IS NULL
@@ -5523,10 +5563,10 @@ BEGIN
         q.[Owner],
         q.Created,
         q.Updated,
-        [Count] = COUNT(*)
+        [Count] = COUNT(c.QueryId)
     FROM
         app.Query q
-    JOIN app.Cohort c on q.Id = c.QueryId
+    LEFT JOIN app.Cohort c on q.Id = c.QueryId
     WHERE [Owner] = @user
     AND UniversalId IS NOT NULL
     AND Nonce IS NULL

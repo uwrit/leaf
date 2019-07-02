@@ -80,6 +80,7 @@ BEGIN
 		ORDER BY PatientCountLastUpdateDateTime ASC
 
 		SET @TotalConcepts = @@ROWCOUNT
+		SET @CurrentConcept = 1
 
 		------------------------------------------------------------------------------------------------------------------------------
 		-- ForEach concept in concepts
@@ -126,6 +127,7 @@ BEGIN
 
 
 END
+
 
 
 GO

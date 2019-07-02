@@ -3464,7 +3464,7 @@ BEGIN
 			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 			
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
-															 'FROM ' + @TargetDatabaseName + '.' + @From + ' _T ' +
+															 'FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' +
 															  ISNULL('WHERE ' + @Where,'') + 
 															')'
 
@@ -3494,7 +3494,6 @@ BEGIN
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Patient Count by Year
 			------------------------------------------------------------------------------------------------------------------------------
-
 			IF (@isEncounterBased = 1 AND TRY_CONVERT(INT, @Result) > 0)
 			
 				BEGIN
@@ -3506,8 +3505,8 @@ BEGIN
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @From + ' _T 
-									   WHERE ' + ISNULL(@Where,'') + ')
+									   FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' + 
+									   ISNULL('WHERE ' + @Where,'') + ')
 									  
 									, year_grouping AS
 									  (SELECT PatientYear
@@ -3526,16 +3525,14 @@ BEGIN
 										'']'')'
 	
 					BEGIN TRY 
-
-						PRINT(@ExecuteSql)
-			
+						
 						EXECUTE sp_executesql 
 							@ExecuteSql,
 							@PatientsByYearParameterDefinition,
 							@TotalPatientsByYearOUT = @Result OUTPUT
 
 						-- Clean up JSON by removing last unnecessary comma
-						SET @Result = REPLACE(REPLACE(LEFT(@Result, LEN(@Result) - 2) + ']','_',''),'z','')
+						SET @Result = LEFT(@Result, LEN(@Result) - 2) + ']'
 
 						UPDATE app.Concept
 						SET UiDisplayPatientCountByYear = @Result
@@ -3561,7 +3558,6 @@ END
 
 
 
-
 GO
 /****** Object:  StoredProcedure [app].[sp_CalculatePatientCounts]    Script Date: 6/12/19 12:20:44 PM ******/
 SET ANSI_NULLS ON
@@ -3575,7 +3571,6 @@ GO
 -- Description: Loops through Concepts and auto-calculates patient counts.
 -- =======================================
 CREATE PROCEDURE [app].[sp_CalculatePatientCounts]
-
 @PersonIdField NVARCHAR(50),
 @TargetDataBaseName NVARCHAR(50),
 @TotalAllowedRuntimeInMinutes INT,
@@ -3638,6 +3633,7 @@ BEGIN
 		ORDER BY PatientCountLastUpdateDateTime ASC
 
 		SET @TotalConcepts = @@ROWCOUNT
+		SET @CurrentConcept = 1
 
 		------------------------------------------------------------------------------------------------------------------------------
 		-- ForEach concept in concepts
