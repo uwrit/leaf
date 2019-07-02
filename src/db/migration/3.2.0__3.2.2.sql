@@ -1,21 +1,4 @@
--- Copyright (c) 2019, UW Medicine Research IT, University of Washington
--- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
--- This Source Code Form is subject to the terms of the Mozilla Public
--- License, v. 2.0. If a copy of the MPL was not distributed with this
--- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
-GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDemographicQuery]    Script Date: 6/12/19 12:20:53 PM ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =======================================
--- Author:      Cliff Spital
--- Create date: 2019/6/12
--- Description: Update the app.DemographicQuery record
--- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateDemographicQuery]
+ALTER PROCEDURE [adm].[sp_UpdateDemographicQuery]
     @sql nvarchar(4000),
     @user auth.[User]
 AS
@@ -57,3 +40,10 @@ BEGIN
 END
 
 GO
+
+IF EXISTS (SELECT 1 FROM ref.Version)
+    UPDATE ref.Version
+    SET [Version] = '3.2.2'
+ELSE 
+    INSERT INTO ref.[Version] (Lock, Version)
+    SELECT 'X', '3.2.2'

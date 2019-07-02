@@ -35,6 +35,10 @@
     margin-right: 8px;
 }
 
+.side-notification svg {
+    height: 2rem;
+}
+
 .side-notification svg circle {
     stroke-width: 2px !important;
 }
