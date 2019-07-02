@@ -64,6 +64,7 @@ namespace Services.Search
         DatasetCompilerContext ReadRequestGrid(SqlMapper.GridReader gridReader, DatasetExecutionRequest request)
         {
             var queryCtx = gridReader.ReadFirstOrDefault<QueryContext>();
+
             var datasetQueryRecord = gridReader.ReadFirstOrDefault<DatasetQueryRecord>();
             var datasetQuery = datasetQueryRecord.DatasetQuery();
 
