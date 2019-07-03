@@ -34,11 +34,23 @@ const decodeToken = (token: string): SessionContext => {
  */
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
     const http = HttpFactory.authenticated(state.auth.userContext!.token);
+
+    const request = http.get('api/user/attest', {
+        params: {
+            'documentation.expirationDate': attestation.documentation.expirationDate,
+            'documentation.institution': attestation.documentation.institution,
+            'documentation.title': attestation.documentation.title,
+            ...attestation
+        }
+    });
+    /*
     const request = http.get('api/user/attest', {
         params: {
             attestation
         }
     });
+    */
+
     const response = await request;
     const respData = response.data as AccessTokenDTO;
     const ctx = decodeToken(respData.accessToken);

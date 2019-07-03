@@ -8,13 +8,10 @@
 import moment from 'moment';
 import React from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { Button } from 'reactstrap';
 import { setPanelDateFilter } from '../../../actions/panels';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import PopupBox from '../../Other/PopupBox/PopupBox';
-import { showInfoModal } from '../../../actions/generalUi';
-import { InformationModalState } from '../../../models/state/GeneralUiState';
 import 'react-day-picker/lib/style.css';
 import './CustomDateRangePicker.css';
 
@@ -163,7 +160,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         if (date) {
             const momentDate = moment(date);
-            isValid = momentDate.isValid && momentDate.year() > 1990 && split.length === 3 && split[2].length === 4 ? true : false;
+            isValid = momentDate.isValid() && momentDate.year() > 1990 && split.length === 3 && split[2].length === 4 ? true : false;
         }
         return { date, isValid };
     }

@@ -12,7 +12,7 @@ namespace Model.Authorization
     {
         public static bool Anonymize(this IUserContext userContext)
         {
-            return !userContext.Identified || !userContext.IsInstutional;
+            return !userContext.Identified || !userContext.IsInstitutional;
         }
     }
 }

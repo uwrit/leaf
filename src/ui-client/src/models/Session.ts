@@ -16,7 +16,7 @@ export enum SessionType {
 }
 
 export interface DocumentationApproval {
-    expirationDate: Date;
+    expirationDate?: Date;
     institution: string;
     title: string;
 }
