@@ -80,9 +80,8 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                             <div className={`${c}-title`}>
                                 <p>{concept.uiDisplayName}</p>
                                 <p className={`${c}-universalid`}>
-                                    {concept.universalId
-                                        ? <span className={`${c}-universalid-value`}>{concept.universalId}</span> 
-                                        : <span className={`${c}-universalid-none`}>local concept only</span> 
+                                    {concept.universalId &&
+                                    <span className={`${c}-universalid-value`}>{concept.universalId}</span> 
                                     }
                                 </p>
                             </div>

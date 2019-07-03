@@ -55,6 +55,14 @@ const decodeToken = (token: string): UserContext => {
 };
 
 /*
+ * Delee the current IdToken from LocalStorage.
+ */
+export const clearCurrentUserToken = (config: AuthConfig) => {
+    const idTokenKey = getIdTokenKey(config);
+    window.localStorage.removeItem(idTokenKey);
+};
+
+/*
  * Return the id token key to look for
  * to retrieve a user token.
  */

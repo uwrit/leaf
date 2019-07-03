@@ -66,12 +66,11 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 /*
  * Tells the server to blacklist this token, as the uses is logging out.
  */
-export const logoutToken = async (state: AppState): Promise<LogoutDTO | undefined> => {
+export const logoutFromServer = async (state: AppState): Promise<LogoutDTO | undefined> => {
     try {
         const http = HttpFactory.authenticated(state.auth.userContext!.token);
-        const request = http.post('api/user/logout');
-        const response = await request;
-        return response.data as LogoutDTO;
+        const request = await http.post('api/user/logout');
+        return request.data as LogoutDTO;
     } catch (err) {
         console.log(err);
     }
