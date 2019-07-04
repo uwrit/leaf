@@ -8,20 +8,22 @@
 import React from 'react';
 import { Row } from 'reactstrap';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
+import { CohortStateType } from '../../../models/state/CohortState';
 import Panel from './Panel';
 
-interface PanelGroupProps {
+interface Props {
     dispatch: any;
     panels: PanelModel[];
+    queryState: CohortStateType;
 }
 
-export class PanelGroup extends React.PureComponent<PanelGroupProps> {
-    constructor(props: PanelGroupProps) {
+export class PanelGroup extends React.PureComponent<Props> {
+    constructor(props: Props) {
         super(props);
     }
 
     public render() {
-        const { panels, dispatch } = this.props;
+        const { panels, dispatch, queryState } = this.props;
 
         return (
             <Row>
@@ -31,6 +33,7 @@ export class PanelGroup extends React.PureComponent<PanelGroupProps> {
                         key={panel.id} 
                         isFirst={i === 0}
                         panel={panel}
+                        queryState={queryState}
                     />
                 )}
             </Row>

@@ -7,18 +7,18 @@
 
 import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd'
-import { connect } from 'react-redux';
 import { removePanelItem, hidePanelItem } from '../../../actions/panels';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
-import { compose } from 'redux';
 import getDragPreview from '../../../utils/getDragPreview';
 import PanelItemNumericFilter from './PanelItemNumericFilter';
 import ConceptSpecializationGroup from './ConceptSpecializationGroup';
 import { SubPanel, SequenceType } from '../../../models/panel/SubPanel';
+import { CohortStateType } from '../../../models/state/CohortState';
 
 interface DndProps {
     connectDragSource?: ConnectDragSource;
     connectDragPreview?: ConnectDragPreview;
+    canDrag?: boolean;
     isDragging?: boolean;
     isDropped?: boolean;
 }
@@ -26,6 +26,7 @@ interface DndProps {
 interface OwnProps {
     dispatch: any;
     panelItem: PanelItemModel;
+    queryState: CohortStateType;
     subPanel: SubPanel;
 }
 
@@ -51,11 +52,15 @@ const conceptNodeSource = {
     endDrag(props: Props) {
         const { dispatch, panelItem } = props;
         dispatch(removePanelItem(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index));
+    },
+    canDrag(props: Props) {
+        return props.queryState !== CohortStateType.REQUESTING;
     }
 };
 
 const collect = (connect: DragSourceConnector, monitor: DragSourceMonitor) => {
     return {
+        canDrag: monitor.canDrag(),
         connectDragPreview: connect.dragPreview(),
         connectDragSource: connect.dragSource(),
         isDragging: monitor.isDragging()
@@ -80,7 +85,7 @@ export class PanelItem extends React.Component<Props> {
     }
     
     public render(): any {
-        const { connectDragSource, dispatch, panelItem, subPanel } = this.props;
+        const { connectDragSource, dispatch, panelItem, subPanel, canDrag } = this.props;
         const { concept, specializations } = panelItem;
         const c = this.className;
         const classes = [ c ]; 
@@ -94,6 +99,7 @@ export class PanelItem extends React.Component<Props> {
             eventJoin.id !== eventId;
         
         if (panelItem.hidden)          classes.push('hidden');
+        if (!canDrag)                  classes.push(`cannot-drag`);
         if (invalidEventId)            classes.push(`${c}-invalid-eventid`);
         if (!concept.isEncounterBased) classes.push(`${c}-not-encounter-based`); 
         else                           classes.push(`${c}-encounter-based`);

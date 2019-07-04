@@ -78,15 +78,17 @@
     font-family: Roboto;
     font-size: 1.2rem;
     font-weight: 300;
-    left: 50%;
+    leftz: 50%;
     max-width: 1000px;
     min-width: 400px;
     opacity: 1;
     padding: 10px;
     position: fixed;
-    top: 50%;
+    topz: 50%;
     transition: all 0.5s;
     transform: translate(-50%, -50%);
+
+    margin-topz: -300px;
 }
 
 .concept-tree-learn-more tspan {

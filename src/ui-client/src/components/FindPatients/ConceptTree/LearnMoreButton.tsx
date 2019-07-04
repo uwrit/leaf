@@ -29,11 +29,16 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
     private className = 'concept-tree-learn-more';
     private startYear = 1995;
     private currYear = new Date().getFullYear();
-    private height = 250;
+    private height = 200;
     private margin = {top: 20, right: 20, left: 20, bottom: 20};
     private minWidth = 300;
     private maxWidth = 1000;
     private hasOutOfBoundYears = false;
+    private refCallback = (el: any) => {
+        if (el) {
+            console.log(el.getBoundingClientRect());
+        }
+    }
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -59,8 +64,8 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
         const { showInfoBox, ShowAllYears, DOMRect } = this.state;
         const c = this.className;
         const countsByYear = concept.uiDisplayPatientCountByYear;
-        const calcWidth = countsByYear ? (countsByYear.length * 40) : this.minWidth;
         const data = this.getYearData();
+        const calcWidth = countsByYear ? (data.length * 40) : this.minWidth;
         const width = calcWidth < this.minWidth 
             ? this.minWidth : calcWidth > this.maxWidth 
             ? this.maxWidth : calcWidth;
@@ -68,7 +73,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
         return (
             <span className={`${c}-button`} onClick={this.handleClick}>
                 <FiBarChart2 />
-                <div>
+                <div ref={this.refCallback}>
                     Learn More
 
                     {/* Popup Box */}
@@ -102,7 +107,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                                     tickLine={false} 
                                     label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
                                 <Bar 
-                                    barSize={35}
+                                    barSize={30}
                                     dataKey="patientCount" 
                                     fill={'rgb(255, 132, 8)'} 
                                     isAnimationActive={true}>
