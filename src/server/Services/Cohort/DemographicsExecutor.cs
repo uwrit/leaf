@@ -112,8 +112,7 @@ namespace Services.Cohort
 
                 if (cohortRecord.Exported)
                 {
-                    var exportRecord = GetExportRecord(reader);
-                    var export = exportConverter(exportRecord);
+                    var export = exportConverter(cohortRecord);
                     exported.Add(export);
                 }
             }
@@ -169,31 +168,6 @@ namespace Services.Cohort
             };
 
             rec.Age = rec.CalculateAge();
-
-            return rec;
-        }
-
-        PatientDemographicRecord GetExportRecord(SqlDataReader reader)
-        {
-            var rec = new PatientDemographicRecord
-            {
-                Exported = reader.GetBoolean(Plan.Exported.Index),
-                MaybeSalt = reader.GetNullableGuid(Plan.Salt.Index),
-                PersonId = reader.GetNullableString(Plan.PersonId?.Index),
-                AddressPostalCode = reader.GetNullableString(Plan.AddressPostalCode?.Index),
-                AddressState = reader.GetNullableString(Plan.AddressState?.Index),
-                Ethnicity = reader.GetNullableString(Plan.Ethnicity?.Index),
-                Gender = reader.GetNullableString(Plan.Gender?.Index),
-                Language = reader.GetNullableString(Plan.Language?.Index),
-                MaritalStatus = reader.GetNullableString(Plan.MaritalStatus?.Index),
-                Race = reader.GetNullableString(Plan.Race?.Index),
-                Religion = reader.GetNullableString(Plan.Religion?.Index),
-                IsMarried = reader.GetNullableBoolean(Plan.IsMarried?.Index),
-                IsHispanic = reader.GetNullableBoolean(Plan.IsHispanic?.Index),
-                IsDeceased = reader.GetNullableBoolean(Plan.IsDeceased?.Index),
-                BirthDate = reader.GetNullableDateTime(Plan.BirthDate?.Index),
-                DeathDate = reader.GetNullableDateTime(Plan.DeathDate?.Index)
-            };
 
             return rec;
         }

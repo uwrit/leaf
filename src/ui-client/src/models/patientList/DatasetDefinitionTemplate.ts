@@ -23,8 +23,8 @@ export const DemographicsDefTemplate: PatientListDatasetDefinitionTemplate = {
         ['gender', { datasetId: 'demographics', id: 'gender', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['language', { datasetId: 'demographics', id: 'language', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['maritalStatus', { datasetId: 'demographics', id: 'maritalStatus', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
-        ['mrn', { datasetId: 'demographics', id: 'mrn', autoDisplayOnLoad: true, type: PatientListColumnType.date, optional: true }],
-        ['name', { datasetId: 'demographics', id: 'name', autoDisplayOnLoad: true, type: PatientListColumnType.date, optional: true }],
+        ['mrn', { datasetId: 'demographics', id: 'mrn', autoDisplayOnLoad: true, type: PatientListColumnType.string, optional: true }],
+        ['name', { datasetId: 'demographics', id: 'name', autoDisplayOnLoad: true, type: PatientListColumnType.string, optional: true }],
         ['race', { datasetId: 'demographics', id: 'race', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['religion', { datasetId: 'demographics', id: 'religion', autoDisplayOnLoad: true, type: PatientListColumnType.string }]
     ]),
