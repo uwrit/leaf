@@ -15,6 +15,14 @@ namespace Tests
 {
     public class PreflightResourcesTests
     {
+        [Fact]
+        public void Empty_ConceptPreflightCheck_Ok()
+        {
+            var check = new ConceptPreflightCheck();
+
+            Assert.True(check.Ok);
+        }
+
         [Theory]
         [ClassData(typeof(PROkTestData))]
         public void Ok_Theory(PreflightResources resources, bool expected)

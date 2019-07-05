@@ -99,7 +99,7 @@ class PanelGroupColumn extends React.Component<Props> {
     }
 
     public render() {
-        const { dispatch, panels, panelFilters } = this.props;
+        const { dispatch, panels, panelFilters, queryState } = this.props;
         return (
             <div>
                 <div className="find-patients-toprow">
@@ -108,7 +108,7 @@ class PanelGroupColumn extends React.Component<Props> {
                     </div>
                 </div>
                 <PanelFilterGroup dispatch={dispatch} filters={panelFilters} />
-                <PanelGroup dispatch={dispatch} panels={panels} />
+                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} />
             </div>
         );
     }

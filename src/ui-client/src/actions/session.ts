@@ -9,12 +9,12 @@ import { Dispatch } from 'redux';
 import { registerNetworkCohorts } from '../actions/cohort/count';
 import { initializeSearchEngine } from '../actions/conceptSearch';
 import { AppState } from '../models/state/AppState';
-import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO, RuntimeMode } from '../models/NetworkResponder';
+import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkIdentityResponseDTO } from '../models/NetworkResponder';
 import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
 import { getExportOptions } from '../services/redcapApi';
-import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutToken } from '../services/sessionApi';
+import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
@@ -30,6 +30,7 @@ import { indexDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
+import { clearCurrentUserToken } from '../services/authApi';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -186,15 +187,35 @@ export const logout = () => {
         let logoutUri = config.logoutUri;
 
         if (config.mechanism !== AuthMechanismType.Unsecured) {
-            const loggedOut = await logoutToken(getState());
+
+            /*
+             * Logout from the server, which will blacklist the current tokens.
+             */
+            const loggedOut = await logoutFromServer(getState());
+
+            /*
+             * Clear the cached user token, which is now blacklisted on the server.
+             */
+            clearCurrentUserToken(config);
+
+            /*
+             * Set the logoutURI to redirect the user.
+             */
             if (loggedOut) {
                 logoutUri = loggedOut.logoutURI;
             }
         }
 
+        /*
+         * If a redirect was provided, go there.
+         */
         if (logoutUri) {
             window.location = (logoutUri as any);
         }
+        /*
+         * Else fall back to a hard reload of the Leaf client,
+         * which should get caught by the IdP to force a re-login.
+         */
         else {
             window.location.reload(true);
         }

@@ -209,6 +209,11 @@
     text-align: left;
 }
 
+.attestation-invalid-date {
+    color: rgb(255, 49, 35);
+    font-size: 1rem;
+}
+
 .attestation-row.doc-input input::placeholder {
     opacity: 0.5;
 }

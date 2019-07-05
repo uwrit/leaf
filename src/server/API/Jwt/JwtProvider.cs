@@ -200,7 +200,7 @@ namespace API.Jwt
 
         Claim GetDataClass(ClaimsPrincipal user, Attestation attestation)
         {
-            var data = (user.HasClaim(Data.Key, Data.Identified) && attestation.IsIdentified) ? Data.Identified : Data.Deidentified;
+            var data = (user.HasClaim(ClaimTypes.Role, Data.Identified) && attestation.IsIdentified) ? Data.Identified : Data.Deidentified;
             return new Claim(Data.Key, data);
         }
 

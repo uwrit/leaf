@@ -8,7 +8,7 @@
 import React from 'react';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { State as AttestationState } from '../../containers/Attestation/Attestation';
-import { Attestation as AttestationModel, DocumentationApproval, SessionType } from '../../models/Session';
+import { SessionType } from '../../models/Session';
 import AttestationRow from './AttestationRow';
 import { UserContext } from '../../models/Auth';
 
@@ -34,9 +34,13 @@ export default class AttestationContent extends React.PureComponent<Props> {
 
     public render() {
         const c = this.props.className;
-        const contentClass = `${c}-content ${this.props.show ? 'show' : ''}`
-        const { hasApprovedIrb, hasApprovedQi, sessionTypeSelected } = this.props.parentState;
-        const { sessionType } = this.props.parentState.attestation;
+        const { 
+            handleApprovalTypeClick, handleUseTypeClick, handleDocumentationTitleChange, handleDocumentationExpDateChange, 
+            handleDocumentationInstitutionChange, handlePhiTypeClick, show, parentState 
+        } = this.props;
+        const { hasApprovedIrb, hasApprovedQi, sessionTypeSelected, documentationExpDateString, attestation } = parentState;
+        const { sessionType } = parentState.attestation;
+        const contentClass = `${c}-content ${show ? 'show' : ''}`
         const irbIdLabel = 'IRB Number or ID';
         const irbIdPlaceholder = 'e.g., HSD 1234';
         const irbInstPlaceholder = 'e.g., University of ABC Human Subjects Division';
@@ -51,12 +55,12 @@ export default class AttestationContent extends React.PureComponent<Props> {
                         <div className={`${c}-option-container`}>
                             <div 
                                 className={this.setUseTypeButtonClass(SessionType.QualityImprovement)} 
-                                onClick={this.props.handleUseTypeClick.bind(null, SessionType.QualityImprovement)}>
+                                onClick={handleUseTypeClick.bind(null, SessionType.QualityImprovement)}>
                                 <span>Quality Improvement</span>
                             </div>
                             <div 
                                 className={this.setUseTypeButtonClass(SessionType.Research)} 
-                                onClick={this.props.handleUseTypeClick.bind(null, SessionType.Research)}>
+                                onClick={handleUseTypeClick.bind(null, SessionType.Research)}>
                                 <span>Research</span>
                             </div>
                         </div>
@@ -72,12 +76,12 @@ export default class AttestationContent extends React.PureComponent<Props> {
                         <div className={`${c}-option-container`}>
                             <div 
                                 className={this.setDocumentationApprovedClass(false)}
-                                onClick={this.props.handleApprovalTypeClick.bind(this, false)}>
+                                onClick={handleApprovalTypeClick.bind(this, false)}>
                                 <span>No</span>
                             </div>
                             <div 
                                 className={this.setDocumentationApprovedClass(true)}
-                                onClick={this.props.handleApprovalTypeClick.bind(this, true)}>
+                                onClick={handleApprovalTypeClick.bind(this, true)}>
                                 <span>Yes</span>
                             </div>
                         </div>                            
@@ -92,10 +96,10 @@ export default class AttestationContent extends React.PureComponent<Props> {
                                 type="text" 
                                 name="doc-number" 
                                 id={`${c}-doc-number`} 
-                                onChange={this.props.handleDocumentationTitleChange} 
+                                onChange={handleDocumentationTitleChange} 
                                 placeholder={sessionType === SessionType.Research ? irbIdPlaceholder : qiIdPlaceholder}
                                 spellCheck={false}
-                                value={this.props.parentState.attestation.documentation.title} />
+                                value={attestation.documentation.title} />
                         </FormGroup>
                         <FormGroup>
                             <Label for={`${c}-doc-inst`}>Approving Institution or Body</Label>
@@ -104,10 +108,10 @@ export default class AttestationContent extends React.PureComponent<Props> {
                                 type="text" 
                                 name="doc-inst" 
                                 id={`${c}-doc-inst`} 
-                                onChange={this.props.handleDocumentationInstitutionChange} 
+                                onChange={handleDocumentationInstitutionChange} 
                                 placeholder={sessionType === SessionType.Research ? irbInstPlaceholder : qiInstPlaceholder}
                                 spellCheck={false}
-                                value={this.props.parentState.attestation.documentation.institution} />
+                                value={attestation.documentation.institution} />
                         </FormGroup>
                         <FormGroup>
                             <Label for={`${c}-doc-expdate`}>Expiration Date</Label>
@@ -116,10 +120,13 @@ export default class AttestationContent extends React.PureComponent<Props> {
                                 type="text" 
                                 name="doc-expdate" 
                                 id={`${c}-doc-expdate`} 
-                                onChange={this.props.handleDocumentationExpDateChange} 
+                                onChange={handleDocumentationExpDateChange} 
                                 placeholder="MM/DD/YYYY"
                                 spellCheck={false}
-                                value={this.props.parentState.documentationExpDateString} />
+                                value={documentationExpDateString} />
+                            {documentationExpDateString && !attestation.documentation.expirationDate &&
+                            <span className={`${c}-invalid-date`}>Enter a future date in the format "MM/DD/YYYY"</span>
+                            }
                         </FormGroup>
                     </AttestationRow>
                     }
@@ -129,12 +136,12 @@ export default class AttestationContent extends React.PureComponent<Props> {
                         <div className={`${c}-option-container`}>
                             <div 
                                 className={this.setPhiTypeButtonClass(false)}
-                                onClick={this.props.handlePhiTypeClick.bind(null, false)}>
+                                onClick={handlePhiTypeClick.bind(null, false)}>
                                 <span>De-Identified</span>
                             </div>
                             <div 
                                 className={this.setPhiTypeButtonClass(true)}
-                                onClick={this.props.handlePhiTypeClick.bind(null, true)}>
+                                onClick={handlePhiTypeClick.bind(null, true)}>
                                 <span>Identified</span>
                             </div>
                         </div>                            

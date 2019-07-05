@@ -108,7 +108,7 @@ namespace Model.Compiler
         /// <param name="localQuery">Local query.</param>
         public void LocalizeDefinition(IQueryDefinition definition, PatientCountQuery localQuery)
         {
-            if (user.IsInstutional)
+            if (user.IsInstitutional)
             {
                 return;
             }
@@ -151,7 +151,7 @@ namespace Model.Compiler
 
         IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, IEnumerable<Concept> concepts)
         {
-            if (user.IsInstutional)
+            if (user.IsInstitutional)
             {
                 var local = concepts.ToDictionary(c => c.Id);
                 return GetPanels(panels, local);

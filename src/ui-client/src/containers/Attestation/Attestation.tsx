@@ -19,6 +19,7 @@ import { getBrowser } from '../../utils/browser';
 import { setBrowser } from '../../actions/generalUi';
 import { Browser } from '../../models/state/GeneralUiState';
 import BrowserError from '../../components/Attestation/BrowserError';
+import moment from 'moment';
 import './Attestation.css';
 
 interface DispatchProps {
@@ -51,7 +52,6 @@ export interface State {
 class Attestation extends React.PureComponent<Props, State> {
     private className = 'attestation';
     private defaultDocumentation: DocumentationApproval = {
-        expirationDate: new Date(),
         institution: '',
         title: ''
     }
@@ -79,7 +79,7 @@ class Attestation extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const { sessionTypeSelected, documentationStatusSelected, identificationTypeSelected } = this.state;
+        const { sessionTypeSelected, documentationStatusSelected, identificationTypeSelected, attestation } = this.state;
         const { sessionLoadProgressPercent, hasAttested, isSubmittingAttestation, hasUserIdToken, authError, sessionError, sessionLoadDisplay, userContext, browser } = this.props;
         const browserError = browser && browser.error;
         const c = this.className;
@@ -147,12 +147,12 @@ class Attestation extends React.PureComponent<Props, State> {
                         handleGoBackClick={this.handleConfirmGoBackClick}
                         handleIAgreeClick={this.handleConfirmIAgreeClick}
                         hasAttested={hasAttested}
-                        isIdentified={this.state.attestation.isIdentified}
-                        isSubmittingAttestation={this.props.isSubmittingAttestation}
+                        isIdentified={attestation.isIdentified}
+                        isSubmittingAttestation={isSubmittingAttestation}
                         key='2'
                         show={showConfirmation}
                         sessionLoadDisplay={sessionLoadDisplay}
-                        sessionType={this.state.attestation.sessionType} />)
+                        sessionType={attestation.sessionType} />)
                     ]}
                 </ModalBody>
             </Modal>
@@ -234,13 +234,20 @@ class Attestation extends React.PureComponent<Props, State> {
 
     private handleDocumentationExpDateChange = (e: any) => {
         const expirationDate = e.currentTarget.value;
+        const split = expirationDate.split('/');
+        const dateTest = moment(expirationDate);
+        let expDate: any;
+
+        if (dateTest.isValid() && dateTest > moment() && split.length === 3 && split[2].length === 4) {
+            expDate = dateTest.toDate();
+        } 
+
         this.setState({ 
             attestation: {
                 ...this.state.attestation,
                 documentation: {
                     ...this.state.attestation.documentation,
-                    // TODO: transform and set a real date (moment.js?)
-                    expirationDate: new Date()
+                    expirationDate: expDate
                 }
             },
             documentationExpDateString: expirationDate
@@ -261,10 +268,10 @@ class Attestation extends React.PureComponent<Props, State> {
     }
 
     private allowPhiIdentified = () => {
-        const { attestation, documentationStatusSelected, hasApprovedIrb, hasApprovedQi, documentationExpDateString } = this.state;
+        const { attestation, documentationStatusSelected, hasApprovedIrb, hasApprovedQi } = this.state;
         if (documentationStatusSelected && 
             (hasApprovedIrb || hasApprovedQi) &&
-            documentationExpDateString.trim() !== '' &&
+            attestation.documentation.expirationDate &&
             attestation.documentation.institution.trim() !== '' &&
             attestation.documentation.title.trim() !== ''
         ) {

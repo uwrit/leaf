@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[DatasetQueryCategory]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  Table [app].[DatasetQueryCategory]    Script Date: 7/5/19 11:48:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -25,7 +25,7 @@ PRIMARY KEY CLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQueryCategory_Category]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  Index [IXUniq_DatasetQueryCategory_Category]    Script Date: 7/5/19 11:48:10 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQueryCategory_Category] ON [app].[DatasetQueryCategory]
 (
 	[Category] ASC

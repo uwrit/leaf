@@ -29,7 +29,7 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
     private className = 'concept-tree-learn-more';
     private startYear = 1995;
     private currYear = new Date().getFullYear();
-    private height = 250;
+    private height = 200;
     private margin = {top: 20, right: 20, left: 20, bottom: 20};
     private minWidth = 300;
     private maxWidth = 1000;
@@ -55,15 +55,8 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
     }
 
     public render(): any {
-        const { concept } = this.props;
-        const { showInfoBox, ShowAllYears, DOMRect } = this.state;
+        const { showInfoBox } = this.state;
         const c = this.className;
-        const countsByYear = concept.uiDisplayPatientCountByYear;
-        const calcWidth = countsByYear ? (countsByYear.length * 40) : this.minWidth;
-        const data = this.getYearData();
-        const width = calcWidth < this.minWidth 
-            ? this.minWidth : calcWidth > this.maxWidth 
-            ? this.maxWidth : calcWidth;
 
         return (
             <span className={`${c}-button`} onClick={this.handleClick}>
@@ -71,82 +64,110 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                 <div>
                     Learn More
 
-                    {/* Popup Box */}
                     {showInfoBox &&
-                    <PopupBox 
-                        parentDomRect={DOMRect!} 
-                        toggle={this.handleInfoBoxClickedOutside}>
-                        <div className={`${c}`} style={{ width }}>
-                            <div className={`${c}-title`}>
-                                <p>{concept.uiDisplayName}</p>
-                                <p className={`${c}-universalid`}>
-                                    {concept.universalId
-                                        ? <span className={`${c}-universalid-value`}>{concept.universalId}</span> 
-                                        : <span className={`${c}-universalid-none`}>local concept only</span> 
-                                    }
-                                </p>
-                            </div>
-                            <div className={`${c}-separator`} />
-
-                            {/* Counts by Year chart */}
-                            {countsByYear &&
-                            <ResponsiveContainer height={this.height}>
-                            <BarChart 
-                                data={data} 
-                                barCategoryGap={5} 
-                                className={`${c}-chart`}
-                                margin={this.margin}>
-                                <XAxis 
-                                    dataKey="year" 
-                                    interval={0} 
-                                    axisLine={false} 
-                                    tickLine={false} 
-                                    label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
-                                <Bar 
-                                    barSize={35}
-                                    dataKey="patientCount" 
-                                    fill={'rgb(255, 132, 8)'} 
-                                    isAnimationActive={true}>
-                                    <LabelList 
-                                        dataKey="label" 
-                                        position="top"/>
-                                </Bar>
-                            </BarChart>
-                            </ResponsiveContainer>}
-
-                            {this.hasOutOfBoundYears && 
-                                <div className={`${c}-show-all-years`}>
-                                    <div className={`${c}-show-all-years-text`}>
-                                        Show all years
-                                    </div>
-                                    <CheckboxSlider checked={ShowAllYears} onClick={this.handleShowAllYearsClick} />
-                                </div>
-                            }
-
-                            {countsByYear && <div className={`${c}-separator-long`} />}
-
-                            {/* Tooltip / Info */}
-                            {concept.uiDisplayTooltip &&
-                            <div className={`${c}-info`}>
-                                <TextareaAutosize
-                                    readOnly={true}
-                                    spellCheck={false}
-                                    value={concept.uiDisplayTooltip}>
-                                </TextareaAutosize>
-                            </div>
-                            }
-                            {!concept.uiDisplayTooltip &&
-                            <p className={`${c}-noinfo`}>
-                                No information provided for this concept
-                            </p>
-                            }
-
-                        </div>    
-                    </PopupBox>
+                    this.getPopupContent()
                     }
                 </div>
             </span>
         )       
+    }
+
+    private getPopupContent = () => {
+        const { concept } = this.props;
+        const { ShowAllYears, DOMRect } = this.state;
+        const c = this.className;
+        const classes = [ c ];
+        const countsByYear = concept.uiDisplayPatientCountByYear;
+        const data = this.getYearData();
+        const calcWidth = countsByYear ? (data.length * 40) : this.minWidth;
+        const width = calcWidth < this.minWidth 
+            ? this.minWidth : calcWidth > this.maxWidth 
+            ? this.maxWidth : calcWidth;
+
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        if (DOMRect && (data.length || concept.uiDisplayTooltip)) {
+            const pos = { 
+                top: DOMRect.top + scrollTop, 
+                left: DOMRect.left + scrollLeft, 
+                clientHeight: document.documentElement.clientHeight 
+            };
+            if (pos.clientHeight - pos.top < 250) { classes.push('offset-bottom'); }
+            else if (pos.top < 250) { classes.push('offset-top'); }
+        }
+
+        return (
+            <PopupBox 
+                parentDomRect={DOMRect!} 
+                toggle={this.handleInfoBoxClickedOutside}>
+                <div className={`${classes.join(' ')}`} style={{ width }}>
+                    <div className={`${c}-title`}>
+                        <p>{concept.uiDisplayName}</p>
+                        <p className={`${c}-universalid`}>
+                            {concept.universalId &&
+                            <span className={`${c}-universalid-value`}>{concept.universalId}</span> 
+                            }
+                        </p>
+                    </div>
+                    <div className={`${c}-separator`} />
+
+                    {/* Counts by Year chart */}
+                    {countsByYear &&
+                    <ResponsiveContainer height={this.height}>
+                    <BarChart 
+                        data={data} 
+                        barCategoryGap={5} 
+                        className={`${c}-chart`}
+                        margin={this.margin}>
+                        <XAxis 
+                            dataKey="year" 
+                            interval={0} 
+                            axisLine={false} 
+                            tickLine={false} 
+                            label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
+                        <Bar 
+                            barSize={28}
+                            dataKey="patientCount" 
+                            fill={'rgb(255, 132, 8)'} 
+                            isAnimationActive={true}>
+                            <LabelList 
+                                dataKey="label" 
+                                position="top"/>
+                        </Bar>
+                    </BarChart>
+                    </ResponsiveContainer>}
+
+                    {this.hasOutOfBoundYears && 
+                        <div className={`${c}-show-all-years`}>
+                            <div className={`${c}-show-all-years-text`}>
+                                Show all years
+                            </div>
+                            <CheckboxSlider checked={ShowAllYears} onClick={this.handleShowAllYearsClick} />
+                        </div>
+                    }
+
+                    {countsByYear && <div className={`${c}-separator-long`} />}
+
+                    {/* Tooltip / Info */}
+                    {concept.uiDisplayTooltip &&
+                    <div className={`${c}-info`}>
+                        <TextareaAutosize
+                            readOnly={true}
+                            spellCheck={false}
+                            value={concept.uiDisplayTooltip}>
+                        </TextareaAutosize>
+                    </div>
+                    }
+                    {!concept.uiDisplayTooltip &&
+                    <p className={`${c}-noinfo`}>
+                        No information provided for this concept
+                    </p>
+                    }
+
+                </div>    
+            </PopupBox>
+        );
     }
 
     private handleClick = (e: any) => { 

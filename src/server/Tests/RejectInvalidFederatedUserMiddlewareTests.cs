@@ -85,7 +85,7 @@ namespace Tests
         {
             public FedIdMockUser(bool id = false, bool quar = false, bool ins = true)
             {
-                IsInstutional = ins;
+                IsInstitutional = ins;
                 Identified = id;
                 IsQuarantined = quar;
             }
@@ -98,7 +98,7 @@ namespace Tests
 
             public string UUID => throw new NotImplementedException();
 
-            public bool IsInstutional { get; }
+            public bool IsInstitutional { get; }
 
             public bool IsAdmin => throw new NotImplementedException();
 

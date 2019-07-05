@@ -87,7 +87,7 @@ namespace API.Controllers
             try
             {
                 // federated user submitting an initial save request
-                if (!user.IsInstutional && QueryUrn.From(querySave.UniversalId) == null)
+                if (!user.IsInstitutional && QueryUrn.From(querySave.UniversalId) == null)
                 {
                     return BadRequest("Initial save requests must be made to home node.");
                 }

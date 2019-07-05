@@ -78,14 +78,21 @@
     font-family: Roboto;
     font-size: 1.2rem;
     font-weight: 300;
-    margin-left: -100px;
-    margin-top: -100px;
     max-width: 1000px;
     min-width: 400px;
     opacity: 1;
     padding: 10px;
-    position: absolute;
+    position: fixed;
     transition: all 0.5s;
+    transform: translate(-50%, -50%);
+}
+
+.concept-tree-learn-more.offset-top {
+    margin-top: 100px;
+}
+
+.concept-tree-learn-more.offset-bottom {
+    margin-top: -250px;
 }
 
 .concept-tree-learn-more tspan {

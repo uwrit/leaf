@@ -141,8 +141,13 @@ export const requestQuerySave = () => {
                     );
                 });
             }));
+
+            /*
+             * Dismiss the modal and query pane. If transitioned simultaneously the pane may 
+             * oddly push content left (pretty sure this is a webkit bug), so put on a delay.
+             */
             dispatch(setNoClickModalState({ message: "Query Saved", state: NotificationStates.Complete }));
-            dispatch(toggleSaveQueryPane());
+            setTimeout(() => dispatch(toggleSaveQueryPane()), 2000);
 
             /*
              * If there is any operation to run after 

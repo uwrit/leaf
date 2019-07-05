@@ -168,7 +168,7 @@ namespace Tests
                 new Claim(JwtRegisteredClaimNames.Iss, "urn:leaf:iss:test.tld"));
             var ctx = new HttpUserContext(acc, GetJwtVerifyingOptions("urn:leaf:iss:test.tld"));
 
-            Assert.True(ctx.IsInstutional);
+            Assert.True(ctx.IsInstitutional);
         }
 
         [Fact]
@@ -178,7 +178,7 @@ namespace Tests
                 new Claim(JwtRegisteredClaimNames.Iss, "urn:leaf:iss:test.tld"));
             var ctx = new HttpUserContext(acc, GetJwtVerifyingOptions("urn:leaf:iss:failTest.tld"));
 
-            Assert.False(ctx.IsInstutional);
+            Assert.False(ctx.IsInstitutional);
         }
 
         [Fact]

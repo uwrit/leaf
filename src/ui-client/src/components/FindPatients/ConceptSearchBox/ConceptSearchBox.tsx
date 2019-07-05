@@ -86,14 +86,18 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
                             {selectedRootDisplay}
                         </DropdownToggle>
                         <DropdownMenu>
+                            <DropdownItem  
+                                className={`leaf-dropdown-item ${(!conceptsSearchState.rootId ? 'selected' : '')}`} 
+                                onClick={this.handleRootDropdownSelect.bind(null, '')}>
+                                All Concepts
+                            </DropdownItem>
                             {roots.map((id: string) => {
                                 const root = drillTree.get(id);
                                 if (!root) { return null }
-                                const display = id === ''  ? 'All Concepts' : root.uiDisplayName;
                                 const classes = [ 'leaf-dropdown-item', (id === conceptsSearchState.rootId ? 'selected' : '') ]; 
                                 return (
                                     <DropdownItem  className={classes.join(' ')} key={id} onClick={this.handleRootDropdownSelect.bind(null, id)}>
-                                        {display}
+                                        {root.uiDisplayName}
                                     </DropdownItem>
                                 )
                             })}

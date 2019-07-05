@@ -69,7 +69,7 @@ namespace Model.Search
 
         async Task<PreflightConcepts> GetConceptsAsyncImpl(ConceptRef cr)
         {
-            if (user.IsInstutional)
+            if (user.IsInstitutional)
             {
                 return await reader.GetConceptsByIdAsync(cr.Id.Value);
             }
@@ -95,7 +95,7 @@ namespace Model.Search
 
         async Task<PreflightConcepts> GetConceptsAsyncImpl(HashSet<ConceptRef> crs)
         {
-            if (user.IsInstutional)
+            if (user.IsInstitutional)
             {
                 return await reader.GetConceptsByIdsAsync(crs.Select(c => c.Id.Value).ToHashSet());
             }
@@ -121,7 +121,7 @@ namespace Model.Search
 
         async Task<PreflightResources> GetResourcesAsyncImpl(ResourceRefs refs)
         {
-            if (user.IsInstutional)
+            if (user.IsInstitutional)
             {
                 return await reader.GetResourcesByIdsAsync(refs);
             }

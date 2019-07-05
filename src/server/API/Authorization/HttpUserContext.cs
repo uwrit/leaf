@@ -59,7 +59,7 @@ namespace API.Authorization
 
         public bool IsInRole(string role) => user.IsInRole(role);
 
-        public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstutional;
+        public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstitutional;
 
         public bool IsQuarantined => !user.IsInRole(Role.Fed);
 
@@ -107,7 +107,7 @@ namespace API.Authorization
             }
         }
 
-        public bool IsInstutional => Issuer == issuer;
+        public bool IsInstitutional => Issuer == issuer;
 
         Guid idNonce;
         public Guid IdNonce

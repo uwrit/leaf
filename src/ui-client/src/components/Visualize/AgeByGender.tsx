@@ -29,7 +29,6 @@ export class AgeByGender extends React.PureComponent<Props> {
         const c = this.className;
         const w = width > this.maxWidth ? this.maxWidth : width;
         const stackHeight = height / 2;
-        const labelWidth = 30;
         const data: AgeByGenderBucket[] = Object.keys(this.props.data.buckets)
             .map((d: string) => {
                 const bucket = this.props.data.buckets[d];
@@ -47,9 +46,9 @@ export class AgeByGender extends React.PureComponent<Props> {
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-female`}
                                 margin={{top: 20, right: 0, left: 0, bottom: 10}} >
                             <XAxis dataKey="label" type="category" interval={0} />
-                            <YAxis label="Females" />
+                            <YAxis label={{ value: "Females", dx: -5 }} width={75} />
                             <Bar dataKey="females" fill={config.colorFemale} >
-                                <LabelList dataKey="females" position="top" />
+                                <LabelList dataKey="females" position="top" formatter={this.formatNumber} />
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
@@ -59,9 +58,9 @@ export class AgeByGender extends React.PureComponent<Props> {
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-male`}
                                 margin={{top: 20, right: 0, left: 0, bottom: 10}} >
                             <XAxis dataKey="label" type="category" interval={0} />
-                            <YAxis label="Males" />
+                            <YAxis label={{ value: "Males", dx: -5 }} width={75} />
                             <Bar dataKey="males" fill={config.colorMale} >
-                                <LabelList dataKey="males" position="top" />
+                                <LabelList dataKey="males" position="top" formatter={this.formatNumber} />
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
@@ -69,4 +68,6 @@ export class AgeByGender extends React.PureComponent<Props> {
             </div>
         );
     }
+
+    private formatNumber = (val: any) => val.toLocaleString();
 }

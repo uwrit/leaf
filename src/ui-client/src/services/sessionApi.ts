@@ -34,11 +34,23 @@ const decodeToken = (token: string): SessionContext => {
  */
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
     const http = HttpFactory.authenticated(state.auth.userContext!.token);
+
+    const request = http.get('api/user/attest', {
+        params: {
+            'documentation.expirationDate': attestation.documentation.expirationDate,
+            'documentation.institution': attestation.documentation.institution,
+            'documentation.title': attestation.documentation.title,
+            ...attestation
+        }
+    });
+    /*
     const request = http.get('api/user/attest', {
         params: {
             attestation
         }
     });
+    */
+
     const response = await request;
     const respData = response.data as AccessTokenDTO;
     const ctx = decodeToken(respData.accessToken);
@@ -66,12 +78,11 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 /*
  * Tells the server to blacklist this token, as the uses is logging out.
  */
-export const logoutToken = async (state: AppState): Promise<LogoutDTO | undefined> => {
+export const logoutFromServer = async (state: AppState): Promise<LogoutDTO | undefined> => {
     try {
         const http = HttpFactory.authenticated(state.auth.userContext!.token);
-        const request = http.post('api/user/logout');
-        const response = await request;
-        return response.data as LogoutDTO;
+        const request = await http.post('api/user/logout');
+        return request.data as LogoutDTO;
     } catch (err) {
         console.log(err);
     }

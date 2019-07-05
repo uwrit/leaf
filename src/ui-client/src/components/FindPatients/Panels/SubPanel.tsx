@@ -16,6 +16,7 @@ import PanelItem from './PanelItem';
 import PanelItemOr from './PanelItemOr';
 import SubPanelDashBorder from './SubPanelDashBorder';
 import SubPanelHeader from './SubPanelHeader';
+import { CohortStateType } from '../../../models/state/CohortState';
 
 interface DndProps {
     canDrop?: boolean;
@@ -27,7 +28,8 @@ interface OwnProps {
     panel: PanelModel;
     subPanel: SubPanelModel;
     index: number;
-    dispatch?: any;
+    dispatch: any;
+    queryState: CohortStateType;
 }
 
 type Props = DndProps & OwnProps
@@ -37,6 +39,9 @@ const panelTarget = {
         const { dispatch, subPanel } = props;
         const concept: Concept = monitor.getItem();
         dispatch(addPanelItem(concept, subPanel.panelIndex, subPanel.index));
+    },
+    canDrop (props: Props, monitor: DropTargetMonitor) {
+        return props.queryState !== CohortStateType.REQUESTING;
     }
 }
 
@@ -52,7 +57,7 @@ class SubPanel extends React.Component<Props> {
     }
 
     public render() {
-        const { connectDropTarget, dispatch, isOver, canDrop, subPanel, index, panel } = this.props;
+        const { connectDropTarget, dispatch, isOver, canDrop, subPanel, index, panel, queryState } = this.props;
         const totalPanelItems = subPanel.panelItems.length;
         const wrapperClasses = 'subpanel-wrapper ' + (totalPanelItems > 0 ? 'has-data' : '');
         const classes = [ 'subpanel' ];
@@ -68,7 +73,7 @@ class SubPanel extends React.Component<Props> {
         // Set PanelItems and -or- objects
         for (let i = 0; i < totalPanelItems; i++) {
             panelItem = subPanel.panelItems[i];
-            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch} subPanel={subPanel}/>);
+            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch} subPanel={subPanel} queryState={queryState} />);
 
             // Add -or- if necessary
             if (subPanel.panelItems[i+1] &&         // Followed by another panelItem

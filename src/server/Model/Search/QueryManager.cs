@@ -110,7 +110,7 @@ namespace Model.Search
 
             cancel.ThrowIfCancellationRequested();
 
-            if (!user.IsInstutional)
+            if (!user.IsInstitutional)
             {
                 converter.LocalizeDefinition(ast, query);
                 log.LogInformation("Localized federated query. Id:{Id} Ast:{Ast}", id, ast);

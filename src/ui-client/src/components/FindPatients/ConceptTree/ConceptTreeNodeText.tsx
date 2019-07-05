@@ -85,7 +85,7 @@ class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
                     {showCount && 
                     <span className={`${c}-count`}>
                         <GoPerson className={`${c}-icon ${c}-icon-lgm`} />
-                        {concept.uiDisplayPatientCount}
+                        {concept.uiDisplayPatientCount!.toLocaleString()}
                     </span>
                     }
                     {concept.eventTypeId &&

@@ -52,7 +52,7 @@ export const RowCount = (props: Props) => {
                     {/* Federated */}
                     {isFederated &&
                     <div className={`${c}-info-detail`}>
-                        <span>One or more of the Leaf server you are querying may be limiting the total amount of patients you are able to view.</span>
+                        <span>One or more of the Leaf servers you are querying may be limiting the total amount of patients you are able to view.</span>
                     </div>
                     }
                 </div>

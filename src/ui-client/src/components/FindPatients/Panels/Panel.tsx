@@ -11,12 +11,14 @@ import { Panel as PanelModel } from '../../../models/panel/Panel';
 import PanelHeader from './PanelHeader';
 import SubPanel from './SubPanel';
 import { DateIncrementType } from '../../../models/panel/Date';
+import { CohortStateType } from '../../../models/state/CohortState';
 import './Panel.css';
 
 export interface Props {
     dispatch: any;
-    panel: PanelModel,
     isFirst: boolean;
+    panel: PanelModel,
+    queryState: CohortStateType;
 }
 
 export default class Panel extends React.PureComponent<Props> {
@@ -25,7 +27,7 @@ export default class Panel extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { dispatch, isFirst, panel } = this.props;
+        const { dispatch, isFirst, panel, queryState } = this.props;
         const isDateFiltered = 
             panel.dateFilter.end.dateIncrementType !== DateIncrementType.NONE && 
             panel.dateFilter.start.dateIncrementType !== DateIncrementType.NONE;
@@ -61,6 +63,7 @@ export default class Panel extends React.PureComponent<Props> {
                             index={i}
                             panel={this.props.panel}
                             subPanel={subpanel}
+                            queryState={queryState}
                         />
                     ))}
                 </div>

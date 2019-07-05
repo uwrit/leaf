@@ -46,8 +46,8 @@ namespace API.Middleware.Federation
             await next(context);
         }
 
-        public bool FederatedIdentified => user.Identified && !user.IsInstutional;
+        public bool FederatedIdentified => user.Identified && !user.IsInstitutional;
 
-        public bool FederatedQuarantined => user.IsQuarantined && !user.IsInstutional;
+        public bool FederatedQuarantined => user.IsQuarantined && !user.IsInstitutional;
     }
 }
