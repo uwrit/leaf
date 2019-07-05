@@ -3439,6 +3439,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/5/23
+-- Description: Calculates the patient count for a given concept using
+--              dynamic SQL for both the total unique patients and unique 
+--              count by year.
+-- =======================================
 CREATE PROCEDURE [app].[sp_CalculateConceptPatientCount]
 	@PersonIdField NVARCHAR(50),
 	@TargetDatabaseName NVARCHAR(100),
@@ -3457,6 +3464,14 @@ BEGIN
 			@PatientsByYearParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsByYearOUT NVARCHAR(MAX) OUTPUT'
 	
 	BEGIN 
+
+			-- Figure out if we need to add the db name
+			DECLARE @DbFrom NVARCHAR(100) = @TargetDatabaseName + '.' + @From
+			SET @DbFrom = 
+				CASE
+					WHEN OBJECT_ID(@DbFrom, 'U') IS NULL AND OBJECT_ID(@DbFrom, 'V') IS NULL THEN @From
+					ELSE @DbFrom
+				END
 			
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Total Patient Count
@@ -3464,7 +3479,7 @@ BEGIN
 			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 			
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
-															 'FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' +
+															 'FROM ' + @DbFrom + ' AS _T ' +
 															  ISNULL('WHERE ' + @Where,'') + 
 															')'
 
@@ -3505,7 +3520,7 @@ BEGIN
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' + 
+									   FROM ' + @DbFrom + ' AS _T ' + 
 									   ISNULL('WHERE ' + @Where,'') + ')
 									  
 									, year_grouping AS
@@ -3557,7 +3572,6 @@ END
 
 
 
-
 GO
 /****** Object:  StoredProcedure [app].[sp_CalculatePatientCounts]    Script Date: 6/12/19 12:20:44 PM ******/
 SET ANSI_NULLS ON
@@ -3571,6 +3585,7 @@ GO
 -- Description: Loops through Concepts and auto-calculates patient counts.
 -- =======================================
 CREATE PROCEDURE [app].[sp_CalculatePatientCounts]
+
 @PersonIdField NVARCHAR(50),
 @TargetDataBaseName NVARCHAR(50),
 @TotalAllowedRuntimeInMinutes INT,
@@ -3604,7 +3619,6 @@ BEGIN
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
 	
-
 	------------------------------------------------------------------------------------------------------------------------------ 
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
@@ -3677,7 +3691,6 @@ BEGIN
 
 	END 
 	-- End ForEach root concept
-
 
 END
 
