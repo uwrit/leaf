@@ -42,7 +42,6 @@ BEGIN
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
 	
-
 	------------------------------------------------------------------------------------------------------------------------------ 
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
@@ -122,6 +121,13 @@ GO
 IF OBJECT_ID('app.sp_CalculateConceptPatientCount', 'P') IS NOT NULL
     DROP PROCEDURE [app].[sp_CalculateConceptPatientCount];
 GO
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/5/23
+-- Description: Calculates the patient count for a given concept using
+--              dynamic SQL for both the total unique patients and unique 
+--              count by year.
+-- =======================================
 CREATE PROCEDURE [app].[sp_CalculateConceptPatientCount]
 	@PersonIdField NVARCHAR(50),
 	@TargetDatabaseName NVARCHAR(100),
@@ -140,6 +146,14 @@ BEGIN
 			@PatientsByYearParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsByYearOUT NVARCHAR(MAX) OUTPUT'
 	
 	BEGIN 
+
+			-- Figure out if we need to add the db name
+			DECLARE @DbFrom NVARCHAR(100) = @TargetDatabaseName + '.' + @From
+			SET @DbFrom = 
+				CASE
+					WHEN OBJECT_ID(@DbFrom, 'U') IS NULL AND OBJECT_ID(@DbFrom, 'V') IS NULL THEN @From
+					ELSE @DbFrom
+				END
 			
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Total Patient Count
@@ -147,7 +161,7 @@ BEGIN
 			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 			
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
-															 'FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' +
+															 'FROM ' + @DbFrom + ' AS _T ' +
 															  ISNULL('WHERE ' + @Where,'') + 
 															')'
 
@@ -188,7 +202,7 @@ BEGIN
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @TargetDatabaseName + '.' + REPLACE(@From,@TargetDatabaseName,'') + ' _T ' + 
+									   FROM ' + @DbFrom + ' AS _T ' + 
 									   ISNULL('WHERE ' + @Where,'') + ')
 									  
 									, year_grouping AS
@@ -478,3 +492,11 @@ BEGIN
     order by QueryId desc;
 END
 GO
+
+
+IF EXISTS (SELECT 1 FROM ref.Version)
+    UPDATE ref.Version
+    SET [Version] = '3.2.3'
+ELSE 
+    INSERT INTO ref.[Version] (Lock, Version)
+    SELECT 'X', '3.2.3'
