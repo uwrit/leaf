@@ -111,7 +111,8 @@
     margin: auto;
 }
 
-.visualization-agebygender-column {
+.visualization-agebygender-column .recharts-yAxis text {
+    margin-left: 50px;
 }
 
 .visualization-ataglance-column {

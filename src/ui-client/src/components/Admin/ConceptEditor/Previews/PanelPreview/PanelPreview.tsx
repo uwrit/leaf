@@ -9,6 +9,7 @@ import React from 'react';
 import { Panel as PanelModel } from '../../../../../models/panel/Panel';
 import Panel from '../../../../FindPatients/Panels/Panel';
 import { createPortal } from 'react-dom';
+import { CohortStateType } from '../../../../../models/state/CohortState';
 import './PanelPreview.css';
 
 interface Props {
@@ -24,7 +25,7 @@ export class PanelPreview extends React.PureComponent<Props> {
             createPortal(
                 <div className={`${c}-panel-container concept-editor-preview`}>
                     <div className={`${c}-panel-container-inner`}>
-                        <Panel dispatch={this.dummyDispatch} panel={panel} isFirst={true} />
+                        <Panel dispatch={this.dummyDispatch} panel={panel} isFirst={true} queryState={CohortStateType.LOADED} />
                     </div>
                 </div>,
                 document.body
