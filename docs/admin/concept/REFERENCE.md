@@ -33,7 +33,20 @@ Tooltips are a bit of a misnomer, as they are actually shown when the user click
 
 The `Patient Count` field shows a small green person indicating the number of unique patients the user would *expect* to find if she were to run a query with this Concept only and with no date restrictions, etc. 
 
-The `stored procedure` to automatically loop through the `app.Concept` table and calculate this for each Concept is here https://github.com/uwrit/leaf/blob/master/src/db/obj/app.sp_CalculateConceptPatientCount.StoredProcedure.sql, though please note that this will likely be scripted into an API or CLI-based procedure in the future.
+An example `stored procedure` to automatically loop through the `app.Concept` table and calculate this for each Concept is here https://github.com/uwrit/leaf/blob/master/src/db/obj/app.sp_CalculatePatientCounts.StoredProcedure.sql, though please note that this will likely be scripted into an API or CLI-based procedure in the future.
+
+This can be used by:
+
+```sql
+EXEC app.sp_CalculatePatientCounts
+    @PersonIdField = 'person_id'           -- PersonId field for this Leaf instance
+  , @TargetDataBaseName = 'ClinDb'         -- Clinical database to query for this Leaf instance
+  , @TotalAllowedRuntimeInMinutes = 180,   -- Total minutes to allow to entire process to run
+  , @PerRootConceptAllowedRuntimeInMinutes -- Total minutes to allow a given Root Concept
+                                           -- and children to run,
+  , @SpecificRootConcept = NULL            -- Optional, specify a Root ConceptId to only 
+                                           -- recalculate counts for part of the tree
+```
 
 This is stored in the database as `UiDisplayPatientCount`.
 
