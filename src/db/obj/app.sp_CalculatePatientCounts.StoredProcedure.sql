@@ -50,7 +50,6 @@ BEGIN
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
 	
-
 	------------------------------------------------------------------------------------------------------------------------------ 
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
@@ -79,6 +78,7 @@ BEGIN
 		ORDER BY PatientCountLastUpdateDateTime ASC
 
 		SET @TotalConcepts = @@ROWCOUNT
+		SET @CurrentConcept = 1
 
 		------------------------------------------------------------------------------------------------------------------------------
 		-- ForEach concept in concepts
@@ -122,8 +122,6 @@ BEGIN
 
 	END 
 	-- End ForEach root concept
-
-
 END
 
 GO

@@ -3434,6 +3434,13 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/5/23
+-- Description: Calculates the patient count for a given concept using
+--              dynamic SQL for both the total unique patients and unique 
+--              count by year.
+-- =======================================
 CREATE PROCEDURE [app].[sp_CalculateConceptPatientCount]
 	@PersonIdField NVARCHAR(50),
 	@TargetDatabaseName NVARCHAR(100),
@@ -3452,6 +3459,14 @@ BEGIN
 			@PatientsByYearParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsByYearOUT NVARCHAR(MAX) OUTPUT'
 	
 	BEGIN 
+
+			-- Figure out if we need to add the db name
+			DECLARE @DbFrom NVARCHAR(100) = @TargetDatabaseName + '.' + @From
+			SET @DbFrom = 
+				CASE
+					WHEN OBJECT_ID(@DbFrom, 'U') IS NULL AND OBJECT_ID(@DbFrom, 'V') IS NULL THEN @From
+					ELSE @DbFrom
+				END
 			
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Total Patient Count
@@ -3459,7 +3474,7 @@ BEGIN
 			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
 			
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
-															 'FROM ' + @TargetDatabaseName + '.' + @From + ' _T ' +
+															 'FROM ' + @DbFrom + ' AS _T ' +
 															  ISNULL('WHERE ' + @Where,'') + 
 															')'
 
@@ -3489,7 +3504,6 @@ BEGIN
 			------------------------------------------------------------------------------------------------------------------------------ 
 			-- Patient Count by Year
 			------------------------------------------------------------------------------------------------------------------------------
-
 			IF (@isEncounterBased = 1 AND TRY_CONVERT(INT, @Result) > 0)
 			
 				BEGIN
@@ -3501,8 +3515,8 @@ BEGIN
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @From + ' _T 
-									   WHERE ' + ISNULL(@Where,'') + ')
+									   FROM ' + @DbFrom + ' AS _T ' + 
+									   ISNULL('WHERE ' + @Where,'') + ')
 									  
 									, year_grouping AS
 									  (SELECT PatientYear
@@ -3521,16 +3535,14 @@ BEGIN
 										'']'')'
 	
 					BEGIN TRY 
-
-						PRINT(@ExecuteSql)
-			
+						
 						EXECUTE sp_executesql 
 							@ExecuteSql,
 							@PatientsByYearParameterDefinition,
 							@TotalPatientsByYearOUT = @Result OUTPUT
 
 						-- Clean up JSON by removing last unnecessary comma
-						SET @Result = REPLACE(REPLACE(LEFT(@Result, LEN(@Result) - 2) + ']','_',''),'z','')
+						SET @Result = LEFT(@Result, LEN(@Result) - 2) + ']'
 
 						UPDATE app.Concept
 						SET UiDisplayPatientCountByYear = @Result
@@ -3599,7 +3611,6 @@ BEGIN
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
 	
-
 	------------------------------------------------------------------------------------------------------------------------------ 
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
@@ -3628,6 +3639,7 @@ BEGIN
 		ORDER BY PatientCountLastUpdateDateTime ASC
 
 		SET @TotalConcepts = @@ROWCOUNT
+		SET @CurrentConcept = 1
 
 		------------------------------------------------------------------------------------------------------------------------------
 		-- ForEach concept in concepts
@@ -3671,8 +3683,6 @@ BEGIN
 
 	END 
 	-- End ForEach root concept
-
-
 END
 
 GO
