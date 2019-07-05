@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 7/5/19 11:48:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2018/12/5
@@ -36,7 +35,7 @@ BEGIN
     -- datasetconstraint ok?
     IF (auth.fn_UserIsAuthorizedForDatasetQueryById(@user, @groups, @datasetid, @admin) = 0)
     BEGIN;
-        DECLARE @dataset403 nvarchar(400) = @user + N' is not authorized to execute dataset ' +  + app.fn_StringifyGuid(@datasetid);
+        DECLARE @dataset403 nvarchar(400) = @user + N' is not authorized to execute dataset ' + app.fn_StringifyGuid(@datasetid);
         THROW 70403, @dataset403, 1;
     END;
 
@@ -63,14 +62,5 @@ BEGIN
         dq.Id = @datasetid;
 
 END
-
-
-
-
-
-
-
-
-
 
 GO

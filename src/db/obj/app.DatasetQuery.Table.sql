@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[DatasetQuery]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  Table [app].[DatasetQuery]    Script Date: 7/5/19 11:48:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -30,7 +30,7 @@ PRIMARY KEY CLUSTERED
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 7/5/19 11:48:10 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
 (
 	[Name] ASC
@@ -38,11 +38,13 @@ CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQue
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 7/5/19 11:48:10 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
 	[UniversalId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+)
+WHERE ([UniversalId] IS NOT NULL)
+WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO

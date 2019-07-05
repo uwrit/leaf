@@ -5,13 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteConcept]    Script Date: 7/5/19 11:48:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/4/1
@@ -44,7 +42,7 @@ BEGIN
         Id uniqueidentifier,
         UniversalId nvarchar(200) null,
         [Name] nvarchar(200) null,
-        [Owner] nvarchar(1000) not null
+        [Owner] nvarchar(200) not null
     );
     INSERT INTO @queries
     SELECT q.Id, q.UniversalId, q.[Name], q.[Owner]
@@ -98,4 +96,5 @@ BEGIN
     SELECT Id, UniversalId, UiDisplayName
     FROM @concepts;
 END
+
 GO

@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_DeleteEndpoint]    Script Date: 6/12/19 12:20:53 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_DeleteEndpoint]    Script Date: 7/5/19 11:48:10 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/5/23
@@ -18,7 +17,7 @@ GO
 -- =======================================
 CREATE PROCEDURE [adm].[sp_DeleteEndpoint]
     @id int,
-    @user auth.[User]
+	@user auth.[User]
 AS
 BEGIN
     SET NOCOUNT ON
@@ -28,6 +27,5 @@ BEGIN
     WHERE Id = @id;
 
 END
-
 
 GO
