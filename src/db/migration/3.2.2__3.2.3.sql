@@ -262,3 +262,11 @@ END
 
 
 GO
+
+
+IF EXISTS (SELECT 1 FROM ref.Version)
+    UPDATE ref.Version
+    SET [Version] = '3.2.3'
+ELSE 
+    INSERT INTO ref.[Version] (Lock, Version)
+    SELECT 'X', '3.2.3'
