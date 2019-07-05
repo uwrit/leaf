@@ -223,7 +223,8 @@ namespace Services.Search
                     IsAuthorized = f.QueryIsAuthorized,
                     ConceptCheck = new ConceptPreflightCheck
                     {
-                        Results = g.Select(c => new ConceptPreflightCheckResult
+                        Results = g.Where(c => c.ConceptId.HasValue)
+                        .Select(c => new ConceptPreflightCheckResult
                         {
                             Id = c.ConceptId,
                             UniversalId = ConceptUrn.From(c.ConceptUniversalId),

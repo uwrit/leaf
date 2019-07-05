@@ -13,7 +13,7 @@ namespace Model.Compiler
     {
         public bool Ok => Results.All(r => r.IsPresent && r.IsAuthorized);
 
-        public IEnumerable<ConceptPreflightCheckResult> Results { get; set; }
+        public IEnumerable<ConceptPreflightCheckResult> Results { get; set; } = new List<ConceptPreflightCheckResult>();
 
         public IEnumerable<ConceptPreflightCheckResult> Errors()
         {
