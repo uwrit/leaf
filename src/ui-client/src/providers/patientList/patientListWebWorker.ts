@@ -280,7 +280,10 @@ export default class PatientListWebWorker {
                 const p = uniquePatients![i];
                 const rows = data[p];
                 const compoundId = `${responderId}_${p}`;
-                const patientData = patientMap.get(compoundId)!.multirowData;
+                const pat = patientMap.get(compoundId);
+                if (!pat) { continue; }
+
+                const patientData = pat.multirowData;
                 uniqueCompoundPatients.push(compoundId);
 
                 // Convert strings to dates

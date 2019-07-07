@@ -113,7 +113,10 @@ var addMultiRowDataset = function (payload) {
         var p = uniquePatients[i];
         var rows = data[p];
         var compoundId = responderId + "_" + p;
-        var patientData = patientMap.get(compoundId).multirowData;
+        var pat = patientMap.get(compoundId);
+        if (!pat) { continue; }
+
+        var patientData = pat.multirowData;
         uniqueCompoundPatients.push(compoundId);
         // Convert strings to dates
         for (var j = 0; j < rows.length; j++) {

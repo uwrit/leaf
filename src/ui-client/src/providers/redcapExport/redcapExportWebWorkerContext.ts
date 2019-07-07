@@ -15,12 +15,19 @@ var handleWorkMessage = function (payload) {
     }
 };
 /*
+ * Prepare a dataset or field name to be used in REDCap.
+ */
+var chars = / |-|?|/g;
+var cleanName = function (pre) {
+    return pre.replace(chars, '').toLowerCase();
+};
+/*
  * Create a unique REDCap project export configuration
  * based on data from the patient list.
  */
 var createExportConfiguration = function (payload) {
     var requestId = payload.requestId, options = payload.options, patientList = payload.patientList, projectTitle = payload.projectTitle, username = payload.username, useRepeatingForms = payload.useRepeatingForms;
-    patientList.forEach(function (d) { return d.datasetId = d.datasetId.toLowerCase(); });
+    patientList.forEach(function (d) { return d.datasetId = cleanName(d.datasetId); });
     var derived = deriveRecords(patientList, useRepeatingForms, options.rowLimit);
     var config = {
         data: derived.records,
@@ -72,7 +79,7 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
         // Update column names by appending datasetId to avoid collisions in REDCap
         for (var j = 0; j < ds.columns.length; j++) {
             var col = ds.columns[j];
-            col.redcapFieldName = (ds.datasetId + "_" + col.id).toLowerCase();
+            col.redcapFieldName = cleanName(ds.datasetId + "_" + col.id);
             if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
                 if (col.id === colPersonId) {
                     personIdAdded = true;

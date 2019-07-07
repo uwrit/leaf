@@ -131,13 +131,20 @@ export default class REDCapExportWebWorker {
         };
 
         /*
+         * Prepare a dataset or field name to be used in REDCap.
+         */
+        const chars = / |-|?|/g;
+        const cleanName = (pre: string): string => {
+            return pre.replace(chars,'').toLowerCase();
+        };
+
+        /*
          * Create a unique REDCap project export configuration
          * based on data from the patient list.
          */
-
         const createExportConfiguration = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, options, patientList, projectTitle, username, useRepeatingForms } = payload;
-            patientList!.forEach((d: PatientListDatasetExport) => d.datasetId = d.datasetId.toLowerCase());
+            patientList!.forEach((d: PatientListDatasetExport) => d.datasetId = cleanName(d.datasetId));
             const derived: REDCapExportDerivedPatientListData = deriveRecords(patientList!, useRepeatingForms!, options!.rowLimit!);
             const config: REDCapExportConfiguration = {
                 data: derived.records,
@@ -170,7 +177,6 @@ export default class REDCapExportWebWorker {
          * and and a single array of records derived from
          * all patient list datasets.
          */
-
         const deriveRecords = (pl: PatientListDatasetExport[], useRepeatingForms: boolean, rowLimit: number): REDCapExportDerivedPatientListData => {
             const colPersonId = 'personId';
             const colRcPersonId = colPersonId.toLowerCase();
@@ -193,7 +199,7 @@ export default class REDCapExportWebWorker {
                 // Update column names by appending datasetId to avoid collisions in REDCap
                 for (let j = 0; j < ds.columns.length; j++) {
                     const col = ds.columns[j] as REDCapExportDerivedPatientListColumn;
-                    col.redcapFieldName = `${ds.datasetId}_${col.id}`.toLowerCase();
+                    col.redcapFieldName = cleanName(`${ds.datasetId}_${col.id}`);
                     if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
                         if (col.id === colPersonId) {
                             personIdAdded = true;
@@ -254,7 +260,6 @@ export default class REDCapExportWebWorker {
          * the REDCap event mappings to point them to specific forms.
          * (1 Patient List Dataset => 1 REDCap Form)
          */
-
         const deriveEvents = (pl: REDCapExportDerivedPatientListData): REDCapExportEventsAndMappings => {
             const events: REDCapEvent[] = [];
             const eventMappings: REDCapEventMapping[] = [];
@@ -289,7 +294,6 @@ export default class REDCapExportWebWorker {
          * from REDCap. Each column in each dataset becomes
          * a field.
          */
-
         const deriveFieldMetadata = (pl: REDCapExportDerivedPatientListData): REDCapFieldMetadata[] => {
             const meta: REDCapFieldMetadata[] = [];
 
@@ -335,7 +339,6 @@ export default class REDCapExportWebWorker {
         /*
          * Derive repeating forms events.
          */
-
         const deriveRepeatingFormsEvents = (pl: REDCapExportDerivedPatientListData): REDCapRepeatingFormEvent[] => {
             const repeatingForms: REDCapRepeatingFormEvent[] = [];
 
@@ -356,7 +359,6 @@ export default class REDCapExportWebWorker {
          * Derive a user JSON object. The Leaf user
          * is designated as the owner of the new REDCap project.
          */
-
         const deriveUser = (options: REDCapExportOptions, patientList: PatientListDatasetExport[], username: string): REDCapUser => {
             const forms: any = {};
             patientList.forEach((d: PatientListDatasetExport) => forms[d.datasetId] = 1);
