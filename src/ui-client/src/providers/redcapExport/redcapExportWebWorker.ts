@@ -134,11 +134,27 @@ export default class REDCapExportWebWorker {
          * Prepare a dataset or field name to be used in REDCap.
          */
         const cleanName = (pre: string): string => {
+
+            // TODO - variables MUST be <= 100 chars
+            // TODO - form names MUST be <= 64 chars
+
+            const repl = new Set([' ','.','-']);
+            let out: any = pre;
+
+            for (let i = 0; i < out.length; i++) {
+                const t = out[i];
+                if (repl.has(t)) {
+                    out[i] = '';
+                }
+            }
+            return out;
+            /*
             return pre
-                .replace(' ','')
-                .replace('-','_')
-                .replace('?','')
+                .replace(/ /g,'')
+                .replace(/./g,'')
+                .replace(/-/g,'_')
                 .toLowerCase();
+            */
         };
 
         /*
