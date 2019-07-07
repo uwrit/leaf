@@ -17,9 +17,8 @@ var handleWorkMessage = function (payload) {
 /*
  * Prepare a dataset or field name to be used in REDCap.
  */
-var chars = /\ |\-|\?|/g;
 var cleanName = function (pre) {
-    return pre.replace(chars, '').toLowerCase();
+    return pre.replace(' ','').replace('-','_').replace('?','').toLowerCase();
 };
 /*
  * Create a unique REDCap project export configuration
