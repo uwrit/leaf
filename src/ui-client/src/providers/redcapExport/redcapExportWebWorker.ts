@@ -133,7 +133,7 @@ export default class REDCapExportWebWorker {
         /*
          * Prepare a dataset or field name to be used in REDCap.
          */
-        const chars = / |-|?|/g;
+        const chars = /\ |\-|\?|/g;
         const cleanName = (pre: string): string => {
             return pre.replace(chars,'').toLowerCase();
         };
