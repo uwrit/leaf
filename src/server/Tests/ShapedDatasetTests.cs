@@ -4,19 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Compiler;
-using Model.Schema;
+using Xunit;
+using Model.Cohort;
 
-namespace Model.Cohort
+namespace Tests
 {
-    public abstract class ShapedDataset
+    public class ShapedDatasetTests
     {
-        [Field(Name = DatasetColumns.PersonId, Type = LeafType.String, Required = true, Phi = true, Mask = true)]
-        public string PersonId { get; set; }
 
-        public virtual object Result()
-        {
-            return this;
-        }
     }
 }

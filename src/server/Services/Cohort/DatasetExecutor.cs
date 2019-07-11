@@ -56,11 +56,7 @@ namespace Services.Cohort
                         var data = marshaller.Marshal(reader, user.Anonymize());
                         var resultSchema = ShapedDatasetSchema.From(dbSchema);
 
-                        return new Dataset
-                        {
-                            Schema = resultSchema,
-                            Results = data.GroupBy(d => d.PersonId).ToDictionary(g => g.Key, g => g.Select(r => r))
-                        };
+                        return new Dataset(resultSchema, data);
                     }
                 }
             }

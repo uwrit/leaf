@@ -13,7 +13,7 @@ namespace API.DTO.Cohort
     public class DatasetDTO
     {
         public DatasetResultSchemaDTO Schema { get; set; }
-        public Dictionary<string, IEnumerable<ShapedDataset>> Results { get; set; }
+        public Dictionary<string, IEnumerable<object>> Results { get; set; }
 
         public DatasetDTO()
         {
@@ -26,7 +26,7 @@ namespace API.DTO.Cohort
             Results = dataset.Results;
         }
 
-        public DatasetDTO(DatasetProvider.Result result): this(result.Dataset)
+        public DatasetDTO(DatasetProvider.Result result) : this(result.Dataset)
         {
         }
     }
