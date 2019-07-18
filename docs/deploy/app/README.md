@@ -65,9 +65,19 @@ openssl pkcs12 -in <your_key_path>/cert.pem -inkey key.pem \
 ## Setting Environment Variables
 
 ### Windows 
-Sensitive configuration data specifying data sources and passwords are stored in environmental variables. 
+Sensitive configuration data specifying data sources and passwords are stored in environmental variables. Where these environment variables are defined depends on which web server is being used.
 
-![Environment Variables](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/windows_env_vars.png "Environment Variables")
+#### IIS
+In IIS they are defined as configuration items in your backing application in IIS itself.
+
+![IIS Environment Variables Navigation](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_environ.png "IIS Environment Variables Navigation")
+
+![IIS Environment Variable Entries](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/iis_env_vars.png "IIS Environment Variable Entries")
+
+#### Apache
+In Apache they are defined as OS level environment variables for the user running the API service.
+
+![OS Environment Variables](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/windows_env_vars.png "OS Environment Variables")
 
 Make sure the following variables are defined:
 
