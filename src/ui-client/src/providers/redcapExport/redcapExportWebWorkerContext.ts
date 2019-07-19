@@ -17,7 +17,7 @@ var handleWorkMessage = function (payload) {
 /*
  * Prepare a dataset or field name to be used in REDCap.
  */
-var invalid = new Map([[' ', '_'], ['-', ''], ['.', ''], [';', ''], ['!', ''], [':', '']]);
+var invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''], ['[',''], [']',''], ['{',''], ['}',''], ['>',''], ['<',''], ['=',''], ['(',''], [')',''] ]);
 var cleanName = function (pre, charLimit) {
     var arr = [];
     for (var i = 0; i < pre.length; i++) {

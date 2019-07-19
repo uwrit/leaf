@@ -381,12 +381,11 @@ var getDerivedNonNumericColumnsTemplate = function () {
  */
 var getNumericSummaryDatasetColums = function (def) {
     var cols = Object.assign({}, getDerivedNumericColumnsTemplate());
-    var defName = def.category ? def.displayName.replace(def.category + ': ','') : def.displayName;
     Array.from(Object.keys(cols)).forEach(function (k, i) {
         var col = cols[k];
         col.index = i;
-        col.displayName = defName + " " + capitalize(col.id);
-        col.id = (defName + "_" + col.id).toLowerCase().replace(' ', '_');
+        col.displayName = def.displayName + " " + capitalize(col.id);
+        col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
     });
@@ -485,12 +484,11 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
  */
 var getNonNumericSummaryDatasetColums = function (def) {
     var cols = getDerivedNonNumericColumnsTemplate();
-    var defName = def.category ? def.displayName.replace(def.category + ': ','') : def.displayName;
     Array.from(Object.keys(cols)).forEach(function (k, i) {
         var col = cols[k];
         col.index = i;
-        col.displayName = defName + " " + capitalize(col.id);
-        col.id = (defName + "_" + col.id).toLowerCase().replace(' ', '_');
+        col.displayName = def.displayName + " " + capitalize(col.id);
+        col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
     });

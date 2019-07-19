@@ -133,7 +133,7 @@ export default class REDCapExportWebWorker {
         /*
          * Prepare a dataset or field name to be used in REDCap.
          */
-        const invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''] ]);
+        const invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''], ['[',''], [']',''], ['{',''], ['}',''], ['>',''], ['<',''], ['=',''], ['(',''], [')',''] ]);
         const cleanName = (pre: string, charLimit: number): string => {
             const arr: string[] = [];
 

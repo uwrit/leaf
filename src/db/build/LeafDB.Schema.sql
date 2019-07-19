@@ -1154,14 +1154,6 @@ INCLUDE ( 	[WordId]) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_I
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_DatasetQuery_Name]    Script Date: 7/5/19 11:48:01 AM ******/
-CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
-(
-	[Name] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-GO
-SET ANSI_PADDING ON
-GO
 /****** Object:  Index [IXUniq_DatasetQuery_UniversalId]    Script Date: 7/5/19 11:48:01 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_DatasetQuery_UniversalId] ON [app].[DatasetQuery]
 (
@@ -2958,8 +2950,8 @@ BEGIN
         IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
             THROW 70404, N'DatasetQuery not found.', 1;
 
-        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId OR @name = Name))
-            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId))
+            THROW 70409, N'DatasetQuery already exists with universal id.', 1;
 
         UPDATE app.DatasetQuery
         SET
