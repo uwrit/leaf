@@ -1,4 +1,8 @@
 
+IF EXISTS (SELECT 1 FROM sysindexes WHERE name = 'IXUniq_DatasetQuery_Name')
+    DROP INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
+GO
+
 IF OBJECT_ID('adm.sp_UpdateDatasetQuery', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_UpdateDatasetQuery];
 GO

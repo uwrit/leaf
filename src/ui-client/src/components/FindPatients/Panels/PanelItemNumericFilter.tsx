@@ -57,14 +57,6 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         }
     }
 
-    /*
-    public componentDidMount() {
-        const { numericFilter } = this.props.panelItem;
-        const newFilter = Object.assign({}, numericFilter, { filterType: types[0].enum });
-        this.dispatchUpdate(newFilter);
-    }
-    */
-
     public render(): any {
         const { panelItem } = this.props;
         const { filterType, filter } = panelItem.numericFilter;
@@ -229,6 +221,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         const { filter, filterType } = panelItem.numericFilter;
         const [ val1, val2 ] = filter;
         const { uiNumericDefaultText, uiDisplayUnits } = panelItem.concept;
+        const units = uiDisplayUnits ? uiDisplayUnits : '';
 
         if (filterType === NumericFilterType.None || val1 === null) {
             return uiNumericDefaultText;
@@ -236,10 +229,10 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
             return uiNumericDefaultText;
         } else if (filterType === NumericFilterType.Between) {
             const between = types.find((p: EqualityValue) => p.enum === NumericFilterType.Between)!;
-            return `${between.operator} ${val1} and ${val2} ${uiDisplayUnits}`;
+            return `${between.operator} ${val1} and ${val2} ${units}`;
         } else {
             const ev = types.find((p: EqualityValue) => p.enum === filterType)!;
-            return `${ev.operator} ${val1} ${uiDisplayUnits}`;
+            return `${ev.operator} ${val1} ${units}`;
         }
     }   
 
