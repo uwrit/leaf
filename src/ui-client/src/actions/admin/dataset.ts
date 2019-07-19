@@ -38,7 +38,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
             const newAdminDataset = dataset.unsaved
                 ? await createDataset(state, dataset)
                 : await updateDataset(state, dataset);
-            dispatch(setAdminDataset(newAdminDataset, false, false));
+            dispatch(setAdminDataset(newAdminDataset, false, true));
 
             /*
              * Swap old for new in UI.

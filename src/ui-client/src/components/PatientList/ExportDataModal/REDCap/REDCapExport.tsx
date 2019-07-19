@@ -129,6 +129,7 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
     private handleClickExport = (): any => {
         const projName = this.state.projectName;
         if (projName) {
+            this.setState({ projectName: '' });
             return () => exportToREDCap(projName);
         }
         else {

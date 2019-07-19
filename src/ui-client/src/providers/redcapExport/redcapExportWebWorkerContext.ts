@@ -15,12 +15,47 @@ var handleWorkMessage = function (payload) {
     }
 };
 /*
+ * Prepare a dataset or field name to be used in REDCap.
+ */
+var invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''], ['[',''], [']',''], ['{',''], ['}',''], ['>',''], ['<',''], ['=',''], ['(',''], [')',''] ]);
+var cleanName = function (pre, charLimit) {
+    var arr = [];
+    for (var i = 0; i < pre.length; i++) {
+        var t = pre[i];
+        var replacement = invalid.get(t);
+        if (replacement) {
+            arr.push(replacement);
+        }
+        else if (t && replacement !== "") {
+            arr.push(t);
+        }
+    }
+    var name = arr.join('').toLowerCase();
+    /*
+     * If the name is too long, generate a random integer,
+     * shorten the name, and append the integer to keep the name unique.
+     */
+    if (name.length > charLimit) {
+        var rand = "" + Math.round(Math.random() * 1000000);
+        return name.substring(0, charLimit - rand.length - 1) + "_" + rand;
+    }
+    return name;
+};
+/*
  * Create a unique REDCap project export configuration
  * based on data from the patient list.
  */
 var createExportConfiguration = function (payload) {
     var requestId = payload.requestId, options = payload.options, patientList = payload.patientList, projectTitle = payload.projectTitle, username = payload.username, useRepeatingForms = payload.useRepeatingForms;
-    patientList.forEach(function (d) { return d.datasetId = d.datasetId.toLowerCase(); });
+    var dsNameLenLimit = 64;
+    /*
+     * Ensure the id generate for each dataset in REDCap has
+     * only valid characters and is wiithin the length limit.
+     */
+    patientList.forEach(function (d) { return d.datasetId = cleanName(d.datasetId, dsNameLenLimit); });
+    /*
+     * Marshall the data to configure and populate the project.
+     */
     var derived = deriveRecords(patientList, useRepeatingForms, options.rowLimit);
     var config = {
         data: derived.records,
@@ -60,19 +95,24 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
     var colRcRepeatInstance = 'redcap_repeat_instance';
     var derived = { datasets: pl, records: [] };
     var recordCompleteStateCode = 2;
+    var fieldNameLenLimit = 100;
     var totalRowCount = 0;
     var totalRowLimitReached = false;
     var personIdAdded = false;
-    // For each dataset
+    /*
+     * For each dataset.
+     */
     for (var i = 0; i < derived.datasets.length; i++) {
         var ds = derived.datasets[i];
         var colRcCompleted = ds.datasetId + "_complete";
         var recordCount = new Map();
         var cols = [];
-        // Update column names by appending datasetId to avoid collisions in REDCap
+        /*
+         * Update column names by appending datasetId to avoid collisions in REDCap.
+         */
         for (var j = 0; j < ds.columns.length; j++) {
             var col = ds.columns[j];
-            col.redcapFieldName = (ds.datasetId + "_" + col.id).toLowerCase();
+            col.redcapFieldName = cleanName(ds.datasetId + "_" + col.id, fieldNameLenLimit);
             if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
                 if (col.id === colPersonId) {
                     personIdAdded = true;
@@ -82,7 +122,9 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
             }
         }
         ds.columns = cols;
-        // Derive REDCap records from data
+        /*
+         * Derive REDCap records from data.
+         */
         for (var k = 0; k < ds.data.length; k++) {
             var r = ds.data[k];
             var patientId = r[colPersonId];
@@ -133,7 +175,6 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
 var deriveEvents = function (pl) {
     var events = [];
     var eventMappings = [];
-    // tslint:disable
     for (var i = 0; i < pl.datasets.length; i++) {
         var ds = pl.datasets[i];
         for (var j = 1; j <= ds.maxRows; j++) {
@@ -154,7 +195,6 @@ var deriveEvents = function (pl) {
             });
         }
     }
-    // tslint:enable
     return { events: events, eventMappings: eventMappings };
 };
 /*
@@ -165,11 +205,9 @@ var deriveEvents = function (pl) {
 var deriveFieldMetadata = function (pl) {
     var meta = [];
     /*
-     * Not ideal, but REDCap expects the properties to be
-     * in exactly the below order (and throws if not),
-     * so linter is disabled, then reenabled after.
+     * Of note, REDCap expects the properties to be
+     * in exactly the below order (and throws if not).
      */
-    // tslint:disable
     for (var i = 0; i < pl.datasets.length; i++) {
         var ds = pl.datasets[i];
         for (var j = 0; j < ds.columns.length; j++) {
@@ -179,7 +217,7 @@ var deriveFieldMetadata = function (pl) {
                 form_name: ds.datasetId,
                 section_header: '',
                 field_type: 'text',
-                field_label: camelCaseToUpperSpaced(col.displayName || col.id),
+                field_label: capitalize(col.id),
                 select_choices_or_calculations: '',
                 field_note: '',
                 text_validation_type_or_show_slider_number: col.type === typeNum ? 'number' :
@@ -198,7 +236,6 @@ var deriveFieldMetadata = function (pl) {
             meta.push(field);
         }
     }
-    // tslint:enable
     return meta;
 };
 /*
@@ -225,7 +262,6 @@ var deriveRepeatingFormsEvents = function (pl) {
 var deriveUser = function (options, patientList, username) {
     var forms = {};
     patientList.forEach(function (d) { return forms[d.datasetId] = 1; });
-    // tslint:disable
     var user = {
         username: username + "@" + options.scope,
         email: "",
@@ -260,15 +296,10 @@ var deriveUser = function (options, patientList, username) {
         lock_records_customization: 0,
         forms: forms
     };
-    // tslint:enable
     return user;
 };
-var camelCaseToUpperSpaced = function (colName) {
-    return colName
-        .replace(/([A-Z])/g, ' $1')
-        .replace(/^./, function (col) { return col.toUpperCase(); })
-        .replace('  ', ' ')
-        .trim();
+var capitalize = function (colName) {
+    return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
 };
 var toREDCapDate = function (date) {
     var hours = date.getHours();

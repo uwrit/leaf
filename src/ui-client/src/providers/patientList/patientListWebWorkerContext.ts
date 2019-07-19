@@ -113,7 +113,10 @@ var addMultiRowDataset = function (payload) {
         var p = uniquePatients[i];
         var rows = data[p];
         var compoundId = responderId + "_" + p;
-        var patientData = patientMap.get(compoundId).multirowData;
+        var pat = patientMap.get(compoundId);
+        if (!pat) { continue; }
+
+        var patientData = pat.multirowData;
         uniqueCompoundPatients.push(compoundId);
         // Convert strings to dates
         for (var j = 0; j < rows.length; j++) {
@@ -377,14 +380,11 @@ var getDerivedNonNumericColumnsTemplate = function () {
  * a given dataset definition.
  */
 var getNumericSummaryDatasetColums = function (def) {
-    var caps = /([A-Z])/g;
-    var firstToUpper = /^./;
-    var camelCaseToUpperSpaced = function (colName) { return colName.replace(caps, ' $1').replace(firstToUpper, function (col) { return col.toUpperCase(); }); };
     var cols = Object.assign({}, getDerivedNumericColumnsTemplate());
     Array.from(Object.keys(cols)).forEach(function (k, i) {
         var col = cols[k];
         col.index = i;
-        col.displayName = "" + def.displayName + camelCaseToUpperSpaced(col.id);
+        col.displayName = def.displayName + " " + capitalize(col.id);
         col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
@@ -483,14 +483,11 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
  * a given non-numeric dataset definition.
  */
 var getNonNumericSummaryDatasetColums = function (def) {
-    var caps = /([A-Z])/g;
-    var firstToUpper = /^./;
-    var camelCaseToUpperSpaced = function (colName) { return colName.replace(caps, ' $1').replace(firstToUpper, function (col) { return col.toUpperCase(); }); };
     var cols = getDerivedNonNumericColumnsTemplate();
     Array.from(Object.keys(cols)).forEach(function (k, i) {
         var col = cols[k];
         col.index = i;
-        col.displayName = "" + def.displayName + camelCaseToUpperSpaced(col.id);
+        col.displayName = def.displayName + " " + capitalize(col.id);
         col.id = (def.displayName + "_" + col.id).toLowerCase().replace(' ', '_');
         col.isDisplayed = col.isDisplayed || false;
         col.datasetId = def.id;
@@ -695,5 +692,9 @@ var getSingletonDataCsv = function (payload) {
         rows.push(row.join(','));
     });
     return { requestId: requestId, result: rows.join(nl) };
+};
+
+var capitalize = (colName) => {
+    return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
 };
 `;

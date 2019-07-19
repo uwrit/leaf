@@ -29,6 +29,16 @@
     border-color: #1CA8DD;
 }
 
+.patientlist-add-dataset-close {
+    color: rgb(200,200,200);
+    cursor: pointer;
+    float: right;
+}
+
+.patientlist-add-dataset-close:hover {
+    color: rgb(244, 67, 54);
+}
+
 .patientlist-add-dataset-select-container {
     background-color: white;
     border-radius: 4px;

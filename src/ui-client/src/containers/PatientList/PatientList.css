@@ -83,7 +83,7 @@
 
 .patientlist-rowcount-container {
     color: rgb(150, 150, 150);
-    margin: 20px 0 0 8px;
+    margin: 10px 0 0 8px;
     position: relative;
 }
 
@@ -175,6 +175,7 @@
     color: #1CA8DD;
     cursor: pointer;
     display: inline;
+    margin-bottom: 8px;
     margin-left: 8px;
     text-transform: capitalize;
     padding: 4px 8px;

@@ -280,7 +280,10 @@ export default class PatientListWebWorker {
                 const p = uniquePatients![i];
                 const rows = data[p];
                 const compoundId = `${responderId}_${p}`;
-                const patientData = patientMap.get(compoundId)!.multirowData;
+                const pat = patientMap.get(compoundId);
+                if (!pat) { continue; }
+
+                const patientData = pat.multirowData;
                 uniqueCompoundPatients.push(compoundId);
 
                 // Convert strings to dates
@@ -560,14 +563,11 @@ export default class PatientListWebWorker {
          * a given dataset definition.
          */
         const getNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedNumericColumnLookup => {
-            const caps = /([A-Z])/g;
-            const firstToUpper = /^./;
-            const camelCaseToUpperSpaced = (colName: string) => colName.replace(caps, ' $1').replace(firstToUpper, (col: string) => col.toUpperCase());
             const cols = Object.assign({}, getDerivedNumericColumnsTemplate());
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
                 col.index = i;
-                col.displayName = `${def.displayName}${camelCaseToUpperSpaced(col.id)}`;
+                col.displayName = `${def.displayName} ${capitalize(col.id)}`;
                 col.id = `${def.displayName}_${col.id}`.toLowerCase().replace(' ','_');
                 col.isDisplayed = col.isDisplayed || false;
                 col.datasetId = def.id;
@@ -673,14 +673,11 @@ export default class PatientListWebWorker {
          * a given non-numeric dataset definition.
          */
         const getNonNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
-            const caps = /([A-Z])/g;
-            const firstToUpper = /^./;
-            const camelCaseToUpperSpaced = (colName: string) => colName.replace(caps, ' $1').replace(firstToUpper, (col: string) => col.toUpperCase());
             const cols = getDerivedNonNumericColumnsTemplate();
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
                 col.index = i;
-                col.displayName = `${def.displayName}${camelCaseToUpperSpaced(col.id)}`;
+                col.displayName = `${def.displayName} ${capitalize(col.id)}`;
                 col.id = `${def.displayName}_${col.id}`.toLowerCase().replace(' ','_');
                 col.isDisplayed = col.isDisplayed || false;
                 col.datasetId = def.id;
@@ -907,6 +904,10 @@ export default class PatientListWebWorker {
                 rows.push(row.join(','));
             });
             return { requestId, result: rows.join(nl) };
+        };
+
+        const capitalize = (colName: string): string => {
+            return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
         };
     }
 }

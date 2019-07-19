@@ -20,6 +20,7 @@ interface Props {
     dates: DateBoundary[];
     datasets: DatasetsState;
     dispatch: any;
+    handleClickClose: () => void;
     handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
     handleDateSelect: (date: DateBoundary) => void;
     selectedDates: DateBoundary;
@@ -31,11 +32,14 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { datasets, className, dates, dispatch, handleDatasetSelect } = this.props;
+        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose } = this.props;
         const c = className ? className : 'patientlist-add-dataset';
         return (
             <div>
                 <Row>
+                    <Col md={12}>
+                        <span className={`${c}-close`} onClick={handleClickClose}>✖</span>
+                    </Col>
                     <Col md={7} className={`${c}-select-col-left`}>
                         <DatasetContainer 
                             datasets={datasets}

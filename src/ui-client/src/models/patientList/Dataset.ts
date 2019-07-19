@@ -122,6 +122,7 @@ export interface PatientListDatasetDefinitionTemplate {
  * metadata added (such as display name, id, etc.).
  */
 export interface PatientListDatasetDefinition extends PatientListDatasetDefinitionTemplate {
+    category?: string;
     columns: Map<PatientListColumnId, PatientListColumn>;
     dateBounds?: DateBoundary;
     displayName: string;
