@@ -108,6 +108,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         configuration={configuration} 
                         className={c}
                         datasets={datasets}
+                        handleClickClose={this.handleClickClose}
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
@@ -153,6 +154,10 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleClick = () => {
         this.setState({ showSelectorModal: true });
+    }
+
+    private handleClickClose = () => {
+        this.setState({ showSelectorModal: false });
     }
 
     private handleBlur = () => {
