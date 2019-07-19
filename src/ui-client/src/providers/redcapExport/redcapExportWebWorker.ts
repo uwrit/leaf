@@ -133,25 +133,30 @@ export default class REDCapExportWebWorker {
         /*
          * Prepare a dataset or field name to be used in REDCap.
          */
+        const invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''] ]);
         const cleanName = (pre: string, charLimit: number): string => {
-
-            // TODO - variables MUST be <= 100 chars
-            // TODO - form names MUST be <= 64 chars
-
-            const repl = new Set([' ','.','-']);
-            const out: string[] = [];
+            const arr: string[] = [];
 
             for (let i = 0; i < pre.length; i++) {
                 const t = pre[i];
-                if (!repl.has(t)) {
-                    out.push(t)
+                const replacement = invalid.get(t);
+                if (replacement) {
+                    arr.push(replacement);
+                } else if (t && replacement !== "") {
+                    arr.push(t);
                 }
             }
-            const combined = out.join('');
-            if (combined.length > charLimit) {
+            const name = arr.join('').toLowerCase();
 
+            /* 
+             * If the name is too long, generate a random integer,
+             * shorten the name, and append the integer to keep the name unique.
+             */ 
+            if (name.length > charLimit) {
+                const rand = `${Math.round(Math.random() * 1000000)}`;
+                return `${name.substring(0, charLimit - rand.length - 1)}_${rand}`;
             }
-            return combined;
+            return name;
         };
 
         /*
@@ -160,7 +165,17 @@ export default class REDCapExportWebWorker {
          */
         const createExportConfiguration = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, options, patientList, projectTitle, username, useRepeatingForms } = payload;
-            patientList!.forEach((d: PatientListDatasetExport) => d.datasetId = cleanName(d.datasetId));
+            const dsNameLenLimit = 64;
+
+            /*
+             * Ensure the id generate for each dataset in REDCap has
+             * only valid characters and is wiithin the length limit.
+             */
+            patientList!.forEach((d) => d.datasetId = cleanName(d.datasetId, dsNameLenLimit));
+
+            /*
+             * Marshall the data to configure and populate the project.
+             */
             const derived: REDCapExportDerivedPatientListData = deriveRecords(patientList!, useRepeatingForms!, options!.rowLimit!);
             const config: REDCapExportConfiguration = {
                 data: derived.records,
@@ -201,21 +216,26 @@ export default class REDCapExportWebWorker {
             const colRcRepeatInstance = 'redcap_repeat_instance';
             const derived: REDCapExportDerivedPatientListData = { datasets: pl, records: [] };
             const recordCompleteStateCode = 2;
+            const fieldNameLenLimit = 100;
             let totalRowCount = 0;
             let totalRowLimitReached = false;
             let personIdAdded = false;
 
-            // For each dataset
+            /*
+             * For each dataset.
+             */
             for (let i = 0; i < derived.datasets.length; i++) {
                 const ds = derived.datasets[i];
                 const colRcCompleted = `${ds.datasetId}_complete`;
                 const recordCount = new Map();
                 const cols: REDCapExportDerivedPatientListColumn[] = [];
 
-                // Update column names by appending datasetId to avoid collisions in REDCap
+                /*
+                 * Update column names by appending datasetId to avoid collisions in REDCap.
+                 */
                 for (let j = 0; j < ds.columns.length; j++) {
                     const col = ds.columns[j] as REDCapExportDerivedPatientListColumn;
-                    col.redcapFieldName = cleanName(`${ds.datasetId}_${col.id}`);
+                    col.redcapFieldName = cleanName(`${ds.datasetId}_${col.id}`, fieldNameLenLimit);
                     if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
                         if (col.id === colPersonId) {
                             personIdAdded = true;
@@ -226,7 +246,9 @@ export default class REDCapExportWebWorker {
                 }
                 ds.columns = cols;
 
-                // Derive REDCap records from data
+                /*
+                 * Derive REDCap records from data.
+                 */
                 for (let k = 0; k < ds.data.length; k++) {
                     const r: any = ds.data[k];
                     const patientId = r[colPersonId];
@@ -280,7 +302,6 @@ export default class REDCapExportWebWorker {
             const events: REDCapEvent[] = [];
             const eventMappings: REDCapEventMapping[] = [];
 
-            // tslint:disable
             for (let i = 0; i < pl.datasets.length; i++) {
                 const ds = pl.datasets[i];
                 for (let j = 1; j <= ds.maxRows; j++) {
@@ -301,7 +322,6 @@ export default class REDCapExportWebWorker {
                     });
                 }
             }
-            // tslint:enable
             return { events, eventMappings };
         }
 
@@ -314,11 +334,9 @@ export default class REDCapExportWebWorker {
             const meta: REDCapFieldMetadata[] = [];
 
             /*
-             * Not ideal, but REDCap expects the properties to be 
-             * in exactly the below order (and throws if not),
-             * so linter is disabled, then reenabled after.
+             * Of note, REDCap expects the properties to be 
+             * in exactly the below order (and throws if not).
              */
-            // tslint:disable
             for (let i = 0; i < pl.datasets.length; i++) {
                 const ds = pl.datasets[i];
                 for (let j = 0; j < ds.columns.length; j++) {
@@ -328,7 +346,7 @@ export default class REDCapExportWebWorker {
                         form_name: ds.datasetId,
                         section_header: '',
                         field_type: 'text',
-                        field_label: camelCaseToUpperSpaced(col.displayName || col.id),
+                        field_label: capitalize(col.id),
                         select_choices_or_calculations: '',
                         field_note: '',
                         text_validation_type_or_show_slider_number: 
@@ -348,7 +366,6 @@ export default class REDCapExportWebWorker {
                     meta.push(field);
                 }
             }
-            // tslint:enable
             return meta;
         }
 
@@ -379,7 +396,6 @@ export default class REDCapExportWebWorker {
             const forms: any = {};
             patientList.forEach((d: PatientListDatasetExport) => forms[d.datasetId] = 1);
 
-            // tslint:disable
             const user: REDCapUser = {
                 username: `${username}@${options.scope}`,
                 email: ``,
@@ -414,16 +430,11 @@ export default class REDCapExportWebWorker {
                 lock_records_customization: 0,
                 forms
             };
-            // tslint:enable
             return user;
         }
 
-        const camelCaseToUpperSpaced = (colName: string): string => {
-            return colName
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, (col: string) => col.toUpperCase())
-                .replace('  ',' ')
-                .trim();
+        const capitalize = (colName: string): string => {
+            return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
         };
 
         const toREDCapDate = (date: Date): string => {

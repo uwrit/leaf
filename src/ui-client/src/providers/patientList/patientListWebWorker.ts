@@ -563,15 +563,13 @@ export default class PatientListWebWorker {
          * a given dataset definition.
          */
         const getNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedNumericColumnLookup => {
-            const caps = /([A-Z])/g;
-            const firstToUpper = /^./;
-            const camelCaseToUpperSpaced = (colName: string) => colName.replace(caps, ' $1').replace(firstToUpper, (col: string) => col.toUpperCase());
             const cols = Object.assign({}, getDerivedNumericColumnsTemplate());
+            const defName = def.category ? def.displayName.replace(`${def.category}: `,'') : def.displayName;
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
                 col.index = i;
-                col.displayName = `${def.displayName}${camelCaseToUpperSpaced(col.id)}`;
-                col.id = `${def.displayName}_${col.id}`.toLowerCase().replace(' ','_');
+                col.displayName = `${defName} ${capitalize(col.id)}`;
+                col.id = `${defName}_${col.id}`.toLowerCase().replace(' ','_');
                 col.isDisplayed = col.isDisplayed || false;
                 col.datasetId = def.id;
             });
@@ -676,15 +674,13 @@ export default class PatientListWebWorker {
          * a given non-numeric dataset definition.
          */
         const getNonNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
-            const caps = /([A-Z])/g;
-            const firstToUpper = /^./;
-            const camelCaseToUpperSpaced = (colName: string) => colName.replace(caps, ' $1').replace(firstToUpper, (col: string) => col.toUpperCase());
             const cols = getDerivedNonNumericColumnsTemplate();
+            const defName = def.category ? def.displayName.replace(`${def.category}: `,'') : def.displayName;
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
                 col.index = i;
-                col.displayName = `${def.displayName}${camelCaseToUpperSpaced(col.id)}`;
-                col.id = `${def.displayName}_${col.id}`.toLowerCase().replace(' ','_');
+                col.displayName = `${defName} ${capitalize(col.id)}`;
+                col.id = `${defName}_${col.id}`.toLowerCase().replace(' ','_');
                 col.isDisplayed = col.isDisplayed || false;
                 col.datasetId = def.id;
             });
@@ -910,6 +906,10 @@ export default class PatientListWebWorker {
                 rows.push(row.join(','));
             });
             return { requestId, result: rows.join(nl) };
+        };
+
+        const capitalize = (colName: string): string => {
+            return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
         };
     }
 }
