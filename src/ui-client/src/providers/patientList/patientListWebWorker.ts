@@ -298,8 +298,8 @@ export default class PatientListWebWorker {
                     }
                 }
 
-                if (!patientData.multirowData.has(dsId)) {
-                    patientData.multirowData.set(dsId, rows);
+                if (!patientData.has(dsId)) {
+                    patientData.set(dsId, rows);
                 }
             }
 
