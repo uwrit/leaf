@@ -36,7 +36,7 @@ namespace Model.Search
         /// </summary>
         /// <returns>The queries.</returns>
         /// <exception cref="System.Data.Common.DbException"/>
-        public async Task<IEnumerable<DatasetQuery>> GetQueriesAsync()
+        public async Task<IEnumerable<IDatasetQuery>> GetQueriesAsync()
         {
             log.LogInformation("Getting dataset queries.");
             return await fetcher.GetDatasetQueriesAsync();

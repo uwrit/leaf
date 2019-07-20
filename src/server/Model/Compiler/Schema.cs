@@ -63,14 +63,20 @@ namespace Model.Compiler
 
         public DatasetResultSchema GetShapedSchema(DatasetResultSchema actualSchema)
         {
+            if (actualSchema.Shape == Shape.Dynamic)
+            {
+                return DatasetResultSchema.For(actualSchema.Shape, actualSchema.Fields);
+            }
             var actualFields = actualSchema.Fields.Where(f => Fields.Contains<BaseSchemaField>(f)).ToArray();
             return DatasetResultSchema.For(actualSchema.Shape, actualFields);
         }
 
-        public static ValidationSchema For(Shape shape)
+        public static ValidationSchema For(ShapedDatasetExecutionContext context)
         {
-            switch (shape)
+            switch (context.Shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicValidationSchema((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
                 case Shape.Observation:
                     return ObservationValidationSchema.Schema;
                 case Shape.Encounter:
@@ -90,8 +96,17 @@ namespace Model.Compiler
                 case Shape.MedicationAdministration:
                     return MedicationAdministrationValidationSchema.Schema;
                 default:
-                    throw new ArgumentException($"{shape.ToString()} is not implemented in ValidationSchema.For");
+                    throw new ArgumentException($"{context.Shape.ToString()} is not implemented in ValidationSchema.For");
             }
+        }
+    }
+
+    public class DynamicValidationSchema : ValidationSchema
+    {
+        public DynamicValidationSchema(IEnumerable<SchemaFieldSelector> fields)
+        {
+            Shape = Shape.Dynamic;
+            Fields = fields.ToArray();
         }
     }
 

@@ -10,6 +10,22 @@ using System.Linq;
 
 namespace Model.Cohort
 {
+    public interface IDatasetResult
+    {
+
+    }
+
+    public class MultirowDatasetResult : Dictionary<string, IEnumerable<object>>, IDatasetResult
+    {
+
+    }
+
+    public class SingletonDatasetResult: Dictionary<string, object>, IDatasetResult
+    {
+
+    }
+
+
     public class Dataset
     {
         public ShapedDatasetSchema Schema { get; }

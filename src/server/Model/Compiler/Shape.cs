@@ -9,6 +9,7 @@ namespace Model.Compiler
 {
     public enum Shape
     {
+        Dynamic = -1,
         Observation = 1,
         Encounter = 2,
         Demographic = 3,

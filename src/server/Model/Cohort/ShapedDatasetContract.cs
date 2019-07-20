@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using Model.Compiler;
 using System.Collections.Generic;
 
@@ -37,6 +38,44 @@ namespace Model.Cohort
                 default:
                     throw new ArgumentException($"{shape.ToString()} is not implemented in ShapedDatasetContract.For");
             }
+        }
+
+        public static ShapedDatasetContract For(DatasetResultSchema schema, DatasetExecutionContext context)
+        {
+            switch (schema.Shape)
+            {
+                case Shape.Dynamic:
+                    return new DynamicContract((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
+                case Shape.Observation:
+                    return ObservationContract.Contract;
+                case Shape.Encounter:
+                    return EncounterContract.Contract;
+                case Shape.Demographic:
+                    return DemographicContract.Contract;
+                case Shape.Condition:
+                    return ConditionContract.Contract;
+                case Shape.Procedure:
+                    return ProcedureContract.Contract;
+                case Shape.Immunization:
+                    return ImmunizationContract.Contract;
+                case Shape.Allergy:
+                    return AllergyContract.Contract;
+                case Shape.MedicationRequest:
+                    return MedicationRequestContract.Contract;
+                case Shape.MedicationAdministration:
+                    return MedicationAdministrationContract.Contract;
+                default:
+                    throw new ArgumentException($"{schema.Shape.ToString()} is not implemented in ShapedDatasetContract.For");
+            }
+        }
+    }
+
+    public sealed class DynamicContract : ShapedDatasetContract
+    {
+        public DynamicContract(IEnumerable<SchemaFieldSelector> fields)
+        {
+            Shape = Shape.Dynamic;
+            Fields = fields.ToArray();
         }
     }
 

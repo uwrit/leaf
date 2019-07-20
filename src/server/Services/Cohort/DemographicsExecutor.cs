@@ -65,7 +65,7 @@ namespace Services.Cohort
         {
             var shape = context.Shape;
             var actualSchema = GetResultSchema(shape, reader);
-            var validationSchema = ValidationSchema.For(shape);
+            var validationSchema = ValidationSchema.For(context);
             var result = validationSchema.Validate(actualSchema);
 
             switch (result.State)
