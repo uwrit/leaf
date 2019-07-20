@@ -42,40 +42,52 @@ namespace Model.Cohort
 
         public static ShapedDatasetContract For(DatasetResultSchema schema, DatasetExecutionContext context)
         {
-            switch (schema.Shape)
+            if (schema.Shape == Shape.Dynamic)
             {
-                case Shape.Dynamic:
-                    return new DynamicContract((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
-                case Shape.Observation:
-                    return ObservationContract.Contract;
-                case Shape.Encounter:
-                    return EncounterContract.Contract;
-                case Shape.Demographic:
-                    return DemographicContract.Contract;
-                case Shape.Condition:
-                    return ConditionContract.Contract;
-                case Shape.Procedure:
-                    return ProcedureContract.Contract;
-                case Shape.Immunization:
-                    return ImmunizationContract.Contract;
-                case Shape.Allergy:
-                    return AllergyContract.Contract;
-                case Shape.MedicationRequest:
-                    return MedicationRequestContract.Contract;
-                case Shape.MedicationAdministration:
-                    return MedicationAdministrationContract.Contract;
-                default:
-                    throw new ArgumentException($"{schema.Shape.ToString()} is not implemented in ShapedDatasetContract.For");
+                return new DynamicContract(context.DatasetQuery as DynamicDatasetQuery);
             }
+            return For(schema.Shape);
+        }
+
+        public virtual ShapedDatasetContract Validate()
+        {
+            return this;
         }
     }
 
     public sealed class DynamicContract : ShapedDatasetContract
     {
-        public DynamicContract(IEnumerable<SchemaFieldSelector> fields)
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public bool IsEncounterBased { get; set; }
+
+        public DynamicContract()
+        {
+
+        }
+
+        public DynamicContract(DynamicDatasetQuery dynamicDataset)
         {
             Shape = Shape.Dynamic;
-            Fields = fields.ToArray();
+            Fields = dynamicDataset.Schema.Fields.ToArray();
+            SqlFieldDate = dynamicDataset.SqlFieldDate;
+            SqlFieldValueString = dynamicDataset.SqlFieldValueString;
+            SqlFieldValueNumeric = dynamicDataset.SqlFieldValueNumeric;
+            IsEncounterBased = dynamicDataset.IsEncounterBased;
+        }
+
+        public override ShapedDatasetContract Validate()
+        {
+            return new DynamicContract
+            {
+                Shape = Shape,
+                Fields = Fields,
+                SqlFieldDate = SqlFieldDate,
+                SqlFieldValueString = SqlFieldValueString,
+                SqlFieldValueNumeric = SqlFieldValueNumeric,
+                IsEncounterBased = IsEncounterBased
+            };
         }
     }
 

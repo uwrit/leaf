@@ -12,10 +12,11 @@ export type ValueByColumnKey = Map<PatientListColumnId, object>;
 
 export enum PatientListColumnType {
     string = 1,
-    number = 2, 
-    date = 3,
-    sparkline = 4,
-    boolean = 5
+    date = 2,
+    boolean = 3,
+    guid = 4,
+    number = 5,
+    sparkline = 6,
 }
 
 export interface PatientListColumnTemplate {

@@ -47,10 +47,8 @@ export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = {
-        // datasetid: nr.isHomeNode ? dataset.id : dataset.universalId,
-        // shape: dataset.shape
-        datasetid: '0AB2E706-74AA-E911-9D29-B886875607D2',
-        shape: PatientListDatasetShape.Dynamic
+        datasetid: nr.isHomeNode ? dataset.id : dataset.universalId,
+        shape: dataset.shape
     }
     if (dates.start.dateIncrementType !== DateIncrementType.NONE && 
         dates.end.dateIncrementType !== DateIncrementType.NONE

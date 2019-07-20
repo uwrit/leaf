@@ -141,7 +141,7 @@ var addMultiRowDataset = function (payload) {
         }
     }
     // Rows are added to the patient map, now compute stats for each patient
-    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.indexOf(def.numericValueColumn) > -1
+    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.findIndex((f) => f.name === def.numericValueColumn) > -1
         ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
         : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
     derivedDef.totalRows = rowCount;

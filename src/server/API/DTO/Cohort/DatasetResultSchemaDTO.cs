@@ -14,12 +14,45 @@ namespace API.DTO.Cohort
     public class DatasetResultSchemaDTO
     {
         public Shape Shape { get; set; }
-        public IEnumerable<string> Fields { get; set; }
+        public IEnumerable<BaseSchemaFieldDTO> Fields { get; set; }
+
+        public DatasetResultSchemaDTO()
+        {
+
+        }
 
         public DatasetResultSchemaDTO(ShapedDatasetSchema schema)
         {
             Shape = schema.Shape;
-            Fields = schema.Fields.Select(f => f.Name);
+            Fields = schema.Fields.Select(f => new BaseSchemaFieldDTO(f));
+        }
+    }
+
+    public class DynamicDatasetResultSchemaDTO : DatasetResultSchemaDTO
+    {
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public bool IsEncounterBased { get; set; }
+
+        public DynamicDatasetResultSchemaDTO(DynamicContract schema)
+        {
+            Shape = schema.Shape;
+            Fields = schema.Fields.Select(f => new BaseSchemaFieldDTO(f));
+            SqlFieldDate = schema.SqlFieldDate;
+            SqlFieldValueString = schema.SqlFieldValueString;
+            SqlFieldValueNumeric = schema.SqlFieldValueNumeric;
+            IsEncounterBased = schema.IsEncounterBased;
+        }
+    }
+
+
+    public class BaseSchemaFieldDTO : BaseSchemaField
+    {
+        public BaseSchemaFieldDTO(BaseSchemaField field)
+        {
+            Name = field.Name;
+            Type = field.Type;
         }
     }
 }

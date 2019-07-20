@@ -17,13 +17,13 @@ namespace Model.Cohort
 
         public override object Result()
         {
-            var x = new ExpandoObject();
+            var res = new ExpandoObject();
 
             foreach (var d in KeyValues)
             {
-                x.TryAdd(d.Key, d.Value);
+                res.TryAdd(d.Key, d.Value);
             }
-            return x;
+            return res;
         }
     }
 }

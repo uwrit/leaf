@@ -12,6 +12,8 @@ namespace Model.Cohort
 {
     public class ShapedDatasetSchema : Schema<BaseSchemaField>
     {
+        public ShapedDatasetContract Contract { get; protected set; }
+
         public ShapedDatasetSchema()
         {
 
@@ -32,7 +34,8 @@ namespace Model.Cohort
             return new ShapedDatasetSchema
             {
                 Shape = resultSchema.Shape,
-                Fields = fields
+                Fields = fields,
+                Contract = contract
             };
         }
     }
