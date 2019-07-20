@@ -35,17 +35,25 @@ export const RowCount = (props: Props) => {
             <span className={`${c}-rowcount`}>{formatSmallNumber(totalPatients + totalDatapoints)} rows</span>
             <span> of data</span>
 
-            {/* Total Displayed Patients less than Total in Cohort - Single Node */}
-            {totalPatients < totalCohortPatients &&
+            {/* Total Displayed Patients less than Total in Cohort */}
+            {totalPatients !== totalCohortPatients &&
             <div className={`${c}-info`}>
                 <div className={`${c}-info-inner`}>Why can't I see data for all {formatSmallNumber(totalCohortPatients)} patients?
 
-                    {/* Single Node */}
-                    {!isFederated &&
+                    {/* Single Node - export limit */}
+                    {!isFederated && totalCohortPatients > exportLimit &&
                     <div className={`${c}-info-detail`}>
                         <span>Your administrator has limited viewing and exporting to </span>
                         <span className={`${c}-info-emphasis`}>{formatSmallNumber(exportLimit)} patients at a time</span> 
                         <span>, which is less than the total number in your cohort.</span>
+                    </div>
+                    }
+
+                    {/* Single Node - missing patients */}
+                    {!isFederated && totalPatients < totalCohortPatients && totalCohortPatients < exportLimit &&
+                    <div className={`${c}-info-detail`}>
+                        <span>The Leaf server returned demographic data for less patients than were included in the original cohort. </span>
+                        <span>This usually indicates that demographic data are missing for these patients.</span>
                     </div>
                     }
 

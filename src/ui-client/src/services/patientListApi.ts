@@ -107,10 +107,10 @@ export const addMultirowDataset = async (
     const singletonDatasets = patientList.configuration.singletonDatasets;
     const def = getDatasetDefinition(datasetDto, queryRef);
     const dataset: PatientListDataset = {
+        ...queryRef,
         data: datasetDto,
-        definition: def,
-        ...queryRef
-    }
+        definition: def
+    };
 
     /* 
      * Add dataset definition.
@@ -275,8 +275,9 @@ const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientL
         : DefTemplates.get(queryRef.shape)!;
     const def: PatientListDatasetDefinition = {
         ...template,
+        category: queryRef.category,
         columns: validateDefinitionColumns(template, dataset.schema.fields.map((c) => c.name), queryRef.name),
-        displayName: queryRef.name,
+        displayName: queryRef.category ?  `${queryRef.category}: ${queryRef.name}` : queryRef.name,
         id: queryRef.id.toLowerCase().replace(' ',''),
         responderStates: new Map()
     };

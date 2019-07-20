@@ -183,6 +183,10 @@ function setPatientListDatasetState(state: CohortState, action: CohortPatientLis
     state.networkCohorts.set(action.id, copy);
     return Object.assign({}, state, {
         ...state,
-        networkCohorts: new Map(state.networkCohorts)
+        networkCohorts: new Map(state.networkCohorts),
+        configuration: {
+            ...state.patientList.configuration,
+            isFetching: type === CohortStateType.REQUESTING
+        }
     }); 
 };

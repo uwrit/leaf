@@ -118,7 +118,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
             if (atLeastOneSucceeded) {
                 const visibleDatasets = await allowDatasetInSearch(dataset.id, false, state.datasets.searchTerm);
                 dispatch(setDatasetSearchResult(visibleDatasets));
-            } else if (responders.length) {
+            } else {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error when attempting to load this dataset. Please contact your Leaf administrator with this information.",
                     header: "Error Loading Dataset",
@@ -128,7 +128,8 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                 dispatch(showInfoModal(info));
             }
         })
-        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates)));
+        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates)))
+        .catch(() => dispatch(setPatientListDatasetFailure(dataset.id, 0)));
     };
 };
 

@@ -78,7 +78,7 @@ export class PanelItem extends React.Component<Props> {
 
     public componentDidMount() {
         const { connectDragPreview, panelItem } = this.props;
-        if (connectDragPreview) {
+        if (connectDragPreview && panelItem.concept) {
             const dragPreview = getDragPreview(panelItem.concept.uiDisplayName);
             connectDragPreview(dragPreview);
         }
