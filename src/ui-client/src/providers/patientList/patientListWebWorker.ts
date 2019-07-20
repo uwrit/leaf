@@ -298,8 +298,8 @@ export default class PatientListWebWorker {
                     }
                 }
 
-                if (!patientData.has(dsId)) {
-                    patientData.set(dsId, rows);
+                if (!patientData.multirowData.has(dsId)) {
+                    patientData.multirowData.set(dsId, rows);
                 }
             }
 
@@ -316,7 +316,7 @@ export default class PatientListWebWorker {
             }
 
             // Rows are added to the patient map, now compute stats for each patient
-            const derivedDef = def.numericValueColumn && dataset!.data.schema.fields.indexOf(def.numericValueColumn) > -1
+            const derivedDef = def.numericValueColumn && dataset!.data.schema.fields.findIndex((f) => f.name === def.numericValueColumn) > -1
                 ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
                 : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
             derivedDef.totalRows = rowCount;

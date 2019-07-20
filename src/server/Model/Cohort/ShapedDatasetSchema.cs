@@ -12,6 +12,8 @@ namespace Model.Cohort
 {
     public class ShapedDatasetSchema : Schema<BaseSchemaField>
     {
+        public ShapedDatasetContract Contract { get; protected set; }
+
         public ShapedDatasetSchema()
         {
 
@@ -23,14 +25,17 @@ namespace Model.Cohort
             Fields = fields;
         }
 
-        public static ShapedDatasetSchema From(DatasetResultSchema resultSchema)
+        public static ShapedDatasetSchema From(DatasetResultSchema resultSchema, DatasetExecutionContext context)
         {
-            var contract = ShapedDatasetContract.For(resultSchema.Shape);
-            var fields = resultSchema.Fields.Where(f => contract.Fields.Contains<BaseSchemaField>(f)).ToArray();
+            var contract = ShapedDatasetContract.For(resultSchema, context);
+            var fields = resultSchema.Shape == Shape.Dynamic
+                ? resultSchema.Fields.Select(f => (BaseSchemaField)f).ToArray()
+                : resultSchema.Fields.Where(f => contract.Fields.Contains<BaseSchemaField>(f)).ToArray();
             return new ShapedDatasetSchema
             {
                 Shape = resultSchema.Shape,
-                Fields = fields
+                Fields = fields,
+                Contract = contract
             };
         }
     }

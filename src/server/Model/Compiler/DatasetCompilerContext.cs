@@ -17,7 +17,7 @@ namespace Model.Compiler
 
     public sealed class DatasetCompilerContext : ShapedDatasetCompilerContext
     {
-        public DatasetQuery DatasetQuery { get; set; }
+        public IDatasetQuery DatasetQuery { get; set; }
         public DateTime? EarlyBound { get; set; }
         public DateTime? LateBound { get; set; }
 

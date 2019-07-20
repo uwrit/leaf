@@ -109,6 +109,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                     }
                 } catch (err) {
                     dispatch(setPatientListDatasetFailure(dataset.id, nr.id));
+                    console.log(err);
                 }
                 resolve();
             });

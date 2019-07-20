@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using Model.Compiler;
 using System.Collections.Generic;
 
@@ -37,6 +38,56 @@ namespace Model.Cohort
                 default:
                     throw new ArgumentException($"{shape.ToString()} is not implemented in ShapedDatasetContract.For");
             }
+        }
+
+        public static ShapedDatasetContract For(DatasetResultSchema schema, DatasetExecutionContext context)
+        {
+            if (schema.Shape == Shape.Dynamic)
+            {
+                return new DynamicContract(context.DatasetQuery as DynamicDatasetQuery);
+            }
+            return For(schema.Shape);
+        }
+
+        public virtual ShapedDatasetContract Validate()
+        {
+            return this;
+        }
+    }
+
+    public sealed class DynamicContract : ShapedDatasetContract
+    {
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public bool IsEncounterBased { get; set; }
+
+        public DynamicContract()
+        {
+
+        }
+
+        public DynamicContract(DynamicDatasetQuery dynamicDataset)
+        {
+            Shape = Shape.Dynamic;
+            Fields = dynamicDataset.Schema.Fields.ToArray();
+            SqlFieldDate = dynamicDataset.SqlFieldDate;
+            SqlFieldValueString = dynamicDataset.SqlFieldValueString;
+            SqlFieldValueNumeric = dynamicDataset.SqlFieldValueNumeric;
+            IsEncounterBased = dynamicDataset.IsEncounterBased;
+        }
+
+        public override ShapedDatasetContract Validate()
+        {
+            return new DynamicContract
+            {
+                Shape = Shape,
+                Fields = Fields,
+                SqlFieldDate = SqlFieldDate,
+                SqlFieldValueString = SqlFieldValueString,
+                SqlFieldValueNumeric = SqlFieldValueNumeric,
+                IsEncounterBased = IsEncounterBased
+            };
         }
     }
 

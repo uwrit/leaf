@@ -19,7 +19,7 @@ namespace API.DTO.Compiler
         public string Description { get; set; }
         public ICollection<string> Tags { get; set; }
 
-        public DatasetQueryDTO(DatasetQuery dq)
+        public DatasetQueryDTO(IDatasetQuery dq)
         {
             Id = dq.Id.Value.ToString();
             UniversalId = dq.UniversalId?.ToString();

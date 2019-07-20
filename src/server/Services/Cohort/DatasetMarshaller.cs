@@ -24,6 +24,8 @@ namespace Services.Cohort
         {
             switch (shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicMarshaller(schema, pepper);
                 case Shape.Observation:
                     return new ObservationMarshaller(schema, pepper);
                 case Shape.Encounter:

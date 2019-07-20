@@ -4,12 +4,41 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using Model.Anonymization;
 using Model.Compiler;
 using Model.Schema;
 
 namespace Model.Cohort
 {
+    public class DynamicDatasetRecord : ShapedDataset, ISalt
+    {
+        [Field(Name = DatasetColumns.Salt, Type = LeafType.Guid, Required = true)]
+        public Guid Salt { get; set; }
+
+        public Dictionary<string, object> KeyValues = new Dictionary<string, object>();
+
+        public DynamicDatasetRecord()
+        {
+
+        }
+
+        public DynamicDatasetRecord(Dictionary<string,object> keyValues)
+        {
+            KeyValues = keyValues;
+        }
+
+        public DynamicShapedDatum ToDatum()
+        {
+            KeyValues.TryGetValue(DatasetColumns.PersonId, out object personId);
+            return new DynamicShapedDatum
+            {
+                PersonId = personId.ToString(),
+                KeyValues = KeyValues
+            };
+        }
+    }
+
     public class MedicationAdministrationDatasetRecord : MedicationAdministration, ISalt
     {
         [Field(Name = DatasetColumns.Salt, Type = LeafType.Guid, Required = true)]

@@ -13,7 +13,7 @@ namespace API.DTO.Cohort
     public class DatasetDTO
     {
         public DatasetResultSchemaDTO Schema { get; set; }
-        public Dictionary<string, IEnumerable<ShapedDataset>> Results { get; set; }
+        public Dictionary<string, IEnumerable<object>> Results { get; set; }
 
         public DatasetDTO()
         {
@@ -22,11 +22,13 @@ namespace API.DTO.Cohort
 
         public DatasetDTO(Dataset dataset)
         {
-            Schema = new DatasetResultSchemaDTO(dataset.Schema);
+            Schema = dataset.Schema.Shape == Shape.Dynamic
+                ? new DynamicDatasetResultSchemaDTO(dataset.Schema.Contract as DynamicContract)
+                : new DatasetResultSchemaDTO(dataset.Schema);
             Results = dataset.Results;
         }
 
-        public DatasetDTO(DatasetProvider.Result result): this(result.Dataset)
+        public DatasetDTO(DatasetProvider.Result result) : this(result.Dataset)
         {
         }
     }

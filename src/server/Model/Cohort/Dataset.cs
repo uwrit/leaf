@@ -6,12 +6,36 @@
 using System;
 using System.Collections.Generic;
 using Model.Compiler;
+using System.Linq;
 
 namespace Model.Cohort
 {
+    public interface IDatasetResult
+    {
+
+    }
+
+    public class MultirowDatasetResult : Dictionary<string, IEnumerable<object>>, IDatasetResult
+    {
+
+    }
+
+    public class SingletonDatasetResult: Dictionary<string, object>, IDatasetResult
+    {
+
+    }
+
+
     public class Dataset
     {
-        public ShapedDatasetSchema Schema { get; set; }
-        public Dictionary<string, IEnumerable<ShapedDataset>> Results { get; set; }
+        public ShapedDatasetSchema Schema { get; }
+        public Dictionary<string, IEnumerable<object>> Results { get; }
+
+        public Dataset(ShapedDatasetSchema schema,
+            IEnumerable<ShapedDataset> data)
+        {
+            Schema = schema;
+            Results = data.GroupBy(d => d.PersonId).ToDictionary(g => g.Key, g => g.Select(r => r.Result()));
+        }
     }
 }

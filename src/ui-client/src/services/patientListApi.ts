@@ -12,8 +12,8 @@ import PatientListWebWorker from '../providers/patientList/patientListWebWorker'
 import REDCapExportWebWorker from '../providers/redcapExport/redcapExportWebWorker';
 import camelCaseToUpperSpaced from '../utils/camelCaseToUpperSpaced';
 import { PatientListConfiguration } from '../models/patientList/Configuration';
-import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQuery, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate } from '../models/patientList/Dataset';
-import { PatientListColumn, PatientListColumnId } from '../models/patientList/Column';
+import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQuery, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate, PatientListDatasetShape, PatientListDatasetDynamicSchema } from '../models/patientList/Dataset';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate } from '../models/patientList/Column';
 import { PatientListRow, PatientListRowDTO } from '../models/patientList/Patient';
 import { DemographicsDefTemplate, DefTemplates } from '../models/patientList/DatasetDefinitionTemplate';
 
@@ -150,7 +150,7 @@ export const addMultirowDataset = async (
          * If it has a numeric column and the column is present in the data,
          * set the type to 'Quantitative', else 'NonQuantitative'.
          */
-        if (summaryDef.numericValueColumn && datasetDto.schema.fields.indexOf(summaryDef.numericValueColumn) > -1) {
+        if (summaryDef.numericValueColumn) {
             summaryDef.summaryType = PatientListDatasetSummaryType.Quantitative;
         } else {
             summaryDef.summaryType = PatientListDatasetSummaryType.NonQuantititive;
@@ -270,14 +270,31 @@ const getDemographicsDefinition = (patient: PatientListRowDTO) => {
  * Extracts a dataset definition.
  */
 const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery) => {
-    const template = DefTemplates.get(queryRef.shape)!;
+    const template: PatientListDatasetDefinitionTemplate = queryRef.shape === PatientListDatasetShape.Dynamic
+        ? deriveDynamicTemplate(dataset, queryRef)
+        : DefTemplates.get(queryRef.shape)!;
     const def: PatientListDatasetDefinition = {
         ...template,
         category: queryRef.category,
-        columns: validateDefinitionColumns(template, dataset.schema.fields, queryRef.name),
+        columns: validateDefinitionColumns(template, dataset.schema.fields.map((c) => c.name), queryRef.name),
         displayName: queryRef.category ?  `${queryRef.category}: ${queryRef.name}` : queryRef.name,
         id: queryRef.id.toLowerCase().replace(' ',''),
         responderStates: new Map()
     };
     return def;
+};
+
+const deriveDynamicTemplate = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery): PatientListDatasetDefinitionTemplate => {
+    const schema = dataset.schema as PatientListDatasetDynamicSchema;
+    const columns: Map<string, PatientListColumnTemplate> = new Map();
+    schema.fields.forEach((f) => columns.set(f.name, { id: f.name, type: f.type }));
+
+    return {
+        columns,
+        multirow: schema.isEncounterBased,
+        shape: schema.shape,
+        dateValueColumn: schema.sqlFieldDate,
+        numericValueColumn: schema.sqlFieldValueNumeric,
+        stringValueColumn: schema.sqlFieldValueString,
+    };
 };
