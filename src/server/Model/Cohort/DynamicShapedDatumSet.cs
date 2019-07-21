@@ -3,6 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using Model.Compiler;
@@ -11,19 +12,32 @@ using Model.Schema;
 namespace Model.Cohort
 {
     [Schema(Shape = Shape.Dynamic)]
-    public class DynamicShapedDatum : ShapedDataset
+    public class DynamicShapedDatumSet : ShapedDataset
     {
-        public Dictionary<string, object> KeyValues = new Dictionary<string, object>();
+        readonly Dictionary<string, object> _keyValues = new Dictionary<string, object>();
+
+        public DynamicShapedDatumSet()
+        {
+
+        }
+
+        public DynamicShapedDatumSet(string personId, Dictionary<string, object> keyValues)
+        {
+            PersonId = personId;
+            _keyValues = keyValues;
+        }
 
         public override object Result()
         {
-            var res = new ExpandoObject();
+            dynamic dyn = new ExpandoObject();
+            dyn.PersonId = PersonId;
 
-            foreach (var d in KeyValues)
+            foreach(var pair in _keyValues)
             {
-                res.TryAdd(d.Key, d.Value);
+                dyn[pair.Key] = pair.Value;
             }
-            return res;
+            return dyn;
         }
+
     }
 }

@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,7 +53,7 @@ namespace Services.Cohort
                     using (var reader = await cmd.ExecuteReaderAsync(token))
                     {
                         var dbSchema = GetShapedSchema(context, reader);
-                        var marshaller = DatasetMarshaller.For(context.Shape, dbSchema, pepper);
+                        var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
                         var data = marshaller.Marshal(reader, user.Anonymize());
                         var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
 
@@ -93,11 +94,14 @@ namespace Services.Cohort
 
     sealed class DynamicMarshaller : DatasetMarshaller
     {
-        public DynamicMarshalPlan Plan { get; set; }
+        DatasetResultSchema _schema { get; set; }
 
-        public DynamicMarshaller(DatasetResultSchema schema, Guid pepper) : base(pepper)
+        DatasetExecutionContext _context { get; set; }
+
+        public DynamicMarshaller(DatasetExecutionContext context, DatasetResultSchema schema, Guid pepper) : base(pepper)
         {
-            Plan = new DynamicMarshalPlan(schema);
+            _context = context;
+            _schema = schema;
         }
 
         public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
@@ -106,37 +110,46 @@ namespace Services.Cohort
             var converter = GetConverter(anonymize);
             while (reader.Read())
             {
-                var record = GetRecord(reader);
+                var record = GetRecord(reader, _schema.Fields);
                 var dyn = converter(record);
                 records.Add(dyn);
             }
             return records;
         }
 
-        Func<DynamicDatasetRecord, DynamicShapedDatum> GetConverter(bool anonymize)
+        Func<dynamic, DynamicShapedDatumSet> GetConverter(bool anonymize)
         {
-            /*
             if (anonymize)
             {
-                var anon = new Anonymizer<DynamicDatasetRecord>(Pepper);
+                // var anon = new Anonymizer<DynamicDatasetRecord>(Pepper);
                 return (rec) =>
                 {
-                    anon.Anonymize(rec);
-                    return rec.ToDatum();
+                    // anon.Anonymize(rec, (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
+                    return rec;
                 };
             }
-            */
-            return (rec) => rec.ToDatum();
+            return (rec) => rec;
         }
 
-        DynamicDatasetRecord GetRecord(SqlDataReader reader)
+        DynamicDatasetRecord GetRecord(SqlDataReader reader, ICollection<SchemaField> fields)
         {
-            var rec = new DynamicDatasetRecord();
-            foreach (var key in Plan.KeyValues.Keys)
+            var dyn = new DynamicDatasetRecord();
+            foreach (var f in fields)
             {
-                rec.KeyValues.Add(key, reader[key]);
+                if (f.Name == DatasetColumns.PersonId)
+                {
+                    dyn.PersonId = reader.GetNullableString(reader.GetOrdinal(DatasetColumns.PersonId));
+                }
+                else if (f.Name == DatasetColumns.Salt)
+                {
+                    dyn.Salt = reader.GetGuid(reader.GetOrdinal(DatasetColumns.Salt));
+                }
+                else
+                {
+                    dyn.SetValue(f.Name, reader[f.Name]);
+                }
             }
-            return rec;
+            return dyn;
         }
     }
 
