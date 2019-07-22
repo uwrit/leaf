@@ -83,7 +83,7 @@ namespace Services.Cohort
             return validationSchema.GetShapedSchema(actualSchema);
         }
 
-        // NOTE(cspital) potentially check conversions here or above to get raw type into error message, obtuse message if switch falls through LeafType
+        // NOTE(cspital) potentially check conversions here or above to get raw type into error message, abstruse message if switch falls through LeafType
         DatasetResultSchema GetResultSchema(Shape shape, SqlDataReader reader)
         {
             var columns = reader.GetColumnSchema();
@@ -108,9 +108,17 @@ namespace Services.Cohort
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize);
+
+            // Redundant PHI check - the SQL statement should already have excluded these
+            // fields but double-check here as well and filter out if needed.
+            var restrictPhi = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields.Where(f => !f.Phi || (f.Phi && f.Mask));
+            var fields = anonymize
+                ? _schema.Fields.Where(f => restrictPhi.Any(fil => fil.Name == f.Name)).ToArray()
+                : _schema.Fields;
+                
             while (reader.Read())
             {
-                var record = GetRecord(reader, _schema.Fields);
+                var record = GetRecord(reader, fields);
                 var dyn = converter(record);
                 records.Add(dyn);
             }

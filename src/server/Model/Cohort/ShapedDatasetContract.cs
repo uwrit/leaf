@@ -40,13 +40,13 @@ namespace Model.Cohort
             }
         }
 
-        public static ShapedDatasetContract For(DatasetResultSchema schema, DatasetExecutionContext context)
+        public static ShapedDatasetContract For(Shape shape, IDatasetQuery query)
         {
-            if (schema.Shape == Shape.Dynamic)
+            if (shape == Shape.Dynamic)
             {
-                return new DynamicContract(context.DatasetQuery as DynamicDatasetQuery);
+                return new DynamicContract(query as DynamicDatasetQuery);
             }
-            return For(schema.Shape);
+            return For(shape);
         }
 
         public virtual ShapedDatasetContract Validate()

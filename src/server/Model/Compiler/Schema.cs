@@ -17,7 +17,7 @@ namespace Model.Compiler
         public ICollection<T> Fields { get; protected set; }
     }
 
-    // Represents the final shape of the a ShapedDataset data pull from the database, including Salt and Exported where involved.
+    // Represents the final shape of a ShapedDataset data pull from the database, including Salt and Exported where involved.
     public abstract class ValidationSchema : Schema<SchemaFieldSelector>
     {
         public virtual SchemaValidationResult Validate(DatasetResultSchema actualSchema)

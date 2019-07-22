@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Error;
 using Model.Validation;
@@ -31,13 +32,16 @@ namespace Model.Cohort
         readonly IDatasetSqlCompiler compiler;
         readonly IDatasetExecutor executor;
         readonly ILogger<DatasetProvider> log;
+        readonly IUserContext user;
 
         public DatasetProvider(
+            IUserContext user,
             DatasetCompilerValidationContextProvider contextProvider,
             IDatasetSqlCompiler compiler,
             IDatasetExecutor datasetService,
             ILogger<DatasetProvider> log)
         {
+            this.user = user;
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = datasetService;
@@ -80,7 +84,7 @@ namespace Model.Cohort
 
             cancel.ThrowIfCancellationRequested();
 
-            var exeContext = compiler.BuildDatasetSql(validationContext.Context);
+            var exeContext = compiler.BuildDatasetSql(validationContext.Context, user.Anonymize());
             log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);

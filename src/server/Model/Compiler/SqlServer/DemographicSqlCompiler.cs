@@ -61,7 +61,7 @@ namespace Model.Compiler.SqlServer
 
             if (!restrictPhi)
             {
-               executionContext.FieldSelectors = schema.Fields;
+                executionContext.FieldSelectors = schema.Fields;
                 return $"SELECT * FROM dataset";
             }
 
