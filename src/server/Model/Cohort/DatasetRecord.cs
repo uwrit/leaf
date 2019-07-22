@@ -25,6 +25,15 @@ namespace Model.Cohort
 
         }
 
+        public IEnumerable<string> Keys => keyValues.Keys;
+
+        public IEnumerable<KeyValuePair<string, object>> KeyValues => keyValues.ToArray();
+
+        public KeyValuePair<string, object> GetKeyValuePair(string key)
+        {
+            return new KeyValuePair<string, object>(key, GetValue(key));
+        }
+
         public object GetValue(string key)
         {
             if (keyValues.TryGetValue(key, out object value))
@@ -36,12 +45,12 @@ namespace Model.Cohort
 
         public void SetValue(string key, object value)
         {
-            keyValues.Add(key, value);
+            keyValues[key] = value;
         }
 
         public DynamicShapedDatumSet ToDatumSet()
         {
-            return new DynamicShapedDatumSet(PersonId, keyValues);
+            return new DynamicShapedDatumSet(keyValues);
         }
     }
 

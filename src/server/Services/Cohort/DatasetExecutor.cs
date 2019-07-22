@@ -94,9 +94,9 @@ namespace Services.Cohort
 
     sealed class DynamicMarshaller : DatasetMarshaller
     {
-        DatasetResultSchema _schema { get; set; }
-
         DatasetExecutionContext _context { get; set; }
+
+        DatasetResultSchema _schema { get; set; }
 
         public DynamicMarshaller(DatasetExecutionContext context, DatasetResultSchema schema, Guid pepper) : base(pepper)
         {
@@ -117,18 +117,22 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<dynamic, DynamicShapedDatumSet> GetConverter(bool anonymize)
+        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize)
         {
+            var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
+                .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name))
+                .Select(f => f);
+
             if (anonymize)
             {
-                // var anon = new Anonymizer<DynamicDatasetRecord>(Pepper);
+                var anon = new DynamicAnonymizer(Pepper);
                 return (rec) =>
                 {
-                    // anon.Anonymize(rec, (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
-                    return rec;
+                    anon.Anonymize(rec, fields);
+                    return rec.ToDatumSet();
                 };
             }
-            return (rec) => rec;
+            return (rec) => rec.ToDatumSet();
         }
 
         DynamicDatasetRecord GetRecord(SqlDataReader reader, ICollection<SchemaField> fields)
@@ -136,13 +140,9 @@ namespace Services.Cohort
             var dyn = new DynamicDatasetRecord();
             foreach (var f in fields)
             {
-                if (f.Name == DatasetColumns.PersonId)
+                if (f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase))
                 {
-                    dyn.PersonId = reader.GetNullableString(reader.GetOrdinal(DatasetColumns.PersonId));
-                }
-                else if (f.Name == DatasetColumns.Salt)
-                {
-                    dyn.Salt = reader.GetGuid(reader.GetOrdinal(DatasetColumns.Salt));
+                    dyn.Salt = reader.GetGuid(f.Index);
                 }
                 else
                 {

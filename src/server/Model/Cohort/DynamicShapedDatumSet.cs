@@ -21,21 +21,25 @@ namespace Model.Cohort
 
         }
 
-        public DynamicShapedDatumSet(string personId, Dictionary<string, object> keyValues)
+        public DynamicShapedDatumSet(Dictionary<string, object> keyValues)
         {
-            PersonId = personId;
+            PersonId = keyValues[DatasetColumns.PersonId].ToString();
+            keyValues.Remove(DatasetColumns.PersonId);
             _keyValues = keyValues;
         }
 
         public override object Result()
         {
-            dynamic dyn = new ExpandoObject();
-            dyn.PersonId = PersonId;
+            var expando = new ExpandoObject() as IDictionary<string, object>;
 
             foreach(var pair in _keyValues)
             {
-                dyn[pair.Key] = pair.Value;
+                expando[pair.Key] = pair.Value;
             }
+
+            dynamic dyn = expando;
+            dyn.PersonId = PersonId;
+
             return dyn;
         }
 

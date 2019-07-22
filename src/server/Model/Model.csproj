@@ -9,7 +9,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Collections\" />
-    <Folder Include="Anonymization\" />
     <Folder Include="Compiler\SqlServer\" />
     <Folder Include="Validation\" />
     <Folder Include="Schema\" />
