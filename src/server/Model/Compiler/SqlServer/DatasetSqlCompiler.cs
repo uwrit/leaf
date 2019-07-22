@@ -61,8 +61,14 @@ namespace Model.Compiler.SqlServer
 
         string CteFilterInternals(DatasetCompilerContext compilerContext)
         {
-            var schema = ShapedDatasetContract.For(compilerContext.Shape, compilerContext.DatasetQuery);
             var provider = DatasetDateFilterProvider.For(compilerContext);
+            
+            // Dynamic datasets may have no datefield
+            if (!provider.CanFilter)
+            {
+                return $"SELECT * FROM dataset";
+            }
+
             var dateFilter = provider.GetDateFilter(compilerContext);
             executionContext.AddParameters(dateFilter.Parameters);
             return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
@@ -80,6 +86,8 @@ namespace Model.Compiler.SqlServer
         const string lateParamName = "@late";
 
         protected abstract string TargetDateField { get; }
+
+        public bool CanFilter => !string.IsNullOrWhiteSpace(TargetDateField);
 
         public static DatasetDateFilterProvider For(DatasetCompilerContext compilerContext)
         {
