@@ -106,16 +106,12 @@ namespace Services.Cohort
 
         public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
         {
+            var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
+                .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name) && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
+                .Select(f => f);
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, fields);
 
-            // Redundant PHI check - the SQL statement should already have excluded these
-            // fields but double-check here as well and filter out if needed.
-            var restrictPhi = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields.Where(f => !f.Phi || (f.Phi && f.Mask));
-            var fields = anonymize
-                ? _schema.Fields.Where(f => restrictPhi.Any(fil => fil.Name == f.Name)).ToArray()
-                : _schema.Fields;
-                
             while (reader.Read())
             {
                 var record = GetRecord(reader, fields);
@@ -125,12 +121,8 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize)
+        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize, IEnumerable<SchemaFieldSelector> fields)
         {
-            var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
-                .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name))
-                .Select(f => f);
-
             if (anonymize)
             {
                 var anon = new DynamicAnonymizer(Pepper);
@@ -143,16 +135,17 @@ namespace Services.Cohort
             return (rec) => rec.ToDatumSet();
         }
 
-        DynamicDatasetRecord GetRecord(SqlDataReader reader, ICollection<SchemaField> fields)
+        DynamicDatasetRecord GetRecord(SqlDataReader reader, IEnumerable<SchemaFieldSelector> fields)
         {
-            var dyn = new DynamicDatasetRecord();
+            var dyn = new DynamicDatasetRecord
+            {
+                Salt = reader.GetGuid(reader.GetOrdinal(DatasetColumns.Salt))
+            };
+
             foreach (var f in fields)
             {
-                if (f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    dyn.Salt = reader.GetGuid(f.Index);
-                }
-                else
+                // Ensure Salt is not passed as property
+                if (!f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase))
                 {
                     dyn.SetValue(f.Name, reader[f.Name]);
                 }

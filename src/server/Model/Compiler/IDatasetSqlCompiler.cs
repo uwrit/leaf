@@ -9,6 +9,6 @@ namespace Model.Compiler
 {
     public interface IDatasetSqlCompiler
     {
-        DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext context, bool restrictPhi);
+        DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext context);
     }
 }

@@ -32,16 +32,13 @@ namespace Model.Cohort
         readonly IDatasetSqlCompiler compiler;
         readonly IDatasetExecutor executor;
         readonly ILogger<DatasetProvider> log;
-        readonly IUserContext user;
 
         public DatasetProvider(
-            IUserContext user,
             DatasetCompilerValidationContextProvider contextProvider,
             IDatasetSqlCompiler compiler,
             IDatasetExecutor datasetService,
             ILogger<DatasetProvider> log)
         {
-            this.user = user;
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = datasetService;
@@ -84,7 +81,7 @@ namespace Model.Cohort
 
             cancel.ThrowIfCancellationRequested();
 
-            var exeContext = compiler.BuildDatasetSql(validationContext.Context, user.Anonymize());
+            var exeContext = compiler.BuildDatasetSql(validationContext.Context);
             log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);

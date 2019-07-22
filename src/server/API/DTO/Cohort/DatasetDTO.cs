@@ -23,7 +23,7 @@ namespace API.DTO.Cohort
         public DatasetDTO(Dataset dataset)
         {
             Schema = dataset.Schema.Shape == Shape.Dynamic
-                ? new DynamicDatasetResultSchemaDTO(dataset.Schema.Contract as DynamicContract)
+                ? new DynamicDatasetResultSchemaDTO(dataset.Schema)
                 : new DatasetResultSchemaDTO(dataset.Schema);
             Results = dataset.Results;
         }

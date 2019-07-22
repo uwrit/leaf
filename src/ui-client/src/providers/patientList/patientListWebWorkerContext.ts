@@ -77,7 +77,9 @@ var addPatientRows = function (payload) {
         // Add the multirow data. This returns a new Dataset Definition
         // for the summary statistics.
         addDatasetDefinition(dataset.definition);
-        result = addMultiRowDataset(payload);
+        result = dataset.definition.multirow
+            ? addMultiRowDataset(payload)
+            : addSingletonDataset(payload);
         addDatasetDefinition(result);
     }
     return { requestId: requestId, result: result };
@@ -92,6 +94,39 @@ var addDatasetDefinition = function (def) {
     }
 };
 /*
+ * Add singleton dataset data to the cache.
+ */
+var addSingletonDataset = function (payload) {
+    var dataset = payload.dataset, responderId = payload.responderId;
+    var def = dataset.definition;
+    var data = dataset.data.results;
+    var dateFields = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
+    var uniquePatients = Object.keys(data);
+    var uniqueCompoundPatients = [];
+    // For each row
+    for (var i = 0; i < uniquePatients.length; i++) {
+        var p = uniquePatients[i];
+        var row = data[p][0];
+        var compoundId = responderId + "_" + p;
+        var pat = patientMap.get(compoundId);
+        if (!pat) {
+            continue;
+        }
+        var patientData = pat.singletonData;
+        uniqueCompoundPatients.push(compoundId);
+        // Convert strings to dates
+        for (var k = 0; k < dateFields.length; k++) {
+            var f = dateFields[k].id;
+            var v = row[f];
+            if (v) {
+                row[f] = new Date(v);
+            }
+        }
+        patientData.set(def.id, new Map(Object.entries(row)));
+    }
+    return def;
+};
+/*
  * Add multirow dataset data to the cache.
  */
 var addMultiRowDataset = function (payload) {
@@ -99,23 +134,19 @@ var addMultiRowDataset = function (payload) {
     var def = dataset.definition;
     var dsId = def.id;
     var data = dataset.data.results;
-    var dateFields = [];
+    var dateFields = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
     var uniquePatients = Object.keys(data);
     var uniqueCompoundPatients = [];
     var rowCount = 0;
-    def.columns.forEach(function (c) {
-        if (c.type === typeDate) {
-            dateFields.push(c);
-        }
-    });
     // For each row
     for (var i = 0; i < uniquePatients.length; i++) {
         var p = uniquePatients[i];
         var rows = data[p];
         var compoundId = responderId + "_" + p;
         var pat = patientMap.get(compoundId);
-        if (!pat) { continue; }
-
+        if (!pat) {
+            continue;
+        }
         var patientData = pat.multirowData;
         uniqueCompoundPatients.push(compoundId);
         // Convert strings to dates
@@ -144,7 +175,7 @@ var addMultiRowDataset = function (payload) {
         }
     }
     // Rows are added to the patient map, now compute stats for each patient
-    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.findIndex((f) => f.name === def.numericValueColumn) > -1
+    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.findIndex(function (f) { return f.name === def.numericValueColumn; }) > -1
         ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
         : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
     derivedDef.totalRows = rowCount;
@@ -463,9 +494,10 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
             var max = numVals[numVals.length - 1].y;
             var mean = +(((numVals.reduce(function (a, b) { return a + b.y; }, 0)) / numVals.length).toFixed(1));
             var half = Math.floor(numVals.length / 2);
-            var median = numVals.length % 2
+            var median = (numVals.length % 2
                 ? numVals[half].y
-                : (numVals[half - 1].y + numVals[half].y) / 2.0;
+                : (numVals[half - 1].y + numVals[half].y) / 2.0
+            ).toFixed(1);
             ds.set(cols.lookup.min, min);
             ds.set(cols.lookup.max, max);
             ds.set(cols.lookup.mean, mean);
@@ -557,9 +589,7 @@ var deriveNonNumericSummaryFromDataset = function (def, ids) {
  * Convert tuple objects to csv-friendly strings.
  */
 var valueToCsvString = function (d) {
-    return !d 
-        ? '' : d instanceof Date 
-        ? d.toLocaleString().replace(',', '') : '';
+    return d;
 };
 /*
  * Pulls all cache data for all datasets into a
@@ -648,7 +678,7 @@ var getMultirowDataCsv = function (payload) {
                 var vals = ds[i];
                 for (var j = 0; j < cols.length; j++) {
                     var d = vals[cols[j].id];
-                    row.push("" + valueToCsvString(d) + "");
+                    row.push(valueToCsvString(d));
                 }
                 rows.push(row.join(','));
             }
@@ -687,14 +717,13 @@ var getSingletonDataCsv = function (payload) {
         cols.forEach(function (col) {
             var ds = p.singletonData.get(col.datasetId);
             var d = ds ? ds.get(col.id) : undefined;
-            row.push("" + valueToCsvString(d) + "");
+            row.push(valueToCsvString(d));
         });
         rows.push(row.join(','));
     });
     return { requestId: requestId, result: rows.join(nl) };
 };
-
-var capitalize = (colName) => {
+var capitalize = function (colName) {
     return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
 };
 `;

@@ -106,6 +106,10 @@
     width: 200px;
 }
 
+.patientlist-tuple.sparkline .recharts-surface {
+    cursor: pointer;
+}
+
 .patientlist-tuple.sparkline text {
     fill: #F44336;
     font-size: 12px;

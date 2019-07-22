@@ -35,14 +35,18 @@ namespace API.DTO.Cohort
         public string SqlFieldValueNumeric { get; set; }
         public bool IsEncounterBased { get; set; }
 
-        public DynamicDatasetResultSchemaDTO(DynamicContract schema)
+        public DynamicDatasetResultSchemaDTO(ShapedDatasetSchema schema)
         {
+            var contract = schema.Contract as DynamicContract;
+
             Shape = schema.Shape;
-            Fields = schema.Fields.Select(f => new BaseSchemaFieldDTO(f));
-            SqlFieldDate = schema.SqlFieldDate;
-            SqlFieldValueString = schema.SqlFieldValueString;
-            SqlFieldValueNumeric = schema.SqlFieldValueNumeric;
-            IsEncounterBased = schema.IsEncounterBased;
+            Fields = schema.Fields
+                .Where(f => contract.Fields.Any(sf => sf.Name == f.Name) && f.Name != DatasetColumns.PersonId)
+                .Select(f => new BaseSchemaFieldDTO(f));
+            SqlFieldDate = contract.SqlFieldDate;
+            SqlFieldValueString = contract.SqlFieldValueString;
+            SqlFieldValueNumeric = contract.SqlFieldValueNumeric;
+            IsEncounterBased = contract.IsEncounterBased;
         }
     }
 

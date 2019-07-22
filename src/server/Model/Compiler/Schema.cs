@@ -31,7 +31,7 @@ namespace Model.Compiler
                 if (actualField == null && field.Required)
                 {
                     result.State = SchemaValidationState.Error;
-                    result.AddMessage($"required field {field.Name} is missing");
+                    result.AddMessage($"Required field '{field.Name}' is missing");
                     continue;
                 }
 
@@ -39,23 +39,29 @@ namespace Model.Compiler
                 if (actualField != null && !actualField.Matches(field))
                 {
                     result.State = SchemaValidationState.Error;
-                    result.AddMessage($"{field.Name} expected {field.Type} but received {actualField.Type}");
+                    result.AddMessage($"'{field.Name}' expected type '{field.Type}' but received '{actualField.Type}'");
                 }
             }
 
+            if (result.State == SchemaValidationState.Ok)
+            {
+                return CheckOverflow(actualSchema);
+            }
             return result;
         }
 
         public SchemaValidationResult CheckOverflow(DatasetResultSchema actualSchema)
         {
             var result = SchemaValidationResult.Ok(Shape);
-            var overflow = Fields.Except<BaseSchemaField>(actualSchema.Fields, (a, b) => a.Equals(b));
+            var overflow = Fields
+                .Except<BaseSchemaField>(actualSchema.Fields, (a, b) => a.Equals(b))
+                .Where(f => !f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase));
             if (overflow.Any())
             {
                 result.State = SchemaValidationState.Warning;
                 foreach (var unrec in overflow)
                 {
-                    result.AddMessage($"unrecognized field {unrec.Name} is not a member of {Shape.ToString()} and will be dropped");
+                    result.AddMessage($"Unrecognized field '{unrec.Name}' is not a member of {Shape.ToString()} and will be dropped");
                 }
             }
             return result;

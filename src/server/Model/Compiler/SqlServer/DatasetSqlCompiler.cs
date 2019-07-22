@@ -29,7 +29,7 @@ namespace Model.Compiler.SqlServer
             compilerOptions = compOpts.Value;
         }
 
-        public DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext compilerContext, bool restrictPhi)
+        public DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext compilerContext)
         {
             executionContext = new DatasetExecutionContext(compilerContext.Shape, compilerContext.QueryContext, compilerContext.DatasetQuery.Id.Value);
 
@@ -38,7 +38,7 @@ namespace Model.Compiler.SqlServer
             new SqlValidator(Dialect.ILLEGAL_COMMANDS).Validate(compilerContext.DatasetQuery.SqlStatement);
             var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
 
-            var filter = CteFilterInternals(compilerContext, restrictPhi);
+            var filter = CteFilterInternals(compilerContext);
             var select = SelectFromCTE();
             executionContext.DatasetQuery = compilerContext.DatasetQuery;
             executionContext.CompiledQuery = Compose(cohort, dataset, filter, select);
@@ -59,23 +59,13 @@ namespace Model.Compiler.SqlServer
 
         string CteDatasetInternals(IDatasetQuery datasetQuery) => datasetQuery.SqlStatement;
 
-        string CteFilterInternals(DatasetCompilerContext compilerContext, bool restrictPhi)
+        string CteFilterInternals(DatasetCompilerContext compilerContext)
         {
             var schema = ShapedDatasetContract.For(compilerContext.Shape, compilerContext.DatasetQuery);
             var provider = DatasetDateFilterProvider.For(compilerContext);
             var dateFilter = provider.GetDateFilter(compilerContext);
             executionContext.AddParameters(dateFilter.Parameters);
-
-            if (!restrictPhi)
-            {
-                return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
-            }
-
-            bool include(SchemaFieldSelector field) => !field.Phi || (field.Phi && !field.Mask);
-
-            var restricted = schema.Fields.Where(include);
-            var fields = string.Join(", ", restricted.Select(f => f.Name));
-            return $"SELECT {fields} FROM dataset WHERE {dateFilter.Clause}";
+            return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
         }
 
         string SelectFromCTE()

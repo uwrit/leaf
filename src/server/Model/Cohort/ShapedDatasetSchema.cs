@@ -28,7 +28,7 @@ namespace Model.Cohort
         public static ShapedDatasetSchema From(DatasetResultSchema resultSchema, DatasetExecutionContext context)
         {
             var contract = ShapedDatasetContract.For(resultSchema.Shape, context.DatasetQuery);
-            var fields = resultSchema.Fields.Where(f => contract.Fields.Contains<BaseSchemaField>(f)).ToArray();
+            var fields = resultSchema.Fields.Where(f => contract.Fields.Any(cf => cf.Name == f.Name)).ToArray();
             return new ShapedDatasetSchema
             {
                 Shape = resultSchema.Shape,
