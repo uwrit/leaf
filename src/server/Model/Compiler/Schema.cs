@@ -22,6 +22,7 @@ namespace Model.Compiler
     {
         public virtual SchemaValidationResult Validate(DatasetResultSchema actualSchema)
         {
+            
             var result = SchemaValidationResult.Ok(Shape);
             foreach (var field in Fields)
             {

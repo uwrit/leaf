@@ -94,6 +94,7 @@ export interface PatientListDatasetQueryDTO {
     category: string;
     description?: string;
     name: string;
+    isEncounterBased: boolean;
     shape: PatientListDatasetShape;
     tags: string[];
     universalId?: string;

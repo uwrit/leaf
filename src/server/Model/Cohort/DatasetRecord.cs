@@ -272,7 +272,7 @@ namespace Model.Cohort
                 AddressState = AddressState,
                 Ethnicity = Ethnicity,
                 Gender = Gender,
-                Age = Age,
+                Age = Age > 89 ? 89 : Age,
                 Language = Language,
                 MaritalStatus = MaritalStatus,
                 Race = Race,

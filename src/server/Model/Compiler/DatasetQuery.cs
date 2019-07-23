@@ -15,6 +15,7 @@ namespace Model.Compiler
     {
         Guid? Id { get; set; }
         Urn UniversalId { get; set; }
+        bool IsEncounterBased { get; set; }
         Shape Shape { get; set; }
         string Name { get; set; }
         string Category { get; set; }
@@ -64,6 +65,7 @@ namespace Model.Compiler
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
+        public bool IsEncounterBased { get; set; }
         public string SqlStatement { get; set; }
         public ICollection<string> Tags { get; set; }
 
@@ -80,7 +82,6 @@ namespace Model.Compiler
 
     public class DynamicDatasetQuery : DatasetQuery, IDatasetQuery
     {
-        public bool IsEncounterBased { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }

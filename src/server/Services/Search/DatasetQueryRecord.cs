@@ -15,6 +15,7 @@ namespace Services.Search
     {
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }
+        public bool IsEncounterBased { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
@@ -30,6 +31,7 @@ namespace Services.Search
             {
                 Id = Id,
                 UniversalId = DatasetQueryUrn.From(UniversalId),
+                IsEncounterBased = IsEncounterBased,
                 Shape = Shape,
                 Name = Name,
                 Category = Category,
@@ -41,7 +43,6 @@ namespace Services.Search
 
     class DynamicDatasetQueryRecord : DatasetQueryRecord
     {
-        public bool IsEncounterBased { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }
