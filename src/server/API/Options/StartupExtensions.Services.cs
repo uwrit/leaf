@@ -151,6 +151,7 @@ namespace API.Options
 
             services.AddTransient<IUserJwtProvider, JwtProvider>();
             services.AddTransient<IApiJwtProvider, JwtProvider>();
+            services.AddTransient<ILoginSaver, LoginSaver>();
 
             return services;
         }
