@@ -31,14 +31,22 @@ An `Interrogator` endpoint is an instance of Leaf's UI and API that will be allo
 #### Bi-directional Federation
 In this (most common) example, two nodes A and B wish to query each other. This configuration requires that A registers B as a `Responder` and `Interrogator`, and B registers A as a `Responder` and `Interrogator`. The following screenshots illustrate A and B's admin panel screen, respectively.
 
+<div>Instance A's screen</div>
+
 ![Mutual Federation A](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/fed_mutual_a.png "Mutual Federation A")
+
+<div>Instance B's screen</div>
 
 ![Mutual Federation B](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/fed_mutual_b.png "Mutual Federation B")
 
 #### Uni-directional Federation
 In this example, there are two nodes X and Y where X would like to additionally query Y for data but Y has no need to query X. X registers Y as a `Responder`, and Y must register X as an `Interrogator`. This type of configuration can be composed with `Gateway` functionality in cases where an instance wishes to act as an observer only and has no data of its own to offer. The following screenshots illustrate X and Y's admin panel screen, respectively.
 
+<div>Instance X's screen</div>
+
 ![Single Federation X](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/fed_uni_x.png "Single Federation X")
+
+<div>Instance Y's screen</div>
 
 ![Single Federation Y](https://github.com/uwrit/leaf/blob/master/docs/deploy/images/fed_uni_y.png "Single Federation Y")
 
