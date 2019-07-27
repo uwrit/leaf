@@ -1,4 +1,4 @@
-# Leaf &middot; [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](https://github.com/uwrit/leaf/pulls)
+# Leaf &middot; [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/uwrit/leaf/pulls)
 <a><img src="/src/ui-client/public/images/logos/apps/leaf.svg" width="120px" align="left" hspace="10" vspace="6"></a>
 
 **Leaf** is a powerful, fun, lightweight web application for querying clinical data. Leaf helps query clinical databases of nearly any data model for cohort estimation and data extraction. Leaf seamlessly integrates with clinical databases and existing enterprise authentication systems to unleash the potential of translational biomedical research.
