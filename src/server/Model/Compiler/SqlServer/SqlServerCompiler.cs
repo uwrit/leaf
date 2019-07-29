@@ -111,7 +111,7 @@ namespace Model.Compiler.SqlServer
 
                 if ((k + 1) < totalItems && totalItems > 1)
                 {
-                    sqlBuilder.Append(Dialect.SQL_SPACE + Dialect.SQL_UNIONALL + Dialect.SQL_SPACE);
+                    sqlBuilder.Append(Dialect.SQL_SPACE + Dialect.SQL_UNION_ALL + Dialect.SQL_SPACE);
                 }
             }
 
@@ -166,7 +166,7 @@ namespace Model.Compiler.SqlServer
                 // JOIN ...
                 if (k > 0)
                 {
-                    panelSql.Append(" " + (subPanel.IncludeSubPanel ? Dialect.SQL_INNERJOIN : Dialect.SQL_LEFTJOIN) + Dialect.SQL_SPACE);
+                    panelSql.Append(" " + (subPanel.IncludeSubPanel ? Dialect.SQL_INNER_JOIN : Dialect.SQL_LEFT_JOIN) + Dialect.SQL_SPACE);
                 }
                 panelSql.Append("(");
 
@@ -194,7 +194,7 @@ namespace Model.Compiler.SqlServer
                     // Add UNION ALL if other panel items follow
                     if ((j + 1) < subPanel.PanelItems.Count())
                     {
-                        panelSql.Append($" {Dialect.SQL_UNIONALL} ");
+                        panelSql.Append($" {Dialect.SQL_UNION_ALL} ");
                     }
                 }
 
@@ -488,7 +488,7 @@ namespace Model.Compiler.SqlServer
 
         void ValidateSql(string input)
         {
-            new SqlValidator(Dialect.ILLEGAL_COMMANDS).Validate(input);
+            new SqlValidator(Dialect.IllegalCommands).Validate(input);
         }
 
         string AddDate(DateFilter filter, bool setToEndOfDay)

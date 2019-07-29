@@ -32,7 +32,7 @@ namespace Model.Compiler.SqlServer
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
 
             var cohort = CteCohortInternals(context.QueryContext);
-            new SqlValidator(Dialect.ILLEGAL_COMMANDS).Validate(context.DemographicQuery);
+            new SqlValidator(Dialect.IllegalCommands).Validate(context.DemographicQuery);
             var dataset = CteDemographicInternals(context.DemographicQuery);
 
             var filter = CteFilterInternals(context, restrictPhi);
