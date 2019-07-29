@@ -21,6 +21,11 @@ namespace Model.Compiler.Common
 
             Select = new[] { personId, encounterId, date };
         }
+
+        internal override void SetHaving()
+        {
+            // Do nothing. HAVING clauses in a sequence are added in the parent Set.
+        }
     }
     
 
@@ -31,6 +36,10 @@ namespace Model.Compiler.Common
         protected SubPanel subpanel;
         protected PanelItem panelitem;
         protected Concept concept;
+
+        protected Column PersonId;
+        protected Column Date;
+
         readonly List<ISelectable> select = new List<ISelectable>() { };
         readonly List<IEvaluatable> where = new List<IEvaluatable>() { };
 
@@ -44,15 +53,27 @@ namespace Model.Compiler.Common
             base.Alias = Alias;
             concept = panelitem.Concept;
 
+            SetColumns();
             SetSelect();
             SetFrom();
             SetWhere();
+            SetGroupBy();
+            SetHaving();
+        }
+
+        void SetColumns()
+        {
+            PersonId = new Column(compilerOptions.FieldPersonId);
+
+            if (concept.IsEncounterBased)
+            {
+                Date = new Column(concept.SqlFieldDate);
+            }
         }
 
         void SetSelect()
         {
-            select.Add(new Column(compilerOptions.FieldPersonId));
-            Select = select;
+            Select = new[] { PersonId };
         }
 
         void SetFrom()
@@ -73,22 +94,42 @@ namespace Model.Compiler.Common
             Where = where;
         }
 
+        void SetGroupBy()
+        {
+            if (concept.IsEncounterBased)
+            {
+                GroupBy = new[] { PersonId };
+            }
+        }
+
+        internal virtual void SetHaving()
+        {
+            if (subpanel.HasCountFilter)
+            {
+                var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {Date})");
+                
+                Having = new List<IEvaluatableAggregate>
+                {
+                    uniqueDates >= subpanel.MinimumCount
+                };
+            }
+        }
+
         void CheckDate()
         {
             if (panel.IsDateFiltered && concept.IsEncounterBased)
             {
-                var col = new Column(concept.SqlFieldDate);
                 var start = GetDateExpression(panel.DateFilter.Start);
                 var end = GetDateExpression(panel.DateFilter.End, true);
 
                 if (panel.PanelType == PanelType.Patient && subpanel.Index > 0)
                 {
                     var offset = new Expression($"{Dialect.Syntax.DATEADD}({Dialect.Time.MONTH}, {-6}, {start})");
-                    where.Add(col >= offset);
+                    where.Add(Date >= offset);
                 }
                 else
                 {
-                    where.Add(col == start & end);
+                    where.Add(Date == start & end);
                 }
             }
         }

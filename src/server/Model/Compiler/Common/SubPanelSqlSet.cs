@@ -25,21 +25,20 @@ namespace Model.Compiler.Common
     {
         readonly CompilerOptions compilerOptions;
         readonly Panel panel;
-        readonly SubPanel subpanel;
+
+        public SubPanel SubPanel { get; protected set; }
 
         public Column PersonId { get; protected set; }
         public Column EncounterId { get; protected set; }
         public Column EventId { get; protected set; }
         public Column Date { get; protected set; }
 
-        internal SubPanelJoinSequence JoinSequence => subpanel.JoinSequence;
-
-        new string Alias => $"{Dialect.Alias.Sequence}{subpanel.Index}";
+        new string Alias => $"{Dialect.Alias.Sequence}{SubPanel.Index}";
 
         public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel)
         {
             this.panel = panel;
-            this.subpanel = subpanel;
+            this.SubPanel = subpanel;
             base.Alias = Alias;
 
             var pis = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi));
@@ -50,16 +49,16 @@ namespace Model.Compiler.Common
 
         void SetSelect()
         {
-            var firstConcept = subpanel.PanelItems.FirstOrDefault().Concept;
-            var seq = subpanel.JoinSequence.SequenceType;
+            var first = SubPanel.PanelItems.FirstOrDefault().Concept;
+            var seq = SubPanel.JoinSequence.SequenceType;
 
             PersonId = new Column(compilerOptions.FieldPersonId);
             EncounterId = new Column(compilerOptions.FieldEncounterId);
-            Date = new Column(firstConcept.SqlFieldDate);
+            Date = new Column(first.SqlFieldDate);
 
             if (seq == SequenceType.Event)
             {
-                EventId = new Column(firstConcept.SqlFieldEvent);
+                EventId = new Column(first.SqlFieldEvent);
                 Select = new[] { PersonId, EncounterId, EventId, Date };
             }
             else

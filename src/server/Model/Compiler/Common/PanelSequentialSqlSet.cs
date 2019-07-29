@@ -17,29 +17,68 @@ namespace Model.Compiler.Common
         readonly CompilerOptions compilerOptions;
         readonly Panel panel;
 
+        public Column PersonId { get; protected set; }
+
         public PanelSequentialSqlSet(Panel panel)
         {
             this.panel = panel;
 
             var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp));
-            var prev = sps.ElementAt(0);
-            var joins = new List<IJoinable>() { new Join { Set = prev, Alias = prev.Alias } };
+            var first = sps.ElementAt(0);
+            var prev = first;
+            var j1 = new Join { Set = first, Alias = first.Alias };
+            var joins = new List<IJoinable>() { j1 };
+            var having = new List<IEvaluatableAggregate>();
 
             foreach (var sp in sps.Skip(1))
             {
+                var sub = sp.SubPanel;
                 var join = GetJoin(prev, sp);
                 joins.Add(join);
+
+                if (sub.HasCountFilter || !sub.IncludeSubPanel)
+                {
+                    having.Add(GetHaving(join, sp));
+                }
 
                 prev = sp;
             }
 
+            SetSelect(j1);
             From = joins;
+            Having = having;
+        }
+
+        void SetSelect(Join firstJoin)
+        {
+            PersonId = new Column(compilerOptions.FieldPersonId, firstJoin);
+            Select = new[] { PersonId };
+            GroupBy = new[] { PersonId };
+        }
+
+        IEvaluatableAggregate GetHaving(Join join, SubPanelSequentialSqlSet sp)
+        {
+            var sub = sp.SubPanel;
+            var col = new Column(sp.Date.Name, join);
+            var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {col})");
+
+            if (sub.IncludeSubPanel)
+            {
+                return uniqueDates >= sub.MinimumCount;
+            }
+            if (!sub.IncludeSubPanel && sub.HasCountFilter)
+            {
+                return uniqueDates < sub.MinimumCount;
+            }
+
+            return uniqueDates == 0;
         }
 
         Join GetJoin(SubPanelSequentialSqlSet prec, SubPanelSequentialSqlSet curr)
         {
-            var seq = curr.JoinSequence;
+            var seq = curr.SubPanel.JoinSequence;
             var incrType = seq.DateIncrementType.ToString().ToUpper();
+            var joinType = curr.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
             var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prec.Date})");
             var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prec.Date})");
 
@@ -50,7 +89,7 @@ namespace Model.Compiler.Common
                  */ 
                 case SequenceType.Encounter:
 
-                    return new Join(curr, curr.Alias, JoinType.Inner)
+                    return new Join(curr, curr.Alias, joinType)
                     {
                         On = new[] { prec.EncounterId == curr.EncounterId }
                     };
@@ -60,7 +99,7 @@ namespace Model.Compiler.Common
                  */
                 case SequenceType.Event:
 
-                    return new Join(curr, curr.Alias, JoinType.Inner)
+                    return new Join(curr, curr.Alias, joinType)
                     {
                         On = new[] { prec.EventId == curr.EventId }
                     };
@@ -70,7 +109,7 @@ namespace Model.Compiler.Common
                  */
                 case SequenceType.PlusMinus:
 
-                    return new Join(curr, curr.Alias, JoinType.Inner)
+                    return new Join(curr, curr.Alias, joinType)
                     {
                         On = new IEvaluatable[]
                         {
@@ -84,7 +123,7 @@ namespace Model.Compiler.Common
                  */
                 case SequenceType.WithinFollowing:
 
-                    return new Join(curr, curr.Alias, JoinType.Inner)
+                    return new Join(curr, curr.Alias, joinType)
                     {
                         On = new IEvaluatable[]
                         {
@@ -98,7 +137,7 @@ namespace Model.Compiler.Common
                  */
                 case SequenceType.AnytimeFollowing:
 
-                    return new Join(curr, curr.Alias, JoinType.Inner)
+                    return new Join(curr, curr.Alias, joinType)
                     {
                         On = new IEvaluatable[]
                         {

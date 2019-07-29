@@ -62,6 +62,7 @@ namespace Model.Compiler.Common
             public const string NOW = "GETDATE()";
             public const string INTERSECT = "INTERSECT";
             public const string EXCEPT = "EXCEPT";
+            public const string DISTINCT = "DISTINCT";
         }
 
         public static readonly string[] IllegalCommands = { "UPDATE ", "TRUNCATE ", "EXEC ", "DROP ", "INSERT ", "CREATE ", "DELETE ", "MERGE ", "SET ", "WITH " };
