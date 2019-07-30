@@ -24,14 +24,15 @@ namespace Model.Compiler.Common
     public class SubPanelSequentialSqlSet : UnionedSet
     {
         internal CompilerOptions compilerOptions;
-
         internal Panel Panel { get; set; }
         internal SubPanel SubPanel { get; set; }
 
-        public Column PersonId { get; protected set; }
-        public Column EncounterId { get; protected set; }
-        public AutoAliasedColumn EventId { get; protected set; }
-        public AutoAliasedColumn Date { get; protected set; }
+        internal Column PersonId { get; set; }
+        internal Column EncounterId { get; set; }
+        internal AutoAliasedColumn EventId { get; set; }
+        internal AutoAliasedColumn Date { get; set; }
+
+        public bool IsEventBased => SubPanel.PanelItems.First().Concept.IsEventBased;
 
         SubPanelSequentialSqlSet() { }
 
@@ -49,16 +50,16 @@ namespace Model.Compiler.Common
 
         void SetSelect()
         {
-            var first = SubPanel.PanelItems.FirstOrDefault().Concept;
-            var seq = SubPanel.JoinSequence.SequenceType;
+            var first = SubPanel.PanelItems.First().Concept;
+            var comp = compilerOptions;
 
-            PersonId = new Column(compilerOptions.FieldPersonId);
-            EncounterId = new Column(compilerOptions.FieldEncounterId);
-            Date = new AutoAliasedColumn(first.SqlFieldDate, compilerOptions.Alias);
+            PersonId = new Column(comp.FieldPersonId);
+            EncounterId = new Column(comp.FieldEncounterId);
+            Date = new AutoAliasedColumn(first.SqlFieldDate, comp.Alias);
 
-            if (seq == SequenceType.Event)
+            if (first.IsEventBased)
             {
-                EventId = new AutoAliasedColumn(first.SqlFieldEvent, compilerOptions.Alias);
+                EventId = new AutoAliasedColumn(first.SqlFieldEvent, comp.Alias);
             }
         }
     }

@@ -47,6 +47,7 @@ namespace Model.Compiler.Common
             public const string MIN = "MIN";
             public const string MAX = "MAX";
             public const string IN = "IN";
+            public const string AS = "AS";
             public const string UNION_ALL = "UNION ALL";
             public const string BETWEEN = "BETWEEN";
             public const string SINGLE_QUOTE = "'";

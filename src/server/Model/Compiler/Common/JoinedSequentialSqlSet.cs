@@ -37,11 +37,11 @@ namespace Model.Compiler.Common
 
         void InheritColumns(SubPanelSequentialSqlSet set)
         {
-            PersonId = new Column(set.PersonId.Name, this);
-            EncounterId = new Column(set.EncounterId.Name, this);
+            PersonId = new Column(set.PersonId, this);
+            EncounterId = new Column(set.EncounterId, this);
             Date = new AutoAliasedColumn(set.Date, this);
 
-            if (set.SubPanel.JoinSequence.SequenceType == SequenceType.Event)
+            if (set.IsEventBased)
             {
                 EventId = new AutoAliasedColumn(set.EventId, this);
             }

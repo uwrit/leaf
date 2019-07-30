@@ -25,7 +25,15 @@ namespace Model.Compiler.Common
             var anchor = j1;
 
             /*
-             * Create join logic for each subpanel Set.
+             * Add the first subpanel's HAVING clause (if any) separately.
+             */ 
+            if (first.SubPanel.HasCountFilter)
+            {
+                having.Add(GetHaving(j1));
+            }
+
+            /*
+             * Create join logic for each subsequent subpanel Set.
              */
             foreach (var sp in sps.Skip(1))
             {
@@ -77,11 +85,10 @@ namespace Model.Compiler.Common
 
         JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet curr)
         {
-            var seq = curr.SubPanel.JoinSequence;
-
             /*
              * Get offset expressions.
              */
+            var seq = curr.SubPanel.JoinSequence;
             var incrType = seq.DateIncrementType.ToString().ToUpper();
             var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
             var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
@@ -89,8 +96,8 @@ namespace Model.Compiler.Common
             /*
              * Get Join.
              */
-            var joinType = curr.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
-            var join = new JoinedSequentialSqlSet(curr, joinType);
+            var type = curr.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
+            var join = new JoinedSequentialSqlSet(curr, type);
             var currDate = new AutoAliasedColumn(curr.Date, join);
 
             switch (seq.SequenceType)
@@ -100,7 +107,10 @@ namespace Model.Compiler.Common
                  */ 
                 case SequenceType.Encounter:
 
-                    join.On = new[] { prev.EncounterId == curr.EncounterId };
+                    join.On = new[] 
+                        {
+                            prev.EncounterId == curr.EncounterId
+                        };
                     return join;
 
                 /*
@@ -108,7 +118,11 @@ namespace Model.Compiler.Common
                  */
                 case SequenceType.Event:
 
-                    join.On = new[] { prev.EventId == curr.EventId };
+                    join.On = new[] 
+                        {
+                            prev.PersonId == curr.PersonId,
+                            prev.EventId == curr.EventId                            
+                        };
                     return join;
 
                 /*

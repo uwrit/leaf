@@ -19,7 +19,7 @@ namespace Model.Compiler.Common
 
         internal override void SetSelect()
         {
-            if (subpanel.JoinSequence.SequenceType == SequenceType.Event)
+            if (concept.IsEventBased)
             {
                 Select = new[] { PersonId, EncounterId, Date, EventId };
             }
@@ -90,11 +90,11 @@ namespace Model.Compiler.Common
             if (concept.IsEncounterBased)
             {
                 EncounterId = new Column(compilerOptions.FieldEncounterId);
-                Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker);
+                Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker, this);
             }
             if (concept.IsEventBased)
             {
-                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker);
+                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Model.Compiler.Common
         {
             if (panelitem.UseNumericFilter)
             {
-                var col = new AutoAliasedColumn(concept.SqlFieldNumeric, compilerOptions.Alias);
+                var col = new AutoAliasedColumn(concept.SqlFieldNumeric, compilerOptions.Alias, this);
                 var val1 = panelitem.NumericFilter.Filter[0];
 
                 switch (panelitem.NumericFilter.FilterType)

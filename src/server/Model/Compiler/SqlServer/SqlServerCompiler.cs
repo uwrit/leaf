@@ -34,7 +34,7 @@ namespace Model.Compiler.SqlServer
         /// <param name="panel">Panel.</param>
         public string BuildPanelSql(Panel panel)
         {
-            var sql = "";
+            string sql;
 
             switch (panel.PanelType)
             {
@@ -44,6 +44,8 @@ namespace Model.Compiler.SqlServer
                 case PanelType.Sequence:
                     sql = new PanelSequentialSqlSet(panel, compilerOptions).ToString();
                     break;
+                default:
+                    return string.Empty;
             }
             ValidateSql(sql);
             return sql;
@@ -82,7 +84,7 @@ namespace Model.Compiler.SqlServer
         {
             var internals = BuildPanelSql(panel);
             var alias = $"P{panel.Index}";
-            return $"SELECT {alias}.{compilerOptions.FieldPersonId} FROM ( {internals} ) AS {alias}";
+            return $"{Dialect.Syntax.SELECT} {alias}.{compilerOptions.FieldPersonId} {Dialect.Syntax.FROM} ( {internals} ) {Dialect.Syntax.AS} {alias}";
         }
 
         void ValidateSql(string input)
