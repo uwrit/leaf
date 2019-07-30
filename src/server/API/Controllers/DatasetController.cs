@@ -34,6 +34,7 @@ namespace API.Controllers
         {
             try
             {
+                return Ok(new List<DatasetQueryDTO>());
                 var queries = await provider.GetQueriesAsync();
                 var dtos = queries.Select(q => new DatasetQueryDTO(q));
                 return Ok(dtos);

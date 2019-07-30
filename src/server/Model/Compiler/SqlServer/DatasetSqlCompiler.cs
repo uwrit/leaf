@@ -4,15 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Text;
-using System.Linq;
-using Model.Compiler;
+using Model.Compiler.Common;
 using Model.Options;
-using Model.Cohort;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Diagnostics.Contracts;
 
 namespace Model.Compiler.SqlServer
 {
@@ -124,7 +119,7 @@ namespace Model.Compiler.SqlServer
             // both present
             if (early.HasValue && late.HasValue)
             {
-                var clause = $"{TargetDateField} {Dialect.SQL_BETWEEN} {earlyParamName} {Dialect.SQL_AND} {lateParamName}";
+                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -140,7 +135,7 @@ namespace Model.Compiler.SqlServer
             if (early.HasValue && !late.HasValue)
             {
                 var now = DateTime.Now;
-                var clause = $"{TargetDateField} {Dialect.SQL_BETWEEN} {earlyParamName} {Dialect.SQL_AND} {lateParamName}";
+                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,

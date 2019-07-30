@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using Model.Options;
 using Composure;
 
@@ -13,18 +12,31 @@ namespace Model.Compiler.Common
 {
     class PanelItemSequentialSqlSet : PanelItemSqlSet
     {
-        public PanelItemSequentialSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem) : base(panel, subpanel, panelitem)
+        public PanelItemSequentialSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions compilerOptions) : base(panel, subpanel, panelitem, compilerOptions)
         {
-            var personId = new Column(compilerOptions.FieldPersonId);
-            var encounterId = new Column(compilerOptions.FieldEncounterId);
-            var date = new Column(concept.SqlFieldDate);
 
-            Select = new[] { personId, encounterId, date };
+        }
+
+        internal override void SetSelect()
+        {
+            if (subpanel.JoinSequence.SequenceType == SequenceType.Event)
+            {
+                Select = new[] { PersonId, EncounterId, Date, EventId };
+            }
+            else
+            {
+                Select = new[] { PersonId, EncounterId, Date };
+            }
+        }
+
+        internal override void SetGroupBy()
+        {
+            // Do nothing. Group By clauses in a sequence are added in the parent PanelSequentialSqlSet.
         }
 
         internal override void SetHaving()
         {
-            // Do nothing. HAVING clauses in a sequence are added in the parent Set.
+            // Do nothing. HAVING clauses in a sequence are added in the parent PanelSequentialSqlSet.
         }
     }
     
@@ -38,18 +50,20 @@ namespace Model.Compiler.Common
         protected Concept concept;
 
         protected Column PersonId;
+        protected Column EncounterId;
         protected Column Date;
+        protected Column EventId;
 
-        readonly List<ISelectable> select = new List<ISelectable>() { };
         readonly List<IEvaluatable> where = new List<IEvaluatable>() { };
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
-        public PanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem)
+        public PanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions compilerOptions)
         {
             this.panel = panel;
             this.subpanel = subpanel;
             this.panelitem = panelitem;
+            this.compilerOptions = compilerOptions;
             base.Alias = Alias;
             concept = panelitem.Concept;
 
@@ -61,27 +75,39 @@ namespace Model.Compiler.Common
             SetHaving();
         }
 
+        public override string ToString()
+        {
+            return base
+                .ToString()
+                .Replace(compilerOptions.Alias, Alias);
+        }
+
         void SetColumns()
         {
             PersonId = new Column(compilerOptions.FieldPersonId);
 
             if (concept.IsEncounterBased)
             {
-                Date = new Column(concept.SqlFieldDate);
+                EncounterId = new Column(compilerOptions.FieldEncounterId);
+                Date = new UnaliasedColumn(concept.SqlFieldDate);
+            }
+            if (concept.IsEventBased)
+            {
+                EventId = new UnaliasedColumn(concept.SqlFieldEvent);
             }
         }
 
-        void SetSelect()
+        internal virtual void SetSelect()
         {
             Select = new[] { PersonId };
         }
 
-        void SetFrom()
+        internal virtual void SetFrom()
         {
             From = concept.SqlSetFrom;
         }
 
-        void SetWhere()
+        internal virtual void SetWhere()
         {
             if (!string.IsNullOrWhiteSpace(concept.SqlSetWhere))
             {
@@ -94,7 +120,7 @@ namespace Model.Compiler.Common
             Where = where;
         }
 
-        void SetGroupBy()
+        internal virtual void SetGroupBy()
         {
             if (concept.IsEncounterBased)
             {
@@ -149,7 +175,7 @@ namespace Model.Compiler.Common
         {
             if (panelitem.UseNumericFilter)
             {
-                var col = new Column(concept.SqlFieldNumeric);
+                var col = new UnaliasedColumn(concept.SqlFieldNumeric);
                 var val1 = panelitem.NumericFilter.Filter[0];
 
                 switch (panelitem.NumericFilter.FilterType)

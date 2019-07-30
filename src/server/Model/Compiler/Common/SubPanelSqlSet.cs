@@ -5,8 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using Model.Options;
 using Composure;
 
@@ -14,37 +12,39 @@ namespace Model.Compiler.Common
 {
     public class SubPanelSqlSet : UnionedSet
     {
-        public SubPanelSqlSet(Panel panel, SubPanel subPanel)
+        public SubPanelSqlSet(Panel panel, CompilerOptions compilerOptions)
         {
-            var pis = subPanel.PanelItems.Select(pi => new PanelItemSqlSet(panel, subPanel, pi));
+            var sub = panel.SubPanels.ElementAt(0);
+            var pis = sub.PanelItems.Select(pi => new PanelItemSqlSet(panel, sub, pi, compilerOptions));
             Add(pis);
+            UnionType = UnionType.All;
         }
     }
 
-    public class SubPanelSequentialSqlSet : VirtualSet
+    public class SubPanelSequentialSqlSet : UnionedSet
     {
-        readonly CompilerOptions compilerOptions;
-        readonly Panel panel;
+        internal CompilerOptions compilerOptions;
 
-        public SubPanel SubPanel { get; protected set; }
+        internal Panel Panel { get; set; }
+        internal SubPanel SubPanel { get; set; }
 
         public Column PersonId { get; protected set; }
         public Column EncounterId { get; protected set; }
         public Column EventId { get; protected set; }
         public Column Date { get; protected set; }
 
-        new string Alias => $"{Dialect.Alias.Sequence}{SubPanel.Index}";
+        SubPanelSequentialSqlSet() { }
 
-        public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel)
+        public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel, CompilerOptions compilerOptions)
         {
-            this.panel = panel;
+            var pis = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions));
+            this.compilerOptions = compilerOptions;
+            this.Panel = panel;
             this.SubPanel = subpanel;
-            base.Alias = Alias;
 
-            var pis = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi));
-            From = new UnionedSet(pis);
-            
             SetSelect();
+            Add(pis);
+            UnionType = UnionType.All;
         }
 
         void SetSelect()
@@ -54,18 +54,12 @@ namespace Model.Compiler.Common
 
             PersonId = new Column(compilerOptions.FieldPersonId);
             EncounterId = new Column(compilerOptions.FieldEncounterId);
-            Date = new Column(first.SqlFieldDate);
+            Date = new UnaliasedColumn(first.SqlFieldDate);
 
             if (seq == SequenceType.Event)
             {
                 EventId = new Column(first.SqlFieldEvent);
-                Select = new[] { PersonId, EncounterId, EventId, Date };
             }
-            else
-            {
-                Select = new[] { PersonId, EncounterId, Date };
-            }
-            
         }
     }
 }
