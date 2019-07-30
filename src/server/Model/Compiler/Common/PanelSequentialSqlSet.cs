@@ -11,92 +11,31 @@ using Composure;
 
 namespace Model.Compiler.Common
 {
-    class AliasedColumn : UnaliasedColumn
-    {
-        readonly CompilerOptions compilerOptions;
-
-        public AliasedColumn(string name, IAliasedSet set, CompilerOptions compilerOptions) : base(name, set)
-        {
-            this.compilerOptions = compilerOptions;
-        }
-
-        public override string ToString()
-        {
-            return base
-                .ToString()
-                .Replace(compilerOptions.Alias, Set.Alias);
-        }
-    }
-
-    class JoinedPanelSequentialSqlSet : Join
-    {
-        public Column PersonId { get; protected set; }
-        public Column EncounterId { get; protected set; }
-        public Column EventId { get; protected set; }
-        public Column Date { get; protected set; }
-
-        public JoinedPanelSequentialSqlSet()
-        {
-
-        }
-
-        public JoinedPanelSequentialSqlSet(SubPanelSequentialSqlSet set, string alias, CompilerOptions compilerOptions)
-        {
-            Set = set;
-            Alias = alias;
-            ConfigureSet(set, compilerOptions);
-        }
-
-        public JoinedPanelSequentialSqlSet(SubPanelSequentialSqlSet set, string alias, JoinType type, CompilerOptions compilerOptions)
-        {
-            Set = set;
-            Alias = alias;
-            Type = type;
-            ConfigureSet(set, compilerOptions);
-        }
-
-        void ConfigureSet(SubPanelSequentialSqlSet set, CompilerOptions compilerOptions)
-        {
-            PersonId = new Column(set.PersonId.Name, this);
-            EncounterId = new Column(set.EncounterId.Name, this);
-            Date = new AliasedColumn(set.Date.Name, this, compilerOptions);
-
-            if (set.SubPanel.JoinSequence.SequenceType == SequenceType.Event)
-            {
-                EventId = new AliasedColumn(set.EventId.Name, this, compilerOptions);
-            }
-        }
-    }
-
     public class PanelSequentialSqlSet : JoinedSet
     {
-        readonly CompilerOptions compilerOptions;
-
         public Column PersonId { get; protected set; }
 
         public PanelSequentialSqlSet(Panel panel, CompilerOptions compilerOptions)
         {
-            this.compilerOptions = compilerOptions;
-
             var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions));
             var first = sps.ElementAt(0);
-            var j1 = new JoinedPanelSequentialSqlSet(first, $"{Dialect.Alias.Sequence}{first.SubPanel.Index}", compilerOptions);
-            var anchor = j1;
+            var j1 = new JoinedSequentialSqlSet(first);
             var joins = new List<IJoinable>() { j1 };
             var having = new List<IEvaluatableAggregate>();
+            var anchor = j1;
 
             /*
              * Create join logic for each subpanel Set.
-             */ 
+             */
             foreach (var sp in sps.Skip(1))
             {
                 var sub = sp.SubPanel;
-                var join = GetJoin(anchor, sp, compilerOptions);
+                var join = GetJoin(anchor, sp);
                 joins.Add(join);
 
                 if (sub.HasCountFilter || !sub.IncludeSubPanel)
                 {
-                    having.Add(GetHaving(join, sp, compilerOptions));
+                    having.Add(GetHaving(join));
                 }
 
                 if (sub.IncludeSubPanel)
@@ -119,11 +58,10 @@ namespace Model.Compiler.Common
             Having = having;
         }
 
-        IEvaluatableAggregate GetHaving(Join join, SubPanelSequentialSqlSet sp, CompilerOptions compilerOptions)
+        IEvaluatableAggregate GetHaving(JoinedSequentialSqlSet join)
         {
-            var sub = sp.SubPanel;
-            var col = new AliasedColumn(sp.Date.Name, join, compilerOptions);
-            var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {col})");
+            var sub = (join.Set as SubPanelSequentialSqlSet).SubPanel;
+            var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {join.Date})");
 
             if (sub.IncludeSubPanel)
             {
@@ -137,15 +75,23 @@ namespace Model.Compiler.Common
             return uniqueDates == 0;
         }
 
-        JoinedPanelSequentialSqlSet GetJoin(JoinedPanelSequentialSqlSet prec, SubPanelSequentialSqlSet curr, CompilerOptions compilerOptions)
+        JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet curr)
         {
             var seq = curr.SubPanel.JoinSequence;
-            var al = $"{Dialect.Alias.Sequence}{curr.SubPanel.Index}";
+
+            /*
+             * Get offset expressions.
+             */
             var incrType = seq.DateIncrementType.ToString().ToUpper();
+            var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
+            var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
+
+            /*
+             * Get Join.
+             */
             var joinType = curr.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
-            var currDate = new AliasedColumn(curr.Date.Name, curr as IAliasedSet, compilerOptions);
-            var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prec.Date})");
-            var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prec.Date})");
+            var join = new JoinedSequentialSqlSet(curr, joinType);
+            var currDate = new AutoAliasedColumn(curr.Date, join);
 
             switch (seq.SequenceType)
             {
@@ -154,68 +100,52 @@ namespace Model.Compiler.Common
                  */ 
                 case SequenceType.Encounter:
 
-                    return new JoinedPanelSequentialSqlSet(curr, al, joinType, compilerOptions)
-                    {
-                        On = new[] 
-                        {
-                            prec.EncounterId == curr.EncounterId
-                        }
-                    };
+                    join.On = new[] { prev.EncounterId == curr.EncounterId };
+                    return join;
 
                 /*
                  * Same Event.
                  */
                 case SequenceType.Event:
 
-                    return new JoinedPanelSequentialSqlSet(curr, al, joinType, compilerOptions)
-                    {
-                        On = new[] 
-                        {
-                            prec.EventId == curr.EventId
-                        }
-                    };
+                    join.On = new[] { prev.EventId == curr.EventId };
+                    return join;
 
                 /*
                  * Plus/Minus a time increment.
                  */
                 case SequenceType.PlusMinus:
 
-                    return new JoinedPanelSequentialSqlSet(curr, al, joinType, compilerOptions)
-                    {
-                        On = new IEvaluatable[]
+                    join.On = new IEvaluatable[]
                         {
-                            prec.PersonId == curr.PersonId,
+                            prev.PersonId == curr.PersonId,
                             currDate == backOffset & forwardOffset
-                        }
-                    };
+                        };
+                    return join;
 
                 /*
                  * Within a following time increment.
                  */
                 case SequenceType.WithinFollowing:
 
-                    return new JoinedPanelSequentialSqlSet(curr, al, joinType, compilerOptions)
-                    {
-                        On = new IEvaluatable[]
+                    join.On = new IEvaluatable[]
                         {
-                            prec.PersonId == curr.PersonId,
-                            currDate == prec.Date & forwardOffset
-                        }
-                    };
+                            prev.PersonId == curr.PersonId,
+                            currDate == prev.Date & forwardOffset
+                        };
+                    return join;
 
                 /*
                  * Anytime after.
                  */
                 case SequenceType.AnytimeFollowing:
 
-                    return new JoinedPanelSequentialSqlSet(curr, al, joinType, compilerOptions)
-                    {
-                        On = new IEvaluatable[]
+                    join.On = new IEvaluatable[]
                         {
-                            prec.PersonId == curr.PersonId,
-                            currDate > prec.Date
-                        }
-                    };
+                            prev.PersonId == curr.PersonId,
+                            currDate > prev.Date
+                        };
+                    return join;
 
                 default:
 

@@ -84,16 +84,17 @@ namespace Model.Compiler.Common
 
         void SetColumns()
         {
+            var aliasMarker = compilerOptions.Alias;
             PersonId = new Column(compilerOptions.FieldPersonId);
 
             if (concept.IsEncounterBased)
             {
                 EncounterId = new Column(compilerOptions.FieldEncounterId);
-                Date = new UnaliasedColumn(concept.SqlFieldDate);
+                Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker, this);
             }
             if (concept.IsEventBased)
             {
-                EventId = new UnaliasedColumn(concept.SqlFieldEvent);
+                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
             }
         }
 

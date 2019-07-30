@@ -30,8 +30,8 @@ namespace Model.Compiler.Common
 
         public Column PersonId { get; protected set; }
         public Column EncounterId { get; protected set; }
-        public Column EventId { get; protected set; }
-        public Column Date { get; protected set; }
+        public AutoAliasedColumn EventId { get; protected set; }
+        public AutoAliasedColumn Date { get; protected set; }
 
         SubPanelSequentialSqlSet() { }
 
@@ -54,11 +54,11 @@ namespace Model.Compiler.Common
 
             PersonId = new Column(compilerOptions.FieldPersonId);
             EncounterId = new Column(compilerOptions.FieldEncounterId);
-            Date = new UnaliasedColumn(first.SqlFieldDate);
+            Date = new AutoAliasedColumn(first.SqlFieldDate, compilerOptions.Alias);
 
             if (seq == SequenceType.Event)
             {
-                EventId = new Column(first.SqlFieldEvent);
+                EventId = new AutoAliasedColumn(first.SqlFieldEvent, compilerOptions.Alias);
             }
         }
     }
