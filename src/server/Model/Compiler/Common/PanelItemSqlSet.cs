@@ -51,8 +51,8 @@ namespace Model.Compiler.Common
 
         protected Column PersonId;
         protected Column EncounterId;
-        protected Column Date;
-        protected Column EventId;
+        protected AutoAliasedColumn Date;
+        protected AutoAliasedColumn EventId;
 
         readonly List<IEvaluatable> where = new List<IEvaluatable>() { };
 
@@ -90,11 +90,11 @@ namespace Model.Compiler.Common
             if (concept.IsEncounterBased)
             {
                 EncounterId = new Column(compilerOptions.FieldEncounterId);
-                Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker, this);
+                Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker);
             }
             if (concept.IsEventBased)
             {
-                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
+                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Model.Compiler.Common
         {
             if (panelitem.UseNumericFilter)
             {
-                var col = new UnaliasedColumn(concept.SqlFieldNumeric);
+                var col = new AutoAliasedColumn(concept.SqlFieldNumeric, compilerOptions.Alias);
                 var val1 = panelitem.NumericFilter.Filter[0];
 
                 switch (panelitem.NumericFilter.FilterType)
@@ -206,12 +206,12 @@ namespace Model.Compiler.Common
             }
         }
 
-        Expression GetDateExpression(DateFilter filter)
+        IExpression GetDateExpression(DateFilter filter)
         {
             return GetDateExpression(filter, false);
         }
 
-        Expression GetDateExpression(DateFilter filter, bool setToEndOfDay)
+        IExpression GetDateExpression(DateFilter filter, bool setToEndOfDay)
         {
             var defaultTime = new DateTime(filter.Date.Year, filter.Date.Month, filter.Date.Day, 0, 0, 0);
             var date = setToEndOfDay
@@ -225,7 +225,7 @@ namespace Model.Compiler.Common
             if (filter.DateIncrementType == DateIncrementType.Specific)
             {
                 var timeFormat = "yyyy-MM-dd HH:mm:ss";
-                return new Expression($"'{date.ToString(timeFormat)}'");
+                return new QuotedExpression(date.ToString(timeFormat));
             }
 
             var incrType = filter.DateIncrementType.ToString().ToUpper();
