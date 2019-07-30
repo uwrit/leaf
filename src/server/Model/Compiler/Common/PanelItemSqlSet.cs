@@ -149,7 +149,7 @@ namespace Model.Compiler.Common
                 var start = GetDateExpression(panel.DateFilter.Start);
                 var end = GetDateExpression(panel.DateFilter.End, true);
 
-                if (panel.PanelType == PanelType.Patient && subpanel.Index > 0)
+                if (panel.PanelType == PanelType.Sequence && subpanel.Index > 0)
                 {
                     var offset = new Expression($"{Dialect.Syntax.DATEADD}({Dialect.Time.MONTH}, {-6}, {start})");
                     where.Add(Date >= offset);

@@ -45,7 +45,6 @@ namespace Model.Compiler.Common
                 {
                     having.Add(GetHaving(join));
                 }
-
                 if (sub.IncludeSubPanel)
                 {
                     anchor = join;
