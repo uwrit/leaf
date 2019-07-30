@@ -19,7 +19,7 @@ namespace Model.Compiler.Common
         {
             Set = set;
             SetAlias(set);
-            ConfigureSet(set);
+            InheritColumns(set);
         }
 
         public JoinedSequentialSqlSet(SubPanelSequentialSqlSet set, JoinType type)
@@ -27,7 +27,7 @@ namespace Model.Compiler.Common
             Set = set;
             Type = type;
             SetAlias(set);
-            ConfigureSet(set);
+            InheritColumns(set);
         }
 
         void SetAlias(SubPanelSequentialSqlSet set)
@@ -35,7 +35,7 @@ namespace Model.Compiler.Common
             Alias = $"{Dialect.Alias.Sequence}{set.SubPanel.Index}";
         }
 
-        void ConfigureSet(SubPanelSequentialSqlSet set)
+        void InheritColumns(SubPanelSequentialSqlSet set)
         {
             PersonId = new Column(set.PersonId.Name, this);
             EncounterId = new Column(set.EncounterId.Name, this);
