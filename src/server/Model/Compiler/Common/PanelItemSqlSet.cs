@@ -54,7 +54,7 @@ namespace Model.Compiler.Common
         protected AutoAliasedColumn Date;
         protected AutoAliasedColumn EventId;
 
-        readonly List<IEvaluatable> where = new List<IEvaluatable>() { };
+        readonly List<IEvaluatable> where = new List<IEvaluatable>();
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
@@ -67,12 +67,7 @@ namespace Model.Compiler.Common
             base.Alias = Alias;
             concept = panelitem.Concept;
 
-            SetColumns();
-            SetSelect();
-            SetFrom();
-            SetWhere();
-            SetGroupBy();
-            SetHaving();
+            Configure();
         }
 
         public override string ToString()
@@ -80,6 +75,16 @@ namespace Model.Compiler.Common
             return base
                 .ToString()
                 .Replace(compilerOptions.Alias, Alias);
+        }
+
+        void Configure()
+        {
+            SetColumns();
+            SetSelect();
+            SetFrom();
+            SetWhere();
+            SetGroupBy();
+            SetHaving();
         }
 
         void SetColumns()
@@ -133,7 +138,7 @@ namespace Model.Compiler.Common
         {
             if (subpanel.HasCountFilter)
             {
-                var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {Date})");
+                var uniqueDates = new Expression($"{Dialect.Syntax.COUNT}({Dialect.Syntax.DISTINCT} {Date})");
                 
                 Having = new List<IEvaluatableAggregate>
                 {

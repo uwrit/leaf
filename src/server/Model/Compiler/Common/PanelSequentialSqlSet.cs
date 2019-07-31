@@ -18,7 +18,7 @@ namespace Model.Compiler.Common
         public PanelSequentialSqlSet(Panel panel, CompilerOptions compilerOptions)
         {
             var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions));
-            var first = sps.ElementAt(0);
+            var first = sps.First();
             var j1 = new JoinedSequentialSqlSet(first);
             var joins = new List<IJoinable>() { j1 };
             var having = new List<IEvaluatableAggregate>();
@@ -54,7 +54,7 @@ namespace Model.Compiler.Common
             /*
              * Set PersonId to first joined Set's.
              */
-            PersonId = new Column(compilerOptions.FieldPersonId, j1);
+            PersonId = j1.PersonId;
 
             /*
              * Compose.
