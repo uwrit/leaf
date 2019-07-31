@@ -78,7 +78,6 @@ namespace Model.Compiler.Common
             {
                 return uniqueDates < sub.MinimumCount;
             }
-
             return uniqueDates == 0;
         }
 

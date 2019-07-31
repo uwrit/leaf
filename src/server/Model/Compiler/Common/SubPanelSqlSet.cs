@@ -29,7 +29,7 @@ namespace Model.Compiler.Common
 
         internal Column PersonId { get; set; }
         internal Column EncounterId { get; set; }
-        internal AutoAliasedColumn EventId { get; set; }
+        internal Column EventId { get; set; }
         internal AutoAliasedColumn Date { get; set; }
 
         public bool IsEventBased => SubPanel.PanelItems.First().Concept.IsEventBased;
@@ -50,17 +50,26 @@ namespace Model.Compiler.Common
 
         void SetSelect()
         {
-            var first = SubPanel.PanelItems.First().Concept;
+            var first = this.First() as PanelItemSequentialSqlSet;
             var comp = compilerOptions;
 
-            PersonId = new Column(comp.FieldPersonId);
-            EncounterId = new Column(comp.FieldEncounterId);
-            Date = new AutoAliasedColumn(first.SqlFieldDate, comp.Alias);
+            PersonId = new Column(first.PersonId);
+            EncounterId = new Column(first.EncounterId);
+            Date = new AutoAliasedColumn(first.Date.Name, comp.Alias);
+            EventId = GetEventId(first);
+        }
 
-            if (first.IsEventBased)
+        Column GetEventId(PanelItemSequentialSqlSet first)
+        {
+            if (first.EventId is AutoAliasedColumn aliased)
             {
-                EventId = new AutoAliasedColumn(first.SqlFieldEvent, comp.Alias);
+                return new AutoAliasedColumn(aliased.Name, compilerOptions.Alias);
             }
+            else if (first.EventId is ExpressedColumn exprs)
+            {
+                return new Column(exprs.Name);
+            }
+            return null;
         }
     }
 }

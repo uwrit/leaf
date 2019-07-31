@@ -12,7 +12,7 @@ namespace Model.Compiler.Common
     {
         public Column PersonId { get; protected set; }
         public Column EncounterId { get; protected set; }
-        public AutoAliasedColumn EventId { get; protected set; }
+        public Column EventId { get; protected set; }
         public AutoAliasedColumn Date { get; protected set; }
 
         public JoinedSequentialSqlSet(SubPanelSequentialSqlSet set)
@@ -39,12 +39,8 @@ namespace Model.Compiler.Common
         {
             PersonId = new Column(set.PersonId, this);
             EncounterId = new Column(set.EncounterId, this);
+            EventId = new Column(set.EventId, this);
             Date = new AutoAliasedColumn(set.Date, this);
-
-            if (set.IsEventBased)
-            {
-                EventId = new AutoAliasedColumn(set.EventId, this);
-            }
         }
     }
 }

@@ -19,14 +19,7 @@ namespace Model.Compiler.Common
 
         internal override void SetSelect()
         {
-            if (concept.IsEventBased)
-            {
-                Select = new[] { PersonId, EncounterId, Date, EventId };
-            }
-            else
-            {
-                Select = new[] { PersonId, EncounterId, Date };
-            }
+            Select = new[] { PersonId, EncounterId, Date, EventId };
         }
 
         internal override void SetGroupBy()
@@ -43,18 +36,17 @@ namespace Model.Compiler.Common
 
     class PanelItemSqlSet : NamedSet
     {
-        protected CompilerOptions compilerOptions;
-        protected Panel panel;
-        protected SubPanel subpanel;
-        protected PanelItem panelitem;
-        protected Concept concept;
-
-        protected Column PersonId;
-        protected Column EncounterId;
-        protected AutoAliasedColumn Date;
-        protected AutoAliasedColumn EventId;
-
+        readonly CompilerOptions compilerOptions;
+        readonly Panel panel;
+        readonly SubPanel subpanel;
+        readonly PanelItem panelitem;
+        readonly Concept concept;
         readonly List<IEvaluatable> where = new List<IEvaluatable>();
+
+        internal Column PersonId;
+        internal Column EncounterId;
+        internal AutoAliasedColumn Date;
+        internal ISelectable EventId;
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
@@ -99,7 +91,11 @@ namespace Model.Compiler.Common
             }
             if (concept.IsEventBased)
             {
-                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
+                 new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
+            }
+            else
+            {
+                EventId = new ExpressedColumn("EventId", new QuotedExpression(""));
             }
         }
 
