@@ -23,7 +23,6 @@ namespace Model.Compiler.Common
 
     public class SubPanelSequentialSqlSet : UnionedSet
     {
-        internal CompilerOptions compilerOptions;
         internal Panel Panel { get; set; }
         internal SubPanel SubPanel { get; set; }
 
@@ -32,14 +31,11 @@ namespace Model.Compiler.Common
         internal Column EventId { get; set; }
         internal AutoAliasedColumn Date { get; set; }
 
-        public bool IsEventBased => SubPanel.PanelItems.First().Concept.IsEventBased;
-
         SubPanelSequentialSqlSet() { }
 
         public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel, CompilerOptions compilerOptions)
         {
             var pis = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions));
-            this.compilerOptions = compilerOptions;
             this.Panel = panel;
             this.SubPanel = subpanel;
 
@@ -51,11 +47,10 @@ namespace Model.Compiler.Common
         void SetSelect()
         {
             var first = this.First() as PanelItemSequentialSqlSet;
-            var comp = compilerOptions;
 
             PersonId = new Column(first.PersonId);
             EncounterId = new Column(first.EncounterId);
-            Date = new AutoAliasedColumn(first.Date.Name, comp.Alias);
+            Date = new AutoAliasedColumn(first.Date.Name, first.Date.AliasMarker);
             EventId = GetEventId(first);
         }
 
@@ -63,7 +58,7 @@ namespace Model.Compiler.Common
         {
             if (first.EventId is AutoAliasedColumn aliased)
             {
-                return new AutoAliasedColumn(aliased.Name, compilerOptions.Alias);
+                return new AutoAliasedColumn(aliased.Name, aliased.AliasMarker);
             }
             else if (first.EventId is ExpressedColumn exprs)
             {

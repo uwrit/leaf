@@ -12,7 +12,7 @@ namespace Model.Compiler.Common
 {
     class PanelItemSequentialSqlSet : PanelItemSqlSet
     {
-        public PanelItemSequentialSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions compilerOptions) : base(panel, subpanel, panelitem, compilerOptions)
+        public PanelItemSequentialSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
         {
 
         }
@@ -50,12 +50,12 @@ namespace Model.Compiler.Common
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
-        public PanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions compilerOptions)
+        public PanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp)
         {
             this.panel = panel;
             this.subpanel = subpanel;
             this.panelitem = panelitem;
-            this.compilerOptions = compilerOptions;
+            this.compilerOptions = comp;
             base.Alias = Alias;
             concept = panelitem.Concept;
 
