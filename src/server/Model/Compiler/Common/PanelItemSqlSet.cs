@@ -91,7 +91,7 @@ namespace Model.Compiler.Common
             }
             if (concept.IsEventBased)
             {
-                 new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
+                 EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
             }
             else
             {

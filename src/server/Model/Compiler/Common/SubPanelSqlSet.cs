@@ -14,7 +14,7 @@ namespace Model.Compiler.Common
     {
         public SubPanelSqlSet(Panel panel, CompilerOptions compilerOptions)
         {
-            var sub = panel.SubPanels.ElementAt(0);
+            var sub = panel.SubPanels.First();
             var pis = sub.PanelItems.Select(pi => new PanelItemSqlSet(panel, sub, pi, compilerOptions));
             Add(pis);
             UnionType = UnionType.All;
@@ -39,8 +39,8 @@ namespace Model.Compiler.Common
             this.Panel = panel;
             this.SubPanel = subpanel;
 
-            SetSelect();
             Add(pis);
+            SetSelect();
             UnionType = UnionType.All;
         }
 

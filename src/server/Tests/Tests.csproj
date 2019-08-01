@@ -6,6 +6,7 @@
     <TieredCompilation>true</TieredCompilation>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
+    <ReleaseVersion>3.1</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,5 +29,11 @@
     <Folder Include="Mock\Models\Collections\" />
     <Folder Include="Mock\Services\Authorization\" />
     <Folder Include="Util\" />
+    <Folder Include="Mock\Models\Compiler\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Composure">
+      <HintPath>..\..\..\..\composure\src\Composure\bin\Release\netcoreapp2.2\Composure.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

@@ -81,12 +81,12 @@ namespace Model.Compiler.Common
             return uniqueDates == 0;
         }
 
-        JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet curr)
+        JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet currSub)
         {
             /*
              * Get offset expressions.
              */
-            var seq = curr.SubPanel.JoinSequence;
+            var seq = currSub.SubPanel.JoinSequence;
             var incrType = seq.DateIncrementType.ToString().ToUpper();
             var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
             var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
@@ -94,9 +94,8 @@ namespace Model.Compiler.Common
             /*
              * Get Join.
              */
-            var type = curr.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
-            var join = new JoinedSequentialSqlSet(curr, type);
-            var currDate = new AutoAliasedColumn(curr.Date, join);
+            var type = currSub.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
+            var curr = new JoinedSequentialSqlSet(currSub, type);
 
             switch (seq.SequenceType)
             {
@@ -105,59 +104,59 @@ namespace Model.Compiler.Common
                  */ 
                 case SequenceType.Encounter:
 
-                    join.On = new[] 
+                    curr.On = new[] 
                         {
                             prev.EncounterId == curr.EncounterId
                         };
-                    return join;
+                    return curr;
 
                 /*
                  * Same Event.
                  */
                 case SequenceType.Event:
 
-                    join.On = new[] 
+                    curr.On = new[] 
                         {
                             prev.PersonId == curr.PersonId,
                             prev.EventId == curr.EventId                            
                         };
-                    return join;
+                    return curr;
 
                 /*
                  * Plus/Minus a time increment.
                  */
                 case SequenceType.PlusMinus:
 
-                    join.On = new IEvaluatable[]
+                    curr.On = new IEvaluatable[]
                         {
                             prev.PersonId == curr.PersonId,
-                            currDate == backOffset & forwardOffset
+                            curr.Date == backOffset & forwardOffset
                         };
-                    return join;
+                    return curr;
 
                 /*
                  * Within a following time increment.
                  */
                 case SequenceType.WithinFollowing:
 
-                    join.On = new IEvaluatable[]
+                    curr.On = new IEvaluatable[]
                         {
                             prev.PersonId == curr.PersonId,
-                            currDate == prev.Date & forwardOffset
+                            curr.Date == prev.Date & forwardOffset
                         };
-                    return join;
+                    return curr;
 
                 /*
                  * Anytime after.
                  */
                 case SequenceType.AnytimeFollowing:
 
-                    join.On = new IEvaluatable[]
+                    curr.On = new IEvaluatable[]
                         {
                             prev.PersonId == curr.PersonId,
-                            currDate > prev.Date
+                            curr.Date > prev.Date
                         };
-                    return join;
+                    return curr;
 
                 default:
 

@@ -4,233 +4,77 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Extensions.Options;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Options;
+using Model.Compiler.Common;
+using Composure;
+using Tests.Mock.Models.Compiler;
 using Xunit;
+using System;
 
 namespace Tests
 {
     public class SqlCompilerTests
     {
-        #region mockPanels
-        Panel singlePanelItem = new Panel
-        {
-            Index = 0,
-            IncludePanel = true,
-            SubPanels = new List<SubPanel>
-                {
-                    new SubPanel
-                    {
-                        Index = 0,
-                        PanelIndex = 0,
-                        IncludeSubPanel = true,
-                        JoinSequence = new SubPanelJoinSequence
-                        {
-                            DateIncrementType = DateIncrementType.Day,
-                            Increment = 0,
-                            SequenceType = SequenceType.Encounter
-                        },
-                        PanelItems = new List<PanelItem>
-                        {
-                            new PanelItem
-                            {
-                                Index = 1,
-                                SubPanelIndex = 0,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    SqlFieldDate = "@.OtherDateField",
-                                    SqlSetFrom = "Encounter",
-                                    SqlSetWhere = "@.Facility = 'HMC'"
-                                }
-                            }
-                        }
-                    }
-                }
-        };
-        Panel doublePanelItem = new Panel
-        {
-            Index = 0,
-            IncludePanel = true,
-            SubPanels = new List<SubPanel>
-                {
-                    new SubPanel
-                    {
-                        Index = 0,
-                        PanelIndex = 0,
-                        IncludeSubPanel = true,
-                        JoinSequence = new SubPanelJoinSequence
-                        {
-                            DateIncrementType = DateIncrementType.Day,
-                            Increment = 0,
-                            SequenceType = SequenceType.Encounter
-                        },
-                        PanelItems = new List<PanelItem>
-                        {
-                            new PanelItem
-                            {
-                                Index = 0,
-                                SubPanelIndex = 0,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    SqlFieldDate = "@.DateField",
-                                    SqlSetFrom = "Encounter",
-                                    SqlSetWhere = "@.EncounterType = 'ED'"
-                                }
-                            },
-                            new PanelItem
-                            {
-                                Index = 1,
-                                SubPanelIndex = 0,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    SqlFieldDate = "@.OtherDateField",
-                                    SqlSetFrom = "Encounter",
-                                    SqlSetWhere = "@.Facility = 'HMC'"
-                                }
-                            }
-                        }
-                    }
-                }
-        };
-        Panel joinBySequence = new Panel
-        {
-            Index = 0,
-            IncludePanel = true,
-            SubPanels = new List<SubPanel>
-                {
-                    new SubPanel
-                    {
-                        Index = 0,
-                        PanelIndex = 0,
-                        IncludeSubPanel = true,
-                        JoinSequence = new SubPanelJoinSequence
-                        {
-                            DateIncrementType = DateIncrementType.Day,
-                            Increment = 0,
-                            SequenceType = SequenceType.Encounter
-                        },
-                        PanelItems = new List<PanelItem>
-                        {
-                            new PanelItem
-                            {
-                                Index = 0,
-                                SubPanelIndex = 0,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    IsEncounterBased = true,
-                                    SqlFieldDate = "@.EncounterDate",
-                                    SqlSetFrom = "Encounter",
-                                    SqlSetWhere = "@.EncounterType = 'ED'"
-                                }
-                            },
-                            new PanelItem
-                            {
-                                Index = 1,
-                                SubPanelIndex = 1,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    IsEncounterBased = true,
-                                    SqlFieldDate = "@.Encounter1Date",
-                                    SqlSetFrom = "Encounter1",
-                                    SqlSetWhere = "@.Facility = 'HMC'"
-                                }
-                            }
-                        }
-                    },
-                    new SubPanel
-                    {
-                        Index = 1,
-                        PanelIndex = 0,
-                        IncludeSubPanel = true,
-                        JoinSequence = new SubPanelJoinSequence
-                        {
-                            DateIncrementType = DateIncrementType.Day,
-                            Increment = 0,
-                            SequenceType = SequenceType.Encounter
-                        },
-                        PanelItems = new List<PanelItem>
-                        {
-                            new PanelItem
-                            {
-                                Index = 0,
-                                SubPanelIndex = 1,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    IsEncounterBased = true,
-                                    SqlFieldDate = "@.DiagnosisDate",
-                                    SqlSetFrom = "Diagnosis",
-                                    SqlSetWhere = "@.DiagnosisType = 'ICD10' AND @.DiagnosisCode = 'E11.2'"
-                                }
-                            },
-                            new PanelItem
-                            {
-                                Index = 1,
-                                SubPanelIndex = 1,
-                                PanelIndex = 0,
-                                Concept = new Concept
-                                {
-                                    IsEncounterBased = true,
-                                    SqlFieldDate = "@.ProblemDate",
-                                    SqlSetFrom = "ProblemList",
-                                    SqlSetWhere = "@.ProblemType = 'ICD10' AND @.ProblemCode = 'E11.2'"
-                                }
-                            }
-                        }
-                    }
-                },
-        };
-        #endregion
+        readonly SqlServerCompiler Compiler = MockOptions.GenerateSqlServerCompiler();
+        readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
 
-        #region compiler
-        IOptions<CompilerOptions> GenerateOmopOptions()
+        int GetIndex(string text, string searchText) => text.IndexOf(searchText, StringComparison.InvariantCultureIgnoreCase);
+
+        string GetContentBetween(string text, string start, string end)
         {
-            return Options.Create<CompilerOptions>(new CompilerOptions
-            {
-                FieldPersonId = "person_id",
-                FieldEncounterId = "visit_id",
-                Alias = "@"
-            });
+            var afterStart = GetIndex(text, start) + end.Length;
+            var len = GetIndex(text, end) - afterStart;
+            return text.Substring(afterStart, len);
         }
-        IOptions<CohortOptions> GenerateCohortOptions()
+
+        string[] GetColumns(string sql)
         {
-            return Options.Create<CohortOptions>(new CohortOptions
-            {
-                SetCohort = "_LeafCohort_"
-            });
+            var colsStr = GetContentBetween(sql, "SELECT", "FROM");
+            var splt = colsStr.Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return splt;
         }
-        SqlServerCompiler GenerateSqlServerCompiler()
+
+        string StripSetAlias(string col)
         {
-            IOptions<CompilerOptions> compilerOptions = GenerateOmopOptions();
-            IOptions<CohortOptions> cohortOptions = GenerateCohortOptions();
-
-            return new SqlServerCompiler(compilerOptions, cohortOptions);
-        }
-        #endregion   
-
-        [Fact]
-        public void Ensure_UnionAll()
-        {
-            SqlServerCompiler sqlCompiler = GenerateSqlServerCompiler();
-            string sql = sqlCompiler.BuildPanelSql(doublePanelItem);
-
-            Assert.Contains("UNION ALL", sql);
+            var per = GetIndex(col, ".") + 1;
+            return col.Substring(per, col.Length - per);
         }
 
         [Fact]
-        public void Ensure_Join_By_Encounter_And_Union()
+        public void Person_Level_Query_Returns_Single_Column()
         {
-            SqlServerCompiler sqlCompiler = GenerateSqlServerCompiler();
-            string sql = sqlCompiler.BuildPanelSql(joinBySequence);
+            var panel = MockPanel.Panel;
+            var ob = new SubPanelSqlSet(panel, Options);
+            var sql = ob.ToString();
+            var cols = GetColumns(sql);
+            var col = StripSetAlias(cols[0]);
 
-            Assert.Contains("_T0.visit_id = _T1.visit_id", sql);
+            Assert.Single(cols);
+            Assert.Equal(Options.FieldPersonId, col);
+        }
+
+        [Fact]
+        public void Sequence_Level_Subquery_Returns_Four_Columns()
+        {
+            var panel = MockPanel.Panel;
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { MockPanel.HmcEnc },
+                JoinSequence = MockPanel.EncJoin
+            });
+
+            var ob = new PanelSequentialSqlSet(panel, Options);
+            var sql = ob.ToString();
+            var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
+            var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
+            Assert.Equal(4, colsStr.Length);
         }
     }
 }
