@@ -28,8 +28,8 @@ namespace Model.Compiler.Common
 
         internal Column PersonId { get; set; }
         internal Column EncounterId { get; set; }
-        internal Column EventId { get; set; }
         internal AutoAliasedColumn Date { get; set; }
+        internal ISelectable EventId { get; set; }
 
         SubPanelSequentialSqlSet() { }
 
@@ -60,7 +60,7 @@ namespace Model.Compiler.Common
             {
                 return new AutoAliasedColumn(aliased.Name, aliased.AliasMarker);
             }
-            else if (first.EventId is ExpressedColumn exprs)
+            if (first.EventId is ExpressedColumn exprs)
             {
                 return new Column(exprs.Name);
             }

@@ -21,11 +21,12 @@ namespace Tests
         readonly SqlServerCompiler Compiler = MockOptions.GenerateSqlServerCompiler();
         readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
 
+        #region Helpers
         int GetIndex(string text, string searchText) => text.IndexOf(searchText, StringComparison.InvariantCultureIgnoreCase);
 
         string GetContentBetween(string text, string start, string end)
         {
-            var afterStart = GetIndex(text, start) + end.Length;
+            var afterStart = GetIndex(text, start) + start.Length;
             var len = GetIndex(text, end) - afterStart;
             return text.Substring(afterStart, len);
         }
@@ -42,42 +43,162 @@ namespace Tests
             var per = GetIndex(col, ".") + 1;
             return col.Substring(per, col.Length - per);
         }
+        #endregion
 
         [Fact]
         public void Person_Level_Query_Returns_Single_Column()
         {
-            var panel = MockPanel.Panel;
+            var panel = MockPanel.Panel();
             var ob = new SubPanelSqlSet(panel, Options);
             var sql = ob.ToString();
             var cols = GetColumns(sql);
-            var col = StripSetAlias(cols[0]);
+            var col = StripSetAlias(cols[0]).Trim();
 
             Assert.Single(cols);
             Assert.Equal(Options.FieldPersonId, col);
         }
 
         [Fact]
-        public void Multiple_Panel_Items_In_Subpanel_Returns_Union()
+        public void Where_Clause_Added_If_Panel_Has_Where()
         {
-            var panel = MockPanel.Panel;
-            panel.SubPanels.ElementAt(0).PanelItems = new List<PanelItem>() { MockPanel.EdEnc, MockPanel.HmcEnc };
-            var ob = new SubPanelSqlSet(panel, Options);
-            var sql = ob.ToString();
+            var panel = MockPanel.Panel();
+            var pi = MockPanel.EdEnc();
 
-            Assert.Contains("UNION ALL", "sql");
+            /*
+             * No WHERE clause
+             */            
+            pi.Concept.SqlSetWhere = null;
+            panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
+            var ob = new SubPanelSqlSet(panel, Options);
+
+            Assert.DoesNotContain("WHERE", ob.ToString());
+
+            /*
+             * One WHERE clause
+             */
+            pi.Concept.SqlSetWhere = "1 = 1";
+            ob = new SubPanelSqlSet(panel, Options);
+
+            Assert.Contains("WHERE 1 = 1", ob.ToString());
+
+            /*
+             * Two WHERE clauses
+             */
+            pi.Concept.SqlFieldNumeric = "Num";
+            pi.NumericFilter = new NumericFilter { Filter = new[] { 5.0M }, FilterType = NumericFilterType.EqualTo };
+            ob = new SubPanelSqlSet(panel, Options);
+
+            Assert.Contains("WHERE 1 = 1 AND Num = 5.0", ob.ToString());
         }
 
         [Fact]
-        public void Sequence_Level_Query_Returns_Single_Column()
+        public void Alias_Placeholder_Filled()
         {
-            var panel = MockPanel.Panel;
+            var panel = MockPanel.Panel();
+            var pi = MockPanel.EdEnc();
+            var expectedAlias = "_S000";
+            pi.Concept.SqlSetWhere = "@.X != @.Y";
+            panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
+
+            var ob = new SubPanelSqlSet(panel, Options);
+            Assert.Contains($"{expectedAlias}.X != {expectedAlias}.Y", ob.ToString());
+        }
+
+        [Fact]
+        public void Dummy_EventId_Field_Added_If_Absent()
+        {
+            var panel = MockPanel.Panel();
             panel.SubPanels.Add(new SubPanel
             {
                 Index = 1,
                 PanelIndex = 0,
                 IncludeSubPanel = true,
-                PanelItems = new[] { MockPanel.HmcEnc },
-                JoinSequence = MockPanel.EncJoin
+                PanelItems = new[] { MockPanel.HmcEnc() },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
+            });
+
+            var ob = new PanelSequentialSqlSet(panel, Options);
+            var sql = ob.ToString();
+            var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
+            var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var defaultNoField = "'' AS EventId";
+            var included = cols.Any(c => c.Trim().Equals(defaultNoField));
+
+            Assert.True(included);
+        }
+
+        [Fact]
+        public void EventId_Field_Included_If_Present()
+        {
+            var panel = MockPanel.Panel();
+            var field = "EventField";
+            var field2 = "EventishField";
+            var pi = MockPanel.EdEnc();
+            var pi2 = MockPanel.HmcEnc();
+
+            pi.Index = 0;
+            pi.Concept.IsEventBased = true;
+            pi.Concept.SqlFieldEvent = $"{Options.Alias}.{field}";
+
+            pi2.Index = 0;
+            pi2.SubPanelIndex = 1;
+            pi2.Concept.IsEventBased = true;
+            pi2.Concept.SqlFieldEvent = $"{Options.Alias}.{field2}";
+
+            panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { pi2 },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Event }
+            });
+
+            var ob = new PanelSequentialSqlSet(panel, Options);
+            var sql = ob.ToString();
+            var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
+            var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
+            var expectedAlias1 = "_S000";
+            var expectedAlias2 = "_S010";
+
+            /*
+             * Event fields added with alias.
+             */
+            Assert.Contains($"{expectedAlias1}.{field}", sql);
+            Assert.Contains($"{expectedAlias2}.{field2}", sql);
+
+            /*
+             * Event fields inherited into parent set and join with parent alias.
+             */
+            var expectedParentAlias1 = "_T0";
+            var expectedParentAlias2 = "_T1";
+
+            Assert.Contains($"{expectedParentAlias1}.{field} = {expectedParentAlias2}.{field2}", sql);
+        }
+
+        [Fact]
+        public void Multiple_Panel_Items_In_Subpanel_Returns_Union()
+        {
+            var panel = MockPanel.Panel();
+            panel.SubPanels.ElementAt(0).PanelItems = new List<PanelItem>() { MockPanel.EdEnc(), MockPanel.HmcEnc() };
+            var ob = new SubPanelSqlSet(panel, Options);
+            var sql = ob.ToString();
+
+            Assert.Contains("UNION ALL", sql);
+        }
+
+        [Fact]
+        public void Sequence_Level_Query_Returns_Single_Column()
+        {
+            var panel = MockPanel.Panel();
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { MockPanel.HmcEnc() },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
             var ob = new PanelSequentialSqlSet(panel, Options);
@@ -92,14 +213,14 @@ namespace Tests
         [Fact]
         public void Sequence_Level_Subquery_Returns_Four_Columns()
         {
-            var panel = MockPanel.Panel;
+            var panel = MockPanel.Panel();
             panel.SubPanels.Add(new SubPanel
             {
                 Index = 1,
                 PanelIndex = 0,
                 IncludeSubPanel = true,
-                PanelItems = new[] { MockPanel.HmcEnc },
-                JoinSequence = MockPanel.EncJoin
+                PanelItems = new[] { MockPanel.HmcEnc() },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
             var ob = new PanelSequentialSqlSet(panel, Options);

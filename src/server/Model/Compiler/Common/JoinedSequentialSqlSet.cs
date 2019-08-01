@@ -39,8 +39,21 @@ namespace Model.Compiler.Common
         {
             PersonId = new Column(set.PersonId, this);
             EncounterId = new Column(set.EncounterId, this);
-            EventId = new Column(set.EventId, this);
             Date = new AutoAliasedColumn(set.Date, this);
+            EventId = GetEventId(set);
+        }
+
+        Column GetEventId(SubPanelSequentialSqlSet set)
+        {
+            if (set.EventId is AutoAliasedColumn aliased)
+            {
+                return new AutoAliasedColumn(aliased, this);
+            }
+            if (set.EventId is ExpressedColumn exprs)
+            {
+                return new Column(exprs.Name);
+            }
+            return null;
         }
     }
 }

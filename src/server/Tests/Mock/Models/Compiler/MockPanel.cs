@@ -11,109 +11,95 @@ namespace Tests.Mock.Models.Compiler
 {
     public static class MockPanel
     {
-        public static Panel Panel = new Panel
+        public static Panel Panel()
         {
-            Index = 0,
-            IncludePanel = true,
-            DateFilter = new DateBoundary(),
-            SubPanels = new List<SubPanel>()
+            return new Panel
             {
-                new SubPanel
+                Index = 0,
+                IncludePanel = true,
+                DateFilter = new DateBoundary(),
+                SubPanels = new List<SubPanel>()
                 {
-                    Index = 0,
-                    PanelIndex = 0,
-                    IncludeSubPanel = true,
-                    JoinSequence = new SubPanelJoinSequence(),
-                    PanelItems = new List<PanelItem>()
+                    new SubPanel
                     {
-                        new PanelItem
+                        Index = 0,
+                        PanelIndex = 0,
+                        IncludeSubPanel = true,
+                        JoinSequence = new SubPanelJoinSequence(),
+                        PanelItems = new List<PanelItem>()
                         {
-                            Index = 0,
-                            SubPanelIndex = 0,
-                            PanelIndex = 0,
-                            Concept = new Concept
+                            new PanelItem
                             {
-                                SqlFieldDate = "@.DateField",
-                                SqlSetFrom = "Encounter",
-                                SqlSetWhere = "@.EncounterType = 'ED'",
-                                IsEncounterBased = true
+                                Index = 0,
+                                SubPanelIndex = 0,
+                                PanelIndex = 0,
+                                Concept = new Concept
+                                {
+                                    SqlFieldDate = "@.DateField",
+                                    SqlSetFrom = "Encounter",
+                                    SqlSetWhere = "@.EncounterType = 'ED'",
+                                    IsEncounterBased = true
+                                }
                             }
                         }
                     }
                 }
-            }
-        };
+            };
+        }
 
-        public static Panel BasicPanel = new Panel
+        public static Panel BasicPanel()
         {
-            Index = 0,
-            IncludePanel = true,
-            SubPanels = new List<SubPanel>()
-        };
-
-        public static SubPanel SubPanel = new SubPanel
-        {
-            Index = 0,
-            PanelIndex = 0,
-            IncludeSubPanel = true,
-            PanelItems = new List<PanelItem>()
-        };
-
-        public static PanelItem EdEnc = new PanelItem
-        {
-            Index = 0,
-            SubPanelIndex = 0,
-            PanelIndex = 0,
-            Concept = new Concept
+            return new Panel
             {
-                SqlFieldDate = "@.DateField",
-                SqlSetFrom = "Encounter",
-                SqlSetWhere = "@.EncounterType = 'ED'",
-                IsEncounterBased = true
-            }
-        };
+                Index = 0,
+                IncludePanel = true,
+                SubPanels = new List<SubPanel>()
+            };
+        }
 
-        public static PanelItem HmcEnc = new PanelItem
+        public static SubPanel SubPanel()
         {
-            Index = 1,
-            SubPanelIndex = 0,
-            PanelIndex = 0,
-            Concept = new Concept
+            return new SubPanel
             {
-                SqlFieldDate = "@.DateField",
-                SqlSetFrom = "Encounter",
-                SqlSetWhere = "@.Facility = 'HMC'",
-                IsEncounterBased = true
-            }
-        };
+                Index = 0,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new List<PanelItem>()
+            };
+        }
 
-        public static SubPanelJoinSequence EncJoin = new SubPanelJoinSequence
+        public static PanelItem EdEnc()
         {
-            SequenceType = SequenceType.Encounter
-        };
+            return new PanelItem
+            {
+                Index = 0,
+                SubPanelIndex = 0,
+                PanelIndex = 0,
+                Concept = new Concept
+                {
+                    SqlFieldDate = "@.DateField",
+                    SqlSetFrom = "Encounter",
+                    SqlSetWhere = "@.EncounterType = 'ED'",
+                    IsEncounterBased = true
+                }
+            };
+        }
 
-        public static SubPanelJoinSequence EventJoin = new SubPanelJoinSequence
+        public static PanelItem HmcEnc()
         {
-            SequenceType = SequenceType.Event
-        };
-
-        public static SubPanelJoinSequence AnytimeAfterJoin = new SubPanelJoinSequence
-        {
-            SequenceType = SequenceType.AnytimeFollowing
-        };
-
-        public static SubPanelJoinSequence PlusMinusJoin = new SubPanelJoinSequence
-        {
-            SequenceType = SequenceType.PlusMinus,
-            Increment = 3,
-            DateIncrementType = DateIncrementType.Month
-        };
-
-        public static SubPanelJoinSequence WithinFollowingJoin = new SubPanelJoinSequence
-        {
-            SequenceType = SequenceType.WithinFollowing,
-            Increment = 2,
-            DateIncrementType = DateIncrementType.Day
-        };
+            return new PanelItem
+            {
+                Index = 1,
+                SubPanelIndex = 0,
+                PanelIndex = 0,
+                Concept = new Concept
+                {
+                    SqlFieldDate = "@.DateField",
+                    SqlSetFrom = "Encounter",
+                    SqlSetWhere = "@.Facility = 'HMC'",
+                    IsEncounterBased = true
+                }
+            };
+        }
     }
 }
