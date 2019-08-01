@@ -10,7 +10,6 @@ using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Options;
 using Model.Compiler.Common;
-using Composure;
 using Tests.Mock.Models.Compiler;
 using Xunit;
 using System;
@@ -58,6 +57,39 @@ namespace Tests
         }
 
         [Fact]
+        public void Multiple_Panel_Items_In_Subpanel_Returns_Union()
+        {
+            var panel = MockPanel.Panel;
+            panel.SubPanels.ElementAt(0).PanelItems = new List<PanelItem>() { MockPanel.EdEnc, MockPanel.HmcEnc };
+            var ob = new SubPanelSqlSet(panel, Options);
+            var sql = ob.ToString();
+
+            Assert.Contains("UNION ALL", "sql");
+        }
+
+        [Fact]
+        public void Sequence_Level_Query_Returns_Single_Column()
+        {
+            var panel = MockPanel.Panel;
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { MockPanel.HmcEnc },
+                JoinSequence = MockPanel.EncJoin
+            });
+
+            var ob = new PanelSequentialSqlSet(panel, Options);
+            var sql = ob.ToString();
+            var cols = GetColumns(sql);
+            var col = StripSetAlias(cols[0]);
+
+            Assert.Single(cols);
+            Assert.Equal(Options.FieldPersonId, col);
+        }
+
+        [Fact]
         public void Sequence_Level_Subquery_Returns_Four_Columns()
         {
             var panel = MockPanel.Panel;
@@ -74,7 +106,8 @@ namespace Tests
             var sql = ob.ToString();
             var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
             var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
-            Assert.Equal(4, colsStr.Length);
+
+            Assert.Equal(4, cols.Length);
         }
     }
 }
