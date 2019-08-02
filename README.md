@@ -19,7 +19,9 @@
 
 Leaf is developed by real people passionate about translational biomedical science and software engineering. :smiley:
 
-See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI
+See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI.
+
+Information on Leaf's role in clinical informatics, architecture, and background is described in this [manuscript](https://www.biorxiv.org/content/10.1101/632471v1).
 
 ## Getting Started
 * [How Leaf can help accomplish research](https://github.com/uwrit/leaf/wiki#how-can-leaf-help-with-research)
