@@ -131,7 +131,7 @@ export default class DatasetSearchEngineWebWorker {
         /*
          * Shared cache.
          */
-        const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
+        const demographics: PatientListDatasetQuery = { id: 'demographics', shape: 3, category: '', isEncounterBased: false, name: 'Basic Demographics', tags: [] };
         const firstCharCache: Map<string, TokenizedDatasetRef[]> = new Map();
         let excluded: Map<string, PatientListDatasetQuery> = new Map([[ demographics.id, demographics ]]);
         let allDs: Map<string, PatientListDatasetQuery> = new Map();

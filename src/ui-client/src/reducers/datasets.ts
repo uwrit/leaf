@@ -31,7 +31,7 @@ export const defaultDatasetsState = (): DatasetsState => {
     };
 };
 
-const demographics: PatientListDatasetQuery = { id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', name: 'Basic Demographics', tags: [] };
+const demographics: PatientListDatasetQuery = { id: 'demographics', shape: PatientListDatasetShape.Demographics, category: '', isEncounterBased: false, name: 'Basic Demographics', tags: [] };
 
 const switchDatasetOldForNew = (state: DatasetsState, action: DatasetAction): DatasetsState => {
     const oldDs = action.dataset!;

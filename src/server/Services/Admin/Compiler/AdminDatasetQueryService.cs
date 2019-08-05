@@ -19,7 +19,6 @@ using Dapper;
 using Model.Compiler;
 using Services.Tables;
 using Model.Extensions;
-using Services.Search;
 
 namespace Services.Admin.Compiler
 {
@@ -52,15 +51,6 @@ namespace Services.Admin.Compiler
 
         public async Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query)
         {
-            if (query.Shape == Shape.Dynamic)
-            {
-                return await UpdateDynamicDatasetQueryAsync(query);
-            }
-            return await UpdateShapedDatasetQueryAsync(query);
-        }
-
-        async Task<AdminDatasetQuery> UpdateShapedDatasetQueryAsync(AdminDatasetQuery query)
-        {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -88,48 +78,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        async Task<AdminDatasetQuery> UpdateDynamicDatasetQueryAsync(AdminDatasetQuery query)
-        {
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                var grid = await cn.QueryMultipleAsync(
-                    Sql.UpdateDynamic,
-                    new
-                    {
-                        id = query.Id,
-                        name = query.Name,
-                        catid = query.CategoryId,
-                        desc = query.Description,
-                        sql = query.SqlStatement,
-                        isEnc = query.IsEncounterBased,
-                        schema = DynamicDatasetSchemaFieldSerde.Serialize(query.Schema),
-                        sqlDate = query.SqlFieldDate,
-                        sqlValString = query.SqlFieldValueString,
-                        sqlValNum = query.SqlFieldValueNumeric,
-                        tags = DatasetQueryTagTable.From(query.Tags),
-                        constraints = ResourceConstraintTable.From(query),
-                        user = user.UUID
-                    },
-                    commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout);
-
-                var updated = DbReader.Read(grid);
-                return updated;
-            }
-        }
-
         public async Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query)
-        {
-            if (query.Shape == Shape.Dynamic)
-            {
-                return await CreateShapedDatasetQueryAsync(query);
-            }
-            return await CreateDynamicDatasetQueryAsync(query);
-        }
-
-        async Task<AdminDatasetQuery> CreateShapedDatasetQueryAsync(AdminDatasetQuery query)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -145,37 +94,6 @@ namespace Services.Admin.Compiler
                         catid = query.CategoryId,
                         desc = query.Description,
                         sql = query.SqlStatement,
-                        tags = DatasetQueryTagTable.From(query.Tags),
-                        constraints = ResourceConstraintTable.From(query),
-                        user = user.UUID
-                    },
-                    commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout);
-                var created = DbReader.Read(grid);
-                return created;
-            }
-        }
-
-        async Task<AdminDatasetQuery> CreateDynamicDatasetQueryAsync(AdminDatasetQuery query)
-        {
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-
-                var grid = await cn.QueryMultipleAsync(
-                    Sql.CreateDynamic,
-                    new
-                    {
-                        shape = query.Shape,
-                        name = query.Name,
-                        catid = query.CategoryId,
-                        desc = query.Description,
-                        sql = query.SqlStatement,
-                        isEnc = query.IsEncounterBased,
-                        schema = DynamicDatasetSchemaFieldSerde.Serialize(query.Schema),
-                        sqlDate = query.SqlFieldDate,
-                        sqlValString = query.SqlFieldValueString,
-                        sqlValNum = query.SqlFieldValueNumeric,
                         tags = DatasetQueryTagTable.From(query.Tags),
                         constraints = ResourceConstraintTable.From(query),
                         user = user.UUID
@@ -209,8 +127,6 @@ namespace Services.Admin.Compiler
             public const string Update = "adm.sp_UpdateDatasetQuery";
             public const string Create = "adm.sp_CreateDatasetQuery";
             public const string Delete = "adm.sp_DeleteDatasetQuery";
-            public const string CreateDynamic = "adm.sp_CreateDynamicDatasetQuery";
-            public const string UpdateDynamic = "adm.sp_UpdateDynamicDatasetQuery";
         }
 
         class DatasetQueryRecord
@@ -222,11 +138,6 @@ namespace Services.Admin.Compiler
             public int? CategoryId { get; set; }
             public string Description { get; set; }
             public string SqlStatement { get; set; }
-            public bool IsEncounterBased { get; set; }
-            public string SqlFieldDate { get; set; }
-            public string SqlFieldValueString { get; set; }
-            public string SqlFieldValueNumeric { get; set; }
-            public string Schema { get; set; }
             public DateTime Created { get; set; }
             public string CreatedBy { get; set; }
             public DateTime Updated { get; set; }
@@ -275,12 +186,7 @@ namespace Services.Admin.Compiler
                     Name = query.Name,
                     CategoryId = query.CategoryId,
                     Description = query.Description,
-                    IsEncounterBased = query.IsEncounterBased,
                     SqlStatement = query.SqlStatement,
-                    SqlFieldDate = query.SqlFieldDate,
-                    SqlFieldValueString = query.SqlFieldValueString,
-                    SqlFieldValueNumeric = query.SqlFieldValueNumeric,
-                    Schema = DynamicDatasetSchemaFieldSerde.Deserialize(query.Schema),
                     Created = query.Created,
                     CreatedBy = query.CreatedBy,
                     Updated = query.Updated,

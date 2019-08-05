@@ -260,6 +260,7 @@ export const setAdminPanelDatasetLoadState = (state: AdminPanelLoadState): Admin
 const deriveUserDatasetFromAdmin = (state: AppState, dataset: AdminDatasetQuery): PatientListDatasetQuery => {
     return {
         ...dataset,
+        isEncounterBased: false,
         category: Boolean(dataset.categoryId)
             ? state.admin!.datasetQueryCategories.categories.get(dataset.categoryId!)!.category 
             : ''
