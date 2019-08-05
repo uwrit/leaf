@@ -157,8 +157,6 @@ namespace Tests
 
             var ob = new PanelSequentialSqlSet(panel, Options);
             var sql = ob.ToString();
-            var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
-            var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
             var expectedAlias1 = "_S000";
             var expectedAlias2 = "_S010";
 

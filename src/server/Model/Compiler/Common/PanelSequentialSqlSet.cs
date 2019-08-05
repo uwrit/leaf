@@ -89,7 +89,7 @@ namespace Model.Compiler.Common
             var seq = currSub.SubPanel.JoinSequence;
             var incrType = seq.DateIncrementType.ToString().ToUpper();
             var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
-            var forwardOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
+            var forwOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
 
             /*
              * Get Join.
@@ -130,7 +130,7 @@ namespace Model.Compiler.Common
                     curr.On = new IEvaluatable[]
                         {
                             prev.PersonId == curr.PersonId,
-                            curr.Date == backOffset & forwardOffset
+                            curr.Date == backOffset & forwOffset
                         };
                     return curr;
 
@@ -142,7 +142,7 @@ namespace Model.Compiler.Common
                     curr.On = new IEvaluatable[]
                         {
                             prev.PersonId == curr.PersonId,
-                            curr.Date == prev.Date & forwardOffset
+                            curr.Date == prev.Date & forwOffset
                         };
                     return curr;
 

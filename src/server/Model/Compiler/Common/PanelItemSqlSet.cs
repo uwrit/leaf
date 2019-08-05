@@ -45,8 +45,8 @@ namespace Model.Compiler.Common
 
         internal Column PersonId;
         internal Column EncounterId;
+        internal EventIdColumn EventId;
         internal AutoAliasedColumn Date;
-        internal ISelectable EventId;
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
@@ -91,11 +91,11 @@ namespace Model.Compiler.Common
             }
             if (concept.IsEventBased)
             {
-                EventId = new AutoAliasedColumn(concept.SqlFieldEvent, aliasMarker, this);
+                EventId = new EventIdColumn(concept.SqlFieldEvent, aliasMarker, this);
             }
             else
             {
-                EventId = new ExpressedColumn("EventId", new QuotedExpression(""));
+                EventId = new EventIdColumn();
             }
         }
 

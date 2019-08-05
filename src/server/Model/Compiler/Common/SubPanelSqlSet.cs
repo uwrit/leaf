@@ -14,9 +14,9 @@ namespace Model.Compiler.Common
     {
         public SubPanelSqlSet(Panel panel, CompilerOptions compilerOptions)
         {
-            var sub = panel.SubPanels.First();
-            var pis = sub.PanelItems.Select(pi => new PanelItemSqlSet(panel, sub, pi, compilerOptions));
-            Add(pis);
+            var first = panel.SubPanels.First();
+            var union = first.PanelItems.Select(pi => new PanelItemSqlSet(panel, first, pi, compilerOptions));
+            Add(union);
             UnionType = UnionType.All;
         }
     }
@@ -28,18 +28,18 @@ namespace Model.Compiler.Common
 
         internal Column PersonId { get; set; }
         internal Column EncounterId { get; set; }
+        internal EventIdColumn EventId { get; set; }
         internal AutoAliasedColumn Date { get; set; }
-        internal ISelectable EventId { get; set; }
 
         SubPanelSequentialSqlSet() { }
 
         public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel, CompilerOptions compilerOptions)
         {
-            var pis = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions));
+            var union = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions));
             this.Panel = panel;
             this.SubPanel = subpanel;
 
-            Add(pis);
+            Add(union);
             SetSelect();
             UnionType = UnionType.All;
         }
@@ -51,20 +51,7 @@ namespace Model.Compiler.Common
             PersonId = new Column(first.PersonId);
             EncounterId = new Column(first.EncounterId);
             Date = new AutoAliasedColumn(first.Date.Name, first.Date.AliasMarker);
-            EventId = GetEventId(first);
-        }
-
-        Column GetEventId(PanelItemSequentialSqlSet first)
-        {
-            if (first.EventId is AutoAliasedColumn aliased)
-            {
-                return new AutoAliasedColumn(aliased.Name, aliased.AliasMarker);
-            }
-            if (first.EventId is ExpressedColumn exprs)
-            {
-                return new Column(exprs.Name);
-            }
-            return null;
+            EventId = new EventIdColumn(first.EventId);
         }
     }
 }
