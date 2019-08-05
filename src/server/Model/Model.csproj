@@ -9,7 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Collections\" />
-    <Folder Include="Compiler\SqlServer\" />
+    <Folder Include="Anonymization\" />
     <Folder Include="Validation\" />
     <Folder Include="Schema\" />
     <Folder Include="Search\" />
@@ -20,5 +20,10 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Composure">
+      <HintPath>..\..\..\..\composure\src\Composure\bin\Release\netcoreapp2.2\Composure.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

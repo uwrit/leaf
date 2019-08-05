@@ -4,12 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Text;
 using System.Linq;
-using Model.Compiler;
+using Model.Compiler.Common;
 using Model.Options;
 using Microsoft.Extensions.Options;
-using System.Collections.Generic;
 using Model.Cohort;
 
 namespace Model.Compiler.SqlServer
@@ -32,7 +30,7 @@ namespace Model.Compiler.SqlServer
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
 
             var cohort = CteCohortInternals(context.QueryContext);
-            new SqlValidator(Dialect.ILLEGAL_COMMANDS).Validate(context.DemographicQuery);
+            new SqlValidator(Dialect.IllegalCommands).Validate(context.DemographicQuery);
             var dataset = CteDemographicInternals(context.DemographicQuery);
 
             var filter = CteFilterInternals(context, restrictPhi);
