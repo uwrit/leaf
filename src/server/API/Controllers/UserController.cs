@@ -57,12 +57,13 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<IdTokenDTO> GetUser()
+        public async Task<ActionResult<IdTokenDTO>> GetUser()
         {
             try
             {
-                var token = jwtProvider.IdToken(HttpContext);
-                return Ok(new IdTokenDTO { IdToken = token });
+                var login = await jwtProvider.IdToken(HttpContext);
+
+                return Ok(new IdTokenDTO { IdToken = login });
             }
             catch (LeafAuthenticationException lae)
             {

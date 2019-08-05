@@ -195,7 +195,7 @@ Pre-build this file can be found under `src/server/API/` relative to the Leaf gi
     - [URI](#uri): `"https://<your_support_page>"`
 
 ## Runtime
-Contains a mode field, indicating `FULL` or `GATEWAY`.
+Contains a mode field, indicating `FULL` or `GATEWAY`. Running Gateway mode is useful when participating in a mesh in an observer role, where the gateway instance has no data of it's own. 
 ### Mode
 - `FULL` enables the cohort functionality in Leaf's API.
 - `GATEWAY` disables cohort functionality in Leaf's API.
