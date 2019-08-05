@@ -13,7 +13,7 @@ namespace Services.Search
 {
     public class DynamicDatasetSchemaFieldSerde
     {
-        static JsonSerializerSettings settings = new JsonSerializerSettings
+        readonly static JsonSerializerSettings settings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
         };

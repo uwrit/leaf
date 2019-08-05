@@ -30,7 +30,7 @@ namespace Model.Compiler.SqlServer
 
             var cohort = CteCohortInternals(compilerContext.QueryContext);
 
-            new SqlValidator(Dialect.IllegalCommands).Validate(compilerContext.DatasetQuery);
+            new SqlValidator(Dialect.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
             var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
 
             var filter = CteFilterInternals(compilerContext);
