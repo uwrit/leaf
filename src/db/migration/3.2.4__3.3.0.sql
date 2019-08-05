@@ -37,6 +37,7 @@ BEGIN
 		dq.[Description],
 		dq.SqlStatement,
 		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
+		ddq.[Schema],
 		ddq.SqlFieldDate,
 		ddq.SqlFieldValueString,
 		ddq.SqlFieldValueNumeric,
@@ -310,6 +311,25 @@ BEGIN
         IF NOT EXISTS (SELECT Id FROM app.DynamicDatasetQuery WHERE Id = @id)
             THROW 70404, N'DatasetQuery not found.', 1;
 
+		DECLARE @upd TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+			IsEncounterBased bit null,
+			[Schema] nvarchar(max) null,
+			SqlFieldDate nvarchar(1000) null,
+			SqlFieldValueString nvarchar(1000) null,
+			SqlFieldValueNumeric nvarchar(1000) null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null
+        );
+
 		UPDATE app.DatasetQuery
         SET
             [Shape] = -1,
@@ -319,6 +339,27 @@ BEGIN
             [SqlStatement] = @sql,
             [Updated] = GETDATE(),
             [UpdatedBy] = @user
+		OUTPUT
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy,
+			@isEnc,
+			@schema,
+			@sqlDate,
+			@sqlValString,
+			@sqlValNum
+        INTO @upd (
+			Id, UniversalId, Shape, Name, CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy, 
+			IsEncounterBased, [Schema], SqlFieldDate, SqlFieldValueString, SqlFieldValueNumeric
+		)
         WHERE Id = @id;
 
         UPDATE app.DynamicDatasetQuery
@@ -326,9 +367,11 @@ BEGIN
 			[IsEncounterBased] = @isEnc,
 			[Schema] = @schema,
 			[SqlFieldDate] = @sqlDate,
-			[SqlFieldValuestring] = @sqlValString,
+			[SqlFieldValueString] = @sqlValString,
 			[SqlFieldValueNumeric] = @sqlValNum
         WHERE Id = @id;
+
+		SELECT * FROM @upd
 
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
@@ -406,6 +449,20 @@ BEGIN
         IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId))
             THROW 70409, N'DatasetQuery already exists with universal id.', 1;
 
+		DECLARE @ins TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null
+        );
+
         UPDATE app.DatasetQuery
         SET
             UniversalId = @uid,
@@ -416,7 +473,22 @@ BEGIN
             SqlStatement = @sql,
             Updated = GETDATE(),
             UpdatedBy = @user
+		OUTPUT
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.Shape,
+            inserted.Name,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
+		INTO @ins
         WHERE Id = @id;
+
+		SELECT * FROM @ins
 
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
