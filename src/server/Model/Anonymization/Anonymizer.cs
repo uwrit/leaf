@@ -14,7 +14,6 @@ using Model.Schema;
 
 namespace Model.Anonymization
 {
-    using System.Runtime.Serialization;
     using Actor = Action<object, PropertyInfo, Guid, Guid>;
 
     public class Anonymizer<T>
@@ -78,8 +77,6 @@ namespace Model.Anonymization
             var type = info.PropertyType;
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
-
-
 
         protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
         {

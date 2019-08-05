@@ -10,13 +10,13 @@ import { AppState } from '../../models/state/AppState';
 import { PatientListState, CohortStateType } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import { fetchDataset } from '../../services/cohortApi';
-import { addDemographicsDataset, addMultirowDataset, getPatients, removeDataset } from '../../services/patientListApi';
+import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '../../services/patientListApi';
 import { DateBoundary } from '../../models/panel/Date';
 import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetQuery, PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
-import { allowDatasetInSearch, searchDatasets } from '../../services/datasetSearchApi';
+import { allowDatasetInSearch } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
 import { InformationModalState, NotificationStates } from '../../models/state/GeneralUiState';
 import { setDatasetSearchResult } from '../datasets';
@@ -99,7 +99,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                     if (nr.isHomeNode || dataset.universalId) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                         const ds = await fetchDataset(state, nr, queryId, dataset, dates);
-                        const newPl = await addMultirowDataset(getState, ds, dataset, nr.id);
+                        const newPl = await addDataset(getState, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);
                         dispatch(setPatientListNetworkDatasetReceived(nr.id, dataset.id));
@@ -109,6 +109,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                     }
                 } catch (err) {
                     dispatch(setPatientListDatasetFailure(dataset.id, nr.id));
+                    console.log(err);
                 }
                 resolve();
             });
@@ -139,7 +140,10 @@ export const deleteDataset = (def: PatientListDatasetDefinition) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const newPl = Object.assign({}, state.cohort.patientList);
-        newPl.totalRows -= def.totalRows!;
+        if (def.totalRows) {
+            newPl.totalRows -= def.totalRows!;
+        }
+        
         newPl.configuration.displayColumns = newPl.configuration.displayColumns.filter((col: PatientListColumn) => col.datasetId !== def.id);
         newPl.configuration.multirowDatasets.delete(def.id);
         newPl.configuration.singletonDatasets.delete(def.id);

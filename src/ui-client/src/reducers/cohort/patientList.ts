@@ -148,7 +148,10 @@ export function setPatientListDatasetReceived(state: CohortState, action: Cohort
     
     // If at least one of the responders succeeded
     if (multirowDs) {
-        copy.patientList.configuration.singletonDatasets.get(action.datasetId!)!.dateBounds = action.dates!;
+        const ds = copy.patientList.configuration.singletonDatasets.get(action.datasetId!);
+        if (ds) {
+            ds.dateBounds = action.dates!
+        }
         copy.networkCohorts.forEach((nc: NetworkCohortState) => {
             multirowDs.responderStates.set(nc.id, nc.patientList.state);
             nc.patientList.state = CohortStateType.LOADED;

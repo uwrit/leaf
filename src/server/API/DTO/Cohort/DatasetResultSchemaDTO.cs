@@ -14,12 +14,49 @@ namespace API.DTO.Cohort
     public class DatasetResultSchemaDTO
     {
         public Shape Shape { get; set; }
-        public IEnumerable<string> Fields { get; set; }
+        public IEnumerable<BaseSchemaFieldDTO> Fields { get; set; }
+
+        public DatasetResultSchemaDTO()
+        {
+
+        }
 
         public DatasetResultSchemaDTO(ShapedDatasetSchema schema)
         {
             Shape = schema.Shape;
-            Fields = schema.Fields.Select(f => f.Name);
+            Fields = schema.Fields.Select(f => new BaseSchemaFieldDTO(f));
+        }
+    }
+
+    public class DynamicDatasetResultSchemaDTO : DatasetResultSchemaDTO
+    {
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public bool IsEncounterBased { get; set; }
+
+        public DynamicDatasetResultSchemaDTO(ShapedDatasetSchema schema)
+        {
+            var contract = schema.Contract as DynamicContract;
+
+            Shape = schema.Shape;
+            Fields = schema.Fields
+                .Where(f => contract.Fields.Any(sf => sf.Name == f.Name) && f.Name != DatasetColumns.PersonId)
+                .Select(f => new BaseSchemaFieldDTO(f));
+            SqlFieldDate = contract.SqlFieldDate;
+            SqlFieldValueString = contract.SqlFieldValueString;
+            SqlFieldValueNumeric = contract.SqlFieldValueNumeric;
+            IsEncounterBased = contract.IsEncounterBased;
+        }
+    }
+
+
+    public class BaseSchemaFieldDTO : BaseSchemaField
+    {
+        public BaseSchemaFieldDTO(BaseSchemaField field)
+        {
+            Name = field.Name;
+            Type = field.Type;
         }
     }
 }

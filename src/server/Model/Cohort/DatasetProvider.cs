@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Error;
 using Model.Validation;

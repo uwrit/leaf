@@ -28,6 +28,7 @@ interface Props {
 
 interface State {
     selectedDates: DateBoundary;
+    showDates: boolean;
     showSelectorModal: boolean;
 }
 
@@ -51,6 +52,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         super(props);
         this.state = {
             selectedDates: dates[4],
+            showDates: false,
             showSelectorModal: false
         }
     }
@@ -73,7 +75,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     public render() {
         const c = this.className;
-        const { selectedDates, showSelectorModal } = this.state;
+        const { selectedDates, showSelectorModal, showDates } = this.state;
         const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
@@ -112,6 +114,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
+                        showDates={showDates}
                     />}
                 </div>
             </div>
@@ -149,6 +152,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
         const { dispatch } = this.props;
+        this.setState({ showDates: dataset.isEncounterBased });
         dispatch(setDatasetSelected(dataset));
     }
 

@@ -13,5 +13,10 @@ namespace Model.Cohort
     {
         [Field(Name = DatasetColumns.PersonId, Type = LeafType.String, Required = true, Phi = true, Mask = true)]
         public string PersonId { get; set; }
+
+        public virtual object Result()
+        {
+            return this;
+        }
     }
 }

@@ -35,6 +35,7 @@ namespace Model.Compiler.SqlServer
 
             var filter = CteFilterInternals(compilerContext);
             var select = SelectFromCTE();
+            executionContext.DatasetQuery = compilerContext.DatasetQuery;
             executionContext.CompiledQuery = Compose(cohort, dataset, filter, select);
 
             return executionContext;
@@ -42,7 +43,7 @@ namespace Model.Compiler.SqlServer
 
         string Compose(string cohort, string dataset, string filter, string select)
         {
-            return $"WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
+            return $"WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
         }
 
         string CteCohortInternals(QueryContext queryContext)
@@ -51,11 +52,18 @@ namespace Model.Compiler.SqlServer
             return $"SELECT {fieldInternalPersonId} = PersonId, Salt FROM {compilerOptions.AppDb}.app.Cohort WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} AND Exported = 1";
         }
 
-        string CteDatasetInternals(DatasetQuery datasetQuery) => datasetQuery.SqlStatement;
+        string CteDatasetInternals(IDatasetQuery datasetQuery) => datasetQuery.SqlStatement;
 
         string CteFilterInternals(DatasetCompilerContext compilerContext)
         {
-            var provider = DatasetDateFilterProvider.For(compilerContext.Shape);
+            var provider = DatasetDateFilterProvider.For(compilerContext);
+            
+            // Dynamic datasets may have no datefield
+            if (!provider.CanFilter)
+            {
+                return $"SELECT * FROM dataset";
+            }
+
             var dateFilter = provider.GetDateFilter(compilerContext);
             executionContext.AddParameters(dateFilter.Parameters);
             return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
@@ -63,7 +71,7 @@ namespace Model.Compiler.SqlServer
 
         string SelectFromCTE()
         {
-            return $"SELECT Salt, filter.* FROM filter INNER JOIN cohort on filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
+            return $"SELECT Salt, filter.* FROM filter INNER JOIN cohort ON filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
         }
     }
 
@@ -74,10 +82,14 @@ namespace Model.Compiler.SqlServer
 
         protected abstract string TargetDateField { get; }
 
-        public static DatasetDateFilterProvider For(Shape shape)
+        public bool CanFilter => !string.IsNullOrWhiteSpace(TargetDateField);
+
+        public static DatasetDateFilterProvider For(DatasetCompilerContext compilerContext)
         {
-            switch (shape)
+            switch (compilerContext.Shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicDatasetDateFilterProvider((compilerContext.DatasetQuery as DynamicDatasetQuery).SqlFieldDate);
                 case Shape.Observation:
                     return new ObservationDatasetDateFilterProvider();
                 case Shape.Encounter:
@@ -95,7 +107,7 @@ namespace Model.Compiler.SqlServer
                 case Shape.MedicationAdministration:
                     return new MedicationAdministrationDateFilterProvider();
                 default:
-                    throw new ArgumentException($"{shape.ToString()} switch branch not implemented");
+                    throw new ArgumentException($"{compilerContext.Shape.ToString()} switch branch not implemented");
             }
         }
 
@@ -158,6 +170,18 @@ namespace Model.Compiler.SqlServer
                 };
             }
         }
+    }
+
+    class DynamicDatasetDateFilterProvider : DatasetDateFilterProvider
+    {
+        string _field { get; set; }
+
+        public DynamicDatasetDateFilterProvider(string targetDateField)
+        {
+            _field = targetDateField;
+        }
+
+        protected override string TargetDateField => _field;
     }
 
     class ObservationDatasetDateFilterProvider : DatasetDateFilterProvider

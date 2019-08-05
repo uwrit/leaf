@@ -241,7 +241,9 @@ export default class PatientListWebWorker {
                 // Add the multirow data. This returns a new Dataset Definition
                 // for the summary statistics.
                 addDatasetDefinition(dataset.definition);
-                result = addMultiRowDataset(payload);
+                result = dataset.definition.multirow
+                    ? addMultiRowDataset(payload)
+                    : addSingletonDataset(payload);
                 addDatasetDefinition(result);
             }
             return { requestId, result };
@@ -258,6 +260,42 @@ export default class PatientListWebWorker {
         };
 
         /*
+         * Add singleton dataset data to the cache.
+         */
+        const addSingletonDataset = (payload: InboundMessagePayload): PatientListDatasetDefinition => {
+            const { dataset, responderId } = payload;
+            const def = dataset!.definition!;
+            const data = dataset!.data.results;
+            const dateFields: PatientListColumn[] = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
+            const uniquePatients: PatientId[] = Object.keys(data);
+            const uniqueCompoundPatients: PatientId[] = [];
+
+            // For each row
+            for (let i = 0; i < uniquePatients.length; i++) {
+                const p = uniquePatients![i];
+                const row = data[p][0];
+                const compoundId = `${responderId}_${p}`;
+                const pat = patientMap.get(compoundId);
+                if (!pat) { continue; }
+
+                const patientData = pat.singletonData;
+                uniqueCompoundPatients.push(compoundId);
+
+                // Convert strings to dates
+                for (let k = 0; k < dateFields.length; k++) {
+                    const f = dateFields[k].id;
+                    const v = row[f];
+                    if (v) {
+                        row[f] = new Date(v);
+                    }
+                }
+
+                patientData.set(def!.id, new Map(Object.entries(row)));
+            }
+            return def;
+        };
+
+        /*
          * Add multirow dataset data to the cache.
          */
         const addMultiRowDataset = (payload: InboundMessagePayload): PatientListDatasetDefinition => {
@@ -265,15 +303,10 @@ export default class PatientListWebWorker {
             const def = dataset!.definition!;
             const dsId = def.id;
             const data = dataset!.data.results;
-            const dateFields: PatientListColumn[] = [];
+            const dateFields: PatientListColumn[] = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
             const uniquePatients: PatientId[] = Object.keys(data);
             const uniqueCompoundPatients: PatientId[] = [];
             let rowCount = 0;
-            def.columns.forEach((c: PatientListColumn) => {
-                if (c.type === typeDate) {
-                    dateFields.push(c);
-                }
-            });
             
             // For each row
             for (let i = 0; i < uniquePatients.length; i++) {
@@ -316,7 +349,7 @@ export default class PatientListWebWorker {
             }
 
             // Rows are added to the patient map, now compute stats for each patient
-            const derivedDef = def.numericValueColumn && dataset!.data.schema.fields.indexOf(def.numericValueColumn) > -1
+            const derivedDef = def.numericValueColumn && dataset!.data.schema.fields.findIndex((f) => f.name === def.numericValueColumn) > -1
                 ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
                 : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
             derivedDef.totalRows = rowCount;
@@ -651,9 +684,10 @@ export default class PatientListWebWorker {
                     const max = numVals[numVals.length - 1].y;
                     const mean = +(((numVals.reduce((a: number, b: XY) => a + b.y, 0)) / numVals.length).toFixed(1));
                     const half = Math.floor(numVals.length / 2);
-                    const median = numVals.length % 2
+                    const median = (numVals.length % 2
                         ? numVals[half].y
-                        : (numVals[half - 1].y + numVals[half].y) / 2.0;
+                        : (numVals[half - 1].y + numVals[half].y) / 2.0
+                    ).toFixed(1);
                     
                     ds.set(cols.lookup.min, min);
                     ds.set(cols.lookup.max, max);

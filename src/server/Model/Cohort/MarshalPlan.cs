@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using Model.Compiler;
 
 namespace Model.Cohort
@@ -24,6 +25,26 @@ namespace Model.Cohort
             if (schema.TryGet(DatasetColumns.Salt, out var salt))
             {
                 Salt = salt;
+            }
+        }
+    }
+
+    public sealed class DynamicMarshalPlan : MarshalPlan
+    {
+        public Dictionary<string, object> KeyValues = new Dictionary<string, object>();
+
+        public IEnumerable<string> Columns => KeyValues.Keys;
+
+        public DynamicMarshalPlan()
+        {
+
+        }
+
+        public DynamicMarshalPlan(DatasetResultSchema schema) : base(schema)
+        {
+            foreach (var field in schema.Fields)
+            {
+                KeyValues.Add(field.Name, schema.Get(field));
             }
         }
     }

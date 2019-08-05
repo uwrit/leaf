@@ -18,6 +18,8 @@ namespace Model.Compiler
 
         public QueryContext QueryContext { get; }
 
+        public IDatasetQuery DatasetQuery { get; set; }
+
         protected ShapedDatasetExecutionContext(Shape shape, QueryContext queryContext)
         {
             Shape = shape;

@@ -19,6 +19,13 @@ namespace Model.Admin.Compiler
         public int? CategoryId { get; set; }
         public string Description { get; set; }
         public string SqlStatement { get; set; }
+
+        public bool IsEncounterBased { get; set; }
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public DynamicDatasetQuerySchema Schema { get; set; }
+
         public DateTime Created { get; set; }
         public string CreatedBy { get; set; }
         public DateTime Updated { get; set; }

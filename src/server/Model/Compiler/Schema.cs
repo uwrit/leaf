@@ -17,11 +17,12 @@ namespace Model.Compiler
         public ICollection<T> Fields { get; protected set; }
     }
 
-    // Represents the final shape of the a ShapedDataset data pull from the database, including Salt and Exported where involved.
+    // Represents the final shape of a ShapedDataset data pull from the database, including Salt and Exported where involved.
     public abstract class ValidationSchema : Schema<SchemaFieldSelector>
     {
         public virtual SchemaValidationResult Validate(DatasetResultSchema actualSchema)
         {
+            
             var result = SchemaValidationResult.Ok(Shape);
             foreach (var field in Fields)
             {
@@ -31,7 +32,7 @@ namespace Model.Compiler
                 if (actualField == null && field.Required)
                 {
                     result.State = SchemaValidationState.Error;
-                    result.AddMessage($"required field {field.Name} is missing");
+                    result.AddMessage($"Required field '{field.Name}' is missing");
                     continue;
                 }
 
@@ -39,23 +40,29 @@ namespace Model.Compiler
                 if (actualField != null && !actualField.Matches(field))
                 {
                     result.State = SchemaValidationState.Error;
-                    result.AddMessage($"{field.Name} expected {field.Type} but received {actualField.Type}");
+                    result.AddMessage($"'{field.Name}' expected type '{field.Type}' but received '{actualField.Type}'");
                 }
             }
 
+            if (result.State == SchemaValidationState.Ok)
+            {
+                return CheckOverflow(actualSchema);
+            }
             return result;
         }
 
         public SchemaValidationResult CheckOverflow(DatasetResultSchema actualSchema)
         {
             var result = SchemaValidationResult.Ok(Shape);
-            var overflow = Fields.Except<BaseSchemaField>(actualSchema.Fields, (a, b) => a.Equals(b));
+            var overflow = Fields
+                .Except<BaseSchemaField>(actualSchema.Fields, (a, b) => a.Equals(b))
+                .Where(f => !f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase));
             if (overflow.Any())
             {
                 result.State = SchemaValidationState.Warning;
                 foreach (var unrec in overflow)
                 {
-                    result.AddMessage($"unrecognized field {unrec.Name} is not a member of {Shape.ToString()} and will be dropped");
+                    result.AddMessage($"Unrecognized field '{unrec.Name}' is not a member of {Shape.ToString()} and will be dropped");
                 }
             }
             return result;
@@ -63,14 +70,20 @@ namespace Model.Compiler
 
         public DatasetResultSchema GetShapedSchema(DatasetResultSchema actualSchema)
         {
+            if (actualSchema.Shape == Shape.Dynamic)
+            {
+                return DatasetResultSchema.For(actualSchema.Shape, actualSchema.Fields);
+            }
             var actualFields = actualSchema.Fields.Where(f => Fields.Contains<BaseSchemaField>(f)).ToArray();
             return DatasetResultSchema.For(actualSchema.Shape, actualFields);
         }
 
-        public static ValidationSchema For(Shape shape)
+        public static ValidationSchema For(ShapedDatasetExecutionContext context)
         {
-            switch (shape)
+            switch (context.Shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicValidationSchema((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
                 case Shape.Observation:
                     return ObservationValidationSchema.Schema;
                 case Shape.Encounter:
@@ -90,8 +103,17 @@ namespace Model.Compiler
                 case Shape.MedicationAdministration:
                     return MedicationAdministrationValidationSchema.Schema;
                 default:
-                    throw new ArgumentException($"{shape.ToString()} is not implemented in ValidationSchema.For");
+                    throw new ArgumentException($"{context.Shape.ToString()} is not implemented in ValidationSchema.For");
             }
+        }
+    }
+
+    public class DynamicValidationSchema : ValidationSchema
+    {
+        public DynamicValidationSchema(IEnumerable<SchemaFieldSelector> fields)
+        {
+            Shape = Shape.Dynamic;
+            Fields = fields.ToArray();
         }
     }
 

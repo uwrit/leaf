@@ -12,8 +12,8 @@ import PatientListWebWorker from '../providers/patientList/patientListWebWorker'
 import REDCapExportWebWorker from '../providers/redcapExport/redcapExportWebWorker';
 import camelCaseToUpperSpaced from '../utils/camelCaseToUpperSpaced';
 import { PatientListConfiguration } from '../models/patientList/Configuration';
-import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQuery, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate } from '../models/patientList/Dataset';
-import { PatientListColumn, PatientListColumnId } from '../models/patientList/Column';
+import { PatientListDatasetDefinition, PatientListDatasetExport, PatientListDatasetDTO, PatientListDataset, PatientListDatasetQuery, PatientListDatasetSummaryType, PatientListDatasetDefinitionTemplate, PatientListDatasetShape, PatientListDatasetDynamicSchema } from '../models/patientList/Dataset';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate } from '../models/patientList/Column';
 import { PatientListRow, PatientListRowDTO } from '../models/patientList/Patient';
 import { DemographicsDefTemplate, DefTemplates } from '../models/patientList/DatasetDefinitionTemplate';
 
@@ -21,7 +21,7 @@ const patientListProvider = new PatientListWebWorker();
 const redcapExportProvider = new REDCapExportWebWorker();
 
 /*
- * Returns a patient list (rows with tuples, as arrays) based on the
+ * Return a patient list (rows with tuples, as arrays) based on the
  * current configuration object.
  */
 export const getPatients = (config: PatientListConfiguration) => {
@@ -33,7 +33,7 @@ export const removeDataset = (config: PatientListConfiguration, def: PatientList
 };
 
 /*
- * Gets all data, regardless of configuration. This is used for transformation
+ * Get all data, regardless of configuration. This is used for transformation
  * prior to export.
  */
 export const getAllData = (config: PatientListConfiguration, useDisplayedColumnsOnly: boolean) => {
@@ -41,7 +41,7 @@ export const getAllData = (config: PatientListConfiguration, useDisplayedColumns
 };
 
 /*
- * Transforms patient list data to REDCap objects to prep for export.
+ * Transform patient list data to REDCap objects to prep for export.
  */
 export const getREDCapExportData = (
         options: REDCapExportOptions, 
@@ -67,7 +67,7 @@ export const getCsvs = async (config: PatientListConfiguration) => {
 };
 
 /*
- * Downloads a dataset (already transformed to a string) to a CSV file in browser.
+ * Download a dataset (already transformed to a string) to a CSV file in browser.
  */
 const downloadCsv = (content: string, fileName: string) => {
     const packageCsv = (csv: string) => new Blob([ csv ], { type: 'text/csv;encoding:utf-8' });
@@ -88,14 +88,81 @@ const downloadCsv = (content: string, fileName: string) => {
 };
 
 /*
- * Tells the web worker to clear all patient list data.
+ * Tell the web worker to clear all patient list data.
  */
 export const clearPreviousPatientList = () => patientListProvider.clearPatients();
 
 /*
- * Adds a multirow dataset, then returns a new patient list.
+ * Add a dataset, then return a new patient list.
  */
-export const addMultirowDataset = async (
+export const addDataset = async (
+    getState: () => AppState, 
+    datasetDto: PatientListDatasetDTO, 
+    queryRef: PatientListDatasetQuery, 
+    responderId: number
+): Promise<PatientListState> => {
+
+    var handler = addMultirowDataset;
+
+    if (datasetDto.schema.shape === PatientListDatasetShape.Dynamic) {
+        var schema = datasetDto.schema as PatientListDatasetDynamicSchema;
+        if (!schema.isEncounterBased) {
+            handler = addSingletonDataset;
+        }
+    }
+
+    return handler(getState, datasetDto, queryRef, responderId)
+};
+
+/*
+ * Add a singleton dataset, then return a new patient list.
+ */
+const addSingletonDataset = async (
+    getState: () => AppState, 
+    datasetDto: PatientListDatasetDTO, 
+    queryRef: PatientListDatasetQuery, 
+    responderId: number
+): Promise<PatientListState> => {
+
+    const patientList = getState().cohort.patientList;
+    const singletonDatasets = patientList.configuration.singletonDatasets;
+    const def = getDatasetDefinition(datasetDto, queryRef);
+    const dataset: PatientListDataset = {
+        ...queryRef,
+        data: datasetDto,
+        definition: def
+    };
+
+    /* 
+    * Add dataset definition.
+    */
+    if (!singletonDatasets.has(def.id)) {
+        singletonDatasets.set(def.id, def);
+    }
+    singletonDatasets.get(def.id)!.responderStates.set(responderId, CohortStateType.LOADED);
+    def.columns.forEach((col: PatientListColumn) => {
+        col.isDisplayed = true;
+        col.displayName = `${def.displayName} ${col.displayName}`
+        patientList.configuration.displayColumns.push(col);
+    });
+
+    /* 
+    * Update the displayed patients.
+    */
+    await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
+
+    /* 
+    * Get the latest patient list.
+    */
+    patientList.display = await getPatients(patientList.configuration) as PatientListRow[];
+
+    return patientList;
+};
+
+/*
+ * Add a multirow dataset, then return a new patient list.
+ */
+const addMultirowDataset = async (
         getState: () => AppState, 
         datasetDto: PatientListDatasetDTO, 
         queryRef: PatientListDatasetQuery, 
@@ -150,7 +217,7 @@ export const addMultirowDataset = async (
          * If it has a numeric column and the column is present in the data,
          * set the type to 'Quantitative', else 'NonQuantitative'.
          */
-        if (summaryDef.numericValueColumn && datasetDto.schema.fields.indexOf(summaryDef.numericValueColumn) > -1) {
+        if (summaryDef.numericValueColumn) {
             summaryDef.summaryType = PatientListDatasetSummaryType.Quantitative;
         } else {
             summaryDef.summaryType = PatientListDatasetSummaryType.NonQuantititive;
@@ -269,15 +336,32 @@ const getDemographicsDefinition = (patient: PatientListRowDTO) => {
 /*
  * Extracts a dataset definition.
  */
-const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery) => {
-    const template = DefTemplates.get(queryRef.shape)!;
+const getDatasetDefinition = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery): PatientListDatasetDefinition => {
+    const template: PatientListDatasetDefinitionTemplate = queryRef.shape === PatientListDatasetShape.Dynamic
+        ? deriveDynamicTemplate(dataset, queryRef)
+        : DefTemplates.get(queryRef.shape)!;
     const def: PatientListDatasetDefinition = {
         ...template,
         category: queryRef.category,
-        columns: validateDefinitionColumns(template, dataset.schema.fields, queryRef.name),
+        columns: validateDefinitionColumns(template, dataset.schema.fields.map((c) => c.name), queryRef.id),
         displayName: queryRef.category ?  `${queryRef.category}: ${queryRef.name}` : queryRef.name,
         id: queryRef.id.toLowerCase().replace(' ',''),
         responderStates: new Map()
     };
     return def;
+};
+
+const deriveDynamicTemplate = (dataset: PatientListDatasetDTO, queryRef: PatientListDatasetQuery): PatientListDatasetDefinitionTemplate => {
+    const schema = dataset.schema as PatientListDatasetDynamicSchema;
+    const columns: Map<string, PatientListColumnTemplate> = new Map();
+    schema.fields.forEach((f) => columns.set(f.name, { id: f.name, type: f.type }));
+
+    return {
+        columns,
+        multirow: schema.isEncounterBased,
+        shape: schema.shape,
+        dateValueColumn: schema.sqlFieldDate,
+        numericValueColumn: schema.sqlFieldValueNumeric,
+        stringValueColumn: schema.sqlFieldValueString,
+    };
 };
