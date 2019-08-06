@@ -59,10 +59,10 @@ namespace Model.Compiler.Common
             /*
              * Compose.
              */ 
-            Select = new[] { PersonId };
-            From = joins;
+            Select  = new[] { PersonId };
+            From    = joins;
             GroupBy = new[] { PersonId };
-            Having = having;
+            Having  = having;
         }
 
         IEvaluatableAggregate GetHaving(JoinedSequentialSqlSet join)

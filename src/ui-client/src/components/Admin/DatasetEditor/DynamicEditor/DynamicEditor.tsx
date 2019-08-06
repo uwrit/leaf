@@ -9,12 +9,13 @@ import React from 'react';
 import { Display } from '../Sections/Display';
 import { SqlEditor } from '../SqlEditor/SqlEditor';
 import { Row, Col } from 'reactstrap';
-import { Identifiers } from '../Sections/Identifiers';
 import { Section } from '../../Section/Section';
 import { Constraints } from '../Constraints/Constraints';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../../../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../../models/patientList/Column';
+import { Tagger } from '../Tagger/Tagger';
+import { DynamicDatasetProps } from '../DynamicDatasetProps/DynamicDatasetProps';
 
 interface Props {
     categories: Map<number, DatasetQueryCategory>;
@@ -41,6 +42,7 @@ export class DynamicEditor extends React.PureComponent<Props> {
         return (
             <div>
                 <Display {...this.props} />
+                <DynamicDatasetProps {...this.props} />
                 <SqlEditor
                     dataset={dataset}
                     dispatch={dispatch}
@@ -49,11 +51,11 @@ export class DynamicEditor extends React.PureComponent<Props> {
                 />
                 <Row>
                     <Col md={6}>
-                        <Identifiers
-                            dataset={dataset}
-                            handleInputChange={inputChangeHandler}
-                            locked={locked}
-                        />
+                        <Section header='Identifiers'>
+                            <Tagger
+                                changeHandler={inputChangeHandler} propName={'tags'} tags={dataset ? dataset.tags : []} locked={locked}
+                            />
+                        </Section>
                     </Col>
                     <Col md={6}>
                         <Section header='Access Restrictions'>

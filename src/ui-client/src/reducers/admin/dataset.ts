@@ -14,6 +14,7 @@ import { DefTemplates, DemographicsAdminSqlDefTemplate } from "../../models/pati
 import { getSqlColumns } from "../../utils/parseSql";
 
 const personId = 'personId';
+const encounterId = 'encounterId';
 
 export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDatasetAction): AdminState => {
     return Object.assign({}, state, { 
@@ -43,7 +44,7 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     let sqlColumns = datasets.sqlColumns;
 
     if (ds && action.analyzeColumns) {
-        const cols = getShapeColumns(ds.sqlStatement, ds.shape);
+        const cols = getShapeColumns(ds.sqlStatement, ds);
         expectedColumns = cols.expectedColumns;
         sqlColumns = cols.sqlColumns;
 
@@ -77,7 +78,7 @@ export const setAdminPanelDemographicsDataset = (state: AdminState, action: Admi
 export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { shape: action.shape }) as AdminDatasetQuery;
-    const { expectedColumns, sqlColumns } = getShapeColumns(ds.sqlStatement, action.shape!);
+    const { expectedColumns, sqlColumns } = getShapeColumns(ds.sqlStatement, ds);
 
     return Object.assign({}, state, { 
         datasets: { 
@@ -106,17 +107,22 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
     });
 };
 
-const getShapeColumns = (sql: string, shape: PatientListDatasetShape) => {
-    const template = shape === PatientListDatasetShape.Demographics
-        ? DemographicsAdminSqlDefTemplate
-        : DefTemplates.get(shape);
+const getShapeColumns = (sql: string, dataset: AdminDatasetQuery) => {
     const sqlColumns = new Set(getSqlColumns(sql));
     const expectedColumns: AdminPanelPatientListColumnTemplate[] = [
         { id: personId, type: PatientListColumnType.string, present: sqlColumns.has(personId) }
     ];
 
-    if (shape !== PatientListDatasetShape.Dynamic) {
-        template!.columns.forEach((c) => expectedColumns.push({ ...c, present: sqlColumns.has(c.id) }));
+    if (dataset.shape === PatientListDatasetShape.Dynamic) {
+        const hasEncounterId = sqlColumns.has(encounterId);
+        if (dataset.isEncounterBased && !hasEncounterId) {
+            expectedColumns.push({ id: encounterId, type: PatientListColumnType.string, present: hasEncounterId });
+        }
+        sqlColumns.forEach(c => expectedColumns.push({ present: true, id: c, type: PatientListColumnType.string }))
+        return { expectedColumns, sqlColumns };
     }
+
+    const template = dataset.shape === PatientListDatasetShape.Demographics ? DemographicsAdminSqlDefTemplate : DefTemplates.get(dataset.shape);
+    template!.columns.forEach((c) => expectedColumns.push({ ...c, present: sqlColumns.has(c.id) }));
     return { expectedColumns, sqlColumns };
-} 
+};

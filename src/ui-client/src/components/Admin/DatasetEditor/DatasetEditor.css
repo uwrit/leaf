@@ -27,6 +27,22 @@
     z-index: 100;
 }
 
+.dataset-editor-dynamic-properties .col-md-6 > .row {
+    padding: 0 20px;
+}
+
+.dataset-editor-column-right .admin-panel-checkbox {
+    padding: 5px 18px 36px 18px !important;
+}
+
+.dataset-editor-dynamic-properties .position-relative.form-group {
+    width: 100%;
+}
+
+.dataset-editor-dynamic-properties .position-relative.form-group button {
+    height: 35.5px;
+}
+
 /* Header */
 .dataset-editor-column-right-header {
     margin-bottom: 20px;

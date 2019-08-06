@@ -157,20 +157,22 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             : undefined;
 
         if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
-            <DynamicEditor 
-                categoryChangeHandler={this.handleCategoryChange}
-                category={currentCategory}
-                categories={data.datasetQueryCategories.categories}
-                dataset={currentDataset}
-                dispatch={dispatch}
-                expectedColumns={expectedColumns}
-                forceValidation={forceValidation}
-                inputChangeHandler={this.handleInputChange}
-                locked={locked}
-                shapeChangeHandler={this.handleShapeClick}
-                shape={data.datasets.currentDataset!.shape}
-                shapes={shapes}
-            />;
+            return (
+                <DynamicEditor 
+                    categoryChangeHandler={this.handleCategoryChange}
+                    category={currentCategory}
+                    categories={data.datasetQueryCategories.categories}
+                    dataset={currentDataset}
+                    dispatch={dispatch}
+                    expectedColumns={expectedColumns}
+                    forceValidation={forceValidation}
+                    inputChangeHandler={this.handleInputChange}
+                    locked={locked}
+                    shapeChangeHandler={this.handleShapeClick}
+                    shape={data.datasets.currentDataset!.shape}
+                    shapes={shapes}
+                />
+            );
         }
         return (
             <FhirTemplateEditor 
