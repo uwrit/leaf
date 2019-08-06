@@ -55,23 +55,23 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                         <DropdownMenu>
                             <div className={`admin-panel-dropdown-item-container`}>
 
-                                {/* No dynamic datasets yet
+                                {/* Dynamic */}
                                 <DropdownItem 
                                     onClick={clickHandler.bind(null,PatientListDatasetShape.Dynamic)}>
                                     {PatientListDatasetShape[PatientListDatasetShape.Dynamic]}
                                 </DropdownItem>
                                 <DropdownItem divider={true} />
-                                */}
                                 
-                            {shapes.map((s) => {
-                                return (
-                                    <DropdownItem 
-                                        key={s}
-                                        onClick={clickHandler.bind(null,s)}>
-                                        {PatientListDatasetShape[s]}
-                                    </DropdownItem>
-                                );
-                            })}
+                                {/* FHIR Template shapes */}
+                                {shapes.map((s) => {
+                                    return (
+                                        <DropdownItem 
+                                            key={s}
+                                            onClick={clickHandler.bind(null,s)}>
+                                            {PatientListDatasetShape[s]}
+                                        </DropdownItem>
+                                    );
+                                })}
                             </div>
                         </DropdownMenu>
                     </BSDropdown>

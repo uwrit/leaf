@@ -668,7 +668,7 @@ BEGIN
         dqc.Category,
         dq.[Description],
         dq.SqlStatement,
-		ddq.IsEncounterBased,
+		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
 		ddq.[Schema],
 		ddq.SqlFieldDate,
 		ddq.SqlFieldValueString,

@@ -6,24 +6,21 @@
  */
 
 import React from 'react';
+import { generate as generateId } from 'shortid';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
 import { InformationModalState, ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
-import { Section } from '../Section/Section';
 import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
-import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
+import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
-import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
 import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
-import { generate as generateId } from 'shortid';
-import { Display } from './Sections/Display';
-import { SqlEditor } from './SqlEditor/SqlEditor';
-import { Identifiers } from './Sections/Identifiers';
+import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
+import { DynamicEditor } from './DynamicEditor/DynamicEditor';
 import './DatasetEditor.css';
 
 interface Props { 
@@ -70,16 +67,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { data, datasets, dispatch } = this.props;
-        const { currentDataset, changed, expectedColumns } = data.datasets;
-        const { shapes, forceValidation } = this.state;
+        const { currentDataset, changed } = data.datasets;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
-        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
-        let currentCategory = undefined;
         const c = this.className;
-
-        if (currentDataset && currentDataset.categoryId) {
-            currentCategory = data.datasetQueryCategories.categories.get(currentDataset.categoryId);
-        }
 
         return (
             <div className={c}>
@@ -139,48 +129,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 }
 
                                 {/* Editor */}
-                                {currentDataset &&
-                                    <div>
-                                        <Display
-                                            categoryChangeHandler={this.handleCategoryChange}
-                                            category={currentCategory}
-                                            categories={data.datasetQueryCategories.categories}
-                                            dataset={currentDataset}
-                                            dispatch={dispatch}
-                                            forceValidation={forceValidation}
-                                            inputChangeHandler={this.handleInputChange}
-                                            locked={locked}
-                                            shapeChangeHandler={this.handleShapeClick}
-                                            shape={data.datasets.currentDataset!.shape}
-                                            shapes={shapes}
-                                        />
-                                        <SqlEditor
-                                            dataset={currentDataset}
-                                            dispatch={dispatch}
-                                            expectedColumns={expectedColumns}
-                                            handleInputChange={this.handleInputChange}
-                                        />
-                                        <Row>
-                                            <Col md={6}>
-                                                <Identifiers
-                                                    dataset={currentDataset}
-                                                    handleInputChange={this.handleInputChange}
-                                                    locked={locked}
-                                                />
-                                            </Col>
-                                            <Col md={6}>
-                                                <Section header='Access Restrictions'>
-                                                    <Constraints 
-                                                        dataset={currentDataset} 
-                                                        changeHandler={this.handleInputChange} 
-                                                        forceValidation={forceValidation}
-                                                        locked={locked}
-                                                    />
-                                                </Section>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                }
+                                {this.getEditor()}
                             </div>
                         </div>
                     </Row>
@@ -188,6 +137,58 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             </div>
         );
     }
+
+    /*
+     * Return React component for the current editor shape.
+     */
+    private getEditor = () => {
+        const { currentDataset } = this.props.data.datasets;
+
+        if (!currentDataset) { 
+            return null;
+        }
+
+        const { data, dispatch } = this.props;
+        const { expectedColumns } = data.datasets;
+        const { shapes, forceValidation } = this.state;
+        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
+        const currentCategory = currentDataset.categoryId 
+            ? data.datasetQueryCategories.categories.get(currentDataset.categoryId)
+            : undefined;
+
+        if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
+            <DynamicEditor 
+                categoryChangeHandler={this.handleCategoryChange}
+                category={currentCategory}
+                categories={data.datasetQueryCategories.categories}
+                dataset={currentDataset}
+                dispatch={dispatch}
+                expectedColumns={expectedColumns}
+                forceValidation={forceValidation}
+                inputChangeHandler={this.handleInputChange}
+                locked={locked}
+                shapeChangeHandler={this.handleShapeClick}
+                shape={data.datasets.currentDataset!.shape}
+                shapes={shapes}
+            />;
+        }
+        return (
+            <FhirTemplateEditor 
+                categoryChangeHandler={this.handleCategoryChange}
+                category={currentCategory}
+                categories={data.datasetQueryCategories.categories}
+                dataset={currentDataset}
+                dispatch={dispatch}
+                expectedColumns={expectedColumns}
+                forceValidation={forceValidation}
+                inputChangeHandler={this.handleInputChange}
+                locked={locked}
+                shapeChangeHandler={this.handleShapeClick}
+                shape={data.datasets.currentDataset!.shape}
+                shapes={shapes}
+            />
+        );
+    };
 
     /*
      * Handle initial click to create a Basic Demographics query.
@@ -437,9 +438,10 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const newAdminDs: AdminDatasetQuery = {
             id,
             constraints: [],
+            isEncounterBased: true,
             name,
             shape,
-            sqlStatement: 'SELECT FROM dbo.table',
+            sqlStatement: 'SELECT * FROM dbo.table',
             tags: [],
             unsaved: true
         };

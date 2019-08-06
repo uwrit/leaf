@@ -7,6 +7,7 @@
 
 import { PatientListDatasetShape } from "../patientList/Dataset";
 import { Constraint } from "./Concept";
+import { PatientListColumnType } from "../patientList/Column";
 
 export interface AdminDemographicQuery {
     sqlStatement: string;
@@ -24,6 +25,13 @@ export interface AdminDatasetQuery {
     sqlStatement: string;
     tags: string[];
     universalId?: string;
+
+    isEncounterBased: boolean;
+    schema?: DynamicDatasetQuerySchema;
+    sqlFieldDate?: string;
+    sqlFieldValueString?: string;
+    sqlFieldValueNumeric?: string;
+
     unsaved?: boolean;
     changed?: boolean;
 }
@@ -33,4 +41,16 @@ export interface DatasetQueryCategory {
     category: string;
     changed?: boolean;
     unsaved?: boolean;
+}
+
+export interface DynamicDatasetQuerySchema {
+    fields: DynamicDatasetQuerySchemaField[];
+}
+
+export interface DynamicDatasetQuerySchemaField {
+    name: string;
+    mask: boolean;
+    required: boolean;
+    type: PatientListColumnType;
+    phi: boolean;
 }

@@ -112,7 +112,7 @@
 }
 
 .admin-panel-dropdown-item-container {
-    max-height: 250px;
+    max-height: 300px;
     overflow-y: auto;
 }
 
