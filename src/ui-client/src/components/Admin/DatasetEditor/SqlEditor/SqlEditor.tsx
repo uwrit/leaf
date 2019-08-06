@@ -13,6 +13,8 @@ import { AdminDatasetQuery } from '../../../../models/admin/Dataset';
 import formatSql from '../../../../utils/formatSql';
 import { FiCheck } from 'react-icons/fi';
 import { setAdminDatasetSql } from '../../../../actions/admin/dataset';
+import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
+import { DynamicSchemaTable } from '../DynamicSchemaTable/DynamicSchemaTable';
 
 interface Props {
     dataset?: AdminDatasetQuery;
@@ -28,18 +30,15 @@ export class SqlEditor extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { expectedColumns, dataset } = this.props;
-        const c = this.className;
-        const width = this.getSqlWidth();
+        const { dataset } = this.props;
         const sql = dataset ? dataset.sqlStatement : '';
+        const width = this.getSqlWidth();
+        const c = this.className;
 
         return (
             <Section header='SQL'>
                 <div className={`${c}-sql-container`}>
-                    <div className={`${c}-column-container`}>
-                        <div className={`${c}-title`}>Expected Columns</div>
-                        {expectedColumns.map((col) => this.getColumnContent(col))}
-                    </div>
+                    {this.getColumnContainer()}
                     <div className={`${c}-sql`}>
                         <div className={`${c}-title`}>SQL Query</div>
                         <SqlBox sql={sql} height={400} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
@@ -47,6 +46,37 @@ export class SqlEditor extends React.PureComponent<Props> {
                     </div>
                 </div>
             </Section>
+        );
+    }
+
+    /*
+     * Returns the React components for SQL column checking
+     * depending on whether the dataset is Dynamic or FHIR-based.
+     */
+    private getColumnContainer = () => {
+        const { expectedColumns, dataset } = this.props;
+        const c = this.className;
+
+        /*
+         * Dynamic.
+         */
+        if (dataset && dataset.shape === PatientListDatasetShape.Dynamic) {
+            return (
+                <div className={`${c}-dynamic-column-container`}>
+                    <div className={`${c}-title`}>Expected Columns</div>
+                    <DynamicSchemaTable schema={dataset.schema} />
+                </div>
+            );
+        }
+
+        /* 
+         * FHIR templated-shape.
+         */
+        return (
+            <div className={`${c}-column-container`}>
+                <div className={`${c}-title`}>Expected Columns</div>
+                {expectedColumns.map((col) => this.getColumnContent(col))}
+            </div>
         );
     }
 

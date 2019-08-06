@@ -32,7 +32,7 @@
 }
 
 .dataset-editor-column-right .admin-panel-checkbox {
-    padding: 5px 18px 36px 18px !important;
+    padding: 5px 18px 20px 18px !important;
 }
 
 .dataset-editor-dynamic-properties .position-relative.form-group {
@@ -130,12 +130,17 @@
 }
 
 /* Columns */
-.dataset-editor-column-container {
+.dataset-editor-column-container,
+.dataset-editor-dynamic-column-container {
     height: 100%;
     min-width: 230px;
     overflow: auto;
     padding: 8px 8px;
     position: relative;
+}
+
+.dataset-editor-dynamic-column-container {
+    min-width: 300px;
 }
 
 .dataset-editor-column-container svg {

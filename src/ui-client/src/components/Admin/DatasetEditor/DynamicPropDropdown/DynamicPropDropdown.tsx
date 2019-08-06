@@ -35,7 +35,7 @@ export class DynamicPropDropdown extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { clickHandler, options, selected, locked, label, prop, sublabel } = this.props;
+        const { clickHandler, options, selected, locked, label, prop, required, sublabel } = this.props;
         const { isOpen } = this.state;
         const c = this.className;
 
@@ -43,6 +43,9 @@ export class DynamicPropDropdown extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>
                     {label}
+                    {required &&
+                    <span className='required'>*</span>
+                    }
                     {sublabel &&
                         <FormText color="muted">{sublabel}</FormText>
                     }

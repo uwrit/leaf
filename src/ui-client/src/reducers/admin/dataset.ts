@@ -8,7 +8,7 @@
 import AdminState from "../../models/state/AdminState";
 import { AdminDatasetAction } from "../../actions/admin/dataset";
 import { AdminPanelPatientListColumnTemplate, PatientListColumnType } from "../../models/patientList/Column";
-import { AdminDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery, DynamicDatasetQuerySchema } from "../../models/admin/Dataset";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { DefTemplates, DemographicsAdminSqlDefTemplate } from "../../models/patientList/DatasetDefinitionTemplate";
 import { getSqlColumns } from "../../utils/parseSql";
@@ -114,15 +114,57 @@ const getShapeColumns = (sql: string, dataset: AdminDatasetQuery) => {
     ];
 
     if (dataset.shape === PatientListDatasetShape.Dynamic) {
-        const hasEncounterId = sqlColumns.has(encounterId);
-        if (dataset.isEncounterBased && !hasEncounterId) {
-            expectedColumns.push({ id: encounterId, type: PatientListColumnType.string, present: hasEncounterId });
+        if (dataset.isEncounterBased) {
+            expectedColumns.push({ id: encounterId, type: PatientListColumnType.string, present: sqlColumns.has(encounterId) });
         }
-        sqlColumns.forEach(c => expectedColumns.push({ present: true, id: c, type: PatientListColumnType.string }))
+        sqlColumns.forEach(c => {
+            if (c !== personId && c !== encounterId) {
+                expectedColumns.push({ present: true, id: c, type: PatientListColumnType.string });
+            }
+        })
         return { expectedColumns, sqlColumns };
     }
 
     const template = dataset.shape === PatientListDatasetShape.Demographics ? DemographicsAdminSqlDefTemplate : DefTemplates.get(dataset.shape);
     template!.columns.forEach((c) => expectedColumns.push({ ...c, present: sqlColumns.has(c.id) }));
     return { expectedColumns, sqlColumns };
+};
+
+const maskableTypes = new Set([ PatientListColumnType.string, PatientListColumnType.date ]);
+
+const createDynamicSchema = (sql: string, dataset: AdminDatasetQuery): DynamicDatasetQuerySchema => {
+    const columns = new Set(getSqlColumns(sql));
+    const exclude = new Set([ personId, encounterId ]);
+    const schema = getDefaultDynamicSchema(dataset);
+    
+    columns.forEach(c => {
+        if (!exclude.has(c)) {
+            schema.fields.push({ name: c, type: PatientListColumnType.string, phi: true, mask: true, required: true });
+        }
+    });
+
+    return schema;
+};
+
+const updateDynamicSchema = (sql: string, dataset: AdminDatasetQuery): DynamicDatasetQuerySchema => {
+    const columns = new Set(getSqlColumns(sql));
+    const schema = getDefaultDynamicSchema(dataset);
+    const prevColNames = new Set(schema.fields.map(f => f.name));
+
+    columns.forEach(c => {
+        if (!prevColNames.has(c)) {
+            schema.fields.push({ name: c, type: PatientListColumnType.string, phi: true, mask: true, required: true });
+        }
+    });
+    return schema;
+};
+
+const getDefaultDynamicSchema = (dataset: AdminDatasetQuery) => {
+    const schema: DynamicDatasetQuerySchema = { fields: [
+        { name: personId, type: PatientListColumnType.string, phi: true, mask: true, required: true }
+    ]};
+    if (dataset.isEncounterBased) {
+        schema.fields.push({ name: encounterId, type: PatientListColumnType.string, phi: true, mask: true, required: true });
+    }
+    return schema;
 };

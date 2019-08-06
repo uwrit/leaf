@@ -61,7 +61,7 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
                                 {dataset.isEncounterBased &&
                                 <DynamicPropDropdown
                                     clickHandler={inputChangeHandler} label={'Date Column'} options={dateCols} prop={'sqlFieldDate'}
-                                    selected={dataset.sqlFieldDate} sublabel={'Optional date-type column to summarize the earliest and latest rows'}
+                                    selected={dataset.sqlFieldDate} sublabel={'Date-type column to summarize the earliest and latest rows. Required if dataset has encounters'}
                                     locked={locked} required={true}
                                 />
                                 }
