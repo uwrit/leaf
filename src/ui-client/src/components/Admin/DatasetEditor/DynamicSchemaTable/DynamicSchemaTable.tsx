@@ -7,10 +7,12 @@
 
 import React from 'react';
 import { DynamicDatasetQuerySchema } from '../../../../models/admin/Dataset';
-import { Container, Row, Col } from 'reactstrap';
-import { PatientListColumnType } from '../../../../models/patientList/Column';
+import { Container } from 'reactstrap';
+import { DynamicSchemaRow } from './DynamicSchemaRow';
+import './DynamicSchemaTable.css';
 
 interface Props {
+    inputChangeHandler: (val: any, propName: string) => any;
     schema?: DynamicDatasetQuerySchema;
 }
 
@@ -27,20 +29,24 @@ export class DynamicSchemaTable extends React.PureComponent<Props> {
 
         return (
             <Container>
-                {schema.fields.map(f => (
-                    <Row>
-                        <Col md={3}>
-                            <span>{f.phi}</span>
-                        </Col>
-                        <Col md={6}>
-                            <span>{f.name}</span>
-                        </Col>
-                        <Col md={3}>
-                            <span>{PatientListColumnType[f.type]}</span>
-                        </Col>
-                    </Row>
+                {schema.fields.map((f,i) => (
+                    <DynamicSchemaRow index={i} field={f} inputChangeHandler={this.handleInputChange} />
                 ))}
             </Container>
         )
+    }
+
+    /* 
+     * Handle tracking of input changes to the dataset.
+     */
+    private handleInputChange = (val: any, propName: string, index: number) => {
+        const { inputChangeHandler, schema } = this.props;
+        const newSchema = Object.assign({}, schema);
+        const fields = newSchema!.fields.slice();
+        const changed = Object.assign({}, fields[index], { [propName]: val });
+        fields[index] = changed;
+        newSchema.fields = fields;
+
+        inputChangeHandler(newSchema, 'schema');
     }
 };

@@ -54,7 +54,7 @@ export class SqlEditor extends React.PureComponent<Props> {
      * depending on whether the dataset is Dynamic or FHIR-based.
      */
     private getColumnContainer = () => {
-        const { expectedColumns, dataset } = this.props;
+        const { expectedColumns, dataset, handleInputChange } = this.props;
         const c = this.className;
 
         /*
@@ -64,7 +64,7 @@ export class SqlEditor extends React.PureComponent<Props> {
             return (
                 <div className={`${c}-dynamic-column-container`}>
                     <div className={`${c}-title`}>Expected Columns</div>
-                    <DynamicSchemaTable schema={dataset.schema} />
+                    <DynamicSchemaTable schema={dataset.schema} inputChangeHandler={handleInputChange} />
                 </div>
             );
         }

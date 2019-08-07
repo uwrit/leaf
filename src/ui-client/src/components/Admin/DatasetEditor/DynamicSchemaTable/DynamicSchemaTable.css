@@ -1,0 +1,53 @@
+/* Column */
+.dataset-editor-dynamic-column {
+    border-bottom: 1px solid rgb(240,240,240);
+}
+
+.dataset-editor-dynamic-column .col-md-3,
+.dataset-editor-dynamic-column .col-md-6 {
+    padding: 0 !important;
+}
+
+.dataset-editor-column-phi,
+.dataset-editor-column-not-phi {
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.dataset-editor-column-not-phi {
+    color: transparent;
+}
+
+.dataset-editor-column-not-phi:hover {
+    color: rgb(130,130,130);
+}
+
+/* Dropdown */
+.admin-panel-dynamic-type-dropdown {
+    outline: none;
+}
+
+.admin-panel-dynamic-type-dropdown button {
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(50,50,50) !important;
+    font-family: Roboto;
+    font-size: 0.8rem;
+    text-align: right;
+    width: 75px;
+}
+
+.admin-panel-dynamic-type-dropdown button:hover {
+    background-color: rgb(245,245,245) !important;
+}
+
+.admin-panel-dynamic-type-dropdown-chevron {
+    float: right;
+    margin-left: 2px;
+    margin-top: 3px;
+    opacity: 1 !important;
+    transform: scale(0.7);
+}

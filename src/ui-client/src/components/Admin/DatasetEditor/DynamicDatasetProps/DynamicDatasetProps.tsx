@@ -7,11 +7,10 @@
 
 import React from 'react';
 import { Section } from '../../Section/Section';
-import { TextArea } from '../../Section/TextArea';
 import { Row, Col, Container } from 'reactstrap';
-import { AdminDatasetQuery, DatasetQueryCategory } from '../../../../models/admin/Dataset';
+import { AdminDatasetQuery, DatasetQueryCategory, DynamicDatasetQuerySchema } from '../../../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
-import { AdminPanelPatientListColumnTemplate, PatientListColumnType } from '../../../../models/patientList/Column';
+import { PatientListColumnType } from '../../../../models/patientList/Column';
 import { DynamicPropDropdown } from '../DynamicPropDropdown/DynamicPropDropdown';
 import { Checkbox } from '../../Section/Checkbox';
 
@@ -21,7 +20,6 @@ interface Props {
     categoryChangeHandler: (categoryId: number) => any;
     dataset: AdminDatasetQuery;
     dispatch: any;
-    expectedColumns: AdminPanelPatientListColumnTemplate[];
     inputChangeHandler: (val: any, prop: string) => any;
     forceValidation: boolean;
     locked?: boolean;
@@ -35,16 +33,18 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
     }
 
     public render() {
-        const { categories, category, categoryChangeHandler, expectedColumns, dataset, inputChangeHandler, forceValidation, shapeChangeHandler, shapes } = this.props;
+        const { dataset, inputChangeHandler } = this.props;
         const numCols: string[] = [];
         const strCols: string[] = [];
         const dateCols: string[] = [];
         const locked = !dataset.isEncounterBased;
 
-        expectedColumns.forEach(c => {
-            if      (c.type === PatientListColumnType.string) strCols.push(c.id);
-            else if (c.type === PatientListColumnType.number) numCols.push(c.id);
-            else if (c.type === PatientListColumnType.date)   dateCols.push(c.id);
+        dataset.schema!.fields.forEach(f => {
+            if (f.name != 'personId') {
+                if      (f.type === PatientListColumnType.string) strCols.push(f.name);
+                else if (f.type === PatientListColumnType.number) numCols.push(f.name);
+                else if (f.type === PatientListColumnType.date)   dateCols.push(f.name);
+            }
         })
 
 
