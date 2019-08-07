@@ -90,7 +90,7 @@ namespace Model.Compiler
 
     public class DynamicDatasetQuerySchema
     {
-        public ICollection<SchemaFieldSelector> Fields { get; set; }
+        public ICollection<DynamicDatasetQuerySchemaFieldRecord> Fields { get; set; }
     }
 
     public class DynamicDatasetQuerySchemaFieldRecord
@@ -101,9 +101,9 @@ namespace Model.Compiler
         public bool Mask { get; set; }
         public bool Required { get; set; }
 
-        public DynamicDatasetQuerySchemaField ToSchemaField()
+        public SchemaFieldSelector ToSchemaField()
         {
-            return new DynamicDatasetQuerySchemaField
+            return new SchemaFieldSelector
             {
                 Name = Name,
                 Type = GetLeafType(),

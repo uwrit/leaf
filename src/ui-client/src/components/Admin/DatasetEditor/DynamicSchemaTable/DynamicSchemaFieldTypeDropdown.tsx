@@ -44,25 +44,25 @@ export class DynamicSchemaFieldTypeDropdown extends React.PureComponent<Props,St
                     </div>
                 </DropdownToggle>
                 <DropdownMenu>
-                    <div className={`${c}-item-container`}>
+                    <div className={`admin-panel-dropdown ${c}-item-container`}>
 
                         {/* String */}
-                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.string )}>
+                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.String )}>
                             String
                         </DropdownItem>
 
                         {/* Number */}
-                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.number )}>
+                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.Numeric )}>
                             Number
                         </DropdownItem>
 
                         {/* Date */}
-                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.date )}>
+                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.DateTime )}>
                             Date
                         </DropdownItem>
 
                         {/* Bool */}
-                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.boolean )}>
+                        <DropdownItem onClick={changeHandler.bind(null, index, PatientListColumnType.Bool )}>
                             Boolean
                         </DropdownItem>
 

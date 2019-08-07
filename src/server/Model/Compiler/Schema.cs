@@ -83,7 +83,7 @@ namespace Model.Compiler
             switch (context.Shape)
             {
                 case Shape.Dynamic:
-                    return new DynamicValidationSchema((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields);
+                    return new DynamicValidationSchema((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields.Select(f => f.ToSchemaField()));
                 case Shape.Observation:
                     return ObservationValidationSchema.Schema;
                 case Shape.Encounter:

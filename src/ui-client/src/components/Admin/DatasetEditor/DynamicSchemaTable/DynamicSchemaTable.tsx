@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { DynamicDatasetQuerySchema } from '../../../../models/admin/Dataset';
+import { DynamicDatasetQuerySchema, DynamicDatasetQuerySchemaField } from '../../../../models/admin/Dataset';
 import { Container } from 'reactstrap';
 import { DynamicSchemaRow } from './DynamicSchemaRow';
 import './DynamicSchemaTable.css';
@@ -30,7 +30,7 @@ export class DynamicSchemaTable extends React.PureComponent<Props> {
         return (
             <Container>
                 {schema.fields.map((f,i) => (
-                    <DynamicSchemaRow key={f.name} index={i} field={f} inputChangeHandler={this.handleInputChange} />
+                    <DynamicSchemaRow key={f.name} index={i} field={f} inputChangeHandler={this.handleInputChange2} />
                 ))}
             </Container>
         )
@@ -45,6 +45,16 @@ export class DynamicSchemaTable extends React.PureComponent<Props> {
         const fields = newSchema!.fields.slice();
         const changed = Object.assign({}, fields[index], { [propName]: val });
         fields[index] = changed;
+        newSchema.fields = fields;
+
+        inputChangeHandler(newSchema, 'schema');
+    }
+
+    private handleInputChange2 = (val: DynamicDatasetQuerySchemaField, index: number) => {
+        const { inputChangeHandler, schema } = this.props;
+        const newSchema = Object.assign({}, schema);
+        const fields = newSchema!.fields.slice();
+        fields[index] = val;
         newSchema.fields = fields;
 
         inputChangeHandler(newSchema, 'schema');

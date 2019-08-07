@@ -28,8 +28,8 @@ export const updateDataset = async (state: AppState, dataset: AdminDatasetQuery)
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/dataset/${dataset.id}`, toDTO(dataset));
-    const ds = resp.data as AdminDatasetQuery;
-    return ds;
+    const ds = resp.data as AdminDatasetQueryDTO;
+    return fromDTO(ds);
 };
 
 /*
@@ -42,8 +42,8 @@ export const createDataset = async (state: AppState, dataset: AdminDatasetQuery)
         ...toDTO(dataset),
         id: null
     });
-    const ds = resp.data as AdminDatasetQuery;
-    return ds;
+    const ds = resp.data as AdminDatasetQueryDTO;
+    return fromDTO(ds);
 };
 
 /*

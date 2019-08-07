@@ -13,7 +13,7 @@ import { PatientListDatasetShape } from '../../../../models/patientList/Dataset'
 import { PatientListColumnType } from '../../../../models/patientList/Column';
 import { DynamicPropDropdown } from '../DynamicPropDropdown/DynamicPropDropdown';
 import { Checkbox } from '../../Section/Checkbox';
-import { personId } from '../../../../models/patientList/DatasetDefinitionTemplate';
+import { personId, encounterId } from '../../../../models/patientList/DatasetDefinitionTemplate';
 
 interface Props {
     categories: Map<number, DatasetQueryCategory>;
@@ -41,10 +41,10 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
         const locked = !dataset.isEncounterBased;
 
         dataset.schema!.fields.forEach(f => {
-            if (f.name != personId) {
-                if      (f.type === PatientListColumnType.string) strCols.push(f.name);
-                else if (f.type === PatientListColumnType.number) numCols.push(f.name);
-                else if (f.type === PatientListColumnType.date)   dateCols.push(f.name);
+            if (f.name !== personId && f.name !== encounterId) {
+                if      (f.type === PatientListColumnType.String) strCols.push(f.name);
+                else if (f.type === PatientListColumnType.Numeric) numCols.push(f.name);
+                else if (f.type === PatientListColumnType.DateTime)   dateCols.push(f.name);
             }
         })
 

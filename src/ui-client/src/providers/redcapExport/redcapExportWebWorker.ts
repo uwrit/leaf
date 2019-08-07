@@ -20,10 +20,10 @@ import { personId, encounterId } from '../../models/patientList/DatasetDefinitio
 
 const CREATE_EXPORT_CONFIGURATION = 'CREATE_EXPORT_CONFIGURATION';
 
-const typeString = PatientListColumnType.string;
-const typeNum = PatientListColumnType.number;
-const typeDate = PatientListColumnType.date;
-const typeSparkline = PatientListColumnType.sparkline;
+const typeString = PatientListColumnType.String;
+const typeNum = PatientListColumnType.Numeric;
+const typeDate = PatientListColumnType.DateTime;
+const typeSparkline = PatientListColumnType.Sparkline;
 
 interface REDCapExportEventsAndMappings {
     events: REDCapEvent[];
@@ -75,10 +75,10 @@ export default class REDCapExportWebWorker {
         const workerFile = `  
             ${this.addMessageTypesToContext([ CREATE_EXPORT_CONFIGURATION ])}
             ${workerContext}
-            var typeString = ${PatientListColumnType.string};
-            var typeNum = ${PatientListColumnType.number};
-            var typeDate = ${PatientListColumnType.date};
-            var typeSparkline = ${PatientListColumnType.sparkline};
+            var typeString = ${PatientListColumnType.String};
+            var typeNum = ${PatientListColumnType.Numeric};
+            var typeDate = ${PatientListColumnType.DateTime};
+            var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = ${personId};
             var encounterId = ${encounterId};
             self.onmessage = function(e) {  

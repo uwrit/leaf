@@ -124,9 +124,9 @@ namespace Services.Admin.Compiler
         {
             if (query.Shape == Shape.Dynamic)
             {
-                return await CreateShapedDatasetQueryAsync(query);
+                return await CreateDynamicDatasetQueryAsync(query);
             }
-            return await CreateDynamicDatasetQueryAsync(query);
+            return await CreateShapedDatasetQueryAsync(query);
         }
 
         async Task<AdminDatasetQuery> CreateShapedDatasetQueryAsync(AdminDatasetQuery query)

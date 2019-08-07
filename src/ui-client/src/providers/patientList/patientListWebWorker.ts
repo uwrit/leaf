@@ -22,10 +22,10 @@ const GET_MULTIROW_CSV = 'GET_MULTIROW_CSV';
 const GET_ALL_DATA = 'GET_ALL_DATA';
 const CLEAR_PATIENTS = 'CLEAR_PATIENTS';
 
-const typeString = PatientListColumnType.string;
-const typeNum = PatientListColumnType.number;
-const typeDate = PatientListColumnType.date;
-const typeSparkline = PatientListColumnType.sparkline;
+const typeString = PatientListColumnType.String;
+const typeNum = PatientListColumnType.Numeric;
+const typeDate = PatientListColumnType.DateTime;
+const typeSparkline = PatientListColumnType.Sparkline;
 
 interface InboundMessagePartialPayload {
     config?: PatientListConfiguration;
@@ -92,10 +92,10 @@ export default class PatientListWebWorker {
         const workerFile = `  
             ${this.addMessageTypesToContext([ ADD_DEMOGRAPHICS, ADD_DATASET, REMOVE_DATASET, CLEAR_PATIENTS, GET_PATIENTS, GET_SINGLETON_CSV, GET_MULTIROW_CSV, GET_ALL_DATA ])}
             ${workerContext}
-            var typeString = ${PatientListColumnType.string};
-            var typeNum = ${PatientListColumnType.number};
-            var typeDate = ${PatientListColumnType.date};
-            var typeSparkline = ${PatientListColumnType.sparkline};
+            var typeString = ${PatientListColumnType.String};
+            var typeNum = ${PatientListColumnType.Numeric};
+            var typeDate = ${PatientListColumnType.DateTime};
+            var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = ${personId};
             var encounterId = ${encounterId};
             self.onmessage = function(e) {  

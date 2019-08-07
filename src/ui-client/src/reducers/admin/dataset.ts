@@ -64,7 +64,7 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
             sqlColumns = cols.sqlColumns;
         }
     }
-    if (ds.shape !== PatientListDatasetShape.Demographics) {
+    if (ds && ds.shape !== PatientListDatasetShape.Demographics) {
         datasets.datasets.set(ds.id, ds);
     }
 
@@ -145,7 +145,7 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
 
 const getShapeColumns = (dataset: AdminDatasetQuery) => {
     const sqlColumns = new Set(getSqlColumns(dataset.sqlStatement));
-    const expectedColumns: AdminPanelPatientListColumnTemplate[] = [ { id: personId, type: PatientListColumnType.string, present: sqlColumns.has(personId) } ];
+    const expectedColumns: AdminPanelPatientListColumnTemplate[] = [ { id: personId, type: PatientListColumnType.String, present: sqlColumns.has(personId) } ];
     const template = dataset.shape === PatientListDatasetShape.Demographics ? DemographicsAdminSqlDefTemplate : DefTemplates.get(dataset.shape);
 
     if (dataset.shape !== PatientListDatasetShape.Dynamic) {

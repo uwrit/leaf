@@ -108,7 +108,7 @@ namespace Services.Cohort
         {
             var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
                 .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name) && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
-                .Select(f => f);
+                .Select(f => f.ToSchemaField());
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, fields);
 

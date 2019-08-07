@@ -11,7 +11,7 @@ import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
 import { InformationModalState, ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
-import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
+import { DefTemplates, personId, encounterId } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
@@ -22,6 +22,7 @@ import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetS
 import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
 import { DynamicEditor } from './DynamicEditor/DynamicEditor';
 import './DatasetEditor.css';
+import { PatientListColumnType } from '../../../models/patientList/Column';
 
 interface Props { 
     data: AdminState;
@@ -227,20 +228,31 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     /*
      * Validate that current admin Concept is valid. Called on 'Save' click.
      */
-    private currentDatasetIsValid = (): boolean => {
+    private currentDatasetIsValid = () => {
         const { currentDataset } = this.props.data.datasets;
 
-        if (!currentDataset) { return false; }
-        if (!currentDataset.name) { return false; }
+        if (!currentDataset) { return 'There is no current dataset'; }
+        if (!currentDataset.name) { return 'No [Name] has been entered'; }
         for (const constraint of currentDataset.constraints) {
-            if (!constraint.constraintValue) { return false; }
+            if (!constraint.constraintValue) { return 'One or more [Access Restrictions] is missing a User or Group'; }
+        }
+        if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
+            if (currentDataset.isEncounterBased && !currentDataset.sqlFieldDate) { return '[Has Encounters] is set to "true" but no [Date Column] has been selected'; }
+            for (const field of currentDataset.schema!.fields) {
+                if (field.type === PatientListColumnType.DateTime && (!field.mask || !field.phi)) {
+                    return `The [${field.name}] column is a DateTime but isn't set to "De-identify". Proceeding may inadvertently reveal Protected Health Information`;
+                }
+                if ((field.name === personId || field.name === encounterId) && (!field.mask || !field.phi)) {
+                    return `The [${field.name}] column is a potentially identifiable and should always be set to "De-identify"`;
+                }
+            }
         }
 
         /*
          * No need to check the [sqlStatement], as the missing SQL column
          * check following this will return granular information on those.
          */
-        return true;
+        return null;
     }
 
     /*
@@ -257,15 +269,17 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      * Handle initiation of saving async changes and syncing with the DB.
      */
     private handleSaveChanges = () => {
-        const { datasets} = this.props.data;
+        const { datasets } = this.props.data;
         const { dispatch } = this.props;
-        const missingCols = datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
-        const isValid = this.currentDatasetIsValid();
+        const missingCols = datasets.currentDataset!.shape === PatientListDatasetShape.Dynamic
+            ? datasets.currentDataset!.schema!.fields.filter((c) => !c.present).map((c) => `[${c.name}]`)
+            : datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
+        const errors = this.currentDatasetIsValid();
         
         /*
          * It's valid and has no missing columns, so save.
          */
-        if (isValid && !missingCols.length) {
+        if (!errors && !missingCols.length) {
             if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
                 dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
             } else {
@@ -275,9 +289,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         /*
          * One or more fields are missing data.
          */
-        } else if (!isValid) {
+        } else if (errors) {
             const confirm: ConfirmationModalState = {
-                body: `One or more fields are missing necessary data. Are you sure you want to save this Dataset?`,
+                body: [
+                    <p key={1}>{errors}.</p>,
+                    <p key={2}>Are you sure you want to try to save this Dataset? The save or query execution process may fail due to missing data.</p>
+                ],
                 header: 'Missing Dataset data',
                 onClickNo: () => null,
                 onClickYes: () => { 
@@ -443,7 +460,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             isEncounterBased: true,
             name,
             shape,
-            sqlStatement: 'SELECT * FROM dbo.table',
+            sqlStatement: `SELECT   FROM dbo.table`,
             tags: [],
             unsaved: true
         };

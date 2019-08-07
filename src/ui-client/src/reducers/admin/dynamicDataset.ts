@@ -22,7 +22,6 @@ export const getDynamicSchema = (dataset: AdminDatasetQuery) => {
     /*
      *  New Column default props.
      */
-    const type = PatientListColumnType.string;
     const phi = false;
     const mask = false;
     const required = true;
@@ -43,6 +42,8 @@ export const getDynamicSchema = (dataset: AdminDatasetQuery) => {
         if (c && !excluded.has(c)) {
             const prev = prevSchema.get(c);
             if (!prev) {
+                const type = inferTypeFromName(c);
+                const { mask, phi } = autoDeidentifyFromType(type);
                 schema.fields.push({ name: c, type, phi, mask, required, present });
             } else {
                 schema.fields.push(prev);
@@ -60,11 +61,28 @@ export const getDynamicSchema = (dataset: AdminDatasetQuery) => {
     return { schema, sqlColumns, sqlFieldDate, sqlFieldValueString, sqlFieldValueNumeric };
 };
 
+const autoDeidentifyFromType = (type: PatientListColumnType) => {
+    if (type === PatientListColumnType.DateTime) {
+        return { mask: true, phi: true };
+    }
+    return { mask: false, phi: false };
+};
+
+const inferTypeFromName = (name: string): PatientListColumnType => {
+    var n = name.toLowerCase();
+    if (n.indexOf('date') > -1)  { return PatientListColumnType.DateTime; }
+    if (n.indexOf('dt') > -1)    { return PatientListColumnType.DateTime; }
+    if (n.indexOf('num') > -1)   { return PatientListColumnType.Numeric; }
+    if (n.indexOf('quant') > -1) { return PatientListColumnType.Numeric; }
+    if (n.startsWith('is'))      { return PatientListColumnType.Bool; }
+    return PatientListColumnType.String;
+};
+
 const getDefaultDynamicSchema = (dataset: AdminDatasetQuery, sqlColumns: Set<string>) => {
     const schema: DynamicDatasetQuerySchema = { fields: [
         { 
             name: personId, 
-            type: PatientListColumnType.string, 
+            type: PatientListColumnType.String, 
             phi: true, 
             mask: true, 
             required: true, 
@@ -75,7 +93,7 @@ const getDefaultDynamicSchema = (dataset: AdminDatasetQuery, sqlColumns: Set<str
         schema.fields.push(
             { 
                 name: encounterId, 
-                type: PatientListColumnType.string, 
+                type: PatientListColumnType.String, 
                 phi: true, 
                 mask: true, 
                 required: true, 

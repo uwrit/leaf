@@ -15,11 +15,12 @@ import { FiCheck } from 'react-icons/fi';
 
 interface Props {
     index: number;
-    inputChangeHandler: (val: any, propName: string, index: number) => any;
+    inputChangeHandler: (val: DynamicDatasetQuerySchemaField, index: number) => any;
     field: DynamicDatasetQuerySchemaField;
 }
 
-const stringOnly = new Set([ personId, encounterId ]);
+const identifiers = new Set([ personId, encounterId ]);
+const deidentifiable = new Set([ PatientListColumnType.String, PatientListColumnType.DateTime ]);
 
 export class DynamicSchemaRow extends React.PureComponent<Props> {
     private className = 'dataset-editor';
@@ -29,7 +30,7 @@ export class DynamicSchemaRow extends React.PureComponent<Props> {
 
     public render() {
         const { field, index } = this.props;
-        const configurable = !stringOnly.has(field.name);
+        const configurable = !identifiers.has(field.name);
         const c = this.className;
         const classes = [ `${c}-column`, `${c}-dynamic-column` ];
 
@@ -40,9 +41,7 @@ export class DynamicSchemaRow extends React.PureComponent<Props> {
         return (
             <Row className={classes.join(' ')}>
                 <FiCheck />
-                <Col md={3} onClick={this.handlePhiClick}>
-                    {this.getPhiField()}
-                </Col>
+                {this.getPhiSection()}
                 <Col md={6}>
                     <span className={`${c}-column-name`}>{field.name}</span>
                 </Col>
@@ -51,14 +50,44 @@ export class DynamicSchemaRow extends React.PureComponent<Props> {
                         <DynamicSchemaFieldTypeDropdown index={index} type={field.type} changeHandler={this.handleTypeChange} />
                     }
                     {!configurable &&
-                        <span className={`${c}-column-type`}>string</span>
+                        <span className={`${c}-column-type`}>String</span>
                     }
                 </Col>
             </Row>
         )
     }
 
-    private getPhiField = () => {
+    /*
+     * Get React components to handle and display column PHI/NoPHI properties.
+     */
+    private getPhiSection = () => {
+        const { field } = this.props;
+        const c = this.className;
+
+        if (identifiers.has(field.name)) {
+            return (
+                <Col md={3}>
+                    <span className={`${c}-column-phi ${c}-column-phi-always`}>De-identify</span>
+                </Col>
+            );
+        }
+        if (deidentifiable.has(field.type)) {
+            return (
+                <Col md={3} onClick={this.handlePhiClick}>
+                    {this.getDeidentText()}
+                </Col>
+            );
+        }
+        return (
+            <Col md={3} className={`${c}-column-nodeident`} />
+        );
+    }
+
+    /*
+     * Get <span> with classname depending on whether a field is 
+     * marked as PHI or not.
+     */
+    private getDeidentText = () => {
         const { field } = this.props;
         const c = this.className;
         const className = field.phi 
@@ -67,13 +96,31 @@ export class DynamicSchemaRow extends React.PureComponent<Props> {
         return <span className={className}>De-identify</span>
     }
 
+    /*
+     * Handle changes to the field's type. If DateTime, auto-de-identify.
+     */
     private handleTypeChange = (index: number, type: PatientListColumnType) => {
-        const { inputChangeHandler } = this.props;
-        inputChangeHandler(type, 'type', index);
+        const { inputChangeHandler, field } = this.props;
+        const newField = Object.assign({}, field, { type })
+
+        if (type === PatientListColumnType.DateTime) {
+            newField.mask = true;
+            newField.phi = true;
+        } else {
+            newField.mask = false;
+            newField.phi = false;
+        }
+
+        inputChangeHandler(newField, index);
     }
 
+    /*
+     * Handle clicks to change whether a field is de-identified or not.
+     */
     private handlePhiClick = () => {
         const { inputChangeHandler, field, index } = this.props;
-        inputChangeHandler(!field.phi, 'phi', index);
+        const deident = !field.phi;
+        const newField = Object.assign({}, field, { phi: deident, mask: deident })
+        inputChangeHandler(newField, index);
     }
 };

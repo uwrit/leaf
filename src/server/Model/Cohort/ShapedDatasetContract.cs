@@ -70,7 +70,7 @@ namespace Model.Cohort
         public DynamicContract(DynamicDatasetQuery dynamicDataset)
         {
             Shape = Shape.Dynamic;
-            Fields = dynamicDataset.Schema.Fields.ToArray();
+            Fields = dynamicDataset.Schema.Fields.Select(f => f.ToSchemaField()).ToArray();
             SqlFieldDate = dynamicDataset.SqlFieldDate;
             SqlFieldValueString = dynamicDataset.SqlFieldValueString;
             SqlFieldValueNumeric = dynamicDataset.SqlFieldValueNumeric;

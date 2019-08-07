@@ -92,7 +92,7 @@ export const toDTO = (ds: AdminDatasetQuery): AdminDatasetQueryDTO => {
                     mask: f.mask, 
                     phi: f.phi, 
                     required: true, 
-                    type: PatientListColumnType[f.name] 
+                    type: PatientListColumnType[f.type]
                 }) ) 
               }
             : { fields: [] }

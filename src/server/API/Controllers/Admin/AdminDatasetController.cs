@@ -97,6 +97,11 @@ namespace API.Controllers.Admin
         {
             try
             {
+                if (dto == null)
+                {
+                    return BadRequest();
+                }
+
                 var query = dto.AdminDatasetQuery();
                 var created = await manager.CreateDatasetQueryAsync(query);
                 return Ok(created.AdminDatasetQueryDTO());
