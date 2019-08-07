@@ -7,7 +7,7 @@
 
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
-import { AdminDatasetQuery, AdminDemographicQuery } from '../../models/admin/Dataset';
+import { AdminDatasetQuery, AdminDemographicQuery, toDTO, fromDTO, AdminDatasetQueryDTO } from '../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../models/patientList/Dataset';
 
 /*
@@ -17,8 +17,8 @@ export const getAdminDataset = async (state: AppState, id: string): Promise<Admi
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/dataset/${id}`);
-    const ds = resp.data as AdminDatasetQuery;
-    return ds;
+    const ds = resp.data as AdminDatasetQueryDTO;
+    return fromDTO(ds);
 };
 
 /*
@@ -27,7 +27,7 @@ export const getAdminDataset = async (state: AppState, id: string): Promise<Admi
 export const updateDataset = async (state: AppState, dataset: AdminDatasetQuery): Promise<AdminDatasetQuery> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/dataset/${dataset.id}`, dataset);
+    const resp = await http.put(`api/admin/dataset/${dataset.id}`, toDTO(dataset));
     const ds = resp.data as AdminDatasetQuery;
     return ds;
 };
@@ -39,7 +39,7 @@ export const createDataset = async (state: AppState, dataset: AdminDatasetQuery)
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/admin/dataset`, {
-        ...dataset,
+        ...toDTO(dataset),
         id: null
     });
     const ds = resp.data as AdminDatasetQuery;

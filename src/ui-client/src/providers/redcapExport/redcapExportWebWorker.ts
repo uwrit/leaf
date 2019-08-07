@@ -16,6 +16,7 @@ import REDCapUser from '../../models/redcapExport/User';
 import { PatientListColumnType, PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetExport } from '../../models/patientList/Dataset';
 import { workerContext } from './redcapExportWebWorkerContext';
+import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 
 const CREATE_EXPORT_CONFIGURATION = 'CREATE_EXPORT_CONFIGURATION';
 
@@ -78,6 +79,8 @@ export default class REDCapExportWebWorker {
             var typeNum = ${PatientListColumnType.number};
             var typeDate = ${PatientListColumnType.date};
             var typeSparkline = ${PatientListColumnType.sparkline};
+            var personId = ${personId};
+            var encounterId = ${encounterId};
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -209,8 +212,7 @@ export default class REDCapExportWebWorker {
          * all patient list datasets.
          */
         const deriveRecords = (pl: PatientListDatasetExport[], useRepeatingForms: boolean, rowLimit: number): REDCapExportDerivedPatientListData => {
-            const colPersonId = 'personId';
-            const colRcPersonId = colPersonId.toLowerCase();
+            const colRcPersonId = personId.toLowerCase();
             const colRcEventName = 'redcap_event_name';
             const colRcRepeatInstrument = 'redcap_repeat_instrument';
             const colRcRepeatInstance = 'redcap_repeat_instance';
@@ -236,8 +238,8 @@ export default class REDCapExportWebWorker {
                 for (let j = 0; j < ds.columns.length; j++) {
                     const col = ds.columns[j] as REDCapExportDerivedPatientListColumn;
                     col.redcapFieldName = cleanName(`${ds.datasetId}_${col.id}`, fieldNameLenLimit);
-                    if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
-                        if (col.id === colPersonId) {
+                    if (col.id !== personId || (col.id === personId && !personIdAdded)) {
+                        if (col.id === personId) {
                             personIdAdded = true;
                             col.redcapFieldName = colRcPersonId;
                         }
@@ -251,7 +253,7 @@ export default class REDCapExportWebWorker {
                  */
                 for (let k = 0; k < ds.data.length; k++) {
                     const r: any = ds.data[k];
-                    const patientId = r[colPersonId];
+                    const patientId = r[personId];
 
                     if (patientId) {
                         let count = recordCount.get(patientId) || 0;
@@ -266,7 +268,7 @@ export default class REDCapExportWebWorker {
                          * instrument fields are added depending on the configuration
                          * of the REDCap and Leaf instances.
                          */
-                        const record: any = { [colRcPersonId]: r[colPersonId], [colRcCompleted]: recordCompleteStateCode };
+                        const record: any = { [colRcPersonId]: r[personId], [colRcCompleted]: recordCompleteStateCode };
                         if (useRepeatingForms && ds.isMultirow) {
                             record[colRcRepeatInstrument] = ds.datasetId;
                             record[colRcRepeatInstance] = count;

@@ -436,7 +436,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { dispatch } = this.props;
         const id = generateId();
         const name = 'New Dataset';
-        const shape = PatientListDatasetShape.Allergy;
+        const shape = PatientListDatasetShape.Dynamic;
         const newAdminDs: AdminDatasetQuery = {
             id,
             constraints: [],

@@ -10,6 +10,8 @@ import { DynamicDatasetQuerySchemaField } from '../../../../models/admin/Dataset
 import { Row, Col } from 'reactstrap';
 import { DynamicSchemaFieldTypeDropdown } from './DynamicSchemaFieldTypeDropdown';
 import { PatientListColumnType } from '../../../../models/patientList/Column';
+import { encounterId, personId } from '../../../../models/patientList/DatasetDefinitionTemplate';
+import { FiCheck } from 'react-icons/fi';
 
 interface Props {
     index: number;
@@ -17,7 +19,7 @@ interface Props {
     field: DynamicDatasetQuerySchemaField;
 }
 
-const stringOnly = new Set([ 'personId', 'encounterId' ]);
+const stringOnly = new Set([ personId, encounterId ]);
 
 export class DynamicSchemaRow extends React.PureComponent<Props> {
     private className = 'dataset-editor';
@@ -29,9 +31,15 @@ export class DynamicSchemaRow extends React.PureComponent<Props> {
         const { field, index } = this.props;
         const configurable = !stringOnly.has(field.name);
         const c = this.className;
+        const classes = [ `${c}-column`, `${c}-dynamic-column` ];
+
+        if (field.present) {
+            classes.push('present');
+        }
 
         return (
-            <Row className={`${c}-column ${c}-dynamic-column`}>
+            <Row className={classes.join(' ')}>
+                <FiCheck />
                 <Col md={3} onClick={this.handlePhiClick}>
                     {this.getPhiField()}
                 </Col>

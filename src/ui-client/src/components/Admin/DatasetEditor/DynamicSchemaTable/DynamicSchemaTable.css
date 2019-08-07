@@ -1,6 +1,11 @@
 /* Column */
 .dataset-editor-dynamic-column {
     border-bottom: 1px solid rgb(240,240,240);
+    height: 25px;
+}
+
+.dataset-editor-dynamic-column svg {
+    margin: 4px 0 0 4px;
 }
 
 .dataset-editor-dynamic-column .col-md-3,
@@ -12,6 +17,7 @@
 .dataset-editor-column-not-phi {
     cursor: pointer;
     font-size: 0.8rem;
+    margin-left: 25px;
 }
 
 .dataset-editor-column-not-phi {
@@ -36,12 +42,13 @@
     color: rgb(50,50,50) !important;
     font-family: Roboto;
     font-size: 0.8rem;
+    margin-top: -4px;
     text-align: right;
     width: 75px;
 }
 
 .admin-panel-dynamic-type-dropdown button:hover {
-    background-color: rgb(245,245,245) !important;
+    color: black;
 }
 
 .admin-panel-dynamic-type-dropdown-chevron {

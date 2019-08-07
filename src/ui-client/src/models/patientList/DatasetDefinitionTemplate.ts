@@ -8,11 +8,14 @@
 import { PatientListDatasetDefinitionTemplate, PatientListDatasetShape } from "./Dataset";
 import { PatientListColumnType } from "./Column";
 
+export const personId = 'personId';
+export const encounterId = 'encounterId';
+
 // https://www.hl7.org/fhir/person.html
 // https://www.hl7.org/fhir/patient.html
 export const DemographicsDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
-        ['personId', { datasetId: 'demographics', id: 'personId', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
+        [personId, { datasetId: 'demographics', id: personId, autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['patientOf', { datasetId: 'demographics', id: 'patientOf',autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['addressPostalCode', { datasetId: 'demographics', id: 'addressPostalCode', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
         ['addressState', { datasetId: 'demographics', id: 'addressState', autoDisplayOnLoad: true, type: PatientListColumnType.string }],
@@ -57,12 +60,12 @@ export const DemographicsAdminSqlDefTemplate: PatientListDatasetDefinitionTempla
 // https://www.hl7.org/fhir/encounter.html
 export const EncounterDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['admitDate', { id: 'admitDate', type: PatientListColumnType.date }],
         ['admitSource', { id: 'admitSource', type: PatientListColumnType.string, optional: true }],
         ['class', { id: 'class', type: PatientListColumnType.string }],
         ['dischargeDate', { id: 'dischargeDate', type: PatientListColumnType.date }],
         ['dischargeDisposition', { id: 'dischargeDisposition', type: PatientListColumnType.string, optional: true }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['location', { id: 'location', type: PatientListColumnType.string }],
         ['status', { id: 'status', type: PatientListColumnType.string, optional: true }]
     ]),
@@ -75,10 +78,10 @@ export const EncounterDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/observation.html
 export const ObservationDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['category', { id: 'category', type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['effectiveDate', { id: 'effectiveDate', type: PatientListColumnType.date }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['referenceRangeLow', { id: 'referenceRangeLow', type: PatientListColumnType.number, optional: true }],
         ['referenceRangeHigh', { id: 'referenceRangeHigh', type: PatientListColumnType.number, optional: true }],
         ['specimentType', { id: 'specimenType', type: PatientListColumnType.string, optional: true }],
@@ -96,11 +99,11 @@ export const ObservationDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/condition.html
 export const ConditionDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['abatementDateTime', { id: 'abatementDateTime', type: PatientListColumnType.number, optional: true }],
         ['category', { id: 'category', type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['onsetDateTime', { id: 'onsetDateTime', type: PatientListColumnType.date }],
         ['recordedDate', { id: 'recordedDate', type: PatientListColumnType.number, optional: true }],
         ['text', { id: 'text', type: PatientListColumnType.string }],
@@ -114,10 +117,10 @@ export const ConditionDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/procedure.html
 export const ProcedureDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['category', { id: 'category', type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['performedDateTime', { id: 'performedDateTime', type: PatientListColumnType.date }],
         ['text', { id: 'text', type: PatientListColumnType.string }],
     ]),
@@ -130,10 +133,10 @@ export const ProcedureDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/immunization.html
 export const ImmunizationDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
         ['doseQuantity', { id: 'doseQuantity', type: PatientListColumnType.number, optional: true }],
         ['doseUnit', { id: 'doseUnit', type: PatientListColumnType.string, optional: true }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['occurrenceDateTime', { id: 'occurrenceDateTime', type: PatientListColumnType.date }],
         ['route', { id: 'route', type: PatientListColumnType.string, optional: true }],
         ['text', { id: 'text', type: PatientListColumnType.string }],
@@ -148,10 +151,10 @@ export const ImmunizationDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/allergyintolerance.html
 export const AllergyDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['category', { id: 'category', type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['onsetDateTime', { id: 'onsetDateTime', type: PatientListColumnType.date }],
         ['recordedDate', { id: 'recordedDate', type: PatientListColumnType.number, optional: true }],
         ['text', { id: 'text', type: PatientListColumnType.string }],
@@ -165,12 +168,12 @@ export const AllergyDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/medicationrequest.html
 export const MedRequestDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['amount', { id: 'amount', type: PatientListColumnType.number, optional: true }],
         ['authoredOn', { id: 'authoredOn', type: PatientListColumnType.date }],
         ['category', { id: 'category', type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['form', { id: 'form', type: PatientListColumnType.string, optional: true }],
         ['text', { id: 'text', type: PatientListColumnType.string }],
         ['unit', { id: 'unit', type: PatientListColumnType.string, optional: true }]
@@ -184,11 +187,11 @@ export const MedRequestDefTemplate: PatientListDatasetDefinitionTemplate = {
 // https://www.hl7.org/fhir/medicationadministration.html
 export const MedAdminDefTemplate: PatientListDatasetDefinitionTemplate = {
     columns: new Map([
+        [encounterId, { id: encounterId, type: PatientListColumnType.string }],
         ['code', { id: 'code', type: PatientListColumnType.string }],
         ['coding', { id: 'coding', type: PatientListColumnType.string }],
         ['doseQuantity', { id: 'doseQuantity', type: PatientListColumnType.number, optional: true }],
         ['doseUnit', { id: 'doseUnit', type: PatientListColumnType.string, optional: true }],
-        ['encounterId', { id: 'encounterId', type: PatientListColumnType.string }],
         ['effectiveDateTime', { id: 'effectiveDateTime', type: PatientListColumnType.date }],
         ['route', { id: 'route', type: PatientListColumnType.string, optional: true }],
         ['text', { id: 'text', type: PatientListColumnType.string }]

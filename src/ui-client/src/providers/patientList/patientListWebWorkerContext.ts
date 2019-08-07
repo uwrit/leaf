@@ -296,7 +296,7 @@ var setDetailRows = function (patId) {
     // Get all encounter detail rows in an array
     pat.multirowData.forEach(function (vals, key) {
         var ds = multirowDatasets.get(key);
-        var cols = Array.from(ds.columns.keys()).filter(function (v) { return v !== 'personId' && v !== 'encounterId' && v !== ds.dateValueColumn; });
+        var cols = Array.from(ds.columns.keys()).filter(function (v) { return v !== personId && v !== encounterId && v !== ds.dateValueColumn; });
         var hasEncounterIdCol = !!vals[0].encounterId;
         var _loop_2 = function (i) {
             var val = vals[i];
@@ -599,17 +599,16 @@ var getAllData = function (payload) {
     var config = payload.config, requestId = payload.requestId, useDisplayedColumnsOnly = payload.useDisplayedColumnsOnly;
     var data = [];
     var singletonData = { columns: [], data: [], datasetId: 'demographics', isMultirow: false, maxRows: 1 };
-    var colPersonId = 'personId';
     // Add the personId column
-    singletonData.columns.push(singletonDatasets.get('demographics').columns.get(colPersonId));
+    singletonData.columns.push(singletonDatasets.get('demographics').columns.get(personId));
     // Use only the columns currently displayed or retrieve all (user selects one option or the other)
     if (useDisplayedColumnsOnly) {
-        singletonData.columns.concat(config.displayColumns.filter(function (col) { return col.type !== typeSparkline && col.id !== colPersonId; }));
+        singletonData.columns.concat(config.displayColumns.filter(function (col) { return col.type !== typeSparkline && col.id !== personId; }));
     }
     else {
         singletonDatasets.forEach(function (def) {
             def.columns.forEach(function (col) {
-                if (col.type !== typeSparkline && col.id !== colPersonId) {
+                if (col.type !== typeSparkline && col.id !== personId) {
                     singletonData.columns.push(col);
                 }
             });
@@ -623,14 +622,14 @@ var getAllData = function (payload) {
             var d = ds ? ds.get(col.id) : '';
             row[col.id] = d;
         });
-        row[colPersonId] = p.compoundId;
+        row[personId] = p.compoundId;
         singletonData.data.push(row);
     });
     data.push(singletonData);
     // Add multirow rows
     multirowDatasets.forEach(function (mds) {
         var mdsName = mds.displayName.replace(' ', '_').toLowerCase();
-        var mdsCols = [{ id: colPersonId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString }];
+        var mdsCols = [{ id: personId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString }];
         mds.columns.forEach(function (col) { return mdsCols.push(col); });
         var exportData = { columns: mdsCols, data: [], datasetId: mdsName, dateValueColumn: mds.dateValueColumn, isMultirow: true, maxRows: 1 };
         patientMap.forEach(function (p) {
@@ -647,7 +646,7 @@ var getAllData = function (payload) {
                             rowCount++;
                         }
                     }
-                    row[colPersonId] = p.compoundId;
+                    row[personId] = p.compoundId;
                     exportData.data.push(row);
                 }
             }
@@ -665,7 +664,7 @@ var getMultirowDataCsv = function (payload) {
     var datasetId = payload.datasetId, requestId = payload.requestId;
     var nl = '';
     var rows = [];
-    var cols = [{ id: 'personId', datasetId: datasetId, index: 0, isDisplayed: true, type: typeString }];
+    var cols = [{ id: personId, datasetId: datasetId, index: 0, isDisplayed: true, type: typeString }];
     multirowDatasets.get(datasetId).columns.forEach(function (col) { return cols.push(col); });
     // Add column headers
     rows.push(cols.map(function (col) { return col.id; }).join(','));

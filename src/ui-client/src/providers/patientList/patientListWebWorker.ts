@@ -11,6 +11,7 @@ import { PatientListConfiguration, PatientListSort } from '../../models/patientL
 import { PatientListDataset, PatientListDatasetDefinition, PatientListDatasetId, PatientListDatasetDefinitionTemplate, PatientListDatasetExport } from '../../models/patientList/Dataset';
 import { PatientListRowDTO, Patient, PatientId, PatientListRow, PatientListDetailEncounterRow, EncounterId } from '../../models/patientList/Patient';
 import { workerContext } from './patientListWebWorkerContext';
+import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 
 const ADD_DEMOGRAPHICS = 'ADD_DEMOGRAPHICS';
 const ADD_DATASET = 'ADD_DATASET';
@@ -95,6 +96,8 @@ export default class PatientListWebWorker {
             var typeNum = ${PatientListColumnType.number};
             var typeDate = ${PatientListColumnType.date};
             var typeSparkline = ${PatientListColumnType.sparkline};
+            var personId = ${personId};
+            var encounterId = ${encounterId};
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -473,7 +476,7 @@ export default class PatientListWebWorker {
             // Get all encounter detail rows in an array
             pat.multirowData.forEach((vals: PatientListRowDTO[], key: PatientListDatasetId) => {
                 const ds = multirowDatasets.get(key)!;
-                const cols = Array.from(ds.columns.keys()).filter((v: string) => v !== 'personId' && v !== 'encounterId' && v !== ds.dateValueColumn);
+                const cols = Array.from(ds.columns.keys()).filter((v: string) => v !== personId && v !== encounterId && v !== ds.dateValueColumn);
                 const hasEncounterIdCol = !!vals[0].encounterId;
 
                 for (let i = 0; i < vals.length; i++) {
@@ -804,18 +807,17 @@ export default class PatientListWebWorker {
             const { config, requestId, useDisplayedColumnsOnly } = payload;
             const data: PatientListDatasetExport[] = [];
             const singletonData: PatientListDatasetExport = { columns: [], data: [], datasetId: 'demographics', isMultirow: false, maxRows: 1 };
-            const colPersonId = 'personId';
 
             // Add the personId column
-            singletonData.columns.push(singletonDatasets.get('demographics')!.columns.get(colPersonId)!);
+            singletonData.columns.push(singletonDatasets.get('demographics')!.columns.get(personId)!);
 
             // Use only the columns currently displayed or retrieve all (user selects one option or the other)
             if (useDisplayedColumnsOnly) {
-                singletonData.columns.concat(config!.displayColumns.filter((col: PatientListColumn) => col.type !== typeSparkline && col.id !== colPersonId));
+                singletonData.columns.concat(config!.displayColumns.filter((col: PatientListColumn) => col.type !== typeSparkline && col.id !== personId));
             } else {
                 singletonDatasets.forEach((def: PatientListDatasetDefinition) => {
                     def.columns.forEach((col: PatientListColumn) => {
-                        if (col.type !== typeSparkline && col.id !== colPersonId) {
+                        if (col.type !== typeSparkline && col.id !== personId) {
                             singletonData.columns.push(col);
                         }
                     });
@@ -830,7 +832,7 @@ export default class PatientListWebWorker {
                     const d = ds ? ds.get(col.id) : '';
                     row[col.id] = d;
                 });
-                row[colPersonId] = p.compoundId;
+                row[personId] = p.compoundId;
                 singletonData.data.push(row);
             });
             data.push(singletonData);
@@ -838,7 +840,7 @@ export default class PatientListWebWorker {
             // Add multirow rows
             multirowDatasets.forEach((mds: PatientListDatasetDefinition) => {
                 const mdsName = mds.displayName.replace(' ','_').toLowerCase();
-                const mdsCols: PatientListColumn[] = [ { id: colPersonId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString } ];
+                const mdsCols: PatientListColumn[] = [ { id: personId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString } ];
                 mds.columns.forEach((col: PatientListColumn) => mdsCols.push(col));
                 const exportData: PatientListDatasetExport = { columns: mdsCols, data: [], datasetId: mdsName, dateValueColumn: mds.dateValueColumn, isMultirow: true, maxRows: 1 };
 
@@ -856,7 +858,7 @@ export default class PatientListWebWorker {
                                     rowCount++;
                                 }
                             }
-                            row[colPersonId] = p.compoundId;
+                            row[personId] = p.compoundId;
                             exportData.data.push(row);
                         }
                     }
@@ -876,7 +878,7 @@ export default class PatientListWebWorker {
             const { datasetId, requestId } = payload;
             const nl = '\r\n';
             const rows: string[] =[];
-            const cols: PatientListColumn[] = [ { id: 'personId', datasetId: datasetId!, index: 0, isDisplayed: true, type: typeString } ];
+            const cols: PatientListColumn[] = [ { id: personId, datasetId: datasetId!, index: 0, isDisplayed: true, type: typeString } ];
             multirowDatasets.get(datasetId!)!.columns.forEach((col: PatientListColumn) => cols.push(col));
 
             // Add column headers

@@ -30,7 +30,7 @@ export class DynamicSchemaTable extends React.PureComponent<Props> {
         return (
             <Container>
                 {schema.fields.map((f,i) => (
-                    <DynamicSchemaRow index={i} field={f} inputChangeHandler={this.handleInputChange} />
+                    <DynamicSchemaRow key={f.name} index={i} field={f} inputChangeHandler={this.handleInputChange} />
                 ))}
             </Container>
         )

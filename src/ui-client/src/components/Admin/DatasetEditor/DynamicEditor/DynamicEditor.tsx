@@ -42,13 +42,13 @@ export class DynamicEditor extends React.PureComponent<Props> {
         return (
             <div>
                 <Display {...this.props} />
-                <DynamicDatasetProps {...this.props} />
                 <SqlEditor
                     dataset={dataset}
                     dispatch={dispatch}
                     expectedColumns={expectedColumns}
                     handleInputChange={inputChangeHandler}
                 />
+                <DynamicDatasetProps {...this.props} />
                 <Row>
                     <Col md={6}>
                         <Section header='Identifiers'>
