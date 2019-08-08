@@ -237,7 +237,10 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             if (!constraint.constraintValue) { return 'One or more [Access Restrictions] is missing a User or Group'; }
         }
         if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
-            if (currentDataset.isEncounterBased && !currentDataset.sqlFieldDate) { return '[Has Encounters] is set to "true" but no [Date Column] has been selected'; }
+            if (currentDataset.isEncounterBased) {
+                if (!currentDataset.sqlFieldDate) { return '[Has Encounters] is set to "true" but no [Date Column] has been selected'; }
+                if (!currentDataset.sqlFieldValueString) { return '[Has Encounters] is set to "true" but no [String Value Column] has been selected'; }
+            }
             for (const field of currentDataset.schema!.fields) {
                 if (field.type === PatientListColumnType.DateTime && (!field.mask || !field.phi)) {
                     return `The [${field.name}] column is a DateTime but isn't set to "De-identify". Proceeding may inadvertently reveal Protected Health Information`;

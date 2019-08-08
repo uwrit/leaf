@@ -73,8 +73,8 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
                                 {dataset.isEncounterBased &&
                                 <DynamicPropDropdown
                                     clickHandler={inputChangeHandler} label={'String Value Column'} options={strCols} prop={'sqlFieldValueString'}
-                                    selected={dataset.sqlFieldValueString} sublabel={'Optional string-type column to summarize the earliest and latest row values. If a Numeric Value Column is defined this will be ignored'}
-                                    locked={locked}
+                                    selected={dataset.sqlFieldValueString} sublabel={'String-type column to summarize the earliest and latest row values. If a Numeric Value Column is defined this will be ignored'}
+                                    locked={locked} required={true}
                                 />
                                 }
                             </Row>

@@ -93,7 +93,30 @@ export const setAdminPanelDemographicsDataset = (state: AdminState, action: Admi
 export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { shape: action.shape }) as AdminDatasetQuery;
-    const { expectedColumns, sqlColumns } = getShapeColumns(ds);
+    let sqlColumns = datasets.sqlColumns;
+    let expectedColumns = datasets.expectedColumns;
+
+    if (ds.shape === PatientListDatasetShape.Dynamic) {
+
+        /*
+         * Validate and set dynamic schema.
+         */
+        const dynSchema = getDynamicSchema(ds);
+        sqlColumns = dynSchema.sqlColumns;
+        ds.schema = dynSchema.schema;
+        ds.sqlFieldDate = dynSchema.sqlFieldDate;
+        ds.sqlFieldValueString = dynSchema.sqlFieldValueString;
+        ds.sqlFieldValueNumeric = dynSchema.sqlFieldValueNumeric;
+
+    } else {
+
+        /*
+         * Set and checked templated columns.
+         */
+        const cols = getShapeColumns(ds);
+        expectedColumns = cols.expectedColumns;
+        sqlColumns = cols.sqlColumns;
+    }
 
     return Object.assign({}, state, { 
         datasets: { 
