@@ -96,7 +96,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
         Promise.all(responders.map((nr: NetworkIdentity, i: number) => { 
             return new Promise( async (resolve, reject) => {
                 try {
-                    if ((nr.isHomeNode || dataset.universalId) && dataset.shape !== PatientListDatasetShape.Dynamic) {
+                    if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                         const ds = await fetchDataset(state, nr, queryId, dataset, dates);
                         const newPl = await addDataset(getState, ds, dataset, nr.id);
