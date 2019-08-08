@@ -117,6 +117,7 @@ namespace Tests
              */
             specs.Add(new ConceptSpecialization { Id = Guid.NewGuid(), SpecializationGroupId = 2, SqlSetWhere = "'A' = 'A'" });
             ob = new SubPanelSqlSet(panel, Options);
+            Assert.Contains("WHERE 2 = 2 AND 'A' = 'A'", ob.ToString());
 
             /*
              * Two specializations with a normal WHERE clause
