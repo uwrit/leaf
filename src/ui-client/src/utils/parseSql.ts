@@ -5,9 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM /i;
+const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM\b/i;
 const BRACKETS = /(\[|\])/g;
 const EQUALS = '=';
+const EQUALS_REGEX = /\=/g;
 const EQUALS_SPACED = ' = ';
 const AS = 'AS';
 const COMMA = ',';
@@ -90,7 +91,7 @@ export const getSqlColumns = (input: string) => {
 const removeParens = (input: string): string => {
     const tokens = input
         .trim()
-        .replace(EQUALS, EQUALS_SPACED)
+        .replace(EQUALS_REGEX, EQUALS_SPACED)
         .replace(LEFT_PAREN_REGEX, LEFT_PAREN_SPACED)
         .replace(RIGHT_PAREN_REGEX, RIGHT_PAREN_SPACED)
         .split(SPACE);
