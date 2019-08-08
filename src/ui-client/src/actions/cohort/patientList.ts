@@ -12,8 +12,8 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import { fetchDataset } from '../../services/cohortApi';
 import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '../../services/patientListApi';
 import { DateBoundary } from '../../models/panel/Date';
-import { PatientListColumn } from '../../models/patientList/Column';
-import { PatientListDatasetQuery, PatientListDatasetDefinition } from '../../models/patientList/Dataset';
+import { PatientListColumn, PatientListColumnType } from '../../models/patientList/Column';
+import { PatientListDatasetQuery, PatientListDatasetDefinition, PatientListDatasetShape } from '../../models/patientList/Dataset';
 import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch } from '../../services/datasetSearchApi';
@@ -96,7 +96,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
         Promise.all(responders.map((nr: NetworkIdentity, i: number) => { 
             return new Promise( async (resolve, reject) => {
                 try {
-                    if (nr.isHomeNode || dataset.universalId) {
+                    if ((nr.isHomeNode || dataset.universalId) && dataset.shape !== PatientListDatasetShape.Dynamic) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                         const ds = await fetchDataset(state, nr, queryId, dataset, dates);
                         const newPl = await addDataset(getState, ds, dataset, nr.id);
