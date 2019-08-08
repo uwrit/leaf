@@ -61,7 +61,7 @@ export default class NetworkHealthResponder extends React.PureComponent<Props> {
                             {this.formatPatientCount(r.totalPatients)}
                         </div>
                     </div>
-                    {this.props.allowDisable &&
+                    {/*this.props.allowDisable*/ 1+1===2 &&
                     <div className={`${c}-enabled`}>
                         <div className={`${c}-enabled-text`}>
                             {status}
