@@ -91,13 +91,13 @@ export default class PatientListWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([ ADD_DEMOGRAPHICS, ADD_DATASET, REMOVE_DATASET, CLEAR_PATIENTS, GET_PATIENTS, GET_SINGLETON_CSV, GET_MULTIROW_CSV, GET_ALL_DATA ])}
-            ${workerContext}
             var typeString = ${PatientListColumnType.String};
             var typeNum = ${PatientListColumnType.Numeric};
             var typeDate = ${PatientListColumnType.DateTime};
             var typeSparkline = ${PatientListColumnType.Sparkline};
-            var personId = ${personId};
-            var encounterId = ${encounterId};
+            var personId = '${personId}';
+            var encounterId = '${encounterId}';
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;

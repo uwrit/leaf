@@ -74,13 +74,13 @@ export default class REDCapExportWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([ CREATE_EXPORT_CONFIGURATION ])}
-            ${workerContext}
             var typeString = ${PatientListColumnType.String};
             var typeNum = ${PatientListColumnType.Numeric};
             var typeDate = ${PatientListColumnType.DateTime};
             var typeSparkline = ${PatientListColumnType.Sparkline};
-            var personId = ${personId};
-            var encounterId = ${encounterId};
+            var personId = '${personId}';
+            var encounterId = '${encounterId}';
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
