@@ -66,7 +66,7 @@ namespace Tests
 
             /*
              * No WHERE clause
-             */            
+             */
             pi.Concept.SqlSetWhere = null;
             panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
             var ob = new SubPanelSqlSet(panel, Options);
@@ -89,6 +89,42 @@ namespace Tests
             ob = new SubPanelSqlSet(panel, Options);
 
             Assert.Contains("WHERE 1 = 1 AND Num = 5.0", ob.ToString());
+        }
+
+        [Fact]
+        public void Specialization_Where_Clauses_Added()
+        {
+            var panel = MockPanel.Panel();
+            var pi = MockPanel.EdEnc();
+            var specs = new List<ConceptSpecialization>
+            {
+                new ConceptSpecialization { Id = Guid.NewGuid(), SpecializationGroupId = 1, SqlSetWhere = "2 = 2" }
+            };
+
+            pi.Concept.SqlSetWhere = null;
+            panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
+            pi.Specializations = specs;
+            
+            /*
+             * One specialization
+             */
+            var ob = new SubPanelSqlSet(panel, Options);
+
+            Assert.Contains("WHERE 2 = 2", ob.ToString());
+
+            /*
+             * Two specializations
+             */
+            specs.Add(new ConceptSpecialization { Id = Guid.NewGuid(), SpecializationGroupId = 2, SqlSetWhere = "'A' = 'A'" });
+            ob = new SubPanelSqlSet(panel, Options);
+
+            /*
+             * Two specializations with a normal WHERE clause
+             */
+            pi.Concept.SqlSetWhere = "1 = 1";
+            ob = new SubPanelSqlSet(panel, Options);
+
+            Assert.Contains("WHERE 1 = 1 AND 2 = 2 AND 'A' = 'A'", ob.ToString());
         }
 
         [Fact]

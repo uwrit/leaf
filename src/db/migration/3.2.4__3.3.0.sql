@@ -2,12 +2,54 @@
 /*
  * Update version.
  */
-IF EXISTS (SELECT 1 FROM ref.Version)
+IF EXISTS (SELECT 1 FROM [ref].[Version])
     UPDATE ref.Version
     SET [Version] = '3.3.0'
 ELSE 
     INSERT INTO ref.[Version] (Lock, Version)
     SELECT 'X', '3.3.0'
+
+/*
+ * Dynamic Shape.
+ */
+IF NOT EXISTS (SELECT 1 FROM [ref].[Shape] WHERE [Id] = -1)
+	INSERT [ref].[Shape] ([Id], [Variant], [Schema]) VALUES (-1, N'Dynamic', N'{"fields":[]}')
+GO
+
+/*
+ * [app].[DynamicDatasetQuery].
+ */
+IF OBJECT_ID('app.DynamicDatasetQuery') IS NOT NULL
+	DROP TABLE [app].[DynamicDatasetQuery];
+GO
+
+/****** Object:  Table [app].[DynamicDatasetQuery]    Script Date: 8/8/2019 9:47:38 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE TABLE [app].[DynamicDatasetQuery](
+	[Id] [uniqueidentifier] NOT NULL,
+	[SqlFieldDate] [nvarchar](1000) NULL,
+	[SqlFieldValueString] [nvarchar](1000) NULL,
+	[SqlFieldValueNumeric] [nvarchar](1000) NULL,
+	[Schema] [nvarchar](max) NOT NULL,
+	[IsEncounterBased] [bit] NOT NULL,
+ CONSTRAINT [PK__DynamicDatasetQuery] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE [app].[DynamicDatasetQuery]  WITH CHECK ADD  CONSTRAINT [FK_DynamicDatasetQuery_Id] FOREIGN KEY([Id])
+REFERENCES [app].[DatasetQuery] ([Id])
+GO
+
+ALTER TABLE [app].[DynamicDatasetQuery] CHECK CONSTRAINT [FK_DynamicDatasetQuery_Id]
+GO
 
 /*
  * [adm].[sp_CreateDynamicDatasetQuery].
