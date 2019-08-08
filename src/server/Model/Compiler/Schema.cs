@@ -83,7 +83,7 @@ namespace Model.Compiler
             switch (context.Shape)
             {
                 case Shape.Dynamic:
-                    return new DynamicValidationSchema((context.DatasetQuery as DynamicDatasetQuery).Schema.Fields.Select(f => f.ToSchemaField()));
+                    return new DynamicValidationSchema(context);
                 case Shape.Observation:
                     return ObservationValidationSchema.Schema;
                 case Shape.Encounter:
@@ -110,8 +110,10 @@ namespace Model.Compiler
 
     public class DynamicValidationSchema : ValidationSchema
     {
-        public DynamicValidationSchema(IEnumerable<SchemaFieldSelector> fields)
+        public DynamicValidationSchema(ShapedDatasetExecutionContext context)
         {
+            var schema = (context.DatasetQuery as DynamicDatasetQuery).Schema;
+            var fields = schema.Fields.Select(f => f.ToSchemaField());
             Shape = Shape.Dynamic;
             Fields = fields.ToArray();
         }

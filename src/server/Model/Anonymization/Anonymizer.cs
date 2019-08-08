@@ -67,7 +67,7 @@ namespace Model.Anonymization
         {
             if (!TypeMap.TryGetValue(prop.PropertyType, out var actor))
             {
-                throw new ArgumentException($"No actor implemented for type {prop.PropertyType.ToString()}");
+                throw new ArgumentException($"No anonymization actor implemented for type {prop.PropertyType.ToString()}");
             }
             actor(record, prop, record.Salt, Pepper);
         }

@@ -28,6 +28,11 @@ namespace Model.Anonymization
             {
                 var pair = record.GetKeyValuePair(field.Name);
 
+                if (field.Phi && !field.Mask)
+                {
+                    throw new LeafDynamicAnonymizerException(field.Name, $"Phi fields must be maskable.");
+                }
+
                 if (pair.Value == null || pair.Value == DBNull.Value || !field.Mask)
                 {
                     continue;
@@ -43,14 +48,9 @@ namespace Model.Anonymization
 
             if (!TypeMap.TryGetValue(type, out var actor))
             {
-                throw new ArgumentException($"No actor implemented for type {type.ToString()}");
+                throw new ArgumentException($"No anonymization actor implemented for type {type.ToString()}");
             }
             actor(record, pair, record.Salt, Pepper);
-        }
-
-        object GetDefault(Type type)
-        {
-            return type.IsValueType ? Activator.CreateInstance(type) : null;
         }
 
         protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
@@ -93,5 +93,17 @@ namespace Model.Anonymization
                 record.SetValue(pair.Key, val.Value.AddHours(shift));
             }
         };
+    }
+
+    public class LeafDynamicAnonymizerException : Exception
+    {
+        readonly string _propertyName;
+        readonly string _message;
+        public override string Message => $"{_message ?? ""} Property: {_propertyName}";
+        public LeafDynamicAnonymizerException(string propertyName, string message)
+        {
+            _propertyName = propertyName;
+            _message = message;
+        }
     }
 }
