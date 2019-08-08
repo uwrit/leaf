@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -47,20 +47,44 @@ BEGIN
         app.Query
     WHERE Id = @queryid;
 
-    -- get datasetquery
-    SELECT
-        dq.Id,
-        dq.UniversalId,
-        dq.Shape,
-        dq.Name,
-        dq.SqlStatement
-    FROM
-        app.DatasetQuery dq
-    LEFT JOIN
-        app.DatasetQueryCategory dqc on dq.CategoryId = dqc.Id
-    WHERE
-        dq.Id = @datasetid;
+	-- dynamic
+	IF EXISTS (SELECT 1 FROM app.DynamicDatasetQuery ddq WHERE ddq.Id = @datasetid)
+		BEGIN
+			SELECT
+				ddq.Id,
+				dq.[Name],
+				dq.SqlStatement,
+				ddq.IsEncounterBased,
+				ddq.[Schema],
+				ddq.SqlFieldDate,
+				ddq.SqlFieldValueString,
+				ddq.SqlFieldValueNumeric,
+				dq.Shape
+			FROM
+				app.DynamicDatasetQuery ddq
+			JOIN app.DatasetQuery dq ON ddq.Id = dq.Id
+			LEFT JOIN
+				app.DatasetQueryCategory dqc ON dq.CategoryId = dqc.Id
+			WHERE
+				ddq.Id = @datasetid;
+		END
+
+	-- else shaped
+	ELSE
+		BEGIN
+			SELECT
+				dq.Id,
+				dq.UniversalId,
+				dq.Shape,
+				dq.Name,
+				dq.SqlStatement
+			FROM
+				app.DatasetQuery dq
+			LEFT JOIN
+				app.DatasetQueryCategory dqc ON dq.CategoryId = dqc.Id
+			WHERE
+				dq.Id = @datasetid;
+		END
 
 END
-
 GO

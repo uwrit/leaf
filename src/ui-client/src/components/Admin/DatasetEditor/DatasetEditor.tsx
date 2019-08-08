@@ -380,7 +380,6 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             const ds: PatientListDatasetQuery = {
                 ...userDs,
                 ...currentDataset!,
-                isEncounterBased: false,
                 category: hadCategory
                     ? data.datasetQueryCategories.categories.get(currentDataset!.categoryId!)!.category
                     : ''
@@ -469,7 +468,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         };
         const newUserDs: PatientListDatasetQuery = {
             id,
-            isEncounterBased: false,
+            isEncounterBased: true,
             category: '',
             name,
             shape,

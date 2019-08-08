@@ -5,15 +5,16 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/6/5
--- Description: Create a datasetquery.
+-- Description: Create a dataset query.
 -- =======================================
 CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
     @uid app.UniversalId,
@@ -44,8 +45,8 @@ BEGIN
     BEGIN TRAN;
     BEGIN TRY
 
-        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE @uid = UniversalId OR @name = Name)
-            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE @uid = UniversalId)
+            THROW 70409, N'DatasetQuery already exists with universal id.', 1;
 
         DECLARE @ins TABLE (
             Id uniqueidentifier,
@@ -88,6 +89,7 @@ BEGIN
             CategoryId,
             [Description],
             SqlStatement,
+			IsEncounterBased = CAST(1 AS BIT),
             Created,
             CreatedBy,
             Updated,
@@ -112,5 +114,4 @@ BEGIN
     END CATCH;
 
 END
-
 GO

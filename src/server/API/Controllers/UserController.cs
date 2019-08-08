@@ -141,24 +141,6 @@ namespace API.Controllers
             }
         }
 
-
-        [AllowAnonymous]
-        [HttpGet("login/config")]
-        public ActionResult<LoginConfigDTO> LoginConfig()
-        {
-            var config = new LoginConfigDTO
-            {
-                Mechanism = authenticationOptions.Mechanism,
-                InactivityTimeoutMinutes = authenticationOptions.InactiveTimeoutMinutes,
-                CacheLimit = cohortOptions.RowLimit,
-                ExportLimit = cohortOptions.ExportLimit,
-                LogoutUri = authenticationOptions.LogoutURI.ToString(),
-                Version = versionOptions.Version.ToString(),
-                ClientOptions = clientOptions
-            };
-            return Ok(config);
-        }
-
         [Authorize(Policy = TokenType.Id)]
         [Authorize(Policy = Access.Institutional)]
         [HttpPost("logout")]

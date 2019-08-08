@@ -64,6 +64,7 @@ class PatientList extends React.PureComponent<Props, State> {
         const c = this.className;
         const classes = [ `${c}-container`, 'scrollable-offset-by-header' ];
         const datasetDefs: PatientListDatasetDefinition[] = [ ...patientList.configuration.singletonDatasets.values() ];
+        const { cacheLimit, exportLimit } = auth.config!.cohort;
         
         /*
          * Calculate the number of patients and rows displayed.
@@ -79,8 +80,8 @@ class PatientList extends React.PureComponent<Props, State> {
         /*
          * If too many patients for caching, let user know.
          */
-        if (cohort.networkCohorts.size === 1 && cohort.count.value > auth.config!.cacheLimit) {
-            return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
+        if (cohort.networkCohorts.size === 1 && cohort.count.value > cacheLimit) {
+            return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
         /*
          * Show a loading spinner if no responders have completed yet.
@@ -132,7 +133,7 @@ class PatientList extends React.PureComponent<Props, State> {
                             }
                         </div>
                         <RowCount 
-                            exportLimit={auth.config!.exportLimit}
+                            exportLimit={exportLimit}
                             isIdentified={isIdentified}
                             isFederated={totalResponders > 1}
                             totalCohortPatients={cohort.count.value} 

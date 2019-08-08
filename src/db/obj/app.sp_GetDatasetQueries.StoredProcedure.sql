@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDatasetQueries]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetDatasetQueries]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -23,7 +23,7 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    declare @ids table (
+    DECLARE @ids TABLE (
         Id UNIQUEIDENTIFIER NOT NULL
     );
 
@@ -31,57 +31,62 @@ BEGIN
     BEGIN;
         -- user is an admin, load them all
         INSERT INTO @ids
-        SELECT Id
-        FROM app.DatasetQuery;
+        SELECT dq.Id
+        FROM app.DatasetQuery dq
     END;
     ELSE
     BEGIN;
         -- user is not an admin, assess their privilege
-        insert into @ids (Id)
-        select distinct
+        INSERT INTO @ids (Id)
+        SELECT
             dq.Id
-        from app.DatasetQuery dq
-        where exists (
-            select 1
-            from auth.DatasetQueryConstraint
-            where DatasetQueryId = dq.Id and
-            ConstraintId = 1 and
+        FROM app.DatasetQuery dq
+        WHERE EXISTS (
+            SELECT 1
+            FROM auth.DatasetQueryConstraint
+            WHERE DatasetQueryId = dq.Id AND
+            ConstraintId = 1 AND
             ConstraintValue = @user
         )
-        or exists (
-            select 1
-            from auth.DatasetQueryConstraint
-            where DatasetQueryId = dq.Id and
-            ConstraintId = 2 and
-            ConstraintValue in (select [Group] from @groups)
+        OR EXISTS (
+            SELECT 1
+            FROM auth.DatasetQueryConstraint
+            WHERE DatasetQueryId = dq.Id AND
+            ConstraintId = 2 AND
+            ConstraintValue in (SELECT [Group] FROM @groups)
         )
-        or not exists (
-            select 1
-            from auth.DatasetQueryConstraint
-            where DatasetQueryId = dq.Id
+        OR NOT EXISTS (
+            SELECT 1
+            FROM auth.DatasetQueryConstraint
+            WHERE DatasetQueryId = dq.Id
         );
     END;
 
     -- produce the hydrated records
-    select
+    SELECT
         i.Id,
         dq.UniversalId,
         dq.Shape,
-        dq.Name,
+        dq.[Name],
         dqc.Category,
         dq.[Description],
-        dq.SqlStatement
-    from @ids i
-    join app.DatasetQuery dq on i.Id = dq.Id
-    left join app.DatasetQueryCategory dqc on dq.CategoryId = dqc.Id;
+        dq.SqlStatement,
+		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
+		ddq.[Schema],
+		ddq.SqlFieldDate,
+		ddq.SqlFieldValueString,
+		ddq.SqlFieldValueNumeric
+    FROM @ids i
+    JOIN app.DatasetQuery dq ON i.Id = dq.Id
+	LEFT JOIN app.DynamicDatasetQuery ddq ON dq.Id = ddq.Id
+    LEFT JOIN app.DatasetQueryCategory dqc ON dq.CategoryId = dqc.Id
 
     -- produce the tags for each record
-    select
+    SELECT
         i.Id,
         Tag
-    from @ids i
-    join app.DatasetQueryTag t on i.Id = t.DatasetQueryId
+    FROM @ids i
+    JOIN app.DatasetQueryTag t on i.Id = t.DatasetQueryId
 
 END
-
 GO

@@ -83,6 +83,13 @@
     filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, 0.1) );
 }
 
+.attestation-leaf-version {
+    bottom: 0;
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+    position: absolute;
+}
+
 .attestation-iths-logo {
     height: 56px;
     transform: scale(0.8);
@@ -102,6 +109,7 @@
     margin-left: -4px;
     margin-right: 10px;
     margin-top: 6px;
+    position: relative;
     vertical-align: middle;
 }
 

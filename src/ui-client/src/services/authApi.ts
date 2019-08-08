@@ -7,13 +7,13 @@
 
 import Axios from 'axios';
 import jwt_decode from 'jwt-decode';
-import { AuthConfig, DecodedIdToken, IdTokenDTO, UserContext } from '../models/Auth';
+import { AppConfig, DecodedIdToken, IdTokenDTO, UserContext } from '../models/Auth';
 
 /*
  * Return the id token key to look for
  * to retrieve a user token.
  */
-const getIdTokenKey = (config: AuthConfig) => {
+const getIdTokenKey = (config: AppConfig) => {
     return `__leaf_idToken_v${config.version}__`;
 };
 
@@ -55,9 +55,9 @@ const decodeToken = (token: string): UserContext => {
 };
 
 /*
- * Delee the current IdToken from LocalStorage.
+ * Delete the current IdToken from LocalStorage.
  */
-export const clearCurrentUserToken = (config: AuthConfig) => {
+export const clearCurrentUserToken = (config: AppConfig) => {
     const idTokenKey = getIdTokenKey(config);
     window.localStorage.removeItem(idTokenKey);
 };
@@ -66,7 +66,7 @@ export const clearCurrentUserToken = (config: AuthConfig) => {
  * Return the id token key to look for
  * to retrieve a user token.
  */
-export const getUserTokenAndContext = async (config: AuthConfig): Promise<UserContext> => {
+export const getUserTokenAndContext = async (config: AppConfig): Promise<UserContext> => {
     return new Promise( async (resolve, reject) => {
         const idTokenKey = getIdTokenKey(config);
         let token;
@@ -103,8 +103,8 @@ export const getUserTokenAndContext = async (config: AuthConfig): Promise<UserCo
  * Return the configuration for this Leaf instance.
  */
 export const getAuthConfig = async () => {
-    const request = await Axios.get('/api/user/login/config');
-    const config = request.data as AuthConfig;
+    const request = await Axios.get('/api/config');
+    const config = request.data as AppConfig;
     return config;
 };
 

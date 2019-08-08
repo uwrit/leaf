@@ -12,7 +12,7 @@ import {
     RECEIVE_ID_TOKEN
 } from '../actions/auth';
 import { AuthorizationState } from '../models/state/AppState';
-import { AuthConfig, UserContext } from '../models/Auth';
+import { AppConfig, UserContext } from '../models/Auth';
 
 export function defaultAuthorizationState(): AuthorizationState {
     return { };
@@ -25,7 +25,7 @@ const setIdTokenAndDates = (state: AuthorizationState, context: UserContext) => 
     })
 }
 
-const setAuthConfig = (state: AuthorizationState, config: AuthConfig) => {
+const setAuthConfig = (state: AuthorizationState, config: AppConfig) => {
     return Object.assign({}, state, {
         config
     })

@@ -20,6 +20,7 @@ import { setBrowser } from '../../actions/generalUi';
 import { Browser } from '../../models/state/GeneralUiState';
 import BrowserError from '../../components/Attestation/BrowserError';
 import moment from 'moment';
+import { version } from '../../../package.json'
 import './Attestation.css';
 
 interface DispatchProps {
@@ -99,7 +100,10 @@ class Attestation extends React.PureComponent<Props, State> {
                 <ModalHeader className={`${c}-header`}>
                     <div className={`${c}-leaf-logo-wrapper`}>
                         <img className={`${c}-leaf-logo`} src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
-                        <div className={`${c}-title`}>leaf</div>
+                        <div className={`${c}-title`}>
+                            leaf
+                            <span className={`${c}-leaf-version`}>v{version}</span>
+                        </div>
                     </div>
                     <div className={`${c}-iths-logo-wrapper`}>
                         <img className={`${c}-iths-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/iths.png'} />

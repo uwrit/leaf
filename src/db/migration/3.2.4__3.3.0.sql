@@ -652,7 +652,8 @@ BEGIN
             Created datetime not null,
             CreatedBy nvarchar(1000) not null,
             Updated datetime not null,
-            UpdatedBy nvarchar(1000) not null
+            UpdatedBy nvarchar(1000) not null,
+			[IsEncounterBased] bit null
         );
 
         UPDATE app.DatasetQuery
@@ -676,7 +677,8 @@ BEGIN
             inserted.Created,
             inserted.CreatedBy,
             inserted.Updated,
-            inserted.UpdatedBy
+            inserted.UpdatedBy,
+            CAST(1 AS BIT)
 		INTO @ins
         WHERE Id = @id;
 
