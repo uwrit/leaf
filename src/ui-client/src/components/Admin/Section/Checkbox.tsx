@@ -6,14 +6,14 @@
  */ 
 
 import React from 'react';
-import { Col, Row } from 'reactstrap';
+import { Col, Row, FormText } from 'reactstrap';
 import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
 import { PropertyProps as Props } from '../ConceptEditor/Props';
 
 export class Checkbox extends React.PureComponent<Props> {
     private className = "admin-panel"
     public render() {
-        const { label, value } = this.props;
+        const { label, subLabel, value } = this.props;
         const c = this.className;
         let val = value || false;
 
@@ -22,7 +22,12 @@ export class Checkbox extends React.PureComponent<Props> {
                 {!!label && 
                 [(
                     <Col md={10} key={1}>
-                        <div className={`${c}-checkbox-text`}>{label}</div>
+                        <div className={`${c}-checkbox-text`}>
+                            {label}
+                            {subLabel &&
+                                <FormText color="muted">{subLabel}</FormText>
+                            }
+                        </div>
                     </Col>),(
                     <Col md={2} key={2}>
                         <CheckboxSlider checked={val} onClick={this.handleChange} />

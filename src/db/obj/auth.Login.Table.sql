@@ -5,27 +5,31 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [auth].[Login]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  Table [auth].[Login]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 CREATE TABLE [auth].[Login](
-	[Id] [int] IDENTITY(1,1) NOT NULL,
-	[Username] [nvarchar](50) NOT NULL,
-	[Salt] [varbinary](16) NOT NULL,
-	[Hash] [varbinary](8000) NOT NULL,
- CONSTRAINT [PK_Login] PRIMARY KEY CLUSTERED 
+	[Id] [uniqueidentifier] NOT NULL,
+	[ScopedIdentity] [nvarchar](500) NOT NULL,
+	[FullIdentity] [nvarchar](1000) NOT NULL,
+	[Claims] [nvarchar](max) NOT NULL,
+	[Created] [datetime] NOT NULL,
+	[Updated] [datetime] NOT NULL,
+ CONSTRAINT [PK_Login_Id] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_Login]    Script Date: 7/5/19 11:48:10 AM ******/
-CREATE UNIQUE NONCLUSTERED INDEX [IX_Login] ON [auth].[Login]
+/****** Object:  Index [IX_Login_ScopedIdentity]    Script Date: 8/8/2019 3:56:27 PM ******/
+CREATE NONCLUSTERED INDEX [IX_Login_ScopedIdentity] ON [auth].[Login]
 (
-	[Username] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+	[ScopedIdentity] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
+ALTER TABLE [auth].[Login] ADD  CONSTRAINT [DF_Login_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO

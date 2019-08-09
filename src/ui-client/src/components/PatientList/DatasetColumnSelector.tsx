@@ -36,6 +36,7 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
         const { className, data } = this.props;
         const c = className ? className : 'patientlist';
         const cs = `${c}-column-selector`;
+        const isDemographics = data.id === 'demographics';
         const cols: PatientListColumn[] = [];
         data.columns.forEach((col: PatientListColumn) => cols.push(col));
 
@@ -47,9 +48,14 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
                         parentDomRect={this.state.DOMRect!} 
                         toggle={this.handleColumnBoxClickedOutside}>
                         <div className={`${cs}-container`}>
-                            {!!data.summaryType &&
+                            {!isDemographics &&
                             <div className={`${cs}-remove`}>
                                 <span onClick={this.handleRemoveDatasetClick}>Remove</span>
+                            </div>
+                            }
+                            {!data.summaryType && !isDemographics &&
+                            <div className={`${cs}-datefilter`}>
+                                <span className={`${cs}-datefilter-value`}>{data.displayName}</span>
                             </div>
                             }
                             {data.dateBounds &&

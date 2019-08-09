@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -51,8 +51,23 @@ BEGIN
         IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
             THROW 70404, N'DatasetQuery not found.', 1;
 
-        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId OR @name = Name))
-            THROW 70409, N'DatasetQuery already exists with universal id or name value.', 1;
+        IF EXISTS (SELECT 1 FROM app.DatasetQuery WHERE Id != @id AND (@uid = UniversalId))
+            THROW 70409, N'DatasetQuery already exists with universal id.', 1;
+
+		DECLARE @ins TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null,
+			[IsEncounterBased] bit null
+        );
 
         UPDATE app.DatasetQuery
         SET
@@ -64,7 +79,7 @@ BEGIN
             SqlStatement = @sql,
             Updated = GETDATE(),
             UpdatedBy = @user
-        OUTPUT
+		OUTPUT
             inserted.Id,
             inserted.UniversalId,
             inserted.Shape,
@@ -75,8 +90,15 @@ BEGIN
             inserted.Created,
             inserted.CreatedBy,
             inserted.Updated,
-            inserted.UpdatedBy
+            inserted.UpdatedBy,
+			CAST(1 AS BIT)
+		INTO @ins
         WHERE Id = @id;
+
+		DELETE app.DynamicDatasetQuery
+		WHERE Id = @id
+
+		SELECT * FROM @ins
 
         DELETE FROM app.DatasetQueryTag
         WHERE DatasetQueryId = @id;
@@ -102,5 +124,4 @@ BEGIN
     END CATCH;
 
 END
-
 GO

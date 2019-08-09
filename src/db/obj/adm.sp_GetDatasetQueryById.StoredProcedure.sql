@@ -5,11 +5,12 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetDatasetQueryById]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetDatasetQueryById]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/6/4
@@ -21,21 +22,28 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-    -- Get query definition.
-    SELECT
-        dq.Id,
-        dq.UniversalId,
-        dq.Shape,
-        dq.Name,
-        dq.CategoryId,
-        dq.[Description],
-        dq.SqlStatement,
-        dq.Created,
-        dq.CreatedBy,
-        dq.Updated,
-        dq.UpdatedBy
-    FROM app.DatasetQuery dq
-    WHERE dq.Id = @id;
+	-- Get dataset
+	SELECT
+		dq.Id,
+		dq.UniversalId,
+		dq.Shape,
+		dq.Name,
+		dq.CategoryId,
+		dq.[Description],
+		dq.SqlStatement,
+		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
+		ddq.[Schema],
+		ddq.SqlFieldDate,
+		ddq.SqlFieldValueString,
+		ddq.SqlFieldValueNumeric,
+		dq.Created,
+		dq.CreatedBy,
+		dq.Updated,
+		dq.UpdatedBy
+	FROM app.DatasetQuery dq
+		 LEFT JOIN app.DynamicDatasetQuery ddq
+			ON dq.Id = ddq.Id
+	WHERE dq.Id = @id
 
     -- Get tags
     SELECT
@@ -53,4 +61,9 @@ BEGIN
     WHERE DatasetQueryId = @id;
 END
 
+/*
+ * Drop previous unused login-related stored procedures.
+ */
+IF OBJECT_ID('auth.sp_CreateLogin') IS NOT NULL
+    DROP PROCEDURE auth.sp_CreateLogin;
 GO

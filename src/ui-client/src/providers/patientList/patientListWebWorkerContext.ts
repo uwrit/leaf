@@ -77,7 +77,9 @@ var addPatientRows = function (payload) {
         // Add the multirow data. This returns a new Dataset Definition
         // for the summary statistics.
         addDatasetDefinition(dataset.definition);
-        result = addMultiRowDataset(payload);
+        result = dataset.definition.multirow
+            ? addMultiRowDataset(payload)
+            : addSingletonDataset(payload);
         addDatasetDefinition(result);
     }
     return { requestId: requestId, result: result };
@@ -92,6 +94,39 @@ var addDatasetDefinition = function (def) {
     }
 };
 /*
+ * Add singleton dataset data to the cache.
+ */
+var addSingletonDataset = function (payload) {
+    var dataset = payload.dataset, responderId = payload.responderId;
+    var def = dataset.definition;
+    var data = dataset.data.results;
+    var dateFields = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
+    var uniquePatients = Object.keys(data);
+    var uniqueCompoundPatients = [];
+    // For each row
+    for (var i = 0; i < uniquePatients.length; i++) {
+        var p = uniquePatients[i];
+        var row = data[p][0];
+        var compoundId = responderId + "_" + p;
+        var pat = patientMap.get(compoundId);
+        if (!pat) {
+            continue;
+        }
+        var patientData = pat.singletonData;
+        uniqueCompoundPatients.push(compoundId);
+        // Convert strings to dates
+        for (var k = 0; k < dateFields.length; k++) {
+            var f = dateFields[k].id;
+            var v = row[f];
+            if (v) {
+                row[f] = new Date(v);
+            }
+        }
+        patientData.set(def.id, new Map(Object.entries(row)));
+    }
+    return def;
+};
+/*
  * Add multirow dataset data to the cache.
  */
 var addMultiRowDataset = function (payload) {
@@ -99,23 +134,19 @@ var addMultiRowDataset = function (payload) {
     var def = dataset.definition;
     var dsId = def.id;
     var data = dataset.data.results;
-    var dateFields = [];
+    var dateFields = [ ...def.columns.values() ].filter((c) => c.type === typeDate);
     var uniquePatients = Object.keys(data);
     var uniqueCompoundPatients = [];
     var rowCount = 0;
-    def.columns.forEach(function (c) {
-        if (c.type === typeDate) {
-            dateFields.push(c);
-        }
-    });
     // For each row
     for (var i = 0; i < uniquePatients.length; i++) {
         var p = uniquePatients[i];
         var rows = data[p];
         var compoundId = responderId + "_" + p;
         var pat = patientMap.get(compoundId);
-        if (!pat) { continue; }
-
+        if (!pat) {
+            continue;
+        }
         var patientData = pat.multirowData;
         uniqueCompoundPatients.push(compoundId);
         // Convert strings to dates
@@ -144,7 +175,7 @@ var addMultiRowDataset = function (payload) {
         }
     }
     // Rows are added to the patient map, now compute stats for each patient
-    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.indexOf(def.numericValueColumn) > -1
+    var derivedDef = def.numericValueColumn && dataset.data.schema.fields.findIndex(function (f) { return f.name === def.numericValueColumn; }) > -1
         ? deriveNumericSummaryFromDataset(def, uniqueCompoundPatients)
         : deriveNonNumericSummaryFromDataset(def, uniqueCompoundPatients);
     derivedDef.totalRows = rowCount;
@@ -265,7 +296,7 @@ var setDetailRows = function (patId) {
     // Get all encounter detail rows in an array
     pat.multirowData.forEach(function (vals, key) {
         var ds = multirowDatasets.get(key);
-        var cols = Array.from(ds.columns.keys()).filter(function (v) { return v !== 'personId' && v !== 'encounterId' && v !== ds.dateValueColumn; });
+        var cols = Array.from(ds.columns.keys()).filter(function (v) { return v !== personId && v !== encounterId && v !== ds.dateValueColumn; });
         var hasEncounterIdCol = !!vals[0].encounterId;
         var _loop_2 = function (i) {
             var val = vals[i];
@@ -463,9 +494,10 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
             var max = numVals[numVals.length - 1].y;
             var mean = +(((numVals.reduce(function (a, b) { return a + b.y; }, 0)) / numVals.length).toFixed(1));
             var half = Math.floor(numVals.length / 2);
-            var median = numVals.length % 2
+            var median = (numVals.length % 2
                 ? numVals[half].y
-                : (numVals[half - 1].y + numVals[half].y) / 2.0;
+                : (numVals[half - 1].y + numVals[half].y) / 2.0
+            ).toFixed(1);
             ds.set(cols.lookup.min, min);
             ds.set(cols.lookup.max, max);
             ds.set(cols.lookup.mean, mean);
@@ -557,9 +589,7 @@ var deriveNonNumericSummaryFromDataset = function (def, ids) {
  * Convert tuple objects to csv-friendly strings.
  */
 var valueToCsvString = function (d) {
-    return !d 
-        ? '' : d instanceof Date 
-        ? d.toLocaleString().replace(',', '') : '';
+    return d;
 };
 /*
  * Pulls all cache data for all datasets into a
@@ -569,17 +599,16 @@ var getAllData = function (payload) {
     var config = payload.config, requestId = payload.requestId, useDisplayedColumnsOnly = payload.useDisplayedColumnsOnly;
     var data = [];
     var singletonData = { columns: [], data: [], datasetId: 'demographics', isMultirow: false, maxRows: 1 };
-    var colPersonId = 'personId';
     // Add the personId column
-    singletonData.columns.push(singletonDatasets.get('demographics').columns.get(colPersonId));
+    singletonData.columns.push(singletonDatasets.get('demographics').columns.get(personId));
     // Use only the columns currently displayed or retrieve all (user selects one option or the other)
     if (useDisplayedColumnsOnly) {
-        singletonData.columns.concat(config.displayColumns.filter(function (col) { return col.type !== typeSparkline && col.id !== colPersonId; }));
+        singletonData.columns.concat(config.displayColumns.filter(function (col) { return col.type !== typeSparkline && col.id !== personId; }));
     }
     else {
         singletonDatasets.forEach(function (def) {
             def.columns.forEach(function (col) {
-                if (col.type !== typeSparkline && col.id !== colPersonId) {
+                if (col.type !== typeSparkline && col.id !== personId) {
                     singletonData.columns.push(col);
                 }
             });
@@ -593,14 +622,14 @@ var getAllData = function (payload) {
             var d = ds ? ds.get(col.id) : '';
             row[col.id] = d;
         });
-        row[colPersonId] = p.compoundId;
+        row[personId] = p.compoundId;
         singletonData.data.push(row);
     });
     data.push(singletonData);
     // Add multirow rows
     multirowDatasets.forEach(function (mds) {
         var mdsName = mds.displayName.replace(' ', '_').toLowerCase();
-        var mdsCols = [{ id: colPersonId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString }];
+        var mdsCols = [{ id: personId, datasetId: mdsName, index: 0, isDisplayed: true, type: typeString }];
         mds.columns.forEach(function (col) { return mdsCols.push(col); });
         var exportData = { columns: mdsCols, data: [], datasetId: mdsName, dateValueColumn: mds.dateValueColumn, isMultirow: true, maxRows: 1 };
         patientMap.forEach(function (p) {
@@ -617,7 +646,7 @@ var getAllData = function (payload) {
                             rowCount++;
                         }
                     }
-                    row[colPersonId] = p.compoundId;
+                    row[personId] = p.compoundId;
                     exportData.data.push(row);
                 }
             }
@@ -635,7 +664,7 @@ var getMultirowDataCsv = function (payload) {
     var datasetId = payload.datasetId, requestId = payload.requestId;
     var nl = '';
     var rows = [];
-    var cols = [{ id: 'personId', datasetId: datasetId, index: 0, isDisplayed: true, type: typeString }];
+    var cols = [{ id: personId, datasetId: datasetId, index: 0, isDisplayed: true, type: typeString }];
     multirowDatasets.get(datasetId).columns.forEach(function (col) { return cols.push(col); });
     // Add column headers
     rows.push(cols.map(function (col) { return col.id; }).join(','));
@@ -648,7 +677,7 @@ var getMultirowDataCsv = function (payload) {
                 var vals = ds[i];
                 for (var j = 0; j < cols.length; j++) {
                     var d = vals[cols[j].id];
-                    row.push("" + valueToCsvString(d) + "");
+                    row.push(valueToCsvString(d));
                 }
                 rows.push(row.join(','));
             }
@@ -687,14 +716,13 @@ var getSingletonDataCsv = function (payload) {
         cols.forEach(function (col) {
             var ds = p.singletonData.get(col.datasetId);
             var d = ds ? ds.get(col.id) : undefined;
-            row.push("" + valueToCsvString(d) + "");
+            row.push(valueToCsvString(d));
         });
         rows.push(row.join(','));
     });
     return { requestId: requestId, result: rows.join(nl) };
 };
-
-var capitalize = (colName) => {
+var capitalize = function (colName) {
     return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
 };
 `;

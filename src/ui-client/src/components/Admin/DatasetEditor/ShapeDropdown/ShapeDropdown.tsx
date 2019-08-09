@@ -42,7 +42,7 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
             <FormGroup>
                 <Label>
                     Dataset Template
-                    <FormText color="muted">FHIR Resource Shape</FormText>
+                    <FormText color="muted">Dynamic or FHIR Resource Shape</FormText>
                 </Label>
                 <div className={`admin-panel-dropdown`} tabIndex={0}>
                     <BSDropdown isOpen={isOpen} toggle={this.toggle} className={c}>
@@ -55,23 +55,31 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                         <DropdownMenu>
                             <div className={`admin-panel-dropdown-item-container`}>
 
-                                {/* No dynamic datasets yet
+                                <p className={`admin-panel-subtext`}>
+                                    Dynamic datasets allow you to flexibly return a custom SQL query with columns you configure. They cannot be used as federated queries.
+                                </p>
+
+                                {/* Dynamic */}
                                 <DropdownItem 
                                     onClick={clickHandler.bind(null,PatientListDatasetShape.Dynamic)}>
                                     {PatientListDatasetShape[PatientListDatasetShape.Dynamic]}
                                 </DropdownItem>
                                 <DropdownItem divider={true} />
-                                */}
+
+                                <p className={`admin-panel-subtext`}>
+                                    FHIR-based template datasets require your SQL query to return a specific set of columns.
+                                </p>
                                 
-                            {shapes.map((s) => {
-                                return (
-                                    <DropdownItem 
-                                        key={s}
-                                        onClick={clickHandler.bind(null,s)}>
-                                        {PatientListDatasetShape[s]}
-                                    </DropdownItem>
-                                );
-                            })}
+                                {/* FHIR Template shapes */}
+                                {shapes.map((s) => {
+                                    return (
+                                        <DropdownItem 
+                                            key={s}
+                                            onClick={clickHandler.bind(null,s)}>
+                                            {PatientListDatasetShape[s]}
+                                        </DropdownItem>
+                                    );
+                                })}
                             </div>
                         </DropdownMenu>
                     </BSDropdown>

@@ -12,6 +12,7 @@ namespace Model.Admin.Compiler
 {
     public class AdminDatasetQuery : IConstrainedResource
     {
+        // Standard fields
         public Guid Id { get; set; }
         public DatasetQueryUrn UniversalId { get; set; }
         public Shape Shape { get; set; }
@@ -19,13 +20,21 @@ namespace Model.Admin.Compiler
         public int? CategoryId { get; set; }
         public string Description { get; set; }
         public string SqlStatement { get; set; }
+        public IEnumerable<string> Tags { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
+
+        // Dynamic-only fields
+        public bool IsEncounterBased { get; set; }
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public DynamicDatasetQuerySchema Schema { get; set; }
+
         public DateTime Created { get; set; }
         public string CreatedBy { get; set; }
         public DateTime Updated { get; set; }
         public string UpdatedBy { get; set; }
 
-        public IEnumerable<string> Tags { get; set; }
-
-        public IEnumerable<Constraint> Constraints { get; set; }
+        
     }
 }

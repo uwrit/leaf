@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Dynamic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,15 +53,11 @@ namespace Services.Cohort
                     using (var reader = await cmd.ExecuteReaderAsync(token))
                     {
                         var dbSchema = GetShapedSchema(context, reader);
-                        var marshaller = DatasetMarshaller.For(context.Shape, dbSchema, pepper);
+                        var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
                         var data = marshaller.Marshal(reader, user.Anonymize());
-                        var resultSchema = ShapedDatasetSchema.From(dbSchema);
+                        var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
 
-                        return new Dataset
-                        {
-                            Schema = resultSchema,
-                            Results = data.GroupBy(d => d.PersonId).ToDictionary(g => g.Key, g => g.Select(r => r))
-                        };
+                        return new Dataset(resultSchema, data);
                     }
                 }
             }
@@ -70,7 +67,7 @@ namespace Services.Cohort
         {
             var shape = context.Shape;
             var actualSchema = GetResultSchema(shape, reader);
-            var validationSchema = ValidationSchema.For(shape);
+            var validationSchema = ValidationSchema.For(context);
             var result = validationSchema.Validate(actualSchema);
 
             switch (result.State)
@@ -86,12 +83,74 @@ namespace Services.Cohort
             return validationSchema.GetShapedSchema(actualSchema);
         }
 
-        // NOTE(cspital) potentially check conversions here or above to get raw type into error message, obtuse message if switch falls through LeafType
+        // NOTE(cspital) potentially check conversions here or above to get raw type into error message, abstruse message if switch falls through LeafType
         DatasetResultSchema GetResultSchema(Shape shape, SqlDataReader reader)
         {
             var columns = reader.GetColumnSchema();
             var fields = columns.Select(c => new SchemaField(c)).ToArray();
             return DatasetResultSchema.For(shape, fields);
+        }
+    }
+
+    sealed class DynamicMarshaller : DatasetMarshaller
+    {
+        DatasetExecutionContext _context { get; set; }
+
+        DatasetResultSchema _schema { get; set; }
+
+        public DynamicMarshaller(DatasetExecutionContext context, DatasetResultSchema schema, Guid pepper) : base(pepper)
+        {
+            _context = context;
+            _schema = schema;
+        }
+
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        {
+            var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
+                .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name) && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
+                .Select(f => f.ToSchemaField());
+            var records = new List<ShapedDataset>();
+            var converter = GetConverter(anonymize, fields);
+
+            while (reader.Read())
+            {
+                var record = GetRecord(reader, fields);
+                var dyn = converter(record);
+                records.Add(dyn);
+            }
+            return records;
+        }
+
+        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize, IEnumerable<SchemaFieldSelector> fields)
+        {
+            if (anonymize)
+            {
+                var anon = new DynamicAnonymizer(Pepper);
+                return (rec) =>
+                {
+                    anon.Anonymize(rec, fields);
+                    return rec.ToDatumSet();
+                };
+            }
+            return (rec) => rec.ToDatumSet();
+        }
+
+        DynamicDatasetRecord GetRecord(SqlDataReader reader, IEnumerable<SchemaFieldSelector> fields)
+        {
+            var dyn = new DynamicDatasetRecord
+            {
+                Salt = reader.GetGuid(reader.GetOrdinal(DatasetColumns.Salt))
+            };
+
+            foreach (var f in fields)
+            {
+                // Ensure Salt is not passed as property
+                if (!f.Name.Equals(DatasetColumns.Salt, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    dyn.SetValue(f.Name, reader[f.Name]);
+                }
+            }
+            return dyn;
         }
     }
 

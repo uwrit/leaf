@@ -29,9 +29,9 @@ import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
 import { CohortStateType } from '../models/state/CohortState';
 import { AdminPanelPane } from '../models/state/AdminState';
+import SideNotification from '../components/SideNotification/SideNotification';
 import { version } from '../../package.json'
 import './App.css';
-import SideNotification from '../components/SideNotification/SideNotification';
 
 
 interface OwnProps {
@@ -163,7 +163,7 @@ class App extends React.Component<Props> {
      */
     private handleActivity = () => {
         const { dispatch, auth, sessionContext } = this.props;
-        if (!sessionContext || auth!.config!.inactivityTimeoutMinutes <= 0) { return; }
+        if (!sessionContext || auth!.config!.authentication.inactivityTimeoutMinutes <= 0) { return; }
 
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
@@ -175,7 +175,7 @@ class App extends React.Component<Props> {
                 show: true, 
                 onClickOkay: () => dispatch(saveSessionAndLogout())
             }));
-        }, auth!.config!.inactivityTimeoutMinutes * 1000 * 60);
+        }, auth!.config!.authentication.inactivityTimeoutMinutes * 1000 * 60);
     }
 }
 

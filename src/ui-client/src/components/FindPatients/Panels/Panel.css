@@ -332,6 +332,7 @@
     font-weight: 500 !important;
     outline: none !important;
     padding: 4px 24px !important;
+    width: 282px;
 }
 
 .panel-item-specialization-dropdown {

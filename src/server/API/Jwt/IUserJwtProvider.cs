@@ -12,7 +12,7 @@ namespace API.Jwt
 {
     public interface IUserJwtProvider
     {
-        string IdToken(HttpContext context);
+        Task<string> IdToken(HttpContext context);
         string AccessToken(HttpContext context);
         string AccessToken(HttpContext context, Attestation attestation);
     }

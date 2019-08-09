@@ -5,11 +5,25 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using Model.Tagging;
+using Model.Schema;
 using System.Collections.Generic;
 using Model.Extensions;
 
 namespace Model.Compiler
 {
+    public interface IDatasetQuery
+    {
+        Guid? Id { get; set; }
+        Urn UniversalId { get; set; }
+        bool IsEncounterBased { get; set; }
+        Shape Shape { get; set; }
+        string Name { get; set; }
+        string Category { get; set; }
+        string Description { get; set; }
+        string SqlStatement { get; set; }
+        ICollection<string> Tags { get; set; }
+    }
+
     public class DatasetQueryRef
     {
         public Guid? Id { get; set; }
@@ -44,11 +58,14 @@ namespace Model.Compiler
         }
     }
 
-    public class DatasetQuery : DatasetQueryRef
+    
+
+    public class DatasetQuery : DatasetQueryRef, IDatasetQuery
     {
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
+        public bool IsEncounterBased { get; set; }
         public string SqlStatement { get; set; }
         public ICollection<string> Tags { get; set; }
 
@@ -61,6 +78,64 @@ namespace Model.Compiler
         {
             Tags = new List<string>();
         }
+    }
+
+    public class DynamicDatasetQuery : DatasetQuery, IDatasetQuery
+    {
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public DynamicDatasetQuerySchema Schema { get; set; }
+    }
+
+    public class DynamicDatasetQuerySchema
+    {
+        public ICollection<DynamicDatasetQuerySchemaFieldRecord> Fields { get; set; }
+    }
+
+    public class DynamicDatasetQuerySchemaFieldRecord
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public bool Phi { get; set; }
+        public bool Mask { get; set; }
+        public bool Required { get; set; }
+
+        public SchemaFieldSelector ToSchemaField()
+        {
+            return new SchemaFieldSelector
+            {
+                Name = Name,
+                Type = GetLeafType(),
+                Phi = Phi,
+                Mask = Mask,
+                Required = Required
+            };
+        }
+
+        private LeafType GetLeafType()
+        {
+            switch (Type)
+            {
+                case "String":
+                    return LeafType.String;
+                case "Bool":
+                    return LeafType.Bool;
+                case "DateTime":
+                    return LeafType.DateTime;
+                case "Guid":
+                    return LeafType.Guid;
+                case "Numeric":
+                    return LeafType.Numeric;
+                default:
+                    return LeafType.String;
+            }
+        }
+    }
+
+    public class DynamicDatasetQuerySchemaField : DynamicDatasetQuerySchemaFieldRecord
+    {
+        public new LeafType Type { get; set; }
     }
 
     public class DatasetQueryRefEqualityComparer : IEqualityComparer<DatasetQueryRef>

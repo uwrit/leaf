@@ -1,0 +1,104 @@
+/* Column */
+.dataset-editor-dynamic-column {
+    border-bottom: 1px solid rgb(240,240,240);
+    height: 25px;
+}
+
+.dataset-editor-dynamic-column svg {
+    margin: 4px 0 0 4px;
+}
+
+.dataset-editor-dynamic-column .col-md-3,
+.dataset-editor-dynamic-column .col-md-6 {
+    max-width: 160px;
+    padding: 0 !important;
+}
+
+.dataset-editor-dynamic-column .col-md-6 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; 
+}
+
+.dataset-editor-column-phi,
+.dataset-editor-column-not-phi {
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-left: 25px;
+}
+
+.dataset-editor-column-phi {
+    color: rgb(28, 168, 221);
+}
+
+.dataset-editor-column-not-phi {
+    color: transparent;
+}
+
+.dataset-editor-column-not-phi:hover {
+    color: rgb(103, 186, 216);
+}
+
+.dataset-editor-column-nodeident {
+    cursor: not-allowed;
+}
+
+.dataset-editor-column-nodeident:hover::after,
+.dataset-editor-column-phi-always:hover::after {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    color: rgb(96, 90, 102);
+    font-size: 0.9rem;
+    left: 100%;
+    margin: auto;
+    padding: 6px;
+    position: absolute;
+    width: 200px;
+    z-index: 100;
+}
+
+.dataset-editor-column-nodeident:hover::after {
+    content: 'Only String and DateTime type columns can be de-identified.';
+}
+
+.dataset-editor-column-phi-always:hover::after {
+    content: 'Identifier columns must always be set to "De-identify".';
+}
+
+/* Dropdown */
+.admin-panel-dynamic-type-dropdown {
+    outline: none;
+}
+
+.admin-panel-dynamic-type-dropdown button {
+    background-color: transparent !important;
+    border: 1px solid transparent !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(50,50,50) !important;
+    font-family: Roboto;
+    font-size: 0.8rem;
+    margin-top: -4px;
+    text-align: right;
+    width: 75px;
+}
+
+.admin-panel-dynamic-type-dropdown button:hover {
+    text-decoration: underline;
+}
+
+.admin-panel-dynamic-type-dropdown-chevron {
+    float: right;
+    margin-left: 2px;
+    margin-top: 3px;
+    opacity: 1 !important;
+    transform: scale(0.7);
+}
+
+.admin-panel-dynamic-type-dropdown-item-container button {
+    cursor: pointer;
+    font-size: 1.0rem;
+    text-decoration: none !important;
+}

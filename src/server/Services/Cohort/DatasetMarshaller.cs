@@ -20,10 +20,12 @@ namespace Services.Cohort
             Pepper = pepper;
         }
 
-        public static DatasetMarshaller For(Shape shape, DatasetResultSchema schema, Guid pepper)
+        public static DatasetMarshaller For(DatasetExecutionContext context, DatasetResultSchema schema, Guid pepper)
         {
-            switch (shape)
+            switch (context.Shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicMarshaller(context, schema, pepper);
                 case Shape.Observation:
                     return new ObservationMarshaller(schema, pepper);
                 case Shape.Encounter:
@@ -41,7 +43,7 @@ namespace Services.Cohort
                 case Shape.MedicationAdministration:
                     return new MedicationAdministrationMarshaller(schema, pepper);
                 default:
-                    throw new ArgumentException($"{shape.ToString()} switch branch not implemented");
+                    throw new ArgumentException($"{context.Shape.ToString()} switch branch not implemented");
             }
         }
 

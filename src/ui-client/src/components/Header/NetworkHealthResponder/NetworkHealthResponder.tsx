@@ -61,7 +61,6 @@ export default class NetworkHealthResponder extends React.PureComponent<Props> {
                             {this.formatPatientCount(r.totalPatients)}
                         </div>
                     </div>
-                    {this.props.allowDisable &&
                     <div className={`${c}-enabled`}>
                         <div className={`${c}-enabled-text`}>
                             {status}
@@ -70,7 +69,6 @@ export default class NetworkHealthResponder extends React.PureComponent<Props> {
                             <GlowingButton indicator={indicator} />
                         </div>
                     </div>
-                    }
                     <div className={`${c}-text-description`}>
                         {r.description && r.description}
                     </div>

@@ -13,34 +13,11 @@ namespace Model.Compiler
     {
         public IEnumerable<PanelItem> PanelItems { get; set; }
 
-        bool? hasNonEncounter;
-        public bool HasNonEncounter
-        {
-            get
-            {
-                if (hasNonEncounter.HasValue) return hasNonEncounter.Value;
-                hasNonEncounter = PanelItems.Any(x => !x.Concept.IsEncounterBased);
-                return hasNonEncounter.Value;
-            }
-        }
-
-        bool? hasNonEvent;
-        public bool HasNonEvent
-        {
-            get
-            {
-                if (hasNonEvent.HasValue) return hasNonEvent.Value;
-                hasNonEvent = PanelItems.Any(x => !x.Concept.IsEventBased);
-                return hasNonEvent.Value;
-            }
-        }
-
-        // NOTE(cspital) this is not a bug, mincount 0 is a not present and so it is valid input
         public bool HasCountFilter
         {
             get
             {
-                return MinimumCount != 1;
+                return MinimumCount > 1;
             }
         }
 

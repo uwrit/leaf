@@ -10,10 +10,9 @@ import { AdminDatasetAction } from "../../actions/admin/dataset";
 import { AdminPanelPatientListColumnTemplate, PatientListColumnType } from "../../models/patientList/Column";
 import { AdminDatasetQuery } from "../../models/admin/Dataset";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { DefTemplates, DemographicsAdminSqlDefTemplate } from "../../models/patientList/DatasetDefinitionTemplate";
+import { DefTemplates, DemographicsAdminSqlDefTemplate, personId } from "../../models/patientList/DatasetDefinitionTemplate";
 import { getSqlColumns } from "../../utils/parseSql";
-
-const personId = 'personId';
+import { getDynamicSchema } from "./dynamicDataset";
 
 export const setAdminPanelDatasetLoadState = (state: AdminState, action: AdminDatasetAction): AdminState => {
     return Object.assign({}, state, { 
@@ -43,13 +42,30 @@ export const setAdminPanelCurrentDataset = (state: AdminState, action: AdminData
     let sqlColumns = datasets.sqlColumns;
 
     if (ds && action.analyzeColumns) {
-        const cols = getShapeColumns(ds.sqlStatement, ds.shape);
-        expectedColumns = cols.expectedColumns;
-        sqlColumns = cols.sqlColumns;
+        if (ds.shape === PatientListDatasetShape.Dynamic) {
 
-        if (ds.shape !== PatientListDatasetShape.Demographics) {
-            datasets.datasets.set(ds.id, ds);
+            /*
+             * Validate and set dynamic schema.
+             */
+            const dynSchema = getDynamicSchema(ds);
+            sqlColumns = dynSchema.sqlColumns;
+            ds.schema = dynSchema.schema;
+            ds.sqlFieldDate = dynSchema.sqlFieldDate;
+            ds.sqlFieldValueString = dynSchema.sqlFieldValueString;
+            ds.sqlFieldValueNumeric = dynSchema.sqlFieldValueNumeric;
+
+        } else {
+
+            /*
+             * Set and checked templated columns.
+             */
+            const cols = getShapeColumns(ds);
+            expectedColumns = cols.expectedColumns;
+            sqlColumns = cols.sqlColumns;
         }
+    }
+    if (ds && ds.shape !== PatientListDatasetShape.Demographics) {
+        datasets.datasets.set(ds.id, ds);
     }
 
     return Object.assign({}, state, { 
@@ -77,7 +93,30 @@ export const setAdminPanelDemographicsDataset = (state: AdminState, action: Admi
 export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { shape: action.shape }) as AdminDatasetQuery;
-    const { expectedColumns, sqlColumns } = getShapeColumns(ds.sqlStatement, action.shape!);
+    let sqlColumns = datasets.sqlColumns;
+    let expectedColumns = datasets.expectedColumns;
+
+    if (ds.shape === PatientListDatasetShape.Dynamic) {
+
+        /*
+         * Validate and set dynamic schema.
+         */
+        const dynSchema = getDynamicSchema(ds);
+        sqlColumns = dynSchema.sqlColumns;
+        ds.schema = dynSchema.schema;
+        ds.sqlFieldDate = dynSchema.sqlFieldDate;
+        ds.sqlFieldValueString = dynSchema.sqlFieldValueString;
+        ds.sqlFieldValueNumeric = dynSchema.sqlFieldValueNumeric;
+
+    } else {
+
+        /*
+         * Set and checked templated columns.
+         */
+        const cols = getShapeColumns(ds);
+        expectedColumns = cols.expectedColumns;
+        sqlColumns = cols.sqlColumns;
+    }
 
     return Object.assign({}, state, { 
         datasets: { 
@@ -93,8 +132,29 @@ export const setAdminPanelDatasetShape = (state: AdminState, action: AdminDatase
 export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetAction): AdminState => {
     const datasets = state.datasets;
     const ds = Object.assign({}, datasets.currentDataset, { sqlStatement: action.sql }) as AdminDatasetQuery;
-    const sqlColumns = new Set(getSqlColumns(action.sql!));
-    datasets.expectedColumns.forEach((c) => c.present = sqlColumns.has(c.id));
+    let sqlColumns = new Set();
+
+    if (ds.shape === PatientListDatasetShape.Dynamic) {
+
+        /*
+         * Validate and set dynamic schema.
+         */
+        const dynSchema = getDynamicSchema(ds);
+        sqlColumns = dynSchema.sqlColumns;
+        ds.schema = dynSchema.schema;
+        ds.sqlFieldDate = dynSchema.sqlFieldDate;
+        ds.sqlFieldValueString = dynSchema.sqlFieldValueString;
+        ds.sqlFieldValueNumeric = dynSchema.sqlFieldValueNumeric;
+
+    } else {
+
+        /*
+         * Set and checked templated columns.
+         */
+        const cols = getShapeColumns(ds);
+        sqlColumns = cols.sqlColumns;
+        datasets.expectedColumns.forEach((c) => c.present = sqlColumns.has(c.id));
+    }
 
     return Object.assign({}, state, { 
         datasets: { 
@@ -106,17 +166,13 @@ export const setAdminPanelDatasetSql = (state: AdminState, action: AdminDatasetA
     });
 };
 
-const getShapeColumns = (sql: string, shape: PatientListDatasetShape) => {
-    const template = shape === PatientListDatasetShape.Demographics
-        ? DemographicsAdminSqlDefTemplate
-        : DefTemplates.get(shape);
-    const sqlColumns = new Set(getSqlColumns(sql));
-    const expectedColumns: AdminPanelPatientListColumnTemplate[] = [
-        { id: personId, type: PatientListColumnType.string, present: sqlColumns.has(personId) }
-    ];
+const getShapeColumns = (dataset: AdminDatasetQuery) => {
+    const sqlColumns = new Set(getSqlColumns(dataset.sqlStatement));
+    const expectedColumns: AdminPanelPatientListColumnTemplate[] = [ { id: personId, type: PatientListColumnType.String, present: sqlColumns.has(personId) } ];
+    const template = dataset.shape === PatientListDatasetShape.Demographics ? DemographicsAdminSqlDefTemplate : DefTemplates.get(dataset.shape);
 
-    if (shape !== PatientListDatasetShape.Dynamic) {
+    if (dataset.shape !== PatientListDatasetShape.Dynamic) {
         template!.columns.forEach((c) => expectedColumns.push({ ...c, present: sqlColumns.has(c.id) }));
     }
     return { expectedColumns, sqlColumns };
-} 
+};

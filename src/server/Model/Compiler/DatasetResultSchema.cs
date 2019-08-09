@@ -16,6 +16,8 @@ namespace Model.Compiler
         {
             switch (shape)
             {
+                case Shape.Dynamic:
+                    return new DynamicDatasetResultSchema(fields);
                 case Shape.Observation:
                     return new ObservationDatasetResultSchema(fields);
                 case Shape.Encounter:
@@ -59,6 +61,15 @@ namespace Model.Compiler
         public SchemaField Get(BaseSchemaField field)
         {
             return Fields.FirstOrDefault(f => f.Name.Equals(field.Name, StringComparison.InvariantCultureIgnoreCase));
+        }
+    }
+
+    public sealed class DynamicDatasetResultSchema : DatasetResultSchema
+    {
+        public DynamicDatasetResultSchema(ICollection<SchemaField> fields)
+        {
+            Shape = Shape.Dynamic;
+            Fields = fields;
         }
     }
 

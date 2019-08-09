@@ -24,8 +24,8 @@ export default class HelpButton extends React.PureComponent<Props> {
     public render() {
         const { auth } = this.props;
         const c = this.className;
-        if (!auth || !auth.config || !auth.config.clientOptions.help.enabled) { return null; }
-        const { help } = auth.config.clientOptions;
+        if (!auth || !auth.config || !auth.config.client.help.enabled) { return null; }
+        const { help } = auth.config.client;
 
         return (
             <div className={`${c}-container`}>

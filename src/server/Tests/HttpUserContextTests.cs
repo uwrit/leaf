@@ -61,12 +61,12 @@ namespace Tests
         [Fact]
         public void Groups_Contains_All_Group_Claims()
         {
-            var acc = MockAccessor.With("user",
+            var acc = MockAccessor.With("user@localhost",
                 new Claim(Group.Key, "test-group-1"),
                 new Claim(JwtRegisteredClaimNames.Iss, "urn:leaf:iss:test.tld"));
             var ctx = new HttpUserContext(acc, GetJwtVerifyingOptions());
 
-            Assert.Contains(ctx.Groups, g => g.Equals("test-group-1@urn:leaf:iss:test.tld"));
+            Assert.Contains(ctx.Groups, g => g.Equals("test-group-1@localhost@urn:leaf:iss:test.tld"));
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace Tests
 
             Assert.False(ctx.IsAdmin);
         }
-        
+
         [Fact]
         public void IsQuarantined_Is_False_When_User_Is_In_Fed_Role()
         {
@@ -148,7 +148,7 @@ namespace Tests
                 new Claim(JwtRegisteredClaimNames.Iss, "urn:leaf:iss:test.tld"));
             var ctx = new HttpUserContext(acc, GetJwtVerifyingOptions());
 
-            Assert.Equal("urn:leaf:iss:test.tld", ctx.Issuer); 
+            Assert.Equal("urn:leaf:iss:test.tld", ctx.Issuer);
         }
 
         [Fact]

@@ -6,7 +6,7 @@
  */ 
 
 import { Concept } from "../concept/Concept";
-import { AuthConfig, UserContext } from "../Auth";
+import { AppConfig, UserContext } from "../Auth";
 import { ConceptEquivalentHint, AggregateConceptHintRef } from "../concept/ConceptHint";
 import { Viewport } from "./Map";
 import { CohortState } from "./CohortState";
@@ -23,7 +23,7 @@ import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQuery
 export type ConceptMap = Map<string, Concept>;
 
 export interface AuthorizationState {
-    config?: AuthConfig;
+    config?: AppConfig;
     error?: string;
     userContext?: UserContext;
 }

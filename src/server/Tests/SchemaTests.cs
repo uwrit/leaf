@@ -218,7 +218,7 @@ namespace Tests
                 new SchemaField { Name = "Salt", Type = LeafType.Guid }
             });
 
-            var datasetSchema = ShapedDatasetSchema.From(actual);
+            var datasetSchema = ShapedDatasetSchema.From(actual, new DatasetExecutionContext(Shape.Observation, new QueryContext(), Guid.Empty));
 
             Assert.DoesNotContain(datasetSchema.Fields, f => f.Name == "Salt");
             Assert.DoesNotContain(datasetSchema.Fields, f => f.Name == "unrecognizedField");

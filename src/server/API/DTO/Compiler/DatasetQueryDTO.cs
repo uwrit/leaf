@@ -13,16 +13,18 @@ namespace API.DTO.Compiler
     {
         public string Id { get; set; }
         public string UniversalId { get; set; }
+        public bool IsEncounterBased { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
         public ICollection<string> Tags { get; set; }
 
-        public DatasetQueryDTO(DatasetQuery dq)
+        public DatasetQueryDTO(IDatasetQuery dq)
         {
             Id = dq.Id.Value.ToString();
             UniversalId = dq.UniversalId?.ToString();
+            IsEncounterBased = dq.IsEncounterBased;
             Shape = dq.Shape;
             Name = dq.Name;
             Category = dq.Category;

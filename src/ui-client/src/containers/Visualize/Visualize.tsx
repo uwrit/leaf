@@ -58,6 +58,7 @@ class Visualize extends React.Component<Props, State> {
         const demogHeight = 400;
         const respPadding = 200;
         const data: any = [];
+        const { cacheLimit } = auth.config!.cohort;
         cohort.networkCohorts.forEach((nc: NetworkCohortState) => {
             const r = responders.get(nc.id)!;
             if (r.enabled && nc.visualization.state === CohortStateType.LOADED) {
@@ -69,8 +70,8 @@ class Visualize extends React.Component<Props, State> {
         /*
          * If too many patients for caching, let user know.
          */
-        if (cohort.networkCohorts.size === 1 && cohort.count.value > auth.config!.cacheLimit) {
-            return <CohortTooLargeBox cacheLimit={auth.config!.cacheLimit} />
+        if (cohort.networkCohorts.size === 1 && cohort.count.value > cacheLimit) {
+            return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
         /*
          * Show a loading spinner if no responders have completed yet.

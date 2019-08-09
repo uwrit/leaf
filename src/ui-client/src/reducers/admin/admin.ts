@@ -119,6 +119,7 @@ export const defaultAdminState = (): AdminState => {
             demographicsDataset: { 
                 id: '',
                 constraints: [],
+                isEncounterBased: false,
                 name: 'Basic Demographics',
                 shape: PatientListDatasetShape.Demographics,
                 sqlStatement: '',

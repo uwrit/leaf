@@ -101,28 +101,32 @@
     padding: 6px;
 }
 
-.patientlist-tuple.sparkline {
+.patientlist-tuple.Sparkline {
     padding: 0;
     width: 200px;
 }
 
-.patientlist-tuple.sparkline text {
+.patientlist-tuple.Sparkline .recharts-surface {
+    cursor: pointer;
+}
+
+.patientlist-tuple.Sparkline text {
     fill: #F44336;
     font-size: 12px;
     font-weight: 300;
 }
 
-.patientlist-tuple.sparkline path {
+.patientlist-tuple.Sparkline path {
     fill: none;
     stroke: rgba(244, 67, 54, 0.4);
     stroke-width: 1.75px;
 }
 
-.patientlist-tuple.sparkline circle {
+.patientlist-tuple.Sparkline circle {
     fill: #F44336;
 }
 
-.patientlist-row:hover .patientlist-tuple.sparkline path {
+.patientlist-row:hover .patientlist-tuple.Sparkline path {
     stroke: #F44336;
 }
 

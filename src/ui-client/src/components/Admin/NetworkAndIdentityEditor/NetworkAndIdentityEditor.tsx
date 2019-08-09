@@ -14,11 +14,10 @@ import { setAdminNetworkIdentity, processApiUpdateQueue, revertAdminNetworkChang
 import { IdentityPreview } from './Sections/IdentityPreview';
 import { Endpoint } from './Endpoint/Endpoint';
 import { NetworkEndpoint } from '../../../models/admin/Network';
-import './NetworkAndIdentityEditor.css';
 import CertModal from './CertModal/CertModal';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../actions/generalUi';
-
+import './NetworkAndIdentityEditor.css';
 
 interface Props {
     data: AdminState;

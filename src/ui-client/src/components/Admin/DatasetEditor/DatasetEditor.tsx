@@ -6,25 +6,23 @@
  */
 
 import React from 'react';
+import { generate as generateId } from 'shortid';
 import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState, { AdminPanelLoadState } from '../../../models/state/AdminState';
 import { InformationModalState, ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetContainer';
-import { Section } from '../Section/Section';
-import { DefTemplates } from '../../../models/patientList/DatasetDefinitionTemplate';
+import { DefTemplates, personId, encounterId } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
-import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, setAdminDatasetSql, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
+import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
 import { AdminDatasetQuery } from '../../../models/admin/Dataset';
-import { Constraints } from './Constraints/Constraints';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
 import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
-import { generate as generateId } from 'shortid';
-import { Display } from './Sections/Display';
-import { SqlEditor } from './SqlEditor/SqlEditor';
-import { Identifiers } from './Sections/Identifiers';
+import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
+import { DynamicEditor } from './DynamicEditor/DynamicEditor';
 import './DatasetEditor.css';
+import { PatientListColumnType } from '../../../models/patientList/Column';
 
 interface Props { 
     data: AdminState;
@@ -70,16 +68,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { data, datasets, dispatch } = this.props;
-        const { currentDataset, changed, expectedColumns } = data.datasets;
-        const { shapes, forceValidation } = this.state;
+        const { currentDataset, changed } = data.datasets;
         const allowDelete = !currentDataset || currentDataset.shape === PatientListDatasetShape.Demographics;
-        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
-        let currentCategory = undefined;
         const c = this.className;
-
-        if (currentDataset && currentDataset.categoryId) {
-            currentCategory = data.datasetQueryCategories.categories.get(currentDataset.categoryId);
-        }
 
         return (
             <div className={c}>
@@ -139,48 +130,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 }
 
                                 {/* Editor */}
-                                {currentDataset &&
-                                    <div>
-                                        <Display
-                                            categoryChangeHandler={this.handleCategoryChange}
-                                            category={currentCategory}
-                                            categories={data.datasetQueryCategories.categories}
-                                            dataset={currentDataset}
-                                            dispatch={dispatch}
-                                            forceValidation={forceValidation}
-                                            inputChangeHandler={this.handleInputChange}
-                                            locked={locked}
-                                            shapeChangeHandler={this.handleShapeClick}
-                                            shape={data.datasets.currentDataset!.shape}
-                                            shapes={shapes}
-                                        />
-                                        <SqlEditor
-                                            dataset={currentDataset}
-                                            dispatch={dispatch}
-                                            expectedColumns={expectedColumns}
-                                            handleInputChange={this.handleInputChange}
-                                        />
-                                        <Row>
-                                            <Col md={6}>
-                                                <Identifiers
-                                                    dataset={currentDataset}
-                                                    handleInputChange={this.handleInputChange}
-                                                    locked={locked}
-                                                />
-                                            </Col>
-                                            <Col md={6}>
-                                                <Section header='Access Restrictions'>
-                                                    <Constraints 
-                                                        dataset={currentDataset} 
-                                                        changeHandler={this.handleInputChange} 
-                                                        forceValidation={forceValidation}
-                                                        locked={locked}
-                                                    />
-                                                </Section>
-                                            </Col>
-                                        </Row>
-                                    </div>
-                                }
+                                {this.getEditor()}
                             </div>
                         </div>
                     </Row>
@@ -188,6 +138,60 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             </div>
         );
     }
+
+    /*
+     * Return React component for the current editor shape.
+     */
+    private getEditor = () => {
+        const { currentDataset } = this.props.data.datasets;
+
+        if (!currentDataset) { 
+            return null;
+        }
+
+        const { data, dispatch } = this.props;
+        const { expectedColumns } = data.datasets;
+        const { shapes, forceValidation } = this.state;
+        const locked = currentDataset && currentDataset.shape === PatientListDatasetShape.Demographics;
+        const currentCategory = currentDataset.categoryId 
+            ? data.datasetQueryCategories.categories.get(currentDataset.categoryId)
+            : undefined;
+
+        if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
+            return (
+                <DynamicEditor 
+                    categoryChangeHandler={this.handleCategoryChange}
+                    category={currentCategory}
+                    categories={data.datasetQueryCategories.categories}
+                    dataset={currentDataset}
+                    dispatch={dispatch}
+                    expectedColumns={expectedColumns}
+                    forceValidation={forceValidation}
+                    inputChangeHandler={this.handleInputChange}
+                    locked={locked}
+                    shapeChangeHandler={this.handleShapeClick}
+                    shape={data.datasets.currentDataset!.shape}
+                    shapes={shapes}
+                />
+            );
+        }
+        return (
+            <FhirTemplateEditor 
+                categoryChangeHandler={this.handleCategoryChange}
+                category={currentCategory}
+                categories={data.datasetQueryCategories.categories}
+                dataset={currentDataset}
+                dispatch={dispatch}
+                expectedColumns={expectedColumns}
+                forceValidation={forceValidation}
+                inputChangeHandler={this.handleInputChange}
+                locked={locked}
+                shapeChangeHandler={this.handleShapeClick}
+                shape={data.datasets.currentDataset!.shape}
+                shapes={shapes}
+            />
+        );
+    };
 
     /*
      * Handle initial click to create a Basic Demographics query.
@@ -224,20 +228,34 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
     /*
      * Validate that current admin Concept is valid. Called on 'Save' click.
      */
-    private currentDatasetIsValid = (): boolean => {
+    private currentDatasetIsValid = () => {
         const { currentDataset } = this.props.data.datasets;
 
-        if (!currentDataset) { return false; }
-        if (!currentDataset.name) { return false; }
+        if (!currentDataset) { return 'There is no current dataset'; }
+        if (!currentDataset.name) { return 'No [Name] has been entered'; }
         for (const constraint of currentDataset.constraints) {
-            if (!constraint.constraintValue) { return false; }
+            if (!constraint.constraintValue) { return 'One or more [Access Restrictions] is missing a User or Group'; }
+        }
+        if (currentDataset.shape === PatientListDatasetShape.Dynamic) {
+            if (currentDataset.isEncounterBased) {
+                if (!currentDataset.sqlFieldDate) { return '[Has Encounters] is set to "true" but no [Date Column] has been selected'; }
+                if (!currentDataset.sqlFieldValueString) { return '[Has Encounters] is set to "true" but no [String Value Column] has been selected'; }
+            }
+            for (const field of currentDataset.schema!.fields) {
+                if (field.type === PatientListColumnType.DateTime && (!field.mask || !field.phi)) {
+                    return `The [${field.name}] column is a DateTime but isn't set to "De-identify". Proceeding may inadvertently reveal Protected Health Information`;
+                }
+                if ((field.name === personId || field.name === encounterId) && (!field.mask || !field.phi)) {
+                    return `The [${field.name}] column is a potentially identifiable and should always be set to "De-identify"`;
+                }
+            }
         }
 
         /*
          * No need to check the [sqlStatement], as the missing SQL column
          * check following this will return granular information on those.
          */
-        return true;
+        return null;
     }
 
     /*
@@ -254,15 +272,17 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      * Handle initiation of saving async changes and syncing with the DB.
      */
     private handleSaveChanges = () => {
-        const { datasets} = this.props.data;
+        const { datasets } = this.props.data;
         const { dispatch } = this.props;
-        const missingCols = datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
-        const isValid = this.currentDatasetIsValid();
+        const missingCols = datasets.currentDataset!.shape === PatientListDatasetShape.Dynamic
+            ? datasets.currentDataset!.schema!.fields.filter((c) => !c.present).map((c) => `[${c.name}]`)
+            : datasets.expectedColumns.filter((c) => !c.optional && !c.present).map((c) => `[${c.id}]`);
+        const errors = this.currentDatasetIsValid();
         
         /*
          * It's valid and has no missing columns, so save.
          */
-        if (isValid && !missingCols.length) {
+        if (!errors && !missingCols.length) {
             if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
                 dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
             } else {
@@ -272,9 +292,12 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         /*
          * One or more fields are missing data.
          */
-        } else if (!isValid) {
+        } else if (errors) {
             const confirm: ConfirmationModalState = {
-                body: `One or more fields are missing necessary data. Are you sure you want to save this Dataset?`,
+                body: [
+                    <p key={1}>{errors}.</p>,
+                    <p key={2}>Are you sure you want to try to save this Dataset? The save or query execution process may fail due to missing data.</p>
+                ],
                 header: 'Missing Dataset data',
                 onClickNo: () => null,
                 onClickYes: () => { 
@@ -332,6 +355,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const newDs: PatientListDatasetQuery = {
             ...userDs,
             ...newAdminDs,
+            isEncounterBased: false,
             category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
         };
 
@@ -431,18 +455,20 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
         const { dispatch } = this.props;
         const id = generateId();
         const name = 'New Dataset';
-        const shape = PatientListDatasetShape.Allergy;
+        const shape = PatientListDatasetShape.Dynamic;
         const newAdminDs: AdminDatasetQuery = {
             id,
             constraints: [],
+            isEncounterBased: true,
             name,
             shape,
-            sqlStatement: 'SELECT FROM dbo.table',
+            sqlStatement: `SELECT   FROM dbo.table`,
             tags: [],
             unsaved: true
         };
         const newUserDs: PatientListDatasetQuery = {
             id,
+            isEncounterBased: true,
             category: '',
             name,
             shape,

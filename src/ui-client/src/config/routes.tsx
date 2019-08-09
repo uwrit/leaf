@@ -13,7 +13,7 @@ import LeafMap from '../containers/Map/LeafMap';
 import PatientList from '../containers/PatientList/PatientList';
 import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
-import { UserContext, AuthConfig } from '../models/Auth';
+import { UserContext, AppConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import AdminPanel from '../containers/Admin/AdminPanel';
 import { AdminPanelPane } from '../models/state/AdminState';
@@ -96,10 +96,10 @@ const admin = (): RouteConfig => {
     };
 }
 
-export const getRoutes = (config: AuthConfig, userContext: UserContext): RouteConfig[] => {
+export const getRoutes = (config: AppConfig, userContext: UserContext): RouteConfig[] => {
     const routes = [ findPatients(), visualize(), patientList() ];
-    if (config!.clientOptions.map.enabled) {
-        routes.splice(1, 0, map(config!.clientOptions.map.tileURI));
+    if (config!.client.map.enabled) {
+        routes.splice(1, 0, map(config!.client.map.tileURI));
     }
     if (userContext && userContext.isAdmin) {
         routes.push(admin());

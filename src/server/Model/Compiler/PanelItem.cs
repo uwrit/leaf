@@ -25,7 +25,7 @@ namespace Model.Compiler
         {
             get
             {
-                return Specializations != null && Specializations.Count() > 0;
+                return Specializations != null && Specializations.Any();
             }
         }
         public bool UseRecencyFilter => RecencyFilter != RecencyFilterType.None;

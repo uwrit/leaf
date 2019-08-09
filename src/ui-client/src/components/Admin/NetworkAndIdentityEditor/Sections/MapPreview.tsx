@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { LatLng, LatLngBounds, latLngBounds } from 'leaflet';
+import { LatLng } from 'leaflet';
 import { connect } from 'react-redux';
 import React from 'react';
 import { Map as LeafletMap, TileLayer } from 'react-leaflet';
@@ -14,7 +14,6 @@ import { AppState } from '../../../../models/state/AppState';
 import EndpointMarker from '../../../Map/EndpointMarker';
 import { CohortStateType } from '../../../../models/state/CohortState';
 import EndpointPopup from '../../../Map/EndpointPopup';
-
 
 interface OwnProps {
     identity: NetworkIdentity;
@@ -87,7 +86,7 @@ export class MapPreview extends React.Component<Props, State> {
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
-        tileUrl: state.auth.config!.clientOptions.map.tileURI
+        tileUrl: state.auth.config!.client.map.tileURI
     };
 }
 

@@ -184,9 +184,9 @@ export const logout = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
         const config = state.auth.config!;
-        let logoutUri = config.logoutUri;
+        let logoutUri = config.authentication.logoutUri;
 
-        if (config.mechanism !== AuthMechanismType.Unsecured) {
+        if (config.authentication.mechanism !== AuthMechanismType.Unsecured) {
 
             /*
              * Logout from the server, which will blacklist the current tokens.

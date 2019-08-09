@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <!-- <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> -->
     <TieredCompilation>true</TieredCompilation>
+    <ReleaseVersion>3.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -10,7 +11,6 @@
   <ItemGroup>
     <Folder Include="Collections\" />
     <Folder Include="Anonymization\" />
-    <Folder Include="Compiler\SqlServer\" />
     <Folder Include="Validation\" />
     <Folder Include="Schema\" />
     <Folder Include="Search\" />
@@ -19,6 +19,7 @@
     <Folder Include="Admin\Compiler\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Composure" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
   </ItemGroup>

@@ -17,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Options;
+using System.Threading.Tasks;
 
 namespace API.Jwt
 {
@@ -30,6 +31,7 @@ namespace API.Jwt
         readonly LeafVersionOptions versionOptions;
         readonly IFederatedEntitlementProvider entitlementService;
         readonly IFederatedIdentityProvider idProvider;
+        readonly ILoginSaver saver;
 
         string Timestamp => DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
 
@@ -38,7 +40,8 @@ namespace API.Jwt
             IOptions<AuthenticationOptions> authOpts,
             IOptions<LeafVersionOptions> versionOpts,
             IFederatedIdentityProvider identityService,
-            IFederatedEntitlementProvider entitlementService
+            IFederatedEntitlementProvider entitlementService,
+            ILoginSaver saver
         )
         {
             jwtOptions = signingOpts.Value;
@@ -46,14 +49,17 @@ namespace API.Jwt
             versionOptions = versionOpts.Value;
             this.idProvider = identityService;
             this.entitlementService = entitlementService;
+            this.saver = saver;
         }
 
-        public string IdToken(HttpContext context)
+        public async Task<string> IdToken(HttpContext context)
         {
             var identity = idProvider.GetIdentity(context);
             var entitlement = entitlementService.GetEntitlement(context, identity);
 
             var claims = IdClaims(identity, entitlement);
+
+            await saver.SaveLogin(new LoginEvent(identity, jwtOptions.Issuer, claims));
 
             return CreateToken(claims, expireMinutes: authenticationOptions.SessionTimeoutMinutes);
         }

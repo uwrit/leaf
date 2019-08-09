@@ -84,8 +84,8 @@ export default class Tuple extends React.PureComponent<Props> {
     private getValueDisplay = () => {
         const { type, value } = this.props;
         return (
-              type === PatientListColumnType.sparkline ? this.createSparkline(value) 
-            : type === PatientListColumnType.date && !!value ? new Date(value).toLocaleString() 
+              type === PatientListColumnType.Sparkline ? this.createSparkline(value) 
+            : type === PatientListColumnType.DateTime && !!value ? new Date(value).toLocaleString() 
             : value
         );
     }

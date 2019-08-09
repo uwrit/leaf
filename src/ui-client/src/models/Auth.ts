@@ -11,15 +11,25 @@ export enum AuthMechanismType {
     Saml2 = 2
 }
 
-export interface AuthConfig {
-    inactivityTimeoutMinutes: number;
-    cacheLimit: number;
-    clientOptions: ClientOptions;
-    exportLimit: number;
-    logoutUri: string;
-    mechanism: AuthMechanismType;
+export interface ConfigDTO {
+    authentication: AuthenticationConfigDTO;
+    cohort: CohortConfigDTO;
+    client: ClientOptions;
     version: string;
 }
+
+interface AuthenticationConfigDTO {
+    mechanism: AuthMechanismType;
+    inactivityTimeoutMinutes: number;
+    logoutUri: string;
+}
+
+interface CohortConfigDTO {
+    cacheLimit: number;
+    exportLimit: number;
+}
+
+export interface AppConfig extends ConfigDTO { }
 
 export interface ClientOptions {
     map: MapOptions;

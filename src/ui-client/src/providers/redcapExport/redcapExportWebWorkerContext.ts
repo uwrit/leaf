@@ -88,8 +88,7 @@ var createExportConfiguration = function (payload) {
  */
 var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
     var _a;
-    var colPersonId = 'personId';
-    var colRcPersonId = colPersonId.toLowerCase();
+    var colRcPersonId = personId.toLowerCase();
     var colRcEventName = 'redcap_event_name';
     var colRcRepeatInstrument = 'redcap_repeat_instrument';
     var colRcRepeatInstance = 'redcap_repeat_instance';
@@ -113,8 +112,8 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
         for (var j = 0; j < ds.columns.length; j++) {
             var col = ds.columns[j];
             col.redcapFieldName = cleanName(ds.datasetId + "_" + col.id, fieldNameLenLimit);
-            if (col.id !== colPersonId || (col.id === colPersonId && !personIdAdded)) {
-                if (col.id === colPersonId) {
+            if (col.id !== personId || (col.id === personId && !personIdAdded)) {
+                if (col.id === personId) {
                     personIdAdded = true;
                     col.redcapFieldName = colRcPersonId;
                 }
@@ -127,7 +126,7 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
          */
         for (var k = 0; k < ds.data.length; k++) {
             var r = ds.data[k];
-            var patientId = r[colPersonId];
+            var patientId = r[personId];
             if (patientId) {
                 var count = recordCount.get(patientId) || 0;
                 count++;
@@ -140,7 +139,7 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
                  * instrument fields are added depending on the configuration
                  * of the REDCap and Leaf instances.
                  */
-                var record = (_a = {}, _a[colRcPersonId] = r[colPersonId], _a[colRcCompleted] = recordCompleteStateCode, _a);
+                var record = (_a = {}, _a[colRcPersonId] = r[personId], _a[colRcCompleted] = recordCompleteStateCode, _a);
                 if (useRepeatingForms && ds.isMultirow) {
                     record[colRcRepeatInstrument] = ds.datasetId;
                     record[colRcRepeatInstance] = count;

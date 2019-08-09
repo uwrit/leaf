@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 7/5/19 11:48:10 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightQueriesByIds]    Script Date: 8/8/2019 3:56:27 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/2/4
@@ -93,11 +92,4 @@ BEGIN
     from @preflight
     order by QueryId desc;
 END
-
-
-
-
-
-
-
 GO

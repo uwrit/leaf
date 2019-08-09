@@ -112,7 +112,7 @@
 }
 
 .admin-panel-dropdown-item-container {
-    max-height: 250px;
+    max-height: 370px;
     overflow-y: auto;
 }
 
@@ -126,4 +126,11 @@
 .admin-panel .validation-error {
     color: rgba(221, 41, 28, 0.699);
     font-size: 0.9rem;
+}
+
+.admin-panel-subtext {
+    color: rgb(150,150,150);
+    font-size: 0.8rem;
+    margin-bottom: 2px;
+    padding: 0 20px;
 }

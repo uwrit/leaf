@@ -7,7 +7,7 @@
 
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
-import { AuthConfig, UserContext } from '../models/Auth';
+import { AppConfig, UserContext } from '../models/Auth';
 import { getAuthConfig, getUserTokenAndContext } from '../services/authApi';
 import { attemptLoginRetryIfPossible } from '../services/sessionApi';
 import { setRouteConfig } from './generalUi';
@@ -19,7 +19,7 @@ export const FAILURE_ID_TOKEN = 'FAILURE_ID_TOKEN';
 export const RECEIVE_AUTH_CONFIG = 'RECEIVE_AUTH_CONFIG';
 
 export interface AuthorizationAction {
-    config?: AuthConfig;
+    config?: AppConfig;
     message?: string;
     context?: UserContext;
     type: string;
@@ -55,7 +55,7 @@ export const getIdToken = () => {
 };
 
 // Synchronous
-export const receiveAuthConfig = (config: AuthConfig): AuthorizationAction => {
+export const receiveAuthConfig = (config: AppConfig): AuthorizationAction => {
     return {
         config,
         type: RECEIVE_AUTH_CONFIG

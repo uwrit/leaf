@@ -16,11 +16,16 @@ namespace API.DTO.Admin.Compiler
     {
         public Guid Id { get; set; }
         public string UniversalId { get; set; }
+        public bool IsEncounterBased { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }
         public string Description { get; set; }
         public string SqlStatement { get; set; }
+        public string SqlFieldDate { get; set; }
+        public string SqlFieldValueString { get; set; }
+        public string SqlFieldValueNumeric { get; set; }
+        public DynamicDatasetQuerySchema Schema { get; set; }
         public DateTime Created { get; set; }
         public string CreatedBy { get; set; }
         public DateTime Updated { get; set; }
@@ -45,6 +50,11 @@ namespace API.DTO.Admin.Compiler
                 CategoryId = q.CategoryId,
                 Description = q.Description,
                 SqlStatement = q.SqlStatement,
+                IsEncounterBased = q.IsEncounterBased,
+                SqlFieldDate = q.SqlFieldDate,
+                SqlFieldValueString = q.SqlFieldValueString,
+                SqlFieldValueNumeric = q.SqlFieldValueNumeric,
+                Schema = q.Schema,
                 Created = q.Created,
                 CreatedBy = q.CreatedBy,
                 Updated = q.Updated,
@@ -66,6 +76,11 @@ namespace API.DTO.Admin.Compiler
                 CategoryId = q.CategoryId,
                 Description = q.Description,
                 SqlStatement = q.SqlStatement,
+                IsEncounterBased = q.IsEncounterBased,
+                SqlFieldDate = q.SqlFieldDate,
+                SqlFieldValueString = q.SqlFieldValueString,
+                SqlFieldValueNumeric = q.SqlFieldValueNumeric,
+                Schema = q.Schema,
                 Created = q.Created,
                 CreatedBy = q.CreatedBy,
                 Updated = q.Updated,

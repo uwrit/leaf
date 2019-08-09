@@ -4,12 +4,56 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Reflection;
+using System.Linq;
+using System.Collections.Generic;
 using Model.Anonymization;
 using Model.Compiler;
 using Model.Schema;
 
 namespace Model.Cohort
 {
+    public class DynamicDatasetRecord : ShapedDataset, ISalt
+    {
+        readonly Dictionary<string, object> keyValues = new Dictionary<string, object>();
+
+        [Field(Name = DatasetColumns.Salt, Type = LeafType.Guid, Required = true)]
+        public Guid Salt { get; set; }
+
+        public DynamicDatasetRecord()
+        {
+
+        }
+
+        public IEnumerable<string> Keys => keyValues.Keys;
+
+        public IEnumerable<KeyValuePair<string, object>> KeyValues => keyValues.ToArray();
+
+        public KeyValuePair<string, object> GetKeyValuePair(string key)
+        {
+            return new KeyValuePair<string, object>(key, GetValue(key));
+        }
+
+        public object GetValue(string key)
+        {
+            if (keyValues.TryGetValue(key, out object value))
+            {
+                return value;
+            }
+            return null;
+        }
+
+        public void SetValue(string key, object value)
+        {
+            keyValues[key] = value;
+        }
+
+        public DynamicShapedDatumSet ToDatumSet()
+        {
+            return new DynamicShapedDatumSet(keyValues);
+        }
+    }
+
     public class MedicationAdministrationDatasetRecord : MedicationAdministration, ISalt
     {
         [Field(Name = DatasetColumns.Salt, Type = LeafType.Guid, Required = true)]
@@ -228,7 +272,7 @@ namespace Model.Cohort
                 AddressState = AddressState,
                 Ethnicity = Ethnicity,
                 Gender = Gender,
-                Age = Age,
+                Age = Age > 89 ? 89 : Age,
                 Language = Language,
                 MaritalStatus = MaritalStatus,
                 Race = Race,

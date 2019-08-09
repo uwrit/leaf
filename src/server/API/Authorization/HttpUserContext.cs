@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Options;
 using System.IdentityModel.Tokens.Jwt;
+using Model.Authentication;
 
 namespace API.Authorization
 {
@@ -37,7 +38,7 @@ namespace API.Authorization
                 if (groups == null)
                 {
                     var gs = user.FindAll(c => c.Type == Group.Key);
-                    groups = gs.Select(g => $"{g.Value}@{Issuer}").ToArray();
+                    groups = gs.Select(g => $"{g.Value}@{ScopedIdentity.Scope}@{Issuer}").ToArray();
                 }
                 return groups;
             }
@@ -62,6 +63,8 @@ namespace API.Authorization
         public bool IsAdmin => user.IsInRole(Role.Admin) && IsInstitutional;
 
         public bool IsQuarantined => !user.IsInRole(Role.Fed);
+
+        IScopedIdentity ScopedIdentity => new SAML2ScopedIdentity(Identity);
 
         string identity;
         string Identity

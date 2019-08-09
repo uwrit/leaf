@@ -7,6 +7,7 @@
 
 import { PatientListDatasetShape } from "../patientList/Dataset";
 import { Constraint } from "./Concept";
+import { PatientListColumnType } from "../patientList/Column";
 
 export interface AdminDemographicQuery {
     sqlStatement: string;
@@ -14,8 +15,9 @@ export interface AdminDemographicQuery {
     changedBy: string;
 }
 
-export interface AdminDatasetQuery {
+interface BaseAdminDatasetQuery {
     id: string;
+    universalId?: string;
     categoryId?: number;
     constraints: Constraint[];
     description?: string;
@@ -23,9 +25,20 @@ export interface AdminDatasetQuery {
     shape: PatientListDatasetShape;
     sqlStatement: string;
     tags: string[];
-    universalId?: string;
+    isEncounterBased: boolean;
+    sqlFieldDate?: string;
+    sqlFieldValueString?: string;
+    sqlFieldValueNumeric?: string;
     unsaved?: boolean;
     changed?: boolean;
+}
+
+export interface AdminDatasetQueryDTO extends BaseAdminDatasetQuery {
+    schema?: DynamicDatasetQuerySchemaDTO;
+}
+
+export interface AdminDatasetQuery extends BaseAdminDatasetQuery {
+    schema?: DynamicDatasetQuerySchema;
 }
 
 export interface DatasetQueryCategory {
@@ -34,3 +47,55 @@ export interface DatasetQueryCategory {
     changed?: boolean;
     unsaved?: boolean;
 }
+
+export interface DynamicDatasetQuerySchemaDTO {
+    fields: DynamicDatasetQuerySchemaFieldDTO[];
+}
+
+export interface DynamicDatasetQuerySchema {
+    fields: DynamicDatasetQuerySchemaField[];
+}
+
+interface BaseDynamicDatasetQuerySchemaField {
+    name: string;
+    mask: boolean;
+    required: boolean;
+    phi: boolean;
+}
+
+export interface DynamicDatasetQuerySchemaFieldDTO extends BaseDynamicDatasetQuerySchemaField {
+    type: string;
+}
+
+export interface DynamicDatasetQuerySchemaField extends BaseDynamicDatasetQuerySchemaField {
+    present: boolean;
+    type: PatientListColumnType;
+}
+
+export const fromDTO = (dto: AdminDatasetQueryDTO): AdminDatasetQuery => {
+    const ds: AdminDatasetQuery = {
+        ...dto,
+        schema: dto.schema 
+            ? { fields: dto.schema.fields.map(f => ({ ...f, type: PatientListColumnType[f.type], present: true })) }
+            : { fields: [] }
+    };
+    return ds;
+};
+
+export const toDTO = (ds: AdminDatasetQuery): AdminDatasetQueryDTO => {
+    const dto: AdminDatasetQueryDTO = {
+        ...ds,
+        schema: ds.schema 
+            ? { fields: ds.schema.fields.map(f => (
+                { 
+                    name: f.name, 
+                    mask: f.mask, 
+                    phi: f.phi, 
+                    required: true, 
+                    type: PatientListColumnType[f.type]
+                }) ) 
+              }
+            : { fields: [] }
+    };
+    return dto;
+};

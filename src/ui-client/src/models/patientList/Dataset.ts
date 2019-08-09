@@ -6,7 +6,7 @@
  */ 
 
 import { CohortStateType } from '../state/CohortState';
-import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, ValueByColumnKey } from './Column';
+import { PatientListColumn, PatientListColumnId, PatientListColumnTemplate, ValueByColumnKey, PatientListColumnType } from './Column';
 import { PatientListRowDTO } from './Patient';
 import { DateBoundary } from '../panel/Date';
 
@@ -53,8 +53,20 @@ export interface PatientListDatasetDTO {
 }
 
 interface PatientListDatasetSchema {
-    fields: string[],
+    fields: PatientListDatasetSchemaField[],
     shape: PatientListDatasetShape;
+}
+
+export interface PatientListDatasetDynamicSchema extends PatientListDatasetSchema {
+    isEncounterBased: boolean;
+    sqlFieldDate?: string;
+    sqlFieldValueString?: string;
+    sqlFieldValueNumeric?: string;
+}
+
+interface PatientListDatasetSchemaField {
+    name: string;
+    type: PatientListColumnType;
 }
 
 interface PatientListDatasetResults {
@@ -82,6 +94,7 @@ export interface PatientListDatasetQueryDTO {
     category: string;
     description?: string;
     name: string;
+    isEncounterBased: boolean;
     shape: PatientListDatasetShape;
     tags: string[];
     universalId?: string;

@@ -27,6 +27,27 @@
     z-index: 100;
 }
 
+.dataset-editor-dynamic-properties {
+    margin-left: -4px !important;
+    padding: 0 !important;
+}
+
+.dataset-editor-dynamic-properties .col-md-6 > .row {
+    padding: 0 20px;
+}
+
+.dataset-editor-column-right .admin-panel-checkbox {
+    padding: 5px 18px 20px 18px !important;
+}
+
+.dataset-editor-dynamic-properties .position-relative.form-group {
+    width: 100%;
+}
+
+.dataset-editor-dynamic-properties .position-relative.form-group button {
+    height: 35.5px;
+}
+
 /* Header */
 .dataset-editor-column-right-header {
     margin-bottom: 20px;
@@ -97,8 +118,9 @@
 .dataset-editor-sql-container {
     background-color: white;
     display: flex;
-    height: 455px;
-    padding: 8px;
+    height: 400px;
+    margin-left: -6px;
+    padding: 0px;
     position: relative;
 }
 
@@ -114,12 +136,17 @@
 }
 
 /* Columns */
-.dataset-editor-column-container {
+.dataset-editor-column-container,
+.dataset-editor-dynamic-column-container {
     height: 100%;
-    min-width: 230px;
+    min-width: 300px;
     overflow: auto;
     padding: 8px 8px;
     position: relative;
+}
+
+.dataset-editor-dynamic-column-container {
+    min-width: 350px;
 }
 
 .dataset-editor-column-container svg {

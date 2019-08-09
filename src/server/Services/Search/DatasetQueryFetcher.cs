@@ -31,7 +31,7 @@ namespace Services.Search
             opts = dbOptions.Value;
         }
 
-        public async Task<IEnumerable<DatasetQuery>> GetDatasetQueriesAsync()
+        public async Task<IEnumerable<IDatasetQuery>> GetDatasetQueriesAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {

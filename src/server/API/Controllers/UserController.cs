@@ -57,12 +57,13 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult<IdTokenDTO> GetUser()
+        public async Task<ActionResult<IdTokenDTO>> GetUser()
         {
             try
             {
-                var token = jwtProvider.IdToken(HttpContext);
-                return Ok(new IdTokenDTO { IdToken = token });
+                var login = await jwtProvider.IdToken(HttpContext);
+
+                return Ok(new IdTokenDTO { IdToken = login });
             }
             catch (LeafAuthenticationException lae)
             {
@@ -138,24 +139,6 @@ namespace API.Controllers
                 logger.LogError("Failed to refresh access token. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-        }
-
-
-        [AllowAnonymous]
-        [HttpGet("login/config")]
-        public ActionResult<LoginConfigDTO> LoginConfig()
-        {
-            var config = new LoginConfigDTO
-            {
-                Mechanism = authenticationOptions.Mechanism,
-                InactivityTimeoutMinutes = authenticationOptions.InactiveTimeoutMinutes,
-                CacheLimit = cohortOptions.RowLimit,
-                ExportLimit = cohortOptions.ExportLimit,
-                LogoutUri = authenticationOptions.LogoutURI.ToString(),
-                Version = versionOptions.Version.ToString(),
-                ClientOptions = clientOptions
-            };
-            return Ok(config);
         }
 
         [Authorize(Policy = TokenType.Id)]

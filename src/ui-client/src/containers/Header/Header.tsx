@@ -17,7 +17,7 @@ import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmation
 import { resetPanels } from '../../actions/panels';
 import NetworkHealthResponder from '../../components/Header/NetworkHealthResponder/NetworkHealthResponder';
 import { AppState } from '../../models/state/AppState';
-import { UserContext, AuthConfig } from '../../models/Auth';
+import { UserContext, AppConfig } from '../../models/Auth';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkResponder';
 import { Panel } from '../../models/panel/Panel';
@@ -33,7 +33,7 @@ import './Header.css';
 
 interface OwnProps {}
 interface StateProps {
-    auth: AuthConfig;
+    auth: AppConfig;
     panels: Panel[];
     panelFilters: PanelFilter[];
     responders: NetworkResponderMap;
