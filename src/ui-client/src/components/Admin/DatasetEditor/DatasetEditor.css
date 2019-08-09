@@ -27,6 +27,11 @@
     z-index: 100;
 }
 
+.dataset-editor-dynamic-properties {
+    margin-left: -4px !important;
+    padding: 0 !important;
+}
+
 .dataset-editor-dynamic-properties .col-md-6 > .row {
     padding: 0 20px;
 }
@@ -113,8 +118,9 @@
 .dataset-editor-sql-container {
     background-color: white;
     display: flex;
-    height: 455px;
-    padding: 8px;
+    height: 400px;
+    margin-left: -6px;
+    padding: 0px;
     position: relative;
 }
 
@@ -133,7 +139,7 @@
 .dataset-editor-column-container,
 .dataset-editor-dynamic-column-container {
     height: 100%;
-    min-width: 230px;
+    min-width: 240px;
     overflow: auto;
     padding: 8px 8px;
     position: relative;
