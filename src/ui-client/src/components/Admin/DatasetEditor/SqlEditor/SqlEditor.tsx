@@ -41,7 +41,7 @@ export class SqlEditor extends React.PureComponent<Props> {
                     {this.getColumnContainer()}
                     <div className={`${c}-sql`}>
                         <div className={`${c}-title`}>SQL Query</div>
-                        <SqlBox sql={sql} height={345} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
+                        <SqlBox sql={sql} height={360} width={width} readonly={false} changeHandler={this.handleSqlChange}/>
                         <div className={`${c}-sql-autoformat`} onClick={this.handleAutoFormatClick}>Auto-format</div>
                     </div>
                 </div>
@@ -84,10 +84,10 @@ export class SqlEditor extends React.PureComponent<Props> {
      * Handle clicks to the 'Auto-format' button, which pretty prints SQL.
      */
     private handleAutoFormatClick = () => {
-        const { dataset, handleInputChange } = this.props;
+        const { dataset, dispatch } = this.props;
         if (dataset) {
             const pretty = formatSql(dataset.sqlStatement);
-            handleInputChange(pretty, 'sqlStatement');
+            dispatch(setAdminDatasetSql(pretty));
         }
     }
 
