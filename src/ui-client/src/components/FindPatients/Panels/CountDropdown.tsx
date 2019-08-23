@@ -23,8 +23,6 @@ interface State {
 export default class CountDropdown extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
-        this.toggle = this.toggle.bind(this);
-        this.selectItem = this.selectItem.bind(this);
         this.state = { dropdownOpen: false };
     }
 
@@ -44,13 +42,13 @@ export default class CountDropdown extends React.Component<Props, State> {
         return false;
     }
     
-    public toggle() {
+    public toggle = () => {
         this.setState((prevState: any) => ({
             dropdownOpen: !prevState.dropdownOpen
         }));
     }
 
-    public selectItem(item: any) {
+    public selectItem = (item: any) => {
         const { dispatch, index, panel } = this.props;
         const text: string = item.target.innerText;
         const val: number = +text.replace('At Least ','').replace('x','').trim();

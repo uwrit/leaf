@@ -20,10 +20,6 @@ interface Props {
 }
 
 export default class Paginate extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { className, patientList, totalPatients } = this.props;
         const c = className || 'patientlist';

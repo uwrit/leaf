@@ -8,9 +8,9 @@
 import React from 'react';
 import { TextArea } from '../../Section/TextArea';
 import { SpecializationGroup, Specialization } from '../../../../models/admin/Concept';
-import { ConfirmationModalState, InformationModalState } from '../../../../models/state/GeneralUiState';
-import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, saveOrUpdateAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
-import { showConfirmationModal, showInfoModal } from '../../../../actions/generalUi';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { removeAdminConceptSpecializationGroup, deleteAdminConceptSpecializationGroup, setAdminConceptSpecializationGroup } from '../../../../actions/admin/specializationGroup';
+import { showConfirmationModal } from '../../../../actions/generalUi';
 import { setAdminConceptSpecialization } from '../../../../actions/admin/specialization';
 import { SpecializationDropdownOption } from '../SpecializationDropdownOption/SpecializationDropdownOption';
 import { generate as generateId } from 'shortid';
@@ -25,9 +25,6 @@ interface Props {
 
 export class SpecializationGroupDropdownPreview extends React.PureComponent<Props> {
     private className = 'sqlset-editor';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { specializationGroup, dispatch, forceValidation } = this.props;

@@ -15,10 +15,6 @@ interface Props {
 }
 
 export default class ExportProgress extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { className, exportState } = this.props;
         const { progress } = exportState;

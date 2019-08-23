@@ -18,9 +18,6 @@ interface Props {
 }
 
 export class SqlEditor extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { data } = this.props;

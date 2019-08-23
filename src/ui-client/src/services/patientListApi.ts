@@ -83,7 +83,7 @@ const downloadCsv = (content: string, fileName: string) => {
         a.click();
         document.body.removeChild(a);
     } else {
-        location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
+        window.location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
     }
 };
 
@@ -149,7 +149,7 @@ const addSingletonDataset = async (
     /* 
     * Update the displayed patients.
     */
-    await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
+    const added = await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
 
     /* 
     * Get the latest patient list.

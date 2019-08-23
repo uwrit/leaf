@@ -22,10 +22,6 @@ interface Props {
 }
 
 export default class ConceptTree extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { tree, allowReparent, allowRerender, dispatch, selectedId } = this.props;
         const roots = this.props.roots

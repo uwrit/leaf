@@ -13,36 +13,35 @@ export const getBrowser = (): Browser => {
     let browserName  =BrowserType.Other;
     let fullVersion  = ''+parseFloat(navigator.appVersion); 
     let majorVersion = parseInt(navigator.appVersion,10);
-    let nameOffset: any;
     let verOffset: any;
     let ix: any;
 
     // In Opera, the true version is after "Opera" or after "Version"
-    if ((verOffset=nAgt.indexOf("Opera"))!=-1) {
+    if ((verOffset=nAgt.indexOf("Opera"))!==-1) {
         browserName = BrowserType.Opera;
         fullVersion = nAgt.substring(verOffset+6);
         if ((verOffset=nAgt.indexOf("Version"))!=-1) 
             fullVersion = nAgt.substring(verOffset+8);
     }
     // In MSIE, the true version is after "MSIE" in userAgent
-    else if ((verOffset=nAgt.indexOf("MSIE"))!=-1) {
+    else if ((verOffset=nAgt.indexOf("MSIE"))!==-1) {
         browserName = BrowserType.InternetExplorer;
         fullVersion = nAgt.substring(verOffset+5);
     }
     // In Chrome, the true version is after "Chrome" 
-    else if ((verOffset=nAgt.indexOf("Chrome"))!=-1) {
+    else if ((verOffset=nAgt.indexOf("Chrome"))!==-1) {
         browserName = /Edge/.test(nAgt) ? BrowserType.Edge : BrowserType.Chrome;
         fullVersion = nAgt.substring(verOffset+7);
     }
     // In Safari, the true version is after "Safari" or after "Version" 
-    else if ((verOffset=nAgt.indexOf("Safari"))!=-1) {
+    else if ((verOffset=nAgt.indexOf("Safari"))!==-1) {
         browserName = BrowserType.Safari;
         fullVersion = nAgt.substring(verOffset+7);
-        if ((verOffset=nAgt.indexOf("Version"))!=-1) 
+        if ((verOffset=nAgt.indexOf("Version"))!==-1) 
             fullVersion = nAgt.substring(verOffset+8);
         }
     // In Firefox, the true version is after "Firefox" 
-    else if ((verOffset=nAgt.indexOf("Firefox"))!=-1) {
+    else if ((verOffset=nAgt.indexOf("Firefox"))!==-1) {
         browserName = BrowserType.Firefox;
         fullVersion = nAgt.substring(verOffset+8);
     }
@@ -57,9 +56,9 @@ export const getBrowser = (): Browser => {
     }
     */
     // trim the fullVersion string at semicolon/space if present
-    if ((ix=fullVersion.indexOf(";"))!=-1)
+    if ((ix=fullVersion.indexOf(";"))!==-1)
         fullVersion=fullVersion.substring(0,ix);
-    if ((ix=fullVersion.indexOf(" "))!=-1)
+    if ((ix=fullVersion.indexOf(" "))!==-1)
         fullVersion=fullVersion.substring(0,ix);
 
     majorVersion = parseInt(''+fullVersion,10);

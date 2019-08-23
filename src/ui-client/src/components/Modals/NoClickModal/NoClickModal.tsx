@@ -20,10 +20,7 @@ interface Props {
 
 export default class NoClickModal extends React.Component<Props> {
     private hideTimeoutOnCompleteMs = 1500;
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public componentDidUpdate(prevProps: Props) {
         const currState = this.props.state;
         const { dispatch } = this.props;

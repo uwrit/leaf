@@ -12,7 +12,7 @@ import { PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';
 import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Date';
-import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetShape, PatientListDatasetQuery } from '../models/patientList/Dataset';
+import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import moment from 'moment'
 
 /*

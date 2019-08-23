@@ -16,10 +16,6 @@ interface Props {
 }
 
 export class Configuration extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { changeHandler, adminConcept, togglePanelPreview } = this.props.data;
         return (

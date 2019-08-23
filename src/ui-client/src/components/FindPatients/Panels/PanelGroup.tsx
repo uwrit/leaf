@@ -18,10 +18,6 @@ interface Props {
 }
 
 export class PanelGroup extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { panels, dispatch, queryState } = this.props;
 

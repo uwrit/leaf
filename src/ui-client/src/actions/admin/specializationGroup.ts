@@ -7,7 +7,7 @@
 
 import { AppState } from "../../models/state/AppState";
 import { SpecializationGroup, SpecializationGroupDeleteResponse } from "../../models/admin/Concept";
-import { getSpecializationGroups, updateSpecializationGroup, deleteSpecializationGroup, createSpecializationGroup } from "../../services/admin/specializationGroupApi";
+import { updateSpecializationGroup, deleteSpecializationGroup, createSpecializationGroup } from "../../services/admin/specializationGroupApi";
 import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
 import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 

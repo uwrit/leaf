@@ -6,14 +6,11 @@
  */ 
 
 import React from 'react';
-import { connect } from 'react-redux';
-import { Button, DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
+import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
 import { setPanelItemNumericFilter } from '../../../actions/panels';
-import { showInfoModal } from '../../../actions/generalUi';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
 import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
-import { InformationModalState } from '../../../models/state/GeneralUiState';
 import './PanelItemNumericFilter.css';
 
 interface Props {

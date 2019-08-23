@@ -144,7 +144,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         const c = this.className;
 
         if (set.specializationGroups.size) {
-            const emphTextClass = `${c}-text-emphasis`
+            // const emphTextClass = `${c}-text-emphasis`
             let toggleClasses = [ `${c}-dropdown-toggle` ];
             let toggleText = `Show Dropdowns (${set.specializationGroups.size} total)`;
             if (isOpen) {

@@ -10,7 +10,6 @@ import Tuple from './Tuple';
 import { FaChevronDown } from 'react-icons/fa';
 import EncounterDetailGroup from './EncounterDetailGroup';
 import { PatientListDetailEncounter, PatientListRow } from '../../models/patientList/Patient';
-import { Collapse } from 'reactstrap';
 import { togglePatientRowOpen } from '../../actions/cohort/patientList';
 import { PatientListColumn } from '../../models/patientList/Column';
 
@@ -23,9 +22,6 @@ interface Props {
 
 export default class Row extends React.Component<Props> {
     private className = 'patientlist';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { columns, index, row } = this.props;

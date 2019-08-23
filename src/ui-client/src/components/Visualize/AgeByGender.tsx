@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
-import { Bar, BarChart, LabelList, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { visualizationConfig } from '../../config/visualization';
-import { AgeByGenderBucket, AgeByGenderBuckets, AgeByGenderData } from '../../models/cohort/DemographicDTO';
+import { AgeByGenderBucket, AgeByGenderData } from '../../models/cohort/DemographicDTO';
 
 export interface Props {
     data: AgeByGenderData;
@@ -19,10 +19,7 @@ export interface Props {
 export class AgeByGender extends React.PureComponent<Props> {
     private className = 'visualization-agebygender';
     private maxWidth = 500;
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public render() {
         const config = visualizationConfig.demographics.ageByGender;
         const { height, width } = this.props;

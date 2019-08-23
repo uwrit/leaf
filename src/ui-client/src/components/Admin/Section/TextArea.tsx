@@ -15,10 +15,6 @@ interface Props extends PropertyProps {
 }
 
 export class TextArea extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { className, label, subLabel, locked, value, required, onClick, forceValidation, errorText, placeholder } = this.props;
         const classes = [ 'leaf-input' ];
@@ -88,7 +84,7 @@ export class TextArea extends React.PureComponent<Props> {
     }
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const { changeHandler, propName, required } = this.props;
+        const { changeHandler, propName } = this.props;
         const newVal = e.currentTarget.value;
         changeHandler(newVal, propName);
     };

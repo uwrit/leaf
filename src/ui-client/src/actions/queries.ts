@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { SavedQuery, SavedQueryRef, Query, QuerySaveResponseDTO, QueryDependent } from '../models/Query';
+import { SavedQuery, SavedQueryRef, Query, QueryDependent } from '../models/Query';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';

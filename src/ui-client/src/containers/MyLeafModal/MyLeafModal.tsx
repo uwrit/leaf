@@ -35,10 +35,6 @@ type Props = StateProps & DispatchProps & OwnProps;
 class MyLeafModal extends React.PureComponent<Props> {
     private className = 'myleaf-modal';
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];

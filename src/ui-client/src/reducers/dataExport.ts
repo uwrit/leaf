@@ -6,7 +6,7 @@
  */ 
 
 import { EXPORT_CLEAR_ERROR_OR_COMPLETE,  EXPORT_COMPLETE, EXPORT_ERROR, EXPORT_SET_OPTIONS, EXPORT_SET_PROGRESS, ExportAction, } from '../actions/dataExport';
-import ExportState, { ExportProgress } from '../models/state/Export';
+import ExportState from '../models/state/Export';
 
 export function defaultExportState(): ExportState {
     return {

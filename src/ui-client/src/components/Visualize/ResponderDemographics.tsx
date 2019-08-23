@@ -21,9 +21,6 @@ export interface Props {
 
 export default class ResponderDemographics extends React.PureComponent<Props> {
     private className = 'visualize-responder';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { ageByGenderData, binarySplitData } = this.props.cohort.visualization.demographics;

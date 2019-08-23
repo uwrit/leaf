@@ -21,8 +21,8 @@ import { DatasetsState } from '../../../models/state/AppState';
 import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetSelected, setDatasetDisplay } from '../../../actions/datasets';
 import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
 import { DynamicEditor } from './DynamicEditor/DynamicEditor';
-import './DatasetEditor.css';
 import { PatientListColumnType } from '../../../models/patientList/Column';
+import './DatasetEditor.css';
 
 interface Props { 
     data: AdminState;
@@ -115,9 +115,9 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 <div className={`${c}-start`}>
                                     <p>It looks like you haven't created a Basic Demographics query to populate the Visualize and Patient List screens.</p>
                                     <p>
-                                        <a onClick={this.handleInitialBasicDemographicsSetupClick}>
+                                        <span onClick={this.handleInitialBasicDemographicsSetupClick}>
                                             Click here to start creating a SQL query to return demographics data.
-                                        </a>
+                                        </span>
                                     </p>
                                 </div>
                                 }
@@ -125,7 +125,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 {/* Hint to click on a Dataset to edit */}
                                 {!currentDataset && !data.datasets.demographicsDataset.unsaved &&
                                 <div className={`${c}-na`}>
-                                    <p>Click on a Dataset to the left to edit <br></br> or <a onClick={this.handleCreateDatasetClick}>create a new one</a></p>
+                                    <p>Click on a Dataset to the left to edit <br></br> or <span onClick={this.handleCreateDatasetClick}>create a new one</span></p>
                                 </div>
                                 }
 

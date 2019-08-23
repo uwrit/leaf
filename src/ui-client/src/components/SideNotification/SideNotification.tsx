@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { SideNotificationState, NotificationStates } from '../../models/state/GeneralUiState';
-import { Row, Col } from 'reactstrap';
 import LoaderIcon from '../Other/LoaderIcon/LoaderIcon';
 import { FiCheckCircle } from 'react-icons/fi';
 import { setSideNotificationState } from '../../actions/generalUi';
@@ -21,11 +20,7 @@ interface Props {
 export default class SideNotification extends React.PureComponent<Props> {
     private className = 'side-notification';
     private hideTimeoutOnCompleteMs = 2500;
-
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public componentDidUpdate(prevProps: Props) {
         const currState = this.props.state;
         const { dispatch } = this.props;

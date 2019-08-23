@@ -17,10 +17,6 @@ interface Props {
 export default class HelpButton extends React.PureComponent<Props> {
     private className = 'help';
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { auth } = this.props;
         const c = this.className;

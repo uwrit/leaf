@@ -18,10 +18,6 @@ interface Props {
 }
 
 export default class ConfirmationModal extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { confirmationModal } = this.props;
         const buttonClasses = "leaf-button leaf-button";

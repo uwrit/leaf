@@ -12,7 +12,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux'
 import { setCohortCountBoxState } from '../../actions/generalUi';
 import { AppState } from '../../models/state/AppState';
-import { CohortStateType, NetworkCohortState, PatientCountState } from '../../models/state/CohortState';
+import { NetworkCohortState, PatientCountState } from '../../models/state/CohortState';
 import { CohortCountBoxState } from '../../models/state/GeneralUiState'
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import { Query } from '../../models/Query';
@@ -33,9 +33,6 @@ type Props = StateProps & DispatchProps & OwnProps;
 
 export class CohortSummary extends React.Component<Props> {
     private prevCount = 0;
-    constructor(props: Props) {
-        super(props);
-    }
 
     public shouldComponentUpdate(nextProps: Props) {
         // Check counts

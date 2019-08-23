@@ -108,11 +108,11 @@ const cancelCountQuery = (state: CohortState): CohortState => {
 
 const resetCohorts = (state: CohortState): CohortState => {
     const network = new Map();
-    state.networkCohorts.forEach((n: NetworkCohortState) => { 
-        n.count = defaultCountState();
-        n.patientList = defaultNetworkPatientListState(),
-        n.visualization = defaultVisualizationState();
-        network.set(n.id, n); 
+    state.networkCohorts.forEach((n: NetworkCohortState) => {
+        const count = defaultCountState()
+        const patientList = defaultNetworkPatientListState();
+        const visualization = defaultVisualizationState();
+        network.set(n.id, Object.assign({}, n, { count, patientList, visualization }));
     });
 
     return Object.assign({}, state, {

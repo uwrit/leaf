@@ -35,10 +35,6 @@ interface OwnProps { }
 type Props = StateProps & DispatchProps & OwnProps;
 
 class PanelGroupColumn extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public handleQueryClick = () => {
         const { queryState, dispatch, panels } = this.props;
         switch (queryState) {
@@ -70,12 +66,16 @@ class PanelGroupColumn extends React.Component<Props> {
                     }
                     return dispatch(showInfoModal(info));
                 }
+                return;
             }
             case CohortStateType.REQUESTING: {
                 return dispatch(cancelQuery());
             }
             case CohortStateType.LOADED: {
                 return dispatch(toggleSaveQueryPane());
+            }
+            default: {
+                return;
             }
         }
     }

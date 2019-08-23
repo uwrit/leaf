@@ -24,10 +24,6 @@ interface Props {
 }
 
 export default class SavedQueriesTable extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { queries, isGateway } = this.props;
 

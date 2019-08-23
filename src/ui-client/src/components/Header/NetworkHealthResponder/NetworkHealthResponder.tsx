@@ -27,10 +27,6 @@ interface Props {
 export default class NetworkHealthResponder extends React.PureComponent<Props> {
     private className = 'header-networkhealth-responder';
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     public static defaultProps = {
         forceUpdate: false
     }

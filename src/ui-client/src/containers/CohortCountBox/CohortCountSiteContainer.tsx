@@ -17,10 +17,6 @@ interface Props {
 }
 
 export class CohortCountSiteContainer extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { cohorts, network, show } = this.props;
         const sites: any = []; 

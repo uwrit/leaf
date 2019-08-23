@@ -8,7 +8,7 @@
 import React from 'react';
 import { Section } from '../../Section/Section';
 import { Row, Col, Container } from 'reactstrap';
-import { AdminDatasetQuery, DatasetQueryCategory, DynamicDatasetQuerySchema } from '../../../../models/admin/Dataset';
+import { AdminDatasetQuery, DatasetQueryCategory } from '../../../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
 import { PatientListColumnType } from '../../../../models/patientList/Column';
 import { DynamicPropDropdown } from '../DynamicPropDropdown/DynamicPropDropdown';
@@ -29,9 +29,6 @@ interface Props {
 }
 
 export class DynamicDatasetProps extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { dataset, inputChangeHandler } = this.props;

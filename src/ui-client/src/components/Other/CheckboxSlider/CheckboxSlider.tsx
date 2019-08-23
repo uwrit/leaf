@@ -16,10 +16,6 @@ interface Props {
 const className = 'checkbox-slider';
 
 export default class CheckboxSlider extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         return (
             <div className={`${className}-container`} onClick={this.props.onClick}>

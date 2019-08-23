@@ -22,9 +22,6 @@ interface Props {
 
 export default class GlowingButton extends React.PureComponent<Props> {
     private className = 'glowing-button';
-    constructor(props: Props) {
-        super(props);
-    }
     
     public render() {
         const c = `${this.className} ${GLOWING_BUTTON_STATE[this.props.indicator].toLowerCase()} ${this.props.className ? this.props.className : ''}`

@@ -6,8 +6,8 @@
  */ 
 
 import React from 'react';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Container, Row, Col } from 'reactstrap';
-import { Certificate, NetworkEndpoint } from '../../../../models/admin/Network';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
+import { NetworkEndpoint } from '../../../../models/admin/Network';
 import { TextArea } from '../../Section/TextArea';
 import { AdminNetworkCertificateModalState } from '../../../../models/state/AdminState';
 import { setAdminNetworkCertModalShown, setAdminNetworkEndpoint } from '../../../../actions/admin/networkAndIdentity';
@@ -19,9 +19,6 @@ interface Props {
 
 export default class CertModal extends React.PureComponent<Props> {
     private className = 'identity-network-endpoint-certificate-preview';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { data } = this.props;

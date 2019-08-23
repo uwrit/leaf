@@ -16,10 +16,7 @@ interface Props {
 
 export default class ResponderStatus extends React.PureComponent<Props> {
     private classname = 'patientlist-responder-status'
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public render() {
         const c = this.classname;
         const { cohort, responder } = this.props;

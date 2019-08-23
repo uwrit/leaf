@@ -14,10 +14,6 @@ interface Props {
 }
 
 export default class EncounterDetailGroup extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { className, data } = this.props;
         const c = className ? className : 'patientlist-tuple-detail';

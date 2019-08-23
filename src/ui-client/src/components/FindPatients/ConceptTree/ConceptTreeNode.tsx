@@ -55,10 +55,7 @@ const collectDrag = (connect: DragSourceConnector, monitor: DragSourceMonitor) =
 };
 
 class ConceptTreeNode extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public componentDidMount() {
         const { connectDragPreview } = this.props;
         if (connectDragPreview) {

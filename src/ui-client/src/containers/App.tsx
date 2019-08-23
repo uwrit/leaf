@@ -63,10 +63,6 @@ class App extends React.Component<Props> {
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     public componentDidMount() {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();

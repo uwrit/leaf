@@ -14,10 +14,10 @@ import { PanelFilter } from '../models/panel/PanelFilter';
 import { NetworkIdentity } from '../models/NetworkResponder';
 import { ResourceRef, ExtensionConcept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
-import moment from 'moment';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
+import moment from 'moment';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -149,7 +149,7 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
                 if (isEmbeddedQuery(resRef.universalId)) {
                     const embedded = state.concepts.extensionTree.get(resRef.universalId!);
                     if (!embedded) { 
-                        throw `${resRef.uiDisplayName} is not an existing saved query.`; 
+                        throw new Error(`${resRef.uiDisplayName} is not an existing saved query.`); 
                     }
                     panelItem.concept = embedded;
                 // Else if concept

@@ -20,9 +20,6 @@ interface Props {
 
 export class HintContainer extends React.PureComponent<Props> {
     private className = 'concept-search';
-    constructor(props: Props) {
-        super(props);
-    }
     
     public render() {
         const { conceptSearchState, handleEquivalentHintClick, handleHintSelect, selectedHintIndex, termIsNumeric } = this.props;

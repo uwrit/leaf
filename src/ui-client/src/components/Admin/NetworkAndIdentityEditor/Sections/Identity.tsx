@@ -19,9 +19,6 @@ interface Props {
 }
 
 export class Identity extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { changeHandler, identity, forceValidation } = this.props;

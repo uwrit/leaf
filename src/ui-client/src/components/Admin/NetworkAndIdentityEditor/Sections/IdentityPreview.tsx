@@ -18,9 +18,6 @@ interface Props {
 
 export class IdentityPreview extends React.PureComponent<Props> {
     private className = 'identity-preview';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { dispatch, identity } = this.props;

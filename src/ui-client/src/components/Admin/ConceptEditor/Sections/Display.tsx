@@ -16,10 +16,6 @@ interface Props {
 }
 
 export class Display extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { changeHandler, adminConcept, togglePanelPreview, forceValidation } = this.props.data;
         return (

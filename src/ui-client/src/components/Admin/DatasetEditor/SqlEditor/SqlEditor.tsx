@@ -25,9 +25,6 @@ interface Props {
 
 export class SqlEditor extends React.PureComponent<Props> {
     private className = 'dataset-editor';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { dataset } = this.props;

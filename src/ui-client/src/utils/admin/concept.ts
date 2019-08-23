@@ -34,7 +34,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
         out.isEncounterBased = sqlSet.isEncounterBased;
     }
 
-    if (alwaysAdd.has(propName) || userConcept[propName] !== undefined && !neverAdd.has(propName)) {
+    if (alwaysAdd.has(propName) || (userConcept[propName] !== undefined && !neverAdd.has(propName))) {
         out[propName] = val;
     }
     return out;

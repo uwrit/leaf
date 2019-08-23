@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Action, Dispatch } from 'redux';
+import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ConceptEquivalentHint, AggregateConceptHintRef } from '../models/concept/ConceptHint';
 import { fetchConceptEquivalentHintFromServer, getHints, initializeSearch } from '../services/conceptHintSuggestionApi';

@@ -28,10 +28,6 @@ interface Props {
 }
 
 export default class AddDatasetSelectors extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates } = this.props;
         const c = className ? className : 'patientlist-add-dataset';
