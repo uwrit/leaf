@@ -22,8 +22,6 @@ export const getDynamicSchema = (dataset: AdminDatasetQuery) => {
     /*
      *  New Column default props.
      */
-    const phi = false;
-    const mask = false;
     const required = true;
     const present = true;
 
@@ -71,7 +69,7 @@ const autoDeidentifyFromType = (type: PatientListColumnType) => {
 const inferTypeFromName = (name: string): PatientListColumnType => {
     var n = name.toLowerCase();
     if (n.indexOf('date') > -1)  { return PatientListColumnType.DateTime; }
-    if (n.indexOf('dt') > -1)    { return PatientListColumnType.DateTime; }
+    if (n.indexOf('time') > -1)  { return PatientListColumnType.DateTime; }
     if (n.indexOf('num') > -1)   { return PatientListColumnType.Numeric; }
     if (n.indexOf('quant') > -1) { return PatientListColumnType.Numeric; }
     if (n.startsWith('is'))      { return PatientListColumnType.Bool; }

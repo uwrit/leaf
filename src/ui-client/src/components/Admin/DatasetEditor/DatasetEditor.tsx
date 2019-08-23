@@ -115,7 +115,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 <div className={`${c}-start`}>
                                     <p>It looks like you haven't created a Basic Demographics query to populate the Visualize and Patient List screens.</p>
                                     <p>
-                                        <span onClick={this.handleInitialBasicDemographicsSetupClick}>
+                                        <span className='link-span' onClick={this.handleInitialBasicDemographicsSetupClick}>
                                             Click here to start creating a SQL query to return demographics data.
                                         </span>
                                     </p>
@@ -125,7 +125,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                 {/* Hint to click on a Dataset to edit */}
                                 {!currentDataset && !data.datasets.demographicsDataset.unsaved &&
                                 <div className={`${c}-na`}>
-                                    <p>Click on a Dataset to the left to edit <br></br> or <span onClick={this.handleCreateDatasetClick}>create a new one</span></p>
+                                    <p>Click on a Dataset to the left to edit <br></br> or <span className='link-span' onClick={this.handleCreateDatasetClick}>create a new one</span></p>
                                 </div>
                                 }
 

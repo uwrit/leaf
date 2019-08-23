@@ -105,6 +105,7 @@ export default class ConceptSearchEngineWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case ADD_CONCEPT_HINTS:

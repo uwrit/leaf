@@ -133,8 +133,8 @@ class CohortCountBox extends React.PureComponent<Props, State> {
  
                 <CohortCountQueryDetail cohort={cohorts} state={cohort.count.state} />
 
-                <div className="cohort-count-detail-show">
-                    <span onClick={this.handleShowDetailClick}>
+                <div className='cohort-count-detail-show'>
+                    <span className='link-span' onClick={this.handleShowDetailClick}>
                         {showDetail ? 'hide detail' : 'show detail'}
                     </span>
                 </div>

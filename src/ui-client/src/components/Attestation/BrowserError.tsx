@@ -22,19 +22,19 @@ export default class BrowserError extends React.PureComponent {
                         </p>
                     </div>
                     <div className={`${c}-browser`}>
-                        <img className={`${c}-browser-chrome`} src={process.env.PUBLIC_URL + '/images/logos/browsers/chrome.png'} />
+                        <img alt='chrome-logo' className={`${c}-browser-chrome`} src={process.env.PUBLIC_URL + '/images/logos/browsers/chrome.png'} />
                         <div className={`${c}-browser-version`}>72+</div>
                     </div>
                     <div className={`${c}-browser`}>
-                        <img className={`${c}-browser-firefox`} src={process.env.PUBLIC_URL + '/images/logos/browsers/firefox.png'} />
+                        <img alt='ff-logo' className={`${c}-browser-firefox`} src={process.env.PUBLIC_URL + '/images/logos/browsers/firefox.png'} />
                         <div className={`${c}-browser-version`}>65+</div>
                     </div>
                     <div className={`${c}-browser`}>
-                        <img className={`${c}-browser-edge`} src={process.env.PUBLIC_URL + '/images/logos/browsers/edge.png'} />
+                        <img alt='edge-logo' className={`${c}-browser-edge`} src={process.env.PUBLIC_URL + '/images/logos/browsers/edge.png'} />
                         <div className={`${c}-browser-version`}>44+</div>
                     </div>
                     <div className={`${c}-browser`}>
-                        <img className={`${c}-browser-safari`} src={process.env.PUBLIC_URL + '/images/logos/browsers/safari.png'} />
+                        <img alt='safari-logo' className={`${c}-browser-safari`} src={process.env.PUBLIC_URL + '/images/logos/browsers/safari.png'} />
                         <div className={`${c}-browser-version`}>12+</div>
                     </div>
                 </div>

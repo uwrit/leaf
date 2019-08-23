@@ -376,7 +376,6 @@ var sortPatients = function (config) {
  * storing summarized stats from numeric datasets.
  */
 var getDerivedNumericColumnsTemplate = function () {
-    // tslint:disable
     return {
         trend: { id: 'Trend', isDisplayed: true, type: typeSparkline },
         count: { id: 'Count', isDisplayed: true, type: typeNum },
@@ -389,14 +388,12 @@ var getDerivedNumericColumnsTemplate = function () {
         earliest: { id: 'Earliest', type: typeString },
         earliestDate: { id: 'EarliestDate', type: typeDate }
     };
-    // tslint:enable
 };
 /*
  * Define a derivedNumericColumns template for
  * storing summarized stats from datasets.
  */
 var getDerivedNonNumericColumnsTemplate = function () {
-    // tslint:disable
     return {
         count: { id: 'Count', isDisplayed: true, type: typeNum },
         mostRecent: { id: 'MostRecent', type: typeString },
@@ -404,7 +401,6 @@ var getDerivedNonNumericColumnsTemplate = function () {
         earliest: { id: 'Earliest', type: typeString },
         earliestDate: { id: 'EarliestDate', type: typeDate }
     };
-    // tslint:enable
 };
 /*
  * Return a map and column id lookup object for

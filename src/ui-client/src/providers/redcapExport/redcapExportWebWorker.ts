@@ -20,10 +20,8 @@ import { personId, encounterId } from '../../models/patientList/DatasetDefinitio
 
 const CREATE_EXPORT_CONFIGURATION = 'CREATE_EXPORT_CONFIGURATION';
 
-const typeString = PatientListColumnType.String;
 const typeNum = PatientListColumnType.Numeric;
 const typeDate = PatientListColumnType.DateTime;
-const typeSparkline = PatientListColumnType.Sparkline;
 
 interface REDCapExportEventsAndMappings {
     events: REDCapEvent[];
@@ -124,6 +122,7 @@ export default class REDCapExportWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case CREATE_EXPORT_CONFIGURATION:

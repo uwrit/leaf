@@ -20,7 +20,7 @@ export const getBrowser = (): Browser => {
     if ((verOffset=nAgt.indexOf("Opera"))!==-1) {
         browserName = BrowserType.Opera;
         fullVersion = nAgt.substring(verOffset+6);
-        if ((verOffset=nAgt.indexOf("Version"))!=-1) 
+        if ((verOffset=nAgt.indexOf("Version"))!==-1) 
             fullVersion = nAgt.substring(verOffset+8);
     }
     // In MSIE, the true version is after "MSIE" in userAgent

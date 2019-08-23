@@ -89,6 +89,7 @@ export default class CohortAggregatorWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case AGGREGATE_STATISTICS:

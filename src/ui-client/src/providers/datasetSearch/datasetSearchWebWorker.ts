@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-// tslint:disable
 import { generate as generateId } from 'shortid';
 import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
@@ -111,6 +110,7 @@ export default class DatasetSearchEngineWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case REINDEX_DATASETS:

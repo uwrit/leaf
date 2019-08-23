@@ -202,26 +202,6 @@ const finishDemographicQuery = (state: CohortState): CohortState => {
     });
 };
 
-const setNetworkCohortDemographic = (state: CohortState, action: CohortVisualizationAction): CohortState => {
-    const c: NetworkCohortState = state.networkCohorts.get(action.id)!;
-    const networkCohort: NetworkCohortState = Object.assign({}, c, {
-        patientList: {
-            ...c.patientList,
-            state: CohortStateType.LOADED
-        },
-        visualization: {
-            demographics: action.vizResults!,
-            state: CohortStateType.LOADED
-        },
-    });
-    const networkClone = new Map(state.networkCohorts);
-    networkClone.set(action.id, networkCohort);
-
-    return Object.assign({}, state, {
-        networkCohorts: networkClone
-    });
-};
-
 const errorCohortDemographics = (state: CohortState, action: CohortCountAction): CohortState => {
     const network = new Map(state.networkCohorts);
 

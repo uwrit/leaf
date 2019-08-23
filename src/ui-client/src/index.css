@@ -38,6 +38,15 @@ body {
     transition: width 0.5s;
 }
 
+.link-span {
+    color: rgb(28,168,221);
+    cursor: pointer;
+}
+
+.link-span:hover {
+    text-decoration: underline;
+}
+
 /* Small screen - 45px icons only */
 @media only screen and (max-width: 1400px) {
     html {

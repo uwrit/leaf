@@ -48,7 +48,7 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
                     <Row>
                         <Col className={`${c}-options`} md={3}>
                             <div className={`${c}-option selected`}>
-                                <img className={`${c}-option-logo`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
+                                <img alt='redcap-logo' className={`${c}-option-logo`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 <span>REDCap</span>
                             </div>
                         </Col>

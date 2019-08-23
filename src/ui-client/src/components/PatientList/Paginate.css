@@ -50,10 +50,10 @@
 }
 
 .patientlist-pagination .break {
-    cursor: default;
+    cursor: pointer;
 }
 
-.patientlist-pagination .break a {
+.patientlist-pagination .break span {
     padding-top: 4px;
 }
 

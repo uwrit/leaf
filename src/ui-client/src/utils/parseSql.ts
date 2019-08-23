@@ -5,11 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- // @ts-ignore
-const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM\b/i;
+const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\/FROM\b/i;
 const BRACKETS = /(\[|\])/g;
 const EQUALS = '=';
-const EQUALS_REGEX = /\=/g;
+const EQUALS_REGEX = /=/g;
 const EQUALS_SPACED = ' = ';
 const AS = 'AS';
 const COMMA = ',';

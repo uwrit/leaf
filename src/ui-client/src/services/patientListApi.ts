@@ -69,6 +69,7 @@ export const getCsvs = async (config: PatientListConfiguration) => {
 /*
  * Download a dataset (already transformed to a string) to a CSV file in browser.
  */
+// eslint-disable-next-line
 const downloadCsv = (content: string, fileName: string) => {
     const packageCsv = (csv: string) => new Blob([ csv ], { type: 'text/csv;encoding:utf-8' });
     const a = document.createElement('a');
@@ -147,9 +148,10 @@ const addSingletonDataset = async (
     });
 
     /* 
-    * Update the displayed patients.
-    */
-    const added = await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
+     * Update the displayed patients.
+     */
+    // eslint-disable-next-line
+    await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
 
     /* 
     * Get the latest patient list.

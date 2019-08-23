@@ -30,7 +30,7 @@ export class Tagger extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { changeHandler, locked, tags } = this.props;
+        const { locked, tags } = this.props;
         const { text } = this.state;
         const c = this.className;
 

@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { RootId, AggregateConceptHintRef, ConceptHintDTO } from '../models/concept/ConceptHint';
+import { AggregateConceptHintRef, ConceptHintDTO } from '../models/concept/ConceptHint';
 import ConceptSearchEngineWebWorker from '../providers/conceptSearchEngine/conceptSearchEngineWebWorker';
 import { HttpFactory } from './HttpFactory';
 

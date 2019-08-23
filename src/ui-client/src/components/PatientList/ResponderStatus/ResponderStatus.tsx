@@ -19,7 +19,7 @@ export default class ResponderStatus extends React.PureComponent<Props> {
     
     public render() {
         const c = this.classname;
-        const { cohort, responder } = this.props;
+        const { responder } = this.props;
         return (
             <div className={c}>
                 <div className={`${c}-abbr`} style={{ color: responder.primaryColor }}>{responder.name}</div>

@@ -176,6 +176,7 @@ export default class PatientListWebWorker {
         let currentSortType: number = 0;
         let currentSortColumn: string = '';
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case ADD_DEMOGRAPHICS:
@@ -562,7 +563,6 @@ export default class PatientListWebWorker {
          * storing summarized stats from numeric datasets.
          */
         const getDerivedNumericColumnsTemplate = () => {
-            // tslint:disable
             return {
                 trend: { id: 'Trend', isDisplayed: true, type: typeSparkline },
                 count: { id: 'Count', isDisplayed: true, type: typeNum },
@@ -575,7 +575,6 @@ export default class PatientListWebWorker {
                 earliest: { id: 'Earliest', type: typeString },
                 earliestDate: { id: 'EarliestDate', type: typeDate }
             };
-            // tslint:enable
         };
 
         /*
@@ -583,7 +582,6 @@ export default class PatientListWebWorker {
          * storing summarized stats from datasets.
          */
         const getDerivedNonNumericColumnsTemplate = () => {
-            // tslint:disable
             return {
                 count: { id: 'Count', isDisplayed: true, type: typeNum },
                 mostRecent: { id: 'MostRecent', type: typeString },
@@ -591,7 +589,6 @@ export default class PatientListWebWorker {
                 earliest: { id: 'Earliest', type: typeString },
                 earliestDate: { id: 'EarliestDate', type: typeDate }
             };
-            // tslint:enable
         };
 
         /*
