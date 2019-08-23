@@ -108,6 +108,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
         const { cohort, cohortCountBox, networkResponders}  = this.props;
         const { showDetail } = this.state;
         const { boxMinimized, boxVisible } = cohortCountBox;
+
         const classes = [ 'cohort-count-detail-container' ];
         const cohorts: NetworkCohortState[] = [];
 
@@ -128,8 +129,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
                 tabIndex={0} 
                 onClick={this.handleClick}
                 onMouseLeave={this.handleMouseLeave} 
-                onMouseEnter={this.handleMouseEnter}
-            >
+                onMouseEnter={this.handleMouseEnter}>
  
                 <CohortCountQueryDetail cohort={cohorts} state={cohort.count.state} />
 
@@ -139,13 +139,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
                     </span>
                 </div>
 
-                {!boxMinimized && 
-                <CohortCountSiteContainer 
-                    cohorts={cohorts} 
-                    network={networkResponders!} 
-                    show={showDetail} 
-                />
-                }
+                <CohortCountSiteContainer cohorts={cohorts} network={networkResponders!} show={showDetail} />
 
             </div>
         );

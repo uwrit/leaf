@@ -21,6 +21,7 @@ export class CohortCountSiteContainer extends React.PureComponent<Props> {
         const { cohorts, network, show } = this.props;
         const sites: any = []; 
         let max: number = 0;
+
         cohorts.forEach((nc: NetworkCohortState) => {
             const responder = network.get(nc.id)!;
             if (responder.enabled) {
@@ -31,9 +32,9 @@ export class CohortCountSiteContainer extends React.PureComponent<Props> {
         });
 
         return (
-            <div className="cohort-count-site-container">    
+            <div className={`cohort-count-site-container`}>    
                 {show && sites.map((s: SiteCountDetail) => {
-                    return <CohortCountSiteDetail data={s} max={max} key={s.id.id} />
+                    return <CohortCountSiteDetail data={s} max={max} key={s.id.id}/>
                 })}
             </div>
         );
