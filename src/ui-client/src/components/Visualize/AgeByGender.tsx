@@ -26,9 +26,12 @@ export class AgeByGender extends React.PureComponent<Props> {
         const c = this.className;
         const w = width > this.maxWidth ? this.maxWidth : width;
         const stackHeight = height / 2;
+        let max = 0;
         const data: AgeByGenderBucket[] = Object.keys(this.props.data.buckets)
             .map((d: string) => {
                 const bucket = this.props.data.buckets[d];
+                if (bucket.females > max) { max = bucket.females; }
+                if (bucket.males > max) { max = bucket.males; }
                 return {
                     ...bucket,
                     label: d,
@@ -41,9 +44,9 @@ export class AgeByGender extends React.PureComponent<Props> {
                 <div style={{ height: stackHeight }}>
                     <ResponsiveContainer >
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-female`}
-                                margin={{top: 20, right: 0, left: 0, bottom: 10}} >
+                                margin={{top: 20, right: 0, left: 0, bottom: 10}}>
                             <XAxis dataKey="label" type="category" interval={0} />
-                            <YAxis label={{ value: "Females", dx: -5 }} width={75} />
+                            <YAxis label={{ value: "Females", dx: -5 }} width={75} domain={[0, max]}/>
                             <Bar dataKey="females" fill={config.colorFemale} >
                                 <LabelList dataKey="females" position="top" formatter={this.formatNumber} />
                             </Bar>
@@ -55,7 +58,7 @@ export class AgeByGender extends React.PureComponent<Props> {
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-male`}
                                 margin={{top: 20, right: 0, left: 0, bottom: 10}} >
                             <XAxis dataKey="label" type="category" interval={0} />
-                            <YAxis label={{ value: "Males", dx: -5 }} width={75} />
+                            <YAxis label={{ value: "Males", dx: -5 }} width={75} domain={[0, max]}/>
                             <Bar dataKey="males" fill={config.colorMale} >
                                 <LabelList dataKey="males" position="top" formatter={this.formatNumber} />
                             </Bar>
