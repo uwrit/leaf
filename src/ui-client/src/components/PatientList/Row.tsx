@@ -39,7 +39,7 @@ export default class Row extends React.Component<Props> {
                 })}
             </tr>),
             (<tr key={`${row.compoundId}_drilldown`} className={`${c}-row-drilldown ${openClass}`}>
-                <td colSpan={columns.length}>
+                <td colSpan={20}>
                     <div className={`${c}-tuple-detail-container`}>
                         {row.isOpen && row.detailValues.map((v: PatientListDetailEncounter) => {
                             return <EncounterDetailGroup key={v.encounterId} className={`${c}-tuple-detail`} data={v} />
