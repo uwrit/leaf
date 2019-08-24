@@ -83,7 +83,7 @@ export default class DatasetContainer extends React.PureComponent<Props> {
                     disabled={!searchEnabled}
                     onChange={this.handleSearchInputChange}
                     onKeyDown={this.handleSearchKeydown}
-                    placeholder="Search..." 
+                    placeholder="Search for a dataset..." 
                     spellCheck={false}
                     value={datasets.searchTerm} />
                 <div className={`${c}-select-datasets-list`}>

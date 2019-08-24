@@ -12,11 +12,10 @@
     color: #1CA8DD;
     cursor: pointer;
     margin-left: 8px;
-    margin-top: 8px;
+    margin-top: -1px;
     min-width: 120px;
     overflow: visible;
     padding: 4px 8px;
-    position: relative;
     text-align: center;
     text-transform: capitalize;
     transition: all 0.3s;
@@ -40,18 +39,19 @@
 }
 
 .patientlist-add-dataset-select-container {
-    background-color: white;
-    border-radius: 4px;
-    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.24);
+    background-color: transparent;
     display: block;
-    margin-top: 0;
-    opacity: 0;
+    left: 0;
+    right: 0;
+    margin-left: 20%;
+    margin-top: 30px;
+    opacity: 1;
     outline: none;
     padding: 10px;
-    pointer-events: none;
     position: absolute;
     transition: opacity 0.3s, margin-top 0.5s;
-    width: 600px; 
+    width: 1020px;
+    z-index: 101;
 }
 
 .patientlist-add-dataset-overlay {
@@ -77,29 +77,19 @@
     display: none !important;
 }
 
-.patientlist-add-dataset-select-container.show {
-    margin-top: 12px;
-    pointer-events: all;
-    opacity: 1;
-    z-index: 101;
+.patientlist-add-dataset {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.24);
+    padding: 8px;
+    width: 1000px;
 }
 
-.patientlist-add-dataset-select-container::before,
-.patientlist-add-dataset-select-container::after {
-    content: " ";
-    position: absolute;
-    bottom: 100%; 
-    left: 10%;
-    margin-left: -11px;
-    border-width: 11px;
-    border-style: solid;
-    border-color: transparent transparent rgba(0,0,0,0.1) transparent;
-}
-
-.patientlist-add-dataset-select-container::after {
-    margin-left: -10px;
-    border-width: 10px;
-    border-bottom-color: white;
+/* Small screen */
+@media only screen and (max-width: 1400px) {
+    .patientlist-add-dataset {
+        width: 800px;
+    }
 }
 
 .patientlist-add-dataset-select-col-left {
@@ -149,5 +139,6 @@
 
 .patientlist-add-dataset-select-footer {
     border-top: 1px solid rgb(240,240,240);
+    height: 50px;
     padding: 10px 0;
 }

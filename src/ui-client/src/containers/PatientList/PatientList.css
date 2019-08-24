@@ -5,11 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .patientlist-container {
+.patientlist-container {
     font-family: Roboto;
     margin-bottom: 120px;
+    opacity: 1;
     padding: 10px;
+    transition: opacity 0.5s;
     user-select: none;
+}
+
+.patientlist-container.hide {
+    opacity: 0;
 }
 
 /* Loading icon */

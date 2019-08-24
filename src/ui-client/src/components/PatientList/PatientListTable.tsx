@@ -28,13 +28,15 @@ interface State {
 }
 
 export default class PatientListTable extends React.PureComponent<Props, State> {
+    private prevRows = 0;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             hidden: true
         }
     }
-
+    
     public componentDidMount() {
         setTimeout(() => this.setState({ hidden: false }), 100);
     }

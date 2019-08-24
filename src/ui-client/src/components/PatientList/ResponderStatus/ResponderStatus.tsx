@@ -8,6 +8,7 @@
 import React from 'react';
 import { CohortStateType, NetworkCohortState } from '../../../models/state/CohortState';
 import { NetworkIdentity } from '../../../models/NetworkResponder';
+import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 
 interface Props {
     cohort: NetworkCohortState;
@@ -37,7 +38,7 @@ export default class ResponderStatus extends React.PureComponent<Props> {
             case CohortStateType.NOT_LOADED:
                 return <span>Not loaded</span>;
             case CohortStateType.REQUESTING:
-                return <span>Requesting data...</span>;
+                return <span><LoaderIcon size={15} /></span>;
             default:
                 return null;
         }

@@ -414,7 +414,7 @@ export default class DatasetSearchEngineWebWorker {
              */
             for (let i = 0; i < all.length; i++) {
                 const ds = all[i];
-                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
+                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags.map(t => t.toLowerCase()));
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
                 allDs.set(ds.id, ds);
