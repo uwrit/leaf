@@ -119,8 +119,14 @@ class PatientList extends React.PureComponent<Props, State> {
                     <Col md={8}>
                         <div className={`${c}-dataset-column-selector-container`}>
                             <div className={`${c}-dataset-text-info`}>Current Datasets (click to edit columns)</div>
-                            {datasetDefs.map((d: PatientListDatasetDefinition) => (
-                                <DatasetColumnSelector className={c} data={d} dispatch={dispatch} key={d.id} />
+                            {datasetDefs.map((d) => (
+                                <DatasetColumnSelector 
+                                    className={c} 
+                                    data={d} 
+                                    dispatch={dispatch} 
+                                    key={d.id} 
+                                    allowRemove={!cohort.patientList.configuration.isFetching}
+                                />
                             ))}
                             {patientList.totalPatients > 0 && datasetDefs.length < datasets.all.size &&
                             <AddDatasetButton 

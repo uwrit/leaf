@@ -41,9 +41,8 @@ class CohortCountBox extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.handleShowDetailClick = this.handleShowDetailClick.bind(this);
         this.state = { 
-            showDetail: false 
+            showDetail: props.networkResponders.size > 1
         };
     }
 
@@ -88,7 +87,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
         return null;
     }
 
-    public handleShowDetailClick() {
+    public handleShowDetailClick = () => {
         this.setState({ showDetail: !this.state.showDetail });
     }
 

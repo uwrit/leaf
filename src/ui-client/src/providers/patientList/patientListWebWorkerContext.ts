@@ -255,7 +255,7 @@ var copySortType = function (configSort) {
 };
 /*
  * Return the actual tabular array to caller, row by row, tuple by tuple.
- * If a patient doesn't have data for a given dataset/column, return undefined.
+ * If a patient doesn't have data for a given dataset/column, return a blank string.
  */
 var patientIdsToListRow = function (config, patIds) {
     var patList = [];
@@ -271,10 +271,10 @@ var patientIdsToListRow = function (config, patIds) {
         };
         patListRow.values = config.displayColumns.map(function (col) {
             var ds = pat.singletonData.get(col.datasetId);
-            if (!ds) {
-                return undefined;
-            }
-            return ds.get(col.id);
+            if (!ds) { return ''; }
+            const val = ds.get(col.id);
+            if (val === undefined || val === null) { return ''; }
+            return val;
         });
         patList.push(patListRow);
     };
@@ -300,15 +300,21 @@ var setDetailRows = function (patId) {
         var hasEncounterIdCol = !!vals[0].encounterId;
         var _loop_2 = function (i) {
             var val = vals[i];
-            if (val && val[ds.dateValueColumn])
+
+            if (val && val[ds.dateValueColumn]) {
                 rowCount++;
-            allDetails.push({
-                columns: cols.map(function (k) { return ({ key: k, value: val[k] }); }),
-                datasetName: ds.displayName,
-                date: val[ds.dateValueColumn],
-                dateColumnName: ds.dateValueColumn,
-                encounterId: hasEncounterIdCol ? val.encounterId : 'Unknown Encounter'
-            });
+                allDetails.push({
+                    columns: cols.map((key) => { 
+                        var value = val[key];
+                        if (value === undefined || value === null) { value = ''; }
+                        return { key, value };
+                    }),
+                    datasetName: ds.displayName,
+                    date: val[ds.dateValueColumn],
+                    dateColumnName: ds.dateValueColumn,
+                    encounterId: hasEncounterIdCol ? val.encounterId : 'Unknown Encounter'
+                });
+            }
         };
         for (var i = 0; i < vals.length; i++) {
             _loop_2(i);

@@ -84,8 +84,6 @@ export class CohortCountSiteDetail extends React.PureComponent<Props, State> {
         );
     }
 
-    private formatNumber = (value: number) => value.toLocaleString();
-
     private getStateDependentContent = () => {
         const { state } = this.props.data.countResults;
         const c = this.className;
