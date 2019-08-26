@@ -6,14 +6,11 @@
  */ 
 
 import React from 'react';
-import { connect } from 'react-redux';
-import { Button, DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
+import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
 import { setPanelItemNumericFilter } from '../../../actions/panels';
-import { showInfoModal } from '../../../actions/generalUi';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
 import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
-import { InformationModalState } from '../../../models/state/GeneralUiState';
 import './PanelItemNumericFilter.css';
 
 interface Props {
@@ -179,13 +176,20 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
     private handleNumberInputChange = (e: any, isFirst: boolean) => {
         const { numericFilter } = this.props.panelItem;
         let val = e.target.value.trim();
+        const finalChar = val[val.length - 1];
 
         if (val === '') { 
             val = null; 
         } else if (!this.isNumeric(val)) { 
             return; 
-        } else if (val.length > 0 && val[val.length - 1] !== '.') {
-            val = parseFloat(val);
+        } else if (val.length > 0 && finalChar !== '.') {
+            if (val.indexOf('.') > -1 && finalChar === '0') {
+                const decimalPlaces = val.split('.')[1];
+                val = parseFloat(val);
+                val = (val * 100.0 / 100.0).toFixed(decimalPlaces.length);
+            } else {
+                val = parseFloat(val);
+            }
         }
 
         const newFilter = Object.assign({}, numericFilter, { 

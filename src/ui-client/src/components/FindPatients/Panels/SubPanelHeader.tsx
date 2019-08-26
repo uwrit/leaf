@@ -19,10 +19,6 @@ interface Props {
 }
 
 export default class SubPanelHeader extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render(): any {
         const { panel, index, dispatch } = this.props;
         const subpanel = panel.subPanels[index];

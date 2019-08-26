@@ -7,7 +7,6 @@
 
 import { arc } from '../bundled/arc';
 
-// tslint:disable 
 export function CalculateGeodesicLine (from, to) {
     /*
      * Convert array of points to xy object

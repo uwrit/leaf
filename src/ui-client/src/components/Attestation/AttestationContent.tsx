@@ -27,11 +27,6 @@ interface Props {
 }
 
 export default class AttestationContent extends React.PureComponent<Props> {
-
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const c = this.props.className;
         const { 

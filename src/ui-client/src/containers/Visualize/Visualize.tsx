@@ -30,10 +30,6 @@ interface State {
 }
 
 class Visualize extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public updateDimensions = () => {
         const dimensions = computeDimensions();
         this.setState({ width: dimensions.contentWidth });

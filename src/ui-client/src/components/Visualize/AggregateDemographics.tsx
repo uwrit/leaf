@@ -19,10 +19,6 @@ export interface Props {
 }
 
 export default class AggregateDemographics extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { ageByGenderData, binarySplitData } = this.props.cohort.visualization.demographics;
         const colWidth = this.props.width / 2;

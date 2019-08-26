@@ -52,10 +52,6 @@ const collect = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
 });
 
 class SubPanel extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { connectDropTarget, dispatch, isOver, canDrop, subPanel, index, panel, queryState } = this.props;
         const totalPanelItems = subPanel.panelItems.length;

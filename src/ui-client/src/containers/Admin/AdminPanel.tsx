@@ -29,9 +29,6 @@ type Props = StateProps & DispatchProps & OwnProps;
 
 class AdminPanel extends React.PureComponent<Props> {
     private className = 'admin-panel';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { admin } = this.props;

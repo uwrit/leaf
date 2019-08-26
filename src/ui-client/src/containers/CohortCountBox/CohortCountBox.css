@@ -89,7 +89,6 @@
     background-color: white;
     border-radius: 8px;
     padding: 0 2px;
-    transform: scaleY(0);
 }
 
 .cohort-count-site-detail:first-child {
@@ -102,10 +101,6 @@
     transition: opacity 0.2s, height 0.2s;
 }
 
-.cohort-count-detail-container.show-detail .cohort-count-site-container {
-    transform: scaleY(1);
-}
-
 .cohort-count-detail-container.show-detail .cohort-count-site-detail {
     height: 50px;
     opacity: 1;
@@ -115,10 +110,11 @@
     display: block;
 }
 
-.cohort-count-site-bar,
+.cohort-count-site-bar-container,
 .cohort-count-site-text {
     display: block;
     position: relative;
+    width: 100%;
 }
 
 .cohort-count-site-text {
@@ -131,11 +127,25 @@
     margin-left: 8px;
 }
 
+.cohort-count-site-bar-container {
+    height: 25px;
+}
+
 .cohort-count-site-bar {
-    font-size: 0.8rem;
-    font-weight: 300;
-    margin-top: -8px;
-    pointer-events: none;
+    height: 13px;
+    left: 0;
+    margin: 5px 0;
+    position: absolute;
+    transition: width 0.75s;
+}
+
+.cohort-count-site-num {
+    color: rgb(80,80,80);
+    font-size: 0.9rem;
+    height: 13px;
+    padding-top: 2px;
+    text-align: left;
+    transition: all 0.75s;
 }
 
 .cohort-count-site-text-name,
@@ -150,7 +160,6 @@
 .cohort-count-site-text-name {
     color: rgb(125,125,125);
     float: left;
-    margin-left: 4px;
 }
 
 .cohort-count-site-text-error {

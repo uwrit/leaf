@@ -16,10 +16,6 @@ interface Props {
 }
 
 export class CohortCountQueryDetail extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { cohort, state } = this.props;
 

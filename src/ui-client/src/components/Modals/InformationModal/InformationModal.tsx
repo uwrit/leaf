@@ -18,10 +18,6 @@ interface Props {
 }
 
 export default class InformationModal extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { informationModal } = this.props;
         const backdrop = this.props.backdrop || true;

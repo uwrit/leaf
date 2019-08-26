@@ -7,7 +7,7 @@
 
 import { AppState } from "../../models/state/AppState";
 import { ConceptSqlSet, ConceptSqlSetDeleteResponse } from "../../models/admin/Concept";
-import { getSqlSets, createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
+import { createSqlSet, deleteSqlSet, updateSqlSet } from "../../services/admin/sqlSetApi";
 import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
 import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { getApiUpdateQueue } from "../../utils/admin/concept";

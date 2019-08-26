@@ -9,7 +9,7 @@ import { generate as generateId } from 'shortid';
 import { PatientListColumnType, PatientListColumnId, PatientListColumn, ValueByColumnKey, XY } from '../../models/patientList/Column';
 import { PatientListConfiguration, PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListDataset, PatientListDatasetDefinition, PatientListDatasetId, PatientListDatasetDefinitionTemplate, PatientListDatasetExport } from '../../models/patientList/Dataset';
-import { PatientListRowDTO, Patient, PatientId, PatientListRow, PatientListDetailEncounterRow, EncounterId } from '../../models/patientList/Patient';
+import { PatientListRowDTO, Patient, PatientId, PatientListRow, PatientListDetailEncounterRow } from '../../models/patientList/Patient';
 import { workerContext } from './patientListWebWorkerContext';
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 
@@ -176,6 +176,7 @@ export default class PatientListWebWorker {
         let currentSortType: number = 0;
         let currentSortColumn: string = '';
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case ADD_DEMOGRAPHICS:
@@ -438,7 +439,7 @@ export default class PatientListWebWorker {
 
         /*
          * Return the actual tabular array to caller, row by row, tuple by tuple.
-         * If a patient doesn't have data for a given dataset/column, return undefined.
+         * If a patient doesn't have data for a given dataset/column, return a blank string.
          */
         const patientIdsToListRow = (config: PatientListConfiguration, patIds: PatientId[]): PatientListRow[] => {
             const patList: PatientListRow[] = [];
@@ -454,8 +455,10 @@ export default class PatientListWebWorker {
                 };
                 patListRow.values = config.displayColumns.map((col: PatientListColumn) =>  {
                     const ds = pat.singletonData.get(col.datasetId);
-                    if (!ds) { return undefined; }
-                    return ds.get(col.id);
+                    if (!ds) { return ''; }
+                    const val = ds.get(col.id);
+                    if (val === undefined || val === null) { return ''; }
+                    return val;
                 });
                 patList.push(patListRow);
             }
@@ -481,20 +484,25 @@ export default class PatientListWebWorker {
 
                 for (let i = 0; i < vals.length; i++) {
                     const val: any = vals[i];
-                    if (val && val[ds.dateValueColumn!])
-                    rowCount++;
+                    if (val && val[ds.dateValueColumn!]) {
+                        rowCount++;
                         allDetails.push({
-                            columns: cols.map((k: string) => ({ key: k, value: val[k] })),
+                            columns: cols.map((key: string) => { 
+                                let value = val[key];
+                                if (value === undefined || value === null) { value = ''; }
+                                return { key, value };
+                            }),
                             datasetName: ds.displayName,
                             date: val[ds.dateValueColumn!],
                             dateColumnName: ds.dateValueColumn!,
                             encounterId: hasEncounterIdCol ? val.encounterId : 'Unknown Encounter'
                         });
+                    }
                 }
             });
             const getTime = (date?: Date) => date ? date.getTime() : 0;
-            const sorted: PatientListDetailEncounterRow[] = allDetails
-                .sort((a: PatientListDetailEncounterRow, b: PatientListDetailEncounterRow) => getTime(b.date) - getTime(a.date));
+            const sorted = allDetails
+                .sort((a, b) => getTime(b.date) - getTime(a.date));
             
             // Group details by encounterId
             for (let j = 0; j < sorted.length; j++) {
@@ -509,7 +517,7 @@ export default class PatientListWebWorker {
 
             // Set the grouped encounter data rows as the patient's detail array
             pat.detailValues = [];
-            encMap.forEach((v: PatientListDetailEncounterRow[], k: EncounterId) => pat.detailValues.push({ encounterId: k, rows: v }));
+            encMap.forEach((v, k) => pat.detailValues.push({ encounterId: k, rows: v }));
             pat.detailRowCount = rowCount;
         };
 
@@ -562,7 +570,6 @@ export default class PatientListWebWorker {
          * storing summarized stats from numeric datasets.
          */
         const getDerivedNumericColumnsTemplate = () => {
-            // tslint:disable
             return {
                 trend: { id: 'Trend', isDisplayed: true, type: typeSparkline },
                 count: { id: 'Count', isDisplayed: true, type: typeNum },
@@ -575,7 +582,6 @@ export default class PatientListWebWorker {
                 earliest: { id: 'Earliest', type: typeString },
                 earliestDate: { id: 'EarliestDate', type: typeDate }
             };
-            // tslint:enable
         };
 
         /*
@@ -583,7 +589,6 @@ export default class PatientListWebWorker {
          * storing summarized stats from datasets.
          */
         const getDerivedNonNumericColumnsTemplate = () => {
-            // tslint:disable
             return {
                 count: { id: 'Count', isDisplayed: true, type: typeNum },
                 mostRecent: { id: 'MostRecent', type: typeString },
@@ -591,7 +596,6 @@ export default class PatientListWebWorker {
                 earliest: { id: 'Earliest', type: typeString },
                 earliestDate: { id: 'EarliestDate', type: typeDate }
             };
-            // tslint:enable
         };
 
         /*

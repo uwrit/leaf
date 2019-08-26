@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { Bar, BarChart, Cell, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis } from 'recharts';
 import { visualizationConfig } from '../../config/visualization';
 import { BinarySplit, BinarySplitPair} from '../../models/cohort/DemographicDTO';
 
@@ -19,10 +19,6 @@ export interface Props {
 
 export class Binary extends React.PureComponent<Props> {
     private maxColWidth = 260;
-
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const config = visualizationConfig.demographics.binary;

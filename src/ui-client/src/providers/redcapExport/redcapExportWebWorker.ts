@@ -20,10 +20,8 @@ import { personId, encounterId } from '../../models/patientList/DatasetDefinitio
 
 const CREATE_EXPORT_CONFIGURATION = 'CREATE_EXPORT_CONFIGURATION';
 
-const typeString = PatientListColumnType.String;
 const typeNum = PatientListColumnType.Numeric;
 const typeDate = PatientListColumnType.DateTime;
-const typeSparkline = PatientListColumnType.Sparkline;
 
 interface REDCapExportEventsAndMappings {
     events: REDCapEvent[];
@@ -124,6 +122,7 @@ export default class REDCapExportWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case CREATE_EXPORT_CONFIGURATION:
@@ -136,16 +135,13 @@ export default class REDCapExportWebWorker {
         /*
          * Prepare a dataset or field name to be used in REDCap.
          */
-        const invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''], ['[',''], [']',''], ['{',''], ['}',''], ['>',''], ['<',''], ['=',''], ['(',''], [')',''] ]);
+        const invalid = new Set([' ', '-', '.', ';', '!', ':', '[', ']', '{', '}', '>', '<', '=', '(', ')' ]);
         const cleanName = (pre: string, charLimit: number): string => {
             const arr: string[] = [];
 
             for (let i = 0; i < pre.length; i++) {
                 const t = pre[i];
-                const replacement = invalid.get(t);
-                if (replacement) {
-                    arr.push(replacement);
-                } else if (t && replacement !== "") {
+                if (!invalid.has(t)) {
                     arr.push(t);
                 }
             }

@@ -8,8 +8,8 @@
  .concept-editor-preview-sql-container {
     background-color: rgb(240,240,240);
     height: 280px !important;
-    margin-left: 20% !important;
-    width: 25%;
+    margin-left: 10% !important;
+    width: 35%;
     z-index: 101;
 }
 

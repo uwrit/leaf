@@ -12,7 +12,7 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import { fetchDataset } from '../../services/cohortApi';
 import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '../../services/patientListApi';
 import { DateBoundary } from '../../models/panel/Date';
-import { PatientListColumn, PatientListColumnType } from '../../models/patientList/Column';
+import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetQuery, PatientListDatasetDefinition, PatientListDatasetShape } from '../../models/patientList/Dataset';
 import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';

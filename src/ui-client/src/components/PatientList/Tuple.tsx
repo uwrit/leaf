@@ -34,10 +34,7 @@ interface SparklineDotProps {
 
 export default class Tuple extends React.PureComponent<Props> {
     private lastSparklineValIndex: number = 0;
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public render() {
         const { className, type } = this.props;
         const c = className ? className : 'patientlist';

@@ -101,6 +101,7 @@ export default class ExtensionConceptsWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case BUILD_SAVED_COHORT_TREE:

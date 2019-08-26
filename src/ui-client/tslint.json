@@ -6,6 +6,8 @@
       "quotemark": [true, "single", "avoid-escape", "jsx-double"],
       "no-empty-interface": false,
       "no-console": false,
+      "no-restricted-globals": false,
+      "no-unused-expression": false,
       "prefer-for-of": false,
       "semicolon": [true, "always", "ignore-interfaces"]
   },

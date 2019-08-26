@@ -24,10 +24,6 @@ interface Props {
 }
 
 export default class SavedQueriesTable extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { queries, isGateway } = this.props;
 
@@ -40,11 +36,6 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
         const rowClass = `${c}-row`;
         const openButtonClass = `${c}-open`;
         const delButtonClass = `${c}-delete`;
-        let cols = [ "name", "category", "count", "owner", "created", "updated" ];
-
-        if (isGateway) {
-            cols = cols.filter((c) => c !== "count");
-        }
 
         return  (
             <div className={classes.join(' ')}>
@@ -57,7 +48,11 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
                         <tr>
 
                             {/* Columns */}
-                            {cols.map((col: string) => <th className={headerClass} key={col}>{col}</th>)}
+                            <th className={headerClass}>Query Name</th>
+                            <th className={headerClass}>Category</th>
+                            {!isGateway && <th className={headerClass}>Patient Count</th>}
+                            <th className={headerClass}>Created</th>
+                            <th className={headerClass}>Last Updated</th>
 
                             {/* 'Open' and '✖' button columns */}
                             <th />
@@ -72,12 +67,11 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
                         {saved.map((s: SavedQueryRef) => {
                             return (
                                 (<tr key={s.id} className={rowClass} onDoubleClick={this.handleOpenQueryClick.bind(null, s)}>
-                                    {/* Tuples */}
-                                    {cols.map((col: any) => {
-                                        const val = s[col];
-                                        const d: any = val instanceof Date ? val.toLocaleString() : val;
-                                        return <td key={`${s.id}_${col}`}>{d}</td>
-                                    })}
+                                    <td>{s.name}</td>
+                                    <td>{s.category}</td>
+                                    {!isGateway && <td>{s.count}</td>}
+                                    <td>{s.created.toLocaleString()}</td>
+                                    <td>{s.updated.toLocaleString()}</td>
                                     <td className={openButtonClass} onClick={this.handleOpenQueryClick.bind(null, s)}>Open</td>
                                     <td className={delButtonClass} onClick={this.handleDeleteQueryClick.bind(null, s)}>✖</td>
                                 </tr>)

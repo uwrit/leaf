@@ -47,7 +47,7 @@ const dates: DateBoundary[] = [
 
 export default class AddDatasetButton extends React.PureComponent<Props, State> {
     private className = 'patientlist-add-dataset';
-    private mouseOut = false;
+    private mouseOut = true;
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -86,24 +86,33 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                 overlayClasses.push('show');
             }
         }
-
-        return (
-            <div className={`${c}-container`}>
-                {createPortal(
-                    <div className={overlayClasses.join(' ')} />, 
-                    document.getElementById('main-content')!
-                )}
-                <div className={`${c}-button`} onClick={this.handleClick}>{this.getButtonContent()}</div>
-                <div 
-                    className={modalClasses.join(' ')}
-                    onBlur={this.handleBlur}
-                    onMouseLeave={this.handleMouseLeave} 
-                    onMouseEnter={this.handleMouseEnter}
-                    tabIndex={0}>
-                    {configuration.isFetching &&
+        
+        /*
+         * Create array of React components.
+         */
+        const arr = [
+            createPortal(
+                <div className={overlayClasses.join(' ')} key={1}/>, 
+                document.getElementById('main-content')!
+            ),
+            <div className={`${c}-button`} onClick={this.handleClick} key={2}>{this.getButtonContent()}</div>
+        ];
+        
+        /*
+         * Display the site summary if fetching a dataset.
+         */
+        if (configuration.isFetching) {
+            arr.push(
+                <div className={`${c}-status-container`} key={3}>
                     <ResponderStatusSummary cohortMap={cohortMap} responderMap={responderMap} />
-                    }
-                    {!configuration.isFetching &&
+                </div>
+            )
+        /*
+         * Show the selector modal.
+         */
+        } else if (showSelectorModal) {
+            arr.push(
+                <div className={modalClasses.join(' ')} onBlur={this.handleBlur} onMouseLeave={this.handleMouseLeave} onMouseEnter={this.handleMouseEnter} tabIndex={0} key={4}>
                     <AddDatasetSelectors 
                         dates={dates}
                         dispatch={dispatch} 
@@ -115,10 +124,12 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
                         showDates={showDates}
-                    />}
+                    />
                 </div>
-            </div>
-        )
+            )
+        }
+
+        return arr;
     }
     
     private getButtonContent = () => {
@@ -130,8 +141,8 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
         if (selected) {
             const name = selected.name;
-            if (name.length > 30) {
-                selectedName = name.substring(0, 30) + '...';
+            if (name.length > 20) {
+                selectedName = name.substring(0, 20) + '...';
             } else {
                 selectedName = name;
             }
@@ -165,7 +176,9 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     }
 
     private handleBlur = () => {
-        if (this.mouseOut) {
+        const { isFetching } = this.props.configuration;
+
+        if (this.mouseOut && !isFetching) {
             this.setState({ showSelectorModal: false });
         }
     }

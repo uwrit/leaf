@@ -61,10 +61,6 @@ const collectSource = (connector: DragSourceConnector, monitor: DragSourceMonito
 });
 
 class Header extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { connectDragSource, connectDropTarget, connectDragPreview, data, onClick, isOver, canDrop, isDragging, sort, className } = this.props;
         const c = className ? className : 'patientlist';

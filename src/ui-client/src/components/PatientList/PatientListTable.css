@@ -175,11 +175,14 @@
 .patientlist-tuple-detail-row-datasetname {
     color: #9B24A1;
     font-size: 1.1rem;
+    max-width: 270px;
     padding-right: 20px;
 }
 
 .patientlist-tuple-detail-column {
     display: inline-block;
+    min-width: 80px;
+    max-width: 300px;
     padding: 10px;
 }
 

@@ -23,10 +23,7 @@ interface CohortResponder {
 
 export default class ResponderStatusSummary extends React.PureComponent<Props> {
     private classname = 'patientlist-responder-status-summary'
-    constructor(props: Props) {
-        super(props);
-    }
-
+    
     public render() {
         const c = this.classname;
         const { cohortMap, responderMap } = this.props;

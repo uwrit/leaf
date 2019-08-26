@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-// tslint:disable
 import { generate as generateId } from 'shortid';
 import { TokenizedDatasetRef, PatientListDatasetQuery, CategorizedDatasetRef, DatasetSearchResult, PatientListDatasetQueryIndex } from '../../models/patientList/Dataset';
 import { workerContext } from './datasetSearchWebWorkerContext';
@@ -111,6 +110,7 @@ export default class DatasetSearchEngineWebWorker {
 
     private workerContext = () => {
 
+        // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
                 case REINDEX_DATASETS:
@@ -414,7 +414,7 @@ export default class DatasetSearchEngineWebWorker {
              */
             for (let i = 0; i < all.length; i++) {
                 const ds = all[i];
-                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags);
+                let tokens = ds.name.toLowerCase().split(' ').concat(ds.tags.map(t => t.toLowerCase()));
                 if (ds.category) { tokens = tokens.concat(ds.category.toLowerCase().split(' ')); }
                 if (ds.description) { tokens = tokens.concat(ds.description.toLowerCase().split(' ')); }
                 allDs.set(ds.id, ds);

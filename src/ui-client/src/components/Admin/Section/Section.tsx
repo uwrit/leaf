@@ -13,9 +13,6 @@ interface Props {
 
 export class Section extends React.PureComponent<Props> {
     private className = "admin-panel"
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { children, header } = this.props;

@@ -108,11 +108,11 @@ const cancelCountQuery = (state: CohortState): CohortState => {
 
 const resetCohorts = (state: CohortState): CohortState => {
     const network = new Map();
-    state.networkCohorts.forEach((n: NetworkCohortState) => { 
-        n.count = defaultCountState();
-        n.patientList = defaultNetworkPatientListState(),
-        n.visualization = defaultVisualizationState();
-        network.set(n.id, n); 
+    state.networkCohorts.forEach((n: NetworkCohortState) => {
+        const count = defaultCountState()
+        const patientList = defaultNetworkPatientListState();
+        const visualization = defaultVisualizationState();
+        network.set(n.id, Object.assign({}, n, { count, patientList, visualization }));
     });
 
     return Object.assign({}, state, {
@@ -199,26 +199,6 @@ const finishDemographicQuery = (state: CohortState): CohortState => {
             ...state.visualization,
             state: CohortStateType.LOADED
         }
-    });
-};
-
-const setNetworkCohortDemographic = (state: CohortState, action: CohortVisualizationAction): CohortState => {
-    const c: NetworkCohortState = state.networkCohorts.get(action.id)!;
-    const networkCohort: NetworkCohortState = Object.assign({}, c, {
-        patientList: {
-            ...c.patientList,
-            state: CohortStateType.LOADED
-        },
-        visualization: {
-            demographics: action.vizResults!,
-            state: CohortStateType.LOADED
-        },
-    });
-    const networkClone = new Map(state.networkCohorts);
-    networkClone.set(action.id, networkCohort);
-
-    return Object.assign({}, state, {
-        networkCohorts: networkClone
     });
 };
 

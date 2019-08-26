@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { Section } from '../../Section/Section';
-import { Input } from '../../Section/Input';
 import { SectionProps } from '../Props';
 import { TextArea } from '../../Section/TextArea';
 
@@ -17,9 +16,6 @@ interface Props {
 
 export class Identifiers extends React.PureComponent<Props> {
     private uidBase = 'urn:leaf:concept:';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { changeHandler, adminConcept } = this.props.data;

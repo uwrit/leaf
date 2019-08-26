@@ -29,10 +29,6 @@ interface Props {
 }
 
 export class Display extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { category, categories, categoryChangeHandler, dataset, dispatch, inputChangeHandler, locked, forceValidation, shapes, shapeChangeHandler } = this.props;
         return (

@@ -25,7 +25,7 @@ import {
     SELECT_CONCEPT_SPECIALIZATION,
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
-import { SavedQueriesState, SavedQuery, SavedQueryRef } from '../models/Query';
+import { SavedQueriesState, SavedQueryRef } from '../models/Query';
 import { generate as generateId } from 'shortid';
 
 export const defaultQueriesState = (): SavedQueriesState => {

@@ -28,10 +28,6 @@ interface OwnProps { }
 type Props = StateProps & DispatchProps & OwnProps;
 
 class ConceptTreeColumn extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { allowReparent, concepts, conceptSearch, dispatch } = this.props;
         const tree = this.props.concepts.currentTree;

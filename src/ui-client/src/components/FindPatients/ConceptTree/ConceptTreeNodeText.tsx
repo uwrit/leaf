@@ -58,10 +58,6 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
 };
 
 class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { concept, connectDropTarget, canDrop, isOver } = this.props;
         const c = 'concept-tree-node';

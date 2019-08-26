@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, CategorizedDatasetRef } from "../patientList/Dataset";
 import { RouteConfig } from "../../config/routes";
-
 
 export enum Routes {
     FindPatients = 1,

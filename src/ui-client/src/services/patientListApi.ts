@@ -69,6 +69,7 @@ export const getCsvs = async (config: PatientListConfiguration) => {
 /*
  * Download a dataset (already transformed to a string) to a CSV file in browser.
  */
+// eslint-disable-next-line
 const downloadCsv = (content: string, fileName: string) => {
     const packageCsv = (csv: string) => new Blob([ csv ], { type: 'text/csv;encoding:utf-8' });
     const a = document.createElement('a');
@@ -83,7 +84,7 @@ const downloadCsv = (content: string, fileName: string) => {
         a.click();
         document.body.removeChild(a);
     } else {
-        location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
+        window.location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
     }
 };
 
@@ -147,8 +148,9 @@ const addSingletonDataset = async (
     });
 
     /* 
-    * Update the displayed patients.
-    */
+     * Update the displayed patients.
+     */
+    // eslint-disable-next-line
     await patientListProvider.addDataset(dataset, responderId) as PatientListDatasetDefinition;
 
     /* 

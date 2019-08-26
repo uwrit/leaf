@@ -16,34 +16,17 @@ interface Props {
 }
 
 const LoaderIcon = (props: Props) => {
-    const useFallback = false;
     const height = props.size || 15;
     const width = props.size || 15;
     const strokeWidth = props.strokeWidth || 4;
 
-    if (!useFallback) {
-        return (
-            <div className="loader" style={{ height, width }}>
-                <svg className="loader-svg" viewBox="25 25 50 50">
-                    <circle className="loader-path" cx="50" cy="50" r="20" fill="none" style={{ strokeWidth }} strokeMiterlimit="10"/>
-                </svg>
-            </div>
-        );
-    }
-    else {
-        const borderWidth = (strokeWidth / 2);
-        return (
-            <div className="loader-fallback" style={{ height, width }}>
-                <div style={{ borderWidth }}/>
-                <div style={{ borderWidth }}/>
-                <div style={{ borderWidth }}/>
-            </div>
-        );
-    }
-};
-
-const isIeOrEdge = () => {
-    return (document['documentMode'] || /Edge/.test(navigator.userAgent))
+    return (
+        <div className="loader" style={{ height, width }}>
+            <svg className="loader-svg" viewBox="25 25 50 50">
+                <circle className="loader-path" cx="50" cy="50" r="20" fill="none" style={{ strokeWidth }} strokeMiterlimit="10"/>
+            </svg>
+        </div>
+    );
 };
 
 export default LoaderIcon;

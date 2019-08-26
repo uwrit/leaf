@@ -14,12 +14,36 @@ interface Props {
     sql: string;
 }
 
-export class SqlPreview extends React.PureComponent<Props> {
+interface State {
+    width: number;
+}
+
+export class SqlPreview extends React.PureComponent<Props, State> {
     private className = 'concept-editor-preview';
+    private mounted = false;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            width: 0
+        }
+    }
+
+    public componentDidMount() {
+        this.mounted = true;
+        this.setWidth();
+        window.addEventListener('resize', this.setWidth );
+    }
+
+    public componentWillUnmount() {
+        this.mounted = false;
+        window.removeEventListener('resize', () => this.setWidth );
+    }
+
     public render() {
         const { sql } = this.props;
         const c = this.className;
-        const width = (document.body.clientWidth * 0.25) - 50;
+        const width = (document.body.clientWidth * 0.35) - 50;
 
         return (
             createPortal(
@@ -31,5 +55,11 @@ export class SqlPreview extends React.PureComponent<Props> {
                 document.body
             )
         );
+    }
+
+    private setWidth = () => {
+        if (!this.mounted) { return; }
+        const width = (document.body.clientWidth * 0.35) - 50;
+        this.setState({ width });
     }
 };

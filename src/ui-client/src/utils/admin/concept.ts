@@ -34,7 +34,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
         out.isEncounterBased = sqlSet.isEncounterBased;
     }
 
-    if (alwaysAdd.has(propName) || userConcept[propName] !== undefined && !neverAdd.has(propName)) {
+    if (alwaysAdd.has(propName) || (userConcept[propName] !== undefined && !neverAdd.has(propName))) {
         out[propName] = val;
     }
     return out;
@@ -48,16 +48,18 @@ export const generateSampleSql = (concept: AdminConcept, sqlSet: ConceptSqlSet, 
     const a = config.alias;
     const person = config.fieldPersonId;
     const where: string[] = [];
+    const nl = `
+    `;
     let sql = 
         `SELECT ${a}.${person} ` +
         `FROM ${sqlSet.sqlSetFrom} AS ${a}`;
 
     if (concept.sqlSetWhere)                            { where.push(concept.sqlSetWhere); }
-    if (sqlSet.isEncounterBased && sqlSet.sqlFieldDate) { where.push(`${sqlSet.sqlFieldDate} > '${year}-01-01'`); }
-    if (concept.isNumeric && concept.sqlFieldNumeric)   { where.push(`${concept.sqlFieldNumeric} > 5`); }
+    if (sqlSet.isEncounterBased && sqlSet.sqlFieldDate) { where.push(`${sqlSet.sqlFieldDate} > '${year}-01-01' -- Example date filter`); }
+    if (concept.isNumeric && concept.sqlFieldNumeric)   { where.push(`${concept.sqlFieldNumeric} > 5 -- Example numeric filter`); }
 
     for (let i = 0; i < where.length; i++) {
-        sql += (i === 0 ? ' WHERE ' : ' AND ') + where[i];
+        sql += (i === 0 ? ' WHERE ' : ' AND ') + where[i] + nl;
     }
 
     // Remove alias

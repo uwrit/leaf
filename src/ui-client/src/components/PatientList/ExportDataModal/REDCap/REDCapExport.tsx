@@ -62,7 +62,7 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
                         Leaf will export all of your datasets and patient data, and only you will have access to the new Project.
                     </p>
                     <p>
-                        Your project will export to <a href={redcapInstanceUrl} target="_blank">{redcapInstanceUrl}</a>
+                        Your project will export to <a href={redcapInstanceUrl} target="_blank" rel='noopener noreferrer'>{redcapInstanceUrl}</a>
                     </p>
 
                     {!!redCap.rowLimit && redCap.rowLimit < rowCount &&
@@ -116,7 +116,7 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
             return <p>Uh oh, it looks like something went wrong while exporting. We apologize for the inconvenience.</p>;
         }
         if (isComplete) {
-            return <p>All done! Your new project can be found at <a href={redCap.url} target="_blank">{redCap.url}</a></p>;
+            return <p>All done! Your new project can be found at <a href={redCap.url} target="_blank" rel='noopener noreferrer'>{redCap.url}</a></p>;
         }
         return <span>{progress.text}...</span>;
     }

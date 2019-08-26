@@ -18,13 +18,10 @@ interface Props {
 }
 
 export class SqlEditor extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { data } = this.props;
-        const { adminConcept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch, changed } = data;
+        const { adminConcept, toggleSqlPreview, toggleOverlay, sqlSets, dispatch } = data;
         return (
             <Section header='SQL'>
                 <SqlSetDropdown

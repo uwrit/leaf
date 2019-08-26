@@ -19,9 +19,6 @@ interface Props {
 
 export class Identifiers extends React.PureComponent<Props> {
     private uidBase = 'urn:leaf:dataset:';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { dataset, handleInputChange, locked } = this.props;

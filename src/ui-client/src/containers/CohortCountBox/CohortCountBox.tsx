@@ -41,9 +41,8 @@ class CohortCountBox extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        this.handleShowDetailClick = this.handleShowDetailClick.bind(this);
         this.state = { 
-            showDetail: false 
+            showDetail: props.networkResponders.size > 1
         };
     }
 
@@ -88,7 +87,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
         return null;
     }
 
-    public handleShowDetailClick() {
+    public handleShowDetailClick = () => {
         this.setState({ showDetail: !this.state.showDetail });
     }
 
@@ -108,6 +107,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
         const { cohort, cohortCountBox, networkResponders}  = this.props;
         const { showDetail } = this.state;
         const { boxMinimized, boxVisible } = cohortCountBox;
+
         const classes = [ 'cohort-count-detail-container' ];
         const cohorts: NetworkCohortState[] = [];
 
@@ -128,24 +128,17 @@ class CohortCountBox extends React.PureComponent<Props, State> {
                 tabIndex={0} 
                 onClick={this.handleClick}
                 onMouseLeave={this.handleMouseLeave} 
-                onMouseEnter={this.handleMouseEnter}
-            >
+                onMouseEnter={this.handleMouseEnter}>
  
                 <CohortCountQueryDetail cohort={cohorts} state={cohort.count.state} />
 
-                <div className="cohort-count-detail-show">
-                    <a onClick={this.handleShowDetailClick}>
+                <div className='cohort-count-detail-show'>
+                    <span className='link-span' onClick={this.handleShowDetailClick}>
                         {showDetail ? 'hide detail' : 'show detail'}
-                    </a>
+                    </span>
                 </div>
 
-                {!boxMinimized && 
-                <CohortCountSiteContainer 
-                    cohorts={cohorts} 
-                    network={networkResponders!} 
-                    show={showDetail} 
-                />
-                }
+                <CohortCountSiteContainer cohorts={cohorts} network={networkResponders!} show={showDetail} />
 
             </div>
         );

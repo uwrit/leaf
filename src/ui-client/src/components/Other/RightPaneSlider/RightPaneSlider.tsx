@@ -22,10 +22,6 @@ export default class RightPaneSlider extends React.Component<Props> {
         overlay: true
     }
 
-    constructor(props: Props) {
-        super(props);
-    }
-
     public handleBlur = () => {
         if (this.mouseOut) {
             this.props.toggle();

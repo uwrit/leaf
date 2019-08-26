@@ -28,20 +28,16 @@ interface Props {
 }
 
 export default class AddDatasetSelectors extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates } = this.props;
         const c = className ? className : 'patientlist-add-dataset';
         return (
-            <div>
+            <div className={c}>
                 <Row>
                     <Col md={12}>
                         <span className={`${c}-close`} onClick={handleClickClose}>✖</span>
                     </Col>
-                    <Col md={7} className={`${c}-select-col-left`}>
+                    <Col md={9} className={`${c}-select-col-left`}>
                         <DatasetContainer 
                             datasets={datasets}
                             dispatch={dispatch}
@@ -50,7 +46,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                             selected={datasets.selected}
                         />
                     </Col>
-                    <Col md={5} className={`${c}-select-col-right`}>
+                    <Col md={3} className={`${c}-select-col-right`}>
                         {showDates &&
                          dates.map((d: DateBoundary) => {
                             return (

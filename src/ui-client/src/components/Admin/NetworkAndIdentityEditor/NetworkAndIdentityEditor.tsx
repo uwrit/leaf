@@ -168,7 +168,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
      * Handle new endpoint to be added.
      */
     private handleAddEndpointClick = () => {
-        const { dispatch, data } = this.props;
+        const { dispatch } = this.props;
         const newEndpoint: NetworkEndpoint = {
             id: this.generateSequentialIntegerId(),
             created: new Date(),

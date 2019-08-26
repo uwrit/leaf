@@ -86,7 +86,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
                 <div className={`${c}-start`}>
                     <p>Hi there! It looks like you need to create Concepts to connect to your clinical data.</p>
                     <p>
-                        <a onClick={this.handleCreateSqlSetClick}>Start by creating a Concept SQL Set</a>
+                        <span className='link-span' onClick={this.handleCreateSqlSetClick}>Start by creating a Concept SQL Set</span>
                         , which is a SQL table, view, or subquery which your Concepts can point to.
                     </p>
                 </div>
@@ -95,7 +95,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
                 {/* Hint to click on a Concept to edit */}
                 {!currentAdminConcept && sets.size > 0 &&
                 <div className={`${c}-na`}>
-                    <p>Click on a Concept to the left to edit <br></br> or <a onClick={this.handleAddConceptClick}>create a new one</a></p>
+                    <p>Click on a Concept to the left to edit <br></br> or <span className='link-span' onClick={this.handleAddConceptClick}>create a new one</span></p>
                 </div>
                 }
 

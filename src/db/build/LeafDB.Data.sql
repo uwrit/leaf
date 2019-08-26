@@ -495,4 +495,4 @@ INSERT [auth].[Constraint] ([Id], [Type]) VALUES (1, N'User')
 INSERT [auth].[Constraint] ([Id], [Type]) VALUES (2, N'Group')
 SET IDENTITY_INSERT [auth].[Constraint] OFF
 INSERT [network].[Identity] ([Lock], [Name], [Abbreviation], [Description], [TotalPatients], [Latitude], [Longitude], [PrimaryColor], [SecondaryColor]) VALUES (N'X', N'University of Washington', N'UW', N'UW Medicine is the most comprehensive integrated health system in the Puget Sound region, comprising 4 hospitals and hundreds of clinics', 4600000, CAST(47.6062 AS Decimal(7, 4)), CAST(-122.3321 AS Decimal(7, 4)), N'rgb(75, 46, 131)', N'rgb(183, 165, 122)')
-INSERT [ref].[Version] ([Lock], [Version]) VALUES (N'X', N'3.2.0')
+INSERT [ref].[Version] ([Lock], [Version]) VALUES (N'X', N'3.3.1')

@@ -9,7 +9,7 @@ import Axios, { CancelTokenSource }  from 'axios';
 import { Dispatch } from 'redux';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType, PatientCountState } from '../../models/state/CohortState';
-import { PatientCountDTO, PreflightCheckDTO } from '../../models/PatientCountDTO';
+import { PatientCountDTO } from '../../models/PatientCountDTO';
 import { DemographicDTO, DemographicStatistics } from '../../models/cohort/DemographicDTO';
 import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkResponder';
 import { panelToDto } from '../../models/panel/Panel';
@@ -104,7 +104,6 @@ export const getCounts = () => {
                             if (getState().cohort.count.state !== CohortStateType.REQUESTING) { return; }
 
                             if (error.response && error.response.status === 400) {
-                                const preflight = error.response.data.preflight as PreflightCheckDTO;
                                 dispatch(setNetworkCohortCountNotImplemented(nr.id))
                             } else {
                                 dispatch(errorNetworkCohortCount(nr.id, error.response));

@@ -9,7 +9,6 @@ import React from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { DropdownToggle, Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
 import { PatientListColumnType } from '../../../../models/patientList/Column';
-import { DynamicDatasetQuerySchemaField } from '../../../../models/admin/Dataset';
 
 interface Props {
     index: number;

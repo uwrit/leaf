@@ -14,6 +14,7 @@ import { PatientListDatasetDefinition, PatientListDatasetSummaryType } from '../
 import { PatientListColumn } from '../../models/patientList/Column';
 
 interface Props {
+    allowRemove: boolean;
     className?: string;
     data: PatientListDatasetDefinition;
     dispatch: any;
@@ -33,7 +34,7 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
     }
 
     public render() {
-        const { className, data } = this.props;
+        const { className, data, allowRemove } = this.props;
         const c = className ? className : 'patientlist';
         const cs = `${c}-column-selector`;
         const isDemographics = data.id === 'demographics';
@@ -49,7 +50,7 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
                         toggle={this.handleColumnBoxClickedOutside}>
                         <div className={`${cs}-container`}>
                             {!isDemographics &&
-                            <div className={`${cs}-remove`}>
+                            <div className={`${cs}-remove ${!allowRemove ? 'not-allowed' : ''}`}>
                                 <span onClick={this.handleRemoveDatasetClick}>Remove</span>
                             </div>
                             }
@@ -93,8 +94,11 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
     }
 
     private handleRemoveDatasetClick = () => {
+        const { data, allowRemove, dispatch } = this.props;
+        if (!allowRemove) { return; }
+
         this.setState({ showColumnBox: false });
-        this.props.dispatch(deleteDataset(this.props.data));
+        dispatch(deleteDataset(data));
     }
 
     private handleColumnBoxClickedOutside = () => {
@@ -102,7 +106,8 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
     }
 
     private handleColumnClick = (col: PatientListColumn) => {
-        this.props.dispatch(toggleDatasetColumn(col));
+        const { dispatch } = this.props;
+        dispatch(toggleDatasetColumn(col));
     }
 
     private getSummaryText = (type: PatientListDatasetSummaryType) => {

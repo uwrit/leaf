@@ -18,10 +18,6 @@ interface Props {
 }
 
 export default class NonDragHeader extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { sort, className, onClick, data } = this.props;
         const c = className ? className : 'patientlist';

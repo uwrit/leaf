@@ -14,10 +14,6 @@ export interface Props {
 }
 
 export class SectionHeader extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         return (
             <div className="section-header">

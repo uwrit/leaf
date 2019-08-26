@@ -12,7 +12,6 @@ import { SpecializationDropdown } from './SpecializationDropdown';
 import { ConceptSqlSet } from '../../../../models/admin/Concept';
 import { ConceptSpecializationGroup, ConceptSpecialization } from '../../../../models/concept/Concept';
 import { setAdminPanelCurrentUserConcept } from '../../../../actions/admin/concept';
-import { setConcept } from '../../../../actions/concepts';
 
 interface Props {
     data: SectionProps;
@@ -22,9 +21,6 @@ interface Props {
 export class SpecializationDropdowns extends React.PureComponent<Props> {
     private className = 'concept-editor';
     private propName = 'specializationGroups';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { data, set } = this.props;

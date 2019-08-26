@@ -20,9 +20,6 @@ interface Props {
 export class Constraints extends React.PureComponent<Props> {
     private className = 'concept-editor';
     private propName = 'constraints';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { dataset, locked, forceValidation } = this.props;

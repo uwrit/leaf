@@ -22,10 +22,6 @@ export interface Props {
 }
 
 export default class Panel extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { dispatch, isFirst, panel, queryState } = this.props;
         const isDateFiltered = 

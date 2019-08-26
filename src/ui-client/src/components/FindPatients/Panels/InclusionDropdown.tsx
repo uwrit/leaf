@@ -30,18 +30,16 @@ export const INCLUSION_DROPDOWN_TYPE = {
 export default class InclusionDropdown extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
-        this.toggle = this.toggle.bind(this);
-        this.selectItem = this.selectItem.bind(this);
         this.state = { dropdownOpen: false };
     }
     
-    public toggle() {
+    public toggle = () => {
         this.setState((prevState: State) => ({
             dropdownOpen: !prevState.dropdownOpen
         }));
     }
 
-    public selectItem(item: any) {
+    public selectItem = (item: any) => {
         const { dispatch, inclusionDropdownType } = this.props;
         const text = item.target.innerText;
         const include = text === 'Patients Who' || text === 'And' ? true : false;

@@ -8,17 +8,11 @@
 import React from 'react';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkCohortState } from '../../models/state/CohortState';
-import { NetworkIdentity } from '../../models/NetworkResponder';
-
 interface CCQueryQuerySitesProps { 
     cohorts: NetworkCohortState[];
 }
 
 export class CohortCountQuerySites extends React.PureComponent<CCQueryQuerySitesProps> {
-    constructor(props: CCQueryQuerySitesProps) {
-        super(props);
-    }
-
     public render() {
         const { cohorts } = this.props;
         let totalSites: number = cohorts.length;

@@ -24,9 +24,6 @@ const deidentifiable = new Set([ PatientListColumnType.String, PatientListColumn
 
 export class DynamicSchemaRow extends React.PureComponent<Props> {
     private className = 'dataset-editor';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { field, index } = this.props;

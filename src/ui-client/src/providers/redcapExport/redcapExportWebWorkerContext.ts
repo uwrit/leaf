@@ -17,16 +17,12 @@ var handleWorkMessage = function (payload) {
 /*
  * Prepare a dataset or field name to be used in REDCap.
  */
-var invalid = new Map([ [' ', '_'], ['-',''], ['.',''], [';',''], ['!',''], [':',''], ['[',''], [']',''], ['{',''], ['}',''], ['>',''], ['<',''], ['=',''], ['(',''], [')',''] ]);
+var invalid = new Set([' ', '-', '.', ';', '!', ':', '[', ']', '{', '}', '>', '<', '=', '(', ')' ]);
 var cleanName = function (pre, charLimit) {
     var arr = [];
     for (var i = 0; i < pre.length; i++) {
         var t = pre[i];
-        var replacement = invalid.get(t);
-        if (replacement) {
-            arr.push(replacement);
-        }
-        else if (t && replacement !== "") {
+        if (!invalid.has(t)) {
             arr.push(t);
         }
     }

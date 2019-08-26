@@ -6,8 +6,6 @@
  */ 
 
 import React from 'react';
-import { setPanelDateFilter } from '../../../actions/panels';
-import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import CountDropdown from './CountDropdown';
 import CustomDateRangePicker from './CustomDateRangePicker';

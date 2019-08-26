@@ -4,11 +4,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
-
+// eslint-disable-next-line
 const SELECT_FROM_SPLITTER = /\SELECT([\s\S]*?)\FROM\b/i;
 const BRACKETS = /(\[|\])/g;
 const EQUALS = '=';
-const EQUALS_REGEX = /\=/g;
+const EQUALS_REGEX = /=/g;
 const EQUALS_SPACED = ' = ';
 const AS = 'AS';
 const COMMA = ',';

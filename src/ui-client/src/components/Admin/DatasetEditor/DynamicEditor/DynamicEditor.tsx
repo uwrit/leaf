@@ -33,10 +33,6 @@ interface Props {
 }
 
 export class DynamicEditor extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { expectedColumns, dataset, dispatch, inputChangeHandler, locked, forceValidation } = this.props;
         return (

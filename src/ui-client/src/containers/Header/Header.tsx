@@ -49,10 +49,6 @@ interface DispatchProps {
 type Props = StateProps & DispatchProps & OwnProps;
 
 class Header extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { user, responders } = this.props;
         const c = 'header';
@@ -71,7 +67,7 @@ class Header extends React.PureComponent<Props> {
             <Navbar id={`${c}-container`} className="d-flex justify-content-between mb-3">
                 <div className={`${c}-content-side`}>
                     <div className={`${c}-title"`} >
-                        <img className="logo" src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
+                        <img alt="leaf-logo" className="logo" src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
                         <div className="title">leaf</div>
                     </div>
                 </div>
@@ -240,7 +236,7 @@ class Header extends React.PureComponent<Props> {
      * Handles 'Log out' clicks. Redirects browser to designated logout URI on confirmation.
      */
     private handleLogoutClick = () => {
-        const { dispatch, auth } = this.props;
+        const { dispatch } = this.props;
         const confirm: ConfirmationModalState = {
             body: 'Are you sure you want to log out?',
             header: 'Log out',

@@ -32,10 +32,6 @@ interface Props {
 }
 
 export class FhirTemplateEditor extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { expectedColumns, dataset, dispatch, inputChangeHandler, locked, forceValidation } = this.props;
         return (

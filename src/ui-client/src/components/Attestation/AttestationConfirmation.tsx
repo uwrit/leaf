@@ -22,9 +22,6 @@ interface Props {
 }
 
 export default class AttestationConfirmation extends React.PureComponent<Props> {
-    constructor(props: Props) {
-        super(props);
-    };
     public render() {
         const c = this.props.className;
         const confirmationClass = `${c}-confirmation-container ${this.props.show ? 'show' : ''}`

@@ -99,17 +99,17 @@ class Attestation extends React.PureComponent<Props, State> {
                 wrapClassName={`${c}-modal-wrap`}>
                 <ModalHeader className={`${c}-header`}>
                     <div className={`${c}-leaf-logo-wrapper`}>
-                        <img className={`${c}-leaf-logo`} src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
+                        <img alt='leaf-logo' className={`${c}-leaf-logo`} src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
                         <div className={`${c}-title`}>
                             leaf
                             <span className={`${c}-leaf-version`}>v{version}</span>
                         </div>
                     </div>
                     <div className={`${c}-iths-logo-wrapper`}>
-                        <img className={`${c}-iths-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/iths.png'} />
+                        <img alt='iths-logo' className={`${c}-iths-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/iths.png'} />
                     </div>
                     <div className={`${c}-cd2h-logo-wrapper`}>
-                        <img className={`${c}-cd2h-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/cd2h.png'} />
+                        <img alt='cd2h-logo' className={`${c}-cd2h-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/cd2h.png'} />
                     </div>
                 </ModalHeader>
                 <div className={progressBarClasses} style={{ width: `${sessionLoadProgressPercent}%` }} />

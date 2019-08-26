@@ -12,7 +12,6 @@ import { setAdminConceptSpecialization, deleteAdminConceptSpecialization, remove
 import { showConfirmationModal } from '../../../../actions/generalUi';
 import { Specialization, SpecializationGroup } from '../../../../models/admin/Concept';
 import { Row, Col, Container } from 'reactstrap';
-import { Input } from '../../Section/Input';
 
 interface Props {
     dispatch: any;
@@ -24,9 +23,6 @@ interface Props {
 export class SpecializationDropdownOption extends React.PureComponent<Props> {
     private uidBase = 'urn:leaf:specialization:';
     private className = 'sqlset-editor';
-    constructor(props: Props) {
-        super(props);
-    }
 
     public render() {
         const { specialization, forceValidation } = this.props;

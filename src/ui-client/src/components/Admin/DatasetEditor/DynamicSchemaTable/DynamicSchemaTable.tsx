@@ -17,11 +17,6 @@ interface Props {
 }
 
 export class DynamicSchemaTable extends React.PureComponent<Props> {
-    private className = 'dataset-editor';
-    constructor(props: Props) {
-        super(props);
-    }
-
     public render() {
         const { schema } = this.props;
 
