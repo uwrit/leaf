@@ -14,7 +14,7 @@ import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '
 import { DateBoundary } from '../../models/panel/Date';
 import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetQuery, PatientListDatasetDefinition, PatientListDatasetShape } from '../../models/patientList/Dataset';
-import { PatientListSort, PatientListSortType } from '../../models/patientList/Configuration';
+import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
