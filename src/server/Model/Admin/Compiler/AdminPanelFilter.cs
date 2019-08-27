@@ -11,6 +11,7 @@ namespace Model.Admin.Compiler
     {
         public int Id { get; set; }
         public Guid ConceptId { get; set; }
+        public bool IsInclusion { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplayDescription { get; set; }
     }
