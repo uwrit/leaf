@@ -16,14 +16,11 @@
     <Folder Include="Jwt\" />
     <Folder Include="Authorization\" />
     <Folder Include="Jobs\" />
-    <Folder Include="DTO\" />
-    <Folder Include="DTO\Admin\" />
     <Folder Include="DTO\Cohort\" />
     <Folder Include="DTO\Compiler\" />
     <Folder Include="DTO\Export\" />
     <Folder Include="DTO\Network\" />
     <Folder Include="DTO\User\" />
-    <Folder Include="DTO\Admin\Compiler\" />
     <Folder Include="DTO\Admin\Network\" />
     <Folder Include="DTO\Config\" />
   </ItemGroup>

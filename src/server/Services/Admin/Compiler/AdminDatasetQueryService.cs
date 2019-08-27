@@ -322,7 +322,6 @@ namespace Services.Admin.Compiler
 
             void Fill(DataTable table, IEnumerable<string> with)
             {
-                var uniq = with.Distinct();
                 foreach (var t in with.Distinct(new TagEqualityComparer()))
                 {
                     var row = table.NewRow();

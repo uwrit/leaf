@@ -3,15 +3,15 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using Model.Admin.Compiler;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace Model.Admin.Compiler
+namespace Services.Admin.Compiler
 {
-    public class PanelFilter
+    public class AdminPanelFilterService : AdminPanelFilterManager.IAdminPanelFilterService
     {
-        public int Id { get; set; }
-        public Guid ConceptId { get; set; }
-        public string UiDisplayText { get; set; }
-        public string UiDisplayDescription { get; set; }
+
     }
 }

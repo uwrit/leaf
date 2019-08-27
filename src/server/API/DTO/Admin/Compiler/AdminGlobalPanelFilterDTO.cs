@@ -4,21 +4,27 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using Model.Admin.Compiler;
 
-namespace Model.Admin.Compiler
+namespace API.DTO.Admin.Compiler
 {
-    public enum AccessMode
-    {
-        QI = 1,
-        Research = 2
-    }
-
-    public class GlobalPanelFilter
+    public class GlobalPanelFilterDTO
     {
         public int Id { get; set; }
         public AccessMode AccessMode { get; set; }
         public bool IsInclusion { get; set; }
         public int SqlSetId { get; set; }
         public string SqlSetWhere { get; set; }
+
+        public GlobalPanelFilterDTO() { }
+
+        public GlobalPanelFilterDTO(AdminGlobalPanelFilter filter)
+        {
+            Id = filter.Id;
+            AccessMode = filter.AccessMode;
+            IsInclusion = filter.IsInclusion;
+            SqlSetId = filter.SqlSetId;
+            SqlSetWhere = filter.SqlSetWhere;
+        }
     }
 }

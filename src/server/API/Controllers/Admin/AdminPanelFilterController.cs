@@ -7,17 +7,14 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using API.DTO.Admin;
+using API.DTO.Admin.Compiler;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Model.Network;
 using Model.Authorization;
 using Model.Error;
-using Model.Admin.Network;
-using API.DTO.Admin.Network;
-using API.DTO.Admin.Compiler;
+using Model.Admin.Compiler;
 
 namespace API.Controllers.Admin
 {
@@ -27,17 +24,28 @@ namespace API.Controllers.Admin
     public class AdminPanelFilterController : Controller
     {
         readonly ILogger<AdminPanelFilterController> logger;
+        readonly AdminPanelFilterManager manager;
 
         public AdminPanelFilterController(
-            ILogger<AdminPanelFilterController> logger)
+            ILogger<AdminPanelFilterController> logger,
+            AdminPanelFilterManager manager)
         {
             this.logger = logger;
+            this.manager = manager;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminPanelFilterDTO>>> Get()
+        public async Task<ActionResult<IEnumerable<AdminPanelFilter>>> Get()
         {
-            return NotFound();
+            try
+            {
+                var panelFilters = await manager.GetAsync();
+                return Ok(panelFilters);
+            }
+            catch (Exception ex)
+            {
+                return 
+            }
         }
     }
 }
