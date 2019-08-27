@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -29,7 +29,6 @@
     <Folder Include="Tables\" />
     <Folder Include="Startup\" />
     <Folder Include="Authentication\" />
-    <Folder Include="Admin\Compiler\" />
     <Folder Include="Admin\Network\" />
   </ItemGroup>
 </Project>
