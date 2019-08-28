@@ -18,22 +18,22 @@ namespace API.Controllers.Admin
 {
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
-    [Route("api/admin/panelfilter")]
-    public class AdminPanelFilterController : Controller
+    [Route("api/admin/globalpanelfilter")]
+    public class AdminGlobalPanelFilterController : Controller
     {
-        readonly ILogger<AdminPanelFilterController> log;
-        readonly AdminPanelFilterManager manager;
+        readonly ILogger<AdminGlobalPanelFilterController> log;
+        readonly AdminGlobalPanelFilterManager manager;
 
-        public AdminPanelFilterController(
-            ILogger<AdminPanelFilterController> log,
-            AdminPanelFilterManager manager)
+        public AdminGlobalPanelFilterController(
+            ILogger<AdminGlobalPanelFilterController> log,
+            AdminGlobalPanelFilterManager manager)
         {
             this.log = log;
             this.manager = manager;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminPanelFilter>>> GetAsync()
+        public async Task<ActionResult<IEnumerable<AdminGlobalPanelFilter>>> GetAsync()
         {
             try
             {
@@ -42,13 +42,13 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                log.LogError("Failed to get admin panel filters. Error:{Error}", e.ToString());
+                log.LogError("Failed to get admin global panel filters. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<AdminPanelFilter>> CreateAsync([FromBody] AdminPanelFilter pf)
+        public async Task<ActionResult<AdminGlobalPanelFilter>> CreateAsync([FromBody] AdminGlobalPanelFilter pf)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace API.Controllers.Admin
             }
             catch (ArgumentException ae)
             {
-                log.LogError("Invalid create PanelFilter model. Model:{@Model} Error:{Error}", pf, ae.Message);
+                log.LogError("Invalid create GlobalPanelFilter model. Model:{@Model} Error:{Error}", pf, ae.Message);
                 return BadRequest();
             }
             catch (LeafRPCException le)
@@ -66,13 +66,13 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to create PanelFilter. Model:{@Model} Error:{Error}", pf, ex.ToString());
+                log.LogError("Failed to create GlobalPanelFilter. Model:{@Model} Error:{Error}", pf, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<AdminPanelFilter>> UpdateAsync(int id, [FromBody] AdminPanelFilter pf)
+        public async Task<ActionResult<AdminGlobalPanelFilter>> UpdateAsync(int id, [FromBody] AdminGlobalPanelFilter pf)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace API.Controllers.Admin
             }
             catch (ArgumentException ae)
             {
-                log.LogError("Invalid update PanelFilter model. Model:{@Model} Error:{Error}", pf, ae.Message);
+                log.LogError("Invalid update GlobalPanelFilter model. Model:{@Model} Error:{Error}", pf, ae.Message);
                 return BadRequest();
             }
             catch (LeafRPCException le)
@@ -94,7 +94,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to update PanelFilter. Model:{@Model} Error:{Error}", pf, ex.ToString());
+                log.LogError("Failed to update GlobalPanelFilter. Model:{@Model} Error:{Error}", pf, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -113,7 +113,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to delete PanelFilter. Id:{Id} Error:{Error}", id, ex.ToString());
+                log.LogError("Failed to delete GlobalPanelFilter. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

@@ -117,6 +117,7 @@ namespace API.Options
             services.AddTransient<AdminDatasetQueryManager.IAdminDatasetQueryService, AdminDatasetQueryService>();
             services.AddTransient<AdminDatasetCategoryManager.IAdminDatasetCategoryService, AdminDatasetCategoryService>();
             services.AddTransient<AdminDemographicsManager.IAdminDemographicQueryService, AdminDemographicQueryService>();
+            services.AddTransient<AdminGlobalPanelFiieerManager.IAdminPanelFilterService, AdminPanelFilterService>();
 
             return services;
         }
