@@ -48,8 +48,8 @@ export const DemographicsAdminSqlDefTemplate: PatientListDatasetDefinitionTempla
         ['marriedBoolean', { datasetId: 'demographics', id: 'marriedBoolean', type: PatientListColumnType.Bool }],
         ['language', { datasetId: 'demographics', id: 'language', type: PatientListColumnType.String }],
         ['maritalStatus', { datasetId: 'demographics', id: 'maritalStatus', type: PatientListColumnType.String }],
-        ['mrn', { datasetId: 'demographics', id: 'mrn', type: PatientListColumnType.DateTime }],
-        ['name', { datasetId: 'demographics', id: 'name', type: PatientListColumnType.DateTime }],
+        ['mrn', { datasetId: 'demographics', id: 'mrn', type: PatientListColumnType.String }],
+        ['name', { datasetId: 'demographics', id: 'name', type: PatientListColumnType.String }],
         ['race', { datasetId: 'demographics', id: 'race', type: PatientListColumnType.String }],
         ['religion', { datasetId: 'demographics', id: 'religion', type: PatientListColumnType.String }]
     ]),
