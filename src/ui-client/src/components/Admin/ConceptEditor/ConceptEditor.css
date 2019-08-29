@@ -330,7 +330,8 @@
     content: 'urn:leaf:concept:';
     font-size: 0.9rem;
     left: 0;
-    margin-top: 3px;
+    margin-left: 20px;
+    margin-top: 1px;
     padding: 4px 8px;
     position: absolute;
 }
