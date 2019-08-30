@@ -23,23 +23,44 @@ const getIdTokenKey = (config: AppConfig) => {
  */
 const decodeToken = (token: string): UserContext => {
     const decoded = jwt_decode(token) as DecodedIdToken;
-    const roles = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
     const fullname = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
     const nameSplit = fullname.split('@');
     let name = fullname;
     let scope = '';
+    let roles: string[] = [];
+    const roleMap = {
+        isAdmin: false,
+        isFederatedOkay: false,
+        isPhiOkay: false,
+        isSuperUser: false
+    };
 
-    if (nameSplit.length === 2) {
+    /*
+     * Check if [roles] property is present, and check for each role if so.
+     */
+    if (decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"]) {
+
+        roles = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+        roleMap.isAdmin         = roles.indexOf('admin') > -1;
+        roleMap.isFederatedOkay = roles.indexOf('fed') > -1;
+        roleMap.isPhiOkay       = roles.indexOf('phi') > -1;
+        roleMap.isSuperUser     = roles.indexOf('super') > -1;
+    }
+
+    /*
+     * Split name on '@'. Actual user name should be arg1, scope arg2.
+     */
+    if (nameSplit.length > 1) {
         name = nameSplit[0];
         scope = nameSplit[1];
     }
     
+    /*
+     * Derive UserContext object from decoded info.
+     */
     const ctx: UserContext = {
+        ...roleMap,
         expirationDate: new Date(decoded.exp * 1000),
-        isAdmin: roles.indexOf('admin') > -1,
-        isFederatedOkay: roles.indexOf('fed') > -1,
-        isPhiOkay: roles.indexOf('phi') > -1,
-        isSuperUser: roles.indexOf('super') > -1,
         issuer: decoded.iss,
         loginDate: new Date(decoded.iat * 1000),
         name,
