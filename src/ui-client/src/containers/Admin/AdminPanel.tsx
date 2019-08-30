@@ -14,6 +14,7 @@ import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEdito
 import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdentityEditor/NetworkAndIdentityEditor';
 import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import './AdminPanel.css';
+import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 
 interface StateProps { 
     admin?: AdminState;
@@ -49,6 +50,8 @@ class AdminPanel extends React.PureComponent<Props> {
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
                 return <ConceptEditor data={admin!} dispatch={dispatch} />;
+            case AdminPanelPane.PANEL_FILTERS:
+                return <PanelFilterEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.SQL_SETS:
                 return <SqlSetEditor data={admin!} dispatch={dispatch} />
             case AdminPanelPane.DATASETS:
