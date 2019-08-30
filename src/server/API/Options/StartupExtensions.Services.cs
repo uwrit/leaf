@@ -86,7 +86,6 @@ namespace API.Options
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
 
             services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
-
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
