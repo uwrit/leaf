@@ -13,6 +13,8 @@ import { getDatasetQueryCategories } from "../../services/admin/datasetQueryCate
 import { setAdminDatasetQueryCategories } from "./datasetQueryCategory";
 import { getNetworkEndpoints } from "../../services/admin/networkAndIdentityApi";
 import { setAdminNetworkEndpoints } from "./networkAndIdentity";
+import { getPanelFilters } from "../../services/admin/panelFilterApi";
+import { getGlobalPanelFilters } from "../../services/admin/globalPanelFilterApi";
 
 export const SET_ADMIN_PANEL_PANE = 'SET_ADMIN_PANEL_PANE';
 export const SET_ADMIN_PANEL_LOAD_STATE = 'SET_ADMIN_PANEL_LOAD_STATE';
@@ -46,6 +48,13 @@ export const loadAdminPanelDataIfNeeded = () => {
                 const conceptEvents = await getConceptEvents(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminConceptEvents(conceptEvents));
+
+                /*
+                 * Load panel filter-related data.
+                 */
+                const panelFilters = await getPanelFilters(state);
+                const globalPanelFilters = await getGlobalPanelFilters(state);
+                
 
                 /*
                  * Load datasets data.

@@ -5,14 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export interface PanelFilter {
+export interface GlobalPanelFilter {
     id: number;
-    conceptId: string;
+    accessMode?: AccessMode;
     isInclusion: boolean;
-    isEnabled: boolean;
-    uiDisplayText: string;
-    uiDisplayDescription: string;
+    sqlSetId: number;
+    sqlSetWhere?: string;
 
     unsaved?: boolean;
     changed?: boolean;
+}
+
+export enum AccessMode {
+    QI = 1,
+    Research = 2
 }

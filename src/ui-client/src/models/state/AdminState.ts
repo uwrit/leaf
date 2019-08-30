@@ -14,6 +14,7 @@ import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
+import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 
 
 export enum AdminPanelLoadState {
@@ -27,8 +28,9 @@ export enum AdminPanelLoadState {
 export enum AdminPanelPane {
     CONCEPTS = 1,
     SQL_SETS = 2,
-    DATASETS = 3,
-    NETWORK = 4
+    PANEL_FILTERS = 3,
+    DATASETS = 4,
+    NETWORK = 5
 }
 
 export interface AdminConceptState {
@@ -55,7 +57,14 @@ export interface AdminPanelSqlSetState {
 
 export interface AdminPanelFilterState {
     changed: boolean;
-    panelFilters: Map<number, PanelFilter>;
+    data: Map<number, PanelFilter>;
+    unedited?: Map<number, PanelFilter>;
+}
+
+export interface AdminGlobalPanelFilterState {
+    changed: boolean;
+    data: Map<number, GlobalPanelFilter>;
+    unedited?: Map<number, GlobalPanelFilter>;
 }
 
 export interface AdminDatasetState {
@@ -96,6 +105,7 @@ export default interface AdminState {
     configuration: AdminConfiguration;
     datasets: AdminDatasetState;
     datasetQueryCategories: AdminDatasetQueryCategoryState;
+    globalPanelFilters: AdminGlobalPanelFilterState;
     networkAndIdentity: AdminNetworkAndIdentityState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;

@@ -194,6 +194,10 @@ class Attestation extends React.PureComponent<Props, State> {
     }
 
     private handleIdentificationTypeClick = (isIdentified: boolean) => {
+        const { userContext } = this.props;
+
+        if (isIdentified && (!userContext || !userContext.isPhiOkay)) { return; }
+
         if (!isIdentified || this.allowPhiIdentified()) {
             this.setState({ 
                 attestation: { ...this.state.attestation, isIdentified },
@@ -273,6 +277,7 @@ class Attestation extends React.PureComponent<Props, State> {
 
     private allowPhiIdentified = () => {
         const { attestation, documentationStatusSelected, hasApprovedIrb, hasApprovedQi } = this.state;
+
         if (documentationStatusSelected && 
             (hasApprovedIrb || hasApprovedQi) &&
             attestation.documentation.expirationDate &&

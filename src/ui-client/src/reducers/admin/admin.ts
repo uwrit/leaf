@@ -87,6 +87,10 @@ import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPan
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
 import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, removeAdminNetworkEndpoint, setAdminNetworkCertModalContent, setAdminNetworkCertModalShown, revertAdminNetworkChanges } from "./networkAndIdentity";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
+import { SET_ADMIN_PANEL_FILTERS, REMOVE_ADMIN_PANEL_FILTER } from "../../actions/admin/panelFilter";
+import { setAdminPanelFilters, deleteAdminPanelFilter } from "./panelFilter";
+import { SET_ADMIN_GLOBAL_PANEL_FILTERS, REMOVE_ADMIN_GLOBAL_PANEL_FILTER } from "../../actions/admin/globalPanelFilter";
+import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter } from "./globalPanelFilter";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -132,6 +136,10 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             categories: new Map()
         },
+        globalPanelFilters: {
+            changed: false,
+            data: new Map()
+        },
         networkAndIdentity: {
             changed: false,
             endpoints: new Map(),
@@ -144,7 +152,7 @@ export const defaultAdminState = (): AdminState => {
         },
         panelFilters: {
             changed: false,
-            panelFilters: new Map()
+            data: new Map()
         },
         sqlSets: {
             changed: false,
@@ -213,6 +221,18 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminConceptSqlSetUnchanged(state, action);
         case SYNC_ADMIN_SQL_SET_UNSAVED_WITH_SAVED:
             return syncAdminConceptSqlSetUnsavedWithSaved(state, action);
+
+        // Panel Filters
+        case SET_ADMIN_PANEL_FILTERS:
+            return setAdminPanelFilters(state, action);
+        case REMOVE_ADMIN_PANEL_FILTER:
+            return deleteAdminPanelFilter(state, action);
+
+        // Global Panel Filters
+        case SET_ADMIN_GLOBAL_PANEL_FILTERS:
+            return setAdminGlobalPanelFilters(state, action);
+        case REMOVE_ADMIN_GLOBAL_PANEL_FILTER:
+            return deleteAdminGlobalPanelFilter(state, action);
 
         // Specialization Groups
         case SET_ADMIN_SPECIALIZATION_GROUPS:
