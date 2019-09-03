@@ -7,7 +7,8 @@
 
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
-import { PanelFilter } from '../../models/admin/PanelFilter';
+import { PanelFilter, PanelFilterDTO } from '../../models/admin/PanelFilter';
+import { fetchConcept } from '../conceptApi';
 
 /*
  * Gets all current Panel Filters.
@@ -16,7 +17,14 @@ export const getPanelFilters = async (state: AppState): Promise<PanelFilter[]> =
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get('api/admin/panelfilter');
-    const pfs = resp.data as PanelFilter[];
+    const dtos = resp.data as PanelFilterDTO[];
+    const pfs: PanelFilter[] = [];
+
+    for (const dto of dtos) {
+        const concept = await fetchConcept(state, dto.conceptId!);
+        pfs.push({ ...dto, concept });
+    }
+
     return pfs;
 };
 

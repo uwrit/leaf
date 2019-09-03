@@ -13,8 +13,8 @@ import { AppState, DatasetsState } from '../../models/state/AppState';
 import { DatasetEditor } from '../../components/Admin/DatasetEditor/DatasetEditor';
 import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdentityEditor/NetworkAndIdentityEditor';
 import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
-import './AdminPanel.css';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
+import './AdminPanel.css';
 
 interface StateProps { 
     admin?: AdminState;

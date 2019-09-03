@@ -73,10 +73,9 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                             </div>
                             <div className={`${c}-endpoint-container`}>
                                 {[ ...endpoints.values() ]
-                                .sort((a,b) => a.id > b.id ? -1 : 1)
-                                .map((e) => (
-                                    <Endpoint key={e.id} dispatch={dispatch} endpoint={e} forceValidation={forceValidation} />
-                                ))}
+                                    .sort((a,b) => a.id > b.id ? -1 : 1)
+                                    .map((e) => <Endpoint key={e.id} dispatch={dispatch} endpoint={e} forceValidation={forceValidation} />)
+                                }
                             </div>
                         </Col>
                     </Row>

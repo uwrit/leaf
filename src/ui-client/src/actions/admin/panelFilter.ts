@@ -12,6 +12,7 @@ import { PanelFilter } from "../../models/admin/PanelFilter";
 import { createPanelFilter, updatePanelFilter, deletePanelFilter } from "../../services/admin/panelFilterApi";
 
 export const SET_ADMIN_PANEL_FILTERS = 'SET_ADMIN_PANEL_FILTERS';
+export const UNDO_ADMIN_PANEL_FILTER_CHANGES = 'UNDO_ADMIN_PANEL_FILTER_CHANGES';
 export const REMOVE_ADMIN_PANEL_FILTER = 'REMOVE_ADMIN_PANEL_FILTER';
 
 export interface AdminPanelFilterAction {
@@ -78,6 +79,12 @@ export const setAdminPanelFilters = (pfs: PanelFilter[]): AdminPanelFilterAction
     return {
         pfs,
         type: SET_ADMIN_PANEL_FILTERS
+    };
+};
+
+export const undoAdminPanelFilterChanges = (): AdminPanelFilterAction => {
+    return {
+        type: UNDO_ADMIN_PANEL_FILTER_CHANGES
     };
 };
 

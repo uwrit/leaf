@@ -5,14 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export interface PanelFilter {
+import { Concept } from "../concept/Concept";
+
+export interface PanelFilterDTO {
     id: number;
-    conceptId: string;
+    conceptId?: string;
     isInclusion: boolean;
-    isEnabled: boolean;
     uiDisplayText: string;
     uiDisplayDescription: string;
 
     unsaved?: boolean;
     changed?: boolean;
+}
+
+export interface PanelFilter extends PanelFilterDTO {
+    concept?: Concept;
 }
