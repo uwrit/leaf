@@ -8,9 +8,8 @@
 import React from 'react';
 import { togglePanelFilter } from '../../../actions/panelFilter';
 import { PanelFilter as PanelFilterModel } from '../../../models/panel/PanelFilter';
-import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
 import PopupBox from '../../Other/PopupBox/PopupBox';
-
+import PanelFilterSelectionBox from './PanelFilterSelectionBox';
 import './PanelFilterGroup.css';
 
 interface Props {
@@ -47,7 +46,7 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
 
     public render() {
         const { shouldShowFilterSelectionBox, DOMRect } = this.state;
-        const { filters } = this.props;
+        const { filters, dispatch } = this.props;
         const c = this.className;
         
         return (
@@ -60,33 +59,7 @@ export default class PanelFilter extends React.PureComponent<Props, State> {
                     <PopupBox
                         parentDomRect={DOMRect!}
                         toggle={this.handleFilterSelectionBoxClose}>
-                        <div className={`${c}-selection-box`}>
-                            <div className={`${c}-selection-title`}>
-                                <p>
-                                    The options below allow you to add criteria to your query without 
-                                    dragging additional Concepts over. These are just for convenience, and are completely optional.
-                                </p>
-                            </div>
-                            <div className={`${c}-selection-body`}>
-                                {filters.length === 0 &&
-                                <div className={`${c}-no-filters`}>
-                                    It looks like your administrator hasn't added these yet!
-                                </div>
-                                }
-                                {filters.map((f: PanelFilterModel) => {
-                                return (
-                                    <div key={f.id}>
-                                        <div className={`${c}-selection-row`}>
-                                            <div className={`${c}-selection-row-title`}>{f.uiDisplayText}</div>
-                                            <CheckboxSlider checked={f.isActive} onClick={this.handleSelectionBoxItemClick.bind(null, f)} />
-                                        </div>
-                                        <div className={`${c}-selection-row-description-container`}>
-                                            <p className={`${c}-selection-row-description`}>{f.uiDisplayDescription}</p>
-                                        </div>
-                                    </div>
-                                )})}
-                            </div>
-                        </div>
+                        <PanelFilterSelectionBox dispatch={dispatch} filters={filters} />
                     </PopupBox>
                     }
                 </span>

@@ -77,6 +77,16 @@ import {
     SET_ADMIN_SQL_CONFIGURATION, 
     AdminConfigurationAction 
 } from "../../actions/admin/configuration";
+import { 
+    SET_ADMIN_PANEL_FILTERS, 
+    REMOVE_ADMIN_PANEL_FILTER, 
+    UNDO_ADMIN_PANEL_FILTER_CHANGES, 
+    SET_ADMIN_PANEL_FILTERS_UNCHANGED 
+} from "../../actions/admin/panelFilter";
+import { 
+    SET_ADMIN_GLOBAL_PANEL_FILTERS, 
+    REMOVE_ADMIN_GLOBAL_PANEL_FILTER 
+} from "../../actions/admin/globalPanelFilter";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -87,9 +97,7 @@ import { setAdminPanelDatasetLoadState, setAdminPanelCurrentDataset, setAdminPan
 import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, undoAdminDatasetQueryCategoryChange, removeAdminDatasetQueryCategory } from "./datasetQueryCategory";
 import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, removeAdminNetworkEndpoint, setAdminNetworkCertModalContent, setAdminNetworkCertModalShown, revertAdminNetworkChanges } from "./networkAndIdentity";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
-import { SET_ADMIN_PANEL_FILTERS, REMOVE_ADMIN_PANEL_FILTER, UNDO_ADMIN_PANEL_FILTER_CHANGES } from "../../actions/admin/panelFilter";
-import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges } from "./panelFilter";
-import { SET_ADMIN_GLOBAL_PANEL_FILTERS, REMOVE_ADMIN_GLOBAL_PANEL_FILTER } from "../../actions/admin/globalPanelFilter";
+import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter } from "./globalPanelFilter";
 
 
@@ -227,6 +235,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminPanelFilters(state, action);
         case UNDO_ADMIN_PANEL_FILTER_CHANGES:
             return undoAdminPanelFilterChanges(state, action);
+        case SET_ADMIN_PANEL_FILTERS_UNCHANGED:
+            return setAdminPanelFiltersUnchanged(state, action);
         case REMOVE_ADMIN_PANEL_FILTER:
             return deleteAdminPanelFilter(state, action);
 

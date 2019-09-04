@@ -102,7 +102,9 @@ export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelPane) => {
             admin.concepts.changed || 
             admin.sqlSets.changed ||
             admin.datasets.changed ||
-            admin.networkAndIdentity.changed
+            admin.networkAndIdentity.changed || 
+            admin.panelFilters.changed ||
+            admin.globalPanelFilters.changed
         ) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",

@@ -75,7 +75,7 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Validate that current admin Concept is valid. Called on 'Save' click.
+     * Validate that current admin SQL Set is valid. Called on 'Save' click.
      */
     private currentSqlSetsAreValid = (): boolean => {
         const { sets } = this.props.data.sqlSets;
@@ -139,6 +139,9 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
         dispatch(undoAdminSqlSetChanges());
     }
 
+    /*
+     * Handle a save event.
+     */
     private handleSaveChangesClick = () => {
         const { dispatch } = this.props;
         const valid = this.currentSqlSetsAreValid();

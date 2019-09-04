@@ -11,15 +11,13 @@ import { PanelFilter } from "../../models/admin/PanelFilter";
 
 export const setAdminPanelFilters = (state: AdminState, action: AdminPanelFilterAction): AdminState => {
     const pfs = action.pfs!;
-    let unedited;
+    let unedited = state.panelFilters.unedited;
     for (const pf of pfs) {
         state.panelFilters.data.set(pf.id, Object.assign({}, pf));
     }
 
     if (!action.changed) {
         unedited = new Map(state.panelFilters.data);
-    } else if (state.panelFilters.unedited) {
-        unedited = state.panelFilters.unedited;
     }
 
     return Object.assign({}, state, {
@@ -45,14 +43,11 @@ export const setAdminUneditedPanelFilter = (state: AdminState, action: AdminPane
 };
 
 export const undoAdminPanelFilterChanges = (state: AdminState, action: AdminPanelFilterAction): AdminState => {
-    const savedOnly: Map<number, PanelFilter> = new Map();
-    state.panelFilters.unedited!.forEach((pf) => {
-        savedOnly.set(pf.id, Object.assign({}, pf))
-    });
-
     return Object.assign({}, state, {
         panelFilters: {
             ...state.panelFilters,
+            data: state.panelFilters.unedited,
+            unedited: new Map(state.panelFilters.unedited!),
             changed: false
         }
     });
@@ -66,7 +61,7 @@ export const deleteAdminPanelFilter = (state: AdminState, action: AdminPanelFilt
     return Object.assign({}, state, {
         panelFilters: {
             ...state.panelFilters,
-            data: new Map(state.panelFilters.data)
+            data: new Map(state.panelFilters.data),
         }
     });
 };

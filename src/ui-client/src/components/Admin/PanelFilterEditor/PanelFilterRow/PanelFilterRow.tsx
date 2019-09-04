@@ -10,9 +10,12 @@ import { Container, Col, Row } from 'reactstrap';
 import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
 import { PanelFilter } from '../../../../models/admin/PanelFilter';
 import { TextArea } from '../../Section/TextArea';
-import { setAdminPanelFilter } from '../../../../actions/admin/panelFilter';
+import { setAdminPanelFilter, removeAdminPanelFilter, deleteAdminPanelFilter } from '../../../../actions/admin/panelFilter';
 import { Checkbox } from '../../Section/Checkbox';
 import { Concept } from '../../../../models/admin/Concept';
+import { isEmbeddedQuery } from '../../../../utils/panelUtils';
+import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../../actions/generalUi';
 
 interface DndProps {
     canDrop?: boolean;
@@ -25,6 +28,7 @@ interface OwnProps {
     concept?: Concept;
     forceValidation: boolean;
     panelFilter: PanelFilter;
+    togglePreview: (show: boolean, selectedFilterId: number) => any;
 }
 
 type Props = DndProps & OwnProps;
@@ -32,9 +36,18 @@ type Props = DndProps & OwnProps;
 const panelTarget = {
     drop(props: Props, monitor: DropTargetMonitor) {
         const { dispatch, panelFilter } = props;
-        const concept: Concept = monitor.getItem()
-        const newPf = Object.assign({}, panelFilter, { concept, conceptId: concept.id, changed: true });
+        const concept: Concept = monitor.getItem();
+        const newPf = Object.assign({}, panelFilter, { 
+            concept, conceptId: 
+            concept.id, changed: true,
+            uiDisplayText: concept.uiDisplayName,
+            uiDisplayDescription: concept.uiDisplayText
+        });
         dispatch(setAdminPanelFilter(newPf, true));
+    },
+    canDrop (props: Props, monitor: DropTargetMonitor) {
+        const concept: Concept = monitor.getItem();
+        return !isEmbeddedQuery(concept.universalId);
     }
 }
 
@@ -58,6 +71,11 @@ class PanelFilterRow extends React.PureComponent<Props> {
             connectDropTarget &&
             connectDropTarget(
                 <div>
+
+                    <div className={`${c}-delete`}>
+                        <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
+                    </div>
+
                     <Row className={classes.join(' ')}>
                         <Col md={3}>
                             <div className={`${c}-text`}>Concept</div>
@@ -70,6 +88,11 @@ class PanelFilterRow extends React.PureComponent<Props> {
                                 </div>
                             </div>
                             }
+                            {!panelFilter.concept &&
+                            <div className={`${c}-noconcept-container`}>
+                                <div className={`${c}-noconcept`}>Drag a Concept to bind to this Panel Filter</div>
+                            </div>
+                            }
                         </Col>
                         <Col md={6}>
 
@@ -77,12 +100,14 @@ class PanelFilterRow extends React.PureComponent<Props> {
                             <TextArea
                                 changeHandler={this.handlePanelFilterChange} propName={'uiDisplayText'} value={panelFilter.uiDisplayText} 
                                 label='Display Text' required={true} errorText='Enter text to display' forceValidation={forceValidation}
+                                focusToggle={this.handlePreviewToggle}
                             />
 
                             {/* Description */}
                             <TextArea
                                 changeHandler={this.handlePanelFilterChange} propName={'uiDisplayDescription'} value={panelFilter.uiDisplayDescription} 
                                 label='Description' required={true} errorText='Enter a description' forceValidation={forceValidation}
+                                focusToggle={this.handlePreviewToggle}
                             />
                         </Col>
 
@@ -102,6 +127,34 @@ class PanelFilterRow extends React.PureComponent<Props> {
                     </Row>
                 </div>
             ));
+    }
+
+    private handlePreviewToggle = (show: boolean) => {
+        const { panelFilter, togglePreview } = this.props;
+        togglePreview(show, panelFilter.id);
+    }
+
+    /*
+     * Handle any edits to the Panel Filter, updating 
+     * the store and preparing a later API save event.
+     */
+    private handleSqlSetDeleteClick = () => {
+        const { panelFilter, dispatch } = this.props;
+
+        if (panelFilter.unsaved) {
+            dispatch(removeAdminPanelFilter(panelFilter));
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `Are you sure you want to delete the Panel Filter (id "${panelFilter.id}")? This can't be undone.`,
+                header: 'Delete Panel Filter',
+                onClickNo: () => null,
+                onClickYes: () => dispatch(deleteAdminPanelFilter(panelFilter)),
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Delete Panel Filter`
+            };
+            dispatch(showConfirmationModal(confirm));
+        }
     }
 
     private handlePanelFilterChange = (val: any, propName: string) => {

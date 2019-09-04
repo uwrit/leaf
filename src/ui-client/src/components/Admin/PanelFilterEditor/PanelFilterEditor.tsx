@@ -10,9 +10,12 @@ import { Container, Row, Col, Button } from 'reactstrap';
 import ConceptColumnContainer from '../../../containers/FindPatients/ConceptColumnContainer';
 import AdminState from '../../../models/state/AdminState';
 import PanelFilterRow from './PanelFilterRow/PanelFilterRow';
-import './PanelFilterEditor.css';
 import { PanelFilter } from '../../../models/admin/PanelFilter';
-import { setAdminPanelFilter, undoAdminPanelFilterChanges } from '../../../actions/admin/panelFilter';
+import { setAdminPanelFilter, undoAdminPanelFilterChanges, processApiUpdateQueue } from '../../../actions/admin/panelFilter';
+import { PanelFilterPreview } from './PanelFilterPreview/PanelFilterPreview';
+import './PanelFilterEditor.css';
+import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
+import { showConfirmationModal } from '../../../actions/generalUi';
 
 interface Props { 
     data: AdminState;
@@ -20,7 +23,9 @@ interface Props {
 }
 
 interface State {
+    selectedFilterId?: number;
     forceValidation: boolean;
+    showPreview: boolean;
 }
 
 export class PanelFilterEditor extends React.PureComponent<Props,State> {
@@ -28,16 +33,23 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            forceValidation: false
+            forceValidation: false,
+            showPreview: false
         }
     }
 
     public render() {
         const { data, dispatch } = this.props;
-        const { forceValidation } = this.state;
+        const { selectedFilterId, forceValidation, showPreview } = this.state;
         const { panelFilters } = data;
         const { changed } = panelFilters;
         const c = this.className;
+        let selectedFilter;
+
+        if (selectedFilterId) {
+            selectedFilter = panelFilters.data.get(selectedFilterId);
+        }
+        
 
         return (
             <div className={c}>
@@ -46,6 +58,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
 
                         {/* Concepts (can be dragged over) */}
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
+                            <div className={`${c}-column-left-overlay ${showPreview ? 'show' : ''}`}></div>
                             <ConceptColumnContainer />
                         </Col>
 
@@ -54,13 +67,13 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
 
                             {/* Header */}
                             <div className={`${c}-header`}>
-                                <Button className='leaf-button leaf-button-addnew' disabled={changed} onClick={this.handleAddNewClick}>
+                                <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddNewClick}>
                                     + Create New Concept
                                 </Button>
                                 <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>
                                     Undo Changes
                                 </Button>
-                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>
+                                <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChangesClick}>
                                     Save
                                 </Button>
                             </div>
@@ -69,13 +82,23 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                             <div className={`${c}-panelfilter-container`}>
                                 {[ ...panelFilters.data.values() ]
                                     .map(pf => {
-                                        return <PanelFilterRow key={pf.id} dispatch={dispatch} panelFilter={pf} forceValidation={forceValidation} />
+                                        return (
+                                            <PanelFilterRow 
+                                                key={pf.id} 
+                                                dispatch={dispatch} 
+                                                panelFilter={pf} 
+                                                forceValidation={forceValidation}
+                                                togglePreview={this.togglePanelFilterPreview}
+                                            />);
                                     })
                                 }
                             </div>
                         </Col>
                     </Row>
                 </Container>
+                {showPreview && selectedFilter &&
+                    <PanelFilterPreview panelFilter={selectedFilter} />
+                }
             </div>
         );
     }
@@ -108,7 +131,52 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
         dispatch(undoAdminPanelFilterChanges());
     }
 
-    private handleSaveChanges = () => {
+    /*
+     * Handle a save event.
+     */
+    private handleSaveChangesClick = () => {
+        const { dispatch } = this.props;
+        const valid = this.currentPanelFiltersAreValid();
+        if (valid) {
+            dispatch(processApiUpdateQueue());
+        } else {
+            const confirm: ConfirmationModalState = {
+                body: `One or more fields in the Panel Filters are missing necessary data. Are you sure you want to save?`,
+                header: 'Missing Panel Filter data',
+                onClickNo: () => null,
+                onClickYes: () => { 
+                    dispatch(processApiUpdateQueue());
+                    this.setState({ forceValidation: false });
+                },
+                show: true,
+                noButtonText: `No`,
+                yesButtonText: `Yes, Save Panel Filters`
+            };
+            dispatch(showConfirmationModal(confirm));
+            this.setState({ forceValidation: true });
+        }
+    }
 
+
+    /*
+     * Validate that current admin Panel Filter is valid. Called on 'Save' click.
+     */
+    private currentPanelFiltersAreValid = (): boolean => {
+        const { data } = this.props.data.panelFilters;
+
+        for (const pf of [ ...data.values() ]) {
+            if (pf.changed || pf.unsaved) {
+                if (!pf.concept || !pf.conceptId) { return false; }
+                if (!pf.uiDisplayText || !pf.uiDisplayDescription) { return false; }
+            }
+        }
+        return true;
+    }
+
+    private togglePanelFilterPreview = (show: boolean, selectedFilterId: number): void => {
+        const { showPreview } = this.state;
+        if (show !== showPreview) {
+            this.setState({ showPreview: show, selectedFilterId });
+        }
     }
 }

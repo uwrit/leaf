@@ -34,9 +34,10 @@ export const getPanelFilters = async (state: AppState): Promise<PanelFilter[]> =
 export const updatePanelFilter = async (state: AppState, pf: PanelFilter): Promise<PanelFilter> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/panelfilter/${pf.id}`, pf);
-    const updated = resp.data as PanelFilter;
-    return updated;
+    const dto = toDto(pf);
+    const resp = await http.put(`api/admin/panelfilter/${dto.id}`, dto);
+    const updated = resp.data as PanelFilterDTO;
+    return { ...pf, ...updated };
 };
 
 /*
@@ -45,9 +46,10 @@ export const updatePanelFilter = async (state: AppState, pf: PanelFilter): Promi
 export const createPanelFilter = async (state: AppState, pf: PanelFilter): Promise<PanelFilter> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.post(`api/admin/panelfilter`, pf);
-    const created = resp.data as PanelFilter;
-    return created;
+    const dto = toDto(pf);
+    const resp = await http.post(`api/admin/panelfilter`, dto);
+    const created = resp.data as PanelFilterDTO;
+    return { ...pf, ...created };
 };
 
 /*
@@ -57,4 +59,14 @@ export const deletePanelFilter = async (state: AppState, pf: PanelFilter) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.delete(`api/admin/panelfilter/${pf.id}`);
+};
+
+const toDto = (pf: PanelFilter): PanelFilterDTO => {
+    return {
+        id: pf.id,
+        conceptId: pf.conceptId!,
+        isInclusion: pf.isInclusion,
+        uiDisplayText: pf.uiDisplayText,
+        uiDisplayDescription: pf.uiDisplayDescription
+    };
 };

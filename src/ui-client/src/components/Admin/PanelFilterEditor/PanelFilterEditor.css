@@ -16,7 +16,7 @@
 
 /* Main */
 .panelfilter-editor-column-right {
-    background-color: rgb(248,248,248);
+    background-color: rgb(240,240,240);
     box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
     height: 100vh;
     z-index: 101;
@@ -86,6 +86,22 @@
     font-size: 0.8rem;
 }
 
+.panelfilter-editor-noconcept-container {
+    background-color: rgba(252, 255, 67, 0.2);
+    border: 1px dashed rgb(195, 197, 43);
+    border-radius: 4px;
+    height: 80px;
+    margin-top: 4px;
+    padding: 20px 0;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.panelfilter-editor-panelfilter.can-drop .panelfilter-editor-noconcept-container {
+    background-color: #aeffb793;
+    border: 1px solid #35cf4793;
+}
+
 .panelfilter-editor-concept-container:hover .panelfilter-editor-conceptid {
     color: rgb(28, 168, 221);
     overflow: initial;
@@ -96,4 +112,20 @@
 .panelfilter-editor-subtext {
     color: rgb(150,150,150);
     font-size: 0.8rem;
+}
+
+/* Overlay */
+.panelfilter-editor-column-left-overlay {
+    background-color: transparent;
+    height: 110%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: background-color 0.5s;
+    width: 100%;
+    z-index: 100;
+}
+
+.panelfilter-editor-column-left-overlay.show {
+    background-color: rgba(0,0,0,0.5);
 }
