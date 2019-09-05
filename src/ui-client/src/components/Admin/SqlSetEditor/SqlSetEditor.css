@@ -64,7 +64,7 @@
 
 /* Table */
 .sqlset-editor-table {
-    height: calc(100vh - 55px - 75.5px);
+    height: calc(100vh - 55px - 84px);
     overflow-x: hidden;
     padding: 0 20% !important;
     z-index: 100;

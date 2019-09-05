@@ -11,15 +11,13 @@ import { GlobalPanelFilter } from "../../models/admin/GlobalPanelFilter";
 
 export const setAdminGlobalPanelFilters = (state: AdminState, action: AdminGlobalPanelFilterAction): AdminState => {
     const pfs = action.pfs!;
-    let unedited;
+    let unedited = state.globalPanelFilters.unedited;
     for (const pf of pfs) {
         state.globalPanelFilters.data.set(pf.id, Object.assign({}, pf));
     }
 
     if (!action.changed) {
         unedited = new Map(state.globalPanelFilters.data);
-    } else if (state.globalPanelFilters.unedited) {
-        unedited = state.globalPanelFilters.unedited;
     }
 
     return Object.assign({}, state, {
@@ -45,14 +43,11 @@ export const setAdminUneditedGlobalPanelFilter = (state: AdminState, action: Adm
 };
 
 export const undoAdminGlobalPanelFilterChanges = (state: AdminState, action: AdminGlobalPanelFilterAction): AdminState => {
-    const savedOnly: Map<number, GlobalPanelFilter> = new Map();
-    state.globalPanelFilters.unedited!.forEach((pf) => {
-        savedOnly.set(pf.id, Object.assign({}, pf))
-    });
-
     return Object.assign({}, state, {
         globalPanelFilters: {
             ...state.globalPanelFilters,
+            data: state.globalPanelFilters.unedited,
+            unedited: new Map(state.globalPanelFilters.unedited!),
             changed: false
         }
     });
@@ -66,17 +61,17 @@ export const deleteAdminGlobalPanelFilter = (state: AdminState, action: AdminGlo
     return Object.assign({}, state, {
         globalPanelFilters: {
             ...state.globalPanelFilters,
-            data: new Map(state.globalPanelFilters.data)
+            data: new Map(state.globalPanelFilters.data),
         }
     });
 };
 
 export const setAdminGlobalPanelFiltersUnchanged = (state: AdminState, action: AdminGlobalPanelFilterAction): AdminState => {
     return Object.assign({}, state, {
-        GlobalPanelFilters: {
-            ...state.globalPanelFilters,
+        panelFilters: {
+            ...state.panelFilters,
             changed: false,
-            unedited: new Map(state.globalPanelFilters.data)
+            unedited: new Map(state.panelFilters.data)
         }
     });
 };

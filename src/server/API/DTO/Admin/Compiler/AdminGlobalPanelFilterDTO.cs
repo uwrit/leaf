@@ -21,7 +21,7 @@ namespace API.DTO.Admin.Compiler
         public GlobalPanelFilterDTO(AdminGlobalPanelFilter filter)
         {
             Id = filter.Id;
-            AccessMode = filter.AccessMode;
+            AccessMode = filter.AccessModeId;
             IsInclusion = filter.IsInclusion;
             SqlSetId = filter.SqlSetId;
             SqlSetWhere = filter.SqlSetWhere;

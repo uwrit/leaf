@@ -22,8 +22,8 @@ import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetS
 import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
 import { DynamicEditor } from './DynamicEditor/DynamicEditor';
 import { PatientListColumnType } from '../../../models/patientList/Column';
-import './DatasetEditor.css';
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
+import './DatasetEditor.css';
 
 interface Props { 
     data: AdminState;

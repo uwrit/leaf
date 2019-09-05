@@ -53,7 +53,7 @@ namespace Services.Admin.Compiler
                     {
                         sqlSetId = pf.SqlSetId,
                         sqlSetWhere = pf.SqlSetWhere,
-                        accessMode = pf.AccessMode,
+                        accessModeId = pf.AccessModeId,
                         isInclusion = pf.IsInclusion,
                         user = user.UUID
                     },
@@ -76,7 +76,7 @@ namespace Services.Admin.Compiler
                         id = pf.Id,
                         sqlSetId = pf.SqlSetId,
                         sqlSetWhere = pf.SqlSetWhere,
-                        accessMode = pf.AccessMode,
+                        accessModeId = pf.AccessModeId,
                         isInclusion = pf.IsInclusion,
                         user = user.UUID
                     },

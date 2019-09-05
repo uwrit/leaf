@@ -85,7 +85,9 @@ import {
 } from "../../actions/admin/panelFilter";
 import { 
     SET_ADMIN_GLOBAL_PANEL_FILTERS, 
-    REMOVE_ADMIN_GLOBAL_PANEL_FILTER 
+    REMOVE_ADMIN_GLOBAL_PANEL_FILTER, 
+    UNDO_ADMIN_GLOBAL_PANEL_FILTER_CHANGES,
+    SET_ADMIN_GLOBAL_PANEL_FILTERS_UNCHANGED
 } from "../../actions/admin/globalPanelFilter";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
@@ -98,7 +100,7 @@ import { setAdminDatasetQueryCategories, setAdminUneditedDatasetQueryCategory, u
 import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, setAdminNetworkEndpoints, removeAdminNetworkEndpoint, setAdminNetworkCertModalContent, setAdminNetworkCertModalShown, revertAdminNetworkChanges } from "./networkAndIdentity";
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
-import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter } from "./globalPanelFilter";
+import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -245,6 +247,10 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminGlobalPanelFilters(state, action);
         case REMOVE_ADMIN_GLOBAL_PANEL_FILTER:
             return deleteAdminGlobalPanelFilter(state, action);
+        case UNDO_ADMIN_GLOBAL_PANEL_FILTER_CHANGES:
+            return undoAdminGlobalPanelFilterChanges(state, action);
+        case SET_ADMIN_GLOBAL_PANEL_FILTERS_UNCHANGED:
+            return setAdminGlobalPanelFiltersUnchanged(state, action);
 
         // Specialization Groups
         case SET_ADMIN_SPECIALIZATION_GROUPS:

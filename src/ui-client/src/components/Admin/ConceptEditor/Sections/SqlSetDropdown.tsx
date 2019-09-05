@@ -17,8 +17,8 @@ import { AdminPanelPane } from '../../../../models/state/AdminState';
 interface Props extends PropertyProps {
     dispatch: any;
     sqlSets: Map<number,ConceptSqlSet>;
-    toggleSqlPreview: (show: boolean) => any;
-    toggleOverlay: (show: boolean) => any;
+    toggleSqlPreview?: (show: boolean) => any;
+    toggleOverlay?: (show: boolean) => any;
 }
 
 interface State {

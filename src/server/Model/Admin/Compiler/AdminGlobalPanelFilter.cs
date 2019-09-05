@@ -16,7 +16,7 @@ namespace Model.Admin.Compiler
     public class AdminGlobalPanelFilter
     {
         public int Id { get; set; }
-        public AccessMode AccessMode { get; set; }
+        public AccessMode AccessModeId { get; set; }
         public bool IsInclusion { get; set; }
         public int SqlSetId { get; set; }
         public string SqlSetWhere { get; set; }

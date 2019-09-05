@@ -5,14 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept as AdminConcept, ConceptSqlSet, SpecializationGroup } from '../../models/admin/Concept';
+import { Concept as AdminConcept, ConceptSqlSet } from '../../models/admin/Concept';
 import { Concept as UserConcept } from '../../models/concept/Concept';
 import { SqlConfiguration } from '../../models/admin/Configuration';
 import formatSql from '../formatSql';
-import { AppState } from '../../models/state/AppState';
-import { saveOrUpdateAdminConceptSqlSet } from '../../actions/admin/sqlSet';
-import { saveOrUpdateAdminConceptSpecializationGroup } from '../../actions/admin/specializationGroup';
-import { saveOrUpdateAdminSpecialization } from '../../actions/admin/specialization';
 import { generate as generateId } from 'shortid';
 
 const year = new Date().getFullYear();

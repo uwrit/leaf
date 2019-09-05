@@ -6,13 +6,16 @@
  */ 
 
 import React from 'react';
-import { Container, Row, Col, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
-import { PanelFilter } from '../../../models/admin/PanelFilter';
-import { setAdminPanelFilter, undoAdminPanelFilterChanges, processApiUpdateQueue } from '../../../actions/admin/panelFilter';
+import { undoAdminGlobalPanelFilterChanges } from '../../../actions/admin/globalPanelFilter';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../actions/generalUi';
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
+import { GlobalPanelFilter } from '../../../models/admin/GlobalPanelFilter';
+import { setAdminGlobalPanelFilter } from '../../../actions/admin/globalPanelFilter';
+import { processApiUpdateQueue } from '../../../actions/admin/globalPanelFilter';
+import { GlobalPanelFilterRow } from './GlobalPanelFilterRow/GlobalPanelFilterRow';
 import './GlobalPanelFilterEditor.css';
 
 interface Props { 
@@ -35,11 +38,50 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { data, dispatch } = this.props;
-        const { panelFilters } = data;
-        const { changed } = panelFilters;
+        const { forceValidation } = this.state;
+        const { globalPanelFilters } = data;
+        const { changed } = globalPanelFilters;
         const c = this.className;
 
-        return null;
+        return (
+            <div className={`${c}-container admin-panel-editor`}>
+
+                {/* Header */}
+                <div className={`${c}-toprow`}>
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddNewClick}>
+                        + Create New Global Panel Filter
+                    </Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChangesClick}>
+                        Undo Changes
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChangesClick}>
+                        Save
+                    </Button>
+
+                    {/* Explanation */}
+                    <WhatsThis 
+                        question={'What is a Global Panel Filter?'}
+                        body={`Global Panel Filters are additional logic that are added to users' queries which users have no control over, and can be 
+                               applied to users logged in for QI, Research, or in all cases. Global Panel Filters are typically used to exclude patients 
+                               who have not consented to having their data used for research (for users in Research mode), or excluding VIPs, etc.`}
+                    />
+                </div>
+
+                {/* Global Panel Filters */}
+                <div className={`${c}-table`}>
+                    {[ ...globalPanelFilters.data.values() ]
+                        .map(gpf => (
+                            <GlobalPanelFilterRow 
+                                key={gpf.id}
+                                data={data} 
+                                dispatch={dispatch} 
+                                globalPanelFilter={gpf} 
+                                forceValidation={forceValidation} 
+                            />)
+                        )}
+                </div>
+            </div>
+        );
     }
 
     /* 
@@ -54,21 +96,22 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
     }
 
     private handleAddNewClick = () => {
-        const { dispatch } = this.props;
-        const newPf: PanelFilter = {
+        const { dispatch, data } = this.props;
+        const newPf: GlobalPanelFilter = {
             id: this.generateSequentialIntegerId(),
             isInclusion: true,
-            uiDisplayText: "New Filter",
-            uiDisplayDescription: "Enter a description of the panel filter.",
+            sqlSetId: data.sqlSets.sets.size > 0 
+                ? [ ...data.sqlSets.sets.keys() ][0]
+                : undefined,
             unsaved: true
         }
-        dispatch(setAdminPanelFilter(newPf, true));
+        dispatch(setAdminGlobalPanelFilter(newPf, true));
     }
 
-    private handleUndoChanges = () => {
+    private handleUndoChangesClick = () => {
         const { dispatch } = this.props;
         this.setState({ forceValidation: false });
-        dispatch(undoAdminPanelFilterChanges());
+        dispatch(undoAdminGlobalPanelFilterChanges());
     }
 
     /*
@@ -81,8 +124,8 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
             dispatch(processApiUpdateQueue());
         } else {
             const confirm: ConfirmationModalState = {
-                body: `One or more fields in the Panel Filters are missing necessary data. Are you sure you want to save?`,
-                header: 'Missing Panel Filter data',
+                body: `One or more fields in the Global Panel Filters are missing necessary data. Are you sure you want to save?`,
+                header: 'Missing Global Panel Filter data',
                 onClickNo: () => null,
                 onClickYes: () => { 
                     dispatch(processApiUpdateQueue());
@@ -90,7 +133,7 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
                 },
                 show: true,
                 noButtonText: `No`,
-                yesButtonText: `Yes, Save Panel Filters`
+                yesButtonText: `Yes, Save Global Panel Filters`
             };
             dispatch(showConfirmationModal(confirm));
             this.setState({ forceValidation: true });
@@ -102,12 +145,11 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
      * Validate that current admin Panel Filter is valid. Called on 'Save' click.
      */
     private currentPanelFiltersAreValid = (): boolean => {
-        const { data } = this.props.data.panelFilters;
+        const { data } = this.props.data.globalPanelFilters;
 
         for (const pf of [ ...data.values() ]) {
             if (pf.changed || pf.unsaved) {
-                if (!pf.concept || !pf.conceptId) { return false; }
-                if (!pf.uiDisplayText || !pf.uiDisplayDescription) { return false; }
+                if (!pf.sqlSetId) { return false; }
             }
         }
         return true;

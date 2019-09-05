@@ -7,9 +7,9 @@
 
 export interface GlobalPanelFilter {
     id: number;
-    accessMode?: AccessMode;
+    accessModeId?: AccessMode;
     isInclusion: boolean;
-    sqlSetId: number;
+    sqlSetId?: number;
     sqlSetWhere?: string;
 
     unsaved?: boolean;

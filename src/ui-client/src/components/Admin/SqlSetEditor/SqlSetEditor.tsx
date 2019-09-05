@@ -15,8 +15,8 @@ import { showConfirmationModal } from '../../../actions/generalUi';
 import AdminState, { AdminPanelPane } from '../../../models/state/AdminState';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../../../actions/admin/admin';
 import { FiCornerUpLeft } from 'react-icons/fi';
-import './SqlSetEditor.css';
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
+import './SqlSetEditor.css';
 
 interface Props {
     data: AdminState;
