@@ -160,8 +160,9 @@ namespace Services.Search
         {
             var pq = ReadQueriesById(grid);
             var pc = ReadConcepts(grid);
+            var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(directQueries)
+            return new PreflightResources(directQueries, pf)
             {
                 DirectQueriesCheck = pq,
                 DirectConceptsCheck = pc
@@ -172,8 +173,9 @@ namespace Services.Search
         {
             var pq = ReadQueriesByUId(grid);
             var pc = ReadConcepts(grid);
+            var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(directQueries)
+            return new PreflightResources(directQueries, pf)
             {
                 DirectQueriesCheck = pq,
                 DirectConceptsCheck = pc
@@ -190,6 +192,11 @@ namespace Services.Search
                 PreflightCheck = new ConceptPreflightCheck { Results = preflight.Select(p => p.ConceptPreflightCheckResult()) },
                 Concepts = concepts?.ToArray()
             };
+        }
+
+        public static IEnumerable<GlobalPanelFilter> ReadGlobalPanelFilters(SqlMapper.GridReader grid)
+        {
+            return grid.Read<GlobalPanelFilter>();
         }
 
         public static PreflightQueries ReadQueriesById(SqlMapper.GridReader grid)

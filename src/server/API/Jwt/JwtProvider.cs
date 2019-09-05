@@ -197,7 +197,7 @@ namespace API.Jwt
             return claims;
         }
 
-        Claim GetSessionType(Attestation attestation) => new Claim(Session.Key, attestation.SessionType == SessionType.QualityImprovement ? Session.QI : Session.Research);
+        public Claim GetSessionType(Attestation attestation) => new Claim(Session.Key, attestation.SessionType == SessionType.QualityImprovement ? Session.QI : Session.Research);
 
         IEnumerable<Claim> GetGroups(Entitlement entitlement)
         {

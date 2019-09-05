@@ -18,10 +18,12 @@ namespace Model.Compiler
         public PreflightConcepts DirectConceptsCheck { get; set; }
         public PreflightQueries DirectQueriesCheck { get; set; }
         IEnumerable<QueryRef> DirectQueries { get; set; }
+        IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
 
-        public PreflightResources(IEnumerable<QueryRef> directQueries)
+        public PreflightResources(IEnumerable<QueryRef> directQueries, IEnumerable<GlobalPanelFilter> globalPanelFilters)
         {
             DirectQueries = directQueries;
+            GlobalPanelFilters = globalPanelFilters;
         }
 
         public IEnumerable<Concept> Concepts(CompilerOptions opts)
