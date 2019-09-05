@@ -63,7 +63,7 @@
 }
 
 .global-panelfilter-editor-table-row {
-    padding: 25px 8px 0;
+    padding: 22px 8px 0;
 }
 
 .global-panelfilter-editor-row-id {
@@ -99,7 +99,6 @@
     font-size: 0.8rem;
     position: absolute;
     margin-right: 4px;
-    margin-top: 2px;
     padding: 2px 4px;
     right: 0;
     z-index: 100;

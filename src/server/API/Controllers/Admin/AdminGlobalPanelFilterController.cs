@@ -99,7 +99,7 @@ namespace API.Controllers.Admin
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult<int?>> DeleteAsync(int id)
         {
             try

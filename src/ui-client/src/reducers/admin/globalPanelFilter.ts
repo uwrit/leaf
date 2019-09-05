@@ -68,10 +68,10 @@ export const deleteAdminGlobalPanelFilter = (state: AdminState, action: AdminGlo
 
 export const setAdminGlobalPanelFiltersUnchanged = (state: AdminState, action: AdminGlobalPanelFilterAction): AdminState => {
     return Object.assign({}, state, {
-        panelFilters: {
-            ...state.panelFilters,
+        globalPanelFilters: {
+            ...state.globalPanelFilters,
             changed: false,
-            unedited: new Map(state.panelFilters.data)
+            unedited: new Map(state.globalPanelFilters.data)
         }
     });
 };

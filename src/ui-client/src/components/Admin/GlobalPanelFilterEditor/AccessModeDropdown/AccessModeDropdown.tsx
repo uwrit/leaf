@@ -79,7 +79,7 @@ export class AccessModeDropdown extends React.PureComponent<Props,State> {
 
     private handleChange = (mode?: AccessMode) => {
         const { changeHandler } = this.props;
-        changeHandler(mode, 'accessMode');
+        changeHandler(mode, 'accessModeId');
     }
 
     private toggle = () => {

@@ -53,7 +53,7 @@ export const deleteAdminGlobalPanelFilter = (pf: GlobalPanelFilter) => {
                 .then(
                     response => {
                         dispatch(removeAdminGlobalPanelFilter(pf));
-                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Panel Filter Deleted' }));
+                        dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Deleted' }));
                 },  error => {
                         const info: InformationModalState = {
                             body: "An error occurred while attempting to delete the Global Panel Filter. Please see the Leaf error logs for details.",
