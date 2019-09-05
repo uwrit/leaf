@@ -90,6 +90,9 @@ const admin = (): RouteConfig => {
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.PANEL_FILTERS)),
             display: 'Panel Filters',
         }, {
+            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.GLOBAL_PANEL_FILTERS)),
+            display: 'Global Panel Filters',
+        }, {
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.DATASETS)),
             display: 'Datasets',
         }, {

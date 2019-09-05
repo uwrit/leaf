@@ -24,7 +24,6 @@ export const getPanelFilters = async (state: AppState): Promise<PanelFilter[]> =
         const concept = await fetchConcept(state, dto.conceptId!);
         pfs.push({ ...dto, concept });
     }
-
     return pfs;
 };
 
@@ -37,7 +36,7 @@ export const updatePanelFilter = async (state: AppState, pf: PanelFilter): Promi
     const dto = toDto(pf);
     const resp = await http.put(`api/admin/panelfilter/${dto.id}`, dto);
     const updated = resp.data as PanelFilterDTO;
-    return { ...pf, ...updated };
+    return fromDto(pf, updated);
 };
 
 /*
@@ -49,7 +48,7 @@ export const createPanelFilter = async (state: AppState, pf: PanelFilter): Promi
     const dto = toDto(pf);
     const resp = await http.post(`api/admin/panelfilter`, dto);
     const created = resp.data as PanelFilterDTO;
-    return { ...pf, ...created };
+    return fromDto(pf, created);
 };
 
 /*
@@ -68,5 +67,16 @@ const toDto = (pf: PanelFilter): PanelFilterDTO => {
         isInclusion: pf.isInclusion,
         uiDisplayText: pf.uiDisplayText,
         uiDisplayDescription: pf.uiDisplayDescription
+    };
+};
+
+const fromDto = (original: PanelFilter, dto: PanelFilterDTO): PanelFilter => {
+    return {
+        id: dto.id,
+        conceptId: dto.conceptId,
+        concept: original.concept,
+        isInclusion: dto.isInclusion,
+        uiDisplayText: dto.uiDisplayText,
+        uiDisplayDescription: dto.uiDisplayDescription
     };
 };

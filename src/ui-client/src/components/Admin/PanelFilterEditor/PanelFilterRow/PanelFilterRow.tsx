@@ -72,10 +72,15 @@ class PanelFilterRow extends React.PureComponent<Props> {
             connectDropTarget(
                 <div>
 
-                    <div className={`${c}-delete`}>
-                        <span onClick={this.handleSqlSetDeleteClick}>Delete</span>
-                    </div>
+                    {/* Unsaved indicator */}
+                    {(panelFilter.unsaved || panelFilter.changed) &&
+                    <div className={`${c}-unsaved`}>unsaved</div>
+                    }
 
+                    {/* Delete button */}
+                    <div className={`${c}-delete`} onClick={this.handleSqlSetDeleteClick}>Delete</div>
+
+                    {/* Bound Concept info */}
                     <Row className={classes.join(' ')}>
                         <Col md={3}>
                             <div className={`${c}-text`}>Concept</div>

@@ -16,6 +16,7 @@ import AdminState, { AdminPanelPane } from '../../../models/state/AdminState';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../../../actions/admin/admin';
 import { FiCornerUpLeft } from 'react-icons/fi';
 import './SqlSetEditor.css';
+import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 
 interface Props {
     data: AdminState;
@@ -60,6 +61,13 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
                         <FiCornerUpLeft /> 
                         Go to Concept Editor
                     </Button>
+
+                    {/* Explanation */}
+                    <WhatsThis 
+                        question={'What is a SQL Set?'}
+                        body={`SQL Sets are the tables, views, or subqueries used in the 'FROM' clauses in Concepts. In order to have a Leaf Concept 
+                            query a particular SQL table (e.g., 'dbo.ENCOUNTER'), for example, you must first create a SQL Set for it.`}
+                    />
                 </div>
 
                 {/* Sets */}

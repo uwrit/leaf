@@ -9,8 +9,10 @@ import { AppState } from "../../models/state/AppState";
 import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
 import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
 import { PanelFilter } from "../../models/admin/PanelFilter";
+import { PanelFilter as UserPanelFilter } from "../../models/panel/PanelFilter";
 import { createPanelFilter, updatePanelFilter, deletePanelFilter } from "../../services/admin/panelFilterApi";
 import { getApiUpdateQueue } from "../../utils/admin/panelFilter";
+import { setPanelFilters, removePanelFilter } from "../panelFilter";
 
 export const SET_ADMIN_PANEL_FILTERS = 'SET_ADMIN_PANEL_FILTERS';
 export const SET_ADMIN_PANEL_FILTERS_UNCHANGED = 'SET_ADMIN_PANEL_FILTERS_UNCHANGED';
@@ -38,6 +40,7 @@ export const saveOrUpdateAdminPanelFilter = async (pf: PanelFilter, dispatch: an
         newPf = await updatePanelFilter(state, pf);
     }
     dispatch(setAdminPanelFilter(newPf, false));
+    dispatch(setPanelFilters([ derivePanelFilterFromAdminPanelFilter(newPf) ]));
     return newPf;
 };
 
@@ -53,6 +56,7 @@ export const deleteAdminPanelFilter = (pf: PanelFilter) => {
                 .then(
                     response => {
                         dispatch(removeAdminPanelFilter(pf));
+                        dispatch(removePanelFilter(derivePanelFilterFromAdminPanelFilter(pf)));
                         dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Panel Filter Deleted' }));
                 },  error => {
                         const info: InformationModalState = {
@@ -132,5 +136,16 @@ export const removeAdminPanelFilter = (pf: PanelFilter): AdminPanelFilterAction 
     return {
         pf,
         type: REMOVE_ADMIN_PANEL_FILTER
+    };
+};
+
+const derivePanelFilterFromAdminPanelFilter = (apf: PanelFilter): UserPanelFilter => {
+    return {
+        id: apf.id,
+        isActive: false,
+        isInclusion: apf.isInclusion,
+        concept: apf.concept!,
+        uiDisplayText: apf.uiDisplayText,
+        uiDisplayDescription: apf.uiDisplayDescription,
     };
 };

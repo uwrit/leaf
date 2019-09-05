@@ -64,7 +64,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         return (
             <div className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
 
-                {/* Unsaved notifier */}
+                {/* Unsaved indicator */}
                 {unsaved &&
                 <span className={`${c}-unsaved`}>unsaved</span>
                 }

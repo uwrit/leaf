@@ -29,8 +29,9 @@ export enum AdminPanelPane {
     CONCEPTS = 1,
     SQL_SETS = 2,
     PANEL_FILTERS = 3,
-    DATASETS = 4,
-    NETWORK = 5
+    GLOBAL_PANEL_FILTERS = 4,
+    DATASETS = 5,
+    NETWORK = 6
 }
 
 export interface AdminConceptState {

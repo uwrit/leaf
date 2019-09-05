@@ -13,9 +13,10 @@ import PanelFilterRow from './PanelFilterRow/PanelFilterRow';
 import { PanelFilter } from '../../../models/admin/PanelFilter';
 import { setAdminPanelFilter, undoAdminPanelFilterChanges, processApiUpdateQueue } from '../../../actions/admin/panelFilter';
 import { PanelFilterPreview } from './PanelFilterPreview/PanelFilterPreview';
-import './PanelFilterEditor.css';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../actions/generalUi';
+import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
+import './PanelFilterEditor.css';
 
 interface Props { 
     data: AdminState;
@@ -78,6 +79,14 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                                 </Button>
                             </div>
 
+                            {/* Explanation */}
+                            <WhatsThis 
+                                question={'What is a Panel Filter?'}
+                                body={`A Panel Filter is a shortcut for users to add a Concept to their query without needing to drag the Concept 
+                                       over repeatedly. Each Panel Filter must be bound to a particular Concept, which can be done by dragging a Concept 
+                                       over from the left. Panel Filters are usually general, widely-used Concepts of interest such as Living/Deceased, etc.`}
+                            />
+
                             {/* Panel Filters */}
                             <div className={`${c}-panelfilter-container`}>
                                 {[ ...panelFilters.data.values() ]
@@ -120,7 +129,8 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
             id: this.generateSequentialIntegerId(),
             isInclusion: true,
             uiDisplayText: "New Filter",
-            uiDisplayDescription: "Enter a description of the panel filter."
+            uiDisplayDescription: "Enter a description of the panel filter.",
+            unsaved: true
         }
         dispatch(setAdminPanelFilter(newPf, true));
     }

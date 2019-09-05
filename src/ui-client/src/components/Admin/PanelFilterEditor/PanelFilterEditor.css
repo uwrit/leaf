@@ -22,6 +22,10 @@
     z-index: 101;
 }
 
+.panelfilter-editor-column-right .whats-this {
+    margin-left: 4px;
+}
+
 .panelfilter-editor {
     background-color: white;
     overflow-y: none;
@@ -40,7 +44,7 @@
     margin-bottom: 10px;
     min-height: 50px;
     min-width: 650px;
-    padding: 10px 0px 0;
+    padding: 25px 0px 0;
     position: relative;
     transition: box-shadow 0.3s;
 }
@@ -128,4 +132,36 @@
 
 .panelfilter-editor-column-left-overlay.show {
     background-color: rgba(0,0,0,0.5);
+}
+
+/* Delete button */
+.panelfilter-editor-delete {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-right: 25px;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    z-index: 101;
+}
+
+.panelfilter-editor-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+}
+
+/* Unsaved indicator */
+.panelfilter-editor-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: 0;
+    margin: 4px 0 0 25px;
+    padding: 2px 4px;
+    position: absolute;
+    z-index: 101;
 }

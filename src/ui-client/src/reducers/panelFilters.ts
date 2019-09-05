@@ -5,7 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PanelFilterAction, SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER, SET_PANEL_FILTER_ACTIVE_STATES } from '../actions/panelFilter';
+import { 
+    PanelFilterAction, 
+    SET_PANEL_FILTERS, 
+    TOGGLE_PANEL_FILTER, 
+    SET_PANEL_FILTER_ACTIVE_STATES,
+    DELETE_PANEL_FILTER
+} from '../actions/panelFilter';
 import { PanelFilter } from '../models/panel/PanelFilter';
 
 export const defaultPanelFiltersState = (): PanelFilter[] => [];
@@ -18,8 +24,18 @@ const togglePanelFilter = (state: PanelFilter[], filter: PanelFilter, isActive: 
 };
 
 const setPanelFilters = (state: PanelFilter[] = [], filters: PanelFilter[]) => {
-    filters.forEach((pf: PanelFilter) => pf.isActive = false);
-    return filters;
+    const copy = state.slice();
+    filters.forEach((pf: PanelFilter) => {
+        pf.isActive = false;
+        const i = copy.findIndex(c => c.id === pf.id);
+
+        if (i > -1) {
+            copy[i] = pf;
+        } else {
+            copy.push(pf);
+        }
+    });
+    return copy;
 };
 
 const setPanelFilterActiveStates = (state: PanelFilter[] = [], filters: PanelFilter[]) => {
@@ -43,6 +59,8 @@ export const panelFilters = (state: PanelFilter[] = defaultPanelFiltersState(), 
             return setPanelFilters(state, action.filters!);
         case SET_PANEL_FILTER_ACTIVE_STATES:
             return setPanelFilterActiveStates(state, action.filters!);
+        case DELETE_PANEL_FILTER:
+            return state.slice().filter(pf => pf.id !== action.filter!.id);
         default:
             return state;
     };
