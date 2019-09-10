@@ -24,7 +24,7 @@ namespace Model.Authorization
         Guid IdNonce { get; }
         Guid? SessionNonce { get; }
         bool Identified { get; }
-        SessionType SessionType { get; set; }
+        SessionType SessionType { get; }
         AuthenticationMechanism AuthenticationMechanism { get; }
 
         bool IsInRole(string role);

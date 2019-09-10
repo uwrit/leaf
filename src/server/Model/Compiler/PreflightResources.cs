@@ -17,8 +17,8 @@ namespace Model.Compiler
 
         public PreflightConcepts DirectConceptsCheck { get; set; }
         public PreflightQueries DirectQueriesCheck { get; set; }
+        public IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
         IEnumerable<QueryRef> DirectQueries { get; set; }
-        IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
 
         public PreflightResources(IEnumerable<QueryRef> directQueries, IEnumerable<GlobalPanelFilter> globalPanelFilters)
         {
@@ -30,7 +30,7 @@ namespace Model.Compiler
         {
             if (Ok)
             {
-                var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => Convert(dq, opts));
+                var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => ToConcept(dq, opts));
                 return DirectConceptsCheck.Concepts.Concat(queryConcepts);
             }
             return new Concept[] { };
@@ -49,7 +49,7 @@ namespace Model.Compiler
             return new PreflightResourcesErrors();
         }
 
-        Concept Convert(QueryRef @ref, CompilerOptions opts)
+        Concept ToConcept(QueryRef @ref, CompilerOptions opts)
         {
             var alias = $"{opts.Alias}C";
             return new Concept

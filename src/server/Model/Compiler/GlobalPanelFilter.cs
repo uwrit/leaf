@@ -7,18 +7,21 @@ using System;
 
 namespace Model.Compiler
 {
-    public enum AccessMode
-    {
-        QI = 1,
-        Research = 2
-    }
-
     public class GlobalPanelFilter
     {
         public int Id { get; set; }
-        public AccessMode AccessModeId { get; set; }
         public bool IsInclusion { get; set; }
-        public int SqlSetId { get; set; }
+        public string SqlSetFrom { get; set; }
         public string SqlSetWhere { get; set; }
+
+        public Concept ToConcept()
+        {
+            return new Concept
+            {
+                Id = Guid.Empty,
+                SqlSetFrom = SqlSetFrom,
+                SqlSetWhere = SqlSetWhere
+            };
+        }
     }
 }

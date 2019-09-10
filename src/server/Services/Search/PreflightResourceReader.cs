@@ -44,7 +44,14 @@ namespace Services.Search
                 var cids = refs.Concepts.Select(c => c.Id.Value);
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byIds,
-                    new { qids = ResourceIdTable.From(qids), cids = ResourceIdTable.From(cids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new {
+                        qids = ResourceIdTable.From(qids),
+                        cids = ResourceIdTable.From(cids),
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        sessionType = user.SessionType,
+                        admin = user.IsAdmin
+                    },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -63,7 +70,14 @@ namespace Services.Search
                 var cuids = refs.Concepts.Select(q => q.UniversalId.ToString()).ToHashSet();
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byUIds,
-                    new { quids = ResourceUniversalIdTable.From(quids), cuids = ResourceUniversalIdTable.From(cuids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new {
+                        quids = ResourceUniversalIdTable.From(quids),
+                        cuids = ResourceUniversalIdTable.From(cuids),
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        sessionType = user.SessionType,
+                        admin = user.IsAdmin
+                    },
                     commandTimeout: opts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
@@ -113,7 +127,13 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                         ConceptPreflightSql.manyIds,
-                        new { ids = ResourceIdTable.From(conceptIds), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                        new {
+                            ids = ResourceIdTable.From(conceptIds),
+                            user = user.UUID,
+                            groups = GroupMembership.From(user),
+                            admin = user.IsAdmin,
+                            sessionType = user.SessionType
+                        },
                         commandTimeout: opts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
@@ -130,7 +150,13 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                         ConceptPreflightSql.manyUIds,
-                        new { uids = ResourceUniversalIdTable.From(conceptUids), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                        new {
+                            uids = ResourceUniversalIdTable.From(conceptUids),
+                            user = user.UUID,
+                            groups = GroupMembership.From(user),
+                            admin = user.IsAdmin,
+                            sessionType = user.SessionType
+                        },
                         commandTimeout: opts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );

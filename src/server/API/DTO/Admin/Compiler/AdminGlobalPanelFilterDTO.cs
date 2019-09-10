@@ -5,13 +5,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using Model.Admin.Compiler;
+using Model.Authorization;
 
 namespace API.DTO.Admin.Compiler
 {
     public class GlobalPanelFilterDTO
     {
         public int Id { get; set; }
-        public AccessMode AccessMode { get; set; }
+        public SessionType SessionType { get; set; }
         public bool IsInclusion { get; set; }
         public int SqlSetId { get; set; }
         public string SqlSetWhere { get; set; }
@@ -21,7 +22,7 @@ namespace API.DTO.Admin.Compiler
         public GlobalPanelFilterDTO(AdminGlobalPanelFilter filter)
         {
             Id = filter.Id;
-            AccessMode = filter.AccessModeId;
+            SessionType = filter.SessionType;
             IsInclusion = filter.IsInclusion;
             SqlSetId = filter.SqlSetId;
             SqlSetWhere = filter.SqlSetWhere;

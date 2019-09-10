@@ -45,5 +45,34 @@ namespace API.DTO.Compiler
                 }
             };
         }
+
+        public static PanelDTO FromGlobalPanelFilter(GlobalPanelFilter filter, int panelIndex)
+        {
+            return new PanelDTO
+            {
+                Index = panelIndex,
+                IncludePanel = filter.IsInclusion,
+                SubPanels = new List<SubPanelDTO>
+                {
+                    new SubPanelDTO
+                    {
+                        PanelIndex = panelIndex,
+                        Index = 0,
+                        IncludeSubPanel = true,
+                        MinimumCount = 1,
+                        PanelItems = new List<PanelItemDTO>
+                        {
+                            new PanelItemDTO
+                            {
+                                Resource = new ResourceRef
+                                {
+                                    Id = Guid.Empty
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
     }
 }

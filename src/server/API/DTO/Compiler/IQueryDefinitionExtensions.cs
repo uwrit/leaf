@@ -20,9 +20,9 @@ namespace API.DTO.Compiler
 
             for (int i = 0; i < query.PanelFilters.Count(); i++)
             {
+                lastPanelIndex += i + 1;
                 var filter = query.PanelFilters.ElementAt(i);
-                var panelIndex = lastPanelIndex + i + 1;
-                var dto = PanelDTO.FromPanelFilterDTO(filter, panelIndex);
+                var dto = PanelDTO.FromPanelFilterDTO(filter, lastPanelIndex);
                 merge.Add(dto);
             }
             return merge;
