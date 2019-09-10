@@ -3,6 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 INSERT [ref].[Shape] ([Id], [Variant], [Schema]) VALUES (-1, N'Dynamic', N'{"fields":[]}')
 INSERT [ref].[Shape] ([Id], [Variant], [Schema]) VALUES (1, N'Observation', N'{"fields":[{"name":"category","type":"String","phi":false,"mask":false,"required":true},{"name":"code","type":"String","phi":false,"mask":false,"required":true},{"name":"effectiveDate","type":"DateTime","phi":true,"mask":true,"required":true},{"name":"encounterId","type":"String","phi":true,"mask":true,"required":true},{"name":"referenceRangeLow","type":"Numeric","phi":false,"mask":false,"required":false},{"name":"referenceRangeHigh","type":"Numeric","phi":false,"mask":false,"required":false},{"name":"specimenType","type":"String","phi":false,"mask":false,"required":false},{"name":"valueString","type":"String","phi":false,"mask":false,"required":true},{"name":"valueQuantity","type":"Numeric","phi":false,"mask":false,"required":false},{"name":"valueUnit","type":"String","phi":false,"mask":false,"required":false},{"name":"personId","type":"String","phi":true,"mask":true,"required":true}]}')
 INSERT [ref].[Shape] ([Id], [Variant], [Schema]) VALUES (2, N'Encounter', N'{"fields":[{"name":"admitDate","type":"DateTime","phi":true,"mask":true,"required":true},{"name":"admitSource","type":"String","phi":false,"mask":false,"required":false},{"name":"class","type":"String","phi":false,"mask":false,"required":true},{"name":"dischargeDate","type":"DateTime","phi":true,"mask":true,"required":true},{"name":"dischargeDisposition","type":"String","phi":false,"mask":false,"required":false},{"name":"encounterId","type":"String","phi":true,"mask":true,"required":true},{"name":"location","type":"String","phi":false,"mask":false,"required":true},{"name":"status","type":"String","phi":false,"mask":false,"required":false},{"name":"personId","type":"String","phi":true,"mask":true,"required":true}]}')
@@ -19,6 +20,11 @@ INSERT [auth].[Constraint] ([Id], [Type]) VALUES (1, N'User')
 INSERT [auth].[Constraint] ([Id], [Type]) VALUES (2, N'Group')
 SET IDENTITY_INSERT [auth].[Constraint] OFF
 
+SET IDENTITY_INSERT [ref].[SessionType] ON 
+INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (1, N'QI')
+INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (2, N'Research')
+SET IDENTITY_INSERT [ref].[SessionType] OFF
+
 INSERT INTO [network].[Identity] ([Lock], [Name], [Abbreviation], [Description], [TotalPatients], [Latitude], [Longitude], [PrimaryColor], [SecondaryColor])
 SELECT 
     [Lock] = 'X'
@@ -32,4 +38,4 @@ SELECT
    ,[SecondaryColor] = 'rgb(183, 165, 122)'
 
 INSERT INTO [ref].[Version] (Lock, [Version])
-SELECT 'X', N'3.3.1';
+SELECT 'X', N'3.4.0';
