@@ -15,7 +15,7 @@ import { showConfirmationModal } from '../../../../actions/generalUi';
 import { GlobalPanelFilter } from '../../../../models/admin/GlobalPanelFilter';
 import { SqlSetDropdown } from '../../ConceptEditor/Sections/SqlSetDropdown';
 import { setAdminGlobalPanelFilter, deleteAdminGlobalPanelFilter } from '../../../../actions/admin/globalPanelFilter';
-import { AccessModeDropdown } from '../AccessModeDropdown/AccessModeDropdown';
+import { SessionTypeDropdown } from '../SessionTypeDropdown/SessionTypeDropdown';
 
 interface Props {
     data: AdminState;
@@ -60,7 +60,7 @@ export class GlobalPanelFilterRow extends React.PureComponent<Props> {
 
                     {/* Access Mode */}
                     <Col md={4} className={`${c}-column`}>
-                        <AccessModeDropdown changeHandler={this.handleEdit} globalPanelFilter={globalPanelFilter} />
+                        <SessionTypeDropdown changeHandler={this.handleEdit} globalPanelFilter={globalPanelFilter} />
                     </Col>
 
                     {/* Include or Exclude */}

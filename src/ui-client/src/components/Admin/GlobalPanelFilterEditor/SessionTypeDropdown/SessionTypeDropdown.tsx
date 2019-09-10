@@ -9,7 +9,7 @@ import React from 'react';
 import { FormGroup, Label, FormText, DropdownToggle } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
-import { GlobalPanelFilter, AccessMode } from '../../../../models/admin/GlobalPanelFilter';
+import { GlobalPanelFilter, SessionType } from '../../../../models/admin/GlobalPanelFilter';
 
 interface Props {
     changeHandler: (val: any, propName: string) => any;
@@ -20,8 +20,9 @@ interface State {
     isOpen: boolean;
 }
 
-export class AccessModeDropdown extends React.PureComponent<Props,State> {
+export class SessionTypeDropdown extends React.PureComponent<Props,State> {
     private className = 'global-panelfilter-editor-accessmode';
+    private propName = 'sessionType';
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -30,11 +31,11 @@ export class AccessModeDropdown extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { accessModeId: accessMode } = this.props.globalPanelFilter;
+        const { sessionType } = this.props.globalPanelFilter;
         const { isOpen } = this.state;
         const c = this.className;
-        const displayText = accessMode
-            ? accessMode === AccessMode.QI ? 'QI' : 'Research' 
+        const displayText = sessionType
+            ? sessionType === SessionType.QI ? 'QI' : 'Research' 
             : 'Both QI and Research';
 
         return (
@@ -53,18 +54,18 @@ export class AccessModeDropdown extends React.PureComponent<Props,State> {
                         </DropdownToggle>
                         <DropdownMenu>
                             <DropdownItem 
-                                onClick={this.handleChange.bind(null, AccessMode.QI)}
-                                className={`${c}-option ${accessMode === AccessMode.QI ? 'selected' : ''}`}>
+                                onClick={this.handleChange.bind(null, SessionType.QI)}
+                                className={`${c}-option ${sessionType === SessionType.QI ? 'selected' : ''}`}>
                                 Quality Improvement (QI)
                             </DropdownItem>
                             <DropdownItem 
-                                onClick={this.handleChange.bind(null, AccessMode.Research)}
-                                className={`${c}-option ${accessMode === AccessMode.Research ? 'selected' : ''}`}>
+                                onClick={this.handleChange.bind(null, SessionType.Research)}
+                                className={`${c}-option ${sessionType === SessionType.Research ? 'selected' : ''}`}>
                                 Research
                             </DropdownItem>
                             <DropdownItem 
                                 onClick={this.handleChange.bind(null, undefined)}
-                                className={`${c}-option ${accessMode === undefined ? 'selected' : ''}`}>
+                                className={`${c}-option ${sessionType === undefined ? 'selected' : ''}`}>
                                 Both QI and Research
                             </DropdownItem>
                         </DropdownMenu>
@@ -77,9 +78,9 @@ export class AccessModeDropdown extends React.PureComponent<Props,State> {
         );
     }
 
-    private handleChange = (mode?: AccessMode) => {
+    private handleChange = (mode?: SessionType) => {
         const { changeHandler } = this.props;
-        changeHandler(mode, 'accessModeId');
+        changeHandler(mode, this.propName);
     }
 
     private toggle = () => {

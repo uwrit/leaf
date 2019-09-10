@@ -69,7 +69,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                             {/* Header */}
                             <div className={`${c}-header`}>
                                 <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddNewClick}>
-                                    + Create New Concept
+                                    + Create New Panel Filter
                                 </Button>
                                 <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>
                                     Undo Changes

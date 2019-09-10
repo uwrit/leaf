@@ -14,7 +14,7 @@ import { AppConfig, DecodedIdToken, IdTokenDTO, UserContext } from '../models/Au
  * to retrieve a user token.
  */
 const getIdTokenKey = (config: AppConfig) => {
-    return `__leaf_idToken_v${config.version}__`;
+    return `__leaf_idToken_v${config.version}_${window.location.pathname}__`;
 };
 
 /*

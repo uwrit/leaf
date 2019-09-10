@@ -89,7 +89,7 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
      * of the current.
      */
     private generateSequentialIntegerId = () => {
-        const { data } = this.props.data.panelFilters;
+        const { data } = this.props.data.globalPanelFilters;
         if (!data.size) { return 1; }
         const max = Math.max.apply(Math, [ ...data.values() ].map((s) => s.id));
         return max + 1;

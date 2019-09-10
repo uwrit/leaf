@@ -7,7 +7,7 @@
 
 export interface GlobalPanelFilter {
     id: number;
-    accessModeId?: AccessMode;
+    sessionType?: SessionType;
     isInclusion: boolean;
     sqlSetId?: number;
     sqlSetWhere?: string;
@@ -16,7 +16,7 @@ export interface GlobalPanelFilter {
     changed?: boolean;
 }
 
-export enum AccessMode {
+export enum SessionType {
     QI = 1,
     Research = 2
 }
