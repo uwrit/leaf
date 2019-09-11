@@ -86,7 +86,6 @@ namespace API.Options
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
 
             services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
-
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
 
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
@@ -117,6 +116,8 @@ namespace API.Options
             services.AddTransient<AdminDatasetQueryManager.IAdminDatasetQueryService, AdminDatasetQueryService>();
             services.AddTransient<AdminDatasetCategoryManager.IAdminDatasetCategoryService, AdminDatasetCategoryService>();
             services.AddTransient<AdminDemographicsManager.IAdminDemographicQueryService, AdminDemographicQueryService>();
+            services.AddTransient<AdminPanelFilterManager.IAdminPanelFilterService, AdminPanelFilterService>();
+            services.AddTransient<AdminGlobalPanelFilterManager.IAdminGlobalPanelFilterService, AdminGlobalPanelFilterService>();
 
             return services;
         }

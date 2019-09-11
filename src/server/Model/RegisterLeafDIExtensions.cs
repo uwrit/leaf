@@ -45,6 +45,8 @@ namespace Model
             services.AddTransient<AdminDatasetQueryManager>();
             services.AddTransient<AdminDatasetCategoryManager>();
             services.AddTransient<AdminDemographicsManager>();
+            services.AddTransient<AdminPanelFilterManager>();
+            services.AddTransient<AdminGlobalPanelFilterManager>();
 
             return services;
         }

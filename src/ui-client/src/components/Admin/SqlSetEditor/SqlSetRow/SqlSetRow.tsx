@@ -64,7 +64,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         return (
             <div className={`${c}-table-row-container ${unsaved ? 'unsaved' : ''}`}>
 
-                {/* Unsaved notifier */}
+                {/* Unsaved indicator */}
                 {unsaved &&
                 <span className={`${c}-unsaved`}>unsaved</span>
                 }
@@ -219,8 +219,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     }
 
     /*
-     * Handle any edits to a Sql Set, updating 
-     * the store and preparing a later API save event.
+     * Handle delete click, removing if unsaved else calling the API.
      */
     private handleSqlSetDeleteClick = () => {
         const { set, dispatch } = this.props;

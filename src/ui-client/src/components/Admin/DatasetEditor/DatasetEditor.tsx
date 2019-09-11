@@ -22,6 +22,7 @@ import { setAdminDatasetSearchMode, moveDatasetCategory, addDataset, setDatasetS
 import { FhirTemplateEditor } from './FhirTemplateEditor/FhirTemplateEditor';
 import { DynamicEditor } from './DynamicEditor/DynamicEditor';
 import { PatientListColumnType } from '../../../models/patientList/Column';
+import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import './DatasetEditor.css';
 
 interface Props { 
@@ -104,6 +105,15 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChanges}>Undo Changes</Button>
                                     <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveChanges}>Save</Button>
                                     <Button className='leaf-button leaf-button-warning' disabled={allowDelete} onClick={this.handleDeleteClick}>Delete</Button>
+
+                                    {/* Explanation */}
+                                    <WhatsThis 
+                                        question={'What is a Dataset?'}
+                                        body={`Datasets are the row-level data (and associated SQL queries) for display in the Patient List. The 'Basic Demographics'
+                                               Dataset is a special required Dataset which populates the Visualize and inital Patient List screens. Additional Datasets 
+                                               can by added by specifying a SQL query (i.e., SELECT... FROM... WHERE...) to retrieve expected fields. Leaf will automatically 
+                                               compute per-patient summary statistics and append columns to the Patient List.`}
+                                    />
                                 </div>
                                 }
 
