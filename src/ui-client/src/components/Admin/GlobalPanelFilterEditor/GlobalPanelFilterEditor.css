@@ -1,0 +1,111 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .global-panelfilter-editor-container {
+    background-color: rgb(240,240,240);
+    padding: 0 0 75px 0;
+}
+
+.sqlset-editor-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: -0.5%;
+    margin: -4px 0 0 10px;
+    padding: 2px 4px;
+    position: absolute;
+}
+
+/* Header */
+.global-panelfilter-editor-toprow {
+    background-color: rgb(250, 250, 250);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 84px;
+    margin-bottom: 4px;
+    padding: 20px;
+    z-index: 101;
+}
+
+.global-panelfilter-editor-toprow .leaf-button {
+    margin-right: 20px !important;
+}
+
+.global-panelfilter-editor-toprow .leaf-button-secondary {
+    background-color: white;
+}
+
+/* Table */
+.global-panelfilter-editor-table {
+    height: calc(100vh - 55px - 84px);
+    overflow-x: hidden;
+    padding: 0 12% !important;
+    z-index: 100;
+}
+
+.global-panelfilter-editor-table-row-container {
+    background-color: white;
+    border-bottom: 1px solid rgb(230,230,230);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    min-height: 50px;
+    padding: 4px 20px 0;
+    position: relative;
+    transition: box-shadow 0.3s;
+}
+
+.global-panelfilter-editor-table-row-container:hover {
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.global-panelfilter-editor-table-row {
+    padding: 22px 8px 0;
+}
+
+.global-panelfilter-editor-row-id {
+    bottom: 0;
+    color: rgb(180,180,180);
+    font-size: 1rem;
+    margin: 0 8px 4px;
+    right: 0;
+    position: absolute;
+}
+
+.global-panelfilter-editor-subtext {
+    color: rgb(150,150,150);
+    font-size: 0.8rem;
+}
+
+/* Unsaved indicator */
+.global-panelfilter-editor-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: -0.5%;
+    margin: 0 0 0 10px;
+    padding: 2px 4px;
+    position: absolute;
+}
+
+/* Delete button */
+.global-panelfilter-editor-delete {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    position: absolute;
+    margin-right: 4px;
+    padding: 2px 4px;
+    right: 0;
+    z-index: 100;
+}
+
+.global-panelfilter-editor-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+} 

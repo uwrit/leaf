@@ -10,6 +10,7 @@ import { PanelFilter } from '../models/panel/PanelFilter';
 export const TOGGLE_PANEL_FILTER = 'TOGGLE_PANEL_FILTER';
 export const SET_PANEL_FILTER_ACTIVE_STATES = 'SET_PANEL_FILTER_ACTIVE_STATES';
 export const SET_PANEL_FILTERS = 'SET_PANEL_FILTERS';
+export const DELETE_PANEL_FILTER = 'DELETE_PANEL_FILTER';
 
 export interface PanelFilterAction {
     isActive?: boolean;
@@ -40,3 +41,11 @@ export const setPanelFilterActiveStates = (filters: PanelFilter[]): PanelFilterA
         type: SET_PANEL_FILTER_ACTIVE_STATES
     }
 };
+
+export const removePanelFilter = (filter: PanelFilter): PanelFilterAction => {
+    return {
+        filter,
+        type: DELETE_PANEL_FILTER
+    }
+};
+

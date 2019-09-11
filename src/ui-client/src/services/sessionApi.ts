@@ -154,5 +154,5 @@ const getStoredSessionObject = (state: AppState): StoredSessionState => {
     };
 };
 
-const getSessionStorageKey = (state: AppState) => `__leaf_session_v${state.auth.config!.version}__`;
+const getSessionStorageKey = (state: AppState) => `__leaf_session_v${state.auth.config!.version}_${window.location.pathname}__`;
 const getSessionRetryKey = () => `__leaf_session_retry__`;
