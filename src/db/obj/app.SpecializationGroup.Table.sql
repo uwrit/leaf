@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[SpecializationGroup]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Table [app].[SpecializationGroup]    Script Date: 9/11/19 9:24:46 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,7 +15,7 @@ CREATE TABLE [app].[SpecializationGroup](
 	[SqlSetId] [int] NOT NULL,
 	[UiDefaultText] [nvarchar](100) NOT NULL,
 	[LastChanged] [datetime] NULL,
-	[ChangedBy] [nvarchar](1000) NULL,
+	[ChangedBy] [nvarchar](200) NULL,
  CONSTRAINT [PK_SpecializationGroup] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

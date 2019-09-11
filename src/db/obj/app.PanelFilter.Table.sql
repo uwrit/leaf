@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[PanelFilter]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Table [app].[PanelFilter]    Script Date: 9/11/19 9:24:46 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -16,15 +16,19 @@ CREATE TABLE [app].[PanelFilter](
 	[IsInclusion] [bit] NOT NULL,
 	[UiDisplayText] [nvarchar](1000) NULL,
 	[UiDisplayDescription] [nvarchar](4000) NULL,
-	[LastChanged] [datetime] NULL,
-	[ChangedBy] [nvarchar](1000) NOT NULL,
+	[Created] [datetime] NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
+	[Updated] [datetime] NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_LastChanged]  DEFAULT (getdate()) FOR [LastChanged]
+ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_Created]  DEFAULT (getdate()) FOR [Created]
+GO
+ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_Updated]  DEFAULT (getdate()) FOR [Updated]
 GO
 ALTER TABLE [app].[PanelFilter]  WITH CHECK ADD  CONSTRAINT [FK_PanelFilter_ConceptId] FOREIGN KEY([ConceptId])
 REFERENCES [app].[Concept] ([Id])

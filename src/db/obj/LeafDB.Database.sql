@@ -5,13 +5,15 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [master]
 GO
-/****** Object:  Database [LeafDB]    Script Date: 8/8/2019 3:56:26 PM ******/
+/****** Object:  Database [LeafDB]    Script Date: 9/11/19 9:24:46 AM ******/
 CREATE DATABASE [LeafDB]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'LeafDB_new', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LeafDB_new.mdf' , SIZE = 204800KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'LeafDB', FILENAME = N'/var/opt/mssql/data/LeafDB.mdf' , SIZE = 335872KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'LeafDB_new_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LeafDB_new_log.ldf' , SIZE = 532480KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 860160KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+GO
+ALTER DATABASE [LeafDB] SET COMPATIBILITY_LEVEL = 120
 GO
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 begin

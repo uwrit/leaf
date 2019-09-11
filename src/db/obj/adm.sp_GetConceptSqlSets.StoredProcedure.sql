@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_GetConceptSqlSets]    Script Date: 9/11/19 9:24:46 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -32,7 +32,6 @@ BEGIN
     FROM
         app.ConceptSqlSet;
 END
-
 
 
 GO

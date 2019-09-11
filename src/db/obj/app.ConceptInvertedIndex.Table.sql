@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[ConceptInvertedIndex]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Table [app].[ConceptInvertedIndex]    Script Date: 9/11/19 9:24:46 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -22,7 +22,7 @@ CREATE TABLE [app].[ConceptInvertedIndex](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IX_ConceptInvertedIndex_Word]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Index [IX_ConceptInvertedIndex_Word]    Script Date: 9/11/19 9:24:46 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IX_ConceptInvertedIndex_Word] ON [app].[ConceptInvertedIndex]
 (
 	[Word] ASC

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[DemographicQuery]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Table [app].[DemographicQuery]    Script Date: 9/11/19 9:24:46 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -15,7 +15,7 @@ CREATE TABLE [app].[DemographicQuery](
 	[SqlStatement] [nvarchar](4000) NOT NULL,
 	[Shape] [int] NOT NULL,
 	[LastChanged] [datetime] NOT NULL,
-	[ChangedBy] [nvarchar](1000) NOT NULL,
+	[ChangedBy] [nvarchar](200) NOT NULL,
  CONSTRAINT [PK_DemographicQuery] PRIMARY KEY CLUSTERED 
 (
 	[Lock] ASC
