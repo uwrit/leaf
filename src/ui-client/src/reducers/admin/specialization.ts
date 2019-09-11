@@ -7,7 +7,7 @@
 
 import AdminState from "../../models/state/AdminState";
 import { AdminSpecializationAction } from "../../actions/admin/specialization";
-import { conceptSqlSetsChanged } from "../../utils/admin/concept";
+import { conceptSqlSetsChanged } from "../../utils/admin/sqlSet";
 
 export const setAdminConceptSpecialization = (state: AdminState, action: AdminSpecializationAction) => {
     const spcs = action.spcs!;

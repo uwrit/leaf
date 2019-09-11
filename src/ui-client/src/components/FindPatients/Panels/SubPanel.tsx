@@ -62,7 +62,7 @@ class SubPanel extends React.Component<Props> {
 
         // Set classes
         if (totalPanelItems === 0) { classes.push('no-data'); }
-        if (isOver && canDrop )    { classes.push('can-drop'); }
+        if (isOver && canDrop)    { classes.push('can-drop'); }
         if (canDrop)               { classes.push('show-dash-border'); }
         if (subPanel.index === 0)  { classes.push('subpanel-first'); }
 

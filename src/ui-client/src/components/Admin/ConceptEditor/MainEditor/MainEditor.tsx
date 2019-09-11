@@ -24,6 +24,7 @@ import { SpecializationDropdowns } from '../Sections/SpecializationDropdowns';
 import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../../utils/admin/concept';
 import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 import { setAdminPanelPane } from '../../../../actions/admin/admin';
+import { WhatsThis } from '../../../Other/WhatsThis/WhatsThis';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -78,6 +79,15 @@ export class MainEditor extends React.PureComponent<Props,State> {
                     <Button className='leaf-button leaf-button-warning' disabled={!currentAdminConcept || state === AdminPanelLoadState.NOT_APPLICABLE} onClick={this.handleDeleteConceptClick}>
                         Delete
                     </Button>
+
+                    {/* Explanation */}
+                    <WhatsThis
+                        question={'What is a Leaf Concept?'}
+                        body={`Concepts are the building blocks of Leaf 'Find Patients' queries. Concepts have both a visual/textual component (the text
+                               shown to users indicating what the Concept represents) as well as programmatic components (the actual SQL FROM and WHERE 
+                               clauses associated with the Concept). After the user has dragged over one or more Concepts, the Leaf API will 'stitch' them 
+                               together to create a final SQL query to be executed against the clinical database.`}
+                    />
                 </div>
                 }
 

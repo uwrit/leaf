@@ -7,18 +7,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using API.DTO.Cohort;
-using API.DTO.Compiler;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Error;
-using API.Controllers.Base;
-using Model.Options;
 
 namespace API.Controllers
 {

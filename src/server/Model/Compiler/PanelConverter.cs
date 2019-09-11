@@ -95,10 +95,10 @@ namespace Model.Compiler
             }
 
             var concepts = resources.Concepts(compilerOptions);
-
             var panels = GetPanels(query.All(), concepts);
+            var merged = MergeFilters(panels, resources.GlobalPanelFilters);
 
-            return new PanelValidationContext(query, resources, panels);
+            return new PanelValidationContext(query, resources, merged);
         }
 
         /// <summary>
@@ -147,6 +147,26 @@ namespace Model.Compiler
             var resources = new ResourceRefs(requested);
 
             return await preflightSearch.GetResourcesAsync(resources);
+        }
+
+        public static IEnumerable<Panel> MergeFilters(IEnumerable<Panel> panels, IEnumerable<GlobalPanelFilter> globalPanelFilters)
+        {
+            var lastPanelIndex = panels.Max(p => p.Index);
+            var merge = new List<Panel>();
+            merge.AddRange(panels);
+
+            for (int i = 0; i < globalPanelFilters.Count(); i++)
+            {
+                lastPanelIndex += i + 1;
+
+                var global = globalPanelFilters.ElementAt(i);
+                var pi = new PanelItem() { Concept = global.ToConcept() };
+                var sub = new SubPanel() { IncludeSubPanel = true, PanelItems = new[] { pi } };
+                var panel = new Panel() { IncludePanel = global.IsInclusion, SubPanels = new[] { sub }, Index = lastPanelIndex };
+
+                merge.Add(panel);
+            }
+            return merge;
         }
 
         IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, IEnumerable<Concept> concepts)

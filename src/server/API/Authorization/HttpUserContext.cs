@@ -125,6 +125,22 @@ namespace API.Authorization
             }
         }
 
+        SessionType sessionType;
+        bool sessionTypeSet;
+        public SessionType SessionType
+        {
+            get
+            {
+                if (sessionTypeSet == false)
+                {
+                    var sessType = user.FindFirst(c => c.Type == Session.Key)?.Value;
+                    sessionType = sessType == Session.QI ? SessionType.QualityImprovement : SessionType.Research;
+                    sessionTypeSet = true;
+                }
+                return sessionType;
+            }
+        }
+        
         Guid? sessionNonce;
         public Guid? SessionNonce
         {

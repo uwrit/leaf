@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByUIds]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetPreflightResourcesByUIds]    Script Date: 9/11/19 9:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -21,6 +21,7 @@ CREATE PROCEDURE [app].[sp_GetPreflightResourcesByUIds]
     @cuids app.ResourceUniversalIdTable READONLY,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
+    @sessionType auth.SessionType,
     @admin bit = 0
 AS
 BEGIN
@@ -29,6 +30,8 @@ BEGIN
     exec app.sp_GetPreflightQueriesByUIds @quids, @user, @groups, @admin = @admin;
 
     exec app.sp_GetPreflightConceptsByUIds @cuids, @user, @groups, @admin = @admin;
+
+    exec app.sp_GetPreflightGlobalPanelFilters @sessionType;
 END
 
 

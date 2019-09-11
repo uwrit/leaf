@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQuery]    Script Date: 9/11/19 9:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -91,7 +91,7 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy,
-			CAST(1 AS BIT)
+            CAST(1 AS BIT)
 		INTO @ins
         WHERE Id = @id;
 
@@ -124,4 +124,5 @@ BEGIN
     END CATCH;
 
 END
+
 GO

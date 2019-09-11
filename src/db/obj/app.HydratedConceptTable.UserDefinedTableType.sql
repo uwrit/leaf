@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [app].[HydratedConceptTable]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  UserDefinedTableType [app].[HydratedConceptTable]    Script Date: 9/11/19 9:39:57 AM ******/
 CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
 	[Id] [uniqueidentifier] NOT NULL,
 	[ParentId] [uniqueidentifier] NULL,

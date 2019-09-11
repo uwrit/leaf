@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[ConceptSqlSet]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  Table [app].[ConceptSqlSet]    Script Date: 9/11/19 9:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -18,9 +18,9 @@ CREATE TABLE [app].[ConceptSqlSet](
 	[SqlFieldDate] [nvarchar](1000) NULL,
 	[SqlFieldEvent] [nvarchar](400) NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](1000) NOT NULL,
+	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](1000) NOT NULL,
+	[UpdatedBy] [nvarchar](200) NOT NULL,
 	[EventId] [int] NULL,
  CONSTRAINT [PK_ConceptSqlSet] PRIMARY KEY CLUSTERED 
 (

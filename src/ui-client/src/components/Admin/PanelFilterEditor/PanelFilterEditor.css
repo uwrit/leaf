@@ -1,0 +1,171 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+/* Header */
+.panelfilter-editor-header {
+    padding-left: 0
+}
+
+.panelfilter-editor-header .leaf-button {
+    margin: 14px 20px 4px 4px !important;
+}
+
+.panelfilter-editor-header .leaf-button-secondary {
+    background-color: white;
+}
+
+/* Main */
+.panelfilter-editor-column-right {
+    background-color: rgb(240,240,240);
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100vh;
+    z-index: 101;
+}
+
+.panelfilter-editor-column-right .whats-this {
+    margin-left: 4px;
+}
+
+.panelfilter-editor {
+    background-color: white;
+    overflow-y: none;
+}
+
+/* Row */
+.panelfilter-editor-panelfilter-container {
+    padding: 10px 20px;
+}
+
+.panelfilter-editor-panelfilter {
+    background-color: white;
+    border: 1px solid transparent;
+    border-bottom: 1px solid rgb(230,230,230);
+    border-radius: 4px;
+    margin-bottom: 10px;
+    min-height: 50px;
+    min-width: 650px;
+    padding: 25px 0px 0;
+    position: relative;
+    transition: box-shadow 0.3s;
+}
+
+.panelfilter-editor-panelfilter.can-drop {
+    background-color: rgba(28, 168, 221, 0.04);
+    border-color: rgb(28, 168, 221);
+}
+
+.panelfilter-editor-panelfilter:hover {
+    box-shadow: 4px 4px 10px 0px rgba(0, 0, 0, 0.1), -4px 4px 10px 0px rgba(0, 0, 0, 0.1);
+}
+
+.panelfilter-editor-panelfilter .col-md-6 {
+    padding: 0 !important;
+}
+
+.panelfilter-editor-concept-container {
+    border: 1px solid rgb(245,245,245);
+    border-radius: 4px;
+    margin-top: 8px;
+    min-height: 80px;
+    padding: 10px 4px;
+}
+
+.panelfilter-editor-conceptname {
+    color: rgb(28, 168, 221);
+    font-size: 1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panelfilter-editor-conceptid-container {
+    color: rgba(28, 168, 221, 0.5);
+    margin-top: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panelfilter-editor-conceptid {
+    font-size: 0.8rem;
+}
+
+.panelfilter-editor-noconcept-container {
+    background-color: rgba(252, 255, 67, 0.2);
+    border: 1px dashed rgb(195, 197, 43);
+    border-radius: 4px;
+    height: 80px;
+    margin-top: 4px;
+    padding: 20px 0;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.panelfilter-editor-panelfilter.can-drop .panelfilter-editor-noconcept-container {
+    background-color: #aeffb793;
+    border: 1px solid #35cf4793;
+}
+
+.panelfilter-editor-concept-container:hover .panelfilter-editor-conceptid {
+    color: rgb(28, 168, 221);
+    overflow: initial;
+    text-overflow: initial;
+    white-space: normal;
+}
+
+.panelfilter-editor-subtext {
+    color: rgb(150,150,150);
+    font-size: 0.8rem;
+}
+
+/* Overlay */
+.panelfilter-editor-column-left-overlay {
+    background-color: transparent;
+    height: 110%;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: background-color 0.5s;
+    width: 100%;
+    z-index: 100;
+}
+
+.panelfilter-editor-column-left-overlay.show {
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Delete button */
+.panelfilter-editor-delete {
+    color: rgba(0,0,0,0.3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-right: 25px;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    z-index: 101;
+}
+
+.panelfilter-editor-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+}
+
+/* Unsaved indicator */
+.panelfilter-editor-unsaved {
+    background-color: rgba(255, 248, 145, 0.5);
+    border-radius: 8px;
+    color: rgb(117, 109, 0);
+    font-size: 0.8rem;
+    left: 0;
+    margin: 4px 0 0 25px;
+    padding: 2px 4px;
+    position: absolute;
+    z-index: 101;
+}

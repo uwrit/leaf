@@ -39,11 +39,11 @@ export class Endpoint extends React.PureComponent<Props,State> {
         const { showDetails } = this.state;
         const c = this.className;
         const toggleClasses = [ `${c}-dropdown-toggle` ];
-        let toggleText = 'Show Certificate Information';
+        let toggleText = 'Show Certificate';
 
         if (showDetails) {
             toggleClasses.push('open');
-            toggleText = 'Hide Certificate Information';
+            toggleText = 'Hide Certificate';
         }
 
         return (
@@ -104,7 +104,7 @@ export class Endpoint extends React.PureComponent<Props,State> {
 
                     {/* Test Connection */}
                     <Button className={`${c}-cert-test leaf-button leaf-button-addnew`} onClick={this.handleLoadCertInfoTest}>
-                        Load Certificate Information
+                        Load Certificate
                     </Button>
 
                     {/* Certs */}

@@ -16,11 +16,13 @@
     <Folder Include="Search\" />
     <Folder Include="Error\" />
     <Folder Include="Admin\Network\" />
-    <Folder Include="Admin\Compiler\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Compiler\appsettings.json" />
   </ItemGroup>
 </Project>

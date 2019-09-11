@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByOwner]    Script Date: 8/8/2019 3:56:27 PM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedBaseQueriesByOwner]    Script Date: 9/11/19 9:39:57 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -44,4 +44,5 @@ BEGIN
         q.Created,
         q.Updated;
 END
+
 GO
