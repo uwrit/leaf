@@ -58,7 +58,7 @@ export class GlobalPanelFilterRow extends React.PureComponent<Props> {
                         />
                     </Col>
 
-                    {/* Access Mode */}
+                    {/* Session Type */}
                     <Col md={4} className={`${c}-column`}>
                         <SessionTypeDropdown changeHandler={this.handleEdit} globalPanelFilter={globalPanelFilter} />
                     </Col>

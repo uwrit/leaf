@@ -6,8 +6,12 @@
  */
 
 /* Header */
+.panelfilter-editor-header {
+    padding-left: 0
+}
+
 .panelfilter-editor-header .leaf-button {
-    margin: 14px 10px 4px !important;
+    margin: 14px 20px 4px 4px !important;
 }
 
 .panelfilter-editor-header .leaf-button-secondary {

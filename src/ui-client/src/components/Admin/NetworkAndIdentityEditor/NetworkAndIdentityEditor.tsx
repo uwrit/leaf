@@ -17,6 +17,7 @@ import { NetworkEndpoint } from '../../../models/admin/Network';
 import CertModal from './CertModal/CertModal';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../actions/generalUi';
+import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import './NetworkAndIdentityEditor.css';
 
 interface Props {
@@ -70,6 +71,14 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
                         <Col md={5} className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
                             <div>
                                 <Button className='leaf-button leaf-button-addnew' onClick={this.handleAddEndpointClick}>+ Add New Networked Leaf Instance</Button>
+
+                                {/* Explanation */}
+                                <WhatsThis 
+                                    question={'What is a Networked Leaf instance?'}
+                                    body={`Leaf instances can be networked/federated by mutually loading certificate information and aligning their 
+                                           settings and roles (i.e., who can query who). Note that this must be reciprocal. Once configured, users from
+                                           one respective Leaf instance will be able to query both their own data and their networked partners' data.`}
+                                />
                             </div>
                             <div className={`${c}-endpoint-container`}>
                                 {[ ...endpoints.values() ]

@@ -41,7 +41,7 @@ export class SessionTypeDropdown extends React.PureComponent<Props,State> {
         return (
             <FormGroup>
                 <Label>
-                    Access Mode
+                    Session Type
                     <span className='required'>*</span>
                 </Label>
                 <div className={`admin-panel-dropdown`} tabIndex={0}>
@@ -63,6 +63,7 @@ export class SessionTypeDropdown extends React.PureComponent<Props,State> {
                                 className={`${c}-option ${sessionType === SessionType.Research ? 'selected' : ''}`}>
                                 Research
                             </DropdownItem>
+                            <DropdownItem divider={true} />
                             <DropdownItem 
                                 onClick={this.handleChange.bind(null, undefined)}
                                 className={`${c}-option ${sessionType === undefined ? 'selected' : ''}`}>
