@@ -151,8 +151,8 @@
 }
 
 .panel-filter-selection-row-description {
-    color: #acacac;
-    font-size: 0.85rem;
+    color: rgb(150,150,150);
+    font-size: 0.9rem;
     padding: 0;
 }
 
