@@ -40,7 +40,7 @@ export const DemographicsAdminSqlDefTemplate: PatientListDatasetDefinitionTempla
         ['addressPostalCode', { datasetId: 'demographics', id: 'addressPostalCode', type: PatientListColumnType.String }],
         ['addressState', { datasetId: 'demographics', id: 'addressState', type: PatientListColumnType.String }],
         ['birthDate', { datasetId: 'demographics', id: 'birthDate', type: PatientListColumnType.DateTime }],
-        ['deceasedDateTime', { datasetId: 'demographics', id: 'deceasedDateTime', autoDisplayOnLoad: true, type: PatientListColumnType.DateTime }],
+        ['deceasedDateTime', { datasetId: 'demographics', id: 'deceasedDateTime', type: PatientListColumnType.DateTime }],
         ['ethnicity', { datasetId: 'demographics', id: 'ethnicity', type: PatientListColumnType.String }],
         ['gender', { datasetId: 'demographics', id: 'gender', type: PatientListColumnType.String }],
         ['deceasedBoolean', { datasetId: 'demographics', id: 'deceasedBoolean', type: PatientListColumnType.Bool }],
