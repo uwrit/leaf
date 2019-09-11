@@ -35,8 +35,7 @@ def report_error(err, m):
 def get_args() -> Namespace:
     parser = ArgumentParser(
         prog='leafdb.sh', description='This script automates capturing database changes in source control.')
-    parser.add_argument('-d', '--include-data',
-                        action='store_true', help='Also creates the data initialization script')
+    parser.add_argument('-d', '--include-data', action='store_true', help='Also creates the data initialization script')
     return parser.parse_args()
 
 
@@ -60,7 +59,7 @@ def create_bootstrap(build_file: str, sa_pw: str):
     args = [r'mssql-scripter', r'-S', r'localhost', r'-d', r'LeafDB', 
             r'-U', r'sa', r'-P', sa_pw,                         
             r'--target-server-version', r'2014', r'-f', build_file]
-    p = Popen(args, shell=True, stdout=PIPE)
+    p = run_subprocess(args)
     if p.wait() != 0:
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating bootstrap file...'))
@@ -90,7 +89,7 @@ def create_data(data_file: str, sa_pw: str):
             r'--data-only', r'--include-objects']
     for t in tables:
         args.append(t)
-    p = Popen(args, shell=True)
+    p = run_subprocess(args)
     if p.wait() != 0:
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating data file...'))
@@ -124,14 +123,20 @@ def create_source(per_file_dir: str, sa_pw: str):
             r'2014', r'--file-per-object', r'-f', per_file_dir, 
             r'-U', r'sa', r'-P', sa_pw
         ]
-    p = Popen(args)
-    # p = Popen(args, shell=True)
+    p = run_subprocess(args)
     if p.wait() != 0:
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating source files...'))
     print('Licensing source files...')
     apply_license(per_file_dir)
     print('Created source files...')
+
+def run_subprocess(args):
+    # If Mac
+    if os.name == 'posix':
+        return Popen(args)
+    # Else windows
+    return Popen(args, shell=True, stdout=PIPE)
 
 
 def main():

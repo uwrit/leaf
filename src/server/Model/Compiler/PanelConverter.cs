@@ -162,7 +162,7 @@ namespace Model.Compiler
                 var global = globalPanelFilters.ElementAt(i);
                 var pi = new PanelItem() { Concept = global.ToConcept() };
                 var sub = new SubPanel() { IncludeSubPanel = true, PanelItems = new[] { pi } };
-                var panel = new Panel() { IncludePanel = global.IsInclusion, SubPanels = new[] { sub } };
+                var panel = new Panel() { IncludePanel = global.IsInclusion, SubPanels = new[] { sub }, Index = lastPanelIndex };
 
                 merge.Add(panel);
             }

@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [app].[SqlSelectors]    Script Date: 9/11/19 9:24:46 AM ******/
+/****** Object:  UserDefinedTableType [app].[SqlSelectors]    Script Date: 9/11/19 9:39:57 AM ******/
 CREATE TYPE [app].[SqlSelectors] AS TABLE(
 	[Column] [nvarchar](100) NOT NULL,
 	[Type] [nvarchar](20) NOT NULL,

@@ -51,7 +51,7 @@ export class GlobalPanelFilterRow extends React.PureComponent<Props> {
                     <Col md={5} className={`${c}column`}>
                         <SqlSetDropdown
                             changeHandler={this.handleEdit} propName={'sqlSetId'} value={globalPanelFilter!.sqlSetId} sqlSets={data.sqlSets.sets}
-                            dispatch={dispatch} required={true} label='Table, View, or Subquery'
+                            dispatch={dispatch} required={true} label='Table, View, or Subquery' forceValidation={forceValidation}
                         />
                         <TextArea 
                             changeHandler={this.handleEdit} propName={'sqlSetWhere'} value={globalPanelFilter!.sqlSetWhere} label='WHERE Clause'
