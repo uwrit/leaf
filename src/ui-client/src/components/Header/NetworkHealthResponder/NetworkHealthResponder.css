@@ -35,6 +35,10 @@
     padding-left: 8px;
 }
 
+.header-networkhealth-responder-title-name {
+    color: rgb(240,240,240);
+}
+
 .header-networkhealth-responder-title-patients {
     color: rgb(163, 162, 100);
     font-size: 0.8rem;
