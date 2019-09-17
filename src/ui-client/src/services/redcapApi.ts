@@ -136,6 +136,11 @@ export class REDCapHttpConnector {
     public exportRecords = (records: object[]) => this.request(ContentTypes.Records, records, [ 'type=flat', 'overwriteBehavior=normal', 'forceAutoNumber=false' ]);
 
     /*
+     * Import metadata. 
+     */
+    public importMetadata = () => this.request(ContentTypes.Metadata);
+
+    /*
      * Send REDCap API request.
      */
     private request = (content: string, data?: any, additionalParams?: any[]): Promise<any> => {

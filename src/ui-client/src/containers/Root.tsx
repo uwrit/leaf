@@ -15,6 +15,7 @@ import { defaultCohortState } from '../reducers/cohort/cohort';
 import { defaultConceptsState } from '../reducers/concepts';
 import { defaultConceptSearchState } from '../reducers/conceptSearch';
 import { defaultExportState } from '../reducers/dataExport';
+import { defaultImportState } from '../reducers/dataImport';
 import { defaultGeneralUiState } from '../reducers/generalUi';
 import { defaultMapState } from '../reducers/map';
 import { defaultRespondersState } from '../reducers/networkResponders';
@@ -32,6 +33,7 @@ const beginState: AppState = {
     conceptSearch: defaultConceptSearchState(),
     concepts: defaultConceptsState(),
     dataExport: defaultExportState(),
+    dataImport: defaultImportState(),
     datasets: defaultDatasetsState(),
     generalUi: defaultGeneralUiState(),
     map: defaultMapState(),

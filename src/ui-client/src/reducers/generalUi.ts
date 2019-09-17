@@ -40,6 +40,7 @@ import {
  } from '../actions/panels';
 import { GeneralUiState, Routes, NotificationStates } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
+import { IMPORT_TOGGLE_MRN_MODAL, IMPORT_TOGGLE_REDCAP_MODAL } from '../actions/dataImport';
 
 export const defaultGeneralUiState = (): GeneralUiState => {
     return {
@@ -68,6 +69,8 @@ export const defaultGeneralUiState = (): GeneralUiState => {
             state: NotificationStates.Hidden
         },
         routes: [],
+        showImportMrnModal: false,
+        showImportRedcapModal: false,
         showExportDataModal: false,
         showMyLeafModal: false,
         showSaveQueryPane: false,
@@ -101,7 +104,11 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case SET_ROUTE:
             return Object.assign({}, state, { currentRoute: action.route }); 
         case SET_ROUTE_CONFIG:
-            return Object.assign({}, state, { routes: action.routeConfig }); 
+            return Object.assign({}, state, { routes: action.routeConfig });
+        case IMPORT_TOGGLE_MRN_MODAL:
+            return Object.assign({}, state, { showImportMrnModal: !state.showImportMrnModal });
+        case IMPORT_TOGGLE_REDCAP_MODAL:
+            return Object.assign({}, state, { showImportRedcapModal: !state.showImportRedcapModal });
         case TOGGLE_SAVE_QUERY_PANE: 
             return Object.assign({}, state, { showSaveQueryPane: !state.showSaveQueryPane });
         case TOGGLE_MY_LEAF_MODAL: 

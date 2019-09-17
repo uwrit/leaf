@@ -88,9 +88,6 @@ export default class UserButton extends React.PureComponent<Props> {
                             <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
                             <span>My Saved Queries</span>
                         </div>
-                        <div className="divider">
-                            <div />
-                        </div>
                         <div className={`${c}-option`} onClick={logoutClickHandler}>
                             <FaDoorOpen className="myleaf-menu-icon myleaf-menu-icon-logout" />
                             <span>Log Out</span>

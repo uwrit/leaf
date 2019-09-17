@@ -77,7 +77,7 @@ class Header extends React.PureComponent<Props> {
                         />
 
                         {/* Import */}
-                        <ImportButton />
+                        <ImportButton dispatch={dispatch} />
 
                         {/* User */}
                         <UserButton 

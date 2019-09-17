@@ -62,6 +62,8 @@ export interface GeneralUiState {
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
     routes: RouteConfig[];
+    showImportMrnModal: boolean;
+    showImportRedcapModal: boolean;
     showMyLeafModal: boolean;
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;

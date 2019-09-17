@@ -184,7 +184,7 @@
 
 /* Import */
 .header-options > li:hover .header-import-icon {
-    color: rgb(225, 235, 143);
+    color: rgb(188, 235, 143);
 }
 
 .header-icon-redcap {
@@ -192,7 +192,7 @@
 }
 
 .header-icon-mrn {
-    color: rgb(70, 202, 250)
+    color: #FF8408;
 }
 
 /* User Roles */
