@@ -5,8 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export default interface REDCapEventMapping {
-    arm_num: string;
-    form: string;
-    unique_event_name: string;
+export interface REDCapRepeatingFormEvent {
+    custom_form_label?: string;
+    event_name?: string;
+    form_name: string;
 }

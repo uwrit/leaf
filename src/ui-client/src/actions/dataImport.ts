@@ -9,6 +9,8 @@ import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ImportOptionsDTO, ImportProgress } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
+import { REDCapEavRecord, REDCapRecord } from '../models/redcapApi/Record';
+import { REDCapRecordFormat } from '../models/redcapApi/RecordExportConfiguration';
 
 export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
@@ -40,14 +42,65 @@ export const importFromREDCap = (token: string) => {
             const state = getState();
             const { redCap } = state.dataImport;
             const conn = new REDCapHttpConnector(token, redCap.apiURI!);
+            const mrnField = 'mrn';
+            let recs: REDCapEavRecord[] = [];
+
+            /*
+             * Get project info.
+             */
+            const proj = await conn.getProjectInfo();
 
             /*
              * Get metadata.
              */
             // dispatch(setImportProgress(2, 'Loading metadata'));
-            const metadata = await conn.importMetadata();
+            const forms = await conn.getForms();
+            const metadata = await conn.getMetadata();
+            const idField = metadata[0].field_name;
 
-            console.log(metadata);
+            /*
+             * Find MRNs.
+             */
+            const mrns = await conn.getRecords({ fields: [ idField, mrnField ], type: REDCapRecordFormat.Flat }) as REDCapRecord[];
+
+            /*
+             * If Classic project.
+             */
+            if (!proj.is_longitudinal) {
+
+                /*
+                 * For each form.
+                 */
+                for (const form of forms) {
+                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ] }) as REDCapEavRecord[];
+                    recs = recs.concat(newRecs);
+                }
+            }
+            /*
+             * Else if Longitudinal project and no repeating forms.
+             */
+            else if (proj.is_longitudinal) {
+                const eventMappings = await conn.getEventMappings();
+                const nonLongForms = forms.filter(f => eventMappings.findIndex(e => e.form === f.instrument_name) === -1);
+
+                /*
+                 * For each non-longitudinal form.
+                 */
+                for (const form of nonLongForms) {
+                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ] }) as REDCapEavRecord[];
+                    recs = recs.concat(newRecs);
+                }
+
+                /*
+                 * For each event mapping.
+                 */
+                for (const eventMap of eventMappings) {
+                    const newRecs = await conn.getRecords({ events: [ eventMap.unique_event_name ], forms: [ eventMap.form ] }) as REDCapEavRecord[];
+                    recs = recs.concat(newRecs);
+                }
+            }
+
+            console.log(mrns, recs);
 
         } catch (err) {
             console.log(err);
@@ -55,6 +108,9 @@ export const importFromREDCap = (token: string) => {
         }
     };
 };
+
+// const importREDCapRecordsBy
+
 
 // Synchronous
 export const toggleImportRedcapModal = (): ImportAction => {

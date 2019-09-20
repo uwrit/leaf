@@ -23,7 +23,7 @@ export function defaultImportState(): ImportState {
             text: ''
         },
         redCap: {
-            apiURI: 'https://redcap.iths.org/api/',
+            apiURI: 'https://rcdev.iths.org/api/',
             enabled: false
         }
     } 

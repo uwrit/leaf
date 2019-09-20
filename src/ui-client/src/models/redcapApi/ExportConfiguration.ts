@@ -5,19 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import REDCapEvent from './Event';
-import REDCapEventMapping from './EventMapping';
-import REDCapFieldMetadata from './Metadata';
-import REDCapProject from './Project';
-import REDCapRepeatingFormEvent from './RepeatingFormEvent';
-import REDCapProjectUser from './User';
+import { REDCapEvent } from './Event';
+import { REDCapEventMapping } from './EventMapping';
+import { REDCapFieldMetadata } from './Metadata';
+import { REDCapProjectRequestInfo } from './Project';
+import { REDCapRepeatingFormEvent } from './RepeatingFormEvent';
+import { REDCapUser } from './User';
 
-export default interface REDCapProjectExportConfiguration {
+export interface REDCapProjectExportConfiguration {
     data: object[];
     events?: REDCapEvent[];
     eventMappings?: REDCapEventMapping[];
     metadata: REDCapFieldMetadata[];
     repeatingFormEvents?: REDCapRepeatingFormEvent[];
-    users: REDCapProjectUser[];
-    project: REDCapProject;
+    users: REDCapUser[];
+    project: REDCapProjectRequestInfo;
 }

@@ -5,11 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export default interface REDCapEvent {
+export interface REDCapEventMapping {
     arm_num: string;
-    day_offset: string;
-    event_name: string;
-    offset_min: string;
-    offset_max: string;
+    form: string;
     unique_event_name: string;
 }

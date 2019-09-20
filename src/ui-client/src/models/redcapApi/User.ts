@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export default interface REDCapUser {
+export interface REDCapUser {
     api_export: number;
     api_import: number;
     calendar: number;

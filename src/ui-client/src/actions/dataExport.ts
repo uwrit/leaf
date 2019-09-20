@@ -8,7 +8,7 @@
 import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ExportOptionsDTO, ExportProgress } from '../models/state/Export';
-import REDCapProjectExportConfiguration from '../models/redcapExport/ExportConfiguration';
+import { REDCapProjectExportConfiguration } from '../models/redcapApi/ExportConfiguration';
 import { getAllData, getREDCapExportData } from '../services/patientListApi';
 import { REDCapHttpConnector, requestProjectCreation, getREDCapVersion, repeatableFormsAllowed } from '../services/redcapApi';
 import { formatSmallNumber } from '../utils/formatNumber';

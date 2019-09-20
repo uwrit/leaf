@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export default interface REDCapFieldMetadata {
+export interface REDCapFieldMetadata {
     branching_logic: string;
     custom_alignment: string;
     field_annotation: string;
