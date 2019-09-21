@@ -17,8 +17,8 @@ export interface REDCapProjectInfo {
     project_pi_lastname?: string;
     project_title: string;
     purpose: number;
-    purpose_other: string;
-    project_notes: string;
+    purpose_other?: string;
+    project_notes?: string;
     randomization_enabled: number;
     record_autonumbering_enabled: number;
     scheduling_enabled: number;

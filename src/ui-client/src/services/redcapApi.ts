@@ -143,6 +143,14 @@ export class REDCapHttpConnector {
     };
 
     /*
+     * Get project users. 
+     */
+    public getUsers = async (): Promise<REDCapUser[]> => {
+        const req = await this.request(REDCapContentTypes.Users);
+        return req.data as REDCapUser[];
+    };
+
+    /*
      * Get project records. 
      */
     public getRecords = async (config?: REDCapRecordExportConfiguration): Promise<REDCapRecord[] | REDCapEavRecord[]> => {
@@ -150,8 +158,6 @@ export class REDCapHttpConnector {
         if (config) {
             if (config.type) {
                 params.push( `type=${config.type}` );
-            } else {
-                params.push( `type=${REDCapRecordFormat.EAV}` );
             }
             if (config.fields) {
                 params.push( `fields=${config.fields.join(',')}` );

@@ -9,8 +9,10 @@ import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ImportOptionsDTO, ImportProgress } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
-import { REDCapEavRecord, REDCapRecord } from '../models/redcapApi/Record';
+import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat } from '../models/redcapApi/RecordExportConfiguration';
+import { REDCapImportConfiguration } from '../models/redcapApi/ImportConfiguration';
+import { loadREDCapImportData, calculateREDCapFieldCount } from '../services/dataImport';
 
 export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
@@ -29,7 +31,7 @@ export interface ImportAction {
 
 // Asynchronous
 /*
- * Attempt to import results from a REDCap instance.
+ * Import results from a REDCap instance.
  */
 export const importFromREDCap = (token: string) => {
     return async (dispatch: Dispatch<Action<any>>, getState: () => AppState) => {
@@ -40,67 +42,72 @@ export const importFromREDCap = (token: string) => {
              */
             // dispatch(setImportProgress(1, 'Preparing import'));
             const state = getState();
-            const { redCap } = state.dataImport;
-            const conn = new REDCapHttpConnector(token, redCap.apiURI!);
-            const mrnField = 'mrn';
-            let recs: REDCapEavRecord[] = [];
+            const { EAV, Flat } = REDCapRecordFormat;
+            const conn = new REDCapHttpConnector(token, state.dataImport.redCap.apiURI!);
+            const config = initializeREDCapImportConfiguration();
 
             /*
              * Get project info.
              */
-            const proj = await conn.getProjectInfo();
-
-            /*
-             * Get metadata.
-             */
-            // dispatch(setImportProgress(2, 'Loading metadata'));
-            const forms = await conn.getForms();
-            const metadata = await conn.getMetadata();
-            const idField = metadata[0].field_name;
-
-            /*
-             * Find MRNs.
-             */
-            const mrns = await conn.getRecords({ fields: [ idField, mrnField ], type: REDCapRecordFormat.Flat }) as REDCapRecord[];
+            config.projectInfo = await conn.getProjectInfo();
+            config.forms = await conn.getForms();
+            config.metadata = await conn.getMetadata();
+            config.users = await conn.getUsers();
+            config.recordField = config.metadata[0].field_name;
+            config.mrns = await conn.getRecords({ fields: [ config.recordField, config.mrnField ], type: Flat });
 
             /*
              * If Classic project.
              */
-            if (!proj.is_longitudinal) {
+            if (!config.projectInfo.is_longitudinal) {
 
                 /*
                  * For each form.
                  */
-                for (const form of forms) {
-                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ] }) as REDCapEavRecord[];
-                    recs = recs.concat(newRecs);
+                for (const form of config.forms) {
+                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
+                    config.records = config.records.concat(newRecs);
                 }
             }
+
             /*
-             * Else if Longitudinal project and no repeating forms.
+             * Else if Longitudinal project.
              */
-            else if (proj.is_longitudinal) {
-                const eventMappings = await conn.getEventMappings();
-                const nonLongForms = forms.filter(f => eventMappings.findIndex(e => e.form === f.instrument_name) === -1);
+            else {
+                config.eventMappings = await conn.getEventMappings();
+                const nonLongForms = config.forms.filter(f => config.eventMappings!.findIndex(e => e.form === f.instrument_name) === -1);
 
                 /*
                  * For each non-longitudinal form.
                  */
                 for (const form of nonLongForms) {
-                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ] }) as REDCapEavRecord[];
-                    recs = recs.concat(newRecs);
+                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
+                    config.records = config.records.concat(newRecs);
                 }
 
                 /*
                  * For each event mapping.
                  */
-                for (const eventMap of eventMappings) {
-                    const newRecs = await conn.getRecords({ events: [ eventMap.unique_event_name ], forms: [ eventMap.form ] }) as REDCapEavRecord[];
-                    recs = recs.concat(newRecs);
+                for (const e of config.eventMappings) {
+                    const newRecs = await conn.getRecords({ events: [ e.unique_event_name ], forms: [ e.form ], type: EAV }) as REDCapEavRecord[];
+                    config.records = config.records.concat(newRecs);
                 }
             }
 
-            console.log(mrns, recs);
+            /*
+             * Prepare to import into Leaf
+             */
+            console.log(config);
+            await loadREDCapImportData(config);
+
+            for (const field of config.metadata) {
+                const count = await calculateREDCapFieldCount(field.field_name);
+
+                console.log(field.field_name, count);
+            }
+            
+
+            console.log(config);
 
         } catch (err) {
             console.log(err);
@@ -108,8 +115,6 @@ export const importFromREDCap = (token: string) => {
         }
     };
 };
-
-// const importREDCapRecordsBy
 
 
 // Synchronous
@@ -164,4 +169,29 @@ const calculateImportCompletionTime = (percentComplete: number): number => {
     const secondsElapsed = (new Date().getTime() - startTime) / 1000;
     const estimate = Math.round((1 - (percentComplete / 100)) * (secondsElapsed / percentComplete) * 100);
     return secondsElapsed < 1 ? 60 : estimate;
+};
+
+const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
+    return  {
+        forms: [],
+        metadata: [],
+        mrnField: 'mrn',
+        mrns: [],
+        projectInfo: {
+            creation_time: '',
+            display_today_now_button: 0,
+            has_repeating_instruments_or_events: 0,
+            is_longitudinal: 0,
+            project_id: 0,
+            project_title: '',
+            purpose: 0,
+            randomization_enabled: 0,
+            record_autonumbering_enabled: 0,
+            scheduling_enabled: 0,
+            surveys_enabled: 0
+        },
+        recordField: '',
+        records: [],
+        users: []
+    };
 };

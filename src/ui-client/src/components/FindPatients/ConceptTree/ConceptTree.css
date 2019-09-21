@@ -146,6 +146,10 @@
     transform: rotate(90deg) translateX(10px) scale(1.2);
 }
 
+.concept-tree-node-arrow-hidden {
+    cursor: default;
+}
+
 .concept-tree-node-arrow-hidden::after {
     color: transparent;
 }
