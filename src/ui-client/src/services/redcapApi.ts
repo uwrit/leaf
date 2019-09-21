@@ -17,7 +17,7 @@ import { HttpFactory } from './HttpFactory';
 import { REDCapRecord, REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapArm } from '../models/redcapApi/Arm';
 import { REDCapForm } from '../models/redcapApi/Form';
-import { REDCapRecordExportConfiguration, REDCapRecordFormat } from '../models/redcapApi/RecordExportConfiguration';
+import { REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 
 export enum REDCapContentTypes {
     Arms = 'arm',

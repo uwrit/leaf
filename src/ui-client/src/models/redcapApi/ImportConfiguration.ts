@@ -25,3 +25,11 @@ export interface REDCapImportConfiguration {
     records: REDCapEavRecord[];
     users: REDCapUser[];
 }
+
+export interface REDCapUrn {
+    event?: string;
+    field?: string;
+    form?: string;
+    project: number;
+    numValue?: number;
+}

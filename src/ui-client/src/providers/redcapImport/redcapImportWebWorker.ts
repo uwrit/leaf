@@ -6,7 +6,7 @@
  */ 
 
 import { generate as generateId } from 'shortid';
-import { REDCapImportConfiguration } from '../../models/redcapApi/ImportConfiguration';
+import { REDCapImportConfiguration, REDCapUrn } from '../../models/redcapApi/ImportConfiguration';
 import { REDCapEavRecord } from '../../models/redcapApi/Record';
 import { ImportRecord } from '../../models/dataImport/ImportRecord';
 import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
@@ -20,6 +20,8 @@ export interface OutboundMessageResultCount {
 }
 
 interface REDCapImportFieldMetadata {
+    event?: string;
+    form: string;
     include: boolean;
     name: string;
     isString: boolean;
@@ -30,6 +32,7 @@ interface REDCapImportFieldMetadata {
 }
 
 interface REDCapImportFieldMetadataOption {
+    parent: REDCapImportFieldMetadata;
     text: string;
     value: number;
 }
@@ -179,14 +182,17 @@ export default class REDCapImportWebWorker {
                 const validation = field.text_validation_type_or_show_slider_number;
 
                 const m: REDCapImportFieldMetadata = {
+                    form: field.form_name,
                     include: field.field_type !== DESCRIPTIVE,
                     name: field.field_name,
                     source: field,
-                    options: deriveFieldOptions(field),
+                    options: [],
                     isString: false,
                     isDate: false,
                     isNumber: false
                 };
+                m.options = deriveFieldOptions(m);
+
                 if (validation === NUMBER || validation === INTEGER || validation === CALC) {
                     m.isNumber = true;
                 } else if (validation.indexOf(DATE) > -1) {
@@ -215,55 +221,48 @@ export default class REDCapImportWebWorker {
         const OPTION_DELIMETER = '|';
         const TEXT_VALUE_DELIMITER = ',';
 
-        const deriveFieldOptions = (field: REDCapFieldMetadata): REDCapImportFieldMetadataOption[] => {
-            const type = field.field_type;
-            const choices = field.select_choices_or_calculations;
+        const deriveFieldOptions = (field: REDCapImportFieldMetadata): REDCapImportFieldMetadataOption[] => {
+            const type = field.source.field_type;
+            const choices = field.source.select_choices_or_calculations;
+            const parent = field;
 
             if (type === YESNO) {
-                return [{ text: YES, value: 1 }, { text: NO, value: 0 }];
+                return [{ text: YES, value: 1, parent }, { text: NO, value: 0, parent }];
             }
             if (type === TRUEFALSE) {
-                return [{ text: TRUE, value: 1 }, { text: FALSE, value: 0 }];
+                return [{ text: TRUE, value: 1, parent }, { text: FALSE, value: 0, parent }];
             }
             if (type === DROPDOWN || type === RADIO || type === CHECKBOX) {
                 return choices.split(OPTION_DELIMETER).map(opt => {
                     const x = opt.split(TEXT_VALUE_DELIMITER);
-                    return { text: x[1], value: +x[0] }
+                    return { text: x[1], value: +x[0], parent }
                 });
             }
             return [];
         };
 
-        const deriveLeafConcepts = (config: REDCapImportConfiguration): Concept[] => {
-            const concepts: Concept[] = [];
-            metadata.forEach(f => {
-                const text = `Had data in REDCap Project '${config.projectInfo.project_title}' field '${f.name}'`;
-                const cpt: Concept = {
-                    rootId: '',
-                    id: '',
-                    isEncounterBased: true,
-                    isParent: f.options.length > 0,
-                    isNumeric: f.isNumber,
-                    isEventBased: false,
-                    isPatientCountAutoCalculated: false,
-                    isSpecializable: false,
-                    isExtension: true,
-                    isFetching: false,
-                    isOpen: false,
-                    childrenLoaded: true,
-                    uiDisplayName: f.name,
-                    uiDisplayText: text
-                };
+        const urnToString = (urn: REDCapUrn): string => {
+            // urn:leaf:concept:import:type=redcap&proj=100&form=demographics&field=name&event=event1
+            // urn:leaf:concept:import:type=redcap&proj=100&form=demographics&field=name&value=1&event=event1
 
-                for (let i = 0; i < f.options.length; i++) {
-                    const opt = f.options[i];
+            const base = [ 'urn', 'leaf', 'concept' ];
+            const parts = [ `type=redcap`, `proj=${urn.project}` ];
 
+            if (urn.form) {
+                parts.push(`form=${urn.form}`);
+            }
+            if (urn.field) {
+                parts.push(`field=${urn.field}`);
+            }
+            if (urn.numValue) {
+                parts.push(`numval=${urn.numValue}`)
+            }
+            if (urn.event) {
+                parts.push(`event=${urn.event}`)
+            }
 
-                }
-
-            })
-
-            return concepts;
+            base.push(parts.join('&'));
+            return base.join(':');
         };
 
         const deriveImportRecords = (payload: InboundMessagePayload) => {
@@ -319,6 +318,114 @@ export default class REDCapImportWebWorker {
                 recs.push(rec);
             }
             records = recs;
+        };
+
+        /*
+         * Derive Leaf concepts based on REDCap project structure.
+         */
+        const deriveLeafConcepts = (config: REDCapImportConfiguration): Concept[] => {
+            const concepts: Concept[] = [];
+            const baseUrn: REDCapUrn = { project: config.projectInfo.project_id };
+            const baseText = `Had data in REDCap Project "${config.projectInfo.project_title}"`;
+
+            /* 
+             * Root.
+             */
+            const rootCpt: Concept = {
+                rootId: '',
+                id: urnToString(baseUrn),
+                isEncounterBased: true,
+                isParent: true,
+                isNumeric: false,
+                isEventBased: false,
+                isPatientCountAutoCalculated: false,
+                isSpecializable: false,
+                isExtension: true,
+                isFetching: false,
+                isOpen: false,
+                childrenLoaded: true,
+                uiDisplayName: config.projectInfo.project_title,
+                uiDisplayText: baseText
+            };
+            rootCpt.rootId = rootCpt.id;
+            rootCpt.universalId = rootCpt.id;
+            concepts.push(rootCpt);
+
+            /*
+             * If longitudinal, add branches by event.
+             */
+            if (config.projectInfo.is_longitudinal && config.events) {
+
+                /* 
+                 * By Event.
+                 */
+                const byEvent: Concept = {
+                    ...rootCpt,
+                    id: `${rootCpt}&byevent`,
+                    universalId: rootCpt.universalId,
+                    uiDisplayName: 'By Event'
+                };
+                concepts.push(byEvent);
+
+                /*
+                 * For each Event.
+                 */
+                config.events.forEach(e => {
+                    const evUrn: REDCapUrn = { ...baseUrn, event: e.event_name };
+                    const evStrUrn = urnToString(evUrn);
+                    const eventCpt: Concept = {
+                        ...rootCpt,
+                        id: evStrUrn,
+                        universalId: evStrUrn,
+                        uiDisplayName: e.event_name,
+                        uiDisplayText: `${baseText} event "${e.event_name}"`
+                    };
+                    concepts.push(eventCpt);
+                });
+            }
+
+            metadata.forEach(f => {
+                const text = `Had data in REDCap Project "${config.projectInfo.project_title}" field "${f.name}"`;
+                const urn: REDCapUrn = { project: config.projectInfo.project_id, event: f.event, form: f.form, field: f.name };
+                const strUrn = urnToString(urn);
+                
+                const cpt: Concept = {
+                    rootId: '',
+                    id: strUrn,
+                    universalId: strUrn,
+                    isEncounterBased: true,
+                    isParent: f.options.length > 0,
+                    isNumeric: f.isNumber,
+                    isEventBased: false,
+                    isPatientCountAutoCalculated: false,
+                    isSpecializable: false,
+                    isExtension: true,
+                    isFetching: false,
+                    isOpen: false,
+                    childrenLoaded: true,
+                    uiDisplayName: f.name,
+                    uiDisplayText: text
+                };
+                concepts.push(cpt);
+
+                for (let i = 0; i < f.options.length; i++) {
+                    const opt = f.options[i];
+                    const optUrn: REDCapUrn = { ...urn, numValue: opt.value };
+                    const optStrUrn = urnToString(optUrn);
+                    const optCpt: Concept = {
+                        ...cpt,
+                        id: optStrUrn,
+                        universalId: optStrUrn,
+                        parentId: strUrn,
+                        isParent: false,
+                        uiDisplayName: opt.text,
+                        uiDisplayText: `${text} of "${opt.text}"`
+                    }
+                    concepts.push(optCpt);
+                }
+            })
+
+            return concepts;
         };
     }
 }
