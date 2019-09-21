@@ -7,12 +7,12 @@
 
 export interface REDCapRecord {
     redcap_event_name?: string;
-    redcap_repeat_instance?: string;
+    redcap_repeat_instance?: number;
     redcap_repeat_instrument?: string;
 }
 
 export interface REDCapEavRecord extends REDCapRecord {
     record: string;
     field_name: string;
-    value: string;
+    value: string | number;
 }

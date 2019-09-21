@@ -30,6 +30,7 @@ export interface REDCapUrn {
     event?: string;
     field?: string;
     form?: string;
+    instance?: number;
     project: number;
-    numValue?: number;
+    value?: number;
 }

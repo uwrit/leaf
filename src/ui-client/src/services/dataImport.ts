@@ -7,13 +7,14 @@
 
 import REDCapImportWebWorker, { OutboundMessageResultCount } from "../providers/redcapImport/redcapImportWebWorker";
 import { REDCapImportConfiguration } from "../models/redcapApi/ImportConfiguration";
+import { Concept } from "../models/concept/Concept";
 
 const worker = new REDCapImportWebWorker();
 
-export const loadREDCapImportData = async (config: REDCapImportConfiguration) => {
+export const loadREDCapImportData = async (config: REDCapImportConfiguration): Promise<Map<string,Concept>> => {
     return new Promise( async (resolve, reject) => {
-        await worker.loadConfig(config);
-        resolve();
+        const concepts = await worker.loadConfig(config) as Map<string,Concept>;
+        resolve(concepts);
     });
 };
 

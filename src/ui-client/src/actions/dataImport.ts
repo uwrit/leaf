@@ -97,18 +97,15 @@ export const importFromREDCap = (token: string) => {
             /*
              * Prepare to import into Leaf
              */
+            const concepts = await loadREDCapImportData(config);
             console.log(config);
-            await loadREDCapImportData(config);
+            console.log(concepts);
 
-            for (const field of config.metadata) {
-                const count = await calculateREDCapFieldCount(field.field_name);
+            for (const concept of concepts) {
+                // const count = await calculateREDCapFieldCount(field.field_name);
 
-                console.log(field.field_name, count);
+                // console.log(field.field_name, count);
             }
-            
-
-            console.log(config);
-
         } catch (err) {
             console.log(err);
             dispatch(setImportError());
