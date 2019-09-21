@@ -6,21 +6,20 @@
  */ 
 
 import REDCapImportWebWorker, { OutboundMessageResultCount } from "../providers/redcapImport/redcapImportWebWorker";
-import { REDCapImportConfiguration } from "../models/redcapApi/ImportConfiguration";
-import { Concept } from "../models/concept/Concept";
+import { REDCapImportConfiguration, REDCapConcept } from "../models/redcapApi/ImportConfiguration";
 
 const worker = new REDCapImportWebWorker();
 
-export const loadREDCapImportData = async (config: REDCapImportConfiguration): Promise<Map<string,Concept>> => {
+export const loadREDCapImportData = async (config: REDCapImportConfiguration): Promise<Map<string, REDCapConcept>> => {
     return new Promise( async (resolve, reject) => {
-        const concepts = await worker.loadConfig(config) as Map<string,Concept>;
+        const concepts = await worker.loadConfig(config) as Map<string, REDCapConcept>;
         resolve(concepts);
     });
 };
 
-export const calculateREDCapFieldCount = async (field_name: string, search_value?: any): Promise<number> => {
+export const calculateREDCapFieldCount = async (concept: REDCapConcept): Promise<number> => {
     return new Promise( async (resolve, reject) => {
-        const count = await worker.calculatePatientCount(field_name, search_value) as OutboundMessageResultCount;
+        const count = await worker.calculatePatientCount(concept) as OutboundMessageResultCount;
         resolve(count.value);
     });
 };

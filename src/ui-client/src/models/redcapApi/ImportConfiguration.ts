@@ -12,6 +12,7 @@ import { REDCapFieldMetadata } from "./Metadata";
 import { REDCapRecord, REDCapEavRecord } from "./Record";
 import { REDCapProjectInfo } from "./Project";
 import { REDCapUser } from "./User";
+import { Concept } from "../concept/Concept";
 
 export interface REDCapImportConfiguration {
     eventMappings?: REDCapEventMapping[];
@@ -33,4 +34,8 @@ export interface REDCapUrn {
     instance?: number;
     project: number;
     value?: number;
+}
+
+export interface REDCapConcept extends Concept {
+    urn: REDCapUrn;
 }

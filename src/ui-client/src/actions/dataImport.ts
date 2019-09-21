@@ -101,11 +101,10 @@ export const importFromREDCap = (token: string) => {
             console.log(config);
             console.log(concepts);
 
-            for (const concept of concepts) {
-                // const count = await calculateREDCapFieldCount(field.field_name);
-
-                // console.log(field.field_name, count);
-            }
+            concepts.forEach( async concept => {
+                const count = await calculateREDCapFieldCount(concept);
+                console.log(concept.uiDisplayName, count);
+            });
         } catch (err) {
             console.log(err);
             dispatch(setImportError());

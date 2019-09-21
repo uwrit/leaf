@@ -6,11 +6,10 @@
  */ 
 
 import { generate as generateId } from 'shortid';
-import { REDCapImportConfiguration, REDCapUrn } from '../../models/redcapApi/ImportConfiguration';
+import { REDCapImportConfiguration, REDCapUrn, REDCapConcept } from '../../models/redcapApi/ImportConfiguration';
 import { REDCapEavRecord } from '../../models/redcapApi/Record';
 import { ImportRecord } from '../../models/dataImport/ImportRecord';
 import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
-import { Concept } from '../../models/concept/Concept';
 import { workerContext } from './redcapImportWebWorkerContext';
 
 const LOAD_IMPORT_CONFIGURATION = 'LOAD_IMPORT_CONFIGURATION';
@@ -39,6 +38,7 @@ interface REDCapImportFieldMetadataOption {
 }
 
 interface InboundMessagePartialPayload {
+    concept?: REDCapConcept;
     config?: REDCapImportConfiguration;
     message: string;
     field_name?: string;
@@ -86,8 +86,8 @@ export default class REDCapImportWebWorker {
         return this.postMessage({ message: LOAD_IMPORT_CONFIGURATION, config });
     }
 
-    public calculatePatientCount = (field_name: string, search_value?: any) => {
-        return this.postMessage({ message: CALCULATE_PATIENT_COUNT, field_name, search_value });
+    public calculatePatientCount = (concept: REDCapConcept) => {
+        return this.postMessage({ message: CALCULATE_PATIENT_COUNT, concept });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -153,17 +153,16 @@ export default class REDCapImportWebWorker {
          * (to be transformed into a Leaf Concept).
          */
         const calculatePatientCount = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, field_name, search_value } = payload;
-            const data = config as REDCapImportConfiguration;
-            const field = metadata.get(field_name!);
+            const { requestId, concept } = payload;
+            const field = metadata.get(concept!.urn.field!);
 
             if (!field) { return { requestId, result: { value: 0 } }; }
 
-            const query = search_value 
-                ? (r: REDCapEavRecord) => r.field_name === field_name && r.value === search_value.toString()
-                : (r: REDCapEavRecord) => r.field_name === field_name;
+            const query = concept!.urn.value 
+                ? (r: ImportRecord) => r.id.startsWith(concept!.universalId!) && r.valueNumber === concept!.urn.value
+                : (r: ImportRecord) => r.id.startsWith(concept!.universalId!);
 
-            const pats = data.records.filter(query).map(p => p.record);
+            const pats = records.filter(query).map(p => p.sourcePersonId);
             const count: OutboundMessageResultCount = { value: new Set(pats).size };
 
             return { requestId, result: count };
@@ -269,7 +268,7 @@ export default class REDCapImportWebWorker {
          * Example: urn:leaf:concept:import:redcap:<project_id>:<form_name>:<field_name>:val=<value>&inst=<instance>
          */
         const urnToString = (urn: REDCapUrn): string => {
-            const parts = [ 'urn', 'leaf', 'concept', 'import', 'redcap', urn.project ];
+            const parts = [ 'urn', 'leaf', 'import', 'redcap', urn.project ];
             const options = [];
 
             if (urn.form) {
@@ -284,10 +283,9 @@ export default class REDCapImportWebWorker {
             if (urn.instance) {
                 options.push(`inst=${urn.instance}`)
             }
-
             if (options.length > 0) {
                 parts.push(options.join('&'));
-            } 
+            }
 
             return parts.join(':');
         };
@@ -346,16 +344,17 @@ export default class REDCapImportWebWorker {
         /*
          * Derive Leaf concepts based on REDCap project structure.
          */
-        const deriveConceptTree = (config: REDCapImportConfiguration): Map<string, Concept> => {
+        const deriveConceptTree = (config: REDCapImportConfiguration): Map<string, REDCapConcept> => {
             const urn: REDCapUrn = { project: config.projectInfo.project_id };
             const id = urnToString(urn);
             const text = `Had data in REDCap Project "${config.projectInfo.project_title}"`;
-            let concepts: Concept[] = [];
+            let concepts: REDCapConcept[] = [];
 
-            const root: Concept = {
+            const root: REDCapConcept = {
                 rootId: id,
                 id: id,
                 universalId: id,
+                urn,
                 isEncounterBased: false,
                 isParent: true,
                 isNumeric: false,
@@ -370,20 +369,18 @@ export default class REDCapImportWebWorker {
                 uiDisplayName: config.projectInfo.project_title,
                 uiDisplayText: text
             };
-            const byForm = deriveByFormConcept(root, urn, config);
+            const byForm = deriveByFormConcept(root, config);
             concepts = byForm.concat([ root ]);
 
             if (config.projectInfo.is_longitudinal) {
-                const byEvent = deriveByEventConcept(root, urn, config);
+                const byEvent = deriveByEventConcept(root, config);
                 concepts = concepts.concat(byEvent);
             }
-
-            console.log(concepts);
 
             /* 
              * Load childrenIds for each parent.
              */
-            const mapped: [string, Concept][] = concepts.map(c => [c.id, c]);
+            const mapped: [string, REDCapConcept][] = concepts.map(c => [c.id, c]);
             const conceptMap = new Map(mapped);
 
             conceptMap.forEach(c => {
@@ -402,19 +399,19 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * By Event => Event1, Event2 ...
          */
-        const deriveByEventConcept = (root: Concept, rootUrn: REDCapUrn, config: REDCapImportConfiguration): Concept[] => {
+        const deriveByEventConcept = (root: REDCapConcept, config: REDCapImportConfiguration): REDCapConcept[] => {
             const idMod = 'event'
-            const concept: Concept = {
+            const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
                 parentId: root.id,
                 childrenIds: new Set(),
                 uiDisplayName: 'By Event'
             };
-            const children = config.events!.map(e => deriveEventConcept(concept, rootUrn, e.event_name, idMod, config));
+            const children = config.events!.map(e => deriveEventConcept(concept, e.event_name, idMod, config));
 
             return children
-                .reduce((a: Concept[], b: Concept[]) => a.concat(b),[])
+                .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
 
@@ -422,19 +419,19 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * By Form => Form1, Form2 ...
          */
-        const deriveByFormConcept = (root: Concept, rootUrn: REDCapUrn, config: REDCapImportConfiguration): Concept[] => {
+        const deriveByFormConcept = (root: REDCapConcept, config: REDCapImportConfiguration): REDCapConcept[] => {
             const idMod = 'form'
-            const concept: Concept = {
+            const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
                 parentId: root.id,
                 childrenIds: new Set(),
                 uiDisplayName: 'By Form'
             };
-            const children = config.forms!.map(f => deriveFormConcept(concept, rootUrn, f.instrument_name, idMod));
+            const children = config.forms!.map(f => deriveFormConcept(concept, f.instrument_name, idMod));
 
             return children
-                .reduce((a: Concept[], b: Concept[]) => a.concat(b),[])
+                .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
 
@@ -442,10 +439,10 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * Event => Form1, Form2 ...
          */
-        const deriveEventConcept = (parent: Concept, parentUrn: REDCapUrn, event: string, idMod: string, config: REDCapImportConfiguration): Concept[] => {
-            const urn: REDCapUrn = { ...parentUrn, event };
+        const deriveEventConcept = (parent: REDCapConcept, event: string, idMod: string, config: REDCapImportConfiguration): REDCapConcept[] => {
+            const urn: REDCapUrn = { ...parent.urn, event };
             const universalId = urnToString(urn);
-            const concept: Concept = {
+            const concept: REDCapConcept = {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
@@ -456,10 +453,10 @@ export default class REDCapImportWebWorker {
             };
             const children = config.eventMappings!
                 .filter(em => em.unique_event_name === event)
-                .map(f => deriveFormConcept(concept, urn, f.form, idMod));
+                .map(f => deriveFormConcept(concept, f.form, idMod));
 
             return children
-                .reduce((a: Concept[], b: Concept[]) => a.concat(b),[])
+                .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         }; 
 
@@ -467,10 +464,10 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * Form => Field1, Field2 ...
          */
-        const deriveFormConcept = (parent: Concept, parentUrn: REDCapUrn, form: string, idMod: string): Concept[] => {
-            const urn: REDCapUrn = { ...parentUrn, form };
+        const deriveFormConcept = (parent: REDCapConcept, form: string, idMod: string): REDCapConcept[] => {
+            const urn: REDCapUrn = { ...parent.urn, form };
             const universalId = urnToString(urn);
-            const concept: Concept = {
+            const concept: REDCapConcept = {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
@@ -481,10 +478,10 @@ export default class REDCapImportWebWorker {
             };
             const children = [ ...metadata.values() ]
                 .filter(f => f.form === form)
-                .map(f => deriveFieldConcept(concept, urn, f, idMod));
+                .map(f => deriveFieldConcept(concept, f, idMod));
 
             return children
-                .reduce((a: Concept[], b: Concept[]) => a.concat(b),[])
+                .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
 
@@ -492,10 +489,10 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * Field => Option1?, Option2? ...
          */
-        const deriveFieldConcept = (parent: Concept, parentUrn: REDCapUrn, field: REDCapImportFieldMetadata, idMod: string): Concept[] => {
-            const urn: REDCapUrn = { ...parentUrn, field: field.name };
+        const deriveFieldConcept = (parent: REDCapConcept, field: REDCapImportFieldMetadata, idMod: string): REDCapConcept[] => {
+            const urn: REDCapUrn = { ...parent.urn, field: field.name };
             const universalId = urnToString(urn);
-            const concept: Concept = {
+            const concept: REDCapConcept = {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
@@ -506,16 +503,16 @@ export default class REDCapImportWebWorker {
                 uiDisplayName: field.name,
                 uiDisplayText: `${parent.uiDisplayText} field "${field.name}"`
             };
-            const children = field.options.map(op => deriveFieldOptionConcept(concept, urn, op, idMod));
+            const children = field.options.map(op => deriveFieldOptionConcept(concept, op, idMod));
 
             return children.concat([ concept ]);
         };
 
         /*
-         * Derive a REDCap Concept for an option within a field.
+         * Derive a REDCapConcept for an option within a field.
          */
-        const deriveFieldOptionConcept = (parent: Concept, parentUrn: REDCapUrn, option: REDCapImportFieldMetadataOption, idMod: string): Concept => {
-            const urn: REDCapUrn = { ...parentUrn, value: option.value };
+        const deriveFieldOptionConcept = (parent: REDCapConcept, option: REDCapImportFieldMetadataOption, idMod: string): REDCapConcept => {
+            const urn: REDCapUrn = { ...parent.urn, value: option.value };
             const universalId = urnToString(urn);
             return {
                 ...parent,
