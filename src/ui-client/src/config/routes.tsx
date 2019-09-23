@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import React from 'react'
+import React, { Suspense } from 'react'
 import { FiBarChart2, FiMap, FiSearch } from 'react-icons/fi';
 import { MdPerson } from 'react-icons/md'
 import { FindPatients } from '../components/FindPatients/FindPatients';
@@ -15,7 +15,6 @@ import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AppConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
-import AdminPanel from '../containers/Admin/AdminPanel';
 import { AdminPanelPane } from '../models/state/AdminState';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../actions/admin/admin';
 
@@ -73,13 +72,22 @@ const patientList = (): RouteConfig => {
         render: () => <PatientList /> 
     };
 };
+
+/*
+ * Lazy-load admin panel, as most users will never see it
+ */
+const AdminPanel = React.lazy(() => import('../containers/Admin/AdminPanel'));
 const admin = (): RouteConfig => {
     return {
         display: 'Admin',
         icon: <MdSecurity />,
         index: Routes.AdminPanel,
         path: '/admin',
-        render: () => <AdminPanel />,
+        render: () => (
+            <Suspense fallback={<div>Loading...</div>}>
+                <AdminPanel />
+            </Suspense>
+        ),
         subRoutes: [{
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.CONCEPTS)),
             display: 'Concepts',

@@ -33,14 +33,9 @@ export interface ConceptSearchAction {
  * let's the worker know the concept root ids it 
  * should prepare to recieve and index concepts for.
  */
-export const initializeSearchEngine = () => {
-    return async (dispatch: Dispatch, getState: () => AppState) => {
-        const state = getState();
-        initializeSearch(state).then(
-            (response: any) => { return; },
-            (error: any) => console.log('Search engine initialization failed', error)        
-        );
-    }
+export const initializeSearchEngine = async (dispatch: any, getState: () => AppState) => {
+    const state = getState();
+    await initializeSearch(state);
 };
 
 /*

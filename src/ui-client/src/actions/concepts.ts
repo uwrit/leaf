@@ -58,18 +58,15 @@ const shouldfetchConceptChildren = (concept: Concept): boolean => {
 
 // Async actions
 /*
- * Request root concepts and panel filters. Called 
- * only at startup.
+ * Request root concepts and panel filters. Called at startup.
  */
-export const requestRootConcepts = () => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const response = await fetchRootConcepts(state);
-        const concepts = response.data.concepts as Concept[];
-        const panelFilters = response.data.panelFilters as PanelFilter[];
-        dispatch(addRootConcepts(concepts));
-        dispatch(setPanelFilters(panelFilters));
-    };
+export const requestRootConcepts = async (dispatch: any, getState: () => AppState) => {
+    const state = getState();
+    const response = await fetchRootConcepts(state);
+    const concepts = response.data.concepts as Concept[];
+    const panelFilters = response.data.panelFilters as PanelFilter[];
+    dispatch(addRootConcepts(concepts));
+    dispatch(setPanelFilters(panelFilters));
 };
 
 /*

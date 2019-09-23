@@ -73,32 +73,10 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             }
 
             /* 
-             * Get responders.
+             * Load responders.
              */
             dispatch(setSessionLoadState('Finding Partner Leaf servers', 40));
-
-            /* 
-             * Fetch network responders if not in identified mode.
-             */
-            const responders: NetworkIdentity[] = [ homeBase.identity ];
-            
-            if (!attestation.isIdentified && homeBase.responders.length && getState().auth.userContext!.isFederatedOkay) {
-                await Promise.all(
-                    homeBase.responders.map((nr: NetworkIdentityResponseDTO, id: number) => { 
-                        return new Promise( async(resolve, reject) => {
-                            fetchResponderIdentity(getState(), nr)
-                                .then(
-                                    response => responders.push({ ...response.data, address: nr.address, enabled: true, id: (id + 1), isHomeNode: false }),
-                                    error => errorResponder(nr.id, error))
-                                .then(() => resolve())
-                        })
-                    })
-                ); 
-            }         
-
-            /* 
-             * Set responders.
-             */
+            const responders: NetworkIdentity[] = await getResponderIdentities(getState, attestation, homeBase);
             dispatch(setResponders(responders));
             dispatch(registerNetworkCohorts(responders));
 
@@ -113,7 +91,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Load concepts.
              */
             dispatch(setSessionLoadState('Loading Concepts', 60));
-            await dispatch(requestRootConcepts());
+            await requestRootConcepts(dispatch, getState);
 
             /* 
              * Load datasets.
@@ -136,7 +114,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              * Initiliaze web worker search.
              */
             dispatch(setSessionLoadState('Initializing Search Engine', 90));
-            await dispatch(initializeSearchEngine());
+            await initializeSearchEngine(dispatch, getState);
 
             /* 
              * All done.
@@ -154,6 +132,32 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(errorAttestation(true));
         }
     };
+};
+
+export const getResponderIdentities = async (getState: () => AppState, attestation: Attestation, homebase: NetworkIdentityRespondersDTO): Promise<NetworkIdentity[]> => {
+    const responders: NetworkIdentity[] = [ homebase.identity ];
+            
+    if (!attestation.isIdentified && homebase.responders.length && getState().auth.userContext!.isFederatedOkay) {
+        
+        await Promise.all(homebase.responders.map((nr: NetworkIdentityResponseDTO, id: number) => {
+
+            /*
+             * Remove unnecessary trailing slash from url if applicable.
+             */
+            if (nr.address.endsWith("/")) { 
+                nr.address = nr.address.substring(0, nr.address.length-1);
+            }
+
+            return new Promise( async(resolve, reject) => {
+                fetchResponderIdentity(getState(), nr)
+                    .then(
+                        response => responders.push({ ...response.data, address: nr.address, enabled: true, id: (id + 1), isHomeNode: false }),
+                        error => errorResponder(nr.id, error))
+                    .then(() => resolve())
+            });
+        })); 
+    }
+    return responders;
 };
 
 /*

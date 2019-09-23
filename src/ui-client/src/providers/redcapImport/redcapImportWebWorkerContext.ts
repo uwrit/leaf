@@ -35,17 +35,20 @@ var handleWorkMessage = function (payload) {
             return null;
     }
 };
-var config;
-var metadata;
+var metadata = new Map();
 var records = [];
 /*
  * Load the raw REDCap project data from the API.
  */
 var loadConfig = function (payload) {
     var requestId = payload.requestId;
-    config = payload.config;
+    var config = payload.config;
+    deriveImportMetadata(config);
     deriveImportRecords(config);
-    var concepts = deriveConceptTree(config);
+    var concepts = deriveConceptTree(config)
+    console.log(metadata);
+    console.log(records);
+    console.log(concepts);
     return { requestId: requestId, result: concepts };
 };
 /*
@@ -53,34 +56,33 @@ var loadConfig = function (payload) {
  * (to be transformed into a Leaf Concept).
  */
 var calculatePatientCount = function (payload) {
-    var requestId = payload.requestId, field_name = payload.field_name, search_value = payload.search_value;
-    var data = config;
-    var field = metadata.get(field_name);
-    if (!field) {
-        return { requestId: requestId, result: { value: 0 } };
-    }
-    var query = search_value
-        ? function (r) { return r.field_name === field_name && r.value === search_value.toString(); }
-        : function (r) { return r.field_name === field_name; };
-    var pats = data.records.filter(query).map(function (p) { return p.record; });
+    var requestId = payload.requestId, concept = payload.concept;
+    var urn = Object.assign({}, concept.urn, { value: undefined, instance: undefined });
+    var universalId = urnToString(urn);
+    var query = concept.urn.value
+        ? function (r) { return r.id.startsWith(universalId) && r.valueNumber === concept.urn.value; }
+        : function (r) { return r.id.startsWith(universalId); };
+    var pats = records.filter(query).map(function (p) { return p.sourcePersonId; });
     var count = { value: new Set(pats).size };
     return { requestId: requestId, result: count };
 };
-/*
- * Derive useful Leaf-centric metadata for REDCap fields.
- * These are used only as an intermediate object on intial load.
- */
 var deriveImportMetadata = function (config) {
-    var meta = new Map();
     var DESCRIPTIVE = 'descriptive';
     var NUMBER = 'number';
     var INTEGER = 'integer';
     var CALC = 'calc';
     var DATE = 'date';
+    var exclude = new Set([DESCRIPTIVE]);
     var _loop_1 = function (i) {
         var field = config.metadata[i];
         var validation = field.text_validation_type_or_show_slider_number;
         var event_1 = void 0;
+        /*
+         * Skip if not an included field type.
+         */
+        if (exclude.has(field.field_type)) {
+            return "continue";
+        }
         /*
          * Try to match to an event, if applicable.
          */
@@ -92,7 +94,6 @@ var deriveImportMetadata = function (config) {
         }
         var m = {
             form: field.form_name,
-            include: field.field_type !== DESCRIPTIVE,
             name: field.field_name,
             source: field,
             urn: {
@@ -110,7 +111,7 @@ var deriveImportMetadata = function (config) {
         /*
          * Determine validation type, if any.
          */
-        if (validation === NUMBER || validation === INTEGER || validation === CALC) {
+        if (validation === NUMBER || validation === INTEGER || validation === CALC || m.options.length) {
             m.isNumber = true;
         }
         else if (validation.indexOf(DATE) > -1) {
@@ -119,13 +120,75 @@ var deriveImportMetadata = function (config) {
         else {
             m.isString = true;
         }
-        meta.set(m.name, m);
+        metadata.set(m.name, m);
     };
     for (var i = 0; i < config.metadata.length; i++) {
         _loop_1(i);
     }
-    metadata = meta;
-    return meta;
+};
+/*
+ * Derive useful Leaf-centric metadata for REDCap fields.
+ * These are used only as an intermediate object on initial load.
+ */
+var deriveImportMetadata = function (config) {
+    var DESCRIPTIVE = 'descriptive';
+    var NUMBER = 'number';
+    var INTEGER = 'integer';
+    var CALC = 'calc';
+    var DATE = 'date';
+    var exclude = new Set([DESCRIPTIVE]);
+    var _loop_1 = function (i) {
+        var field = config.metadata[i];
+        var validation = field.text_validation_type_or_show_slider_number;
+        var event_1 = void 0;
+        /*
+         * Skip if not an included field type.
+         */
+        if (exclude.has(field.field_type)) {
+            return "continue";
+        }
+        /*
+         * Try to match to an event, if applicable.
+         */
+        if (config.eventMappings) {
+            var eventMap = config.eventMappings.find(function (em) { return em.form === field.form_name; });
+            if (eventMap) {
+                event_1 = eventMap.unique_event_name;
+            }
+        }
+        var m = {
+            form: field.form_name,
+            name: field.field_name,
+            source: field,
+            urn: {
+                project: config.projectInfo.project_id,
+                form: field.form_name,
+                field: field.field_name,
+                event: event_1
+            },
+            options: [],
+            isString: false,
+            isDate: false,
+            isNumber: false
+        };
+        m.options = deriveFieldOptions(m);
+        /*
+         * Determine validation type, if any.
+         */
+        if (validation === NUMBER || validation === INTEGER || validation === CALC || m.options.length) {
+            m.isNumber = true;
+        }
+        else if (validation.indexOf(DATE) > -1) {
+            m.isDate = true;
+        }
+        else {
+            m.isString = true;
+        }
+        metadata.set(m.name, m);
+    };
+    for (var i = 0; i < config.metadata.length; i++) {
+        _loop_1(i);
+    }
 };
 /*
  * Derive options within a REDCap field. In REDCap these are '|' and ',' delimited.
@@ -163,8 +226,8 @@ var deriveFieldOptions = function (field) {
  * Example: urn:leaf:concept:import:redcap:<project_id>:<form_name>:<field_name>:val=<value>&inst=<instance>
  */
 var urnToString = function (urn) {
-    var parts = ['urn', 'leaf', 'concept', 'import', 'redcap', urn.project];
-    var options = [];
+    var parts = ['urn', 'leaf', 'import', 'redcap', urn.project];
+    var params = [];
     if (urn.form) {
         parts.push(urn.form);
     }
@@ -172,29 +235,29 @@ var urnToString = function (urn) {
         parts.push(urn.field);
     }
     if (urn.value) {
-        options.push("val=" + urn.value);
+        params.push("val=" + urn.value);
     }
     if (urn.instance) {
-        options.push("inst=" + urn.instance);
+        params.push("inst=" + urn.instance);
     }
-    if (options.length > 0) {
-        parts.push(options.join('&'));
-    } 
+    if (params.length > 0) {
+        parts.push(params.join('&'));
+    }
     return parts.join(':');
 };
-var deriveImportRecords = function (payload) {
-    var meta = deriveImportMetadata(config);
-    var recs = [];
+var deriveImportRecords = function (config) {
     for (var i = 0; i < config.records.length; i++) {
         var raw = config.records[i];
-        var field = meta.get(raw.field_name);
+        var field = metadata.get(raw.field_name);
+        // console.log(raw, field);
         if (!field || raw.value === '') {
             continue;
         }
         var rec = {
-            id: urnToString({ ...field.urn, instance: raw.redcap_repeat_instance }),
+            id: urnToString(__assign(__assign({}, field.urn), { instance: raw.redcap_repeat_instance })),
             sourcePersonId: raw.record,
-            sourceValue: raw.value.toString()
+            sourceValue: raw.value.toString(),
+            sourceModifier: raw.redcap_event_name
         };
         /*
          * If a string.
@@ -225,9 +288,8 @@ var deriveImportRecords = function (payload) {
             }
             rec.valueNumber = v;
         }
-        recs.push(rec);
+        records.push(rec);
     }
-    records = recs;
 };
 /*
  * Derive Leaf concepts based on REDCap project structure.
@@ -235,12 +297,13 @@ var deriveImportRecords = function (payload) {
 var deriveConceptTree = function (config) {
     var urn = { project: config.projectInfo.project_id };
     var id = urnToString(urn);
-    var text = 'Had data in REDCap Project "' + config.projectInfo.project_title + '"';
+    var text = 'Had data in REDCap Project ' + config.projectInfo.project_title + '"';
     var concepts = [];
     var root = {
         rootId: id,
         id: id,
         universalId: id,
+        urn: urn,
         isEncounterBased: false,
         isParent: true,
         isNumeric: false,
@@ -255,13 +318,12 @@ var deriveConceptTree = function (config) {
         uiDisplayName: config.projectInfo.project_title,
         uiDisplayText: text
     };
-    var byForm = deriveByFormConcept(root, urn, config);
+    var byForm = deriveByFormConcept(root, config);
     concepts = byForm.concat([root]);
     if (config.projectInfo.is_longitudinal) {
-        var byEvent = deriveByEventConcept(root, urn, config);
+        var byEvent = deriveByEventConcept(root, config);
         concepts = concepts.concat(byEvent);
     }
-    console.log(concepts);
     /*
      * Load childrenIds for each parent.
      */
@@ -281,72 +343,71 @@ var deriveConceptTree = function (config) {
  * Derive a REDCap Concept structure based on:
  * By Event => Event1, Event2 ...
  */
-var deriveByEventConcept = function (root, rootUrn, config) {
+var deriveByEventConcept = function (root, config) {
     var idMod = 'event';
-    var concept = { ...root, id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Event' };
-    var children = config.events.map(function (e) { return deriveEventConcept(concept, rootUrn, e.event_name, idMod, config); });
-    return children
-        .reduce(function (a, b) { return a.concat(b); },[])
+    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Event' });
+    return config.events
+        .map(function (e) { return deriveEventConcept(concept, e.event_name, idMod, config); })
+        .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
 /*
  * Derive a REDCap Concept structure based on:
  * By Form => Form1, Form2 ...
  */
-var deriveByFormConcept = function (root, rootUrn, config) {
+var deriveByFormConcept = function (root, config) {
     var idMod = 'form';
-    var concept = { ...root, id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Form' };
-    var children = config.forms.map(function (f) { return deriveFormConcept(concept, rootUrn, f.instrument_name, idMod); });
-    return children
-        .reduce(function (a, b) { return a.concat(b); },[])
+    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Form' });
+    return config.forms
+        .map(function (f) { return deriveFormConcept(concept, f.instrument_name, idMod); })
+        .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
 /*
  * Derive a REDCap Concept structure based on:
  * Event => Form1, Form2 ...
  */
-var deriveEventConcept = function (parent, parentUrn, event, idMod, config) {
-    var urn = { ...parentUrn, event: event };
+var deriveEventConcept = function (parent, event, idMod, config) {
+    var urn = Object.assign({}, parent.urn, { event: event });
     var universalId = urnToString(urn);
-    var concept = { ...parent, id: universalId + ":" + idMod, universalId: universalId, parentId: parent.id, childrenIds: new Set(), uiDisplayName: event, uiDisplayText: parent.uiDisplayText + ' event "' + event + "'" };
-    var children = config.eventMappings
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: event, uiDisplayText: parent.uiDisplayText + ' event "' + event + '"' });
+    return config.eventMappings
         .filter(function (em) { return em.unique_event_name === event; })
-        .map(function (f) { return deriveFormConcept(concept, urn, f.form, idMod); });
-    return children
-        .reduce(function (a, b) { return a.concat(b); },[])
+        .map(function (f) { return deriveFormConcept(concept, f.form, idMod); })
+        .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
 /*
  * Derive a REDCap Concept structure based on:
  * Form => Field1, Field2 ...
  */
-var deriveFormConcept = function (parent, parentUrn, form, idMod) {
-    var urn = { ...parentUrn, form: form };
+var deriveFormConcept = function (parent, form, idMod) {
+    var urn = Object.assign({}, parent.urn, { form: form });
     var universalId = urnToString(urn);
-    var concept = { ...parent, id: universalId + ":" + idMod, universalId: universalId, parentId: parent.id, childrenIds: new Set(), uiDisplayName: form, uiDisplayText: parent.uiDisplayText + ' form "' + form + '"'};
-    var children = [ ...metadata.values() ].filter(function (f) { return f.form === form; })
-        .map(function (f) { return deriveFieldConcept(concept, urn, f, idMod); });
-    return children
-        .reduce(function (a, b) { return a.concat(b); },[])
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: form, uiDisplayText: parent.uiDisplayText + ' form "' + form + '"' });
+    return [ ...metadata.values() ].filter(function (f) { return f.form === form; })
+        .map(function (f) { return deriveFieldConcept(concept, f, idMod); })
+        .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
 /*
  * Derive a REDCap Concept structure based on:
  * Field => Option1?, Option2? ...
  */
-var deriveFieldConcept = function (parent, parentUrn, field, idMod) {
-    var urn = { ...parentUrn, field: field.name };
+var deriveFieldConcept = function (parent, field, idMod) {
+    var urn = Object.assign({}, parent.urn, { field: field.id });
     var universalId = urnToString(urn);
-    var concept = { ...parent, id: universalId + ":" + idMod, universalId: universalId, parentId: parent.id, isParent: field.options.length > 0, childrenIds: new Set(), isEncounterBased: field.isDate, uiDisplayName: field.name, uiDisplayText: parent.uiDisplayText + ' field "' + field.name + '"' };
-    var children = field.options.map(function (op) { return deriveFieldOptionConcept(concept, urn, op, idMod); });
-    return children.concat([concept]);
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.name, uiDisplayText: parent.uiDisplayText + ' field "' + field.name + '"' });
+    return field.options
+        .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })
+        .concat([concept]);
 };
 /*
- * Derive a REDCap Concept for an option within a field.
+ * Derive a REDCapConcept for an option within a field.
  */
-var deriveFieldOptionConcept = function (parent, parentUrn, option, idMod) {
-    var urn = { ...parentUrn, value: option.value };
+var deriveFieldOptionConcept = function (parent, option, idMod) {
+    var urn = Object.assign({}, parent.urn, { value: option.value });
     var universalId = urnToString(urn);
-    return { ...parent, id: universalId + ":" + idMod, universalId: universalId, parentId: parent.id, isParent: false, childrenIds: new Set(), isEncounterBased: false, uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' };
+    return Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
 };
 `

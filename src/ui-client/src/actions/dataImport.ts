@@ -65,6 +65,7 @@ export const importFromREDCap = (token: string) => {
                  * For each form.
                  */
                 for (const form of config.forms) {
+                    console.log(`Loading form: ${form.instrument_name}`);
                     const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
                     config.records = config.records.concat(newRecs);
                 }
@@ -81,6 +82,7 @@ export const importFromREDCap = (token: string) => {
                  * For each non-longitudinal form.
                  */
                 for (const form of nonLongForms) {
+                    console.log(`Loading form: ${form.instrument_name}`);
                     const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
                     config.records = config.records.concat(newRecs);
                 }
@@ -89,6 +91,7 @@ export const importFromREDCap = (token: string) => {
                  * For each event mapping.
                  */
                 for (const e of config.eventMappings) {
+                    console.log(`Loading form: ${e.form}`);
                     const newRecs = await conn.getRecords({ events: [ e.unique_event_name ], forms: [ e.form ], type: EAV }) as REDCapEavRecord[];
                     config.records = config.records.concat(newRecs);
                 }
@@ -98,13 +101,12 @@ export const importFromREDCap = (token: string) => {
              * Prepare to import into Leaf
              */
             const concepts = await loadREDCapImportData(config);
-            console.log(config);
-            console.log(concepts);
-
+            
             concepts.forEach( async concept => {
-                const count = await calculateREDCapFieldCount(concept);
-                console.log(concept.uiDisplayName, count);
+                concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
+                console.log(concept.uiDisplayName, concept.uiDisplayPatientCount);
             });
+
         } catch (err) {
             console.log(err);
             dispatch(setImportError());
