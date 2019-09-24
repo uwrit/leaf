@@ -19,6 +19,7 @@ interface Props {
 }
 
 interface State {
+    available: REDCapFieldMetadata[];
     display: REDCapFieldMetadata[];
     focused: boolean;
     selected: number;
@@ -30,8 +31,11 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
 
     constructor(props: Props) {
         super(props);
+        const fields = props.redCap.config!.metadata.slice();
+        fields.forEach(f => f.field_label = f.field_label.toLowerCase());
         this.state = {
-            display: props.redCap.config!.metadata.slice(0, this.displayLimit),
+            available: fields, 
+            display: fields.slice(0, this.displayLimit),
             focused: false,
             selected: -1
         }
@@ -98,9 +102,10 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
      * new search for suggestions.
      */
     private handleMrnFieldChange = (e: React.FormEvent<HTMLInputElement>) => {
-        const { mrnFieldChangeHandler, redCap } = this.props;
+        const { mrnFieldChangeHandler } = this.props;
+        const { available } = this.state;
         const text = e.currentTarget.value;
-        const newDisplay = redCap.config!.metadata
+        const newDisplay = available
             .filter(f => f.field_name.startsWith(text) || f.field_label.startsWith(text))
             .slice(0, this.displayLimit);
 
