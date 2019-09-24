@@ -30,7 +30,7 @@ import HelpButton from '../components/HelpButton/HelpButton';
 import { CohortStateType } from '../models/state/CohortState';
 import { AdminPanelPane } from '../models/state/AdminState';
 import SideNotification from '../components/SideNotification/SideNotification';
-import DataImportModal from './DataImportModal/DataImportModal';
+import DataImportContainer from '../containers/DataImport/DataImport';
 import { version } from '../../package.json'
 import './App.css';
 
@@ -113,7 +113,7 @@ class App extends React.Component<Props> {
                 <div id="main-content">
                     <SaveQueryPanel />
                     <MyLeafModal />
-                    <DataImportModal />
+                    <DataImportContainer />
                     {content}
                 </div>
                 }

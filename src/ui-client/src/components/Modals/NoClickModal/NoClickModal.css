@@ -16,7 +16,7 @@
 }
 
 .noclick-modal.modal-dialog {
-    width: 400px !important;
+    max-width: 450px !important;
     z-index: 100;
 }
 

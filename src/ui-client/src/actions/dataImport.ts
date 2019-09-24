@@ -7,12 +7,14 @@
 
 import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
-import { ImportOptionsDTO, ImportProgress } from '../models/state/Import';
+import { ImportOptionsDTO, ImportProgress, REDCapImportState } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat } from '../models/redcapApi/RecordExportConfiguration';
 import { REDCapImportConfiguration } from '../models/redcapApi/ImportConfiguration';
 import { loadREDCapImportData, calculateREDCapFieldCount } from '../services/dataImport';
+import { InformationModalState, NotificationStates } from '../models/state/GeneralUiState';
+import { setNoClickModalState, showInfoModal } from './generalUi';
 
 export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
@@ -20,21 +22,71 @@ export const IMPORT_CLEAR_ERROR_OR_COMPLETE = 'IMPORT_CLEAR_ERROR_OR_COMPLETE';
 export const IMPORT_SET_OPTIONS = 'IMPORT_SET_OPTIONS';
 export const IMPORT_SET_PROGRESS = 'IMPORT_SET_PROGRESS';
 export const IMPORT_TOGGLE_REDCAP_MODAL = 'IMPORT_TOGGLE_REDCAP_MODAL';
+export const IMPORT_SET_REDCAP_CONFIG = 'IMPORT_SET_REDCAP_CONFIG';
+export const IMPORT_SET_REDCAP_MRN_FIELD = 'IMPORT_SET_REDCAP_MRN_FIELD';
+export const IMPORT_SET_REDCAP_API_TOKEN = 'IMPORT_SET_REDCAP_API_TOKEN';
+export const IMPORT_SET_REDCAP_ROW_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
+export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
+export const IMPORT_SET_REDCAP_UNMATCHED = 'IMPORT_SET_REDCAP_UNMATCHED';
 export const IMPORT_TOGGLE_MRN_MODAL = 'IMPORT_TOGGLE_MRN_MODAL';
 
 export interface ImportAction {
-    importOptions?: ImportOptionsDTO;
-    progress?: ImportProgress;
+    count?: number;
     error?: string;
+    field?: string;
+    importOptions?: ImportOptionsDTO;
+    loaded?: boolean;
+    progress?: ImportProgress;
+    rcConfig?: REDCapImportConfiguration;
+    token?: string;
     type: string;
+    unmatched?: string[];
 }
 
 // Asynchronous
 /*
+ * Load metadata from a REDCap instance.
+ */
+export const importMetadataFromREDCap = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        try {
+            const state = getState();
+            const { apiToken, apiURI } = state.dataImport.redCap;
+            const conn = new REDCapHttpConnector(apiToken, apiURI);
+
+            /* 
+             * Try API token.
+             */
+            dispatch(setNoClickModalState({ message: 'Phoning a friend ', state: NotificationStates.Working }));
+            const config = initializeREDCapImportConfiguration();
+            config.projectInfo = await conn.getProjectInfo();
+            config.metadata = await conn.getMetadata();
+
+            /* 
+             * Find first field with 'mrn' in the name (if any) and set the import configuration state.
+             */
+            const mrnField = config.metadata.find(f => f.field_name.indexOf('mrn') > -1);
+            dispatch(setImportRedcapConfiguration(config));
+            dispatch(setImportRedcapMrnField(mrnField ? mrnField.field_name : ''));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+
+        } catch (err) {
+            const info: InformationModalState = {
+                body: "Whoops, that doesn't seem to be a valid REDCap Project token. Check that the token is correct and that you have access to the REDCap API.",
+                header: "Invalid REDCap Project Token",
+                show: true
+            };
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            dispatch(showInfoModal(info));
+        }
+    }
+};
+
+/*
  * Import results from a REDCap instance.
  */
-export const importFromREDCap = (token: string) => {
-    return async (dispatch: Dispatch<Action<any>>, getState: () => AppState) => {
+export const importRecordsFromREDCap = () => {
+    return async (dispatch: any, getState: () => AppState) => {
         startTime = new Date().getTime();
         try {
             /*
@@ -42,16 +94,15 @@ export const importFromREDCap = (token: string) => {
              */
             // dispatch(setImportProgress(1, 'Preparing import'));
             const state = getState();
+            const redCap = state.dataImport.redCap;
             const { EAV, Flat } = REDCapRecordFormat;
-            const conn = new REDCapHttpConnector(token, state.dataImport.redCap.apiURI!);
-            const config = initializeREDCapImportConfiguration();
+            const conn = new REDCapHttpConnector(redCap.apiToken, redCap.apiURI!);
+            const config = redCap.config!;
 
             /*
              * Get project info.
              */
-            config.projectInfo = await conn.getProjectInfo();
             config.forms = await conn.getForms();
-            config.metadata = await conn.getMetadata();
             config.users = await conn.getUsers();
             config.recordField = config.metadata[0].field_name;
             config.mrns = await conn.getRecords({ fields: [ config.recordField, config.mrnField ], type: Flat });
@@ -119,6 +170,48 @@ export const importFromREDCap = (token: string) => {
 export const toggleImportRedcapModal = (): ImportAction => {
     return {
         type: IMPORT_TOGGLE_REDCAP_MODAL
+    };
+};
+
+export const setImportRedcapConfiguration = (rcConfig: REDCapImportConfiguration | undefined): ImportAction => {
+    return {
+        rcConfig,
+        type: IMPORT_SET_REDCAP_CONFIG
+    };
+};
+
+export const setImportRedcapMrnField = (field: string): ImportAction => {
+    return {
+        field,
+        type: IMPORT_SET_REDCAP_MRN_FIELD
+    };
+};
+
+export const setImportRedcapApiToken = (token: string): ImportAction => {
+    return {
+        token,
+        type: IMPORT_SET_REDCAP_API_TOKEN
+    };
+};
+
+export const setImportRedcapRowCount = (count: number): ImportAction => {
+    return {
+        count,
+        type: IMPORT_SET_REDCAP_ROW_COUNT
+    };
+};
+
+export const setImportRedcapPatientCount = (count: number): ImportAction => {
+    return {
+        count,
+        type: IMPORT_SET_REDCAP_PATIENT_COUNT
+    };
+};
+
+export const setImportRedcapUnmatched = (count: number): ImportAction => {
+    return {
+        count,
+        type: IMPORT_SET_REDCAP_UNMATCHED
     };
 };
 

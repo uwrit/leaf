@@ -1,0 +1,112 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.import-redcap.modal-dialog {
+    max-width: 800px !important;
+    width: 90% !important;
+    z-index: 99;
+}
+
+.import-redcap p {
+    font-size: 1.1rem;
+}
+
+.import-redcap-close {
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+}
+
+.import-redcap .import-redcap-input {
+    background-color: rgb(250,250,250);
+    border: 1px solid rgb(240,240,240);
+    border-radius: 4px;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.import-redcap .import-redcap-input {
+    background-color: rgb(208, 238, 173);
+    border: 1px solid #AED581;
+    border-radius: 4px;
+    margin: 20px 0;
+    padding: 10px;
+}
+
+.import-redcap .import-redcap-input .leaf-input {
+    color: rgb(104, 151, 49) !important;
+}
+
+.import-redcap .import-redcap-input .leaf-input:focus {
+    border-color: rgb(104, 151, 49) !important;
+}
+
+/* Metadata Summary */
+.import-redcap-metadata-summary {
+    border: 1px solid rgb(230,230,230);
+    border-left: none;
+    border-right: none;
+    padding-left: 10px;
+}
+
+.import-redcap-metadata-summary-field,
+.import-redcap-metadata-summary-value {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.import-redcap-metadata-summary-field {
+    width: 80px;
+}
+
+.import-redcap-metadata-summary-value {
+    color: rgb(150,150,150);
+}
+
+/* MRN Search Box */
+.import-redcap-mrn-field-container {
+    display: block;
+    position: relative;
+    width: 100%;
+}
+
+.import-redcap-mrn-field-container > div {
+    margin-bottom: 0;
+}
+
+.import-redcap-mrn-field-option-container {
+    display: block;
+    background-color: white;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+    margin-top: 0px;
+    padding: 0;
+    position: absolute;
+    width: 750px;
+    z-index: 102;
+}
+
+.import-redcap-mrn-field-option {
+    border-bottom: 1px solid rgb(240,240,240);
+    color: rgb(0,0,0,0.8) !important;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 300;
+    overflow: hidden;
+    padding: 4px 8px;
+    text-overflow: ellipsis;
+}
+
+.import-redcap-mrn-field-option > span {
+    color: rgb(150,150,150);
+    font-size: 0.9rem;
+    margin-left: 10px;
+}

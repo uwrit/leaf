@@ -5,12 +5,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+import { REDCapImportConfiguration } from "../redcapApi/ImportConfiguration";
+
 export interface REDCapImportOptionsDTO {
     apiURI?: string;
     enabled: boolean;
 }
 
-export interface REDCapImportOptions extends REDCapImportOptionsDTO { }
+export interface REDCapImportState extends REDCapImportOptionsDTO {
+    apiToken?: string;
+    config?: REDCapImportConfiguration;
+    metadataLoaded: false;
+    mrnField?: string;
+    patients: number;
+    rows: number;
+    unmatchedPatients: string[];
+}
 
 export interface ImportProgress {
     completed: number;
@@ -36,5 +46,5 @@ export default interface ImportState {
     isImporting: boolean;
     mrn: MrnImportOptions;
     progress: ImportProgress;
-    redCap: REDCapImportOptions;
+    redCap: REDCapImportState;
 }
