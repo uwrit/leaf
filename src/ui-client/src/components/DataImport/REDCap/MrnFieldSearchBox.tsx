@@ -46,6 +46,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         return (
             <div className={`${c}-input ${c}-mrn-field-container`}>
 
+                {/* Input field */}
                 <FormGroup>
                     <Label>MRN field</Label>
                     <Input
@@ -60,6 +61,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
                         value={redCap.mrnField} />
                 </FormGroup>
 
+                {/* Suggestions */}
                 {focused &&
                 <div className={`${optClass}-container`}>
                     {display.map((opt, i: number) => {
@@ -69,10 +71,11 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
                         }
 
                         return (
-                        <div className={classes.join(' ')} key={opt.field_name}>
-                            {opt.field_label}
-                            <span>{opt.field_name}</span>
-                        </div>)}
+                            <div className={classes.join(' ')} key={opt.field_name}>
+                                {opt.field_label}
+                                <span>{opt.field_name}</span>
+                            </div>);
+                        }
                     )}
                 </div>
                 }
@@ -80,10 +83,20 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         )
     }
 
+    /*
+     * Set the focus to true, showing suggestions.
+     */
     private handleInputFocus = () => this.setState({ focused: true });
 
+    /*
+     * Set the focus to false, hiding suggestions.
+     */
     private handleInputBlur = () => this.setState({ focused: false });
 
+    /*
+     * Handle changes to the Mrn input field. This triggers a 
+     * new search for suggestions.
+     */
     private handleMrnFieldChange = (e: React.FormEvent<HTMLInputElement>) => {
         const { mrnFieldChangeHandler, redCap } = this.props;
         const text = e.currentTarget.value;
@@ -95,6 +108,9 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         this.setState({ display: newDisplay, selected: 0, focused: true });
     }
 
+    /*
+     * Handle keydowns if up/down/enter.
+     */
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
 
@@ -110,6 +126,10 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         }
     }
 
+    /*
+     * Handle enter presses, which sets Mrn field to currently
+     * selected option.
+     */
     private handleEnterKeyPress = () => {
         const { dispatch } = this.props;
         const { display, selected } = this.state;
@@ -121,6 +141,9 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         }
     }
 
+    /*
+     * Move the selected option up/down on keydown.
+     */
     private handleArrowUpDownKeyPress = (key: number) => {
         const { selected, display } = this.state;
 
