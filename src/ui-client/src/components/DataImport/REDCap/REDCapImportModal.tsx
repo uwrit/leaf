@@ -14,6 +14,8 @@ import { loadREDCapImportData } from '../../../services/dataImport';
 import MetadataSummary from './MetadataSummary';
 import { ReactComponentLike } from 'prop-types';
 import MrnFieldSearchBox from './MrnFieldSearchBox';
+import ProgressBar from '../../Other/ProgressBar/ProgressBar';
+import CountUp from 'react-countup';
 
 interface Props {
     data: ImportState
@@ -42,26 +44,7 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
                 {/* Body */}
                 <ModalBody>
                     <div className={`${c}-container`}>
-                        {!isImporting &&
-                            <div>
-                                <p>
-                                    The Leaf REDCap Project Import tool allows you to copy project data directly from REDCap into Leaf, tying patient data in REDCap 
-                                    to data for the same patients data available in Leaf. Start by entering your REDCap Project API Token.
-                                </p>
-                                <p>
-                                    <strong>Your REDCap data will only be visible to you and other users already able to access the Project.</strong>
-                                </p>
-
-                                {/* API token or metadata summary, depending on step */}
-                                {this.getApiOrSummary()}
-
-                                {/* MRN field */}
-                                {redCap.config && 
-                                <MrnFieldSearchBox redCap={redCap} dispatch={dispatch} mrnFieldChangeHandler={this.handleMrnFieldChange} />
-                                }
-                            </div>
-                        }
-
+                        {this.getMainContent()}
                     </div>
                 </ModalBody>
 
@@ -93,29 +76,96 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
      * Generate component for the API token entry (if not yet validated)
      * or else a summary of the loaded REDCap metadata.
      */
-    private getApiOrSummary = () => {
+    private getMainContent = () => {
         const c = this.className;
-        const { redCap } = this.props.data;
+        const { dispatch, data } = this.props;
+        const { redCap, isImporting } = data;
+        const { completed, estimatedSecondsRemaining } = data.progress;
 
+        /*
+         * Step 1: if no config generated, show API token entry form.
+         */
         if (!redCap.config) {
             return (
-                <div className={`${c}-input ${c}-api-token-container`}>
-                    <FormGroup>
-                        <Label>REDCap API Token</Label>
-                        <Input
-                            className='leaf-input'
-                            type="text" 
-                            onChange={this.handleTokenInputChange} 
-                            placeholder={'Enter token...'}
-                            spellCheck={false}
-                            readOnly={!!redCap.config}
-                            value={redCap.apiToken} />
-                    </FormGroup>
+                <div>
+                    <p>
+                        The Leaf REDCap Project Import tool allows you to copy project data directly from REDCap into Leaf, tying patient data in REDCap 
+                        to data for the same patients data available in Leaf. Start by entering your REDCap Project API Token.
+                    </p>
+                    <p>
+                        <strong>Your REDCap data will only be visible to you and other users already able to access the Project.</strong>
+                    </p>
+                    <div className={`${c}-input ${c}-api-token-container`}>
+                        <FormGroup>
+                            <Label>REDCap API Token</Label>
+                            <Input
+                                className='leaf-input'
+                                type="text" 
+                                onChange={this.handleTokenInputChange} 
+                                placeholder={'Enter token...'}
+                                spellCheck={false}
+                                readOnly={!!redCap.config}
+                                value={redCap.apiToken} />
+                        </FormGroup>
+                    </div>
                 </div>
             )
+        /*
+         * Step 2: Else if we have a config but not importing yet, show MRN field entry form.
+         */
+        } else if (redCap.config && !isImporting) {
+            return (
+                <div>
+                    <MetadataSummary redCap={redCap} />
+                    <MrnFieldSearchBox redCap={redCap} dispatch={dispatch} mrnFieldChangeHandler={this.handleMrnFieldChange} />
+                </div>
+            );
+
+        /*
+         * Step 3: Else if importing, show progress body.
+         */
+        } else if (isImporting) {
+            return (
+                <div className={`${c}-progress-container`}>
+                    <div className={`${c}-progress-outer`}>
+                        <div className={`${c}-progress-inner`}>
+                            <div className={`${c}-counts`}>
+                                <div className={`${c}-count-rows`}>
+                                    <CountUp className="progress-rowcount" 
+                                        start={0} 
+                                        end={redCap.rows} 
+                                        duration={0.5} 
+                                        decimals={0} 
+                                        formattingFn={this.formatNumber} 
+                                    />
+                                </div>
+                                <div className={`${c}-count-patients`}>
+                                    <CountUp className="progress-patientcount" 
+                                        start={0} 
+                                        end={redCap.patients} 
+                                        duration={0.5} 
+                                        decimals={0} 
+                                        formattingFn={this.formatNumber} 
+                                    />
+                                </div>
+                            </div>
+                            <ProgressBar percentCompleted={completed} secondsRemaining={estimatedSecondsRemaining} />
+                        </div>
+                    </div>
+                </div>
+            )
+        /*
+         * Else we're in error, so show error body.
+         */
+        } else {
+            return <div />
         }
-        return <MetadataSummary redCap={redCap} />
     }
+
+    /*
+     * Format a number with commas.
+     */
+    private formatNumber = (n: number) => n.toLocaleString();
 
     /*
      * Handle clicks to re-edit the API token. This clears the current Import configuration.

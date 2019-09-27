@@ -15,7 +15,6 @@ export interface REDCapImportOptionsDTO {
 export interface REDCapImportState extends REDCapImportOptionsDTO {
     apiToken?: string;
     config?: REDCapImportConfiguration;
-    metadataLoaded: false;
     mrnField?: string;
     patients: number;
     rows: number;

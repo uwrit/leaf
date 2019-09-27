@@ -6,27 +6,27 @@
  */ 
 
 import React from 'react';
-import ExportState from '../../../../models/state/Export';
-import './ExportProgress.css';
+import './ProgressBar.css';
 
 interface Props {
-    className?: string;
-    exportState: ExportState
+    percentCompleted: number;
+    secondsRemaining?: number;
 }
 
-export default class ExportProgress extends React.PureComponent<Props> {
+export default class ProgressBar extends React.PureComponent<Props> {
+    private className = 'progressbar';
+
     public render() {
-        const { className, exportState } = this.props;
-        const { progress } = exportState;
-        const c = className ? className : 'patientlist-export-modal-progress';
+        const c = this.className;
+        const { percentCompleted, secondsRemaining } = this.props;
 
         return  (
             <div className={`${c}-container`}>
-                <div className={`${c}-progressbar-outer`}>
-                    <div className={`leaf-progressbar show relative`} style={{ width: `${progress.completed}%` }} />
+                <div className={`${c}-outer`}>
+                    <div className={`leaf-progressbar show relative`} style={{ width: `${percentCompleted}%` }} />
                 </div>
                 <div className={`${c}-remaining`}>
-                    <span>{this.getRemainingTimeText(progress.estimatedSecondsRemaining)}</span>
+                    <span>{this.getRemainingTimeText(secondsRemaining)}</span>
                 </div>
             </div>
         );

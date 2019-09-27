@@ -9,8 +9,8 @@ import React from 'react';
 import { Button, FormGroup, Input } from 'reactstrap';
 import { exportToREDCap } from '../../../../actions/dataExport';
 import ExportState from '../../../../models/state/Export';
-import ExportProgress from '../ExportProgress/ExportProgress';
 import { formatSmallNumber } from '../../../../utils/formatNumber';
+import ProgressBar from '../../../Other/ProgressBar/ProgressBar';
 import './REDCapExport.css';
 
 interface Props {
@@ -46,6 +46,7 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
         const inputClasses = [ 'leaf-input' ];
         const redcapInstanceUrl = redCap.apiURI ? redCap.apiURI!.replace('/api/','') : '';
         const formattedRowLimit = formatSmallNumber(redCap.rowLimit!);
+        const { completed, estimatedSecondsRemaining } = exportState.progress;
         let inputPlaceholder = 'REDCap Project name....';
 
         if (this.state.projectNameError) {
@@ -96,7 +97,7 @@ export default class REDCapExport extends React.PureComponent<Props,State> {
                             {this.getDisplay(exportState)}
                         </div>
                         {!isErrored && 
-                        <ExportProgress exportState={exportState}/>
+                        <ProgressBar percentCompleted={completed} secondsRemaining={estimatedSecondsRemaining} />
                         }
                     </div>
                 </div>

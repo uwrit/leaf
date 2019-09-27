@@ -19,10 +19,15 @@ interface Props {
 }
 
 interface State {
-    available: REDCapFieldMetadata[];
-    display: REDCapFieldMetadata[];
+    available: CachedFieldPointer[];
+    display: CachedFieldPointer[];
     focused: boolean;
     selected: number;
+}
+
+interface CachedFieldPointer {
+    field_label: string;
+    field_name: string;
 }
 
 export default class MrnFieldSearchBox extends React.PureComponent<Props, State> {
@@ -31,11 +36,13 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
 
     constructor(props: Props) {
         super(props);
-        const fields = props.redCap.config!.metadata.slice();
-        fields.forEach(f => f.field_label = f.field_label.toLowerCase());
+        const available: CachedFieldPointer[] = props.redCap.config!.metadata
+            .slice()
+            .map(f => ({ field_label: f.field_label.toLowerCase(), field_name: f.field_name }));
+
         this.state = {
-            available: fields, 
-            display: fields.slice(0, this.displayLimit),
+            available, 
+            display: available.slice(0, this.displayLimit),
             focused: false,
             selected: -1
         }
@@ -104,7 +111,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
     private handleMrnFieldChange = (e: React.FormEvent<HTMLInputElement>) => {
         const { mrnFieldChangeHandler } = this.props;
         const { available } = this.state;
-        const text = e.currentTarget.value;
+        const text = e.currentTarget.value.toLowerCase();
         const newDisplay = available
             .filter(f => f.field_name.startsWith(text) || f.field_label.startsWith(text))
             .slice(0, this.displayLimit);

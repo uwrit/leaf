@@ -5,20 +5,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .patientlist-export-modal-progress-progressbar-outer {
+ .progressbar-outer {
     background-color: rgba(0,0,0,0.1);
     height: 2px;
     margin: 14px 0 4px;
     width: 100%;
 }
 
-.patientlist-export-modal-progress-progressbar-inner {
+.progressbar-inner {
     background-color: rgb(28,168,221);
     height: 2px;
     transition: width 0.3s;
 }
 
-.patientlist-export-modal-progress-remaining {
+.progressbar-remaining {
     color: rgb(100,100,100);
     font-size: 0.8rem;
     text-align: center;
