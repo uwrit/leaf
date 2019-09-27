@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { REDCapImportState } from '../../../models/state/Import';
+import { REDCapImportState } from '../../../../models/state/Import';
 
 interface Props {
     redCap: REDCapImportState;

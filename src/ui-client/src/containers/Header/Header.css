@@ -35,7 +35,7 @@
 
 .header-options-chevron {
     margin-left: 1px !important;
-    transform: scale(0.7);
+    transform: scale(0.8) translateY(2px);
 }
 
 .header-options {
@@ -132,6 +132,10 @@
     padding-left: 4px;
 }
 
+.header-option svg {
+    margin-bottom: -2px;
+}
+
 .header-option > span {
     padding-left: 4px;
 }
@@ -188,6 +192,8 @@
 }
 
 .header-icon-redcap {
+    border-radius: 4px;
+    margin: -4px 2px 0 0;
     width: 18px;
 }
 

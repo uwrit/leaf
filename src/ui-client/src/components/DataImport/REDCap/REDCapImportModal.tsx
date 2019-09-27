@@ -6,16 +6,16 @@
  */ 
 
 import React from 'react';
-import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Input, FormGroup, Label } from 'reactstrap';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import ImportState from '../../../models/state/Import';
 import { setImportRedcapApiToken, toggleImportRedcapModal, importRecordsFromREDCap, importMetadataFromREDCap, setImportRedcapConfiguration, setImportRedcapMrnField } from '../../../actions/dataImport';
-import './REDCapImportModal.css';
 import { loadREDCapImportData } from '../../../services/dataImport';
-import MetadataSummary from './MetadataSummary';
-import { ReactComponentLike } from 'prop-types';
-import MrnFieldSearchBox from './MrnFieldSearchBox';
-import ProgressBar from '../../Other/ProgressBar/ProgressBar';
-import CountUp from 'react-countup';
+import ApiTokenEntryForm from './Sections/ApiTokenEntryForm';
+import MrnFieldEntryForm from './Sections/MrnFieldEntryForm';
+import ImportProgress from './Sections/ImportProgress';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FiCheck } from 'react-icons/fi';
+import './REDCapImportModal.css';
 
 interface Props {
     data: ImportState
@@ -23,14 +23,25 @@ interface Props {
     show: boolean;
 }
 
-export default class REDCapImportModal extends React.PureComponent<Props> {
+interface State {
+    mrnFieldValid: boolean;
+}
+
+export default class REDCapImportModal extends React.PureComponent<Props, State> {
     private className = 'import-redcap';
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            mrnFieldValid: false
+        };
+    }
 
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];
-        const { show, data, dispatch } = this.props;
-        const { redCap, isComplete, isErrored, isImporting } = data;
+        const { show, data } = this.props;
+        const { isImporting } = data;
 
         return (
             <Modal isOpen={show} className={classes.join(' ')} keyboard={true}>
@@ -49,9 +60,11 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
                 </ModalBody>
 
                 {/* Footer */}
+                {!isImporting &&
                 <ModalFooter>
                     {this.getFooterButtons()}
                 </ModalFooter>
+                }
             </Modal>
         );
     }
@@ -60,15 +73,31 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
      * Generate component footer buttons
      */
     private getFooterButtons = () => {
+        const c = this.className;
         const { redCap } = this.props.data;
+        const { mrnFieldValid } = this.state;
         const buttons: any[] = [];
-        let mainText = 'Begin Project';
 
-        if (redCap.config) {
-            mainText = 'Import Project';
-            buttons.push(<Button key={1} className="leaf-button leaf-button-secondary" onClick={this.handleEditApiTokenClick}>Edit API token</Button>);
+        if (!redCap.config) {
+            buttons.push(
+                <Button key={1} className="leaf-button leaf-button-primary" onClick={this.handleImportButtonClick} disabled={!redCap.apiToken}>
+                    <span>Begin Import</span>
+                    <FaChevronRight className={`${c}-chevron-right`}/>
+                </Button>
+            );
+        } else if (redCap.config) {
+            buttons.push(
+                <Button key={2} className="leaf-button leaf-button-secondary" onClick={this.handleEditApiTokenClick}>
+                    <FaChevronLeft className={`${c}-chevron-left`}/>
+                    <span>Edit API token</span>
+                </Button>
+            );
+            buttons.push(
+                <Button key={3} className="leaf-button leaf-button-primary" onClick={this.handleImportButtonClick} disabled={!mrnFieldValid}>
+                    <FiCheck className={`${c}-check`}/>
+                    <span>Import Project</span>
+                </Button>);
         }
-        buttons.push(<Button key={2} className="leaf-button leaf-button-primary" onClick={this.handleImportButtonClick}>{mainText}</Button>);
         return buttons;
     }
 
@@ -76,96 +105,41 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
      * Generate component for the API token entry (if not yet validated)
      * or else a summary of the loaded REDCap metadata.
      */
-    private getMainContent = () => {
-        const c = this.className;
+    private getMainContent = (): JSX.Element => {
         const { dispatch, data } = this.props;
         const { redCap, isImporting } = data;
-        const { completed, estimatedSecondsRemaining } = data.progress;
+        const { mrnFieldValid } = this.state;
+
+        return <ImportProgress data={data} />;
 
         /*
          * Step 1: if no config generated, show API token entry form.
          */
         if (!redCap.config) {
-            return (
-                <div>
-                    <p>
-                        The Leaf REDCap Project Import tool allows you to copy project data directly from REDCap into Leaf, tying patient data in REDCap 
-                        to data for the same patients data available in Leaf. Start by entering your REDCap Project API Token.
-                    </p>
-                    <p>
-                        <strong>Your REDCap data will only be visible to you and other users already able to access the Project.</strong>
-                    </p>
-                    <div className={`${c}-input ${c}-api-token-container`}>
-                        <FormGroup>
-                            <Label>REDCap API Token</Label>
-                            <Input
-                                className='leaf-input'
-                                type="text" 
-                                onChange={this.handleTokenInputChange} 
-                                placeholder={'Enter token...'}
-                                spellCheck={false}
-                                readOnly={!!redCap.config}
-                                value={redCap.apiToken} />
-                        </FormGroup>
-                    </div>
-                </div>
-            )
+            return <ApiTokenEntryForm redCap={redCap} tokenInputChangeHandler={this.handleTokenInputChange} />;
         /*
          * Step 2: Else if we have a config but not importing yet, show MRN field entry form.
          */
         } else if (redCap.config && !isImporting) {
             return (
-                <div>
-                    <MetadataSummary redCap={redCap} />
-                    <MrnFieldSearchBox redCap={redCap} dispatch={dispatch} mrnFieldChangeHandler={this.handleMrnFieldChange} />
-                </div>
+                <MrnFieldEntryForm 
+                    dispatch={dispatch} mrnFieldInputChangeHandler={this.handleMrnFieldChange} 
+                    redCap={redCap} setMrnFieldValid={this.setMrnFieldValid} valid={mrnFieldValid} 
+                />
             );
 
         /*
          * Step 3: Else if importing, show progress body.
          */
         } else if (isImporting) {
-            return (
-                <div className={`${c}-progress-container`}>
-                    <div className={`${c}-progress-outer`}>
-                        <div className={`${c}-progress-inner`}>
-                            <div className={`${c}-counts`}>
-                                <div className={`${c}-count-rows`}>
-                                    <CountUp className="progress-rowcount" 
-                                        start={0} 
-                                        end={redCap.rows} 
-                                        duration={0.5} 
-                                        decimals={0} 
-                                        formattingFn={this.formatNumber} 
-                                    />
-                                </div>
-                                <div className={`${c}-count-patients`}>
-                                    <CountUp className="progress-patientcount" 
-                                        start={0} 
-                                        end={redCap.patients} 
-                                        duration={0.5} 
-                                        decimals={0} 
-                                        formattingFn={this.formatNumber} 
-                                    />
-                                </div>
-                            </div>
-                            <ProgressBar percentCompleted={completed} secondsRemaining={estimatedSecondsRemaining} />
-                        </div>
-                    </div>
-                </div>
-            )
+            return <ImportProgress data={data} />;
         /*
          * Else we're in error, so show error body.
          */
         } else {
-            return <div />
+            return <div />;
         }
     }
-
-    /*
-     * Format a number with commas.
-     */
-    private formatNumber = (n: number) => n.toLocaleString();
 
     /*
      * Handle clicks to re-edit the API token. This clears the current Import configuration.
@@ -178,9 +152,9 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
     /* 
      * Handle changes to the token input box.
      */
-    private handleTokenInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    private handleTokenInputChange = (token: string) => {
         const { dispatch } = this.props;
-        dispatch(setImportRedcapApiToken(e.currentTarget.value));
+        dispatch(setImportRedcapApiToken(token));
     }
 
     /* 
@@ -190,6 +164,11 @@ export default class REDCapImportModal extends React.PureComponent<Props> {
         const { dispatch } = this.props;
         dispatch(setImportRedcapMrnField(text));
     }
+
+    /* 
+     * Set whether the entered MRN field exists.
+     */
+    private setMrnFieldValid = (mrnFieldValid: boolean) => this.setState({ mrnFieldValid });
 
     /* 
      * Handle clicks on the 'Import' button.

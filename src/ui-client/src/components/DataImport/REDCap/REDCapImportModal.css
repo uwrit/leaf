@@ -5,10 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+ /* Main */
 .import-redcap.modal-dialog {
     max-width: 800px !important;
     width: 90% !important;
     z-index: 99;
+}
+
+.import-redcap .modal-footer {
+    display: block;
+}
+
+.import-redcap .modal-footer .leaf-button-primary {
+    float: right;
 }
 
 .import-redcap p {
@@ -46,11 +55,41 @@
     border-color: rgb(104, 151, 49) !important;
 }
 
+/* Button icons */
+.import-redcap-check {
+    margin: 0 4px -3px -2px;
+    transform: scale(1.2);
+}
+
+.import-redcap-chevron-right,
+.import-redcap-chevron-left {
+    transform: scale(0.9);
+}
+
+.import-redcap-chevron-left {
+    margin: 0 2px -2px -2px;
+}
+
+.import-redcap-chevron-right {
+    margin: 0 -2px -3px 2px;
+}
+
+/* Sections */
+.import-redcap-section {
+    opacity: 1;
+    transition: opacity .5s ease-in;
+}
+
+.import-redcap-section.hidden {
+    opacity: 0;
+}
+
 /* Metadata Summary */
 .import-redcap-metadata-summary {
+    background-color: rgba(0,0,0,0.02);
     border: 1px solid rgb(230,230,230);
-    border-left: none;
-    border-right: none;
+    border-radius: 4px;
+    margin-bottom: 10px;
     padding-left: 10px;
 }
 
@@ -66,7 +105,7 @@
 }
 
 .import-redcap-metadata-summary-value {
-    color: rgb(150,150,150);
+    color: rgb(130,130,130);
 }
 
 /* MRN Search Box */

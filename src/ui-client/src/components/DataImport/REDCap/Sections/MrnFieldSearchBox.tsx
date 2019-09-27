@@ -6,16 +6,17 @@
  */ 
 
 import React from 'react';
-import { REDCapImportState } from '../../../models/state/Import';
-import { REDCapFieldMetadata } from '../../../models/redcapApi/Metadata';
+import { REDCapImportState } from '../../../../models/state/Import';
 import { FormGroup, Label, Input } from 'reactstrap';
-import { keys } from '../../../models/Keyboard';
-import { setImportRedcapMrnField } from '../../../actions/dataImport';
+import { keys } from '../../../../models/Keyboard';
+import { setImportRedcapMrnField } from '../../../../actions/dataImport';
 
 interface Props {
     dispatch: any;
     mrnFieldChangeHandler: (text: string) => void;
     redCap: REDCapImportState;
+    setMrnFieldValid: (valid: boolean) => void;
+    valid: boolean;
 }
 
 interface State {
@@ -27,24 +28,40 @@ interface State {
 
 interface CachedFieldPointer {
     field_label: string;
+    field_label_lower: string;
     field_name: string;
 }
 
 export default class MrnFieldSearchBox extends React.PureComponent<Props, State> {
     private className = 'import-redcap';
     private displayLimit = 5;
+    private fields: Set<string> = new Set();
 
     constructor(props: Props) {
         super(props);
         const available: CachedFieldPointer[] = props.redCap.config!.metadata
             .slice()
-            .map(f => ({ field_label: f.field_label.toLowerCase(), field_name: f.field_name }));
+            .map(f => {
+                this.fields.add(f.field_name);
+                return { field_label_lower: f.field_label.toLowerCase(), field_label: f.field_label, field_name: f.field_name }
+            });
 
         this.state = {
             available, 
             display: available.slice(0, this.displayLimit),
             focused: false,
             selected: -1
+        }
+    }
+
+    public getSnapshotBeforeUpdate() {
+        const { setMrnFieldValid, redCap } = this.props;
+        const { mrnField } = redCap;
+
+        if (mrnField && this.fields.has(mrnField)) {
+            setMrnFieldValid(true);
+        } else {
+            setMrnFieldValid(false);
         }
     }
 
@@ -82,7 +99,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
                         }
 
                         return (
-                            <div className={classes.join(' ')} key={opt.field_name}>
+                            <div className={classes.join(' ')} key={opt.field_name} onClick={this.handleDropdownClick.bind(this, i)}>
                                 {opt.field_label}
                                 <span>{opt.field_name}</span>
                             </div>);
@@ -113,7 +130,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         const { available } = this.state;
         const text = e.currentTarget.value.toLowerCase();
         const newDisplay = available
-            .filter(f => f.field_name.startsWith(text) || f.field_label.startsWith(text))
+            .filter(f => f.field_name.startsWith(text) || f.field_label_lower.startsWith(text))
             .slice(0, this.displayLimit);
 
         mrnFieldChangeHandler(text);
@@ -150,6 +167,20 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         if (focused) {
             dispatch(setImportRedcapMrnField(focused.field_name));
             this.setState({ focused: false });
+        }
+    }
+
+    /*
+     * Set the selected field index from click event.
+     */
+    private handleDropdownClick = (i: number) => {
+        const { dispatch } = this.props;
+        const { display } = this.state;
+        const focused = display[i];
+
+        if (focused) {
+            dispatch(setImportRedcapMrnField(focused.field_name));
+            this.setState({ focused: false, selected: i });
         }
     }
 

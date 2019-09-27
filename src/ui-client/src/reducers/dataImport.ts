@@ -26,20 +26,22 @@ export function defaultImportState(): ImportState {
         enabled: false,
         isComplete: false,
         isErrored: false,
-        isImporting: false,
+        isImporting: true,
         mrn: {
             enabled: false
         },
         progress: {
-            completed: 0,
-            estimatedSecondsRemaining: 0,
-            text: ''
+            completed: 22,
+            estimatedSecondsRemaining: 41,
+            text: 'Loading "pat_name_formatted"'
         },
         redCap: {
+            apiToken: '',
             apiURI: 'https://rcdev.iths.org/api/',
             enabled: false,
-            patients: 0,
-            rows: 0,
+            mrnField: '',
+            patients: 1231,
+            rows: 101241,
             unmatchedPatients: []
         }
     } 

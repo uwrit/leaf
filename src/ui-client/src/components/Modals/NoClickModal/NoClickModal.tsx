@@ -65,7 +65,7 @@ export default class NoClickModal extends React.Component<Props> {
             case NotificationStates.Complete:
                 return (
                     <Row>
-                        <Col md={4}><FiCheckCircle size="8rem" /></Col>
+                        <Col md={4}><FiCheckCircle/></Col>
                         <Col md={8}>
                             <div className="noclick-modal-text noclick-modal-text-complete">{state.message}</div>
                         </Col>

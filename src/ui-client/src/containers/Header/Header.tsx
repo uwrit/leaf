@@ -25,8 +25,8 @@ import { logout } from '../../actions/session';
 import NewQueryButton from '../../components/Header/NewQueryButton';
 import DatabasesButton from '../../components/Header/DatabasesButton';
 import UserButton from '../../components/Header/UserButton';
-import './Header.css';
 import ImportButton from '../../components/Header/ImportButton';
+import './Header.css';
 
 interface OwnProps {}
 interface StateProps {

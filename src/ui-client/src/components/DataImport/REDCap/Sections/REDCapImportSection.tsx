@@ -7,34 +7,34 @@
 
 import React from 'react';
 
-interface Props {
-    className?: string;
-}
+interface Props {}
 
 interface State {
     hidden: boolean;
 }
 
-export default class AttestationRow extends React.PureComponent<Props, State> {
+export default class REDCapImportSection extends React.PureComponent<Props, State> {
+    private className = 'import-redcap-section';
+
     constructor(props: Props) {
         super(props);
         this.state = {
             hidden: true
-        }
-    };
+        };
+    }
 
     public componentDidMount() {
         setTimeout(() => this.setState({ hidden: false }), 10);
     }
 
     public render() {
-        const c = `attestation-row ${this.props.className ? this.props.className : ''}`
+        const c = this.className;
         const classes = [ c, (this.state.hidden ? 'hidden' : '') ];
 
-        return  (
+        return (
             <div className={classes.join(' ')}>
                 {this.props.children}
             </div>
-        )
+        );
     }
-}
+};

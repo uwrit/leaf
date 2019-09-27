@@ -1,0 +1,36 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.import-redcap-progress-project-name {
+    color: rgb(180,180,180);
+}
+
+.import-redcap-progress-counts {
+    display: flex;
+    justify-content: center;
+}
+
+.import-redcap-progress-count {
+    text-align: center;
+    width: 200px;
+}
+
+.import-redcap-progress-count-text {
+    color: rgb(130,130,130);
+    font-size: 0.9rem;
+    margin-top: -8px;
+}
+
+.import-redcap-progress-count-value {
+    font-size: 3.0rem;
+    font-weight: 100;
+}
+
+.import-redcap-progress-text {
+    margin: 25px 0;
+    text-align: center;
+}
