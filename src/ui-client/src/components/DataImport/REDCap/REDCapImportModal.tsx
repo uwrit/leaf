@@ -8,8 +8,7 @@
 import React from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import ImportState from '../../../models/state/Import';
-import { setImportRedcapApiToken, toggleImportRedcapModal, importRecordsFromREDCap, importMetadataFromREDCap, setImportRedcapConfiguration, setImportRedcapMrnField } from '../../../actions/dataImport';
-import { loadREDCapImportData } from '../../../services/dataImport';
+import { setImportRedcapApiToken, toggleImportRedcapModal, importREDCapProjectData, importMetadataFromREDCap, setImportRedcapConfiguration, setImportRedcapMrnField } from '../../../actions/dataImport';
 import ApiTokenEntryForm from './Sections/ApiTokenEntryForm';
 import MrnFieldEntryForm from './Sections/MrnFieldEntryForm';
 import ImportProgress from './Sections/ImportProgress';
@@ -110,8 +109,6 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
         const { redCap, isImporting } = data;
         const { mrnFieldValid } = this.state;
 
-        return <ImportProgress data={data} />;
-
         /*
          * Step 1: if no config generated, show API token entry form.
          */
@@ -127,7 +124,6 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
                     redCap={redCap} setMrnFieldValid={this.setMrnFieldValid} valid={mrnFieldValid} 
                 />
             );
-
         /*
          * Step 3: Else if importing, show progress body.
          */
@@ -179,7 +175,7 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
         if (!data.redCap.config) {
             dispatch(importMetadataFromREDCap());
         } else {
-            dispatch(importRecordsFromREDCap());
+            dispatch(importREDCapProjectData());
         }
     }
 

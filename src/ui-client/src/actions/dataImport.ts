@@ -10,7 +10,7 @@ import { AppState } from '../models/state/AppState';
 import { ImportOptionsDTO, ImportProgress, REDCapImportState } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
-import { REDCapRecordFormat } from '../models/redcapApi/RecordExportConfiguration';
+import { REDCapRecordFormat, REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 import { REDCapImportConfiguration } from '../models/redcapApi/ImportConfiguration';
 import { loadREDCapImportData, calculateREDCapFieldCount } from '../services/dataImport';
 import { InformationModalState, NotificationStates } from '../models/state/GeneralUiState';
@@ -83,19 +83,72 @@ export const importMetadataFromREDCap = () => {
 };
 
 /*
+ * Import project rows from REDCap.
+ */
+const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfiguration, conn: REDCapHttpConnector) => {
+    const { EAV } = REDCapRecordFormat;
+    let records: REDCapEavRecord[] = [];
+
+    /*
+     * If Classic project.
+     */
+    if (!config.projectInfo.is_longitudinal) {
+        for (const form of config.forms) {
+            records = await importFormRecordsFromREDCap(dispatch, { forms: [ form.instrument_name ], type: EAV }, conn, records);
+        }
+    }
+
+    /*
+     * Else if Longitudinal project.
+     */
+    else {
+        config.eventMappings = await conn.getEventMappings();
+        const nonLongForms = config.forms.filter(f => config.eventMappings!.findIndex(e => e.form === f.instrument_name) === -1);
+
+        for (const form of nonLongForms) {
+            records = await importFormRecordsFromREDCap(dispatch, { forms: [ form.instrument_name ], type: EAV }, conn, records);
+        }
+
+        for (const e of config.eventMappings) {
+            records = await importFormRecordsFromREDCap(dispatch, { events: [ e.unique_event_name ], forms: [ e.form ], type: EAV }, conn, records);
+        }
+    }
+    return records;
+};
+
+/*
+ * Import records from a given REDCap form.
+ */
+const importFormRecordsFromREDCap = async (dispatch: any, config: REDCapRecordExportConfiguration, conn: REDCapHttpConnector, records: REDCapEavRecord[]) => {
+    const form = config.forms![0];
+
+    if (!config.events) {
+        dispatch(setImportProgress(10, `Loading form "${form}"`));
+    } else {
+        dispatch(setImportProgress(10, `Loading event "${config.events![0]}", form "${form}"`));
+    }
+
+    const newRecs = await conn.getRecords(config) as REDCapEavRecord[];
+    records = records.concat(newRecs);
+    dispatch(setImportRedcapRowCount(records.length));
+    return records;
+};
+
+/*
  * Import results from a REDCap instance.
  */
-export const importRecordsFromREDCap = () => {
+export const importREDCapProjectData = () => {
     return async (dispatch: any, getState: () => AppState) => {
         startTime = new Date().getTime();
         try {
             /*
              * Initialize params.
              */
+            
             // dispatch(setImportProgress(1, 'Preparing import'));
             const state = getState();
             const redCap = state.dataImport.redCap;
-            const { EAV, Flat } = REDCapRecordFormat;
+            const { Flat } = REDCapRecordFormat;
             const conn = new REDCapHttpConnector(redCap.apiToken, redCap.apiURI!);
             const config = redCap.config!;
 
@@ -107,46 +160,10 @@ export const importRecordsFromREDCap = () => {
             config.recordField = config.metadata[0].field_name;
             config.mrns = await conn.getRecords({ fields: [ config.recordField, config.mrnField ], type: Flat });
 
-            /*
-             * If Classic project.
+            /* 
+             * Get records.
              */
-            if (!config.projectInfo.is_longitudinal) {
-
-                /*
-                 * For each form.
-                 */
-                for (const form of config.forms) {
-                    console.log(`Loading form: ${form.instrument_name}`);
-                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
-                    config.records = config.records.concat(newRecs);
-                }
-            }
-
-            /*
-             * Else if Longitudinal project.
-             */
-            else {
-                config.eventMappings = await conn.getEventMappings();
-                const nonLongForms = config.forms.filter(f => config.eventMappings!.findIndex(e => e.form === f.instrument_name) === -1);
-
-                /*
-                 * For each non-longitudinal form.
-                 */
-                for (const form of nonLongForms) {
-                    console.log(`Loading form: ${form.instrument_name}`);
-                    const newRecs = await conn.getRecords({ forms: [ form.instrument_name ], type: EAV }) as REDCapEavRecord[];
-                    config.records = config.records.concat(newRecs);
-                }
-
-                /*
-                 * For each event mapping.
-                 */
-                for (const e of config.eventMappings) {
-                    console.log(`Loading form: ${e.form}`);
-                    const newRecs = await conn.getRecords({ events: [ e.unique_event_name ], forms: [ e.form ], type: EAV }) as REDCapEavRecord[];
-                    config.records = config.records.concat(newRecs);
-                }
-            }
+            config.records = await importRecordsFromREDCap(dispatch, config, conn);
 
             /*
              * Prepare to import into Leaf
@@ -154,9 +171,12 @@ export const importRecordsFromREDCap = () => {
             const concepts = await loadREDCapImportData(config);
             
             concepts.forEach( async concept => {
+                dispatch(setImportProgress(10, `Calculating patients counts for "${concept.uiDisplayName}"`));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
-                console.log(concept.uiDisplayName, concept.uiDisplayPatientCount);
             });
+
+            // sanity check
+            console.log([ ...concepts.values() ].map(c => [ c.uiDisplayName, c.uiDisplayPatientCount ]));
 
         } catch (err) {
             console.log(err);

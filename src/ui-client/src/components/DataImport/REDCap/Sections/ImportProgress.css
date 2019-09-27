@@ -7,6 +7,7 @@
 
 .import-redcap-progress-project-name {
     color: rgb(180,180,180);
+    margin-bottom: 10px;
 }
 
 .import-redcap-progress-counts {
@@ -31,6 +32,6 @@
 }
 
 .import-redcap-progress-text {
-    margin: 25px 0;
+    margin: 25px 0 0;
     text-align: center;
 }
