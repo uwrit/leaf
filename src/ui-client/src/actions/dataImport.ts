@@ -198,7 +198,7 @@ export const importREDCapProjectData = () => {
                  * Recalculate the current percent complete, then calculate patient count.
                  */
                 increment();
-                dispatch(setImportProgress(completed, `Calculating patients counts for "${concept.uiDisplayName}"`));
+                dispatch(setImportProgress(completed, 'Calculating patients counts'));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 
@@ -287,7 +287,6 @@ export const setImportClearErrorOrComplete = (): ImportAction => {
 };
 
 export const setImportProgress = (completed: number, text: string): ImportAction => {
-    // console.log(completed, text);
     return {
         progress: {
             completed,
@@ -308,14 +307,6 @@ const pcts = {
     LOAD: 0.4
 };
 let completed = 0;
-
-/*
-const calculateCompleted = (percent: number): number => {
-    const proportion = percent * stage * 100.0;
-    completed += proportion;
-    return completed;
-};
-*/
 
 /*
  * Calculate the estimated amount of time remaining for the export
