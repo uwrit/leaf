@@ -337,7 +337,7 @@ var deriveConceptTree = function (config) {
             }
         }
     });
-    return conceptMap;
+    return [ ...conceptMap.values() ];
 };
 /*
  * Derive a REDCap Concept structure based on:

@@ -61,13 +61,13 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
             return Object.assign({}, state, {
                 isComplete: false,
                 isErrored: false,
-                isExporting: false
+                isImporting: false
             });
         case IMPORT_SET_OPTIONS:
             return Object.assign({}, state, action.importOptions);
         case IMPORT_SET_PROGRESS:
             return Object.assign({}, state, {
-                isExporting: true,
+                isImporting: true,
                 progress: action.progress,
             });
         case IMPORT_ERROR:

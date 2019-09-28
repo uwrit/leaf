@@ -343,7 +343,7 @@ export default class REDCapImportWebWorker {
         /*
          * Derive Leaf concepts based on REDCap project structure.
          */
-        const deriveConceptTree = (config: REDCapImportConfiguration): Map<string, REDCapConcept> => {
+        const deriveConceptTree = (config: REDCapImportConfiguration): REDCapConcept[] => {
             const urn: REDCapUrn = { project: config.projectInfo.project_id };
             const id = urnToString(urn);
             const text = `Had data in REDCap Project "${config.projectInfo.project_title}"`;
@@ -391,7 +391,7 @@ export default class REDCapImportWebWorker {
                 }
             });
 
-            return conceptMap;
+            return [ ...conceptMap.values() ];
         };
 
         /*

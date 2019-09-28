@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ImportOptionsDTO, ImportProgress, REDCapImportState } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
@@ -26,7 +25,7 @@ export const IMPORT_SET_REDCAP_CONFIG = 'IMPORT_SET_REDCAP_CONFIG';
 export const IMPORT_SET_REDCAP_MRN_FIELD = 'IMPORT_SET_REDCAP_MRN_FIELD';
 export const IMPORT_SET_REDCAP_API_TOKEN = 'IMPORT_SET_REDCAP_API_TOKEN';
 export const IMPORT_SET_REDCAP_ROW_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
-export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
+export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_PATIENT_COUNT';
 export const IMPORT_SET_REDCAP_UNMATCHED = 'IMPORT_SET_REDCAP_UNMATCHED';
 export const IMPORT_TOGGLE_MRN_MODAL = 'IMPORT_TOGGLE_MRN_MODAL';
 
@@ -57,7 +56,7 @@ export const importMetadataFromREDCap = () => {
             /* 
              * Try API token.
              */
-            dispatch(setNoClickModalState({ message: 'Phoning a friend ', state: NotificationStates.Working }));
+            dispatch(setNoClickModalState({ message: 'Phoning a friend', state: NotificationStates.Working }));
             const config = initializeREDCapImportConfiguration();
             config.projectInfo = await conn.getProjectInfo();
             config.metadata = await conn.getMetadata();
@@ -87,14 +86,19 @@ export const importMetadataFromREDCap = () => {
  */
 const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfiguration, conn: REDCapHttpConnector) => {
     const { EAV } = REDCapRecordFormat;
-    let records: REDCapEavRecord[] = [];
+    let total = 0;
+    let i = 0;
+    let done = 0.0;
+    const increment = () => { i++; done = i / total * 100.0; }
 
     /*
      * If Classic project.
      */
     if (!config.projectInfo.is_longitudinal) {
+        total = config.forms.length;
         for (const form of config.forms) {
-            records = await importFormRecordsFromREDCap(dispatch, { forms: [ form.instrument_name ], type: EAV }, conn, records);
+            increment();
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { forms: [ form.instrument_name ], type: EAV });
         }
     }
 
@@ -102,30 +106,34 @@ const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfig
      * Else if Longitudinal project.
      */
     else {
+        config.events = await conn.getEvents();
         config.eventMappings = await conn.getEventMappings();
         const nonLongForms = config.forms.filter(f => config.eventMappings!.findIndex(e => e.form === f.instrument_name) === -1);
+        total = nonLongForms.length + config.eventMappings.length;
 
         for (const form of nonLongForms) {
-            records = await importFormRecordsFromREDCap(dispatch, { forms: [ form.instrument_name ], type: EAV }, conn, records);
+            increment();
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { forms: [ form.instrument_name ], type: EAV });
         }
 
         for (const e of config.eventMappings) {
-            records = await importFormRecordsFromREDCap(dispatch, { events: [ e.unique_event_name ], forms: [ e.form ], type: EAV }, conn, records);
+            increment();
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { events: [ e.unique_event_name ], forms: [ e.form ], type: EAV });
         }
     }
-    return records;
 };
 
 /*
  * Import records from a given REDCap form.
  */
-const importFormRecordsFromREDCap = async (dispatch: any, config: REDCapRecordExportConfiguration, conn: REDCapHttpConnector, records: REDCapEavRecord[]) => {
+const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnector, records: REDCapEavRecord[], done: number, config: REDCapRecordExportConfiguration) => {
     const form = config.forms![0];
+    completed = (pcts.INITIAL * 100.0) + (done * pcts.RECORDS)
 
     if (!config.events) {
-        dispatch(setImportProgress(10, `Loading form "${form}"`));
+        dispatch(setImportProgress(completed, `Loading form "${form}"`));
     } else {
-        dispatch(setImportProgress(10, `Loading event "${config.events![0]}", form "${form}"`));
+        dispatch(setImportProgress(completed, `Loading event "${config.events![0]}", form "${form}"`));
     }
 
     const newRecs = await conn.getRecords(config) as REDCapEavRecord[];
@@ -139,13 +147,15 @@ const importFormRecordsFromREDCap = async (dispatch: any, config: REDCapRecordEx
  */
 export const importREDCapProjectData = () => {
     return async (dispatch: any, getState: () => AppState) => {
+
+        dispatch(setImportProgress(1, 'Preparing import'));
         startTime = new Date().getTime();
+        completed = pcts.INITIAL * 100;
+
         try {
             /*
              * Initialize params.
              */
-            
-            // dispatch(setImportProgress(1, 'Preparing import'));
             const state = getState();
             const redCap = state.dataImport.redCap;
             const { Flat } = REDCapRecordFormat;
@@ -155,28 +165,44 @@ export const importREDCapProjectData = () => {
             /*
              * Get project info.
              */
+            dispatch(setImportProgress(3, 'Loading form types'));
             config.forms = await conn.getForms();
+
+            dispatch(setImportProgress(6, 'Loading project users'));
             config.users = await conn.getUsers();
+
+            dispatch(setImportProgress(9, 'Loading patient mappings'));
             config.recordField = config.metadata[0].field_name;
             config.mrns = await conn.getRecords({ fields: [ config.recordField, config.mrnField ], type: Flat });
+            dispatch(setImportRedcapPatientCount(config.mrns.length));
 
             /* 
              * Get records.
              */
-            config.records = await importRecordsFromREDCap(dispatch, config, conn);
+            await importRecordsFromREDCap(dispatch, config, conn);
 
             /*
-             * Prepare to import into Leaf
+             * Prepare to import into Leaf.
              */
+            dispatch(setImportProgress(completed, 'Generating Leaf Concepts'));
             const concepts = await loadREDCapImportData(config);
             
-            concepts.forEach( async concept => {
-                dispatch(setImportProgress(10, `Calculating patients counts for "${concept.uiDisplayName}"`));
+            /*
+             * Calculate the patient count for each new REDCap concept.
+             */
+            let i = 0;
+            const increment = () => { i++; completed = Math.round(((pcts.INITIAL + pcts.RECORDS) * 100.0) + ((i / concepts.length * 100.0) * pcts.COUNTS)); }
+            
+            for (const concept of concepts) {
+                /*
+                 * Recalculate the current percent complete, then calculate patient count.
+                 */
+                increment();
+                dispatch(setImportProgress(completed, `Calculating patients counts for "${concept.uiDisplayName}"`));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
-            });
+            };
 
-            // sanity check
-            console.log([ ...concepts.values() ].map(c => [ c.uiDisplayName, c.uiDisplayPatientCount ]));
+            dispatch(setImportRedcapConfiguration());
 
         } catch (err) {
             console.log(err);
@@ -193,7 +219,7 @@ export const toggleImportRedcapModal = (): ImportAction => {
     };
 };
 
-export const setImportRedcapConfiguration = (rcConfig: REDCapImportConfiguration | undefined): ImportAction => {
+export const setImportRedcapConfiguration = (rcConfig: REDCapImportConfiguration | undefined = undefined): ImportAction => {
     return {
         rcConfig,
         type: IMPORT_SET_REDCAP_CONFIG
@@ -261,6 +287,7 @@ export const setImportClearErrorOrComplete = (): ImportAction => {
 };
 
 export const setImportProgress = (completed: number, text: string): ImportAction => {
+    // console.log(completed, text);
     return {
         progress: {
             completed,
@@ -270,6 +297,25 @@ export const setImportProgress = (completed: number, text: string): ImportAction
         type: IMPORT_SET_PROGRESS
     };
 };
+
+/*
+ * Set proportion of total completion time each stage is weighted.
+ */
+const pcts = {
+    INITIAL: 0.1,
+    RECORDS: 0.3,
+    COUNTS: 0.2,
+    LOAD: 0.4
+};
+let completed = 0;
+
+/*
+const calculateCompleted = (percent: number): number => {
+    const proportion = percent * stage * 100.0;
+    completed += proportion;
+    return completed;
+};
+*/
 
 /*
  * Calculate the estimated amount of time remaining for the export
@@ -286,7 +332,7 @@ const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
     return  {
         forms: [],
         metadata: [],
-        mrnField: 'mrn',
+        mrnField: '',
         mrns: [],
         projectInfo: {
             creation_time: '',

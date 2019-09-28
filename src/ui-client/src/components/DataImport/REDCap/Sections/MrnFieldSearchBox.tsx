@@ -63,7 +63,10 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         } else {
             setMrnFieldValid(false);
         }
+        return null;
     }
+
+    public componentDidUpdate() {}
 
     public render() {
         const c = this.className;

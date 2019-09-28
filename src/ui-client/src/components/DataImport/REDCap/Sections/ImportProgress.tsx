@@ -21,25 +21,23 @@ export default class ImportProgress extends React.PureComponent<Props> {
     private prevCountPats = 0;
     private prevCountRows = 0;
 
-    public getSnapshotBeforeUpdate(prevProps: Props) {
-        const { rows, patients } = this.props.data.redCap;
-
-        if (prevProps.data.redCap.rows !== rows) {
-            this.prevCountRows = rows;
-        }
-        if (prevProps.data.redCap.patients !== patients) {
-            this.prevCountPats = patients;
-        }
-        return null;
+    public componentDidUpdate(props: Props, state: any, vals: number[]) {
+        const [ rows, patients ] = vals;
+        this.prevCountRows = rows;
+        this.prevCountPats = patients;
     }
 
-    public componentDidUpdate() {}
+    public getSnapshotBeforeUpdate() {
+        const { rows, patients } = this.props.data.redCap;
+        return [ rows, patients ];
+    }
 
     public render() {
         const c = this.className;
         const { data } = this.props;
         const { redCap } = data;
         const { completed, estimatedSecondsRemaining, text } = data.progress;
+        const duration = 1.0;
 
         return (
             <REDCapImportSection>
@@ -47,7 +45,7 @@ export default class ImportProgress extends React.PureComponent<Props> {
 
                     {/* Project name */}
                     <div className={`${c}-project-name`}>
-                        Importing The Cool Project...
+                        Importing "{redCap.config!.projectInfo.project_title}"...
                     </div>
 
                     <div className={`${c}-outer`}>
@@ -59,7 +57,7 @@ export default class ImportProgress extends React.PureComponent<Props> {
                                     <CountUp className={`${c}-count-value`}
                                         start={this.prevCountRows} 
                                         end={redCap.rows} 
-                                        duration={0.5} 
+                                        duration={duration} 
                                         decimals={0} 
                                         formattingFn={this.formatNumber}
                                     />
@@ -71,7 +69,7 @@ export default class ImportProgress extends React.PureComponent<Props> {
                                     <CountUp className={`${c}-count-value`}
                                         start={this.prevCountPats} 
                                         end={redCap.patients} 
-                                        duration={0.5} 
+                                        duration={duration} 
                                         decimals={0} 
                                         formattingFn={this.formatNumber} 
                                     />
@@ -80,7 +78,7 @@ export default class ImportProgress extends React.PureComponent<Props> {
                             </div>
 
                             {/* Current state text */}
-                            <div className={`${c}-text`}>{text}</div>
+                            <div className={`${c}-text`}>{text}...</div>
 
                             {/* Percent Complete */}
                             <ProgressBar percentCompleted={completed} secondsRemaining={estimatedSecondsRemaining} />

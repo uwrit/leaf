@@ -142,7 +142,7 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
      */
     private handleEditApiTokenClick = () => {
         const { dispatch } = this.props;
-        dispatch(setImportRedcapConfiguration(undefined));
+        dispatch(setImportRedcapConfiguration());
     }
 
     /* 

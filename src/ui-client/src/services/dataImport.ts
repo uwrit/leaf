@@ -10,9 +10,9 @@ import { REDCapImportConfiguration, REDCapConcept } from "../models/redcapApi/Im
 
 const worker = new REDCapImportWebWorker();
 
-export const loadREDCapImportData = async (config: REDCapImportConfiguration): Promise<Map<string, REDCapConcept>> => {
+export const loadREDCapImportData = async (config: REDCapImportConfiguration): Promise<REDCapConcept[]> => {
     return new Promise( async (resolve, reject) => {
-        const concepts = await worker.loadConfig(config) as Map<string, REDCapConcept>;
+        const concepts = await worker.loadConfig(config) as REDCapConcept[];
         resolve(concepts);
     });
 };
