@@ -14,15 +14,15 @@ namespace Model.Import
         Task<IEnumerable<ImportMetadata>> GetAllImportMetadata();
         Task<ImportMetadata> GetImportMetadataAsync(string sourceId);
         Task<ImportMetadata> GetImportMetadataAsync(Guid id);
-        Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata);
-        Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata);
+        Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure);
+        Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure);
         Task<ImportMetadata> DeleteImportMetadataAsync(Guid id);
-        Task<IResult> AddImportDataAsync(IEnumerable<IImport> records);
+        Task<IResult> ImportDataAsync(IEnumerable<Import> records);
         Task<IEnumerable<IImport>> GetImportDataAsync(Guid id);
 
         public interface IResult
         {
-            public int RecordsChanged { get; set; }
+            public int Changed { get; set; }
         }
     }
 }

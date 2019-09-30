@@ -4,6 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
+using Model.Admin.Compiler;
 
 namespace Model.Import
 {
@@ -12,6 +14,7 @@ namespace Model.Import
         public Guid? Id { get; set; }
         public string SourceId { get; set; }
         public ImportType Type { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
     }
 
     public class ImportMetadata : IImportMetadata
@@ -20,6 +23,7 @@ namespace Model.Import
         public string SourceId { get; set; }
         public ImportType Type { get; set; }
         public IImportStructure Structure { get; set; }
+        public IEnumerable<Constraint> Constraints { get; set; }
     }
 
     public enum ImportType

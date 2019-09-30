@@ -65,7 +65,7 @@ namespace Services.Import
                     Sql.GetMetadataBySourceId,
                     new 
                     { 
-                        sourceId = sourceId,
+                        sourceId,
                         user = user.UUID, 
                         groups = GroupMembership.From(user), 
                         admin = user.IsAdmin 
@@ -79,27 +79,105 @@ namespace Services.Import
 
         public async Task<ImportMetadata> GetImportMetadataAsync(Guid id)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var metadata = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                    Sql.GetMetadataById,
+                    new
+                    {
+                        id,
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return metadata;
+            }
         }
 
-        public async Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata)
+        public async Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var created = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                    Sql.CreateImportMetadata,
+                    new
+                    {
+                        sourceId = metadata.SourceId,
+                        type = metadata.Type,
+                        structure,
+                        constraints = metadata.Constraints,
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return created;
+            }
         }
 
-        public async Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata)
+        public async Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var updated = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                    Sql.CreateImportMetadata,
+                    new
+                    {
+                        id = metadata.Id,
+                        sourceId = metadata.SourceId,
+                        type = metadata.Type,
+                        structure,
+                        constraints = metadata.Constraints,
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return updated;
+            }
         }
 
         public async Task<ImportMetadata> DeleteImportMetadataAsync(Guid id)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var deleted = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                    Sql.DeleteImportMetadata,
+                    new
+                    {
+                        id,
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return deleted;
+            }
         }
 
-        public async Task<IImportService.IResult> AddImportDataAsync(IEnumerable<IImport> records)
+        public async Task<IImportService.IResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.Import> records)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var changed = await cn.QueryFirstOrDefaultAsync<IImportService.IResult>(
+                    Sql.ImportData,
+                    new
+                    {
+                        id,
+                        data = ImportDataTable.From(id, records),
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return changed;
+            }
         }
 
         public async Task<IEnumerable<IImport>> GetImportDataAsync(Guid id)
@@ -109,12 +187,17 @@ namespace Services.Import
 
         public class Result : IImportService.IResult
         {
-            public int RecordsChanged { get; set; }
+            public int Changed { get; set; }
         }
         static class Sql
         {
             public const string GetAllMetadata = "app.sp_GetImportMetadata";
-            public const string GetMetadataBySourceId = "sp_GetImportMetadataBySourceId";
+            public const string GetMetadataBySourceId = "app.sp_GetImportMetadataBySourceId";
+            public const string GetMetadataById = "app.sp_GetImportMetadataById";
+            public const string CreateImportMetadata = "app.sp_CreateImportMetadata";
+            public const string UpdateImportMetadata = "app.sp_UpdateImportMetadata";
+            public const string DeleteImportMetadata = "app.sp_DeleteImportMetadata";
+            public const string ImportData = "app.sp_ImportData";
         }
     }
 }
