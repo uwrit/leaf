@@ -7,7 +7,7 @@ using System;
 
 namespace Model.Import
 {
-    public interface IImport
+    public interface IImportRecord
     {
         public string Id { get; set; }
         public Guid ImportMetadataId { get; set; }
@@ -16,7 +16,7 @@ namespace Model.Import
         public DateTime? ValueDate { get; set; }
     }
 
-    public class Import : IImport
+    public class ImportRecord : IImportRecord
     {
         public string Id { get; set; }
         public Guid ImportMetadataId { get; set; }

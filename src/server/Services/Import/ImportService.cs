@@ -21,7 +21,7 @@ using Services.Tables;
 
 namespace Services.Import
 {
-    public class ImportService : IImportService
+    public class ImportService : DataImporter.IImportService
     {
         readonly AppDbOptions dbOptions;
         readonly IUserContext user;
@@ -109,7 +109,8 @@ namespace Services.Import
                         type = metadata.Type,
                         structure,
                         constraints = metadata.Constraints,
-                        user = user.UUID
+                        user = user.UUID,
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
@@ -123,7 +124,7 @@ namespace Services.Import
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
                 var updated = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
-                    Sql.CreateImportMetadata,
+                    Sql.UpdateImportMetadata,
                     new
                     {
                         id = metadata.Id,
@@ -133,6 +134,7 @@ namespace Services.Import
                         constraints = metadata.Constraints,
                         user = user.UUID,
                         groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
@@ -152,6 +154,7 @@ namespace Services.Import
                         id,
                         user = user.UUID,
                         groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
@@ -160,11 +163,11 @@ namespace Services.Import
             }
         }
 
-        public async Task<IImportService.IResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.Import> records)
+        public async Task<DataImporter.IResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.ImportRecord> records)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var changed = await cn.QueryFirstOrDefaultAsync<IImportService.IResult>(
+                var changed = await cn.QueryFirstOrDefaultAsync<DataImporter.IResult>(
                     Sql.ImportData,
                     new
                     {
@@ -172,6 +175,7 @@ namespace Services.Import
                         data = ImportDataTable.From(id, records),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
@@ -180,12 +184,27 @@ namespace Services.Import
             }
         }
 
-        public async Task<IEnumerable<IImport>> GetImportDataAsync(Guid id)
+        public async Task<IEnumerable<Model.Import.ImportRecord>> GetImportDataAsync(Guid id)
         {
-
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                var changed = await cn.QueryAsync<Model.Import.ImportRecord>(
+                    Sql.GetImportData,
+                    new
+                    {
+                        id,
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+                return changed;
+            }
         }
 
-        public class Result : IImportService.IResult
+        public class Result : DataImporter.IResult
         {
             public int Changed { get; set; }
         }
@@ -198,6 +217,7 @@ namespace Services.Import
             public const string UpdateImportMetadata = "app.sp_UpdateImportMetadata";
             public const string DeleteImportMetadata = "app.sp_DeleteImportMetadata";
             public const string ImportData = "app.sp_ImportData";
+            public const string GetImportData = "app.sp_GetImportData";
         }
     }
 }

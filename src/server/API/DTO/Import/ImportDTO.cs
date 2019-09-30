@@ -8,7 +8,7 @@ using System;
 
 namespace API.DTO.Import
 {
-    public class ImportDTO : IImport
+    public class ImportDTO : IImportRecord
     {
         
         public string Id { get; set; }

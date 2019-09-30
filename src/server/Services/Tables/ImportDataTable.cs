@@ -26,7 +26,7 @@ namespace Services.Tables
         const string valueNumber = "ValueNumber";
         const string valueDate = "ValueDate";
 
-        ImportDataTable(Guid mid, IEnumerable<Model.Import.Import> imports)
+        ImportDataTable(Guid mid, IEnumerable<Model.Import.ImportRecord> imports)
         {
             var table = Schema();
             Fill(table, mid, imports);
@@ -50,7 +50,7 @@ namespace Services.Tables
             return dt;
         }
 
-        void Fill(DataTable table, Guid mid, IEnumerable<Model.Import.Import> imports)
+        void Fill(DataTable table, Guid mid, IEnumerable<Model.Import.ImportRecord> imports)
         {
             foreach (var i in imports)
             {
@@ -67,9 +67,9 @@ namespace Services.Tables
             }
         }
 
-        public static DataTable From(Guid mid, IEnumerable<Model.Import.Import> imports)
+        public static DataTable From(Guid mid, IEnumerable<Model.Import.ImportRecord> imports)
         {
-            var impts = imports ?? new List<Model.Import.Import>();
+            var impts = imports ?? new List<Model.Import.ImportRecord>();
             return new ImportDataTable(mid, impts).Value;
         }
     }

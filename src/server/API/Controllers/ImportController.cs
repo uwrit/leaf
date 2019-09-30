@@ -27,8 +27,8 @@ namespace API.Controllers
             log = logger;
         }
 
-        [HttpPost("import")]
-        public async Task<ActionResult<ImportMetadata>> CreateImport([FromBody] ImportMetadataDTO dto)
+        [HttpPost("import/metadata")]
+        public async Task<ActionResult<ImportMetadata>> CreateMetadataImport([FromBody] ImportMetadataDTO dto)
         {
             try
             {
