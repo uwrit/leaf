@@ -4,16 +4,25 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-
 
 namespace Model.Import
 {
     public interface IImportService
     {
-        Task<ImportMetadata> GetImportAsync(string sourceId);
-        Task<ImportMetadata> CreateImportAsync(IImportMetadata import);
-        Task<ImportMetadata> UpdateImportAsync(IImportMetadata import);
-        Task<ImportMetadata> DeleteImportAsync(Guid id);
+        Task<IEnumerable<ImportMetadata>> GetAllImportMetadata();
+        Task<ImportMetadata> GetImportMetadataAsync(string sourceId);
+        Task<ImportMetadata> GetImportMetadataAsync(Guid id);
+        Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata);
+        Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata);
+        Task<ImportMetadata> DeleteImportMetadataAsync(Guid id);
+        Task<IResult> AddImportDataAsync(IEnumerable<IImport> records);
+        Task<IEnumerable<IImport>> GetImportDataAsync(Guid id);
+
+        public interface IResult
+        {
+            public int RecordsChanged { get; set; }
+        }
     }
 }

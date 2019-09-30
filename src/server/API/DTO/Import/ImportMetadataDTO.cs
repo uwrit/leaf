@@ -12,7 +12,7 @@ namespace API.DTO.Import
     {
         public Guid? Id { get; set; }
         public string SourceId { get; set; }
-        public ImportType ImportType { get; set; }
+        public ImportType Type { get; set; }
         public string Structure { get; set; }
     }
 }

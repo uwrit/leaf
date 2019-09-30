@@ -11,8 +11,6 @@ namespace Model.Import
     {
         public string Id { get; set; }
         public Guid ImportMetadataId { get; set; }
-        public string PersonId { get; set; }
-        public string SourceValue { get; set; }
         public string ValueString { get; set; }
         public decimal? ValueNumber { get; set; }
         public DateTime? ValueDate { get; set; }
