@@ -100,7 +100,7 @@ export const exportToREDCap = (projectTitle: string) => {
                  */
                 const endIdx = startIdx + batchSize;
                 const batch = config.data.slice(startIdx, endIdx);
-                const displayText = `Exporting ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records`
+                const displayText = `Exporting ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records`;
                 dispatch(setExportProgress(completed, displayText));
                 await conn.exportRecords(batch);
 

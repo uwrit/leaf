@@ -36,6 +36,16 @@ export const calculateREDCapFieldCount = async (concept: REDCapConcept): Promise
 };
 
 /*
+ * Get all currently prepped REDCapImport records
+ */
+export const getREDCapImportRecords = async (): Promise<ImportRecord[]> => {
+    return new Promise( async (resolve, reject) => {
+        const records = await worker.getRecords() as ImportRecord[];
+        resolve(records);
+    });
+};
+
+/*
  * Get all metadata imports.
  */
 export const getAllMetdata = async (state: AppState): Promise<ImportMetadata[]> => {
@@ -76,7 +86,7 @@ export const getMetdataBySourceId = async (state: AppState, sourceId: string): P
 export const createMetdata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.post(`api/import/metadata`, meta);
+    const resp = await http.post(`api/import/metadata`, toDto(meta));
     const dto = resp.data as ImportMetadataDTO;
     return fromDto(dto);
 };
@@ -106,7 +116,7 @@ export const deleteMetdata = async (state: AppState, meta: ImportMetadata): Prom
 /*
  * Upsert import data.
  */
-export const upsertData = async (state: AppState, meta: ImportMetadata, records: ImportRecord): Promise<ImportDataResultDTO> => {
+export const upsertImportRecords = async (state: AppState, meta: ImportMetadata, records: ImportRecord[]): Promise<ImportDataResultDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/import/data/${meta.id}`, {

@@ -6,14 +6,16 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { ImportOptionsDTO, ImportProgress, REDCapImportState } from '../models/state/Import';
+import { ImportOptionsDTO, ImportProgress } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat, REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
-import { REDCapImportConfiguration } from '../models/redcapApi/ImportConfiguration';
-import { loadREDCapImportData, calculateREDCapFieldCount } from '../services/dataImport';
+import { REDCapImportConfiguration, REDCapConcept } from '../models/redcapApi/ImportConfiguration';
+import { loadREDCapImportData, calculateREDCapFieldCount, createMetdata, getREDCapImportRecords, upsertImportRecords } from '../services/dataImport';
 import { InformationModalState, NotificationStates } from '../models/state/GeneralUiState';
 import { setNoClickModalState, showInfoModal } from './generalUi';
+import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
+import { formatSmallNumber } from '../utils/formatNumber';
 
 export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
@@ -182,7 +184,7 @@ export const importREDCapProjectData = () => {
             await importRecordsFromREDCap(dispatch, config, conn);
 
             /*
-             * Prepare to import into Leaf.
+             * Transform metadata into concepts.
              */
             dispatch(setImportProgress(completed, 'Generating Leaf Concepts'));
             const concepts = await loadREDCapImportData(config);
@@ -194,15 +196,49 @@ export const importREDCapProjectData = () => {
             const increment = () => { i++; completed = Math.round(((pcts.INITIAL + pcts.RECORDS) * 100.0) + ((i / concepts.length * 100.0) * pcts.COUNTS)); }
             
             for (const concept of concepts) {
-                /*
-                 * Recalculate the current percent complete, then calculate patient count.
-                 */
                 increment();
                 dispatch(setImportProgress(completed, 'Calculating patients counts'));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 
+            /*
+             * Import the project metadata
+             */
+            dispatch(setImportProgress(completed, 'Loading REDCap data into Leaf'));
+            let meta = deriveREDCapImportMetadataStructure(concepts, config);
+            meta = await createMetdata(state, meta);
+
+            /*
+             * Post records to the server in batches.
+             */
+            const records = await getREDCapImportRecords();
+            const totalRecords = records.length;
+            const batchSize = 10000;
+            let startIdx = 0;
+            while (startIdx <= totalRecords) {
+
+                /*
+                 * Export current batch.
+                 */
+                const endIdx = startIdx + batchSize;
+                const batch = records.slice(startIdx, endIdx);
+                const displayText = `Loading ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records into Leaf`;
+                dispatch(setImportProgress(completed, displayText));
+                await upsertImportRecords(state, meta, batch);
+
+                /*
+                 * Increment current index and recalculate
+                 * export progress.
+                 */
+                startIdx += batchSize;
+                completed = Math.round((1 - pcts.LOAD) + (endIdx / totalRecords * 100 * pcts.LOAD));
+            }
             
+            /*
+             * Success, so wrap it up.
+             */
+            dispatch(setImportRedcapConfiguration());
+            dispatch(setImportComplete());
 
         } catch (err) {
             console.log(err);
@@ -210,7 +246,6 @@ export const importREDCapProjectData = () => {
         }
     };
 };
-
 
 // Synchronous
 export const toggleImportRedcapModal = (): ImportAction => {
@@ -280,6 +315,12 @@ export const setImportError = (): ImportAction => {
     };
 };
 
+export const setImportComplete = (): ImportAction => {
+    return {
+        type: IMPORT_COMPLETE
+    };
+};
+
 export const setImportClearErrorOrComplete = (): ImportAction => {
     return {
         type: IMPORT_CLEAR_ERROR_OR_COMPLETE
@@ -342,4 +383,20 @@ const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
         records: [],
         users: []
     };
+};
+
+const deriveREDCapImportMetadataStructure = (concepts: REDCapConcept[], config: REDCapImportConfiguration): ImportMetadata => {
+    const id = `urn:leaf:import:redcap:${config.projectInfo.project_id}`;
+    const structure: REDCapImportStructure = {
+        id,
+        concepts: concepts.map(c => { delete c.urn; return c; }),
+        configuration: config
+    };
+
+    return {
+        constraints: [],
+        sourceId: id,
+        structure,
+        type: ImportType.REDCapProject,
+    } 
 };

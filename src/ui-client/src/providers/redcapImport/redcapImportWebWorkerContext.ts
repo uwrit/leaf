@@ -31,12 +31,21 @@ var handleWorkMessage = function (payload) {
             return loadConfig(payload);
         case CALCULATE_PATIENT_COUNT:
             return calculatePatientCount(payload);
+        case GET_RECORDS:
+            return getRecords(payload);
         default:
             return null;
     }
 };
 var metadata = new Map();
 var records = [];
+/*
+* Return all current records.
+*/
+var getRecords = function (payload) {
+    var requestId = payload.requestId;
+    return { requestId: requestId, result: records };
+};
 /*
  * Load the raw REDCap project data from the API.
  */

@@ -36,13 +36,13 @@ namespace Model.Import
         }
 
         readonly IImportService importService;
-        readonly IImportIdentifierMappingService mapper;
+        // readonly IImportIdentifierMappingService mapper;
         readonly ILogger<DataImporter> log;
 
-        public DataImporter(IImportService importService, IImportIdentifierMappingService mapper, ILogger<DataImporter> log)
+        public DataImporter(IImportService importService, ILogger<DataImporter> log)
         {
             this.importService = importService;
-            this.mapper = mapper;
+            // this.mapper = mapper;
             this.log = log;
         }
 

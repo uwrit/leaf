@@ -14,6 +14,7 @@ import { REDCapEavRecord } from '../../models/redcapApi/Record';
 
 const LOAD_IMPORT_CONFIGURATION = 'LOAD_IMPORT_CONFIGURATION';
 const CALCULATE_PATIENT_COUNT = 'CALCULATE_PATIENT_COUNT';
+const GET_RECORDS = 'GET_RECORDS';
 
 export interface OutboundMessageResultCount {
     value: number
@@ -70,7 +71,7 @@ export default class REDCapImportWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT ])}
+            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT, GET_RECORDS ])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -88,6 +89,10 @@ export default class REDCapImportWebWorker {
 
     public calculatePatientCount = (concept: REDCapConcept) => {
         return this.postMessage({ message: CALCULATE_PATIENT_COUNT, concept });
+    }
+
+    public getRecords = () => {
+        return this.postMessage({ message: GET_RECORDS });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -126,6 +131,8 @@ export default class REDCapImportWebWorker {
                     return loadConfig(payload);
                 case CALCULATE_PATIENT_COUNT:
                     return calculatePatientCount(payload);
+                case GET_RECORDS:
+                    return getRecords(payload);
                 default:
                     return null;
             }
@@ -133,6 +140,14 @@ export default class REDCapImportWebWorker {
 
         let metadata: Map<string,REDCapImportFieldMetadata> = new Map();
         let records: ImportRecord[] = [];
+
+        /*
+         * Return all current records.
+         */
+        const getRecords = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            return { requestId, result: records };
+        };
 
         /*
          * Load the raw REDCap project data from the API.
