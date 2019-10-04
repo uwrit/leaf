@@ -163,11 +163,11 @@ namespace Services.Import
             }
         }
 
-        public async Task<DataImporter.IResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.ImportRecord> records)
+        public async Task<DataImporter.IImportDataResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.ImportRecord> records)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var changed = await cn.QueryFirstOrDefaultAsync<DataImporter.IResult>(
+                var changed = await cn.QueryFirstOrDefaultAsync<DataImporter.IImportDataResult>(
                     Sql.ImportData,
                     new
                     {
@@ -204,7 +204,7 @@ namespace Services.Import
             }
         }
 
-        public class Result : DataImporter.IResult
+        public class Result : DataImporter.IImportDataResult
         {
             public int Changed { get; set; }
         }

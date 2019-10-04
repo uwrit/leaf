@@ -8,7 +8,7 @@ using System;
 
 namespace API.DTO.Import
 {
-    public class ImportDTO : IImportRecord
+    public class ImportRecordDTO : IImportRecord
     {
         
         public string Id { get; set; }
@@ -18,6 +18,20 @@ namespace API.DTO.Import
         public string ValueString { get; set; }
         public decimal? ValueNumber { get; set; }
         public DateTime? ValueDate { get; set; }
+
+        public ImportRecord ToImportRecord()
+        {
+            return new ImportRecord
+            {
+                Id = Id,
+                ImportMetadataId = ImportMetadataId,
+                PersonId = PersonId,
+                SourceValue = SourceValue,
+                ValueString = ValueString,
+                ValueNumber = ValueNumber,
+                ValueDate = ValueDate
+            };
+        }
     }
 }
 

@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using Microsoft.Extensions.Logging;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -20,11 +21,11 @@ namespace Model.Import
             Task<ImportMetadata> CreateImportMetadataAsync(ImportMetadata metadata);
             Task<ImportMetadata> UpdateImportMetadataAsync(ImportMetadata metadata);
             Task<ImportMetadata> DeleteImportMetadataAsync(Guid id);
-            Task<IResult> ImportDataAsync(Guid id, IEnumerable<ImportRecord> records);
+            Task<IImportDataResult> ImportDataAsync(Guid id, IEnumerable<ImportRecord> records);
             Task<IEnumerable<ImportRecord>> GetImportDataAsync(Guid id);
         }
 
-        public interface IResult
+        public interface IImportDataResult
         {
             public int Changed { get; set; }
         }
@@ -63,7 +64,7 @@ namespace Model.Import
 
         public async Task<ImportMetadata> GetImportMetadata(Guid id)
         {
-            log.LogInformation("Getting import metadata by Id. Id:{id}", id);
+            log.LogInformation("Getting import metadata by Id. ImportMetadataId:{id}", id);
             var import = await importService.GetImportMetadataAsync(id);
 
             return import;
@@ -93,10 +94,26 @@ namespace Model.Import
 
         public async Task<ImportMetadata> DeleteImportMetadata(Guid id)
         {
-            log.LogInformation("Deleting import metadata. Id:{id}", id);
+            log.LogInformation("Deleting import metadata. ImportMetadataId:{id}", id);
             var deleted = await importService.DeleteImportMetadataAsync(id);
 
             return deleted;
+        }
+
+        public async Task<IImportDataResult> ImportData(Guid id, IEnumerable<ImportRecord> records)
+        {
+            log.LogInformation("Importing records. ImportMetadataId:{id} RecordCount:{cnt}", id, records.Count());
+            var importCount = await importService.ImportDataAsync(id, records);
+
+            return importCount;
+        }
+
+        public async Task<IEnumerable<ImportRecord>> GetImportRecords(Guid id)
+        {
+            log.LogInformation("Getting imported records. ImportMetadataId:{id}", id);
+            var data = await importService.GetImportDataAsync(id);
+
+            return data;
         }
     }
 }
