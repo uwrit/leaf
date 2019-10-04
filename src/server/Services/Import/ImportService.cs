@@ -42,7 +42,7 @@ namespace Services.Import
             this.user = user;
         }
 
-        public async Task<IEnumerable<ImportMetadata>> GetAllImportMetadata()
+        public async Task<IEnumerable<ImportMetadata>> GetAllImportMetadataAsync()
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
@@ -97,7 +97,7 @@ namespace Services.Import
             }
         }
 
-        public async Task<ImportMetadata> CreateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure)
+        public async Task<ImportMetadata> CreateImportMetadataAsync(ImportMetadata metadata)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
@@ -107,7 +107,7 @@ namespace Services.Import
                     {
                         sourceId = metadata.SourceId,
                         type = metadata.Type,
-                        structure,
+                        structure = metadata.StructureJson,
                         constraints = metadata.Constraints,
                         user = user.UUID,
                         admin = user.IsAdmin
@@ -119,7 +119,7 @@ namespace Services.Import
             }
         }
 
-        public async Task<ImportMetadata> UpdateImportMetadataAsync(IImportMetadata metadata, IImportStructure structure)
+        public async Task<ImportMetadata> UpdateImportMetadataAsync(ImportMetadata metadata)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
@@ -130,7 +130,7 @@ namespace Services.Import
                         id = metadata.Id,
                         sourceId = metadata.SourceId,
                         type = metadata.Type,
-                        structure,
+                        structure = metadata.StructureJson,
                         constraints = metadata.Constraints,
                         user = user.UUID,
                         groups = GroupMembership.From(user),

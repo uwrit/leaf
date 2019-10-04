@@ -6,35 +6,31 @@
 using System;
 using System.Collections.Generic;
 using Model.Admin.Compiler;
-using Model.Import;
 
 namespace Model.Import
 {
-    public interface IImportMetadata
+    public class ImportMetadata
     {
         public Guid? Id { get; set; }
         public string SourceId { get; set; }
         public ImportType Type { get; set; }
-        public IImportStructure Structure { get; set; }
+        public string StructureJson { get; set; }
         public IEnumerable<Constraint> Constraints { get; set; }
     }
 
-    public class ImportMetadata : IImportMetadata
+    public class ImportMetadataDTO : ImportMetadata
     {
-        public Guid? Id { get; set; }
-        public string SourceId { get; set; }
-        public ImportType Type { get; set; }
-        public IImportStructure Structure { get; set; }
-        public IEnumerable<Constraint> Constraints { get; set; }
-    }
-
-    public class ImportMetadataDTO
-    {
-        public Guid? Id { get; set; }
-        public string SourceId { get; set; }
-        public ImportType Type { get; set; }
-        public string Structure { get; set; }
-        public IEnumerable<Constraint> Constraints { get; set; }
+        public ImportMetadata ToImportMetadata()
+        {
+            return new ImportMetadata
+            {
+                Id = Id,
+                SourceId = SourceId,
+                Type = Type,
+                StructureJson = StructureJson,
+                Constraints = Constraints
+            };
+        }
     }
 
     public enum ImportType
@@ -42,6 +38,4 @@ namespace Model.Import
         REDCapProject = 1,
         MRN = 2
     }
-
-    public 
 }
