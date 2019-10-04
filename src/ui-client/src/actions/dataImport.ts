@@ -202,7 +202,7 @@ export const importREDCapProjectData = () => {
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 
-            dispatch(setImportRedcapConfiguration());
+            
 
         } catch (err) {
             console.log(err);

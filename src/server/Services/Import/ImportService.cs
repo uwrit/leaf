@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using Newtonsoft.Json;
@@ -163,7 +162,7 @@ namespace Services.Import
             }
         }
 
-        public async Task<DataImporter.IImportDataResult> ImportDataAsync(Guid id, IEnumerable<Model.Import.ImportRecord> records)
+        public async Task<DataImporter.IImportDataResult> ImportDataAsync(Guid id, IEnumerable<ImportRecord> records)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
@@ -184,11 +183,11 @@ namespace Services.Import
             }
         }
 
-        public async Task<IEnumerable<Model.Import.ImportRecord>> GetImportDataAsync(Guid id)
+        public async Task<IEnumerable<ImportRecord>> GetImportDataAsync(Guid id)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var changed = await cn.QueryAsync<Model.Import.ImportRecord>(
+                var changed = await cn.QueryAsync<ImportRecord>(
                     Sql.GetImportData,
                     new
                     {

@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using Model.Import;
 using System;
+using System.Collections.Generic;
 
 namespace API.DTO.Import
 {
@@ -32,6 +33,11 @@ namespace API.DTO.Import
                 ValueDate = ValueDate
             };
         }
+    }
+
+    public class ImportDataRecordDTO
+    {
+        public IEnumerable<ImportRecordDTO> Records { get; set; }
     }
 }
 

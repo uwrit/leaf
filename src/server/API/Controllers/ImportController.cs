@@ -7,13 +7,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using API.DTO.Import;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Import;
+using API.DTO.Import;
 
 namespace API.Controllers
 {
@@ -140,11 +140,11 @@ namespace API.Controllers
         }
 
         [HttpPost("data/{id}")]
-        public async Task<ActionResult<ImportDataResultDTO>> ImportData(Guid id, IEnumerable<ImportRecordDTO> records, [FromServices] DataImporter importer)
+        public async Task<ActionResult<ImportDataResultDTO>> ImportData(Guid id, ImportDataRecordDTO data, [FromServices] DataImporter importer)
         {
             try
             {
-                var upserted = await importer.ImportData(id, records.Select(r => r.ToImportRecord()));
+                var upserted = await importer.ImportData(id, data.Records.Select(r => r.ToImportRecord()));
                 if (upserted == null)
                 {
                     return NotFound();
