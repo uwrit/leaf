@@ -10,7 +10,7 @@ import { REDCapImportConfiguration, REDCapConcept } from "../models/redcapApi/Im
 import { HttpFactory } from './HttpFactory';
 import { AppState } from "../models/state/AppState";
 import { ImportMetadata, ImportMetadataDTO } from "../models/dataImport/ImportMetadata";
-import { ImportRecord, ImportDataResultDTO } from "../models/dataImport/ImportRecord";
+import { ImportRecord, ImportDataResultDTO, ImportRecordDTO } from "../models/dataImport/ImportRecord";
 
 const worker = new REDCapImportWebWorker();
 
@@ -38,9 +38,9 @@ export const calculateREDCapFieldCount = async (concept: REDCapConcept): Promise
 /*
  * Get all currently prepped REDCapImport records
  */
-export const getREDCapImportRecords = async (): Promise<ImportRecord[]> => {
+export const getREDCapImportRecords = async (importMetadataId: string): Promise<ImportRecordDTO[]> => {
     return new Promise( async (resolve, reject) => {
-        const records = await worker.getRecords() as ImportRecord[];
+        const records = await worker.getRecords(importMetadataId) as ImportRecordDTO[];
         resolve(records);
     });
 };
@@ -116,7 +116,7 @@ export const deleteMetdata = async (state: AppState, meta: ImportMetadata): Prom
 /*
  * Upsert import data.
  */
-export const upsertImportRecords = async (state: AppState, meta: ImportMetadata, records: ImportRecord[]): Promise<ImportDataResultDTO> => {
+export const upsertImportRecords = async (state: AppState, meta: ImportMetadata, records: ImportRecordDTO[]): Promise<ImportDataResultDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/import/data/${meta.id}`, {

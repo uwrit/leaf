@@ -43,8 +43,10 @@ var records = [];
 * Return all current records.
 */
 var getRecords = function (payload) {
-    var requestId = payload.requestId;
-    return { requestId: requestId, result: records };
+    var { requestId, id } = payload;
+    var dtos = records.map(r => Object.assign({}, r, { importMetadataId: id }));
+
+    return { requestId, result: dtos };
 };
 /*
  * Load the raw REDCap project data from the API.

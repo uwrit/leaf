@@ -14,7 +14,8 @@ namespace API.DTO.Import
         
         public string Id { get; set; }
         public Guid ImportMetadataId { get; set; }
-        public string PersonId { get; set; }
+        public string SourceModifier { get; set; }
+        public string SourcePersonId { get; set; }
         public string SourceValue { get; set; }
         public string ValueString { get; set; }
         public decimal? ValueNumber { get; set; }
@@ -26,7 +27,7 @@ namespace API.DTO.Import
             {
                 Id = Id,
                 ImportMetadataId = ImportMetadataId,
-                PersonId = PersonId,
+                SourcePersonId = SourcePersonId,
                 SourceValue = SourceValue,
                 ValueString = ValueString,
                 ValueNumber = ValueNumber,
@@ -37,7 +38,7 @@ namespace API.DTO.Import
 
     public class ImportDataRecordDTO
     {
-        public IEnumerable<ImportRecordDTO> Records { get; set; }
+        public IEnumerable<ImportRecordDTO> Records { get; set; } 
     }
 }
 

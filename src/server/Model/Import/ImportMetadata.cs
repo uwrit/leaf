@@ -9,9 +9,9 @@ using Model.Admin.Compiler;
 
 namespace Model.Import
 {
-    public class ImportMetadata
+    public class ImportMetadata : IConstrainedResource
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string SourceId { get; set; }
         public ImportType Type { get; set; }
         public string StructureJson { get; set; }

@@ -103,7 +103,21 @@ namespace Model.Import
         public async Task<IImportDataResult> ImportData(Guid id, IEnumerable<ImportRecord> records)
         {
             log.LogInformation("Importing records. ImportMetadataId:{id} RecordCount:{cnt}", id, records.Count());
-            var importCount = await importService.ImportDataAsync(id, records);
+
+            // Map patient ids
+            var mapped = records.Select(r => new ImportRecord
+            {
+                Id = r.Id,
+                ImportMetadataId = id,
+                SourcePersonId = r.SourcePersonId,
+                PersonId = r.SourcePersonId,
+                SourceValue = r.SourceValue,
+                ValueString = r.ValueString,
+                ValueNumber = r.ValueNumber,
+                ValueDate = r.ValueDate
+            });
+
+            var importCount = await importService.ImportDataAsync(id, mapped);
 
             return importCount;
         }

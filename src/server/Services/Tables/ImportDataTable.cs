@@ -39,13 +39,13 @@ namespace Services.Tables
             var cols = dt.Columns;
 
             cols.Add(new DataColumn(id, typeof(string)));
-            cols.Add(new DataColumn(importMetadataId, typeof(string)));
+            cols.Add(new DataColumn(importMetadataId, typeof(Guid)));
             cols.Add(new DataColumn(personId, typeof(string)));
             cols.Add(new DataColumn(sourcePersonId, typeof(string)));
             cols.Add(new DataColumn(sourceValue, typeof(string)));
             cols.Add(new DataColumn(valueString, typeof(string)));
-            cols.Add(new DataColumn(valueNumber, typeof(double?)));
-            cols.Add(new DataColumn(valueDate, typeof(DateTime?)));
+            cols.Add(new DataColumn(valueNumber, typeof(double)));
+            cols.Add(new DataColumn(valueDate, typeof(DateTime)));
 
             return dt;
         }
@@ -60,9 +60,19 @@ namespace Services.Tables
                 row[personId] = i.PersonId;
                 row[sourcePersonId] = i.SourcePersonId;
                 row[sourceValue] = i.SourceValue;
-                row[valueString] = i.ValueString;
-                row[valueNumber] = i.ValueNumber;
-                row[valueDate] = i.ValueDate;
+
+                if (i.ValueString != null)
+                {
+                    row[valueString] = i.ValueString;
+                }
+                if (i.ValueNumber != null)
+                {
+                    row[valueNumber] = i.ValueNumber;
+                }
+                if (i.ValueDate != null)
+                {
+                    row[valueDate] = i.ValueDate;
+                }
                 table.Rows.Add(row);
             }
         }

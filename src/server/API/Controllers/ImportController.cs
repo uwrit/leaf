@@ -140,7 +140,7 @@ namespace API.Controllers
         }
 
         [HttpPost("data/{id}")]
-        public async Task<ActionResult<ImportDataResultDTO>> ImportData(Guid id, ImportDataRecordDTO data, [FromServices] DataImporter importer)
+        public async Task<ActionResult<ImportDataResultDTO>> ImportData(Guid id, [FromBody] ImportDataRecordDTO data, [FromServices] DataImporter importer)
         {
             try
             {

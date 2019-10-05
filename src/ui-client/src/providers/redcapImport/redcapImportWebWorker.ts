@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { REDCapImportConfiguration, REDCapUrn, REDCapConcept } from '../../models/redcapApi/ImportConfiguration';
-import { ImportRecord } from '../../models/dataImport/ImportRecord';
+import { ImportRecord, ImportRecordDTO } from '../../models/dataImport/ImportRecord';
 import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
 import { workerContext } from './redcapImportWebWorkerContext';
 import { REDCapEavRecord } from '../../models/redcapApi/Record';
@@ -41,6 +41,7 @@ interface REDCapImportFieldMetadataOption {
 interface InboundMessagePartialPayload {
     concept?: REDCapConcept;
     config?: REDCapImportConfiguration;
+    id?: string;
     message: string;
     field_name?: string;
     search_value?: any;
@@ -91,8 +92,8 @@ export default class REDCapImportWebWorker {
         return this.postMessage({ message: CALCULATE_PATIENT_COUNT, concept });
     }
 
-    public getRecords = () => {
-        return this.postMessage({ message: GET_RECORDS });
+    public getRecords = (id: string) => {
+        return this.postMessage({ message: GET_RECORDS, id });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -145,8 +146,10 @@ export default class REDCapImportWebWorker {
          * Return all current records.
          */
         const getRecords = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId } = payload;
-            return { requestId, result: records };
+            const { requestId, id } = payload;
+            const dtos: ImportRecordDTO[] = records.map(r => Object.assign({}, r, { importMetadataId: id }) as ImportRecordDTO);
+
+            return { requestId, result: dtos };
         };
 
         /*

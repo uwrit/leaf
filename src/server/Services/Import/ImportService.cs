@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Data.SqlClient;
@@ -45,13 +46,15 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var metadata = await cn.QueryAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.GetAllMetadata,
                     new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
-                return metadata;
+
+                var metas = DbReader.ReadMany(grid);
+                return metas;
             }
         }
 
@@ -60,18 +63,20 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var metadata = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.GetMetadataBySourceId,
-                    new 
-                    { 
+                    new
+                    {
                         sourceId,
-                        user = user.UUID, 
-                        groups = GroupMembership.From(user), 
-                        admin = user.IsAdmin 
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
+
+                var metadata = DbReader.Read(grid);
                 return metadata;
             }
         }
@@ -80,7 +85,7 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var metadata = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.GetMetadataById,
                     new
                     {
@@ -92,6 +97,8 @@ namespace Services.Import
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
+
+                var metadata = DbReader.Read(grid);
                 return metadata;
             }
         }
@@ -100,20 +107,21 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var created = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.CreateImportMetadata,
                     new
                     {
                         sourceId = metadata.SourceId,
                         type = metadata.Type,
                         structure = metadata.StructureJson,
-                        constraints = metadata.Constraints,
-                        user = user.UUID,
-                        admin = user.IsAdmin
+                        constraints = ResourceConstraintTable.From(metadata),
+                        user = user.UUID
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
+
+                var created = DbReader.Read(grid);
                 return created;
             }
         }
@@ -122,7 +130,7 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var updated = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.UpdateImportMetadata,
                     new
                     {
@@ -130,7 +138,7 @@ namespace Services.Import
                         sourceId = metadata.SourceId,
                         type = metadata.Type,
                         structure = metadata.StructureJson,
-                        constraints = metadata.Constraints,
+                        constraints = ResourceConstraintTable.From(metadata),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
                         admin = user.IsAdmin
@@ -138,6 +146,8 @@ namespace Services.Import
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
+
+                var updated = DbReader.Read(grid);
                 return updated;
             }
         }
@@ -146,7 +156,7 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var deleted = await cn.QueryFirstOrDefaultAsync<ImportMetadata>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.DeleteImportMetadata,
                     new
                     {
@@ -158,6 +168,8 @@ namespace Services.Import
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
+
+                var deleted = DbReader.Read(grid);
                 return deleted;
             }
         }
@@ -166,7 +178,7 @@ namespace Services.Import
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
-                var changed = await cn.QueryFirstOrDefaultAsync<DataImporter.IImportDataResult>(
+                var changed = await cn.QueryFirstOrDefaultAsync<Result>(
                     Sql.ImportData,
                     new
                     {
@@ -207,6 +219,69 @@ namespace Services.Import
         {
             public int Changed { get; set; }
         }
+
+        public class ImportMetadataRecord
+        {
+            public Guid Id { get; set; }
+            public string SourceId { get; set; }
+            public ImportType Type { get; set; }
+            public string Structure { get; set; }
+        }
+
+        static class DbReader
+        {
+            public static ImportMetadata Read(SqlMapper.GridReader grid)
+            {
+                var meta = grid.ReadFirstOrDefault<ImportMetadataRecord>();
+                if (meta == null)
+                {
+                    return null;
+                }
+                var cons = grid.Read<ImportMetadataConstraintRecord>();
+                return new ImportMetadata
+                {
+                    Id = meta.Id,
+                    SourceId = meta.SourceId,
+                    StructureJson = meta.Structure,
+                    Type = meta.Type,
+                    Constraints = cons.Select(c => c.Constraint())
+                };
+            }
+
+            public static IEnumerable<ImportMetadata> ReadMany(SqlMapper.GridReader grid)
+            {
+                var metas = grid.Read<ImportMetadataRecord>();
+                var cons = grid.Read<ImportMetadataConstraintRecord>();
+
+                return metas.Select(m =>
+                new ImportMetadata
+                {
+                    Id = m.Id,
+                    SourceId = m.SourceId,
+                    StructureJson = m.Structure,
+                    Type = m.Type,
+                    Constraints = cons.Where(c => c.ImportMetadataId == m.Id).Select(c => c.Constraint())
+                });
+            }
+        }
+
+        class ImportMetadataConstraintRecord
+        {
+            public Guid ImportMetadataId { get; set; }
+            public int ConstraintId { get; set; }
+            public string ConstraintValue { get; set; }
+
+            public Model.Admin.Compiler.Constraint Constraint()
+            {
+                return new Model.Admin.Compiler.Constraint
+                {
+                    ResourceId = ImportMetadataId,
+                    ConstraintId = Model.Admin.Compiler.Constraint.TypeFrom(ConstraintId),
+                    ConstraintValue = ConstraintValue
+                };
+            }
+        }
+
         static class Sql
         {
             public const string GetAllMetadata = "app.sp_GetImportMetadata";

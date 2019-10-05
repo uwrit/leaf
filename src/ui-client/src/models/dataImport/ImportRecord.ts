@@ -15,7 +15,9 @@ export interface ImportRecord {
     valueString?: string;
 }
 
-export interface ImportRecordDTO extends ImportRecord {}
+export interface ImportRecordDTO extends ImportRecord {
+    importMetadataId: string;
+}
 
 export interface ImportDataResultDTO {
     changed: number;

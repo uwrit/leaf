@@ -211,9 +211,9 @@ export const importREDCapProjectData = () => {
             /*
              * Post records to the server in batches.
              */
-            const records = await getREDCapImportRecords();
+            const records = await getREDCapImportRecords(meta.id!);
             const totalRecords = records.length;
-            const batchSize = 10000;
+            const batchSize = 1000;
             let startIdx = 0;
             while (startIdx <= totalRecords) {
 
