@@ -37,7 +37,8 @@ export function defaultImportState(): ImportState {
         },
         redCap: {
             apiToken: '',
-            apiURI: 'https://rcdev.iths.org/api/',
+            apiURI: '',
+            batchSize: 1000,
             enabled: false,
             mrnField: '',
             patients: 0,
@@ -64,7 +65,12 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
                 isImporting: false
             });
         case IMPORT_SET_OPTIONS:
-            return Object.assign({}, state, action.importOptions);
+            return Object.assign({}, state, {
+                mrn: { ...state.mrn },
+                redCap: { ...state.redCap },
+                ...action.importOptions,
+                enabled: action.importOptions!.redCap || action.importOptions!.mrn.enabled
+            });
         case IMPORT_SET_PROGRESS:
             return Object.assign({}, state, {
                 isImporting: true,

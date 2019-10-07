@@ -8,7 +8,8 @@
 import { REDCapImportConfiguration } from "../redcapApi/ImportConfiguration";
 
 export interface REDCapImportOptionsDTO {
-    apiURI?: string;
+    apiURI: string;
+    batchSize: number;
     enabled: boolean;
 }
 

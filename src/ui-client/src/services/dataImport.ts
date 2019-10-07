@@ -83,7 +83,7 @@ export const getMetdataBySourceId = async (state: AppState, sourceId: string): P
 /*
  * Create import metadata.
  */
-export const createMetdata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
+export const createMetadata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post(`api/import/metadata`, toDto(meta));

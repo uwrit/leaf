@@ -112,6 +112,7 @@ namespace Model.Import
                 SourcePersonId = r.SourcePersonId,
                 PersonId = r.SourcePersonId,
                 SourceValue = r.SourceValue,
+                SourceModifier = r.SourceModifier,
                 ValueString = r.ValueString,
                 ValueNumber = r.ValueNumber,
                 ValueDate = r.ValueDate

@@ -26,11 +26,13 @@ import NewQueryButton from '../../components/Header/NewQueryButton';
 import DatabasesButton from '../../components/Header/DatabasesButton';
 import UserButton from '../../components/Header/UserButton';
 import ImportButton from '../../components/Header/ImportButton';
+import ImportState from '../../models/state/Import';
 import './Header.css';
 
 interface OwnProps {}
 interface StateProps {
     auth: AppConfig;
+    importState: ImportState;
     panels: Panel[];
     panelFilters: PanelFilter[];
     responders: NetworkResponderMap;
@@ -47,7 +49,7 @@ type Props = StateProps & DispatchProps & OwnProps;
 
 class Header extends React.PureComponent<Props> {
     public render() {
-        const { user, responders, dispatch, queryState } = this.props;
+        const { user, responders, dispatch, queryState, importState } = this.props;
         const c = 'header';
 
         return (
@@ -77,7 +79,9 @@ class Header extends React.PureComponent<Props> {
                         />
 
                         {/* Import */}
-                        <ImportButton dispatch={dispatch} />
+                        {importState.enabled &&
+                        <ImportButton dispatch={dispatch} importOptions={importState} />
+                        }
 
                         {/* User */}
                         <UserButton 
@@ -163,6 +167,7 @@ class Header extends React.PureComponent<Props> {
 const mapStateToProps = (state: AppState): StateProps => {
     return { 
         auth: state.auth.config!,
+        importState: state.dataImport,
         panels: state.panels,
         panelFilters: state.panelFilters,
         queryState: state.cohort.count.state,

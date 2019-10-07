@@ -104,9 +104,9 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
      * Generate component for the API token entry (if not yet validated)
      * or else a summary of the loaded REDCap metadata.
      */
-    private getMainContent = (): JSX.Element => {
+    private getMainContent = () => {
         const { dispatch, data } = this.props;
-        const { redCap, isImporting } = data;
+        const { redCap, isImporting, isComplete, isErrored } = data;
         const { mrnFieldValid } = this.state;
 
         /*
@@ -130,11 +130,18 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
         } else if (isImporting) {
             return <ImportProgress data={data} />;
         /*
+         * Step 4: Else if complete, show completion screen.
+         */
+        } else if (isComplete) {
+            return <div />;
+        /*
          * Else we're in error, so show error body.
          */
-        } else {
+        } else if (isErrored) {
             return <div />;
         }
+
+        return null;
     }
 
     /*

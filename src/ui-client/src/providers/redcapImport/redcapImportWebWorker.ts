@@ -146,10 +146,8 @@ export default class REDCapImportWebWorker {
          * Return all current records.
          */
         const getRecords = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, id } = payload;
-            const dtos: ImportRecordDTO[] = records.map(r => Object.assign({}, r, { importMetadataId: id }) as ImportRecordDTO);
-
-            return { requestId, result: dtos };
+            const { requestId } = payload;
+            return { requestId, result: records };
         };
 
         /*
@@ -296,10 +294,10 @@ export default class REDCapImportWebWorker {
             if (urn.field) {
                 parts.push(urn.field);
             }
-            if (urn.value) {
+            if (urn.value !== undefined) {
                 params.push(`val=${urn.value}`)
             }
-            if (urn.instance) {
+            if (urn.instance !== undefined) {
                 params.push(`inst=${urn.instance}`)
             }
             if (params.length > 0) {
@@ -310,6 +308,7 @@ export default class REDCapImportWebWorker {
         };
 
         const deriveImportRecords = (config: REDCapImportConfiguration) => {
+            const seen: Map<string, number> = new Map();
 
             for (let i = 0; i < config!.records.length; i++) {
                 const raw = config!.records[i] as REDCapEavRecord;
@@ -317,13 +316,16 @@ export default class REDCapImportWebWorker {
 
                 if (!field || raw.value === '') { continue; }
 
+                const uniqueId = `${urnToString({ ...field.urn })}_${raw.record}`;
+                const prevInstance = seen.get(uniqueId);
+                const instance = prevInstance ? (prevInstance + 1) : 1;
+                
                 const rec: ImportRecord = {
-                    id: urnToString({ ...field.urn, instance: raw.redcap_repeat_instance }),
+                    id: urnToString({ ...field.urn, instance }),
                     sourcePersonId: raw.record,
                     sourceValue: raw.value.toString(),
                     sourceModifier: raw.redcap_event_name
                 };
-                
                 /*
                  * If a string.
                  */
@@ -354,6 +356,7 @@ export default class REDCapImportWebWorker {
                     }
                     rec.valueNumber = v;
                 }
+                seen.set(uniqueId, instance);
                 records.push(rec);
             }
         };

@@ -10,9 +10,11 @@ import { NavItem } from 'reactstrap';
 import { FiUploadCloud, FiUsers } from 'react-icons/fi';
 import { FaChevronDown } from 'react-icons/fa';
 import { toggleImportRedcapModal } from '../../actions/dataImport';
+import ImportState from '../../models/state/Import';
 
 interface Props {
     dispatch: any;
+    importOptions: ImportState;
 }
 
 export default class ImportButton extends React.PureComponent<Props> {
@@ -20,6 +22,7 @@ export default class ImportButton extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
+        const { mrn, redCap } = this.props.importOptions;
 
         return (
             <NavItem className={`${c}-import ${c}-item-dropdown ${c}-item-hover-dark`}>
@@ -33,16 +36,20 @@ export default class ImportButton extends React.PureComponent<Props> {
 
 
                         {/* REDCap */}
+                        {redCap.enabled && 
                         <div className={`${c}-option`} onClick={this.handleRedcapImportClick}>
                             <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                             <span>REDCap Project</span>
                         </div>
+                        }
 
                         {/* MRNs */}
+                        {mrn.enabled &&
                         <div className={`${c}-option`}>
                             <FiUsers className={`${c}-icon-mrn`} />
                             <span>MRNs</span>
                         </div>
+                        }
 
                     </div>
                 </div>

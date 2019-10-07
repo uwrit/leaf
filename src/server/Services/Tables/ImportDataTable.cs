@@ -6,6 +6,7 @@
 using System;
 using System.Data;
 using System.Collections.Generic;
+using Model.Import;
 
 namespace Services.Tables
 {
@@ -22,11 +23,12 @@ namespace Services.Tables
         const string personId = "PersonId";
         const string sourcePersonId = "SourcePersonId";
         const string sourceValue = "SourceValue";
+        const string sourceModifier = "SourceModifier";
         const string valueString = "ValueString";
         const string valueNumber = "ValueNumber";
         const string valueDate = "ValueDate";
 
-        ImportDataTable(Guid mid, IEnumerable<Model.Import.ImportRecord> imports)
+        ImportDataTable(Guid mid, IEnumerable<ImportRecord> imports)
         {
             var table = Schema();
             Fill(table, mid, imports);
@@ -43,6 +45,7 @@ namespace Services.Tables
             cols.Add(new DataColumn(personId, typeof(string)));
             cols.Add(new DataColumn(sourcePersonId, typeof(string)));
             cols.Add(new DataColumn(sourceValue, typeof(string)));
+            cols.Add(new DataColumn(sourceModifier, typeof(string)));
             cols.Add(new DataColumn(valueString, typeof(string)));
             cols.Add(new DataColumn(valueNumber, typeof(double)));
             cols.Add(new DataColumn(valueDate, typeof(DateTime)));
@@ -50,20 +53,25 @@ namespace Services.Tables
             return dt;
         }
 
-        void Fill(DataTable table, Guid mid, IEnumerable<Model.Import.ImportRecord> imports)
+        void Fill(DataTable table, Guid mid, IEnumerable<ImportRecord> imports)
         {
             foreach (var i in imports)
             {
                 var row = table.NewRow();
+                var value = i.SourceValue.Length > 100 
+                    ? i.SourceValue.Substring(0, 100)
+                    : i.SourceValue;
+
                 row[id] = i.Id;
                 row[importMetadataId] = mid;
                 row[personId] = i.PersonId;
                 row[sourcePersonId] = i.SourcePersonId;
-                row[sourceValue] = i.SourceValue;
+                row[sourceValue] = value;
+                row[sourceModifier] = i.SourceModifier;
 
                 if (i.ValueString != null)
                 {
-                    row[valueString] = i.ValueString;
+                    row[valueString] = value;
                 }
                 if (i.ValueNumber != null)
                 {

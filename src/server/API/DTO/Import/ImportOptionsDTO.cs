@@ -6,31 +6,27 @@
 using System;
 using Model.Options;
 
-namespace API.DTO.Export
+namespace API.DTO.Import
 {
-    public class ExportOptionsDTO
+    public class ImportOptionsDTO
     {
-        public REDCapExportOptionsDTO REDCap { get; set; }
+        public REDCapImportOptionsDTO REDCap { get; set; }
 
-        public ExportOptionsDTO(ExportOptions exportOptions)
+        public ImportOptionsDTO(ImportOptions importOptions)
         {
-            REDCap = new REDCapExportOptionsDTO(exportOptions.REDCap);
+            REDCap = new REDCapImportOptionsDTO(importOptions.REDCap);
         }
 
-        public class REDCapExportOptionsDTO
+        public class REDCapImportOptionsDTO
         {
-            public string ApiURI { get; set; }
-            public string Scope { get; set; }
-            public int BatchSize { get; set; }
-            public int RowLimit { get; set; }
             public bool Enabled { get; set; }
+            public string ApiURI { get; set; }
+            public int BatchSize { get; set; }
 
-            public REDCapExportOptionsDTO(REDCapExportOptions redcapOptions)
+            public REDCapImportOptionsDTO(REDCapImportOptions redcapOptions)
             {
                 ApiURI = redcapOptions.ApiURI;
-                Scope = redcapOptions.Scope;
                 BatchSize = redcapOptions.BatchSize;
-                RowLimit = redcapOptions.RowLimit;
                 Enabled = redcapOptions.Enabled;
             }
         }

@@ -34,7 +34,7 @@ export default class ProgressBar extends React.PureComponent<Props> {
 
     private getRemainingTimeText = (estimatedSeconds?: number): string => {
         if (!estimatedSeconds) { return ''; }
-        if (estimatedSeconds === 0) { return 'almost done'; }
+        if (estimatedSeconds <= 0) { return 'almost done'; }
 
         let num = estimatedSeconds;
         let unit = 'second';

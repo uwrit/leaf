@@ -29,6 +29,7 @@ namespace API.DTO.Import
                 ImportMetadataId = ImportMetadataId,
                 SourcePersonId = SourcePersonId,
                 SourceValue = SourceValue,
+                SourceModifier = SourceModifier,
                 ValueString = ValueString,
                 ValueNumber = ValueNumber,
                 ValueDate = ValueDate

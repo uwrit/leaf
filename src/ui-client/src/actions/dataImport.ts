@@ -11,7 +11,7 @@ import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat, REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 import { REDCapImportConfiguration, REDCapConcept } from '../models/redcapApi/ImportConfiguration';
-import { loadREDCapImportData, calculateREDCapFieldCount, createMetdata, getREDCapImportRecords, upsertImportRecords } from '../services/dataImport';
+import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getREDCapImportRecords, upsertImportRecords } from '../services/dataImport';
 import { InformationModalState, NotificationStates } from '../models/state/GeneralUiState';
 import { setNoClickModalState, showInfoModal } from './generalUi';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
@@ -140,7 +140,13 @@ const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnec
 
     const newRecs = await conn.getRecords(config) as REDCapEavRecord[];
     records = records.concat(newRecs);
-    dispatch(setImportRedcapRowCount(records.length));
+
+    /* 
+     * Some records may be dropped in downstream processing, so to avoid 
+     * confusing the user, show half the number actually imported, then switch to
+     * final number later when preparing to important processed records into the DB.
+     */
+    dispatch(setImportRedcapRowCount(Math.round(records.length / 2)));
     return records;
 };
 
@@ -206,32 +212,31 @@ export const importREDCapProjectData = () => {
              */
             dispatch(setImportProgress(completed, 'Loading REDCap data into Leaf'));
             let meta = deriveREDCapImportMetadataStructure(concepts, config);
-            meta = await createMetdata(state, meta);
+            meta = await createMetadata(state, meta);
 
             /*
              * Post records to the server in batches.
              */
             const records = await getREDCapImportRecords(meta.id!);
+            dispatch(setImportRedcapRowCount(records.length));
             const totalRecords = records.length;
-            const batchSize = 1000;
             let startIdx = 0;
             while (startIdx <= totalRecords) {
 
                 /*
-                 * Export current batch.
+                 * Import current batch.
                  */
-                const endIdx = startIdx + batchSize;
+                const endIdx = startIdx + redCap.batchSize;
                 const batch = records.slice(startIdx, endIdx);
                 const displayText = `Loading ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records into Leaf`;
                 dispatch(setImportProgress(completed, displayText));
                 await upsertImportRecords(state, meta, batch);
 
                 /*
-                 * Increment current index and recalculate
-                 * export progress.
+                 * Increment current index and recalculate import progress.
                  */
-                startIdx += batchSize;
-                completed = Math.round((1 - pcts.LOAD) + (endIdx / totalRecords * 100 * pcts.LOAD));
+                startIdx += redCap.batchSize;
+                completed = Math.round(((1 - pcts.LOAD) + (endIdx / totalRecords * pcts.LOAD)) * 100);
             }
             
             /*

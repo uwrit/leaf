@@ -43,10 +43,8 @@ var records = [];
 * Return all current records.
 */
 var getRecords = function (payload) {
-    var { requestId, id } = payload;
-    var dtos = records.map(r => Object.assign({}, r, { importMetadataId: id }));
-
-    return { requestId, result: dtos };
+    var { requestId } = payload;
+    return { requestId, result: records };
 };
 /*
  * Load the raw REDCap project data from the API.
@@ -57,9 +55,6 @@ var loadConfig = function (payload) {
     deriveImportMetadata(config);
     deriveImportRecords(config);
     var concepts = deriveConceptTree(config)
-    console.log(metadata);
-    console.log(records);
-    console.log(concepts);
     return { requestId: requestId, result: concepts };
 };
 /*
@@ -76,66 +71,6 @@ var calculatePatientCount = function (payload) {
     var pats = records.filter(query).map(function (p) { return p.sourcePersonId; });
     var count = { value: new Set(pats).size };
     return { requestId: requestId, result: count };
-};
-var deriveImportMetadata = function (config) {
-    var DESCRIPTIVE = 'descriptive';
-    var NUMBER = 'number';
-    var INTEGER = 'integer';
-    var CALC = 'calc';
-    var DATE = 'date';
-    var exclude = new Set([DESCRIPTIVE]);
-    var _loop_1 = function (i) {
-        var field = config.metadata[i];
-        var validation = field.text_validation_type_or_show_slider_number;
-        var event_1 = void 0;
-        /*
-         * Skip if not an included field type.
-         */
-        if (exclude.has(field.field_type)) {
-            return "continue";
-        }
-        /*
-         * Try to match to an event, if applicable.
-         */
-        if (config.eventMappings) {
-            var eventMap = config.eventMappings.find(function (em) { return em.form === field.form_name; });
-            if (eventMap) {
-                event_1 = eventMap.unique_event_name;
-            }
-        }
-        var m = {
-            form: field.form_name,
-            name: field.field_name,
-            source: field,
-            urn: {
-                project: config.projectInfo.project_id,
-                form: field.form_name,
-                field: field.field_name,
-                event: event_1
-            },
-            options: [],
-            isString: false,
-            isDate: false,
-            isNumber: false
-        };
-        m.options = deriveFieldOptions(m);
-        /*
-         * Determine validation type, if any.
-         */
-        if (validation === NUMBER || validation === INTEGER || validation === CALC || m.options.length) {
-            m.isNumber = true;
-        }
-        else if (validation.indexOf(DATE) > -1) {
-            m.isDate = true;
-        }
-        else {
-            m.isString = true;
-        }
-        metadata.set(m.name, m);
-    };
-    for (var i = 0; i < config.metadata.length; i++) {
-        _loop_1(i);
-    }
 };
 /*
  * Derive useful Leaf-centric metadata for REDCap fields.
@@ -245,10 +180,10 @@ var urnToString = function (urn) {
     if (urn.field) {
         parts.push(urn.field);
     }
-    if (urn.value) {
+    if (urn.value !== undefined) {
         params.push("val=" + urn.value);
     }
-    if (urn.instance) {
+    if (urn.instance !== undefined) {
         params.push("inst=" + urn.instance);
     }
     if (params.length > 0) {
@@ -257,15 +192,19 @@ var urnToString = function (urn) {
     return parts.join(':');
 };
 var deriveImportRecords = function (config) {
+    var seen = new Map();
     for (var i = 0; i < config.records.length; i++) {
         var raw = config.records[i];
         var field = metadata.get(raw.field_name);
-        // console.log(raw, field);
         if (!field || raw.value === '') {
             continue;
         }
+        var uniqueId = urnToString(__assign({}, field.urn)) + "_" + raw.record;
+        var prevInstance = seen.get(uniqueId);
+        var instance = prevInstance ? (prevInstance + 1) : 1;
+
         var rec = {
-            id: urnToString(__assign(__assign({}, field.urn), { instance: raw.redcap_repeat_instance })),
+            id: urnToString(__assign(__assign({}, field.urn), { instance: instance })),
             sourcePersonId: raw.record,
             sourceValue: raw.value.toString(),
             sourceModifier: raw.redcap_event_name
@@ -299,9 +238,11 @@ var deriveImportRecords = function (config) {
             }
             rec.valueNumber = v;
         }
+        seen.set(uniqueId, instance);
         records.push(rec);
     }
 };
+
 /*
  * Derive Leaf concepts based on REDCap project structure.
  */

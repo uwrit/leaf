@@ -14,6 +14,8 @@ using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Import;
 using API.DTO.Import;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace API.Controllers
 {
@@ -23,10 +25,28 @@ namespace API.Controllers
     public class ImportController : Controller
     {
         readonly ILogger<ImportController> log;
+        readonly ImportOptions importOptions;
 
-        public ImportController(ILogger<ImportController> logger)
+        public ImportController(ILogger<ImportController> logger, IOptions<ImportOptions> importOptions)
         {
             log = logger;
+            this.importOptions = importOptions.Value;
+
+        }
+
+        [HttpGet("options")]
+        public ActionResult<ImportOptionsDTO> Import()
+        {
+            try
+            {
+                var opts = new ImportOptionsDTO(importOptions);
+                return Ok(opts);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to retrieve export options. Error:{Error}", ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet("metadata")]

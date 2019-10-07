@@ -38,6 +38,12 @@ interface REDCapVersion {
     patch: number;
 }
 
+export const getImportOptions = (state: AppState) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    return http.get('/api/import/options');
+};
+
 export const getExportOptions = (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);

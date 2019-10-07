@@ -13,7 +13,7 @@ import { NetworkIdentity, NetworkIdentityRespondersDTO, NetworkIdentityResponseD
 import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
-import { getExportOptions } from '../services/redcapApi';
+import { getExportOptions, getImportOptions } from '../services/redcapApi';
 import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
@@ -31,6 +31,7 @@ import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
+import { setImportOptions } from './dataImport';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -75,7 +76,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Load responders.
              */
-            dispatch(setSessionLoadState('Finding Partner Leaf servers', 40));
+            dispatch(setSessionLoadState('Finding Partner Leaf servers', 30));
             const responders: NetworkIdentity[] = await getResponderIdentities(getState, attestation, homeBase);
             dispatch(setResponders(responders));
             dispatch(registerNetworkCohorts(responders));
@@ -83,9 +84,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Load export options.
              */
-            dispatch(setSessionLoadState('Loading Export options', 50));
+            dispatch(setSessionLoadState('Loading Export options', 40));
             const exportOptResponse = await getExportOptions(getState());
             dispatch(setExportOptions(exportOptResponse.data));
+
+            /* 
+             * Load import options.
+             */
+            dispatch(setSessionLoadState('Loading Import options', 50));
+            const importOptResponse = await getImportOptions(getState());
+            dispatch(setImportOptions(importOptResponse.data));
 
             /* 
              * Load concepts.
