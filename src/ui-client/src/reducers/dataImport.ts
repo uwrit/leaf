@@ -15,7 +15,7 @@ import {
     ImportAction, 
     IMPORT_SET_REDCAP_API_TOKEN, 
     IMPORT_SET_REDCAP_MRN_FIELD, 
-    IMPORT_SET_REDCAP_UNMATCHED, 
+    IMPORT_SET_REDCAP_UNMAPPED, 
     IMPORT_SET_REDCAP_ROW_COUNT, 
     IMPORT_SET_REDCAP_PATIENT_COUNT, 
     IMPORT_SET_REDCAP_CONFIG 
@@ -43,7 +43,7 @@ export function defaultImportState(): ImportState {
             mrnField: '',
             patients: 0,
             rows: 0,
-            unmatchedPatients: []
+            unmappedPatients: []
         }
     } 
 }
@@ -107,11 +107,11 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
                 }
             });
 
-        case IMPORT_SET_REDCAP_UNMATCHED:
+        case IMPORT_SET_REDCAP_UNMAPPED:
             return Object.assign({}, state, { 
                 redCap: {
                     ...state.redCap,
-                    unmatchedPatients: action.unmatched
+                    unmappedPatients: action.unmapped
                 }
             });
 

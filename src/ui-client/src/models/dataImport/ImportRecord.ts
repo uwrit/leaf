@@ -21,4 +21,5 @@ export interface ImportRecordDTO extends ImportRecord {
 
 export interface ImportDataResultDTO {
     changed: number;
+    unmapped: string[];
 }

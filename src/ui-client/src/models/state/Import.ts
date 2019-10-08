@@ -19,7 +19,7 @@ export interface REDCapImportState extends REDCapImportOptionsDTO {
     mrnField?: string;
     patients: number;
     rows: number;
-    unmatchedPatients: string[];
+    unmappedPatients: string[];
 }
 
 export interface ImportProgress {

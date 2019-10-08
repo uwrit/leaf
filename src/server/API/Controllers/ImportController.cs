@@ -170,7 +170,7 @@ namespace API.Controllers
                     return NotFound();
                 }
 
-                return Ok(upserted);
+                return Ok(new ImportDataResultDTO(upserted));
             }
             catch (Exception ex)
             {

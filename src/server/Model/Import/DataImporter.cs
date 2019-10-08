@@ -30,6 +30,7 @@ namespace Model.Import
         public interface IImportDataResult
         {
             public int Changed { get; set; }
+            public IEnumerable<string> Unmapped { get; set; }
         }
 
         public interface IImportIdentifierMappingService
@@ -108,25 +109,11 @@ namespace Model.Import
         {
             log.LogInformation("Importing records. ImportMetadataId:{id} RecordCount:{cnt}", id, records.Count());
 
-            // Map patient ids
-            /*
-            var mapped = records.Select(r => new ImportRecord
-            {
-                Id = r.Id,
-                ImportMetadataId = id,
-                SourcePersonId = r.SourcePersonId,
-                PersonId = r.SourcePersonId,
-                SourceValue = r.SourceValue,
-                SourceModifier = r.SourceModifier,
-                ValueString = r.ValueString,
-                ValueNumber = r.ValueNumber,
-                ValueDate = r.ValueDate
-            });
-            */
             var mapped = await mapper.MapIds(importOptions.REDCap.Mapping, records);
-            var importCount = await importService.ImportDataAsync(id, mapped.Item1);
+            var result = await importService.ImportDataAsync(id, mapped.Item1);
+            result.Unmapped = mapped.Item2;
 
-            return importCount;
+            return result;
         }
 
         public async Task<IEnumerable<ImportRecord>> GetImportRecords(Guid id)

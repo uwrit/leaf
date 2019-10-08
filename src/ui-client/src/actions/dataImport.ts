@@ -30,7 +30,7 @@ export const IMPORT_SET_REDCAP_MRN_FIELD = 'IMPORT_SET_REDCAP_MRN_FIELD';
 export const IMPORT_SET_REDCAP_API_TOKEN = 'IMPORT_SET_REDCAP_API_TOKEN';
 export const IMPORT_SET_REDCAP_ROW_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
 export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_PATIENT_COUNT';
-export const IMPORT_SET_REDCAP_UNMATCHED = 'IMPORT_SET_REDCAP_UNMATCHED';
+export const IMPORT_SET_REDCAP_UNMAPPED = 'IMPORT_SET_REDCAP_UNMAPPED';
 export const IMPORT_TOGGLE_MRN_MODAL = 'IMPORT_TOGGLE_MRN_MODAL';
 
 export interface ImportAction {
@@ -43,7 +43,7 @@ export interface ImportAction {
     rcConfig?: REDCapImportConfiguration;
     token?: string;
     type: string;
-    unmatched?: string[];
+    unmapped?: string[];
 }
 
 // Asynchronous
@@ -233,13 +233,15 @@ export const importREDCapProjectData = () => {
                 const batch = records.slice(startIdx, endIdx);
                 const displayText = `Loading ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records into Leaf`;
                 dispatch(setImportProgress(completed, displayText));
-                await upsertImportRecords(state, meta, batch);
+                const result = await upsertImportRecords(state, meta, batch);
+                const unmapped = [ ...new Set(getState().dataImport.redCap.unmappedPatients.concat(result.unmapped)) ];
 
                 /*
                  * Increment current index and recalculate import progress.
                  */
                 startIdx += redCap.batchSize;
                 completed = Math.round(((1 - pcts.LOAD) + (endIdx / totalRecords * pcts.LOAD)) * 100);
+                dispatch(setImportRedcapUnmapped(unmapped));
             }
             
             /*
@@ -297,10 +299,10 @@ export const setImportRedcapPatientCount = (count: number): ImportAction => {
     };
 };
 
-export const setImportRedcapUnmatched = (count: number): ImportAction => {
+export const setImportRedcapUnmapped = (unmapped: string[]): ImportAction => {
     return {
-        count,
-        type: IMPORT_SET_REDCAP_UNMATCHED
+        unmapped,
+        type: IMPORT_SET_REDCAP_UNMAPPED
     };
 };
 

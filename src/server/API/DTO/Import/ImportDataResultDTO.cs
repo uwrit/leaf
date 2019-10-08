@@ -4,11 +4,20 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
+using Model.Import;
 
 namespace API.DTO.Import
 {
     public class ImportDataResultDTO
     {
         public int Changed { get; set; }
+        public IEnumerable<string> Unmapped { get; set; }
+
+        public ImportDataResultDTO(DataImporter.IImportDataResult result)
+        {
+            Changed = result.Changed;
+            Unmapped = result.Unmapped;
+        }
     }
 }
