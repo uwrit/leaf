@@ -14,17 +14,20 @@ import { REDCapProjectInfo } from "./Project";
 import { REDCapUser } from "./User";
 import { Concept } from "../concept/Concept";
 
-export interface REDCapImportConfiguration {
+export interface BaseREDCapImportConfiguration {
     eventMappings?: REDCapEventMapping[];
     events?: REDCapEvent[];
     forms: REDCapForm[];
-    metadata: REDCapFieldMetadata[];
     mrnField: string;
-    mrns: REDCapRecord[];
     projectInfo: REDCapProjectInfo;
     recordField: string;
-    records: REDCapEavRecord[];
     users: REDCapUser[];
+}
+
+export interface REDCapImportConfiguration extends BaseREDCapImportConfiguration {
+    metadata: REDCapFieldMetadata[];
+    mrns: REDCapRecord[];
+    records: REDCapEavRecord[];
 }
 
 export interface REDCapUrn {

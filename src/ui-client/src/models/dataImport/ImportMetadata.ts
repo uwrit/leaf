@@ -6,7 +6,7 @@
  */
 
 import { Concept } from "../concept/Concept";
-import { REDCapImportConfiguration } from "../redcapApi/ImportConfiguration";
+import { BaseREDCapImportConfiguration } from "../redcapApi/ImportConfiguration";
 import { Constraint } from "../admin/Concept";
 
 export enum ImportType {
@@ -35,7 +35,7 @@ export interface ImportStructure {
 
 export interface REDCapImportStructure extends ImportStructure {
     concepts: Concept[];
-    configuration: REDCapImportConfiguration;
+    configuration: BaseREDCapImportConfiguration;
 }
 
 export interface MrnImportStructure extends ImportStructure {

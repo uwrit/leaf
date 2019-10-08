@@ -66,9 +66,8 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
             });
         case IMPORT_SET_OPTIONS:
             return Object.assign({}, state, {
-                mrn: { ...state.mrn },
-                redCap: { ...state.redCap },
-                ...action.importOptions,
+                mrn: { ...state.mrn, ...action.importOptions!.mrn },
+                redCap: { ...state.redCap, ...action.importOptions!.redCap },
                 enabled: action.importOptions!.redCap || action.importOptions!.mrn.enabled
             });
         case IMPORT_SET_PROGRESS:

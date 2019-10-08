@@ -102,6 +102,7 @@ namespace API.Options
             services.AddTransient<IQueryService, QueryService>();
 
             services.AddTransient<DataImporter.IImportService, ImportService>();
+            services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

@@ -309,12 +309,14 @@ export default class REDCapImportWebWorker {
 
         const deriveImportRecords = (config: REDCapImportConfiguration) => {
             const seen: Map<string, number> = new Map();
+            const mrnMap: Map<string, string> = new Map(config.mrns.map(m => [ m[config.recordField], m[config.mrnField] ]));
 
             for (let i = 0; i < config!.records.length; i++) {
                 const raw = config!.records[i] as REDCapEavRecord;
                 const field = metadata.get(raw.field_name);
+                const sourcePersonId = mrnMap.get(raw.record);
 
-                if (!field || raw.value === '') { continue; }
+                if (!field || !sourcePersonId || raw.value === '') { continue; }
 
                 const uniqueId = `${urnToString({ ...field.urn })}_${raw.record}`;
                 const prevInstance = seen.get(uniqueId);
@@ -322,10 +324,11 @@ export default class REDCapImportWebWorker {
                 
                 const rec: ImportRecord = {
                     id: urnToString({ ...field.urn, instance }),
-                    sourcePersonId: raw.record,
+                    sourcePersonId,
                     sourceValue: raw.value.toString(),
                     sourceModifier: raw.redcap_event_name
                 };
+
                 /*
                  * If a string.
                  */

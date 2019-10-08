@@ -193,19 +193,21 @@ var urnToString = function (urn) {
 };
 var deriveImportRecords = function (config) {
     var seen = new Map();
+    var mrnMap = new Map(config.mrns.map(m => [ m[config.recordField], m[config.mrnField] ]));
+    console.log(mrnMap);
     for (var i = 0; i < config.records.length; i++) {
         var raw = config.records[i];
         var field = metadata.get(raw.field_name);
-        if (!field || raw.value === '') {
+        var sourcePersonId = mrnMap.get(raw.record);
+        if (!field || !sourcePersonId || raw.value === '') {
             continue;
         }
         var uniqueId = urnToString(__assign({}, field.urn)) + "_" + raw.record;
         var prevInstance = seen.get(uniqueId);
         var instance = prevInstance ? (prevInstance + 1) : 1;
-
         var rec = {
             id: urnToString(__assign(__assign({}, field.urn), { instance: instance })),
-            sourcePersonId: raw.record,
+            sourcePersonId: sourcePersonId,
             sourceValue: raw.value.toString(),
             sourceModifier: raw.redcap_event_name
         };

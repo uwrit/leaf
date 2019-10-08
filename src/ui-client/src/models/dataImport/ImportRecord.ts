@@ -8,7 +8,7 @@
 export interface ImportRecord {
     id: string;
     sourceModifier?: string;
-    sourcePersonId: string;
+    sourcePersonId?: string;
     sourceValue: string;
     valueDate?: Date;
     valueNumber?: number;

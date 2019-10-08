@@ -8,6 +8,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace Model.Import
 {
@@ -32,17 +34,19 @@ namespace Model.Import
 
         public interface IImportIdentifierMappingService
         {
-            Task<IEnumerable<ImportRecord>> Map(IEnumerable<IImportRecord> records);
+            Task<(IEnumerable<ImportRecord>, IEnumerable<string>)> MapIds(ImportMappingOptions opts, IEnumerable<ImportRecord> records);
         }
 
+        readonly ImportOptions importOptions;
         readonly IImportService importService;
-        // readonly IImportIdentifierMappingService mapper;
+        readonly IImportIdentifierMappingService mapper;
         readonly ILogger<DataImporter> log;
 
-        public DataImporter(IImportService importService, ILogger<DataImporter> log)
+        public DataImporter(IImportService importService, IImportIdentifierMappingService mapper, IOptions<ImportOptions> importOptions, ILogger<DataImporter> log)
         {
             this.importService = importService;
-            // this.mapper = mapper;
+            this.mapper = mapper;
+            this.importOptions = importOptions.Value;
             this.log = log;
         }
 
@@ -105,6 +109,7 @@ namespace Model.Import
             log.LogInformation("Importing records. ImportMetadataId:{id} RecordCount:{cnt}", id, records.Count());
 
             // Map patient ids
+            /*
             var mapped = records.Select(r => new ImportRecord
             {
                 Id = r.Id,
@@ -117,8 +122,9 @@ namespace Model.Import
                 ValueNumber = r.ValueNumber,
                 ValueDate = r.ValueDate
             });
-
-            var importCount = await importService.ImportDataAsync(id, mapped);
+            */
+            var mapped = await mapper.MapIds(importOptions.REDCap.Mapping, records);
+            var importCount = await importService.ImportDataAsync(id, mapped.Item1);
 
             return importCount;
         }

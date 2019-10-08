@@ -16,6 +16,8 @@ import { InformationModalState, NotificationStates } from '../models/state/Gener
 import { setNoClickModalState, showInfoModal } from './generalUi';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
 import { formatSmallNumber } from '../utils/formatNumber';
+import { UserContext } from '../models/Auth';
+import { ConstraintType, Constraint } from '../models/admin/Concept';
 
 export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
@@ -181,6 +183,7 @@ export const importREDCapProjectData = () => {
 
             dispatch(setImportProgress(9, 'Loading patient mappings'));
             config.recordField = config.metadata[0].field_name;
+            config.mrnField = redCap.mrnField!;
             config.mrns = await conn.getRecords({ fields: [ config.recordField, config.mrnField ], type: Flat });
             dispatch(setImportRedcapPatientCount(config.mrns.length));
 
@@ -211,7 +214,7 @@ export const importREDCapProjectData = () => {
              * Import the project metadata
              */
             dispatch(setImportProgress(completed, 'Loading REDCap data into Leaf'));
-            let meta = deriveREDCapImportMetadataStructure(concepts, config);
+            let meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config);
             meta = await createMetadata(state, meta);
 
             /*
@@ -390,18 +393,43 @@ const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
     };
 };
 
-const deriveREDCapImportMetadataStructure = (concepts: REDCapConcept[], config: REDCapImportConfiguration): ImportMetadata => {
+const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCapConcept[], config: REDCapImportConfiguration): ImportMetadata => {
     const id = `urn:leaf:import:redcap:${config.projectInfo.project_id}`;
     const structure: REDCapImportStructure = {
         id,
-        concepts: concepts.map(c => { delete c.urn; return c; }),
-        configuration: config
+        concepts,
+        configuration: {
+            eventMappings: config.eventMappings,
+            events: config.events,
+            forms: config.forms,
+            mrnField: config.mrnField,
+            projectInfo: config.projectInfo,
+            recordField: config.recordField,
+            users: config.users
+        }
     };
 
     return {
-        constraints: [],
+        constraints: createREDCapAccessUsers(user, config),
         sourceId: id,
         structure,
         type: ImportType.REDCapProject,
     } 
+};
+
+const createREDCapAccessUsers = (user: UserContext, config: REDCapImportConfiguration): Constraint[] => {
+    const fullscope = `${user.scope}@${user.issuer}`;
+    const importer = `${user.name}@${fullscope}`;
+    const others = config.users.map(u => {
+        let name = u.username;
+        const atIdx = u.username.indexOf('@');
+        if (atIdx > -1) {
+            name = name.substring(0, atIdx);
+        }
+        return `${name}@${fullscope}`
+    });
+
+    return [ importer ]
+        .concat(others)
+        .map(u => ({ constraintId: ConstraintType.User, constraintValue: u }));
 };
