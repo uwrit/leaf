@@ -9,15 +9,18 @@ import { generate as generateId } from 'shortid';
 import { SavedQueryRef } from '../../models/Query';
 import { Concept, ConceptExtensionType, ExtensionConcept } from '../../models/concept/Concept';
 import { workerContext } from './extensionConceptsWebWorkerContext';
+import { ImportMetadata, ImportType, REDCapImportStructure } from '../../models/dataImport/ImportMetadata';
 
 const ADD_SAVED_COHORT = 'ADD_SAVED_COHORT';
 const BUILD_SAVED_COHORT_TREE = 'BUILD_SAVED_COHORT_TREE';
 const SEARCH_SAVED_COHORTS = 'SEARCH_SAVED_COHORTS';
+const BUILD_EXTENSION_TREE = 'BUILD_EXTENSION_TREE';
 
 const savedQueryType = ConceptExtensionType.SavedQuery;
 
 interface InboundMessagePartialPayload {
     displayThreshhold?: number;
+    imports?: ImportMetadata[];
     savedQuery?: SavedQueryRef;
     savedQueries?: SavedQueryRef[];
     message: string;
@@ -68,6 +71,10 @@ export default class ExtensionConceptsWebWorker {
         return this.postMessage({ message: BUILD_SAVED_COHORT_TREE, savedQueries })
     }
 
+    public buildExtensionImportTree = (imports: ImportMetadata[]) => {
+        return this.postMessage({ message: BUILD_EXTENSION_TREE, imports })
+    }
+
     public searchSavedCohorts = (searchString: string) => {
         return this.postMessage({ message: SEARCH_SAVED_COHORTS, searchString });
     }
@@ -106,6 +113,8 @@ export default class ExtensionConceptsWebWorker {
             switch (payload.message) {
                 case BUILD_SAVED_COHORT_TREE:
                     return buildSavedCohortTree(payload);
+                case BUILD_EXTENSION_TREE:
+                    return 
                 case SEARCH_SAVED_COHORTS:
                     return search(payload);
                 default:
@@ -114,6 +123,52 @@ export default class ExtensionConceptsWebWorker {
         };
 
         let conceptMap: Map<string, ExtensionConcept> = new Map();
+
+        const buildExtensionImportTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            const imports = payload.imports!;
+        };
+
+        const buildRedcapImportTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            const imports = payload.imports!;
+            const redcapImports = imports.filter(i => i.type === ImportType.REDCapProject);
+            const conceptMap: Map<string,Concept> = new Map();
+            const root: ExtensionConcept = {
+                ...getEmptyConcept(),
+                id: `urn:leaf:import:redcap:root`,
+                injectChildrenOnDrop: [],
+                uiDisplayName: 'REDCap Imports'
+            };
+
+            for (let i = 0; i < redcapImports.length; i++) {
+                const impt = redcapImports[i];
+                const struct = impt.structure as REDCapImportStructure;
+
+                // Set Ids
+                for (let j = 0; j < struct.concepts.length; j++) {
+                    const conc = struct.concepts[j];
+                    conc.childrenIds = new Set();
+                    conceptMap.set(conc.id, conc);
+                }
+
+                // Set children
+                for (let j = 0; j < struct.concepts.length; j++) {
+                    const conc = struct.concepts[j];
+                    if (conc.parentId) {
+                        const p = conceptMap.get(conc.parentId);
+                        if (p) {
+                            p.childrenIds!.add(conc.id);
+                        }
+                    }
+                }
+            }
+
+            // Add root concept
+            conceptMap.set(root.id, root);
+            
+            return { result: { concepts: conceptMap, roots: [ root.id ] }, requestId };
+        };
 
         /*
          * Build a Map object to be unioned with the Concept tree

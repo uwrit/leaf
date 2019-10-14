@@ -32,6 +32,7 @@ import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
 import { setImportOptions } from './dataImport';
+import { getAllMetdata } from '../services/dataImport';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -67,7 +68,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Get home node identity.
              */
-            dispatch(setSessionLoadState('Finding Home Leaf server', 20));
+            dispatch(setSessionLoadState('Finding Home Leaf server', 10));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
             if (getState().auth.userContext!.isAdmin) {
                 dispatch(setAdminNetworkIdentity(homeBase.identity, false));
@@ -76,7 +77,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Load responders.
              */
-            dispatch(setSessionLoadState('Finding Partner Leaf servers', 30));
+            dispatch(setSessionLoadState('Finding Partner Leaf servers', 20));
             const responders: NetworkIdentity[] = await getResponderIdentities(getState, attestation, homeBase);
             dispatch(setResponders(responders));
             dispatch(registerNetworkCohorts(responders));
@@ -84,27 +85,27 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /* 
              * Load export options.
              */
-            dispatch(setSessionLoadState('Loading Export options', 40));
+            dispatch(setSessionLoadState('Loading Export options', 30));
             const exportOptResponse = await getExportOptions(getState());
             dispatch(setExportOptions(exportOptResponse.data));
 
             /* 
              * Load import options.
              */
-            dispatch(setSessionLoadState('Loading Import options', 50));
+            dispatch(setSessionLoadState('Loading Import options', 40));
             const importOptResponse = await getImportOptions(getState());
             dispatch(setImportOptions(importOptResponse.data));
 
             /* 
              * Load concepts.
              */
-            dispatch(setSessionLoadState('Loading Concepts', 60));
+            dispatch(setSessionLoadState('Loading Concepts', 50));
             await requestRootConcepts(dispatch, getState);
 
             /* 
              * Load datasets.
              */
-            dispatch(setSessionLoadState('Loading Patient List Datasets', 70));
+            dispatch(setSessionLoadState('Loading Patient List Datasets', 60));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
             dispatch(setDatasets(datasets, datasetsCategorized));
@@ -112,11 +113,18 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /*
              * Load saved queries.
              */
-            dispatch(setSessionLoadState('Loading Saved Queries', 80));
+            dispatch(setSessionLoadState('Loading Saved Queries', 70));
             const savedCohorts = await getSavedQueries(getState());
             const savedCohortConcepts = await getQueriesAsConcepts(savedCohorts) as ConceptExtensionInitializer;
             dispatch(addSavedQueries(savedCohorts));
             dispatch(setExtensionConcepts(savedCohortConcepts.concepts, savedCohortConcepts.roots));
+
+            /*
+             * Load imported metadata.
+             */
+            dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
+            const imports = await getAllMetdata(getState());
+            console.log(imports);
 
             /* 
              * Initiliaze web worker search.

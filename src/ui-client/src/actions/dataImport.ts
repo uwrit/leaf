@@ -19,7 +19,6 @@ import { formatSmallNumber } from '../utils/formatNumber';
 import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
 
-export const IMPORT_COMPLETE = 'IMPORT_COMPLETE'
 export const IMPORT_ERROR = 'IMPORT_ERROR';
 export const IMPORT_CLEAR_ERROR_OR_COMPLETE = 'IMPORT_CLEAR_ERROR_OR_COMPLETE';
 export const IMPORT_SET_OPTIONS = 'IMPORT_SET_OPTIONS';
@@ -30,7 +29,7 @@ export const IMPORT_SET_REDCAP_MRN_FIELD = 'IMPORT_SET_REDCAP_MRN_FIELD';
 export const IMPORT_SET_REDCAP_API_TOKEN = 'IMPORT_SET_REDCAP_API_TOKEN';
 export const IMPORT_SET_REDCAP_ROW_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
 export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_PATIENT_COUNT';
-export const IMPORT_SET_REDCAP_SUMMARY = 'IMPORT_SET_REDCAP_SUMMARY';
+export const IMPORT_SET_REDCAP_COMPLETE = 'IMPORT_SET_REDCAP_COMPLETE'
 export const IMPORT_TOGGLE_MRN_MODAL = 'IMPORT_TOGGLE_MRN_MODAL';
 
 export interface ImportAction {
@@ -287,9 +286,9 @@ export const importREDCapProjectData = () => {
              */
             await clearRecords();
             dispatch(setImportRedcapConfiguration());
-            dispatch(setImportComplete({ 
+            dispatch(setImportRedcapComplete({ 
                 importedPatients: config.mrns.length, 
-                importedRows: config.records.length - records.length, 
+                importedRows: records.length, 
                 unmappedPatients, 
                 users: config.users.map(u => u.username) 
             }));
@@ -362,10 +361,10 @@ export const setImportError = (): ImportAction => {
     };
 };
 
-export const setImportComplete = (summary: REDCapImportCompletionSummary): ImportAction => {
+export const setImportRedcapComplete = (summary: REDCapImportCompletionSummary): ImportAction => {
     return {
         summary,
-        type: IMPORT_COMPLETE
+        type: IMPORT_SET_REDCAP_COMPLETE
     };
 };
 

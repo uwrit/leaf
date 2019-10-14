@@ -7,7 +7,7 @@
 
 import ImportState from '../models/state/Import';
 import { 
-    IMPORT_COMPLETE, 
+    IMPORT_SET_REDCAP_COMPLETE, 
     IMPORT_SET_OPTIONS, 
     IMPORT_CLEAR_ERROR_OR_COMPLETE, 
     IMPORT_SET_PROGRESS, 
@@ -58,21 +58,17 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
         /* 
          * General
          */
-        case IMPORT_COMPLETE:
-            return Object.assign({}, state, {
-                isImporting: false,
-                isErrored: false,
-                isComplete: true,
-                redCap: {
-                    ...state.redCap,
-                    summary: action.summary
-                }
-            });
         case IMPORT_CLEAR_ERROR_OR_COMPLETE:
             return Object.assign({}, state, {
                 isComplete: false,
                 isErrored: false,
-                isImporting: false
+                isImporting: false,
+                redCap: {
+                    ...state.redCap,
+                    patients: 0,
+                    rows: 0,
+                    summary: defaultImportState().redCap.summary
+                }
             });
         case IMPORT_SET_OPTIONS:
             return Object.assign({}, state, {
@@ -97,6 +93,18 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
         /* 
          * REDCap
          */
+        case IMPORT_SET_REDCAP_COMPLETE:
+            return Object.assign({}, state, {
+                isImporting: false,
+                isErrored: false,
+                isComplete: true,
+                redCap: {
+                    ...state.redCap,
+                    apiToken: '',
+                    summary: action.summary
+                }
+            });
+
         case IMPORT_SET_REDCAP_CONFIG:
             return Object.assign({}, state, { 
                 redCap: {

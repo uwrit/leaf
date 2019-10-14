@@ -534,7 +534,7 @@ export default class REDCapImportWebWorker {
             const universalId = urnToString(urn);
             const concept: REDCapConcept = {
                 ...parent,
-                id: `${universalId}:${idMod}`,
+                id: `${universalId}:${idMod}:${field.name}`,
                 universalId,
                 urn,
                 parentId: parent.id,
@@ -559,7 +559,7 @@ export default class REDCapImportWebWorker {
 
             return {
                 ...parent,
-                id: `${universalId}:${idMod}`,
+                id: `${parent.id}:${option.value}`,
                 universalId,
                 urn,
                 parentId: parent.id,

@@ -159,8 +159,12 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
      * Handle clicks to 'Okay' button after import error or completion.
      */
     private handleErrorOrCompleteOkayButtonClick = () => {
-        const { dispatch } = this.props;
+        const { dispatch, data } = this.props;
         dispatch(setImportClearErrorOrComplete());
+
+        if (data.isComplete) {
+            dispatch(toggleImportRedcapModal());
+        }
     }
 
     /* 

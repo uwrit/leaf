@@ -262,7 +262,7 @@ var deriveImportRecords = function (config) {
 var deriveConceptTree = function (config) {
     var urn = { project: config.projectInfo.project_id };
     var id = urnToString(urn);
-    var text = 'Had data in REDCap Project ' + config.projectInfo.project_title + '"';
+    var text = 'Had data in REDCap Project "' + config.projectInfo.project_title + '"';
     var concepts = [];
     var root = {
         rootId: id,
@@ -362,7 +362,7 @@ var deriveFormConcept = function (parent, form, idMod) {
 var deriveFieldConcept = function (parent, field, idMod) {
     var urn = Object.assign({}, parent.urn, { field: field.id });
     var universalId = urnToString(urn);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.name, uiDisplayText: parent.uiDisplayText + ' field "' + field.name + '"' });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.name, uiDisplayText: parent.uiDisplayText + ' field "' + field.name + '"' });
     return field.options
         .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })
         .concat([concept]);
@@ -373,6 +373,6 @@ var deriveFieldConcept = function (parent, field, idMod) {
 var deriveFieldOptionConcept = function (parent, option, idMod) {
     var urn = Object.assign({}, parent.urn, { value: option.value });
     var universalId = urnToString(urn);
-    return Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
+    return Object.assign({}, parent, { id: parent.Id + ":" + option.value, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
 };
 `
