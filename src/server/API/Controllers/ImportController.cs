@@ -65,31 +65,23 @@ namespace API.Controllers
         }
 
         [HttpGet("metadata/{id}")]
-        public async Task<ActionResult<ImportMetadata>> GetMetadata(Guid id, [FromServices] DataImporter importer)
+        public async Task<ActionResult<ImportMetadata>> GetMetadata(string id, [FromServices] DataImporter importer)
         {
             try
             {
-                var meta = await importer.GetImportMetadata(id);
-                if (meta == null)
+                ImportMetadata meta = null;
+                var isGuid = Guid.TryParse(id, out var guidId);
+                if (isGuid)
                 {
-                    return NotFound();
+                    // Get by leaf internal Id
+                    meta = await importer.GetImportMetadata(guidId);
+                }
+                else
+                {
+                    // Get by sourceId
+                    meta = await importer.GetImportMetadata(id);
                 }
 
-                return Ok(meta);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed get import metadata. Error:{Error}", ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("metadata")]
-        public async Task<ActionResult<ImportMetadata>> GetMetadata([FromQuery] string sourceId, [FromServices] DataImporter importer)
-        {
-            try
-            {
-                var meta = await importer.GetImportMetadata(sourceId);
                 if (meta == null)
                 {
                     return NotFound();

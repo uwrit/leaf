@@ -218,6 +218,7 @@ namespace Services.Import
         public class Result : DataImporter.IImportDataResult
         {
             public int Changed { get; set; }
+            public IEnumerable<string> Unmapped { get; set; }
         }
 
         public class ImportMetadataRecord

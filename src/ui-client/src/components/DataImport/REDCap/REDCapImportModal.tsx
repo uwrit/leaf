@@ -8,13 +8,14 @@
 import React from 'react';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import ImportState from '../../../models/state/Import';
-import { setImportRedcapApiToken, toggleImportRedcapModal, importREDCapProjectData, importMetadataFromREDCap, setImportRedcapConfiguration, setImportRedcapMrnField } from '../../../actions/dataImport';
+import { setImportRedcapApiToken, toggleImportRedcapModal, importREDCapProjectData, importMetadataFromREDCap, setImportRedcapConfiguration, setImportRedcapMrnField, setImportClearErrorOrComplete } from '../../../actions/dataImport';
 import ApiTokenEntryForm from './Sections/ApiTokenEntryForm';
 import MrnFieldEntryForm from './Sections/MrnFieldEntryForm';
 import ImportProgress from './Sections/ImportProgress';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FiCheck } from 'react-icons/fi';
 import './REDCapImportModal.css';
+import ImportComplete from './Sections/ImportComplete';
 
 interface Props {
     data: ImportState
@@ -73,11 +74,18 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
      */
     private getFooterButtons = () => {
         const c = this.className;
-        const { redCap } = this.props.data;
+        const { data } = this.props;
+        const { redCap } = data;
         const { mrnFieldValid } = this.state;
         const buttons: any[] = [];
 
-        if (!redCap.config) {
+        if (data.isErrored || data.isComplete) {
+            buttons.push(
+                <Button key={3} className="leaf-button-primary" onClick={this.handleErrorOrCompleteOkayButtonClick}>
+                    <span>Okay</span>
+                </Button>
+            );
+        } else if (!redCap.config) {
             buttons.push(
                 <Button key={1} className="leaf-button leaf-button-primary" onClick={this.handleImportButtonClick} disabled={!redCap.apiToken}>
                     <span>Begin Import</span>
@@ -96,7 +104,7 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
                     <FiCheck className={`${c}-check`}/>
                     <span>Import Project</span>
                 </Button>);
-        }
+        } 
         return buttons;
     }
 
@@ -108,6 +116,12 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
         const { dispatch, data } = this.props;
         const { redCap, isImporting, isComplete, isErrored } = data;
         const { mrnFieldValid } = this.state;
+
+        if (isErrored) {
+            return <p>Whoops, an error occurred while attempting to import your data. We are sorry for the inconvenience.</p>
+        } else if (isComplete) {
+            return <ImportComplete data={data} />
+        }
 
         /*
          * Step 1: if no config generated, show API token entry form.
@@ -129,18 +143,7 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
          */
         } else if (isImporting) {
             return <ImportProgress data={data} />;
-        /*
-         * Step 4: Else if complete, show completion screen.
-         */
-        } else if (isComplete) {
-            return <div />;
-        /*
-         * Else we're in error, so show error body.
-         */
-        } else if (isErrored) {
-            return <div />;
         }
-
         return null;
     }
 
@@ -150,6 +153,14 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
     private handleEditApiTokenClick = () => {
         const { dispatch } = this.props;
         dispatch(setImportRedcapConfiguration());
+    }
+
+    /*
+     * Handle clicks to 'Okay' button after import error or completion.
+     */
+    private handleErrorOrCompleteOkayButtonClick = () => {
+        const { dispatch } = this.props;
+        dispatch(setImportClearErrorOrComplete());
     }
 
     /* 

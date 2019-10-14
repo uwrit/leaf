@@ -36,6 +36,16 @@ export const calculateREDCapFieldCount = async (concept: REDCapConcept): Promise
 };
 
 /*
+ * Clear all current cached import data.
+ */
+export const clearRecords = async () => {
+    return new Promise( async (resolve, reject) => {
+        await worker.clearRecords();
+        resolve();
+    });
+};
+
+/*
  * Get all currently prepped REDCapImport records
  */
 export const getREDCapImportRecords = async (importMetadataId: string): Promise<ImportRecordDTO[]> => {
@@ -73,9 +83,7 @@ export const getMetdataById = async (state: AppState, id: string): Promise<Impor
 export const getMetdataBySourceId = async (state: AppState, sourceId: string): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const request = await http.get('api/import/metadata', {
-        params: { sourceId }
-    });
+    const request = await http.get(`api/import/metadata/${sourceId}`);
     const dto = request.data as ImportMetadataDTO;
     return fromDto(dto);
 };
@@ -94,7 +102,7 @@ export const createMetadata = async (state: AppState, meta: ImportMetadata): Pro
 /*
  * Update import metadata.
  */
-export const updateMetdata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
+export const updateMetadata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/import/metadata`, meta);
@@ -105,7 +113,7 @@ export const updateMetdata = async (state: AppState, meta: ImportMetadata): Prom
 /*
  * Delete import metadata.
  */
-export const deleteMetdata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
+export const deleteMetadata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.delete(`api/import/metadata/${meta.id}`);

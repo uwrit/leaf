@@ -15,11 +15,18 @@ export interface REDCapImportOptionsDTO {
 
 export interface REDCapImportState extends REDCapImportOptionsDTO {
     apiToken?: string;
+    summary: REDCapImportCompletionSummary;
     config?: REDCapImportConfiguration;
     mrnField?: string;
     patients: number;
     rows: number;
+}
+
+export interface REDCapImportCompletionSummary {
+    importedPatients: number;
+    importedRows: number;
     unmappedPatients: string[];
+    users: string[];
 }
 
 export interface ImportProgress {

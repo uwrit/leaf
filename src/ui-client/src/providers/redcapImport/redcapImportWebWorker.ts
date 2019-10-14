@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { REDCapImportConfiguration, REDCapUrn, REDCapConcept } from '../../models/redcapApi/ImportConfiguration';
-import { ImportRecord, ImportRecordDTO } from '../../models/dataImport/ImportRecord';
+import { ImportRecord } from '../../models/dataImport/ImportRecord';
 import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
 import { workerContext } from './redcapImportWebWorkerContext';
 import { REDCapEavRecord } from '../../models/redcapApi/Record';
@@ -15,6 +15,7 @@ import { REDCapEavRecord } from '../../models/redcapApi/Record';
 const LOAD_IMPORT_CONFIGURATION = 'LOAD_IMPORT_CONFIGURATION';
 const CALCULATE_PATIENT_COUNT = 'CALCULATE_PATIENT_COUNT';
 const GET_RECORDS = 'GET_RECORDS';
+const CLEAR_RECORDS = 'CLEAR_RECORDS';
 
 export interface OutboundMessageResultCount {
     value: number
@@ -72,7 +73,7 @@ export default class REDCapImportWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT, GET_RECORDS ])}
+            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT, GET_RECORDS, CLEAR_RECORDS ])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -94,6 +95,10 @@ export default class REDCapImportWebWorker {
 
     public getRecords = (id: string) => {
         return this.postMessage({ message: GET_RECORDS, id });
+    }
+
+    public clearRecords = () => {
+        return this.postMessage({ message: CLEAR_RECORDS });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -134,6 +139,8 @@ export default class REDCapImportWebWorker {
                     return calculatePatientCount(payload);
                 case GET_RECORDS:
                     return getRecords(payload);
+                case CLEAR_RECORDS:
+                    return clearRecords(payload);
                 default:
                     return null;
             }
@@ -141,6 +148,16 @@ export default class REDCapImportWebWorker {
 
         let metadata: Map<string,REDCapImportFieldMetadata> = new Map();
         let records: ImportRecord[] = [];
+
+        /*
+         * Clear all current records.
+         */
+        const clearRecords = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            metadata = new Map();
+            records = [];
+            return { requestId };
+        };
 
         /*
          * Return all current records.

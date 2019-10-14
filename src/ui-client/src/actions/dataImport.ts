@@ -6,14 +6,14 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { ImportOptionsDTO, ImportProgress } from '../models/state/Import';
+import { ImportOptionsDTO, ImportProgress, REDCapImportCompletionSummary } from '../models/state/Import';
 import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat, REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 import { REDCapImportConfiguration, REDCapConcept } from '../models/redcapApi/ImportConfiguration';
-import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getREDCapImportRecords, upsertImportRecords } from '../services/dataImport';
-import { InformationModalState, NotificationStates } from '../models/state/GeneralUiState';
-import { setNoClickModalState, showInfoModal } from './generalUi';
+import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getREDCapImportRecords, upsertImportRecords, getMetdataBySourceId, deleteMetadata, clearRecords } from '../services/dataImport';
+import { InformationModalState, NotificationStates, ConfirmationModalState } from '../models/state/GeneralUiState';
+import { setNoClickModalState, showInfoModal, showConfirmationModal } from './generalUi';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
 import { formatSmallNumber } from '../utils/formatNumber';
 import { UserContext } from '../models/Auth';
@@ -30,7 +30,7 @@ export const IMPORT_SET_REDCAP_MRN_FIELD = 'IMPORT_SET_REDCAP_MRN_FIELD';
 export const IMPORT_SET_REDCAP_API_TOKEN = 'IMPORT_SET_REDCAP_API_TOKEN';
 export const IMPORT_SET_REDCAP_ROW_COUNT = 'IMPORT_SET_REDCAP_ROW_COUNT';
 export const IMPORT_SET_REDCAP_PATIENT_COUNT = 'IMPORT_SET_REDCAP_PATIENT_COUNT';
-export const IMPORT_SET_REDCAP_UNMAPPED = 'IMPORT_SET_REDCAP_UNMAPPED';
+export const IMPORT_SET_REDCAP_SUMMARY = 'IMPORT_SET_REDCAP_SUMMARY';
 export const IMPORT_TOGGLE_MRN_MODAL = 'IMPORT_TOGGLE_MRN_MODAL';
 
 export interface ImportAction {
@@ -41,6 +41,7 @@ export interface ImportAction {
     loaded?: boolean;
     progress?: ImportProgress;
     rcConfig?: REDCapImportConfiguration;
+    summary?: REDCapImportCompletionSummary;
     token?: string;
     type: string;
     unmapped?: string[];
@@ -64,15 +65,44 @@ export const importMetadataFromREDCap = () => {
             const config = initializeREDCapImportConfiguration();
             config.projectInfo = await conn.getProjectInfo();
             config.metadata = await conn.getMetadata();
+            const complete = () => {
 
-            /* 
-             * Find first field with 'mrn' in the name (if any) and set the import configuration state.
+                /* 
+                * Find first field with 'mrn' in the name (if any) and set the import configuration state.
+                */
+                const mrnField = config.metadata.find(f => f.field_name.indexOf('mrn') > -1);
+                dispatch(setImportRedcapConfiguration(config));
+                dispatch(setImportRedcapMrnField(mrnField ? mrnField.field_name : ''));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            }
+
+            /*
+             * Check if project already imported
              */
-            const mrnField = config.metadata.find(f => f.field_name.indexOf('mrn') > -1);
-            dispatch(setImportRedcapConfiguration(config));
-            dispatch(setImportRedcapMrnField(mrnField ? mrnField.field_name : ''));
-            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            const prev = await getPreviouslyImportedRedCapProject(state, config);
+            if (prev) {
+                const confirm: ConfirmationModalState = {
+                    body: `It looks like this project, "${config.projectInfo.project_title}", has already been imported into Leaf. Do you want to delete it now and import again?`,
+                    header: 'Delete Previous REDCap Import',
+                    onClickNo: () => null,
+                    onClickYes: async () => {
+                        dispatch(setNoClickModalState({ message: 'Deleting previous', state: NotificationStates.Working }));
+                        await deleteMetadata(state, prev);
+                        complete();
+                    },
+                    show: true,
+                    noButtonText: `No`,
+                    yesButtonText: `Yes, delete previous import`
+                };
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+                dispatch(showConfirmationModal(confirm));
 
+            /*
+             * If new, set the configuration and finish up.
+             */
+            } else {
+                complete();
+            }
         } catch (err) {
             const info: InformationModalState = {
                 body: "Whoops, that doesn't seem to be a valid REDCap Project token. Check that the token is correct and that you have access to the REDCap API.",
@@ -82,6 +112,19 @@ export const importMetadataFromREDCap = () => {
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             dispatch(showInfoModal(info));
         }
+    }
+};
+
+/*
+ * Load metadata from a REDCap instance.
+ */
+export const getPreviouslyImportedRedCapProject = async (state: AppState, config: REDCapImportConfiguration): Promise<ImportMetadata | null> => {
+    const sourceId = `urn:leaf:import:redcap:${config.projectInfo.project_id}`;
+    try {
+        const prev = await getMetdataBySourceId(state, sourceId);
+        return prev;
+    } catch (err) {
+        return null;
     }
 };
 
@@ -142,13 +185,8 @@ const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnec
 
     const newRecs = await conn.getRecords(config) as REDCapEavRecord[];
     records = records.concat(newRecs);
+    dispatch(setImportRedcapRowCount(records.length));
 
-    /* 
-     * Some records may be dropped in downstream processing, so to avoid 
-     * confusing the user, show half the number actually imported, then switch to
-     * final number later when preparing to important processed records into the DB.
-     */
-    dispatch(setImportRedcapRowCount(Math.round(records.length / 2)));
     return records;
 };
 
@@ -196,6 +234,7 @@ export const importREDCapProjectData = () => {
              * Transform metadata into concepts.
              */
             dispatch(setImportProgress(completed, 'Generating Leaf Concepts'));
+            await clearRecords();
             const concepts = await loadREDCapImportData(config);
             
             /*
@@ -221,8 +260,8 @@ export const importREDCapProjectData = () => {
              * Post records to the server in batches.
              */
             const records = await getREDCapImportRecords(meta.id!);
-            dispatch(setImportRedcapRowCount(records.length));
             const totalRecords = records.length;
+            let unmappedPatients: string[] = [];
             let startIdx = 0;
             while (startIdx <= totalRecords) {
 
@@ -234,21 +273,26 @@ export const importREDCapProjectData = () => {
                 const displayText = `Loading ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records into Leaf`;
                 dispatch(setImportProgress(completed, displayText));
                 const result = await upsertImportRecords(state, meta, batch);
-                const unmapped = [ ...new Set(getState().dataImport.redCap.unmappedPatients.concat(result.unmapped)) ];
+                unmappedPatients = [ ...new Set(unmappedPatients.concat(result.unmapped)) ];
 
                 /*
                  * Increment current index and recalculate import progress.
                  */
                 startIdx += redCap.batchSize;
                 completed = Math.round(((1 - pcts.LOAD) + (endIdx / totalRecords * pcts.LOAD)) * 100);
-                dispatch(setImportRedcapUnmapped(unmapped));
             }
             
             /*
              * Success, so wrap it up.
              */
+            await clearRecords();
             dispatch(setImportRedcapConfiguration());
-            dispatch(setImportComplete());
+            dispatch(setImportComplete({ 
+                importedPatients: config.mrns.length, 
+                importedRows: config.records.length - records.length, 
+                unmappedPatients, 
+                users: config.users.map(u => u.username) 
+            }));
 
         } catch (err) {
             console.log(err);
@@ -299,13 +343,6 @@ export const setImportRedcapPatientCount = (count: number): ImportAction => {
     };
 };
 
-export const setImportRedcapUnmapped = (unmapped: string[]): ImportAction => {
-    return {
-        unmapped,
-        type: IMPORT_SET_REDCAP_UNMAPPED
-    };
-};
-
 export const toggleImportMrnModal = (): ImportAction => {
     return {
         type: IMPORT_TOGGLE_MRN_MODAL
@@ -325,8 +362,9 @@ export const setImportError = (): ImportAction => {
     };
 };
 
-export const setImportComplete = (): ImportAction => {
+export const setImportComplete = (summary: REDCapImportCompletionSummary): ImportAction => {
     return {
+        summary,
         type: IMPORT_COMPLETE
     };
 };

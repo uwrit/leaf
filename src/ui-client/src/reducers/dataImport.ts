@@ -14,8 +14,7 @@ import {
     IMPORT_ERROR, 
     ImportAction, 
     IMPORT_SET_REDCAP_API_TOKEN, 
-    IMPORT_SET_REDCAP_MRN_FIELD, 
-    IMPORT_SET_REDCAP_UNMAPPED, 
+    IMPORT_SET_REDCAP_MRN_FIELD,
     IMPORT_SET_REDCAP_ROW_COUNT, 
     IMPORT_SET_REDCAP_PATIENT_COUNT, 
     IMPORT_SET_REDCAP_CONFIG 
@@ -43,7 +42,12 @@ export function defaultImportState(): ImportState {
             mrnField: '',
             patients: 0,
             rows: 0,
-            unmappedPatients: []
+            summary: {
+                importedPatients: 0,
+                importedRows: 0,
+                unmappedPatients: [],
+                users: []
+            }
         }
     } 
 }
@@ -56,7 +60,13 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
          */
         case IMPORT_COMPLETE:
             return Object.assign({}, state, {
-                isComplete: true
+                isImporting: false,
+                isErrored: false,
+                isComplete: true,
+                redCap: {
+                    ...state.redCap,
+                    summary: action.summary
+                }
             });
         case IMPORT_CLEAR_ERROR_OR_COMPLETE:
             return Object.assign({}, state, {
@@ -73,11 +83,15 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
         case IMPORT_SET_PROGRESS:
             return Object.assign({}, state, {
                 isImporting: true,
+                isErrored: false,
+                isComplete: false,
                 progress: action.progress,
             });
         case IMPORT_ERROR:
             return Object.assign({}, state, {
-                isErrored: true
+                isErrored: true,
+                isComplete: false,
+                isImporting: false
             });
         
         /* 
@@ -104,14 +118,6 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
                 redCap: {
                     ...state.redCap,
                     mrnField: action.field
-                }
-            });
-
-        case IMPORT_SET_REDCAP_UNMAPPED:
-            return Object.assign({}, state, { 
-                redCap: {
-                    ...state.redCap,
-                    unmappedPatients: action.unmapped
                 }
             });
 

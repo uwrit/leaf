@@ -33,12 +33,23 @@ var handleWorkMessage = function (payload) {
             return calculatePatientCount(payload);
         case GET_RECORDS:
             return getRecords(payload);
+        case CLEAR_RECORDS:
+            return clearRecords(payload);
         default:
             return null;
     }
 };
 var metadata = new Map();
 var records = [];
+/*
+ * Clear all current records.
+ */
+var clearRecords = function(payload) {
+    var { requestId } = payload;
+    metadata = new Map();
+    records = [];
+    return { requestId };
+};
 /*
 * Return all current records.
 */
