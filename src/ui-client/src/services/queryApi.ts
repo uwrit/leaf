@@ -18,6 +18,7 @@ import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
 import moment from 'moment';
+import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -108,8 +109,8 @@ export const preflightSavedQuery = async (state: AppState, resourceRef: Resource
  * created from the worker. The return object is 
  * merged with the Concept tree.
  */
-export const getQueriesAsConcepts = async (queries: SavedQueryRef[]) => {
-    const concepts = await worker.buildSavedCohortTree(queries);
+export const getExtensionConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]) => {
+    const concepts = await worker.buildExtensionImportTree(imports, queries);
     return concepts;
 };
 

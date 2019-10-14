@@ -11,6 +11,7 @@ import { ImportRecord } from '../../models/dataImport/ImportRecord';
 import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
 import { workerContext } from './redcapImportWebWorkerContext';
 import { REDCapEavRecord } from '../../models/redcapApi/Record';
+import { REDCapForm } from '../../models/redcapApi/Form';
 
 const LOAD_IMPORT_CONFIGURATION = 'LOAD_IMPORT_CONFIGURATION';
 const CALCULATE_PATIENT_COUNT = 'CALCULATE_PATIENT_COUNT';
@@ -25,6 +26,7 @@ interface REDCapImportFieldMetadata {
     event?: string;
     form: string;
     id: string;
+    label: string;
     name: string;
     isString: boolean;
     isDate: boolean;
@@ -234,7 +236,8 @@ export default class REDCapImportWebWorker {
                 const m: REDCapImportFieldMetadata = {
                     form: field.form_name,
                     id: field.field_name,
-                    name: field.field_label,
+                    label: field.field_label,
+                    name: field.field_name,
                     source: field,
                     urn: { 
                         project: config.projectInfo.project_id,
@@ -388,11 +391,13 @@ export default class REDCapImportWebWorker {
             const urn: REDCapUrn = { project: config.projectInfo.project_id };
             const id = urnToString(urn);
             const text = `Had data in REDCap Project "${config.projectInfo.project_title}"`;
+            const rootId = 'urn:leaf:import:redcap:root';
             let concepts: REDCapConcept[] = [];
 
             const root: REDCapConcept = {
-                rootId: id,
+                rootId,
                 id: id,
+                parentId: rootId,
                 universalId: id,
                 urn,
                 isEncounterBased: false,
@@ -470,7 +475,7 @@ export default class REDCapImportWebWorker {
             };
             
             return config.forms!
-                .map(f => deriveFormConcept(concept, f.instrument_name, idMod))
+                .map(f => deriveFormConcept(concept, f, idMod))
                 .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
@@ -495,7 +500,7 @@ export default class REDCapImportWebWorker {
 
             return config.eventMappings!
                 .filter(em => em.unique_event_name === event)
-                .map(f => deriveFormConcept(concept, f.form, idMod))
+                .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form)!, idMod))
                 .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         }; 
@@ -504,8 +509,8 @@ export default class REDCapImportWebWorker {
          * Derive a REDCap Concept structure based on:
          * Form => Field1, Field2 ...
          */
-        const deriveFormConcept = (parent: REDCapConcept, form: string, idMod: string): REDCapConcept[] => {
-            const urn: REDCapUrn = Object.assign({}, parent.urn, { form });
+        const deriveFormConcept = (parent: REDCapConcept, form: REDCapForm, idMod: string): REDCapConcept[] => {
+            const urn: REDCapUrn = Object.assign({}, parent.urn, { form: form.instrument_name });
             const universalId = urnToString(urn);
             const concept: REDCapConcept = {
                 ...parent,
@@ -514,12 +519,12 @@ export default class REDCapImportWebWorker {
                 urn,
                 parentId: parent.id,
                 childrenIds: new Set(),
-                uiDisplayName: form,
-                uiDisplayText: `${parent.uiDisplayText} form "${form}"`
+                uiDisplayName: form.instrument_label,
+                uiDisplayText: `${parent.uiDisplayText} form "${form.instrument_label}"`
             };
             
             return [ ...metadata.values() ]
-                .filter(f => f.form === form)
+                .filter(f => f.form === form.instrument_name)
                 .map(f => deriveFieldConcept(concept, f, idMod))
                 .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
@@ -541,8 +546,8 @@ export default class REDCapImportWebWorker {
                 isParent: field.options.length > 0,
                 isEncounterBased: field.isDate,
                 childrenIds: new Set(),
-                uiDisplayName: field.name,
-                uiDisplayText: `${parent.uiDisplayText} field "${field.name}"`
+                uiDisplayName: field.label,
+                uiDisplayText: `${parent.uiDisplayText} field "${field.label}"`
             };
             
             return field.options

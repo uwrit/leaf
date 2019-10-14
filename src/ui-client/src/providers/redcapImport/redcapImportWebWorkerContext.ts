@@ -115,6 +115,7 @@ var deriveImportMetadata = function (config) {
         }
         var m = {
             form: field.form_name,
+            label: field.field_label,
             name: field.field_name,
             source: field,
             urn: {
@@ -205,7 +206,6 @@ var urnToString = function (urn) {
 var deriveImportRecords = function (config) {
     var seen = new Map();
     var mrnMap = new Map(config.mrns.map(m => [ m[config.recordField], m[config.mrnField] ]));
-    console.log(mrnMap);
     for (var i = 0; i < config.records.length; i++) {
         var raw = config.records[i];
         var field = metadata.get(raw.field_name);
@@ -263,10 +263,12 @@ var deriveConceptTree = function (config) {
     var urn = { project: config.projectInfo.project_id };
     var id = urnToString(urn);
     var text = 'Had data in REDCap Project "' + config.projectInfo.project_title + '"';
+    var rootId = 'urn:leaf:import:redcap:root';
     var concepts = [];
     var root = {
-        rootId: id,
+        rootId,
         id: id,
+        parentId: rootId,
         universalId: id,
         urn: urn,
         isEncounterBased: false,
@@ -312,7 +314,7 @@ var deriveByEventConcept = function (root, config) {
     var idMod = 'event';
     var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Event' });
     return config.events
-        .map(function (e) { return deriveEventConcept(concept, e.event_name, idMod, config); })
+    .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form), idMod))
         .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
@@ -324,7 +326,7 @@ var deriveByFormConcept = function (root, config) {
     var idMod = 'form';
     var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'By Form' });
     return config.forms
-        .map(function (f) { return deriveFormConcept(concept, f.instrument_name, idMod); })
+        .map(function (f) { return deriveFormConcept(concept, f, idMod); })
         .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);
 };
@@ -347,10 +349,10 @@ var deriveEventConcept = function (parent, event, idMod, config) {
  * Form => Field1, Field2 ...
  */
 var deriveFormConcept = function (parent, form, idMod) {
-    var urn = Object.assign({}, parent.urn, { form: form });
+    var urn = Object.assign({}, parent.urn, { form: form.instrument_name });
     var universalId = urnToString(urn);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: form, uiDisplayText: parent.uiDisplayText + ' form "' + form + '"' });
-    return [ ...metadata.values() ].filter(function (f) { return f.form === form; })
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: form.instrument_name, uiDisplayText: parent.uiDisplayText + ' form "' + form.instrument_name + '"' });
+    return [ ...metadata.values() ].filter(function (f) { return f.form === form.instrument_name; })
         .map(function (f) { return deriveFieldConcept(concept, f, idMod); })
         .reduce(function (a, b) { return a.concat(b); }, [])
         .concat([concept]);

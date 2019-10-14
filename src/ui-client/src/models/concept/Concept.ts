@@ -9,7 +9,9 @@ import { ConceptMap } from '../state/AppState';
 import { PanelFilter } from '../panel/PanelFilter';
 
 export enum ConceptExtensionType {
-    SavedQuery = 1
+    SavedQuery = 1,
+    REDCapImport = 2,
+    MRN = 3
 }
 
 export interface BaseConcept {

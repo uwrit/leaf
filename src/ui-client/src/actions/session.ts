@@ -20,7 +20,7 @@ import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
 import { showConfirmationModal } from '../actions/generalUi';
-import { getSavedQueries, getQueriesAsConcepts } from '../services/queryApi';
+import { getSavedQueries, getExtensionConcepts } from '../services/queryApi';
 import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
@@ -115,16 +115,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Saved Queries', 70));
             const savedCohorts = await getSavedQueries(getState());
-            const savedCohortConcepts = await getQueriesAsConcepts(savedCohorts) as ConceptExtensionInitializer;
             dispatch(addSavedQueries(savedCohorts));
-            dispatch(setExtensionConcepts(savedCohortConcepts.concepts, savedCohortConcepts.roots));
 
             /*
              * Load imported metadata.
              */
             dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
             const imports = await getAllMetdata(getState());
-            console.log(imports);
+            const extensionConcepts = await getExtensionConcepts(imports, savedCohorts) as ConceptExtensionInitializer;
+            dispatch(setExtensionConcepts(extensionConcepts.concepts, extensionConcepts.roots));
+            console.log(imports, extensionConcepts);
 
             /* 
              * Initiliaze web worker search.

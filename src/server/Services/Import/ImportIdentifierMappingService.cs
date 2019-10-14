@@ -37,7 +37,15 @@ namespace Services.Import
             var query = new ImportMappingQuery(opts, unique).ToString();
             var map = await GetMappingRecords(opts, query);
             var unmapped = new List<string>();
-            
+
+            // TESTING
+            foreach (var rec in records)
+            {
+                rec.PersonId = Guid.NewGuid().ToString();
+                output.Add(rec);
+            }
+            return (output, new List<string>());
+
             foreach (var rec in records)
             {
                 map.TryGetValue(rec.SourcePersonId, out string mappedId);

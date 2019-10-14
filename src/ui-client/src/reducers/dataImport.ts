@@ -87,7 +87,13 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
             return Object.assign({}, state, {
                 isErrored: true,
                 isComplete: false,
-                isImporting: false
+                isImporting: false,
+                redCap: {
+                    ...defaultImportState().redCap,
+                    apiURI: state.redCap.apiURI,
+                    batchSize: state.redCap.batchSize,
+                    enabled: state.redCap.enabled
+                }
             });
         
         /* 

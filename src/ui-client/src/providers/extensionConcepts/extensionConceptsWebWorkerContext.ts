@@ -6,10 +6,11 @@
  */ 
 
 export const workerContext = `
+// eslint-disable-next-line
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
-        case BUILD_SAVED_COHORT_TREE:
-            return buildSavedCohortTree(payload);
+        case BUILD_EXTENSION_TREE:
+            return buildExtensionImportTree(payload);
         case SEARCH_SAVED_COHORTS:
             return search(payload);
         default:
@@ -17,13 +18,50 @@ var handleWorkMessage = function (payload) {
     }
 };
 var conceptMap = new Map();
+var buildExtensionImportTree = function (payload) {
+    var requestId = payload.requestId, imports = payload.imports, savedQueries = payload.savedQueries;
+    var redcap = imports.filter(function (i) { return i.type === redcapImport; });
+    var mrn = imports.filter(function (i) { return i.type === mrnImport; });
+    var conceptMap = new Map();
+    conceptMap = buildRedcapImportTree(conceptMap, redcap);
+    // conceptMap = buildSavedCohortTree(conceptMap, savedQueries);
+    var roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root')).map(c => c.id);
+    return { requestId: requestId, result: { concepts: conceptMap, roots: roots } };
+};
+var buildRedcapImportTree = function (conceptMap, redcapImports) {
+    let root = {
+        ...getEmptyConcept(),
+        id: 'urn:leaf:import:redcap:root',
+        isParent: true,
+        childrenLoaded: true,
+        injectChildrenOnDrop: [],
+        uiDisplayName: 'REDCap Imports',
+        extensionType: redcapImportType
+    };
+    for (var i = 0; i < redcapImports.length; i++) {
+        var impt = redcapImports[i];
+        var struct = impt.structure;
+        var _loop_1 = function (j) {
+            var conc = struct.concepts[j];
+            var children = struct.concepts.filter(function (c) { return c.parentId === conc.id; });
+            conc.childrenIds = new Set(children.map(function (c) { return c.id; }));
+            conc.extensionType = redcapImportType;
+            conceptMap.set(conc.id, conc);
+        };
+        // Set Concepts
+        for (var j = 0; j < struct.concepts.length; j++) {
+            _loop_1(j);
+        }
+    }
+    root.childrenIds = new Set([ ...conceptMap.values() ].filter(c => c.parentId === root.id).map(c => c.id));
+    conceptMap.set(root.id, root);
+    return conceptMap;
+};
 /*
  * Build a Map object to be unioned with the Concept tree
  * to search for and display saved cohorts in patient list.
  */
-var buildSavedCohortTree = function (payload) {
-    var requestId = payload.requestId;
-    var savedQueries = payload.savedQueries;
+var buildSavedCohortTree = function (conceptMap, savedQueries) {
     var all = [];
     var catIds = new Set();
     var prefix = 'urn:leaf:query';
@@ -54,7 +92,7 @@ var buildSavedCohortTree = function (payload) {
     // Add root concept
     var root = getRootConcept(all, catIds, rootId);
     conceptMap.set(rootId, root);
-    return { result: { concepts: conceptMap, roots: [rootId] }, requestId: requestId };
+    return conceptMap;
 };
 var getEmptyConcept = function () {
     return {
