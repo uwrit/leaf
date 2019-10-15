@@ -9,12 +9,12 @@ namespace Model.Import
 {
     public interface IImportRecord
     {
-        public string Id { get; set; }
-        public Guid ImportMetadataId { get; set; }
-        public string SourceModifier { get; set; }
-        public string ValueString { get; set; }
-        public decimal? ValueNumber { get; set; }
-        public DateTime? ValueDate { get; set; }
+        string Id { get; set; }
+        Guid ImportMetadataId { get; set; }
+        string SourceModifier { get; set; }
+        string ValueString { get; set; }
+        decimal? ValueNumber { get; set; }
+        DateTime? ValueDate { get; set; }
     }
 
     public class ImportRecord : IImportRecord

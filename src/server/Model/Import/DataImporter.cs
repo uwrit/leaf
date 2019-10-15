@@ -29,8 +29,8 @@ namespace Model.Import
 
         public interface IImportDataResult
         {
-            public int Changed { get; set; }
-            public IEnumerable<string> Unmapped { get; set; }
+            int Changed { get; set; }
+            IEnumerable<string> Unmapped { get; set; }
         }
 
         public interface IImportIdentifierMappingService

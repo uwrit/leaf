@@ -10,7 +10,7 @@ namespace Model.Import
 {
     public interface IImportStructure
     {
-        public string Id { get; set; }
+        string Id { get; set; }
     }
 
     public class REDCapImportStructure : IImportStructure

@@ -278,17 +278,19 @@
     bottom: 0;
     box-shadow: 0px -10px 20px rgba(0, 0, 0, 0.1);
     font-family: Roboto;
+    font-size: 1.0rem;
     max-height: 92px;
-    opacity: 0.9;
+    opacity: 0.8;
+    overflow: hidden;
     padding: 4px 50px;
     position: absolute;
     text-align: center;
-    transition: opacity 0.2s;
+    transition: opacity 0.5s;
     width: 100%;
 }
 
 .attestation-footer:hover {
-    opacity: 1;
+    opacity: 0.9;
 }
 
 .attestation-footer span {
@@ -296,10 +298,17 @@
 }
 
 .attestation-footer-manuscript {
+    font-size: 0.9rem;
     margin-top: 6px;
     padding: 0 15%;
 }
 
 .attestation-footer-manuscript-publisher {
     font-style: italic;
+}
+
+.attestation-footer-manuscript-title {
+    font-family: "Mukta Mahee";
+    font-size: 1.0rem;
+    font-weight: 700;
 }

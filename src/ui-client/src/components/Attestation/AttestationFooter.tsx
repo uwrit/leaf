@@ -11,7 +11,7 @@ import { createPortal } from 'react-dom';
 interface Props { }
 
 interface State {
-    backdrop: any;
+    backdrop: Element | null;
 }
 
 export default class AttestationFooter extends React.PureComponent<Props,State> {
@@ -36,27 +36,25 @@ export default class AttestationFooter extends React.PureComponent<Props,State> 
         const c = this.className;
         const { backdrop } = this.state;
 
-        if (!backdrop) {
-            return null;
-        }
+        if (!backdrop) { return null; }
 
         return createPortal(
             <div className={c}>
                 <div className={`${c}-text`}>
                     <strong>Planning to publish your results?</strong>
-                    <span>Please cite the below manuscript to ensure we can continue making Leaf better:</span>
+                    <span>Great! Please cite this manuscript to ensure we can continue making Leaf even better:</span>
                 </div>
                 <div className={`${c}-manuscript`}>
                     <a href='https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocz165/5583724' target='_'>
+                        <span className={`${c}-manuscript-authors`}>
+                            Nicholas J Dobbins, Clifford H Spital, Robert A Black, Jason M Morrison, Bas de Veer, Elizabeth Zampino, Robert D Harrington, 
+                            Bethene D Britt, Kari A Stephens, Adam B Wilcox, Peter Tarczy-Hornoch, Sean D Mooney.
+                        </span>
                         <span className={`${c}-manuscript-title`}>
                             Leaf: an open-source, model-agnostic, data-driven web application for cohort discovery and translational biomedical research.
                         </span>
-                        <span className={`${c}-manuscript-authors`}>
-                        Nicholas J Dobbins, Clifford H Spital, Robert A Black, Jason M Morrison, Bas de Veer, Elizabeth Zampino, Robert D Harrington, 
-                        Bethene D Britt, Kari A Stephens, Adam B Wilcox, Peter Tarczy-Hornoch, Sean D Mooney.
-                        </span>
                         <span className={`${c}-manuscript-publisher`}>
-                            Journal of the American Medical Informatics Association, Oct 2019., https://doi.org/10.1093/jamia/ocz165
+                            Journal of the American Medical Informatics Association, ocz165, https://doi.org/10.1093/jamia/ocz165
                         </span>
                     </a>
                 </div>
@@ -65,6 +63,10 @@ export default class AttestationFooter extends React.PureComponent<Props,State> 
         );
     }
 
+    /*
+     * Set the backdrop element if loaded, then remove the 'shown'
+     * class after update (this provides the CSS opacity transition).
+     */
     private setBackdrop = () => {
         if (!this.state.backdrop) {
             const backdrop = document.querySelector('.attestation-modal-wrap .modal');
