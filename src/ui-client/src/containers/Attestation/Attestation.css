@@ -271,3 +271,35 @@
 .attestation-confirmation-settings {
     color: rgb(0, 138, 0);
 }
+
+/* Footer */
+.attestation-footer {
+    background-color: white;
+    bottom: 0;
+    box-shadow: 0px -10px 20px rgba(0, 0, 0, 0.1);
+    font-family: Roboto;
+    max-height: 92px;
+    opacity: 0.9;
+    padding: 4px 50px;
+    position: absolute;
+    text-align: center;
+    transition: opacity 0.2s;
+    width: 100%;
+}
+
+.attestation-footer:hover {
+    opacity: 1;
+}
+
+.attestation-footer span {
+    margin-left: 6px;
+}
+
+.attestation-footer-manuscript {
+    margin-top: 6px;
+    padding: 0 15%;
+}
+
+.attestation-footer-manuscript-publisher {
+    font-style: italic;
+}

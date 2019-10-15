@@ -12,6 +12,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { attestAndLoadSession } from '../../actions/session';
 import AttestationConfirmation from '../../components/Attestation/AttestationConfirmation';
 import AttestationContent from '../../components/Attestation/AttestationContent';
+import AttestationFooter from '../../components/Attestation/AttestationFooter';
 import { AppState } from '../../models/state/AppState';
 import { Attestation as AttestationModel, DocumentationApproval, SessionType } from '../../models/Session';
 import { UserContext } from '../../models/Auth';
@@ -159,6 +160,7 @@ class Attestation extends React.PureComponent<Props, State> {
                         sessionType={attestation.sessionType} />)
                     ]}
                 </ModalBody>
+                <AttestationFooter />
             </Modal>
         );
     }
