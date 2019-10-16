@@ -19,6 +19,8 @@ import { formatSmallNumber } from '../utils/formatNumber';
 import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
 
+export const IMPORT_SET_METADATA = 'IMPORT_SET_METADATA';
+export const IMPORT_DELETE_METADATA = 'IMPORT_DELETE_METADATA';
 export const IMPORT_ERROR = 'IMPORT_ERROR';
 export const IMPORT_CLEAR_ERROR_OR_COMPLETE = 'IMPORT_CLEAR_ERROR_OR_COMPLETE';
 export const IMPORT_SET_OPTIONS = 'IMPORT_SET_OPTIONS';
@@ -38,6 +40,7 @@ export interface ImportAction {
     field?: string;
     importOptions?: ImportOptionsDTO;
     loaded?: boolean;
+    meta?: ImportMetadata[];
     progress?: ImportProgress;
     rcConfig?: REDCapImportConfiguration;
     summary?: REDCapImportCompletionSummary;
@@ -301,6 +304,27 @@ export const importREDCapProjectData = () => {
 };
 
 // Synchronous
+export const setImportMetadata = (meta: ImportMetadata): ImportAction => {
+    return {
+        meta: [ meta ],
+        type: IMPORT_SET_METADATA
+    };
+};
+
+export const setImportsMetadata = (meta: ImportMetadata[]): ImportAction => {
+    return {
+        meta,
+        type: IMPORT_SET_METADATA
+    };
+};
+
+export const deleteImportMetadata = (meta: ImportMetadata): ImportAction => {
+    return {
+        meta: [ meta ],
+        type: IMPORT_DELETE_METADATA
+    };
+};
+
 export const toggleImportRedcapModal = (): ImportAction => {
     return {
         type: IMPORT_TOGGLE_REDCAP_MODAL

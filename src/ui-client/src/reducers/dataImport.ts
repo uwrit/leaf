@@ -17,12 +17,15 @@ import {
     IMPORT_SET_REDCAP_MRN_FIELD,
     IMPORT_SET_REDCAP_ROW_COUNT, 
     IMPORT_SET_REDCAP_PATIENT_COUNT, 
-    IMPORT_SET_REDCAP_CONFIG 
+    IMPORT_SET_REDCAP_CONFIG, 
+    IMPORT_SET_METADATA,
+    IMPORT_DELETE_METADATA
 } from '../actions/dataImport';
 
 export function defaultImportState(): ImportState {
     return {
         enabled: false,
+        imports: new Map(),
         isComplete: false,
         isErrored: false,
         isImporting: false,
@@ -58,6 +61,22 @@ export const dataImport = (state: ImportState = defaultImportState(), action: Im
         /* 
          * General
          */
+        case IMPORT_SET_METADATA:
+            for (const meta of action.meta!) {
+                state.imports.set(meta.id!, meta);
+            }
+            return Object.assign({}, state, { 
+                imports: new Map(state.imports) 
+            });
+
+        case IMPORT_DELETE_METADATA:
+            for (const meta of action.meta!) {
+                state.imports.delete(meta.id!);
+            }
+            return Object.assign({}, state, { 
+                imports: new Map(state.imports) 
+            });
+
         case IMPORT_CLEAR_ERROR_OR_COMPLETE:
             return Object.assign({}, state, {
                 isComplete: false,

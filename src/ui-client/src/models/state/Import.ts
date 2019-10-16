@@ -6,6 +6,7 @@
  */ 
 
 import { REDCapImportConfiguration } from "../redcapApi/ImportConfiguration";
+import { ImportMetadata } from "../dataImport/ImportMetadata";
 
 export interface REDCapImportOptionsDTO {
     apiURI: string;
@@ -48,6 +49,7 @@ export interface ImportOptionsDTO {
 
 export default interface ImportState {
     enabled: boolean;
+    imports: Map<string, ImportMetadata>;
     isComplete: boolean;
     isErrored: boolean;
     isImporting: boolean;

@@ -31,7 +31,7 @@ import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
-import { setImportOptions } from './dataImport';
+import { setImportOptions, setImportsMetadata } from './dataImport';
 import { getAllMetdata } from '../services/dataImport';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
@@ -124,6 +124,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             const imports = await getAllMetdata(getState());
             const extensionConcepts = await getExtensionConcepts(imports, savedCohorts) as ConceptExtensionInitializer;
             dispatch(setExtensionConcepts(extensionConcepts.concepts, extensionConcepts.roots));
+            dispatch(setImportsMetadata(imports));
             console.log(imports, extensionConcepts);
 
             /* 
