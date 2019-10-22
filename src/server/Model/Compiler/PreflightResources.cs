@@ -32,6 +32,7 @@ namespace Model.Compiler
             if (Ok)
             {
                 var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => ToConcept(dq, opts));
+                // var importCOncepts = DirectImportsCheck
                 return DirectConceptsCheck.Concepts.Concat(queryConcepts);
             }
             return new Concept[] { };

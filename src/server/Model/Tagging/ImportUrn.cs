@@ -4,14 +4,39 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using Model.Extensions;
+using Composure;
+using Model.Compiler;
 
 namespace Model.Tagging
 {
     public class ImportUrn : Urn
     {
         const string resourceSegment = ResourceType.Import;
+
+
+
+        /*
+            const parts = [ 'urn', 'leaf', 'import', 'redcap', urn.project ];
+            const params = [];
+
+            if (urn.form) {
+                parts.push(urn.form);
+            }
+            if (urn.field) {
+                parts.push(urn.field);
+            }
+            if (urn.value !== undefined) {
+                params.push(`val=${urn.value}`)
+            }
+            if (urn.instance !== undefined) {
+                params.push(`inst=${urn.instance}`)
+            }
+            if (params.length > 0) {
+                parts.push(params.join('&'));
+            }
+
+            return parts.join(':');
+            */
 
         ImportUrn(string urn) : base(urn)
         {
@@ -52,5 +77,15 @@ namespace Model.Tagging
             urn = conceptUrn;
             return ok;
         }
+
+        /*
+        public Concept ToConcept()
+        {
+
+
+
+            
+        }
+        */
     }
 }

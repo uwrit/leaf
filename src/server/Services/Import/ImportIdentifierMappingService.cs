@@ -43,6 +43,13 @@ namespace Services.Import
 
             foreach (var rec in records)
             {
+                rec.PersonId = rec.SourcePersonId;
+                output.Add(rec);
+            }
+            return (output, unmapped);
+
+            foreach (var rec in records)
+            {
                 map.TryGetValue(rec.SourcePersonId, out string mappedId);
 
                 if (mappedId != null)
