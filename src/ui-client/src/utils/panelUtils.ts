@@ -19,7 +19,7 @@ export const getEmbeddedQueries = (panels: Panel[]): Concept[] => {
     for (const p of panels) {
         for (const sp of p.subPanels) {
             for (const pi of sp.panelItems) {
-                if (isEmbeddedQuery(pi.concept.universalId)) {
+                if (isNonstandard(pi.concept.universalId)) {
                     embedded.push(pi.concept);
                 }
             }
@@ -28,11 +28,11 @@ export const getEmbeddedQueries = (panels: Panel[]): Concept[] => {
     return embedded;
 };
 
-export const isEmbeddedQuery = (universalId?: string): boolean => {
-    const embeddedQueryUrn = 'urn:leaf:query:';
+export const isNonstandard = (universalId?: string): boolean => {
+    const urnConvention = 'urn:leaf:';
     if (!universalId) {
         return false;
-    } else if (universalId!.startsWith(embeddedQueryUrn)) {
+    } else if (universalId!.startsWith(urnConvention)) {
         return true;
     }
     return false;

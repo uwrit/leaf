@@ -19,14 +19,17 @@ namespace Services.Import
     public class ImportIdentifierMappingService : DataImporter.IImportIdentifierMappingService
     {
         readonly ClinDbOptions dbOptions;
+        readonly CompilerOptions compilerOptions;
         readonly ILogger<ImportIdentifierMappingService> logger;
 
         public ImportIdentifierMappingService(
             IOptions<ClinDbOptions> dbOptions,
+            IOptions<CompilerOptions> compilerOptions,
             ILogger<ImportIdentifierMappingService> logger
         )
         {
             this.dbOptions = dbOptions.Value;
+            this.compilerOptions = compilerOptions.Value;
             this.logger = logger;
         }
 
@@ -34,17 +37,9 @@ namespace Services.Import
         {
             var output = new List<ImportRecord>();
             var unique = records.Select(r => r.SourcePersonId).Distinct();
-            var query = new ImportMappingQuery(opts, unique).ToString();
+            var query = new ImportMappingQuery(compilerOptions, opts, unique).ToString();
             var map = await GetMappingRecords(opts, query);
             var unmapped = new List<string>();
-
-            // TESTING
-            foreach (var rec in records)
-            {
-                rec.PersonId = Guid.NewGuid().ToString();
-                output.Add(rec);
-            }
-            return (output, new List<string>());
 
             foreach (var rec in records)
             {
@@ -78,8 +73,8 @@ namespace Services.Import
                         while(reader.Read())
                         {
                             map.Add(
-                                reader[opts.FieldSourcePersonId].ToString(), 
-                                reader[opts.Select].ToString()
+                                reader[opts.FieldMrn].ToString(), 
+                                reader[compilerOptions.FieldPersonId].ToString()
                             );
                         }
                     }

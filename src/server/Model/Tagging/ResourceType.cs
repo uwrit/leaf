@@ -12,5 +12,6 @@ namespace Model.Tagging
         public const string Query = "query";
         public const string Dataset = "dataset";
         public const string Specialization = "specialization";
+        public const string Import = "import";
     }
 }

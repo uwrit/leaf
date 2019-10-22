@@ -68,7 +68,7 @@ const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsStat
         for (const childId of newConcept.childrenIds!) {
             const childConcept = state.currentTree.get(childId);
             if (childConcept && childConcept.isOpen) {
-                const clone =  Object.assign({}, childConcept, { isOpen: false });
+                const clone = Object.assign({}, childConcept, { isOpen: false });
                 updated.push(clone);
             }
         }
@@ -171,7 +171,7 @@ const addRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState 
 
 const addConcepts = (state: ConceptsState, cons: Concept[]): ConceptsState => {
     const currentTree = new Map(state.currentTree);
-    cons.forEach(c => currentTree.set(c.id, c));
+    cons.forEach(c => currentTree.set(c.id, Object.assign({}, c)));
     return Object.assign({}, state, { currentTree });
 };
 

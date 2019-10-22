@@ -15,16 +15,16 @@ namespace Model.Import
         readonly NamedSet set = new NamedSet();
         readonly List<IEvaluatable> where = new List<IEvaluatable>();
 
-        public ImportMappingQuery(ImportMappingOptions opts, IEnumerable<string> ids)
+        public ImportMappingQuery(CompilerOptions compilerOptions, ImportMappingOptions opts, IEnumerable<string> ids)
         {
-            if (!string.IsNullOrWhiteSpace(opts.Where))
+            if (!string.IsNullOrWhiteSpace(opts.WhereClause))
             {
-                where.Add(new RawEval(opts.Where));
+                where.Add(new RawEval(opts.WhereClause));
             }
-            where.Add(new Column(opts.FieldSourcePersonId) == ids);
+            where.Add(new Column(opts.FieldMrn) == ids);
 
-            set.Select = new[] { new Column(opts.Select), new Column(opts.FieldSourcePersonId) };
-            set.From = opts.From;
+            set.Select = new[] { new Column(compilerOptions.FieldPersonId), new Column(opts.FieldMrn) };
+            set.From = opts.SetMrn;
             set.Where = where;
         }
 

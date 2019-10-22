@@ -8,7 +8,7 @@
 import { Concept, ResourceRef, ConceptSpecialization, ExtensionConcept } from '../concept/Concept';
 import { NumericFilter, NumericFilterType, NumericFilterDTO } from './NumericFilter';
 import { RecencyFilterType } from './RecencyFilter';
-import { isEmbeddedQuery } from '../../utils/panelUtils';
+import { isNonstandard } from '../../utils/panelUtils';
 
 export interface BasePanelItem {
     hidden?: boolean;
@@ -37,7 +37,7 @@ export interface PanelItem extends BasePanelItem {
 export const panelItemToDto = (panelItem: PanelItem): PanelItemDTO => {
     return {
         resource: {
-            id: isEmbeddedQuery(panelItem.concept.universalId) 
+            id: isNonstandard(panelItem.concept.universalId) 
                 ? (panelItem.concept as ExtensionConcept).extensionId
                 : panelItem.concept.id,
             universalId: panelItem.concept.universalId!,

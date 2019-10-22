@@ -16,7 +16,7 @@ import { ResourceRef, ExtensionConcept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
-import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
+import { getEmbeddedQueries, isNonstandard } from '../utils/panelUtils';
 import moment from 'moment';
 import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 
@@ -147,7 +147,7 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
                 const resRef = panelItem.resource as ResourceRef;
 
                 // If saved query
-                if (isEmbeddedQuery(resRef.universalId)) {
+                if (isNonstandard(resRef.universalId)) {
                     const embedded = state.concepts.extensionTree.get(resRef.universalId!);
                     if (!embedded) { 
                         throw new Error(`${resRef.uiDisplayName} is not an existing saved query.`); 

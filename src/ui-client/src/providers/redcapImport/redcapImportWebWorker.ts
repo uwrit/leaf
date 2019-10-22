@@ -191,7 +191,7 @@ export default class REDCapImportWebWorker {
             const urn = Object.assign({}, concept!.urn, { value: undefined, instance: undefined });
             const universalId = urnToString(urn);
 
-            const query = concept!.urn.value 
+            const query = concept!.urn.value !== undefined
                 ? (r: ImportRecord) => r.id.startsWith(universalId) && r.valueNumber === concept!.urn.value
                 : (r: ImportRecord) => r.id.startsWith(universalId);
 
@@ -211,6 +211,7 @@ export default class REDCapImportWebWorker {
             const INTEGER = 'integer';
             const CALC = 'calc';
             const DATE = 'date';
+            const REGEX_MARKUP = /<\/?[a-z]*>/g;
             const exclude = new Set([ DESCRIPTIVE ]);
 
             for (let i = 0; i < config.metadata.length; i++) {
@@ -236,7 +237,7 @@ export default class REDCapImportWebWorker {
                 const m: REDCapImportFieldMetadata = {
                     form: field.form_name,
                     id: field.field_name,
-                    label: field.field_label,
+                    label: field.field_label.replace(REGEX_MARKUP, '').trim(),
                     name: field.field_name,
                     source: field,
                     urn: { 
@@ -549,7 +550,7 @@ export default class REDCapImportWebWorker {
                 uiDisplayName: field.label,
                 uiDisplayText: `${parent.uiDisplayText} field "${field.label}"`
             };
-            
+
             return field.options
                 .map(op => deriveFieldOptionConcept(concept, op, idMod))
                 .concat([ concept ]);

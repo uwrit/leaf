@@ -27,9 +27,8 @@ namespace Model.Options
 
     public class ImportMappingOptions
     {
-        public string Select { get; set; }
-        public string From { get; set; }
-        public string Where { get; set; }
-        public string FieldSourcePersonId { get; set; }
+        public string SetMrn { get; set; }
+        public string WhereClause { get; set; }
+        public string FieldMrn { get; set; }
     }
 }

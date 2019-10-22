@@ -42,11 +42,13 @@ namespace Services.Search
 
                 var qids = refs.Queries.Select(q => q.Id.Value);
                 var cids = refs.Concepts.Select(c => c.Id.Value);
+                var iids = refs.Imports.Select(i => i.Id.Value);
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byIds,
                     new {
                         qids = ResourceIdTable.From(qids),
                         cids = ResourceIdTable.From(cids),
+                        iids = ResourceIdTable.From(iids),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
                         sessionType = user.SessionType,
@@ -68,11 +70,13 @@ namespace Services.Search
 
                 var quids = refs.Queries.Select(q => q.UniversalId.ToString()).ToHashSet();
                 var cuids = refs.Concepts.Select(q => q.UniversalId.ToString()).ToHashSet();
+                var iuids = refs.Imports.Select(q => q.UniversalId.ToString()).ToHashSet(); 
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byUIds,
                     new {
                         quids = ResourceUniversalIdTable.From(quids),
                         cuids = ResourceUniversalIdTable.From(cuids),
+                        iuids = ResourceUniversalIdTable.From(iuids),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
                         sessionType = user.SessionType,

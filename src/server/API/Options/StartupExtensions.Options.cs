@@ -191,10 +191,9 @@ namespace API.Options
             {
                 rc.ApiURI = config.GetValue<string>(Config.Import.REDCap.ApiURI);
                 rc.BatchSize = config.GetValue<int>(Config.Import.REDCap.BatchSize);
-                rc.Mapping.Select = config.GetValue<string>(Config.Import.REDCap.Mapping.Select);
-                rc.Mapping.From = config.GetValue<string>(Config.Import.REDCap.Mapping.From);
-                rc.Mapping.Where = config.GetValue<string>(Config.Import.REDCap.Mapping.Where);
-                rc.Mapping.FieldSourcePersonId = config.GetValue<string>(Config.Import.REDCap.Mapping.FieldSourcePersonId);
+                rc.Mapping.SetMrn = config.GetValue<string>(Config.Import.REDCap.Mapping.SetPersonMrn);
+                rc.Mapping.WhereClause = config.GetValue<string>(Config.Import.REDCap.Mapping.WhereClause);
+                rc.Mapping.FieldMrn = config.GetValue<string>(Config.Import.REDCap.Mapping.FieldMrn);
             }
 
             services.Configure<REDCapImportOptions>(opts =>
@@ -202,10 +201,9 @@ namespace API.Options
                 opts.Enabled = rc.Enabled;
                 opts.ApiURI = rc.ApiURI;
                 opts.BatchSize = rc.BatchSize;
-                opts.Mapping.Select = rc.Mapping.Select;
-                opts.Mapping.From = rc.Mapping.From;
-                opts.Mapping.Where = rc.Mapping.Where;
-                opts.Mapping.FieldSourcePersonId = rc.Mapping.FieldSourcePersonId;
+                opts.Mapping.SetMrn = rc.Mapping.SetMrn;
+                opts.Mapping.WhereClause = rc.Mapping.WhereClause;
+                opts.Mapping.FieldMrn = rc.Mapping.FieldMrn;
             });
 
             services.Configure<ImportOptions>(opts =>

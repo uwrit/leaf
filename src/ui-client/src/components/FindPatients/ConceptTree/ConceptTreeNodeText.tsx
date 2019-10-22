@@ -57,7 +57,19 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
     });
 };
 
-class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
+class ConceptTreeNodeTextWrapper extends React.Component<Props> {
+
+    public shouldComponentUpdate(nextProps: Props) {
+        const { canDrop, isOver } = this.props;
+
+        if (canDrop !== nextProps.canDrop) { 
+            return true;
+        } else if (isOver !== nextProps.isOver) {
+            return true;
+        }
+        return false;
+    }
+
     public render() {
         const { concept, connectDropTarget, canDrop, isOver } = this.props;
         const c = 'concept-tree-node';
@@ -68,7 +80,9 @@ class ConceptTreeNodeTextWrapper extends React.PureComponent<Props> {
             ? <MdAccessTime className={`${c}-icon ${c}-icon-clock`} /> 
             : <GoPerson className={`${c}-icon ${c}-icon-person`} />;
 
-        if (concept.uiDisplayPatientCount === 0) { nodeTextClasses.push(`${c}-text-nopatients`); }
+        if (concept.uiDisplayPatientCount === 0) { 
+            nodeTextClasses.push(`${c}-text-nopatients`); 
+        }
     
         return (
             connectDropTarget &&

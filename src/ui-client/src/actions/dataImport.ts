@@ -243,11 +243,12 @@ export const importREDCapProjectData = () => {
              * Calculate the patient count for each new REDCap concept.
              */
             let i = 0;
-            const increment = () => { i++; completed = Math.round(((pcts.INITIAL + pcts.RECORDS) * 100.0) + ((i / concepts.length * 100.0) * pcts.COUNTS)); }
+            const len = concepts.length;
+            const increment = () => { i++; completed = Math.round(((pcts.INITIAL + pcts.RECORDS) * 100.0) + ((i / len * 100.0) * pcts.COUNTS)); }
             
             for (const concept of concepts) {
                 increment();
-                dispatch(setImportProgress(completed, 'Calculating patients counts'));
+                dispatch(setImportProgress(completed, `Calculating patient counts (${i} of ${len} concepts)`));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 

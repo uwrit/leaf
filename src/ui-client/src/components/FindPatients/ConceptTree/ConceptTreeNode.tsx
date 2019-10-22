@@ -54,7 +54,7 @@ const collectDrag = (connect: DragSourceConnector, monitor: DragSourceMonitor) =
     });
 };
 
-class ConceptTreeNode extends React.PureComponent<Props> {
+class ConceptTreeNode extends React.Component<Props> {
     
     public componentDidMount() {
         const { connectDragPreview } = this.props;
@@ -66,6 +66,13 @@ class ConceptTreeNode extends React.PureComponent<Props> {
             const dragPreview = getDragPreview(this.props.concept.uiDisplayName);
             connectDragPreview(dragPreview);
         }
+    }
+
+    public shouldComponentUpdate(nextProps: Props) {
+        if (nextProps.allowRerender.has(this.props.concept.id)) {
+            return true;
+        }
+        return false;
     }
 
     public render() {
@@ -106,7 +113,6 @@ class ConceptTreeNode extends React.PureComponent<Props> {
                                 {concept.isFetching &&
                                 <LoaderIcon />
                                 }
-
                             </div>
 
                             {/* Main Text */}

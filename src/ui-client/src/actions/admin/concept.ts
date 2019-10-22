@@ -11,7 +11,7 @@ import { Concept as AdminConcept } from '../../models/admin/Concept';
 import { AppState } from '../../models/state/AppState';
 import { InformationModalState, NotificationStates, ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { getAdminConcept, updateAdminConcept, createAdminConcept, deleteAdminConcept } from '../../services/admin/conceptApi';
-import { isEmbeddedQuery } from '../../utils/panelUtils';
+import { isNonstandard } from '../../utils/panelUtils';
 import { AdminPanelLoadState } from '../../models/state/AdminState';
 import { showInfoModal, setNoClickModalState, showConfirmationModal, setSideNotificationState } from '../generalUi';
 import { generateSampleSql, getRootId } from '../../utils/admin/concept';
@@ -134,7 +134,7 @@ export const fetchAdminConceptIfNeeded = (userConcept: UserConcept) => {
             if (userConcept.unsaved) { return; }
 
             const adm = state.admin!.concepts;
-            const embedded = isEmbeddedQuery(userConcept.universalId);
+            const embedded = isNonstandard(userConcept.universalId);
             dispatch(setAdminPanelCurrentUserConcept(userConcept));
 
             /*

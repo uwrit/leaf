@@ -18,6 +18,7 @@ namespace Model.Compiler
     {
         public IEnumerable<ConceptRef> Concepts { get; set; } = new List<ConceptRef>();
         public IEnumerable<QueryRef> Queries { get; set; } = new List<QueryRef>();
+        public IEnumerable<ImportRef> Imports { get; set; } = new List<ImportRef>();
 
         public ResourceRefs()
         {
@@ -28,6 +29,7 @@ namespace Model.Compiler
         {
             var concepts = new List<ConceptRef>();
             var queries = new List<QueryRef>();
+            var imports = new List<ImportRef>();
 
             foreach (var res in refs)
             {
@@ -48,11 +50,15 @@ namespace Model.Compiler
                     case QueryUrn query:
                         queries.Add(new QueryRef { UniversalId = query, Id = res.Id });
                         break;
+                    case ImportUrn import:
+                        imports.Add(new ImportRef { UniversalId = import, Id = res.Id });
+                        break;
                 }
             }
 
             Concepts = concepts;
             Queries = queries;
+            Imports = imports;
         }
     }
 

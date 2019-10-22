@@ -60,6 +60,7 @@ namespace Model.Tagging
         {
             { ResourceType.Concept, ConceptUrn.TryParseUrn },
             { ResourceType.Query, QueryUrn.TryParseUrn },
+            { ResourceType.Import, ImportUrn.TryParseUrn }
         };
 
         delegate bool Factory(string value, out Urn urn);

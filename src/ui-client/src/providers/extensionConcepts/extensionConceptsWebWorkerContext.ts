@@ -46,6 +46,7 @@ var buildRedcapImportTree = function (conceptMap, redcapImports) {
             var children = struct.concepts.filter(function (c) { return c.parentId === conc.id; });
             conc.childrenIds = new Set(children.map(function (c) { return c.id; }));
             conc.extensionType = redcapImportType;
+            conc.extensionId = impt.id;
             conceptMap.set(conc.id, conc);
         };
         // Set Concepts

@@ -17,6 +17,7 @@ namespace Model.Compiler
 
         public PreflightConcepts DirectConceptsCheck { get; set; }
         public PreflightQueries DirectQueriesCheck { get; set; }
+        public PreflightImports DirectImportsCheck { get; set; }
         public IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
         IEnumerable<QueryRef> DirectQueries { get; set; }
 
@@ -66,6 +67,7 @@ namespace Model.Compiler
     {
         public IEnumerable<ConceptPreflightCheckResult> ConceptErrors { get; set; } = new ConceptPreflightCheckResult[] { };
         public IEnumerable<QueryPreflightCheckResult> QueryErrors { get; set; } = new QueryPreflightCheckResult[] { };
+        public IEnumerable<ImportPreflightCheckResult> ImportErrors { get; set; } = new ImportPreflightCheckResult[] { };
     }
 
     public class PreflightQueries
@@ -82,6 +84,36 @@ namespace Model.Compiler
         {
             return Results.Select(r => r.Errors())
                           .Where(r => r != null);
+        }
+    }
+
+    public class PreflightImports
+    {
+        public bool Ok => Results.All(r => r.Ok);
+        public IEnumerable<ImportPreflightCheckResult> Results { get; set; }
+
+        public IEnumerable<ImportPreflightCheckResult> Errors()
+        {
+            return Results.Select(r => r.Errors())
+                          .Where(r => r != null);
+        }
+    }
+
+    public class ImportPreflightCheckResult
+    {
+        public Guid Id { get; set; }
+        public bool IsPresent { get; set; }
+        public bool IsAuthorized { get; set; }
+
+        public bool Ok => IsPresent && IsAuthorized;
+
+        public ImportPreflightCheckResult Errors()
+        {
+            if (!Ok)
+            {
+                return this;
+            }
+            return null;
         }
     }
 

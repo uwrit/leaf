@@ -128,7 +128,6 @@ export default class ExtensionConceptsWebWorker {
         const buildExtensionImportTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, imports, savedQueries } = payload;
             const redcap = imports!.filter(i => i.type === redcapImport);
-            const mrn = imports!.filter(i => i.type === mrnImport);
             let conceptMap: Map<string,Concept> = new Map();
 
             conceptMap = buildRedcapImportTree(conceptMap, redcap);
@@ -160,6 +159,7 @@ export default class ExtensionConceptsWebWorker {
                     conc.childrenIds = new Set(children.map(c => c.id));
                     conc.childrenLoaded = conc.isParent;
                     conc.extensionType = redcapImportType;
+                    conc.extensionId = impt.id!;
                     conceptMap.set(conc.id, conc);
                 }
             }

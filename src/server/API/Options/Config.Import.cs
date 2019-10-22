@@ -20,10 +20,9 @@ namespace API.Options
 
                 public static class Mapping
                 {
-                    public const string Select = @"Import:REDCap:Mapping:SELECT";
-                    public const string From = @"Import:REDCap:Mapping:FROM";
-                    public const string Where = @"Import:REDCap:Mapping:WHERE";
-                    public const string FieldSourcePersonId = @"Import:REDCap:Mapping:FieldSourcePersonId";
+                    public const string SetPersonMrn = @"Import:REDCap:Mapping:SetPersonMrn";
+                    public const string WhereClause = @"Import:REDCap:Mapping:WhereClause";
+                    public const string FieldMrn = @"Import:REDCap:Mapping:FieldMrn";
                 }
             }
 
