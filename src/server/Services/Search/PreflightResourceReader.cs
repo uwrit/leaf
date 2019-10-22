@@ -203,6 +203,7 @@ namespace Services.Search
         {
             var pq = ReadQueriesByUId(grid);
             var pc = ReadConcepts(grid);
+            var im = ReadImports
             var pf = ReadGlobalPanelFilters(grid);
 
             return new PreflightResources(directQueries, pf)
@@ -224,15 +225,23 @@ namespace Services.Search
             };
         }
 
+        
+
         public static IEnumerable<GlobalPanelFilter> ReadGlobalPanelFilters(SqlMapper.GridReader grid)
         {
             return grid.Read<GlobalPanelFilter>();
         }
 
+        public static PreflightImports ReadImportsById(SqlMapper.GridReader grid)
+        {
+            var records = grid.Read<ImportPreflightCheckResult>();
+            var results = records.GroupBy(r => r.Id).Pro
+
+        }
+
         public static PreflightQueries ReadQueriesById(SqlMapper.GridReader grid)
         {
             var records = grid.Read<QueryPreflightCheckResultRecord>();
-
             var results = records.GroupBy(r => r.QueryId).Project();
 
             return new PreflightQueries { Results = results };
@@ -241,7 +250,6 @@ namespace Services.Search
         public static PreflightQueries ReadQueriesByUId(SqlMapper.GridReader grid)
         {
             var records = grid.Read<QueryPreflightCheckResultRecord>();
-
             var results = records.GroupBy(r => r.QueryUniversalId).Project();
 
             return new PreflightQueries { Results = results };
