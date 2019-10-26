@@ -84,15 +84,6 @@ var calculatePatientCount = function (payload) {
     var count = { value: new Set(pats).size };
     return { requestId: requestId, result: count };
 };
-/* 
-* Generate a random guid
-* See https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript/2117523#2117523
-*/
-var generateGuid = () => {
-    return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-    );
-};
 /*
  * Derive useful Leaf-centric metadata for REDCap fields.
  * These are used only as an intermediate object on initial load.
@@ -284,8 +275,6 @@ var deriveConceptTree = function (config) {
         rootId,
         id: id,
         parentId: rootId,
-        universalId: id,
-        extensionId: generateGuid(),
         urn: urn,
         isEncounterBased: false,
         isParent: true,
@@ -328,7 +317,7 @@ var deriveConceptTree = function (config) {
  */
 var deriveByEventConcept = function (root, config) {
     var idMod = 'event';
-    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, extensionId: generateGuid(), childrenIds: new Set(), uiDisplayName: 'Events' });
+    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'Events' });
     return config.events
     .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form), idMod))
         .reduce(function (a, b) { return a.concat(b); }, [])
@@ -340,7 +329,7 @@ var deriveByEventConcept = function (root, config) {
  */
 var deriveByFormConcept = function (root, config) {
     var idMod = 'form';
-    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, extensionId: generateGuid(), childrenIds: new Set(), uiDisplayName: 'Forms' });
+    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'Forms' });
     return config.forms
         .map(function (f) { return deriveFormConcept(concept, f, idMod); })
         .reduce(function (a, b) { return a.concat(b); }, [])
@@ -353,7 +342,7 @@ var deriveByFormConcept = function (root, config) {
 var deriveEventConcept = function (parent, event, idMod, config) {
     var urn = Object.assign({}, parent.urn, { event: event });
     var universalId = urnToString(urn);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, extensionId: generateGuid(), childrenIds: new Set(), uiDisplayName: event, uiDisplayText: parent.uiDisplayText + ' event "' + event + '"' });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: event, uiDisplayText: parent.uiDisplayText + ' event "' + event + '"' });
     return config.eventMappings
         .filter(function (em) { return em.unique_event_name === event; })
         .map(function (f) { return deriveFormConcept(concept, f.form, idMod); })
@@ -367,7 +356,7 @@ var deriveEventConcept = function (parent, event, idMod, config) {
 var deriveFormConcept = function (parent, form, idMod) {
     var urn = Object.assign({}, parent.urn, { form: form.instrument_name });
     var universalId = urnToString(urn);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, extensionId: generateGuid(), childrenIds: new Set(), uiDisplayName: form.instrument_label, uiDisplayText: parent.uiDisplayText + ' form "' + form.instrument_label + '"' });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod, universalId: universalId, urn, parentId: parent.id, childrenIds: new Set(), uiDisplayName: form.instrument_label, uiDisplayText: parent.uiDisplayText + ' form "' + form.instrument_label + '"' });
     return [ ...metadata.values() ].filter(function (f) { return f.form === form.instrument_name; })
         .map(function (f) { return deriveFieldConcept(concept, f, idMod); })
         .reduce(function (a, b) { return a.concat(b); }, [])
@@ -381,7 +370,7 @@ var deriveFieldConcept = function (parent, field, idMod) {
     var urn = Object.assign({}, parent.urn, { field: field.name });
     var universalId = urnToString(urn);
     console.log(urn, universalId, field);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, extensionId: generateGuid(), isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"' });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"' });
     return field.options
         .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })
         .concat([concept]);
@@ -392,6 +381,6 @@ var deriveFieldConcept = function (parent, field, idMod) {
 var deriveFieldOptionConcept = function (parent, option, idMod) {
     var urn = Object.assign({}, parent.urn, { value: option.value });
     var universalId = urnToString(urn);
-    return Object.assign({}, parent, { id: parent.id + ":" + option.value, universalId: universalId, urn, parentId: parent.id, extensionId: generateGuid(), isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
+    return Object.assign({}, parent, { id: parent.id + ":" + option.value, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
 };
 `

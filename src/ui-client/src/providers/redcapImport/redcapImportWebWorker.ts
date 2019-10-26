@@ -412,7 +412,6 @@ export default class REDCapImportWebWorker {
             const root: REDCapConcept = {
                 rootId,
                 id: id,
-                extensionId: generateGuid(),
                 parentId: rootId,
                 universalId: id,
                 urn,
@@ -465,7 +464,6 @@ export default class REDCapImportWebWorker {
             const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
-                extensionId: generateGuid(),
                 parentId: root.id,
                 childrenIds: new Set(),
                 uiDisplayName: 'Events'
@@ -486,7 +484,6 @@ export default class REDCapImportWebWorker {
             const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
-                extensionId: generateGuid(),
                 parentId: root.id,
                 childrenIds: new Set(),
                 uiDisplayName: 'Forms'
@@ -509,7 +506,6 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
-                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 childrenIds: new Set(),
@@ -535,7 +531,6 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
-                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 childrenIds: new Set(),
@@ -561,7 +556,6 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}:${field.name}`,
                 universalId,
-                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 isParent: field.options.length > 0,
@@ -587,7 +581,6 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${parent.id}:${option.value}`,
                 universalId,
-                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 isParent: false,
