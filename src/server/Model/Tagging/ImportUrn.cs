@@ -4,8 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Composure;
-using Model.Compiler;
 
 namespace Model.Tagging
 {
@@ -13,34 +11,55 @@ namespace Model.Tagging
     {
         const string resourceSegment = ResourceType.Import;
 
+        public bool UseModifier => !string.IsNullOrEmpty(Modifier);
 
+        public new int? Value { get; private set; }
+        public int? Instance { get; private set; }
+        public string Modifier { get; private set; }
+        public string BaseSegment { get; private set; }
 
-        /*
-            const parts = [ 'urn', 'leaf', 'import', 'redcap', urn.project ];
-            const params = [];
+        void ParseArgs()
+        {
+            var raw = base.Value;
+            var lastColonIdx = raw.LastIndexOf(':');
+            var lastSeg = raw.Substring(lastColonIdx);
 
-            if (urn.form) {
-                parts.push(urn.form);
-            }
-            if (urn.field) {
-                parts.push(urn.field);
-            }
-            if (urn.value !== undefined) {
-                params.push(`val=${urn.value}`)
-            }
-            if (urn.instance !== undefined) {
-                params.push(`inst=${urn.instance}`)
-            }
-            if (params.length > 0) {
-                parts.push(params.join('&'));
-            }
+            if (lastSeg.IndexOf('=') > -1)
+            {
+                BaseSegment = raw.Substring(0, lastColonIdx);
+                string[] args = lastSeg.Replace(":","").Split('&');
+                foreach (var arg in args)
+                {
+                    string[] keyVal = arg.Split('=');
+                    if (keyVal.Length == 2)
+                    {
+                        string key = keyVal[0];
+                        string val = keyVal[1];
 
-            return parts.join(':');
-            */
+                        switch (key)
+                        {
+                            case "val":
+                                Value = Convert.ToInt32(val);
+                                break;
+                            case "inst":
+                                Instance = Convert.ToInt32(val);
+                                break;
+                            case "mod":
+                                Modifier = val;
+                                break;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                BaseSegment = raw;
+            }
+        }
 
         ImportUrn(string urn) : base(urn)
         {
-
+            ParseArgs();
         }
 
         public static ImportUrn From(string urn)
@@ -77,15 +96,5 @@ namespace Model.Tagging
             urn = conceptUrn;
             return ok;
         }
-
-        /*
-        public Concept ToConcept()
-        {
-
-
-
-            
-        }
-        */
     }
 }

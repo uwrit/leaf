@@ -29,10 +29,10 @@ export const getEmbeddedQueries = (panels: Panel[]): Concept[] => {
 };
 
 export const isNonstandard = (universalId?: string): boolean => {
-    const urnConvention = 'urn:leaf:';
+    const urnConvention = 'urn:leaf:concept';
     if (!universalId) {
         return false;
-    } else if (universalId!.startsWith(urnConvention)) {
+    } else if (!universalId!.startsWith(urnConvention)) {
         return true;
     }
     return false;

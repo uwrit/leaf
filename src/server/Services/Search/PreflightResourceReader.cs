@@ -193,7 +193,7 @@ namespace Services.Search
             var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(refs.Queries, pf)
+            return new PreflightResources(refs.Queries, refs.Imports, pf)
             {
                 DirectQueriesCheck = pq,
                 DirectConceptsCheck = pc,
@@ -208,7 +208,7 @@ namespace Services.Search
             var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(refs.Queries, pf)
+            return new PreflightResources(refs.Queries, refs.Imports, pf)
             {
                 DirectQueriesCheck = pq,
                 DirectConceptsCheck = pc,
@@ -240,11 +240,17 @@ namespace Services.Search
 
             foreach (var importRef in refs)
             {
-                var mapped = results.FirstOrDefault(r => r.Id == importRef.Id);
-                if (mapped != null)
+                var matched = results.FirstOrDefault(r => r.Id == importRef.Id);
+                if (matched != null)
                 {
-                    mapped.UniversalId = importRef.UniversalId.ToString();
-                    output.Add(mapped);
+                    var clone = new ImportPreflightCheckResult
+                    { 
+                        IsPresent = matched.IsPresent,
+                        IsAuthorized = matched.IsAuthorized,
+                        UniversalId = importRef.UniversalId.ToString(),
+                        ImportRef = importRef.Map()
+                    };
+                    output.Add(clone);
                 }
             }
 

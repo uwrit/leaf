@@ -10,7 +10,7 @@ import { connect } from 'react-redux';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { Dispatch } from 'redux';
 import { toggleMyLeafModal } from '../../actions/generalUi';
-import SavedQueriesTable from '../../components/MyLeafModal/SavedQueriesTable';
+import SavedQueriesTable from '../../components/MyLeafModal/SavedQueriesTable/SavedQueriesTable';
 import { AppState } from '../../models/state/AppState';
 import { SavedQueriesState } from '../../models/Query';
 import { Panel } from '../../models/panel/Panel';

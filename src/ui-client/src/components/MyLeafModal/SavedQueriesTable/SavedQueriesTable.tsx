@@ -6,13 +6,13 @@
  */ 
 
 import React from 'react';
-import { SavedQueryRef, SavedQueriesState } from '../../models/Query';
-import { getSavedQuery, setRunAfterSave, deleteSavedQueryAndCohort } from '../../actions/queries';
-import { Panel } from '../../models/panel/Panel';
-import { ConfirmationModalState } from '../../models/state/GeneralUiState';
-import { showConfirmationModal, toggleSaveQueryPane, hideMyLeafModal, showInfoModal } from '../../actions/generalUi';
-import { getPanelItemCount } from '../../utils/panelUtils';
-import { CohortStateType } from '../../models/state/CohortState';
+import { CohortStateType } from '../../../models/state/CohortState';
+import { Panel } from '../../../models/panel/Panel';
+import { SavedQueriesState, SavedQueryRef } from '../../../models/Query';
+import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
+import { deleteSavedQueryAndCohort, getSavedQuery, setRunAfterSave } from '../../../actions/queries';
+import { showConfirmationModal, hideMyLeafModal, toggleSaveQueryPane, showInfoModal } from '../../../actions/generalUi';
+import { getPanelItemCount } from '../../../utils/panelUtils';
 import './SavedQueriesTable.css';
 
 interface Props {

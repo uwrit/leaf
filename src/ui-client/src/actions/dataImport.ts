@@ -201,12 +201,12 @@ export const importREDCapProjectData = () => {
         dispatch(setImportProgress(1, 'Preparing import'));
         startTime = new Date().getTime();
         completed = pcts.INITIAL * 100;
+        const state = getState();
 
         try {
             /*
              * Initialize params.
              */
-            const state = getState();
             const redCap = state.dataImport.redCap;
             const { Flat } = REDCapRecordFormat;
             const conn = new REDCapHttpConnector(redCap.apiToken, redCap.apiURI!);

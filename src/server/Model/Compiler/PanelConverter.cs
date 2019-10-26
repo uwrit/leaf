@@ -95,10 +95,29 @@ namespace Model.Compiler
             }
 
             var concepts = resources.Concepts(compilerOptions);
-            var panels = GetPanels(query.All(), concepts);
+            var crosswalk = CrosswalkImportIds(query.All(), resources.DirectImportsCheck.Results.Select(r => r.ImportRef));
+            var panels = GetPanels(crosswalk, concepts);
             var merged = MergeFilters(panels, resources.GlobalPanelFilters);
 
             return new PanelValidationContext(query, resources, merged);
+        }
+
+        public IEnumerable<IPanelDTO> CrosswalkImportIds(IEnumerable<IPanelDTO> panels, IEnumerable<ImportRef> importRefs)
+        {
+            var mapped = panels.Select(p => p).ToList();
+
+            foreach (var @ref in importRefs)
+            {
+                var map = mapped
+                    .SelectMany(p => p.SubPanels
+                    .SelectMany(sp => sp.PanelItems
+                    .Where(pi => pi.Resource.UniversalId == @ref.UniversalId.ToString())));
+                foreach (var panelItem in map)
+                {
+                    panelItem.Resource.Id = @ref.Id;
+                }
+            }
+            return mapped;
         }
 
         /// <summary>

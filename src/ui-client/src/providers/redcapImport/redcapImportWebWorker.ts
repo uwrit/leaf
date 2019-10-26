@@ -201,6 +201,17 @@ export default class REDCapImportWebWorker {
             return { requestId, result: count };
         };
 
+        /* 
+         * Generate a random guid
+         * See https://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript/2117523#2117523
+         */
+        const generateGuid = (): string => {
+            // @ts-ignore
+            return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        };
+
         /*
          * Derive useful Leaf-centric metadata for REDCap fields.
          * These are used only as an intermediate object on intial load.
@@ -236,7 +247,7 @@ export default class REDCapImportWebWorker {
 
                 const m: REDCapImportFieldMetadata = {
                     form: field.form_name,
-                    id: field.field_name,
+                    id: field.form_name,
                     label: field.field_label.replace(REGEX_MARKUP, '').trim(),
                     name: field.field_name,
                     source: field,
@@ -316,10 +327,13 @@ export default class REDCapImportWebWorker {
                 parts.push(urn.field);
             }
             if (urn.value !== undefined) {
-                params.push(`val=${urn.value}`)
+                params.push(`val=${urn.value}`);
             }
             if (urn.instance !== undefined) {
-                params.push(`inst=${urn.instance}`)
+                params.push(`inst=${urn.instance}`);
+            }
+            if (urn.event !== undefined) {
+                params.push(`mod=${urn.event}`);
             }
             if (params.length > 0) {
                 parts.push(params.join('&'));
@@ -398,6 +412,7 @@ export default class REDCapImportWebWorker {
             const root: REDCapConcept = {
                 rootId,
                 id: id,
+                extensionId: generateGuid(),
                 parentId: rootId,
                 universalId: id,
                 urn,
@@ -450,9 +465,10 @@ export default class REDCapImportWebWorker {
             const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
+                extensionId: generateGuid(),
                 parentId: root.id,
                 childrenIds: new Set(),
-                uiDisplayName: 'By Event'
+                uiDisplayName: 'Events'
             };
 
             return config.events!
@@ -470,9 +486,10 @@ export default class REDCapImportWebWorker {
             const concept: REDCapConcept = {
                 ...root,
                 id: `${root.universalId}:${idMod}`,
+                extensionId: generateGuid(),
                 parentId: root.id,
                 childrenIds: new Set(),
-                uiDisplayName: 'By Form'
+                uiDisplayName: 'Forms'
             };
             
             return config.forms!
@@ -492,6 +509,7 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
+                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 childrenIds: new Set(),
@@ -517,6 +535,7 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}`,
                 universalId,
+                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 childrenIds: new Set(),
@@ -542,6 +561,7 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${universalId}:${idMod}:${field.name}`,
                 universalId,
+                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 isParent: field.options.length > 0,
@@ -567,6 +587,7 @@ export default class REDCapImportWebWorker {
                 ...parent,
                 id: `${parent.id}:${option.value}`,
                 universalId,
+                extensionId: generateGuid(),
                 urn,
                 parentId: parent.id,
                 isParent: false,
