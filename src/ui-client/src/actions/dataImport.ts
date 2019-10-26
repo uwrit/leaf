@@ -432,6 +432,10 @@ const calculateImportCompletionTime = (percentComplete: number): number => {
     return secondsElapsed < 1 ? 60 : estimate;
 };
 
+/*
+ * Create a REDCap import config from scratch, which will be updated
+ * as the import progresses.
+ */
 const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
     return  {
         forms: [],
@@ -457,6 +461,10 @@ const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
     };
 };
 
+/*
+ * Create a REDCap import metadata structure, which will be stored as JSON
+ * in the DB and loaded in the client on future startups.
+ */
 const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCapConcept[], config: REDCapImportConfiguration): ImportMetadata => {
     const id = `urn:leaf:import:redcap:${config.projectInfo.project_id}`;
     const structure: REDCapImportStructure = {
@@ -481,6 +489,12 @@ const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCap
     } 
 };
 
+/*
+ * Configure the users who can access the project by checking REDCap,
+ * then swapping their REDCap-based scope (ie, everything after the '@')
+ * with the current scope of the importing user. The current user is
+ * of course also added to the group.
+ */
 const createREDCapAccessUsers = (user: UserContext, config: REDCapImportConfiguration): Constraint[] => {
     const fullscope = `${user.scope}@${user.issuer}`;
     const importer = `${user.name}@${fullscope}`;
