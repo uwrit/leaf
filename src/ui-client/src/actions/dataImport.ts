@@ -11,7 +11,7 @@ import { REDCapHttpConnector } from '../services/redcapApi';
 import { REDCapEavRecord } from '../models/redcapApi/Record';
 import { REDCapRecordFormat, REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 import { REDCapImportConfiguration, REDCapConcept } from '../models/redcapApi/ImportConfiguration';
-import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getREDCapImportRecords, upsertImportRecords, getMetdataBySourceId, deleteMetadata, clearRecords } from '../services/dataImport';
+import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getREDCapImportRecords, upsertImportRecords, getMetdataBySourceId, deleteMetadata, clearRecords, clearUnmappedRecords, updateMetadata } from '../services/dataImport';
 import { InformationModalState, NotificationStates, ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setNoClickModalState, showInfoModal, showConfirmationModal } from './generalUi';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
@@ -238,19 +238,6 @@ export const importREDCapProjectData = () => {
             dispatch(setImportProgress(completed, 'Generating Leaf Concepts'));
             await clearRecords();
             const concepts = await loadREDCapImportData(config);
-            
-            /*
-             * Calculate the patient count for each new REDCap concept.
-             */
-            let i = 0;
-            const len = concepts.length;
-            const increment = () => { i++; completed = Math.round(((pcts.INITIAL + pcts.RECORDS) * 100.0) + ((i / len * 100.0) * pcts.COUNTS)); }
-            
-            for (const concept of concepts) {
-                increment();
-                dispatch(setImportProgress(completed, `Calculating patient counts (${i} of ${len} concepts)`));
-                concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
-            };
 
             /*
              * Import the project metadata
@@ -282,8 +269,33 @@ export const importREDCapProjectData = () => {
                  * Increment current index and recalculate import progress.
                  */
                 startIdx += redCap.batchSize;
-                completed = Math.round(((1 - pcts.LOAD) + (endIdx / totalRecords * pcts.LOAD)) * 100);
+                completed = Math.round(((pcts.INITIAL + pcts.RECORDS) + (endIdx / totalRecords * pcts.LOAD)) * 100);
             }
+
+            /*
+             * Delete any cached records for which the server wasn't
+             * able to map an MRN to a patientId.
+             */
+            await clearUnmappedRecords(new Set(unmappedPatients));
+
+            /*
+             * Calculate the patient count for each new REDCap concept.
+             */
+            let i = 0;
+            const len = concepts.length;
+            const increment = () => { i++; completed = Math.round(((1 - pcts.COUNTS) * 100.0) + ((i / len * 100.0) * pcts.COUNTS)); }
+            
+            for (const concept of concepts) {
+                increment();
+                dispatch(setImportProgress(completed, `Calculating patient counts (${i} of ${len} concepts)`));
+                concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
+            };
+
+            /*
+             * Update metadata with final patient counts.
+             */
+            (meta.structure as REDCapImportStructure).concepts = concepts;
+            await updateMetadata(state, meta);
             
             /*
              * Success, so wrap it up.
@@ -300,6 +312,7 @@ export const importREDCapProjectData = () => {
         } catch (err) {
             console.log(err);
             dispatch(setImportError());
+            clearRecords();
         }
     };
 };
@@ -416,8 +429,8 @@ export const setImportProgress = (completed: number, text: string): ImportAction
 const pcts = {
     INITIAL: 0.1,
     RECORDS: 0.3,
-    COUNTS: 0.2,
-    LOAD: 0.4
+    LOAD: 0.4,
+    COUNTS: 0.2
 };
 let completed = 0;
 

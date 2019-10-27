@@ -35,6 +35,8 @@ var handleWorkMessage = function (payload) {
             return getRecords(payload);
         case CLEAR_RECORDS:
             return clearRecords(payload);
+        case CLEAR_UNMAPPED:
+            return clearUnmappedRecords(payload);
         default:
             return null;
     }
@@ -44,18 +46,27 @@ var records = [];
 /*
  * Clear all current records.
  */
-var clearRecords = function(payload) {
+var clearRecords = function (payload) {
     var { requestId } = payload;
     metadata = new Map();
     records = [];
-    return { requestId };
+    return { requestId: requestId };
+};
+/*
+ * Clear current records for which the server could find 
+ * no matching PersonId to an MRN.
+ */
+var clearUnmappedRecords = function (payload) {
+    const { requestId, unmapped } = payload;
+    records = records.filter(r => !unmapped.has(r.sourcePersonId));
+    return { requestId: requestId };
 };
 /*
 * Return all current records.
 */
 var getRecords = function (payload) {
     var { requestId } = payload;
-    return { requestId, result: records };
+    return { requestId: requestId, result: records };
 };
 /*
  * Load the raw REDCap project data from the API.

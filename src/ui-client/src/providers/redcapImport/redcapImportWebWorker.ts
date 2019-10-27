@@ -17,6 +17,7 @@ const LOAD_IMPORT_CONFIGURATION = 'LOAD_IMPORT_CONFIGURATION';
 const CALCULATE_PATIENT_COUNT = 'CALCULATE_PATIENT_COUNT';
 const GET_RECORDS = 'GET_RECORDS';
 const CLEAR_RECORDS = 'CLEAR_RECORDS';
+const CLEAR_UNMAPPED = 'CLEAR_UNMAPPED';
 
 export interface OutboundMessageResultCount {
     value: number
@@ -48,6 +49,7 @@ interface InboundMessagePartialPayload {
     message: string;
     field_name?: string;
     search_value?: any;
+    unmapped?: Set<string>;
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -75,7 +77,7 @@ export default class REDCapImportWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT, GET_RECORDS, CLEAR_RECORDS ])}
+            ${this.addMessageTypesToContext([ LOAD_IMPORT_CONFIGURATION, CALCULATE_PATIENT_COUNT, GET_RECORDS, CLEAR_RECORDS, CLEAR_UNMAPPED ])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -101,6 +103,10 @@ export default class REDCapImportWebWorker {
 
     public clearRecords = () => {
         return this.postMessage({ message: CLEAR_RECORDS });
+    }
+
+    public clearUnmapped = (unmapped: Set<string>) => {
+        return this.postMessage({ message: CLEAR_UNMAPPED, unmapped });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -143,6 +149,8 @@ export default class REDCapImportWebWorker {
                     return getRecords(payload);
                 case CLEAR_RECORDS:
                     return clearRecords(payload);
+                case CLEAR_UNMAPPED:
+                    return clearUnmappedRecords(payload);
                 default:
                     return null;
             }
@@ -158,6 +166,16 @@ export default class REDCapImportWebWorker {
             const { requestId } = payload;
             metadata = new Map();
             records = [];
+            return { requestId };
+        };
+
+        /*
+         * Clear current records for which the server could find 
+         * no matching PersonId to an MRN.
+         */
+        const clearUnmappedRecords = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, unmapped } = payload;
+            records = records.filter(r => !unmapped!.has(r.sourcePersonId!));
             return { requestId };
         };
 

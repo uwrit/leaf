@@ -46,6 +46,16 @@ export const clearRecords = async () => {
 };
 
 /*
+ * Clear records with unmapped MRNs.
+ */
+export const clearUnmappedRecords = async (unmapped: Set<string>) => {
+    return new Promise( async (resolve, reject) => {
+        await worker.clearUnmapped(unmapped);
+        resolve();
+    });
+};
+
+/*
  * Get all currently prepped REDCapImport records
  */
 export const getREDCapImportRecords = async (importMetadataId: string): Promise<ImportRecordDTO[]> => {
