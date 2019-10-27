@@ -287,7 +287,7 @@ export const importREDCapProjectData = () => {
             
             for (const concept of concepts) {
                 increment();
-                dispatch(setImportProgress(completed, `Calculating patient counts (${i} of ${len} concepts)`));
+                dispatch(setImportProgress(completed, `Calculating patient counts (${i.toLocaleString()} of ${len.toLocaleString()} concepts)`));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 
