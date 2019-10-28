@@ -286,6 +286,7 @@ var deriveConceptTree = function (config) {
         rootId,
         id: id,
         parentId: rootId,
+        universalId: id,
         urn: urn,
         isEncounterBased: false,
         isParent: true,

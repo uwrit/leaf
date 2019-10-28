@@ -242,7 +242,7 @@ export const importREDCapProjectData = () => {
             /*
              * Import the project metadata
              */
-            dispatch(setImportProgress(completed, 'Loading REDCap data into Leaf'));
+            dispatch(setImportProgress(completed, 'Analyzing REDCap project structure'));
             let meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config);
             meta = await createMetadata(state, meta);
 
@@ -283,11 +283,12 @@ export const importREDCapProjectData = () => {
              */
             let i = 0;
             const len = concepts.length;
+            const lenStr = len.toLocaleString();
             const increment = () => { i++; completed = Math.round(((1 - pcts.COUNTS) * 100.0) + ((i / len * 100.0) * pcts.COUNTS)); }
             
             for (const concept of concepts) {
                 increment();
-                dispatch(setImportProgress(completed, `Calculating patient counts (${i.toLocaleString()} of ${len.toLocaleString()} concepts)`));
+                dispatch(setImportProgress(completed, `Calculating patient counts (${i.toLocaleString()} of ${lenStr} concepts)`));
                 concept.uiDisplayPatientCount = await calculateREDCapFieldCount(concept);
             };
 

@@ -115,7 +115,7 @@ export const createMetadata = async (state: AppState, meta: ImportMetadata): Pro
 export const updateMetadata = async (state: AppState, meta: ImportMetadata): Promise<ImportMetadata> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/import/metadata`, meta);
+    const resp = await http.put(`api/import/metadata`, toDto(meta));
     const dto = resp.data as ImportMetadataDTO;
     return fromDto(dto);
 };
