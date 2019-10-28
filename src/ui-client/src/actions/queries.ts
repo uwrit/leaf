@@ -9,7 +9,7 @@ import { SavedQuery, SavedQueryRef, Query, QueryDependent } from '../models/Quer
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';
-import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getExtensionConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
+import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getExtensionRootConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { setNoClickModalState, showInfoModal, toggleSaveQueryPane, hideMyLeafModal, showConfirmationModal, setRoute } from './generalUi';
 import { NotificationStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
@@ -127,8 +127,8 @@ export const requestQuerySave = () => {
             state = getState();
             const savedQueries = [ ...state.queries.saved.values() ];
             const imports: any[] = []; // TODO: fix this
-            const newQueryConcepts = await getExtensionConcepts(imports, savedQueries) as ConceptExtensionInitializer;
-            dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
+            // const newQueryConcepts = await getExtensionConcepts(imports, savedQueries) as ConceptExtensionInitializer;
+            // dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
 
             /*
              * Save to any network responder nodes.
@@ -219,8 +219,8 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                         state = getState();
                         const savedQueries = [ ...state.queries.saved.values() ];
                         const imports: any[] = []; // TODO: fix this
-                        const newQueryConcepts = await getExtensionConcepts(imports, savedQueries) as ConceptExtensionInitializer;
-                        dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
+                        // const newQueryConcepts = await getExtensionConcepts(imports, savedQueries) as ConceptExtensionInitializer;
+                        // dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
 
                         /*
                          * Delete from network responders.

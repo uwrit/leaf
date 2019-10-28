@@ -15,13 +15,12 @@ import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
 import { getExportOptions, getImportOptions } from '../services/redcapApi';
 import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer } from '../services/sessionApi';
-import { requestRootConcepts, setExtensionConcepts } from './concepts';
+import { requestRootConcepts, setExtensionRootConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
 import { showConfirmationModal } from '../actions/generalUi';
-import { getSavedQueries, getExtensionConcepts } from '../services/queryApi';
-import { ConceptExtensionInitializer } from '../models/concept/Concept';
+import { getSavedQueries, getExtensionRootConcepts } from '../services/queryApi';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setPanels } from './panels';
@@ -122,10 +121,9 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
             const imports = await getAllMetdata(getState());
-            const extensionConcepts = await getExtensionConcepts(imports, savedCohorts) as ConceptExtensionInitializer;
-            dispatch(setExtensionConcepts(extensionConcepts.concepts, extensionConcepts.roots));
+            const extensionConcepts = await getExtensionRootConcepts(imports, savedCohorts);
+            dispatch(setExtensionRootConcepts(extensionConcepts));
             dispatch(setImportsMetadata(imports));
-            console.log(imports, extensionConcepts);
 
             /* 
              * Initiliaze web worker search.

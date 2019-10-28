@@ -12,7 +12,7 @@ import ExtensionConceptsWebWorker from '../providers/extensionConcepts/extension
 import { PanelDTO, Panel } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { NetworkIdentity } from '../models/NetworkResponder';
-import { ResourceRef, ExtensionConcept } from '../models/concept/Concept';
+import { ResourceRef, ExtensionConcept, Concept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
@@ -109,9 +109,17 @@ export const preflightSavedQuery = async (state: AppState, resourceRef: Resource
  * created from the worker. The return object is 
  * merged with the Concept tree.
  */
-export const getExtensionConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]) => {
+export const getExtensionRootConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]): Promise<Concept[]> => {
     const concepts = await worker.buildExtensionImportTree(imports, queries);
-    return concepts;
+    return concepts as Concept[];
+};
+
+/*
+ * Requests child extension concepts for a given concept.
+ */
+export const fetchExtensionConceptChildren = async (concept: ExtensionConcept | Concept): Promise<Concept[]> => {
+    const concepts = await worker.loadConceptChildren(concept as ExtensionConcept);
+    return concepts as Concept[];
 };
 
 /*

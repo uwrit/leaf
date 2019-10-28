@@ -14,7 +14,7 @@ import {
     SET_CONCEPTS,
     SET_ROOT_CONCEPTS,
     SET_SEARCH_TREE,
-    SET_EXTENSION_CONCEPTS,
+    SET_EXTENSION_ROOT_CONCEPTS,
     SET_EXTENSION_CONCEPT,
     SET_SELECTED_CONCEPT,
     REPARENT_CONCEPT,
@@ -45,8 +45,8 @@ export const defaultConceptsState = (): ConceptsState => {
     };
 };
 
-const getAncestors = (concept: Concept, cache: ConceptMap): Set<string> => {
-    const updateChain = new Set([concept.id]);
+const getAncestors = (concept: Concept, cache: ConceptMap, forceRerender: string[] = []): Set<string> => {
+    const updateChain = new Set([concept.id].concat(forceRerender));
     let parentId = cache.get(concept.id)!.parentId;
     
     while (parentId) {
@@ -59,6 +59,7 @@ const getAncestors = (concept: Concept, cache: ConceptMap): Set<string> => {
 const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsState => {
     const newConcept = Object.assign({}, concept, { isOpen: !concept.isOpen });
     const updated: Concept[] = [ newConcept ];
+    const forceRerender: string[] = [];
 
     // Make sure all children of newly opened concept are closed to
     // prevent odd rendering issues (if they were previously opened but
@@ -70,11 +71,12 @@ const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsStat
             if (childConcept && childConcept.isOpen) {
                 const clone = Object.assign({}, childConcept, { isOpen: false });
                 updated.push(clone);
+                forceRerender.push(clone.id);
             }
         }
     }
     return Object.assign({}, addConcepts(state, updated), {
-        allowRerender: getAncestors(concept, state.currentTree)
+        allowRerender: getAncestors(concept, state.currentTree, forceRerender)
     })
 };
 
@@ -170,17 +172,16 @@ const addRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState 
 };
 
 const addConcepts = (state: ConceptsState, cons: Concept[]): ConceptsState => {
-    const currentTree = new Map(state.currentTree);
-    cons.forEach(c => currentTree.set(c.id, Object.assign({}, c)));
-    return Object.assign({}, state, { currentTree });
+    cons.forEach(c => state.currentTree.set(c.id, Object.assign({}, c)));
+    return Object.assign({}, state, { currentTree: new Map(state.currentTree) });
 };
 
 
-const setExtensionConcepts = (state: ConceptsState, extensionTree: ConceptMap, roots: string[]): ConceptsState => {
+const setExtensionRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState => {
+    roots.forEach(c => state.currentTree.set(c.id, c));
     return Object.assign({}, state, {
-        currentTree: new Map([...state.currentTree, ...extensionTree]),
-        roots: state.roots.slice().concat(roots),
-        extensionTree
+        currentTree: new Map(state.currentTree),
+        roots: state.roots.slice().concat(roots.map(r => r.id)),
     });
 };
 
@@ -413,8 +414,8 @@ export const concepts = (state: ConceptsState = defaultConceptsState(), action: 
         case SET_CONCEPT:
         case SET_CONCEPTS:
             return addConcepts(state, action.concepts!);
-        case SET_EXTENSION_CONCEPTS:
-            return setExtensionConcepts(state, action.conceptMap!, action.roots!);
+        case SET_EXTENSION_ROOT_CONCEPTS:
+            return setExtensionRootConcepts(state, action.concepts!);
         case SET_EXTENSION_CONCEPT:
             return setExtensionConcept(state, action.concept!);
         case REMOVE_EXTENSION_CONCEPT:

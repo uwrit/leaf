@@ -15,12 +15,14 @@ import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, f
 import { fetchAdminConceptIfNeeded } from './admin/concept';
 import { Routes, InformationModalState } from '../models/state/GeneralUiState';
 import { showInfoModal } from './generalUi';
+import { isNonstandard } from '../utils/panelUtils';
+import { fetchExtensionConceptChildren } from '../services/queryApi';
 
 export const SET_CONCEPT = 'SET_CONCEPT';
 export const SET_CONCEPTS = 'SET_CONCEPTS';
 export const SET_ROOT_CONCEPTS = 'SET_ROOT_CONCEPTS';
 export const SET_EXTENSION_CONCEPT = 'SET_EXTENSION_CONCEPT';
-export const SET_EXTENSION_CONCEPTS = 'SET_EXTENSION_CONCEPTS';
+export const SET_EXTENSION_ROOT_CONCEPTS = 'SET_EXTENSION_ROOT_CONCEPTS';
 export const SET_SEARCH_TREE = 'SET_SEARCH_TREE';
 export const SET_SELECTED_CONCEPT = 'SET_SELECTED_CONCEPT';
 export const CREATE_CONCEPT = 'CREATE_CONCEPT';
@@ -89,9 +91,16 @@ export const fetchConceptChildrenIfNeeded = (concept: Concept) => {
  */
 export const getConceptChildren = (concept: Concept) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const isStandard = !isNonstandard(concept.universalId);
         dispatch(requestConceptChildren(concept));
-        const response = await fetchConceptChildren(concept, getState());
-        dispatch(receiveConceptChildren(concept, response.data));
+
+        if (isStandard) {
+            const response = await fetchConceptChildren(concept, getState());
+            dispatch(receiveConceptChildren(concept, response.data));
+        } else {
+            const response = await fetchExtensionConceptChildren(concept);
+            dispatch(receiveConceptChildren(concept, response));
+        }
     };
 };
 
@@ -271,11 +280,10 @@ export const removeExtensionConcept = (concept: Concept) => {
     }
 };
 
-export const setExtensionConcepts = (conceptMap: ConceptMap, roots: string[]): ConceptsAction => {
+export const setExtensionRootConcepts = (concepts: Concept[]): ConceptsAction => {
     return {
-        conceptMap,
-        roots,
-        type: SET_EXTENSION_CONCEPTS
+        concepts,
+        type: SET_EXTENSION_ROOT_CONCEPTS
     };
 };
 
