@@ -33,6 +33,10 @@
     border-bottom: none;
 }
 
+.myleaf-modal .modal-body { 
+    min-height: 300px;
+}
+
 .myleaf-modal-tab-container {
     background-color: #fafbfc;
 } 

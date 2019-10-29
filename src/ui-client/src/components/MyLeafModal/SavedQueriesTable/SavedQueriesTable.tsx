@@ -13,7 +13,6 @@ import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { deleteSavedQueryAndCohort, getSavedQuery, setRunAfterSave } from '../../../actions/queries';
 import { showConfirmationModal, hideMyLeafModal, toggleSaveQueryPane, showInfoModal } from '../../../actions/generalUi';
 import { getPanelItemCount } from '../../../utils/panelUtils';
-import './SavedQueriesTable.css';
 
 interface Props {
     dispatch: any;

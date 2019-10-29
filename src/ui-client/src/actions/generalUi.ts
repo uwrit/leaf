@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState } from '../models/state/GeneralUiState';
+import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType } from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -14,6 +14,7 @@ import { loadAdminPanelDataIfNeeded } from './admin/admin';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 
+export const SET_MYLEAF_TAB = 'SET_MYLEAF_TAB';
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
 export const SET_ROUTE = 'SET_ROUTE';
 export const SET_ROUTE_CONFIG = 'SET_ROUTE_CONFIG';
@@ -43,6 +44,7 @@ export interface GeneralUiAction {
     routeConfig?: RouteConfig[];
     selectable?: boolean;
     sideNotification?: SideNotificationState;
+    tab?: MyLeafTabType;
     type: string;
 }
 
@@ -181,5 +183,12 @@ export const setBrowser = (browser: Browser): GeneralUiAction  => {
     return {
         browser,
         type: SET_BROWSER
+    }
+};
+
+export const setMyLeafTab = (tab: MyLeafTabType): GeneralUiAction  => {
+    return {
+        tab,
+        type: SET_MYLEAF_TAB
     }
 };

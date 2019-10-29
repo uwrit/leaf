@@ -199,6 +199,36 @@ const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnec
 };
 
 /*
+ * Delete an imported project.
+ */
+export const deleteREDCapImport = (meta: ImportMetadata) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        dispatch(setNoClickModalState({ message: 'Deleting project', state: NotificationStates.Working }));
+
+        try {
+            await deleteMetadata(state, meta);
+            const imports = [ ...state.dataImport.imports.values() ].filter(d => d.id !== meta.id);
+            const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+            dispatch(deleteImportMetadata(meta));
+            dispatch(deleteAllExtensionConcepts());
+            dispatch(setExtensionRootConcepts(extensionConcepts));
+
+            dispatch(setNoClickModalState({ message: 'Project Deleted', state: NotificationStates.Complete }));
+        } catch (err) {
+            console.log(err);
+            const info: InformationModalState = {
+                body: "Uh oh, something went wrong when attempting to delete your REDCap project. Please contact your Leaf administrator.",
+                header: "Error Deleting REDCap Project",
+                show: true
+            };
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            dispatch(showInfoModal(info));
+        }
+    };
+};
+
+/*
  * Import results from a REDCap instance.
  */
 export const importREDCapProjectData = () => {

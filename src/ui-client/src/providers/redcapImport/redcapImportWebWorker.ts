@@ -384,10 +384,15 @@ export default class REDCapImportWebWorker {
                 };
 
                 /*
-                 * If a string.
+                 * If a number.
                  */
-                if (field.isString) {
-                    rec.valueString = rec.sourceValue;
+                if (field.isNumber || field.options.length) {
+                    const v = parseFloat(rec.sourceValue);
+
+                    if (v > 99999999 || v < -99999999) {
+                        continue;
+                    }
+                    rec.valueNumber = v;
                 }
                 /*
                  * Else if a date.
@@ -403,15 +408,10 @@ export default class REDCapImportWebWorker {
                     }
                 }
                 /*
-                 * Else if a number.
+                 * Else it's a string.
                  */
-                else if (field.isNumber || field.options.length) {
-                    const v = parseFloat(rec.sourceValue);
-
-                    if (v > 99999999 || v < -99999999) {
-                        continue;
-                    }
-                    rec.valueNumber = v;
+                else {
+                    rec.valueString = rec.sourceValue;
                 }
                 seen.set(uniqueId, instance);
                 records.push(rec);

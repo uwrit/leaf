@@ -9,16 +9,17 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { Dispatch } from 'redux';
-import { toggleMyLeafModal } from '../../actions/generalUi';
+import { toggleMyLeafModal, setMyLeafTab } from '../../actions/generalUi';
 import SavedQueriesTable from '../../components/MyLeafModal/SavedQueriesTable/SavedQueriesTable';
 import { AppState } from '../../models/state/AppState';
 import { SavedQueriesState } from '../../models/Query';
 import { Panel } from '../../models/panel/Panel';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
-import './MyLeafModal.css';
 import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/REDCapImportsTable';
 import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
+import { MyLeafTabType } from '../../models/state/GeneralUiState';
+import './MyLeafModal.css';
 
 interface StateProps {
     home?: NetworkIdentity;
@@ -27,6 +28,7 @@ interface StateProps {
     panels: Panel[];
     queries: SavedQueriesState;
     show: boolean;
+    tab: MyLeafTabType
 }
 interface DispatchProps {
     dispatch: Dispatch<any>
@@ -35,25 +37,13 @@ interface OwnProps {}
 
 type Props = StateProps & DispatchProps & OwnProps;
 
-interface State {
-    activeTab: string;
-}
-
-class MyLeafModal extends React.PureComponent<Props, State> {
+class MyLeafModal extends React.PureComponent<Props> {
     private className = 'myleaf-modal';
-
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            activeTab: '1'
-        };
-    }
 
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];
-        const { queries, dispatch, panels, queryState, home, imports } = this.props;
-        const { activeTab } = this.state;
+        const { queries, dispatch, panels, queryState, home, imports, tab } = this.props;
         const isGateway = home ? home.isGateway : false;
         const redcap = [ ...imports.values() ].filter(im => im.type === ImportType.REDCapProject);
 
@@ -69,12 +59,12 @@ class MyLeafModal extends React.PureComponent<Props, State> {
                 <div className={`${c}-tab-container`}>
                     <Nav tabs={true}>
                         <NavItem>
-                            <NavLink active={activeTab === '1'} onClick={this.handleTabClick.bind(null, '1')}>
+                            <NavLink active={tab === MyLeafTabType.SavedQueries} onClick={this.handleTabClick.bind(null, MyLeafTabType.SavedQueries)}>
                                 My Saved Queries
                             </NavLink>
                         </NavItem>
                         <NavItem>
-                            <NavLink active={activeTab === '2'} onClick={this.handleTabClick.bind(null, '2')}>
+                            <NavLink active={tab === MyLeafTabType.REDCapImport} onClick={this.handleTabClick.bind(null, MyLeafTabType.REDCapImport)}>
                                 My REDCap Imports
                             </NavLink>
                         </NavItem>
@@ -83,11 +73,11 @@ class MyLeafModal extends React.PureComponent<Props, State> {
 
                 {/* Body */}
                 <ModalBody>
-                    <TabContent activeTab={activeTab}>
-                        <TabPane tabId="1">
+                    <TabContent activeTab={tab}>
+                        <TabPane tabId={MyLeafTabType.SavedQueries}>
                             <SavedQueriesTable dispatch={dispatch} panels={panels} queries={queries} queryState={queryState} isGateway={isGateway}/>
                         </TabPane>
-                        <TabPane tabId="2">
+                        <TabPane tabId={MyLeafTabType.REDCapImport}>
                             <REDCapImportsTable dispatch={dispatch} imports={redcap} />
                         </TabPane>
                     </TabContent>
@@ -103,8 +93,9 @@ class MyLeafModal extends React.PureComponent<Props, State> {
 
     private handleCloseClick = () => this.props.dispatch(toggleMyLeafModal());
 
-    private handleTabClick = (id: string) => {
-        this.setState({ activeTab: id });
+    private handleTabClick = (tab: MyLeafTabType) => {
+        const { dispatch } = this.props;
+        dispatch(setMyLeafTab(tab));
     }
 };
 
@@ -115,7 +106,8 @@ const mapStateToProps = (state: AppState): StateProps => {
         queryState: state.cohort.count.state,
         panels: state.panels,
         queries: state.queries,
-        show: state.generalUi.showMyLeafModal
+        show: state.generalUi.showMyLeafModal,
+        tab: state.generalUi.currentMyLeafTab
     };
 }
 

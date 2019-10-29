@@ -6,10 +6,10 @@
  */ 
 
 import React from 'react';
-import './REDCapImportsTable.css';
 import { ImportMetadata, REDCapImportStructure } from '../../../models/dataImport/ImportMetadata';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../actions/generalUi';
+import { deleteREDCapImport } from '../../../actions/dataImport';
 
 interface Props {
     dispatch: any;
@@ -79,12 +79,10 @@ export default class REDCapImportsTable extends React.PureComponent<Props> {
         const { dispatch } = this.props;
         const struct = im.structure as REDCapImportStructure;
         const confirm: ConfirmationModalState = {
-            body: `Are you sure you want to delete the REDCap imported project "${struct.configuration.projectInfo.project_title}"? This will not affect your real data in REDCap`,
+            body: `Are you sure you want to delete the REDCap imported project "${struct.configuration.projectInfo.project_title}"? This will not affect your real data in REDCap.`,
             header: 'Delete REDCap Import',
             onClickNo: () => null,
-            onClickYes: async () => {
-                
-            },
+            onClickYes: () => dispatch(deleteREDCapImport(im)),
             show: true,
             noButtonText: 'No',
             yesButtonText: `Yes, delete this project`

@@ -14,8 +14,8 @@ import MrnFieldEntryForm from './Sections/MrnFieldEntryForm';
 import ImportProgress from './Sections/ImportProgress';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { FiCheck } from 'react-icons/fi';
-import './REDCapImportModal.css';
 import ImportComplete from './Sections/ImportComplete';
+import './REDCapImportModal.css';
 
 interface Props {
     data: ImportState

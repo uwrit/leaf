@@ -238,10 +238,15 @@ var deriveImportRecords = function (config) {
             sourceModifier: raw.redcap_event_name
         };
         /*
-         * If a string.
+         * If a number.
          */
-        if (field.isString) {
-            rec.valueString = rec.sourceValue;
+        if (field.isNumber || field.options.length) {
+            var v = parseFloat(rec.sourceValue);
+
+            if (v > 99999999 || v < -99999999) {
+                continue;
+            }
+            rec.valueNumber = v;
         }
         /*
          * Else if a date.
@@ -249,22 +254,18 @@ var deriveImportRecords = function (config) {
         else if (field.isDate) {
             var d = new Date(rec.sourceValue);
             var y = d.getFullYear();
+
             if (d instanceof Date && !isNaN(y) && y > 1900 && y < 2100) {
                 rec.valueDate = d;
-            }
-            else {
-                continue;
+            } else { 
+                continue; 
             }
         }
         /*
-         * Else if a number.
+         * Else it's a string.
          */
-        else if (field.isNumber || field.options.length) {
-            var v = parseFloat(rec.sourceValue);
-            if (v > 99999999 || v < -99999999) {
-                continue;
-            }
-            rec.valueNumber = v;
+        else {
+            rec.valueString = rec.sourceValue;
         }
         seen.set(uniqueId, instance);
         records.push(rec);

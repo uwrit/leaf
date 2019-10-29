@@ -128,7 +128,7 @@
 }
 
 .header-option {
-    margin: 4px 0;
+    margin: 6px 0;
     padding-left: 4px;
 }
 
@@ -284,6 +284,10 @@
 
 .header-role-icon-quarantine {
     color: #ffcb1e;
+}
+
+.header-icon-redcap {
+    margin-left: -3px;
 }
 
 .myleaf-menu-icon-savedqueries {

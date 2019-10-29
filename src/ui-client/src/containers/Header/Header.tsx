@@ -8,7 +8,7 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { Navbar, Nav } from 'reactstrap';
-import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmationModal, toggleMyLeafModal, showInfoModal } from '../../actions/generalUi';
+import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmationModal, toggleMyLeafModal, showInfoModal, setMyLeafTab } from '../../actions/generalUi';
 import { resetPanels } from '../../actions/panels';
 import { AppState } from '../../models/state/AppState';
 import { UserContext, AppConfig } from '../../models/Auth';
@@ -16,7 +16,7 @@ import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { Panel } from '../../models/panel/Panel';
 import CohortSummary from './CohortSummary';
-import { Routes, ConfirmationModalState } from '../../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, MyLeafTabType } from '../../models/state/GeneralUiState';
 import { SavedQueriesState } from '../../models/Query';
 import { setCurrentQuery, setRunAfterSave } from '../../actions/queries';
 import { PanelFilter } from '../../models/panel/PanelFilter';
@@ -85,10 +85,12 @@ class Header extends React.PureComponent<Props> {
 
                         {/* User */}
                         <UserButton 
-                            federated={responders.size > 1} 
-                            user={user} 
+                            federated={responders.size > 1}
+                            imports={importState}
                             logoutClickHandler={this.handleLogoutClick} 
                             mySavedQueriesClickHandler={this.handleMySavedQueriesClick}
+                            redcapImportClickHandler={this.handleREDCapImportClick}
+                            user={user} 
                         />
 
                     </Nav>
@@ -161,7 +163,20 @@ class Header extends React.PureComponent<Props> {
     /*
      * Handles MySavedQueries click, opening the modal.
      */
-    private handleMySavedQueriesClick = () => this.props.dispatch(toggleMyLeafModal())
+    private handleMySavedQueriesClick = () => {
+        const { dispatch } = this.props;
+        dispatch(setMyLeafTab(MyLeafTabType.SavedQueries));
+        dispatch(toggleMyLeafModal());
+    }
+
+    /*
+     * Handles REDCap Import click.
+     */
+    private handleREDCapImportClick = () => {
+        const { dispatch } = this.props;
+        dispatch(setMyLeafTab(MyLeafTabType.REDCapImport));
+        dispatch(toggleMyLeafModal());
+    }
 }
 
 const mapStateToProps = (state: AppState): StateProps => {

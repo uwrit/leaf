@@ -22,7 +22,8 @@ import {
     CONFIRM_MODAL_SHOW,
     CONFIRM_MODAL_HIDE,
     NOCLICK_MODAL_SET_STATE,
-    SIDE_NOTIFICATION_SET_STATE
+    SIDE_NOTIFICATION_SET_STATE,
+    SET_MYLEAF_TAB
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -38,7 +39,7 @@ import {
     SELECT_CONCEPT_SPECIALIZATION,
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
-import { GeneralUiState, Routes, NotificationStates } from '../models/state/GeneralUiState';
+import { GeneralUiState, Routes, NotificationStates, MyLeafTabType } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
 import { IMPORT_TOGGLE_MRN_MODAL, IMPORT_TOGGLE_REDCAP_MODAL } from '../actions/dataImport';
 
@@ -63,6 +64,7 @@ export const defaultGeneralUiState = (): GeneralUiState => {
             header: "",
             show: false
         },
+        currentMyLeafTab: MyLeafTabType.SavedQueries,
         currentRoute: Routes.FindPatients,
         noclickModal: {
             message: "",
@@ -103,6 +105,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { currentRoute: Routes.FindPatients }); 
         case SET_ROUTE:
             return Object.assign({}, state, { currentRoute: action.route }); 
+        case SET_MYLEAF_TAB:
+            return Object.assign({}, state, { currentMyLeafTab: action.tab }); 
         case SET_ROUTE_CONFIG:
             return Object.assign({}, state, { routes: action.routeConfig });
         case IMPORT_TOGGLE_MRN_MODAL:
