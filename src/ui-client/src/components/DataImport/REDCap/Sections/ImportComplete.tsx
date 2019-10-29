@@ -30,8 +30,8 @@ export default class ImportComplete extends React.PureComponent<Props> {
                         Your REDCap project was successfully imported!
                     </p>
                     <p>
-                        <span className={`${c}-emphasis`}>Your imported data can be queried in the Concept Tree under REDCap Imports -> {`${redCap.config!.projectInfo.project_title}`}. </span>
-                        <span>Your project data will only be visible to you and any user able to access your existing REDCap project.</span>
+                        <span className={`${c}-emphasis`}>Your imported data can be queried in the Concept Tree under <strong>REDCap Imports -> {`${redCap.config!.projectInfo.project_title}`}</strong>. </span>
+                        <span>Your project data will only be visible to any user able to access your existing REDCap project.</span>
                     </p>
 
                     <Row>

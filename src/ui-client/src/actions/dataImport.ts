@@ -250,7 +250,7 @@ export const importREDCapProjectData = () => {
              * Import the project metadata
              */
             dispatch(setImportProgress(completed, 'Analyzing REDCap project structure'));
-            meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config);
+            meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config, config.mrns.length);
             meta = await createMetadata(state, meta);
 
             /*
@@ -499,7 +499,7 @@ const initializeREDCapImportConfiguration = (): REDCapImportConfiguration => {
  * Create a REDCap import metadata structure, which will be stored as JSON
  * in the DB and loaded in the client on future startups.
  */
-const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCapConcept[], config: REDCapImportConfiguration): ImportMetadata => {
+const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCapConcept[], config: REDCapImportConfiguration, patients: number): ImportMetadata => {
     const id = `urn:leaf:import:redcap:${config.projectInfo.project_id}`;
     const structure: REDCapImportStructure = {
         id,
@@ -512,14 +512,17 @@ const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCap
             projectInfo: config.projectInfo,
             recordField: config.recordField,
             users: config.users
-        }
+        },
+        patients
     };
 
     return {
+        created: new Date(),
         constraints: createREDCapAccessUsers(user, config),
         sourceId: id,
         structure,
         type: ImportType.REDCapProject,
+        updated: new Date()
     } 
 };
 

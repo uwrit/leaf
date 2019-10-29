@@ -23,10 +23,14 @@ interface BaseImportMetadata {
 
 export interface ImportMetadata extends BaseImportMetadata {
     structure: ImportStructure;
+    created: Date;
+    updated: Date;
 }
 
 export interface ImportMetadataDTO extends BaseImportMetadata {
     structureJson: string;
+    created: string;
+    updated: string;
 }
 
 export interface ImportStructure {
@@ -36,6 +40,7 @@ export interface ImportStructure {
 export interface REDCapImportStructure extends ImportStructure {
     concepts: Concept[];
     configuration: BaseREDCapImportConfiguration;
+    patients: number;
 }
 
 export interface MrnImportStructure extends ImportStructure {

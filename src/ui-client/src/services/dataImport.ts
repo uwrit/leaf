@@ -148,9 +148,11 @@ const fromDto = (dto: ImportMetadataDTO): ImportMetadata => {
     return {
         id: dto.id,
         constraints: dto.constraints,
+        created: new Date(dto.created),
         sourceId: dto.sourceId,
         structure: JSON.parse(dto.structureJson),
-        type: dto.type
+        type: dto.type,
+        updated: new Date(dto.updated)
     };
 };
 
@@ -158,8 +160,10 @@ const toDto = (meta: ImportMetadata): ImportMetadataDTO => {
     return {
         id: meta.id,
         constraints: meta.constraints,
+        created: `${meta.created}`,
         sourceId: meta.sourceId,
         structureJson: JSON.stringify(meta.structure),
-        type: meta.type
+        type: meta.type,
+        updated: `${meta.updated}`,
     };
 };

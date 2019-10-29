@@ -24,12 +24,14 @@ interface Props {
 }
 
 export default class SavedQueriesTable extends React.PureComponent<Props> {
+    private className = 'myleaf-table';
+
     public render() {
         const { queries, isGateway } = this.props;
 
         if (!queries.saved.size) { return <div>No saved queries to display</div>; }
 
-        const c = "myleaf-saved-queries";
+        const c = this.className;
         const classes = [ `${c}-container` ];
         const saved: SavedQueryRef[] = [ ...queries.saved.values() ];
         const headerClass = `${c}-header`;
@@ -41,7 +43,7 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
             <div className={classes.join(' ')}>
 
                 {/* Table */}
-                <table className={`${c}-table`}>
+                <table className={c}>
 
                     {/* Header */}
                     <thead className={`${c}-header`}>

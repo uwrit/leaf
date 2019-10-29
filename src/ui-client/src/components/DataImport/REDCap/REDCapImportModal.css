@@ -151,6 +151,11 @@
 }
 
 /* Completion summary */
+.import-redcap-summary-emphasis {
+    color: rgb(24, 142, 185);
+    font-weight: 500;
+}
+
 .import-redcap-summary .col-md-4 {
     text-align: center;
 }
@@ -172,6 +177,7 @@
 }
 
 .import-redcap-summary-users .import-redcap-summary-value {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 300;
     margin-bottom: 8px;
 }
