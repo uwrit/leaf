@@ -141,7 +141,8 @@ var deriveImportMetadata = function (config) {
             options: [],
             isString: false,
             isDate: false,
-            isNumber: false
+            isNumber: false,
+            numericValidation: false
         };
         m.options = deriveFieldOptions(m);
         /*
@@ -149,11 +150,12 @@ var deriveImportMetadata = function (config) {
          */
         if (validation === NUMBER || validation === INTEGER || validation === CALC) {
             m.isNumber = true;
-        }
-        else if (validation.indexOf(DATE) > -1) {
+            m.numericValidation = true;
+        } else if (m.options.length) {
+            m.isNumber = true;
+        } else if (validation.indexOf(DATE) > -1) {
             m.isDate = true;
-        }
-        else {
+        } else {
             m.isString = true;
         }
         metadata.set(m.name, m);
@@ -382,7 +384,7 @@ var deriveFieldConcept = function (parent, field, idMod) {
     var urn = Object.assign({}, parent.urn, { field: field.name });
     var universalId = urnToString(urn);
     console.log(urn, universalId, field);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"', isNumeric: field.isNumber, uiNumericDefaultText: field.isNumber ? 'of any result' : undefined });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"', isNumeric: field.numericValidation, uiNumericDefaultText: field.numericValidation ? 'of any result' : undefined });
     return field.options
         .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })
         .concat([concept]);
@@ -393,6 +395,6 @@ var deriveFieldConcept = function (parent, field, idMod) {
 var deriveFieldOptionConcept = function (parent, option, idMod) {
     var urn = Object.assign({}, parent.urn, { value: option.value });
     var universalId = urnToString(urn);
-    return Object.assign({}, parent, { id: parent.id + ":" + option.value, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"' });
+    return Object.assign({}, parent, { id: parent.id + ":" + option.value, universalId: universalId, urn, parentId: parent.id, isParent: false, isEncounterBased: false, childrenIds: new Set(), uiDisplayName: option.text, uiDisplayText: parent.uiDisplayText + ' of "' + option.text + '"', isNumeric: false, uiNumericDefaultText: undefined });
 };
 `
