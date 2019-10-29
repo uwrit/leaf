@@ -149,3 +149,29 @@
     font-size: 0.9rem;
     margin-left: 10px;
 }
+
+/* Completion summary */
+.import-redcap-summary .col-md-4 {
+    text-align: center;
+}
+
+.import-redcap-summary-text {
+    color: rgb(130,130,130);
+    font-size: 0.9rem;
+    margin-top: -8px;
+}
+
+.import-redcap-summary-value {
+    font-size: 3.0rem;
+    font-weight: 100;
+}
+
+.import-redcap-summary-users {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.import-redcap-summary-users .import-redcap-summary-value {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+}

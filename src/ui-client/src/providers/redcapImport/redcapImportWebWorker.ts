@@ -578,9 +578,11 @@ export default class REDCapImportWebWorker {
                 parentId: parent.id,
                 isParent: field.options.length > 0,
                 isEncounterBased: field.isDate,
+                isNumeric: field.isNumber,
                 childrenIds: new Set(),
                 uiDisplayName: field.label,
-                uiDisplayText: `${parent.uiDisplayText} field "${field.label}"`
+                uiDisplayText: `${parent.uiDisplayText} field "${field.label}"`,
+                uiNumericDefaultText: field.isNumber ? 'of any result' : undefined
             };
 
             return field.options

@@ -382,7 +382,7 @@ var deriveFieldConcept = function (parent, field, idMod) {
     var urn = Object.assign({}, parent.urn, { field: field.name });
     var universalId = urnToString(urn);
     console.log(urn, universalId, field);
-    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"' });
+    var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"', isNumeric: field.isNumber, uiNumericDefaultText: field.isNumber ? 'of any result' : undefined });
     return field.options
         .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })
         .concat([concept]);

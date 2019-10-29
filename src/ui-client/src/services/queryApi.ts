@@ -17,8 +17,8 @@ import { fetchConcept } from '../services/conceptApi';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isNonstandard } from '../utils/panelUtils';
-import moment from 'moment';
 import { ImportMetadata } from '../models/dataImport/ImportMetadata';
+import moment from 'moment';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -105,13 +105,23 @@ export const preflightSavedQuery = async (state: AppState, resourceRef: Resource
 };
 
 /*
- * Requests a Saved Cohort tree be derived and 
+ * Requests an extension tree be derived and 
  * created from the worker. The return object is 
  * merged with the Concept tree.
  */
 export const getExtensionRootConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]): Promise<Concept[]> => {
     const concepts = await worker.buildExtensionImportTree(imports, queries);
     return concepts as Concept[];
+};
+
+/*
+ * Request a Saved Cohort tree be derived and 
+ * created from the worker. The return object is 
+ * merged with the Concept tree.
+ */
+export const getExtensionConcept = async (id: string): Promise<Concept | undefined> => {
+    const concept = await worker.getExtensionConcept(id);
+    return concept as Concept | undefined;
 };
 
 /*
@@ -156,7 +166,7 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
 
                 // If saved query
                 if (isNonstandard(resRef.universalId)) {
-                    const embedded = state.concepts.extensionTree.get(resRef.universalId!);
+                    const embedded =  await getExtensionConcept(resRef.id);
                     if (!embedded) { 
                         throw new Error(`${resRef.uiDisplayName} is not an existing saved query.`); 
                     }

@@ -18,6 +18,8 @@ import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dat
 import { formatSmallNumber } from '../utils/formatNumber';
 import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
+import { deleteAllExtensionConcepts, setExtensionRootConcepts } from './concepts';
+import { getExtensionRootConcepts } from '../services/queryApi';
 
 export const IMPORT_SET_METADATA = 'IMPORT_SET_METADATA';
 export const IMPORT_DELETE_METADATA = 'IMPORT_DELETE_METADATA';
@@ -90,6 +92,10 @@ export const importMetadataFromREDCap = () => {
                     onClickYes: async () => {
                         dispatch(setNoClickModalState({ message: 'Deleting previous', state: NotificationStates.Working }));
                         await deleteMetadata(state, prev);
+                        const imports = [ ...state.dataImport.imports.values() ].filter(d => d.id !== prev.id);
+                        const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+                        dispatch(deleteAllExtensionConcepts());
+                        dispatch(setExtensionRootConcepts(extensionConcepts));
                         complete();
                     },
                     show: true,
@@ -202,6 +208,7 @@ export const importREDCapProjectData = () => {
         startTime = new Date().getTime();
         completed = pcts.INITIAL * 100;
         const state = getState();
+        let meta: any = null;
 
         try {
             /*
@@ -243,7 +250,7 @@ export const importREDCapProjectData = () => {
              * Import the project metadata
              */
             dispatch(setImportProgress(completed, 'Analyzing REDCap project structure'));
-            let meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config);
+            meta = deriveREDCapImportMetadataStructure(state.auth.userContext!, concepts, config);
             meta = await createMetadata(state, meta);
 
             /*
@@ -295,14 +302,23 @@ export const importREDCapProjectData = () => {
             /*
              * Update metadata with final patient counts.
              */
+            dispatch(setImportProgress(100, 'Finishing up'));
             (meta.structure as REDCapImportStructure).concepts = concepts;
             await updateMetadata(state, meta);
+
+            /*
+             * Update concept tree.
+             */
+            const imports = [ ...state.dataImport.imports.values() ].concat([ meta ]);
+            const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+            dispatch(deleteAllExtensionConcepts());
+            dispatch(setExtensionRootConcepts(extensionConcepts));
+            dispatch(setImportMetadata(meta));
             
             /*
              * Success, so wrap it up.
              */
             await clearRecords();
-            dispatch(setImportRedcapConfiguration());
             dispatch(setImportRedcapComplete({ 
                 importedPatients: config.mrns.length, 
                 importedRows: records.length, 
@@ -314,6 +330,10 @@ export const importREDCapProjectData = () => {
             console.log(err);
             dispatch(setImportError());
             clearRecords();
+            if (meta && meta.id) {
+                deleteImportMetadata(meta);
+                deleteMetadata(state, meta);
+            }
         }
     };
 };
@@ -429,9 +449,9 @@ export const setImportProgress = (completed: number, text: string): ImportAction
  */
 const pcts = {
     INITIAL: 0.1,
-    RECORDS: 0.3,
-    LOAD: 0.4,
-    COUNTS: 0.2
+    RECORDS: 0.2,
+    LOAD: 0.3,
+    COUNTS: 0.4
 };
 let completed = 0;
 

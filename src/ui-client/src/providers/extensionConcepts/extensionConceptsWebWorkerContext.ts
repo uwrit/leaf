@@ -34,6 +34,8 @@ var handleWorkMessage = function (payload) {
             return search(payload);
         case LOAD_EXTENSION_CONCEPT_CHILDREN:
             return loadExtensionChildrenConcepts(payload);
+        case GET_EXTENSION_CONCEPT:
+            return getExtensionConcept(payload);
         default:
             return null;
     }
@@ -43,6 +45,11 @@ var loadExtensionChildrenConcepts = function (payload) {
     const { requestId, concept } = payload;
     const children = [ ... conceptMap.values() ].filter(c => c.parentId === concept.id)
     return { requestId, result: children };
+};
+var getExtensionConcept = function (payload) {
+    const { requestId, id } = payload;
+    const concept = conceptMap.get(id);
+    return { requestId: requestId, result: concept };
 };
 /*
  * Build the extension concept tree map.
@@ -97,14 +104,10 @@ var buildSavedCohortTree = function (savedQueries) {
         all.push(concept);
         // Add category as concept
         if (conceptMap.has(catId)) {
-            var catConcept = conceptMap.get(catId);
-            if (!catConcept.childrenIds.has(concept.universalId)) {
-                catConcept.injectChildrenOnDrop.push(concept);
-                catConcept.childrenIds.add(concept.universalId);
-            }
-        }
-        else {
-            var newCatConcept = categoryToConcept(catId, query, rootId);
+            const catConcept = conceptMap.get(catId);
+            catConcept.injectChildrenOnDrop.push(concept);
+        } else {
+            const newCatConcept = categoryToConcept(catId, query, rootId);
             conceptMap.set(catId, newCatConcept);
         }
     }

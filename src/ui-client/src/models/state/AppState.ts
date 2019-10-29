@@ -33,7 +33,6 @@ export interface ConceptsState {
     allowRerender: Set<string>;
     currentTree: ConceptMap;
     drillTree: ConceptMap;
-    extensionTree: ConceptMap;
     requestingSearchTree: boolean;
     roots: string[];
     searchTree: ConceptMap;

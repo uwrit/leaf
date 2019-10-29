@@ -81,7 +81,7 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
 
         if (data.isErrored || data.isComplete) {
             buttons.push(
-                <Button key={3} className="leaf-button-primary" onClick={this.handleErrorOrCompleteOkayButtonClick}>
+                <Button key={3} className="leaf-button leaf-button-primary" onClick={this.handleErrorOrCompleteOkayButtonClick}>
                     <span>Okay</span>
                 </Button>
             );
@@ -160,11 +160,12 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
      */
     private handleErrorOrCompleteOkayButtonClick = () => {
         const { dispatch, data } = this.props;
-        dispatch(setImportClearErrorOrComplete());
 
         if (data.isComplete) {
             dispatch(toggleImportRedcapModal());
+            dispatch(setImportRedcapConfiguration());
         }
+        dispatch(setImportClearErrorOrComplete());
     }
 
     /* 

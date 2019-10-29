@@ -15,6 +15,7 @@ const ADD_SAVED_COHORT = 'ADD_SAVED_COHORT';
 const SEARCH_SAVED_COHORTS = 'SEARCH_SAVED_COHORTS';
 const BUILD_EXTENSION_TREE = 'BUILD_EXTENSION_TREE';
 const LOAD_EXTENSION_CONCEPT_CHILDREN = 'LOAD_EXTENSION_CONCEPT_CHILDREN';
+const GET_EXTENSION_CONCEPT = 'GET_EXTENSION_CONCEPT';
 
 const savedQueryType = ConceptExtensionType.SavedQuery;
 const redcapImportType = ConceptExtensionType.REDCapImport;
@@ -25,6 +26,7 @@ const mrnImport = ImportType.MRN;
 interface InboundMessagePartialPayload {
     concept?: ExtensionConcept;
     displayThreshhold?: number;
+    id?: string;
     imports?: ImportMetadata[];
     savedQuery?: SavedQueryRef;
     savedQueries?: SavedQueryRef[];
@@ -59,7 +61,7 @@ export default class ExtensionConceptsWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ADD_SAVED_COHORT, BUILD_EXTENSION_TREE, SEARCH_SAVED_COHORTS,LOAD_EXTENSION_CONCEPT_CHILDREN])}
+            ${this.addMessageTypesToContext([ADD_SAVED_COHORT, BUILD_EXTENSION_TREE, SEARCH_SAVED_COHORTS,LOAD_EXTENSION_CONCEPT_CHILDREN,GET_EXTENSION_CONCEPT])}
             ${workerContext}
             var redcapImport = ${redcapImport}
             var mrnImport = ${mrnImport}
@@ -86,6 +88,10 @@ export default class ExtensionConceptsWebWorker {
 
     public loadConceptChildren = (concept: ExtensionConcept) => {
         return this.postMessage({ message: LOAD_EXTENSION_CONCEPT_CHILDREN, concept });
+    }
+
+    public getExtensionConcept = (id: string) => {
+        return this.postMessage({ message: GET_EXTENSION_CONCEPT, id });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -126,6 +132,8 @@ export default class ExtensionConceptsWebWorker {
                     return search(payload);
                 case LOAD_EXTENSION_CONCEPT_CHILDREN:
                     return loadExtensionChildrenConcepts(payload);
+                case GET_EXTENSION_CONCEPT:
+                    return getExtensionConcept(payload);
                 default:
                     return null;
             }
@@ -137,6 +145,12 @@ export default class ExtensionConceptsWebWorker {
             const { requestId, concept } = payload;
             const children: ExtensionConcept[] = [ ... conceptMap.values() ].filter(c => c.parentId === concept!.id)
             return { requestId, result: children };
+        };
+
+        const getExtensionConcept = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, id } = payload;
+            const concept = conceptMap.get(id!)!;
+            return { requestId, result: concept };
         };
 
         /*
@@ -209,12 +223,8 @@ export default class ExtensionConceptsWebWorker {
                 // Add category as concept
                 if (conceptMap.has(catId)) {
                     const catConcept = conceptMap.get(catId)! as ExtensionConcept;
-                    if (!catConcept.childrenIds!.has(concept.universalId!)) {
-                        catConcept.injectChildrenOnDrop!.push(concept);
-                        catConcept.childrenIds!.add(concept.universalId!);
-                    }
-                }
-                else {
+                    catConcept.injectChildrenOnDrop!.push(concept);
+                } else {
                     const newCatConcept = categoryToConcept(catId, query, rootId);
                     conceptMap.set(catId, newCatConcept);
                 }

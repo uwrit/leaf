@@ -29,8 +29,7 @@ export const CREATE_CONCEPT = 'CREATE_CONCEPT';
 export const REPARENT_CONCEPT = 'REPARENT_CONCEPT';
 export const SWITCH_CONCEPTS = 'SWITCH_CONCEPTS';
 export const REMOVE_CONCEPT = 'REMOVE_CONCEPT';
-export const MERGE_EXTENSION_CONCEPTS = 'MERGE_EXTENSION_CONCEPTS';
-export const REMOVE_EXTENSION_CONCEPT = 'REMOVE_EXTENSION_CONCEPT';
+export const DELETE_ALL_EXTENSION_CONCEPTS = 'DELETE_ALL_EXTENSION_CONCEPTS';
 export const ERROR_CONCEPTS = 'ERROR_CONCEPTS';
 export const TOGGLE_CONCEPT_OPEN = 'TOGGLE_CONCEPT_OPEN';
 export const REQUEST_CONCEPT_CHILDREN = 'REQUEST_CONCEPT_CHILDREN';
@@ -273,10 +272,9 @@ export const setExtensionConcept = (concept: Concept) => {
     }
 };
 
-export const removeExtensionConcept = (concept: Concept) => {
+export const deleteAllExtensionConcepts = () => {
     return {
-        concept,
-        type: REMOVE_EXTENSION_CONCEPT
+        type: DELETE_ALL_EXTENSION_CONCEPTS
     }
 };
 
@@ -284,13 +282,6 @@ export const setExtensionRootConcepts = (concepts: Concept[]): ConceptsAction =>
     return {
         concepts,
         type: SET_EXTENSION_ROOT_CONCEPTS
-    };
-};
-
-export const mergeExtensionConcepts = (conceptMap: ConceptMap): ConceptsAction => {
-    return {
-        conceptMap,
-        type: MERGE_EXTENSION_CONCEPTS
     };
 };
 
