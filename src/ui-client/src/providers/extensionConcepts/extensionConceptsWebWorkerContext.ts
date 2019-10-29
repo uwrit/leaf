@@ -6,7 +6,6 @@
  */ 
 
 export const workerContext = `
-"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -25,7 +24,6 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
             r[k] = a[j];
     return r;
 };
-// eslint-disable-next-line
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
         case BUILD_EXTENSION_TREE:
@@ -42,13 +40,13 @@ var handleWorkMessage = function (payload) {
 };
 var conceptMap = new Map();
 var loadExtensionChildrenConcepts = function (payload) {
-    const { requestId, concept } = payload;
-    const children = [ ... conceptMap.values() ].filter(c => c.parentId === concept.id)
-    return { requestId, result: children };
+    var requestId = payload.requestId, concept = payload.concept;
+    var children = [ ... conceptMap.values() ].filter(c => c.parentId === concept.id)
+    return { requestId: requestId, result: children };
 };
 var getExtensionConcept = function (payload) {
-    const { requestId, id } = payload;
-    const concept = conceptMap.get(id);
+    var requestId = payload.requestId, id = payload.id;
+    var concept = conceptMap.get(id);
     return { requestId: requestId, result: concept };
 };
 /*
@@ -60,15 +58,15 @@ var buildExtensionImportTree = function (payload) {
     conceptMap = new Map();
     buildRedcapImportTree(redcap);
     buildSavedCohortTree(savedQueries);
-    const roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
+    var roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
     return { requestId: requestId, result: roots };
 };
 /*
  * Build the REDCap Import-specific concept tree map.
  */
 var buildRedcapImportTree = function (redcapImports) {
-    var rootId = 'urn:leaf:import:redcap:root';
-    var root = __assign(__assign({}, getEmptyConcept()), { id: "urn:leaf:import:redcap:root", isParent: true, childrenLoaded: false, id: rootId, universalId: rootId, injectChildrenOnDrop: [], uiDisplayName: 'REDCap Imports', extensionType: redcapImportType });
+    var rootId = "urn:leaf:import:redcap:root";
+    var root = __assign(__assign({}, getEmptyConcept()), { id: rootId, universalId: rootId, isParent: true, childrenOnDrop: [], uiDisplayName: 'REDCap Imports' });
     for (var i = 0; i < redcapImports.length; i++) {
         var impt = redcapImports[i];
         var struct = impt.structure;
@@ -77,7 +75,6 @@ var buildRedcapImportTree = function (redcapImports) {
             var conc = struct.concepts[j];
             conc.childrenIds = undefined;
             conc.childrenLoaded = false;
-            conc.extensionType = redcapImportType;
             conc.extensionId = impt.id;
             conceptMap.set(conc.id, conc);
         }
@@ -104,10 +101,11 @@ var buildSavedCohortTree = function (savedQueries) {
         all.push(concept);
         // Add category as concept
         if (conceptMap.has(catId)) {
-            const catConcept = conceptMap.get(catId);
-            catConcept.injectChildrenOnDrop.push(concept);
-        } else {
-            const newCatConcept = categoryToConcept(catId, query, rootId);
+            var catConcept = conceptMap.get(catId);
+            catConcept.childrenOnDrop.push(concept);
+        }
+        else {
+            var newCatConcept = categoryToConcept(catId, query, rootId);
             conceptMap.set(catId, newCatConcept);
         }
     }
@@ -140,7 +138,6 @@ var getEmptyConcept = function () {
  */
 var cohortToConcept = function (categoryId, query, rootId) {
     var concept = getEmptyConcept();
-    concept.extensionType = savedQueryType;
     concept.extensionId = query.id;
     concept.id = query.universalId;
     concept.universalId = query.universalId;
@@ -157,8 +154,7 @@ var cohortToConcept = function (categoryId, query, rootId) {
 var categoryToConcept = function (categoryId, query, rootId) {
     var childrenOnDrop = conceptMap.get(query.universalId);
     var concept = getEmptyConcept();
-    concept.extensionType = savedQueryType;
-    concept.injectChildrenOnDrop = [childrenOnDrop];
+    concept.childrenOnDrop = [childrenOnDrop];
     concept.isParent = true;
     concept.parentId = rootId;
     concept.rootId = rootId;
@@ -173,14 +169,13 @@ var categoryToConcept = function (categoryId, query, rootId) {
  */
 var getRootConcept = function (children, directChildrenIds, rootId) {
     var concept = getEmptyConcept();
-    concept.extensionType = savedQueryType;
     concept.isParent = true;
     concept.childrenLoaded = false;
     concept.id = rootId;
     concept.universalId = rootId;
     concept.rootId = rootId;
     concept.uiDisplayName = 'My Saved Cohorts';
-    concept.injectChildrenOnDrop = children;
+    concept.childrenOnDrop = children;
     return concept;
 };
 var search = function (payload) {

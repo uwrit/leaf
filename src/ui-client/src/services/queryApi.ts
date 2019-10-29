@@ -12,7 +12,7 @@ import ExtensionConceptsWebWorker from '../providers/extensionConcepts/extension
 import { PanelDTO, Panel } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { NetworkIdentity } from '../models/NetworkResponder';
-import { ResourceRef, ExtensionConcept, Concept } from '../models/concept/Concept';
+import { ResourceRef, Concept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
@@ -127,8 +127,8 @@ export const getExtensionConcept = async (id: string): Promise<Concept | undefin
 /*
  * Requests child extension concepts for a given concept.
  */
-export const fetchExtensionConceptChildren = async (concept: ExtensionConcept | Concept): Promise<Concept[]> => {
-    const concepts = await worker.loadConceptChildren(concept as ExtensionConcept);
+export const fetchExtensionConceptChildren = async (concept: Concept | Concept): Promise<Concept[]> => {
+    const concepts = await worker.loadConceptChildren(concept);
     return concepts as Concept[];
 };
 
@@ -235,8 +235,8 @@ export const hasRecursiveDependency = async (state: AppState): Promise<(string |
     const embedded = getEmbeddedQueries(state.panels);
 
     for (const e of embedded) {
-        const c = e as ExtensionConcept;
-        const resp = await preflightSavedQuery(state, { id: c.extensionId, universalId: c.universalId!, uiDisplayName: c.uiDisplayName });
+        const c = e as Concept;
+        const resp = await preflightSavedQuery(state, { id: c.extensionId!, universalId: c.universalId!, uiDisplayName: c.uiDisplayName });
         const dependents = (resp.data as PreflightCheckDTO).queryPreflight.results;
         for (const d of dependents) {
             if (d.id === curr.id) {

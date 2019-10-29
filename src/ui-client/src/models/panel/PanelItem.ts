@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Concept, ResourceRef, ConceptSpecialization, ExtensionConcept } from '../concept/Concept';
+import { Concept, ResourceRef, ConceptSpecialization } from '../concept/Concept';
 import { NumericFilter, NumericFilterType, NumericFilterDTO } from './NumericFilter';
 import { RecencyFilterType } from './RecencyFilter';
 import { isNonstandard } from '../../utils/panelUtils';
@@ -38,7 +38,7 @@ export const panelItemToDto = (panelItem: PanelItem): PanelItemDTO => {
     return {
         resource: {
             id: isNonstandard(panelItem.concept.universalId) 
-                ? (panelItem.concept as ExtensionConcept).extensionId
+                ? panelItem.concept.extensionId!
                 : panelItem.concept.id,
             universalId: panelItem.concept.universalId!,
             uiDisplayName: panelItem.concept.uiDisplayName

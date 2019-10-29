@@ -32,7 +32,7 @@ interface REDCapImportFieldMetadata {
     isString: boolean;
     isDate: boolean;
     isNumber: boolean;
-    numericValidation: boolean;
+    // numericValidation: boolean;
     options: REDCapImportFieldMetadataOption[];
     source: REDCapFieldMetadata;
     urn: REDCapUrn;
@@ -279,8 +279,7 @@ export default class REDCapImportWebWorker {
                     options: [],
                     isString: false,
                     isDate: false,
-                    isNumber: false,
-                    numericValidation: false
+                    isNumber: false
                 };
                 m.options = deriveFieldOptions(m);
 
@@ -288,9 +287,6 @@ export default class REDCapImportWebWorker {
                  * Determine validation type, if any.
                  */
                 if (validation === NUMBER || validation === INTEGER || validation === CALC) {
-                    m.isNumber = true;
-                    m.numericValidation = true;
-                } else if (m.options.length) {
                     m.isNumber = true;
                 } else if (validation.indexOf(DATE) > -1) {
                     m.isDate = true;
@@ -409,7 +405,7 @@ export default class REDCapImportWebWorker {
                 /*
                  * Else if a number.
                  */
-                else if (field.isNumber) {
+                else if (field.isNumber || field.options.length) {
                     const v = parseFloat(rec.sourceValue);
 
                     if (v > 99999999 || v < -99999999) {
@@ -583,11 +579,11 @@ export default class REDCapImportWebWorker {
                 parentId: parent.id,
                 isParent: field.options.length > 0,
                 isEncounterBased: field.isDate,
-                isNumeric: field.numericValidation,
+                isNumeric: field.isNumber,
                 childrenIds: new Set(),
                 uiDisplayName: field.label,
                 uiDisplayText: `${parent.uiDisplayText} field "${field.label}"`,
-                uiNumericDefaultText: field.numericValidation ? 'of any result' : undefined
+                uiNumericDefaultText: field.isNumber ? 'of any result' : undefined
             };
 
             return field.options

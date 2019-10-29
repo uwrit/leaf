@@ -8,12 +8,6 @@
 import { ConceptMap } from '../state/AppState';
 import { PanelFilter } from '../panel/PanelFilter';
 
-export enum ConceptExtensionType {
-    SavedQuery = 1,
-    REDCapImport = 2,
-    MRN = 3
-}
-
 export interface BaseConcept {
     id: string;
     universalId?: string;
@@ -44,16 +38,12 @@ export interface Concept extends BaseConcept {
     // client-only props
     childrenIds?: Set<string>;
     childrenLoaded: boolean;
+    childrenOnDrop?: Concept[];
+    extensionId?: string;
     isExtension?: boolean;
     isOpen: boolean;
     isFetching: boolean;
     unsaved?: boolean;
-}
-
-export interface ExtensionConcept extends Concept {
-    extensionId: string;
-    extensionType?: ConceptExtensionType;
-    injectChildrenOnDrop?: Concept[];
 }
 
 export interface ConceptSpecialization {
