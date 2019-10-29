@@ -227,6 +227,8 @@ namespace Services.Import
             public string SourceId { get; set; }
             public ImportType Type { get; set; }
             public string Structure { get; set; }
+            public DateTime Created { get; set; }
+            public DateTime Updated { get; set; }
         }
 
         static class DbReader
@@ -241,11 +243,13 @@ namespace Services.Import
                 var cons = grid.Read<ImportMetadataConstraintRecord>();
                 return new ImportMetadata
                 {
+                    Constraints = cons.Select(c => c.Constraint()),
+                    Created = meta.Created,
                     Id = meta.Id,
                     SourceId = meta.SourceId,
                     StructureJson = meta.Structure,
                     Type = meta.Type,
-                    Constraints = cons.Select(c => c.Constraint())
+                    Updated = meta.Updated
                 };
             }
 
@@ -257,11 +261,13 @@ namespace Services.Import
                 return metas.Select(m =>
                 new ImportMetadata
                 {
+                    Constraints = cons.Where(c => c.ImportMetadataId == m.Id).Select(c => c.Constraint()),
+                    Created = m.Created,
                     Id = m.Id,
                     SourceId = m.SourceId,
                     StructureJson = m.Structure,
                     Type = m.Type,
-                    Constraints = cons.Where(c => c.ImportMetadataId == m.Id).Select(c => c.Constraint())
+                    Updated = m.Updated
                 });
             }
         }

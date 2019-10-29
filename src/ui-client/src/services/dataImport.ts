@@ -160,10 +160,10 @@ const toDto = (meta: ImportMetadata): ImportMetadataDTO => {
     return {
         id: meta.id,
         constraints: meta.constraints,
-        created: `${meta.created}`,
+        created: meta.created,
         sourceId: meta.sourceId,
         structureJson: JSON.stringify(meta.structure),
         type: meta.type,
-        updated: `${meta.updated}`,
+        updated: meta.created,
     };
 };

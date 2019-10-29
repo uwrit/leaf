@@ -13,7 +13,7 @@ import { showConfirmationModal } from '../../../actions/generalUi';
 
 interface Props {
     dispatch: any;
-    imports: Map<string, ImportMetadata>;
+    imports: ImportMetadata[];
 }
 
 export default class REDCapImportsTable extends React.PureComponent<Props> {
@@ -22,7 +22,7 @@ export default class REDCapImportsTable extends React.PureComponent<Props> {
     public render() {
         const { imports } = this.props;
 
-        if (!imports.size) { return <div>No imported REDCap projects to display</div>; }
+        if (!imports.length) { return <div>No imported REDCap projects to display</div>; }
 
         const c = this.className;
         const classes = [ `${c}-container` ];
@@ -56,16 +56,16 @@ export default class REDCapImportsTable extends React.PureComponent<Props> {
                     <tbody className={`${c}-body`}>
 
                         {/* Rows */}
-                        {[ ...imports.values() ].map((im) => {
+                        {imports.map((im) => {
                             const struct = im.structure as REDCapImportStructure;
                             return (
-                                (<tr key={im.id} className={rowClass}>
+                                <tr key={im.id} className={rowClass}>
                                     <td>{struct.configuration.projectInfo.project_title}</td>
-                                    <td>{struct.patients}</td>
-                                    <td>{struct.concepts.length}</td>
+                                    <td>{struct.patients.toLocaleString()}</td>
+                                    <td>{struct.concepts.length.toLocaleString()}</td>
                                     <td>{im.created.toLocaleString()}</td>
                                     <td className={delButtonClass} onClick={this.handleDeleteClick.bind(null, im)}>✖</td>
-                                </tr>)
+                                </tr>
                             );
                         })}
                         

@@ -285,7 +285,7 @@ export default class REDCapImportWebWorker {
                 /*
                  * Determine validation type, if any.
                  */
-                if (validation === NUMBER || validation === INTEGER || validation === CALC || m.options.length) {
+                if (validation === NUMBER || validation === INTEGER || validation === CALC) {
                     m.isNumber = true;
                 } else if (validation.indexOf(DATE) > -1) {
                     m.isDate = true;

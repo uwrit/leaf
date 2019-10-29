@@ -147,7 +147,7 @@ var deriveImportMetadata = function (config) {
         /*
          * Determine validation type, if any.
          */
-        if (validation === NUMBER || validation === INTEGER || validation === CALC || m.options.length) {
+        if (validation === NUMBER || validation === INTEGER || validation === CALC) {
             m.isNumber = true;
         }
         else if (validation.indexOf(DATE) > -1) {

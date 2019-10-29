@@ -16,21 +16,19 @@ export enum ImportType {
 
 interface BaseImportMetadata {
     constraints: Constraint[];
+    created: Date;
     id?: string;
     sourceId: string;
     type: ImportType;
+    updated: Date;
 }
 
 export interface ImportMetadata extends BaseImportMetadata {
     structure: ImportStructure;
-    created: Date;
-    updated: Date;
 }
 
 export interface ImportMetadataDTO extends BaseImportMetadata {
     structureJson: string;
-    created: string;
-    updated: string;
 }
 
 export interface ImportStructure {

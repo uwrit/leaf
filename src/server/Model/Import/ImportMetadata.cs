@@ -16,8 +16,8 @@ namespace Model.Import
         public ImportType Type { get; set; }
         public string StructureJson { get; set; }
         public IEnumerable<Constraint> Constraints { get; set; }
-        public DateTime Created { get; set; }
-        public DateTime Updated { get; set; }
+        public DateTime? Created { get; set; }
+        public DateTime? Updated { get; set; }
     }
 
     public class ImportMetadataDTO : ImportMetadata

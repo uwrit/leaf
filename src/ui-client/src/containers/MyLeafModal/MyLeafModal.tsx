@@ -17,9 +17,12 @@ import { Panel } from '../../models/panel/Panel';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import './MyLeafModal.css';
+import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/REDCapImportsTable';
+import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
 
 interface StateProps {
     home?: NetworkIdentity;
+    imports: Map<string, ImportMetadata>;
     queryState: CohortStateType;
     panels: Panel[];
     queries: SavedQueriesState;
@@ -32,37 +35,65 @@ interface OwnProps {}
 
 type Props = StateProps & DispatchProps & OwnProps;
 
-class MyLeafModal extends React.PureComponent<Props> {
+interface State {
+    activeTab: string;
+}
+
+class MyLeafModal extends React.PureComponent<Props, State> {
     private className = 'myleaf-modal';
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            activeTab: '1'
+        };
+    }
 
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];
-        const { queries, dispatch, panels, queryState, home } = this.props;
+        const { queries, dispatch, panels, queryState, home, imports } = this.props;
+        const { activeTab } = this.state;
         const isGateway = home ? home.isGateway : false;
+        const redcap = [ ...imports.values() ].filter(im => im.type === ImportType.REDCapProject);
 
         return (
             <Modal isOpen={this.props.show} className={classes.join(' ')} keyboard={true}>
+
+                {/* Header */}
                 <ModalHeader>
-                    My Leaf
-                    <span className={`${c}-close`} onClick={this.handleCloseClick}>✖</span>
+                    My Leaf <span className={`${c}-close`} onClick={this.handleCloseClick}>✖</span>
                 </ModalHeader>
+
+                {/* Tabs */}
                 <div className={`${c}-tab-container`}>
-                <Nav tabs={true}>
+                    <Nav tabs={true}>
                         <NavItem>
-                            <NavLink active={true}>
+                            <NavLink active={activeTab === '1'} onClick={this.handleTabClick.bind(null, '1')}>
                                 My Saved Queries
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink active={activeTab === '2'} onClick={this.handleTabClick.bind(null, '2')}>
+                                My REDCap Imports
                             </NavLink>
                         </NavItem>
                     </Nav>
                 </div>
+
+                {/* Body */}
                 <ModalBody>
-                    <TabContent activeTab="1">
+                    <TabContent activeTab={activeTab}>
                         <TabPane tabId="1">
                             <SavedQueriesTable dispatch={dispatch} panels={panels} queries={queries} queryState={queryState} isGateway={isGateway}/>
                         </TabPane>
+                        <TabPane tabId="2">
+                            <REDCapImportsTable dispatch={dispatch} imports={redcap} />
+                        </TabPane>
                     </TabContent>
                 </ModalBody>
+
+                {/* Footer */}
                 <ModalFooter>
                     <Button className="leaf-button leaf-button-primary" onClick={this.handleCloseClick}>Close</Button>
                 </ModalFooter>
@@ -71,11 +102,16 @@ class MyLeafModal extends React.PureComponent<Props> {
     }
 
     private handleCloseClick = () => this.props.dispatch(toggleMyLeafModal());
+
+    private handleTabClick = (id: string) => {
+        this.setState({ activeTab: id });
+    }
 };
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
-        home: state.responders.get(0), 
+        home: state.responders.get(0),
+        imports: state.dataImport.imports,
         queryState: state.cohort.count.state,
         panels: state.panels,
         queries: state.queries,
