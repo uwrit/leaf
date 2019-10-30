@@ -39,7 +39,7 @@
 
 .myleaf-modal-tab-container {
     background-color: #fafbfc;
-} 
+}
 
 .myleaf-modal-tab-container .nav-tabs {
     padding: 4px 10px 0;
@@ -48,6 +48,10 @@
 .myleaf-modal-tab-container .nav-link {
     font-size: 1.2rem;
     cursor: pointer;
+}
+
+.myleaf-modal-tab-container .nav-link svg {
+    margin-right: 4px;
 }
 
 .myleaf-modal-tab-container .nav-link.active {

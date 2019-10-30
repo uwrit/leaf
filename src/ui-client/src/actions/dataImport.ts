@@ -15,7 +15,6 @@ import { loadREDCapImportData, calculateREDCapFieldCount, createMetadata, getRED
 import { InformationModalState, NotificationStates, ConfirmationModalState } from '../models/state/GeneralUiState';
 import { setNoClickModalState, showInfoModal, showConfirmationModal } from './generalUi';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../models/dataImport/ImportMetadata';
-import { formatSmallNumber } from '../utils/formatNumber';
 import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
 import { deleteAllExtensionConcepts, setExtensionRootConcepts } from './concepts';
@@ -297,7 +296,7 @@ export const importREDCapProjectData = () => {
                  */
                 const endIdx = startIdx + redCap.batchSize;
                 const batch = records.slice(startIdx, endIdx);
-                const displayText = `Loading ${formatSmallNumber(endIdx < totalRecords ? endIdx : totalRecords)} of ${formatSmallNumber(totalRecords)} records into Leaf`;
+                const displayText = `Loading ${(endIdx < totalRecords ? endIdx : totalRecords).toLocaleString()} of ${totalRecords.toLocaleString()} records into Leaf`;
                 dispatch(setImportProgress(completed, displayText));
                 const result = await upsertImportRecords(state, meta, batch);
                 unmappedPatients = [ ...new Set(unmappedPatients.concat(result.unmapped)) ];
@@ -565,16 +564,16 @@ const deriveREDCapImportMetadataStructure = (user: UserContext, concepts: REDCap
 const createREDCapAccessUsers = (user: UserContext, config: REDCapImportConfiguration): Constraint[] => {
     const fullscope = `${user.scope}@${user.issuer}`;
     const importer = `${user.name}@${fullscope}`;
-    const others = config.users.map(u => {
-        let name = u.username;
-        const atIdx = u.username.indexOf('@');
-        if (atIdx > -1) {
-            name = name.substring(0, atIdx);
-        }
-        return `${name}@${fullscope}`
-    });
+    const others = config.users
+        .map(u => {
+            let name = u.username;
+            const atIdx = u.username.indexOf('@');
+            if (atIdx > -1) {
+                name = name.substring(0, atIdx);
+            }
+            return `${name}@${fullscope}`
+        })
 
-    return [ importer ]
-        .concat(others)
+    return [ ...new Set([ ...others, ...[ importer ]]) ]
         .map(u => ({ constraintId: ConstraintType.User, constraintValue: u }));
 };

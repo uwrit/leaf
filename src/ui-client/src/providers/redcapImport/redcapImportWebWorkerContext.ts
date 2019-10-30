@@ -87,7 +87,6 @@ var calculatePatientCount = function (payload) {
     var requestId = payload.requestId, concept = payload.concept;
     var urn = Object.assign({}, concept.urn, { value: undefined, instance: undefined });
     var universalId = urnToString(urn);
-    console.log(payload.concept, urn, universalId)
     var query = concept.urn.value !== undefined
         ? function (r) { return r.id.startsWith(universalId) && r.valueNumber === concept.urn.value; }
         : function (r) { return r.id.startsWith(universalId); };
@@ -225,7 +224,7 @@ var deriveImportRecords = function (config) {
     for (var i = 0; i < config.records.length; i++) {
         var raw = config.records[i];
         var field = metadata.get(raw.field_name);
-        var sourcePersonId = raw.record; //mrnMap.get(raw.record);
+        var sourcePersonId = mrnMap.get(raw.record);
         if (!field || !sourcePersonId || raw.value === '') {
             continue;
         }
@@ -381,7 +380,6 @@ var deriveFormConcept = function (parent, form, idMod) {
 var deriveFieldConcept = function (parent, field, idMod) {
     var urn = Object.assign({}, parent.urn, { field: field.name });
     var universalId = urnToString(urn);
-    console.log(urn, universalId, field);
     var concept = Object.assign({}, parent, { id: universalId + ":" + idMod + ":" + field.name , universalId: universalId, urn: urn, parentId: parent.id, isParent: field.options.length > 0, isEncounterBased: field.isDate, childrenIds: new Set(), uiDisplayName: field.label, uiDisplayText: parent.uiDisplayText + ' field "' + field.label + '"', isNumeric: field.isNumber, uiNumericDefaultText: field.isNumber ? 'of any result' : undefined });
     return field.options
         .map(function (op) { return deriveFieldOptionConcept(concept, op, idMod); })

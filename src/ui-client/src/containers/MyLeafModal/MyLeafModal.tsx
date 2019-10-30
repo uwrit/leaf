@@ -67,7 +67,7 @@ class MyLeafModal extends React.PureComponent<Props> {
                         </NavItem>
                         <NavItem>
                             <NavLink active={tab === MyLeafTabType.REDCapImport} onClick={this.handleTabClick.bind(null, MyLeafTabType.REDCapImport)}>
-                                <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
+                                <img alt='redcap-logo' className='header-icon-redcap' src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 My REDCap Imports
                             </NavLink>
                         </NavItem>

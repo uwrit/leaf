@@ -20,18 +20,22 @@ namespace Services.Import
 {
     public class ImportIdentifierMappingService : DataImporter.IImportIdentifierMappingService
     {
-        readonly ClinDbOptions opts;
-        readonly CompilerOptions compilerOptions;
+        readonly ClinDbOptions clinDbOpts;
+        readonly AppDbOptions appDbOpts;
+        readonly CompilerOptions opts;
         readonly ILogger<ImportIdentifierMappingService> logger;
 
         public ImportIdentifierMappingService(
-            IOptions<ClinDbOptions> opts,
+            IOptions<ClinDbOptions> clinDbOpts,
+            IOptions<AppDbOptions> appDbOpts,
+            IOptions<CompilerOptions> opts,
             IOptions<CompilerOptions> compilerOptions,
             ILogger<ImportIdentifierMappingService> logger
         )
         {
+            this.clinDbOpts = clinDbOpts.Value;
+            this.appDbOpts = appDbOpts.Value;
             this.opts = opts.Value;
-            this.compilerOptions = compilerOptions.Value;
             this.logger = logger;
         }
 
@@ -41,13 +45,7 @@ namespace Services.Import
             var unique = records.Select(r => r.SourcePersonId).Distinct();
             var map = await GetMappingRecords(unique);
             var unmapped = new List<string>();
-
-            foreach (var rec in records)
-            {
-                rec.PersonId = rec.SourcePersonId;
-                output.Add(rec);
-            }
-            return (output, unmapped);
+            var seen = new HashSet<string>();
 
             foreach (var rec in records)
             {
@@ -56,7 +54,13 @@ namespace Services.Import
                 if (mappedId != null)
                 {
                     rec.PersonId = mappedId;
-                    output.Add(rec);
+                    var idx = $"{rec.PersonId}_{rec.Id}";
+
+                    if (!seen.Contains(idx))
+                    {
+                        output.Add(rec);
+                        seen.Add(idx);
+                    }
                 }
                 else
                 {
@@ -71,44 +75,40 @@ namespace Services.Import
             var queryParams = await cn.QueryFirstOrDefaultAsync<MappingQuery>(
                     Sql.GetImportPatientMappingQuery,
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout);
+                    commandTimeout: clinDbOpts.DefaultTimeout);
             return queryParams;
         }
 
         async Task<IDictionary<string, string>> GetMappingRecords(IEnumerable<string> ids)
         {
             var map = new Dictionary<string, string>();
+            var query = "";
 
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
-
                 var queryParams = await GetMappingParameters(cn);
-                var query = GetMappingQuery(queryParams, ids);
+                query = GetMappingQuery(queryParams, ids);
+            }
 
+            using (var cn = new SqlConnection(clinDbOpts.ConnectionString))
+            {
+                await cn.OpenAsync();
                 using var cmd = new SqlCommand(query, cn);
                 using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (reader.Read())
                     {
-                        map.Add(reader[1].ToString(), reader[0].ToString());
+                        var mrn = reader[Cols.Mrn].ToString();
+                        if (!map.ContainsKey(mrn))
+                        {
+                            map.Add(mrn, reader[Cols.PersonId].ToString());
+                        }
                     }
                 }
             }
 
             return map;
-        }
-
-        class MappingRecord
-        {
-            public string PersonId { get; set; }
-            public string SourceMapPersonId { get; set; }
-
-            public MappingRecord(SqlDataReader reader)
-            {
-                PersonId = reader[0].ToString();
-                SourceMapPersonId = reader[1].ToString();
-            }
         }
 
         class MappingQuery
