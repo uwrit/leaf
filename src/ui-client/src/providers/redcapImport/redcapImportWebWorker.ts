@@ -263,11 +263,12 @@ export default class REDCapImportWebWorker {
                         event = eventMap.unique_event_name;
                     }
                 }
-
+                
+                const label = field.field_label ? field.field_label : field.field_name;
                 const m: REDCapImportFieldMetadata = {
                     form: field.form_name,
                     id: field.form_name,
-                    label: field.field_label.replace(REGEX_MARKUP, '').trim(),
+                    label: label.replace(REGEX_MARKUP, '').trim(),
                     name: field.field_name,
                     source: field,
                     urn: { 

@@ -93,8 +93,8 @@ export default class UserButton extends React.PureComponent<Props> {
                         </div>
 
                         {imports.redCap.enabled && 
-                        <div className={`${c}-option`} onClick={mySavedQueriesClickHandler}>
-                            <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`} onClick={redcapImportClickHandler}/>
+                        <div className={`${c}-option`} onClick={redcapImportClickHandler}>
+                            <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                             <span>My REDCap Imports</span>
                         </div>
                         }

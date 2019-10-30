@@ -191,9 +191,6 @@ namespace API.Options
             {
                 rc.ApiURI = config.GetValue<string>(Config.Import.REDCap.ApiURI);
                 rc.BatchSize = config.GetValue<int>(Config.Import.REDCap.BatchSize);
-                rc.Mapping.SetMrn = config.GetValue<string>(Config.Import.REDCap.Mapping.SetPersonMrn);
-                rc.Mapping.WhereClause = config.GetValue<string>(Config.Import.REDCap.Mapping.WhereClause);
-                rc.Mapping.FieldMrn = config.GetValue<string>(Config.Import.REDCap.Mapping.FieldMrn);
             }
 
             services.Configure<REDCapImportOptions>(opts =>
@@ -201,9 +198,6 @@ namespace API.Options
                 opts.Enabled = rc.Enabled;
                 opts.ApiURI = rc.ApiURI;
                 opts.BatchSize = rc.BatchSize;
-                opts.Mapping.SetMrn = rc.Mapping.SetMrn;
-                opts.Mapping.WhereClause = rc.Mapping.WhereClause;
-                opts.Mapping.FieldMrn = rc.Mapping.FieldMrn;
             });
 
             services.Configure<ImportOptions>(opts =>

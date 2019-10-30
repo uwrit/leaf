@@ -17,18 +17,5 @@ namespace Model.Options
         public bool Enabled { get; set; } = false;
         public string ApiURI { get; set; }
         public int BatchSize { get; set; }
-        public ImportMappingOptions Mapping { get; set; }
-
-        public REDCapImportOptions()
-        {
-            Mapping = new ImportMappingOptions();
-        }
-    }
-
-    public class ImportMappingOptions
-    {
-        public string SetMrn { get; set; }
-        public string WhereClause { get; set; }
-        public string FieldMrn { get; set; }
     }
 }

@@ -24,6 +24,16 @@
     font-size: 1.1rem;
 }
 
+.import-redcap-error {
+    height: 150px;
+    padding: 50px 20px;
+    text-align: center;
+}
+
+.import-redcap-error p {
+    font-size: 1.2rem;
+}
+
 .import-redcap-close {
     cursor: pointer;
     margin-right: 10px;

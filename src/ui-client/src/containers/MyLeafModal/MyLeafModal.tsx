@@ -20,6 +20,7 @@ import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/
 import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
 import { MyLeafTabType } from '../../models/state/GeneralUiState';
 import './MyLeafModal.css';
+import { FaStar } from 'react-icons/fa';
 
 interface StateProps {
     home?: NetworkIdentity;
@@ -60,11 +61,13 @@ class MyLeafModal extends React.PureComponent<Props> {
                     <Nav tabs={true}>
                         <NavItem>
                             <NavLink active={tab === MyLeafTabType.SavedQueries} onClick={this.handleTabClick.bind(null, MyLeafTabType.SavedQueries)}>
+                                <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
                                 My Saved Queries
                             </NavLink>
                         </NavItem>
                         <NavItem>
                             <NavLink active={tab === MyLeafTabType.REDCapImport} onClick={this.handleTabClick.bind(null, MyLeafTabType.REDCapImport)}>
+                                <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 My REDCap Imports
                             </NavLink>
                         </NavItem>

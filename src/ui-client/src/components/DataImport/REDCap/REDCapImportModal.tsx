@@ -116,9 +116,15 @@ export default class REDCapImportModal extends React.PureComponent<Props, State>
         const { dispatch, data } = this.props;
         const { redCap, isImporting, isComplete, isErrored } = data;
         const { mrnFieldValid } = this.state;
+        const c = this.className;
 
         if (isErrored) {
-            return <p>Whoops, an error occurred while attempting to import your data. We are sorry for the inconvenience.</p>
+            return (
+                <div className={`${c}-error`}>
+                    <p>Whoops! Leaf encountered an unexpected error while attempting to import your data.</p>
+                    <p>We are sorry for the inconvenience. If the problem occurs again, please contact your Leaf adminstrator.</p>
+                </div>
+            );
         } else if (isComplete) {
             return <ImportComplete data={data} />
         }

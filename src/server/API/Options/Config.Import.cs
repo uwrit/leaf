@@ -17,15 +17,7 @@ namespace API.Options
                 public const string Enabled = @"Import:REDCap:Enabled";
                 public const string ApiURI = @"Import:REDCap:ApiURI";
                 public const string BatchSize = @"Import:REDCap:BatchSize";
-
-                public static class Mapping
-                {
-                    public const string SetPersonMrn = @"Import:REDCap:Mapping:SetPersonMrn";
-                    public const string WhereClause = @"Import:REDCap:Mapping:WhereClause";
-                    public const string FieldMrn = @"Import:REDCap:Mapping:FieldMrn";
-                }
             }
-
         }
     }
 }

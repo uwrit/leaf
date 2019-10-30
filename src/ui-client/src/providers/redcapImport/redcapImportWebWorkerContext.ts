@@ -126,10 +126,11 @@ var deriveImportMetadata = function (config) {
                 event_1 = eventMap.unique_event_name;
             }
         }
+        var label = field.field_label ? field.field_label : field.field_name;
         var m = {
             form: field.form_name,
             id: field.form_name,
-            label: field.field_label.replace(REGEX_MARKUP, '').trim(),
+            label: label.replace(REGEX_MARKUP, '').trim(),
             name: field.field_name,
             source: field,
             urn: {

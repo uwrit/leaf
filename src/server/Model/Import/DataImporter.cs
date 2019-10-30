@@ -35,7 +35,7 @@ namespace Model.Import
 
         public interface IImportIdentifierMappingService
         {
-            Task<(IEnumerable<ImportRecord>, IEnumerable<string>)> MapIds(ImportMappingOptions opts, IEnumerable<ImportRecord> records);
+            Task<(IEnumerable<ImportRecord>, IEnumerable<string>)> MapIds(IEnumerable<ImportRecord> records);
         }
 
         readonly ImportOptions importOptions;
@@ -109,7 +109,7 @@ namespace Model.Import
         {
             log.LogInformation("Importing records. ImportMetadataId:{id} RecordCount:{cnt}", id, records.Count());
 
-            var mapped = await mapper.MapIds(importOptions.REDCap.Mapping, records);
+            var mapped = await mapper.MapIds(records);
             var result = await importService.ImportDataAsync(id, mapped.Item1);
             result.Unmapped = mapped.Item2;
 

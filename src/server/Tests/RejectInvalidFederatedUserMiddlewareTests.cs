@@ -108,6 +108,8 @@ namespace Tests
 
             public Guid? SessionNonce => throw new NotImplementedException();
 
+            public SessionType SessionType => throw new NotImplementedException();
+
             public bool Identified { get; }
 
             public AuthenticationMechanism AuthenticationMechanism => throw new NotImplementedException();
