@@ -185,7 +185,7 @@ export default class ExtensionConceptsWebWorker {
                     conc.childrenIds = undefined;
                     conc.childrenLoaded = false;
                     conc.extensionId = impt.id!;
-                    conceptMap.set(conc.id, conc);
+                    conceptMap.set(conc.universalId!, conc);
                 }
             }
             conceptMap.set(root.id, root);

@@ -174,6 +174,9 @@ export class REDCapHttpConnector {
             if (config.forms) {
                 params.push( `forms=${config.forms.join(',')}` );
             }
+            if (config.records) {
+                params.push( `records=${config.records.join(',')}` );
+            }
         }
 
         const req = await this.request(REDCapContentTypes.Records, null, params);

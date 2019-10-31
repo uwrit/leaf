@@ -166,7 +166,7 @@ namespace Services.Import
                         admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: dbOptions.DefaultTimeout
+                    commandTimeout: 180
                 );
 
                 var deleted = DbReader.Read(grid);

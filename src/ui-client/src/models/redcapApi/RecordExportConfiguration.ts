@@ -9,6 +9,7 @@ export interface REDCapRecordExportConfiguration {
     events?: string[];
     fields?: string[];
     forms?: string[];
+    records?: string[];
     type?: REDCapRecordFormat;
 }
 

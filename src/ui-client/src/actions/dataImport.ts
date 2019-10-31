@@ -19,6 +19,7 @@ import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
 import { deleteAllExtensionConcepts, setExtensionRootConcepts } from './concepts';
 import { getExtensionRootConcepts } from '../services/queryApi';
+import { REDCapFieldMetadata } from '../models/redcapApi/Metadata';
 
 export const IMPORT_SET_METADATA = 'IMPORT_SET_METADATA';
 export const IMPORT_DELETE_METADATA = 'IMPORT_DELETE_METADATA';
@@ -152,7 +153,7 @@ const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfig
         total = config.forms.length;
         for (const form of config.forms) {
             increment();
-            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { forms: [ form.instrument_name ], type: EAV });
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config, done, { forms: [ form.instrument_name ], type: EAV });
         }
     }
 
@@ -167,12 +168,12 @@ const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfig
 
         for (const form of nonLongForms) {
             increment();
-            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { forms: [ form.instrument_name ], type: EAV });
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config, done, { forms: [ form.instrument_name ], type: EAV });
         }
 
         for (const e of config.eventMappings) {
             increment();
-            config.records = await importFormRecordsFromREDCap(dispatch, conn, config.records, done, { events: [ e.unique_event_name ], forms: [ e.form ], type: EAV });
+            config.records = await importFormRecordsFromREDCap(dispatch, conn, config, done, { events: [ e.unique_event_name ], forms: [ e.form ], type: EAV });
         }
     }
 };
@@ -180,21 +181,62 @@ const importRecordsFromREDCap = async (dispatch: any, config: REDCapImportConfig
 /*
  * Import records from a given REDCap form.
  */
-const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnector, records: REDCapEavRecord[], done: number, config: REDCapRecordExportConfiguration) => {
-    const form = config.forms![0];
+const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnector, config: REDCapImportConfiguration, done: number, request: REDCapRecordExportConfiguration,) => {
+    const form = request.forms![0];
+    const requestStart = new Date();
+    let tryBatching = false;
     completed = (pcts.INITIAL * 100.0) + (done * pcts.RECORDS)
 
-    if (!config.events) {
+    if (!request.events) {
         dispatch(setImportProgress(completed, `Loading form "${form}"`));
     } else {
-        dispatch(setImportProgress(completed, `Loading event "${config.events![0]}", form "${form}"`));
+        dispatch(setImportProgress(completed, `Loading event "${request.events![0]}", form "${form}"`));
     }
 
-    const newRecs = await conn.getRecords(config) as REDCapEavRecord[];
-    records = records.concat(newRecs);
-    dispatch(setImportRedcapRowCount(records.length));
+    /* 
+     * If project is small enough to import all fields, all patients from a form at once, do so.
+     */
+    const newRecs = await conn.getRecords(request) as REDCapEavRecord[];
+    const elapsed = (new Date().getTime() - requestStart.getTime()) / 1000;
 
-    return records;
+    if (elapsed >= 10 && newRecs.length === 0) {
+        tryBatching = true;
+    } else {
+        config.records = config.records.concat(newRecs);
+        dispatch(setImportRedcapRowCount(config.records.length));
+    }
+
+    /* 
+     * Else request the data by batches of patients.
+     */
+    if (tryBatching) {
+        const totalRecords = config.mrns.length;
+        const batchSize = 50;
+        let startIdx = 0;
+
+        while (startIdx <= totalRecords) {
+
+            /*
+             * Import current batch.
+             */
+            const endIdx = startIdx + batchSize;
+            const batch = config.mrns.slice(startIdx, endIdx).map(m => m[config.recordField]);
+            const newRecs = await conn.getRecords({ ...request, records: batch }) as REDCapEavRecord[];
+            const display = `(${endIdx.toLocaleString()} of ${totalRecords.toLocaleString()})`;
+            config.records = config.records.concat(newRecs);
+            startIdx += batchSize;
+            dispatch(setImportRedcapRowCount(config.records.length));
+
+            if (!request.events) {
+                dispatch(setImportProgress(completed, `Loading form "${form}" ${display}`));
+            } else {
+                dispatch(setImportProgress(completed, `Loading event "${request.events![0]}", form "${form}" ${display}`));
+            }
+        
+        }
+    }
+    
+    return config.records;
 };
 
 /*

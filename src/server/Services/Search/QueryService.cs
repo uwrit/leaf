@@ -120,7 +120,7 @@ namespace Services.Search
         public async Task<QuerySaveResult> InitialSaveAsync(QuerySave query)
         {
             var urn = QueryUrn.Create(query.QueryId);
-            var conceptids = query.Resources.Concepts.Select(c => c.Id.Value);
+            var conceptids = query.Resources.Concepts.Select(c => c.Id.Value).Where(c => c != Guid.Empty);
             var queryids = query.Resources.Queries.Select(q => q.Id.Value);
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
@@ -154,7 +154,7 @@ namespace Services.Search
 
         public async Task<QuerySaveResult> UpsertSaveAsync(QuerySave query)
         {
-            var conceptids = query.Resources.Concepts.Select(c => c.Id.Value);
+            var conceptids = query.Resources.Concepts.Select(c => c.Id.Value).Where(c => c != Guid.Empty);
             var queryids = query.Resources.Queries.Select(q => q.Id.Value);
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {

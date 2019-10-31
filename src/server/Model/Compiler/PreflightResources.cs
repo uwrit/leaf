@@ -62,6 +62,7 @@ namespace Model.Compiler
                 Id = @ref.Id.Value,
                 UniversalId = @ref.UniversalId,
                 RootId = Guid.Empty,
+                IsEncounterBased = true,
                 SqlFieldNumeric = $"{opts.Alias}.ValueNumber",
                 SqlFieldDate = $"{opts.Alias}.ValueDate",
                 SqlSetFrom = $"({@ref.ToQuery(opts)})"

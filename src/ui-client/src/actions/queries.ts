@@ -48,7 +48,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
 
         try {
             dispatch(setNoClickModalState({ message: "Loading Query", state: NotificationStates.Working }));
-            const saved = await loadSavedQuery(ref.universalId, state);
+            const saved = await loadSavedQuery(ref.universalId, state, dispatch);
 
             /* 
              * Update UI with the new query.

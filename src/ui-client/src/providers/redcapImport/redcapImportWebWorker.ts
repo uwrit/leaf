@@ -488,10 +488,12 @@ export default class REDCapImportWebWorker {
          */
         const deriveByEventConcept = (root: REDCapConcept, config: REDCapImportConfiguration): REDCapConcept[] => {
             const idMod = 'event'
+            const id = `${root.universalId}:${idMod}`
             const concept: REDCapConcept = {
                 ...root,
-                id: `${root.universalId}:${idMod}`,
+                id,
                 parentId: root.id,
+                universalId: id,
                 childrenIds: new Set(),
                 uiDisplayName: 'Events'
             };
@@ -508,10 +510,12 @@ export default class REDCapImportWebWorker {
          */
         const deriveByFormConcept = (root: REDCapConcept, config: REDCapImportConfiguration): REDCapConcept[] => {
             const idMod = 'form'
+            const id = `${root.universalId}:${idMod}`;
             const concept: REDCapConcept = {
                 ...root,
-                id: `${root.universalId}:${idMod}`,
+                id,
                 parentId: root.id,
+                universalId: id,
                 childrenIds: new Set(),
                 uiDisplayName: 'Forms'
             };

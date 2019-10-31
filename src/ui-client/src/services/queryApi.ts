@@ -19,6 +19,7 @@ import { PreflightCheckDTO } from '../models/PatientCountDTO';
 import { getEmbeddedQueries, isNonstandard } from '../utils/panelUtils';
 import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 import moment from 'moment';
+import { setConcept } from '../actions/concepts';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -139,7 +140,7 @@ export const fetchExtensionConceptChildren = async (concept: Concept | Concept):
  * any embedded queries or Concepts are still available
  * to the user.
  */
-export const deserialize = async (queryDefJson: string, state: AppState) => {
+export const deserialize = async (queryDefJson: string, state: AppState, dispatch: any) => {
     const deser = JSON.parse(queryDefJson);
 
     /*
@@ -166,10 +167,11 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
 
                 // If saved query
                 if (isNonstandard(resRef.universalId)) {
-                    const embedded =  await getExtensionConcept(resRef.id);
-                    if (!embedded) { 
-                        throw new Error(`${resRef.uiDisplayName} is not an existing saved query.`); 
+                    const embedded =  await getExtensionConcept(resRef.universalId!);
+                    if (!embedded || !embedded.universalId) { 
+                        throw new Error(`${resRef.uiDisplayName} is not an existing saved query or imported dataset.`); 
                     }
+                    dispatch(setConcept(embedded))
                     panelItem.concept = embedded;
                 // Else if concept
                 } else {
@@ -212,10 +214,10 @@ const handleDate = (dateStr?: any): Date => {
  * Loads a Saved Query from the server and
  * deserializes into a panels and panel filters.
  */
-export const loadSavedQuery = async (universalId: string, state: AppState): Promise<SavedQuery> => {
+export const loadSavedQuery = async (universalId: string, state: AppState, dispatch: any): Promise<SavedQuery> => {
     const queryResp = await getSavedQueryContext(state, universalId);
     const queryRaw = queryResp.data as SavedQueryRefDTO;
-    const deser = await deserialize(queryRaw.definition, state) as SavedQueryDefinitionDTO;
+    const deser = await deserialize(queryRaw.definition, state, dispatch) as SavedQueryDefinitionDTO;
     const query = { 
         ...deser,
         ...queryRaw, 

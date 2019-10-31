@@ -335,7 +335,8 @@ var deriveConceptTree = function (config) {
  */
 var deriveByEventConcept = function (root, config) {
     var idMod = 'event';
-    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'Events' });
+    var id = root.universalId + ":" + idMod;
+    var concept = Object.assign({}, root, { id: id, parentId: root.id, universalId: id, childrenIds: new Set(), uiDisplayName: 'Events' });
     return config.events
         .map(e => deriveEventConcept(concept, e.unique_event_name, idMod, config))
         .reduce((a, b) => a.concat(b),[])
@@ -347,7 +348,8 @@ var deriveByEventConcept = function (root, config) {
  */
 var deriveByFormConcept = function (root, config) {
     var idMod = 'form';
-    var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'Forms' });
+    var id = root.universalId + ":" + idMod;
+    var concept = Object.assign({}, root, { id: id, parentId: root.id, universalId: id, childrenIds: new Set(), uiDisplayName: 'Forms' });
     return config.forms
         .map(function (f) { return deriveFormConcept(concept, f, idMod); })
         .reduce(function (a, b) { return a.concat(b); }, [])
