@@ -19,8 +19,8 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/REDCapImportsTable';
 import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
 import { MyLeafTabType } from '../../models/state/GeneralUiState';
-import './MyLeafModal.css';
 import { FaStar } from 'react-icons/fa';
+import './MyLeafModal.css';
 
 interface StateProps {
     home?: NetworkIdentity;

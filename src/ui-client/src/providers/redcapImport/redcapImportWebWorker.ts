@@ -324,10 +324,16 @@ export default class REDCapImportWebWorker {
                 return [{ text: TRUE, value: 1 }, { text: FALSE, value: 0 }];
             }
             if (type === DROPDOWN || type === RADIO || type === CHECKBOX) {
-                return choices.split(OPTION_DELIMETER).map(opt => {
+                const opts = choices.split(OPTION_DELIMETER).map(opt => {
                     const x = opt.split(TEXT_VALUE_DELIMITER);
+                    if (!x || x.length !== 2) {
+                        return null
+                    }
                     return { text: x[1].trim(), value: +x[0] }
-                });
+                })
+                .filter(opt => opt !== null);
+
+                return opts as any; 
             }
             return [];
         };
@@ -490,7 +496,7 @@ export default class REDCapImportWebWorker {
             };
 
             return config.events!
-                .map(e => deriveEventConcept(concept, e.event_name, idMod, config))
+                .map(e => deriveEventConcept(concept, e.unique_event_name, idMod, config))
                 .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
@@ -532,7 +538,7 @@ export default class REDCapImportWebWorker {
                 uiDisplayName: event,
                 uiDisplayText: `${parent.uiDisplayText} event "${event}"`
             };
-
+            
             return config.eventMappings!
                 .filter(em => em.unique_event_name === event)
                 .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form)!, idMod))

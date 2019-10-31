@@ -184,10 +184,17 @@ var deriveFieldOptions = function (field) {
         return [{ text: TRUE, value: 1 }, { text: FALSE, value: 0 }];
     }
     if (type === DROPDOWN || type === RADIO || type === CHECKBOX) {
-        return choices.split(OPTION_DELIMETER).map(function (opt) {
-            var x = opt.split(TEXT_VALUE_DELIMITER);
-            return { text: x[1].trim(), value: +x[0] };
-        });
+        var opts = choices.split(OPTION_DELIMETER)
+            .map(opt => {
+                const x = opt.split(TEXT_VALUE_DELIMITER);
+                if (!x || x.length !== 2) {
+                    return null
+                }
+                return { text: x[1].trim(), value: +x[0] }
+            })
+            .filter(opt => opt !== null);
+        
+        return opts; 
     }
     return [];
 };
@@ -330,9 +337,9 @@ var deriveByEventConcept = function (root, config) {
     var idMod = 'event';
     var concept = Object.assign({}, root, { id: root.universalId + ":" + idMod, parentId: root.id, childrenIds: new Set(), uiDisplayName: 'Events' });
     return config.events
-    .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form), idMod))
-        .reduce(function (a, b) { return a.concat(b); }, [])
-        .concat([concept]);
+        .map(e => deriveEventConcept(concept, e.unique_event_name, idMod, config))
+        .reduce((a, b) => a.concat(b),[])
+        .concat([ concept ]);
 };
 /*
  * Derive a REDCap Concept structure based on:
