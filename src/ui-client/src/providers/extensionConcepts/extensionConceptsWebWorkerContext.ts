@@ -77,12 +77,9 @@ var buildRedcapImportTree = function (redcapImports) {
             conc.childrenLoaded = false;
             conc.extensionId = impt.id;
             conceptMap.set(conc.universalId, conc);
-            if (conc.id.endsWith('3725')) { console.log(conc)}
-            if (conc.parentId && conc.parentId.endsWith('3725')) { console.log(conc)}
         }
     }
     conceptMap.set(root.id, root);
-    console.log(conceptMap)
 };
 /*
  * Build a Map object to be unioned with the Concept tree

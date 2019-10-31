@@ -211,7 +211,7 @@ const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnec
      */
     if (tryBatching) {
         const totalRecords = config.mrns.length;
-        const batchSize = 50;
+        const batchSize = 100;
         let startIdx = 0;
 
         while (startIdx <= totalRecords) {
