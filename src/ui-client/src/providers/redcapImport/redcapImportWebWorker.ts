@@ -324,10 +324,17 @@ export default class REDCapImportWebWorker {
                 return [{ text: TRUE, value: 1 }, { text: FALSE, value: 0 }];
             }
             if (type === DROPDOWN || type === RADIO || type === CHECKBOX) {
-                return choices.split(OPTION_DELIMETER).map(opt => {
-                    const x = opt.split(TEXT_VALUE_DELIMITER);
-                    return { text: x[1].trim(), value: +x[0] }
-                });
+                const opts = choices
+                    .split(OPTION_DELIMETER)
+                    .map(opt => {
+                        const x = opt.split(TEXT_VALUE_DELIMITER);
+                        if (!x || x.length !== 2 || !x[1]) {
+                            return null;
+                        }
+                        return { text: x[1].trim(), value: +x[0] }
+                    })
+                    .filter(opt => opt !== null);
+                return opts as any;
             }
             return [];
         };
