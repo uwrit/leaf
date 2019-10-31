@@ -497,7 +497,7 @@ export default class REDCapImportWebWorker {
             };
 
             return config.events!
-                .map(e => deriveEventConcept(concept, e.event_name, idMod, config))
+                .map(e => deriveEventConcept(concept, e.unique_event_name, idMod, config))
                 .reduce((a, b) => a.concat(b),[])
                 .concat([ concept ]);
         };
@@ -539,7 +539,7 @@ export default class REDCapImportWebWorker {
                 uiDisplayName: event,
                 uiDisplayText: `${parent.uiDisplayText} event "${event}"`
             };
-
+            
             return config.eventMappings!
                 .filter(em => em.unique_event_name === event)
                 .map(f => deriveFormConcept(concept, config.forms.find(fo => fo.instrument_name === f.form)!, idMod))
