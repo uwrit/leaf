@@ -154,8 +154,10 @@ export default class ExtensionConceptsWebWorker {
             const { requestId, imports, savedQueries } = payload;
             const redcap = imports!.filter(i => i.type === redcapImport);
             conceptMap = new Map();
-            buildRedcapImportTree(redcap);
             buildSavedCohortTree(savedQueries!);
+            if (redcap.length) {
+                buildRedcapImportTree(redcap);
+            }
             const roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
 
             return { requestId, result: roots }

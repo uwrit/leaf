@@ -32,6 +32,8 @@ import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
 import { setImportOptions, setImportsMetadata } from './dataImport';
 import { getAllMetdata } from '../services/dataImport';
+import { ImportOptionsDTO } from '../models/state/Import';
+import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -93,7 +95,8 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Import options', 40));
             const importOptResponse = await getImportOptions(getState());
-            dispatch(setImportOptions(importOptResponse.data));
+            const importOpts = importOptResponse.data as ImportOptionsDTO;
+            dispatch(setImportOptions(importOpts));
 
             /* 
              * Load concepts.
@@ -119,8 +122,11 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             /*
              * Load imported metadata.
              */
-            dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
-            const imports = await getAllMetdata(getState());
+            let imports: ImportMetadata[] = [];
+            if (importOpts.redCap.enabled) {
+                dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
+                imports = await getAllMetdata(getState());
+            }
             const extensionConcepts = await getExtensionRootConcepts(imports, savedCohorts);
             dispatch(setExtensionRootConcepts(extensionConcepts));
             dispatch(setImportsMetadata(imports));
