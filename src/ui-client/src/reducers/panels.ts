@@ -31,7 +31,7 @@ import { NumericFilterType } from '../models/panel/NumericFilter';
 import { Panel } from '../models/panel/Panel';
 import { RecencyFilterType } from '../models/panel/RecencyFilter';
 import { SequenceType } from '../models/panel/SubPanel';
-import { ConceptSpecialization, ExtensionConcept } from '../models/concept/Concept';
+import { ConceptSpecialization } from '../models/concept/Concept';
 import { SavedQuery } from '../models/Query';
 
 const ANYTIME = 'Anytime';
@@ -157,8 +157,8 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
     const panel = Object.assign({}, newpanels[action.panelIndex]);
     const subpanel = panel.subPanels[action.subPanelIndex];
     const panelItem = Object.assign({}, subpanel.panelItems[action.panelItemIndex!]);
-    const concepts = action.concept!.isExtension && (action.concept! as ExtensionConcept).injectChildrenOnDrop
-        ? (action.concept! as ExtensionConcept).injectChildrenOnDrop
+    const concepts = action.concept!.childrenOnDrop
+        ? action.concept.childrenOnDrop
         : [ action.concept ];
     newpanels[action.panelIndex] = panel;
 

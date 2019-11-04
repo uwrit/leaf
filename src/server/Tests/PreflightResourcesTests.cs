@@ -45,7 +45,7 @@ namespace Tests
             var c12340 = Guid.NewGuid();
             var c12350 = Guid.NewGuid();
 
-            var pr = new PreflightResources(new QueryRef[] { first, second })
+            var pr = new PreflightResources(new QueryRef[] { first, second }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
                 DirectConceptsCheck = new PreflightConcepts
                 {
@@ -158,7 +158,7 @@ namespace Tests
             var first = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359679-df0d-4604-a2d9-1d3d04417dc2:123456") };
             var second = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359668-df0d-4604-a2d9-1d3d04417dc2:563423") };
             var errorUid = ConceptUrn.From("urn:leaf:concept:diag:codeset=ICD9+code=123.42");
-            var pr = new PreflightResources(new QueryRef[] { })
+            var pr = new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
                 DirectConceptsCheck = new PreflightConcepts
                 {
@@ -253,7 +253,7 @@ namespace Tests
         {
             var first = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359679-df0d-4604-a2d9-1d3d04417dc2:123456") };
             var second = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359668-df0d-4604-a2d9-1d3d04417dc2:563423") };
-            var pr = new PreflightResources(new QueryRef[] { })
+            var pr = new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
                 DirectConceptsCheck = new PreflightConcepts
                 {
@@ -348,7 +348,7 @@ namespace Tests
         {
             var first = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359679-df0d-4604-a2d9-1d3d04417dc2:123456") };
             var second = new QueryRef { UniversalId = QueryUrn.From("urn:leaf:query:d7359668-df0d-4604-a2d9-1d3d04417dc2:563423") };
-            var pr = new PreflightResources(new QueryRef[] { })
+            var pr = new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
                 DirectConceptsCheck = new PreflightConcepts
                 {
@@ -449,7 +449,7 @@ namespace Tests
 
             yield return new object[]
             {
-                new PreflightResources(new QueryRef[] { })
+                new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
                 {
                     DirectConceptsCheck = new PreflightConcepts
                     {
@@ -537,7 +537,7 @@ namespace Tests
             };
             yield return new object[]
             {
-                new PreflightResources(new QueryRef[] { })
+                new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
                 {
                     DirectConceptsCheck = new PreflightConcepts
                     {
@@ -625,7 +625,7 @@ namespace Tests
             };
             yield return new object[]
             {
-                new PreflightResources(new QueryRef[] { })
+                new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
                 {
                     DirectConceptsCheck = new PreflightConcepts
                     {
@@ -713,7 +713,7 @@ namespace Tests
             };
             yield return new object[]
             {
-                new PreflightResources(new QueryRef[] { })
+                new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
                 {
                     DirectConceptsCheck = new PreflightConcepts
                     {

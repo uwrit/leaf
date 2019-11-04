@@ -63,6 +63,9 @@ body {
     .header-options-text {
         display: none;
     }
+    .cohort-summary-name {
+        max-width: 300px;
+    }
     .leaf-button-main {
         height: 44px;
         width: 170px;

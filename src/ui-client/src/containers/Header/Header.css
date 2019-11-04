@@ -33,27 +33,9 @@
     padding: 2px 0 0;
 }
 
-.header-options > .nav-item {
-    margin-left: 12px;
-}
-
 .header-options-chevron {
     margin-left: 1px !important;
-    margin-bottom: -3px !important;
-    transform: scale(0.7);
-}
-
-.header-hover-menu {
-    background-color: white;
-    border-radius: 2px;
-    box-shadow: rgba(0, 0, 0, 0.24) 0px 4px 9px 0px;
-    color: rgb(96, 90, 102);
-    display: none;
-    font-size: 1rem;
-    margin-right: -18px;
-    position: absolute;
-    right: 0;
-    width: 200px;
+    transform: scale(0.8) translateY(2px);
 }
 
 .header-options {
@@ -76,8 +58,7 @@
     color: white;
 }
 
-.header-myleaf:hover,
-.header-networkhealth:hover {
+.header-item-hover-dark:hover {
     background-color: rgba(0, 48, 66, 1) !important;
     color: rgb(220,220,220) !important;
 }
@@ -109,7 +90,61 @@
     filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, 0.1) );
 }
 
-/* Custom css for each header option */
+/* Right side options */
+.header-item-dropdown {
+    border-bottom-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    padding: 0 8px 4px; 
+    position: relative;
+    transition: none !important;
+}
+
+.header-item-dropdown .header-option-container {
+    bottom: 0;
+    color: rgb(200, 200, 200);
+    display: none;
+    height: 2px;
+    margin: auto;
+    margin-top: -2px;
+    min-width: 200px;
+    position: absolute;
+    right: 0;
+    text-align: left;
+    top: 100%;
+    z-index: 105;
+}
+
+.header-option-inner {
+    background-color: rgba(0, 48, 66, 1);
+    border-radius: 4px;
+    border-top-right-radius: 0;
+    box-shadow: rgba(0, 0, 0, 0.24) -4px 4px 9px 0px;
+    padding: 8px;
+    position: relative;
+}
+
+.header-item-dropdown:hover .header-option-container {
+    display: inline-block;
+}
+
+.header-option {
+    margin: 6px 0;
+    padding-left: 4px;
+}
+
+.header-option svg {
+    margin-bottom: -2px;
+}
+
+.header-option > span {
+    padding-left: 4px;
+}
+
+.header-option:hover > span {
+    color: white;
+}
+
+/* New Query */
 .header-new-query-icon {
     font-size: 1.1rem;
 }
@@ -118,59 +153,7 @@
     color: rgb(13, 206, 77);
 }
 
-.header-myleaf-icon {
-    font-size: 1rem;
-    margin-top: -1px;
-}
-
-.header-options .header-database-icon {
-    margin-bottom: -3px !important;
-}
-
-.header-options > li:hover .header-database-icon {
-    color: rgba(28,168,221,0.8);
-}
-
-.header-options > li:hover .header-myleaf-icon {
-    color: rgb(220, 169, 223);
-}
-
-.header-myleaf,
-.header-networkhealth {
-    border-bottom-right-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    position: relative;
-    transition: none !important;
-}
-
-.header-networkhealth {
-    position: relative;
-    padding-bottom: 0 !important;
-    padding-top: -2px;
-}
-
-.header-myleaf {
-    padding: 4px 8px; 
-}
-
-.header-myleaf-icon-container {
-    margin-top: -2px;
-}
-
-.header-networkhealth-container,
-.header-myleaf-container {
-    bottom: 0;
-    color: rgb(240, 240, 240);
-    display: none;
-    height: 2px;
-    margin: auto;
-    margin-top: -2px;
-    position: absolute;
-    right: 0;
-    top: 100%;
-    z-index: 105;
-}
-
+/* Databases/Network Health */
 .header-networkhealth-description {
     border-bottom: 1px solid rgba(0,0,0,0.01);
     color: rgb(200,200,200);
@@ -182,11 +165,6 @@
 .header-networkhealth-description > span {
     border-bottom: 1px solid rgba(250,250,250,0.2);
     padding: 0 8px 4px;
-}
-
-.header-networkhealth-text {
-    padding-left: 10px;
-    padding-right: 10px;
 }
 
 .header-networkhealth-text > div {
@@ -204,74 +182,26 @@
     width: 600px;
 }
 
-.header-myleaf-container {
-    color: rgb(200,200,200);
-    min-width: 200px;
-    text-align: left;
+.header-options > li:hover .header-database-icon {
+    color: rgba(28,168,221,0.8);
 }
 
-.header-networkhealth-inner,
-.header-myleaf-inner {
-    background-color: rgba(0, 48, 66, 1);
+/* Import */
+.header-options > li:hover .header-import-icon {
+    color: rgb(188, 235, 143);
+}
+
+.header-icon-redcap {
     border-radius: 4px;
-    border-top-right-radius: 0;
-    box-shadow: rgba(0, 0, 0, 0.24) -4px 4px 9px 0px;
-    padding: 8px;
-    position: relative;
+    margin: -4px 2px 0 0;
+    width: 18px;
 }
 
-.header-networkhealth:hover .header-networkhealth-container,
-.header-myleaf:hover .header-myleaf-container {
-    display: inline-block;
+.header-icon-mrn {
+    color: #FF8408;
 }
 
-.header-myleaf-option > span,
-.header-role > span {
-    margin-left: 6px;
-}
-
-.myleaf-menu-icon-savedqueries {
-    color: rgba(255, 166, 0, 0.8);
-}
-
-.myleaf-menu-icon-logout {
-    color: rgba(90, 113, 219, 0.8);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-savedqueries {
-    color: rgb(255, 166, 0);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-logout {
-    color: rgb(90, 113, 219);
-}
-
-.myleaf-menu-icon-savedqueries {
-    font-size: 0.9rem;
-}
-
-.divider {
-    background-color: transparent !important;
-    cursor: default;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.divider > div {
-    background-color: rgba(0,0,0,0.3);
-    height: 1px;
-    margin: 0;
-}
-
-.header-myleaf-option {
-    padding: 4px 8px;
-}
-
-.header-myleaf-option:hover {
-    color: white;
-}
-
-/* Roles */
+/* User Roles */
 .header-roles {
     background-color: rgb(0, 75, 102);
     border: 1px solid rgb(0, 90, 122);
@@ -293,6 +223,10 @@
     cursor: default;
     padding: 0 8px 4px;
     position: relative;
+}
+
+.header-role > span {
+    margin-left: 6px;
 }
 
 .header-role svg {
@@ -323,6 +257,19 @@
     display: block;
 }
 
+.myleaf-menu-icon-savedqueries {
+    font-size: 0.9rem;
+}
+
+.header-myleaf-icon {
+    font-size: 1rem;
+    margin-top: -1px;
+}
+
+.header-options > li:hover .header-myleaf-icon {
+    color: rgb(220, 169, 223);
+}
+
 .header-role-icon-admin {
     color: rgb(210, 224, 9);
 }
@@ -337,4 +284,24 @@
 
 .header-role-icon-quarantine {
     color: #ffcb1e;
+}
+
+.header-icon-redcap {
+    margin-left: -3px;
+}
+
+.myleaf-menu-icon-savedqueries {
+    color: rgba(255, 166, 0, 0.8);
+}
+
+.myleaf-menu-icon-logout {
+    color: rgba(90, 113, 219, 0.8);
+}
+
+.header-myleaf-option:hover > .myleaf-menu-icon-savedqueries {
+    color: rgb(255, 166, 0);
+}
+
+.header-myleaf-option:hover > .myleaf-menu-icon-logout {
+    color: rgb(90, 113, 219);
 }

@@ -33,9 +33,20 @@
     border-bottom: none;
 }
 
+.myleaf-modal-tab-container .leaf-button { 
+    margin: 38px 25px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.myleaf-modal .modal-body { 
+    min-height: 300px;
+}
+
 .myleaf-modal-tab-container {
     background-color: #fafbfc;
-} 
+}
 
 .myleaf-modal-tab-container .nav-tabs {
     padding: 4px 10px 0;
@@ -46,7 +57,79 @@
     cursor: pointer;
 }
 
+.myleaf-modal-tab-container .nav-link svg {
+    margin-right: 4px;
+}
+
 .myleaf-modal-tab-container .nav-link.active {
     border-top: 2px solid rgb(28, 168, 221) !important;
     color: rgb(28, 168, 221);
 }
+
+/* Table */
+.myleaf-table-container {
+    max-height: 600px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.myleaf-table {    
+    font-size: 1.1rem;
+    width: 100%;
+}
+
+.myleaf-table-header {
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+    height: 40px;
+    text-transform: capitalize;
+}
+
+.myleaf-table-header tr {
+    border: none;
+}
+
+.myleaf-table-row {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-top: none;
+    cursor: pointer;
+    height: 32px;
+}
+
+.myleaf-table-row:hover {
+    background-color: rgba(28, 168, 221, 0.08);
+}
+
+.myleaf-table-row td:first-child {
+    color: #2196F3;
+    font-weight: 500;
+}
+
+.myleaf-table-row td {
+    padding: 0 4px;
+}
+
+.myleaf-table-open,
+.myleaf-table-delete {
+    background-color: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.myleaf-table-open {
+    color: #2196F3;
+}
+
+.myleaf-table-open:hover {
+    background-color: rgba(44, 113, 170, 0.1);
+}
+
+.myleaf-table-delete {
+    color: #E57373;
+}
+
+.myleaf-table-delete:hover {
+    background-color: rgba(179, 76, 76, 0.1);
+}
+

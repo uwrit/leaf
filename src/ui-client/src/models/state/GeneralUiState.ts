@@ -59,13 +59,21 @@ export interface GeneralUiState {
     cohortCountBox: CohortCountBoxState;
     confirmationModal: ConfirmationModalState;
     currentRoute: Routes;
+    currentMyLeafTab: MyLeafTabType,
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
     routes: RouteConfig[];
+    showImportMrnModal: boolean;
+    showImportRedcapModal: boolean;
     showMyLeafModal: boolean;
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;
     sideNotification: SideNotificationState;
+}
+
+export enum MyLeafTabType {
+    SavedQueries = '1',
+    REDCapImport = '2'
 }
 
 export enum BrowserType { 

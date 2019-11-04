@@ -15,7 +15,6 @@ interface State {
     hidden: boolean;
 }
 
-
 export default class AttestationRow extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);

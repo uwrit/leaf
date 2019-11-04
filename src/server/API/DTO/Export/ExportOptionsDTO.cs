@@ -4,22 +4,20 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Model.Options;
 
 namespace API.DTO.Export
 {
     public class ExportOptionsDTO
     {
-        public REDCapOptionsDTO REDCap { get; set; }
+        public REDCapExportOptionsDTO REDCap { get; set; }
 
         public ExportOptionsDTO(ExportOptions exportOptions)
         {
-            REDCap = new REDCapOptionsDTO(exportOptions.REDCap);
+            REDCap = new REDCapExportOptionsDTO(exportOptions.REDCap);
         }
 
-        public class REDCapOptionsDTO
+        public class REDCapExportOptionsDTO
         {
             public string ApiURI { get; set; }
             public string Scope { get; set; }
@@ -27,7 +25,7 @@ namespace API.DTO.Export
             public int RowLimit { get; set; }
             public bool Enabled { get; set; }
 
-            public REDCapOptionsDTO(REDCapOptions redcapOptions)
+            public REDCapExportOptionsDTO(REDCapExportOptions redcapOptions)
             {
                 ApiURI = redcapOptions.ApiURI;
                 Scope = redcapOptions.Scope;

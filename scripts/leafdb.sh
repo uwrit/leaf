@@ -22,7 +22,7 @@ tables = [r'app.Concept', r'auth.Constraint',
           r'app.PanelFilter', r'app.DemographicQuery',
           r'network.Identity', r'ref.Shape', r'ref.SessionType', r'app.DatasetQuery',
           r'app.ConceptSqlSet', r'app.SpecializationGroup', r'app.Specialization',
-          r'rela.ConceptSpecializationGroup', r'ref.Version']
+          r'rela.ConceptSpecializationGroup', r'ref.Version', r'ref.ImportType']
 
 
 def report_error(err, m):
@@ -57,7 +57,7 @@ def get_env():
 def create_bootstrap(build_file: str, sa_pw: str):
     print('Creating bootstrap file...')
     args = [r'mssql-scripter', r'-S', r'localhost', r'-d', r'LeafDB', 
-            r'-U', r'sa', r'-P', sa_pw,                         
+            #r'-U', r'sa', r'-P', sa_pw,                         
             r'--target-server-version', r'2014', r'-f', build_file]
     p = run_subprocess(args)
     if p.wait() != 0:
@@ -85,7 +85,7 @@ def create_data(data_file: str, sa_pw: str):
     print('Creating data file...')
     args = [r'mssql-scripter', r'-S', r'localhost', r'-d', r'LeafDB',
             r'--target-server-version', r'2014', r'-f', data_file, 
-            r'-U', r'sa', r'-P', sa_pw,
+            #r'-U', r'sa', r'-P', sa_pw,
             r'--data-only', r'--include-objects']
     for t in tables:
         args.append(t)
@@ -121,7 +121,7 @@ def create_source(per_file_dir: str, sa_pw: str):
     print('Creating source files...')
     args = [r'mssql-scripter', r'-S', r'localhost', r'-d', r'LeafDB', r'--target-server-version',
             r'2014', r'--file-per-object', r'-f', per_file_dir, 
-            r'-U', r'sa', r'-P', sa_pw
+            #r'-U', r'sa', r'-P', sa_pw
         ]
     p = run_subprocess(args)
     if p.wait() != 0:

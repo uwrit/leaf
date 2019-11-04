@@ -45,7 +45,9 @@ namespace Model.Extensions
                 .SelectMany(p => p.SubPanels)
                 .SelectMany(s => s.PanelItems);
 
-            return new ResourceRefs(items.Select(i => new ResourceRef { Id = i.Concept.Id, UniversalId = i.Concept.UniversalId?.ToString() }));
+            return new ResourceRefs(items
+                .Where(i => i.Concept.Id != Guid.Empty)
+                .Select(i => new ResourceRef { Id = i.Concept.Id, UniversalId = i.Concept.UniversalId?.ToString() }));
         }
     }
 }

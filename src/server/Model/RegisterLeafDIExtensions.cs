@@ -8,6 +8,7 @@ using Model.Network;
 using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
+using Model.Import;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
 
@@ -24,17 +25,16 @@ namespace Model
             services.AddTransient<PanelConverter>();
             services.AddTransient<DemographicCompilerValidationContextProvider>();
             services.AddTransient<DatasetCompilerValidationContextProvider>();
-
             services.AddSingleton<PatientCountAggregator>();
             services.AddTransient<CohortCounter>();
             services.AddTransient<DemographicProvider>();
             services.AddTransient<DatasetProvider>();
             services.AddTransient<QueryManager>();
-
             services.AddTransient<ConceptHintSearcher>();
             services.AddTransient<ConceptTreeSearcher>();
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DatasetQueryProvider>();
+            services.AddTransient<DataImporter>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();

@@ -9,15 +9,14 @@ import { SavedQuery, SavedQueryRef, Query, QueryDependent } from '../models/Quer
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';
-import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getQueriesAsConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
+import { saveQueryHomeNode, saveQueryFedNode, deleteSavedQuery, getExtensionRootConcepts, loadSavedQuery, hasRecursiveDependency, deriveSavedQuery } from '../services/queryApi';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { setNoClickModalState, showInfoModal, toggleSaveQueryPane, hideMyLeafModal, showConfirmationModal, setRoute } from './generalUi';
 import { NotificationStates, InformationModalState, ConfirmationModalState, Routes } from '../models/state/GeneralUiState';
 import { NetworkIdentity } from '../models/NetworkResponder';
-import { mergeExtensionConcepts } from './concepts';
-import { ConceptExtensionInitializer } from '../models/concept/Concept';
 import { resetPanels } from './panels';
 import { setPanelFilterActiveStates } from './panelFilter';
+import { setExtensionRootConcepts } from './concepts';
 
 export const REQUEST_SAVE_QUERY = 'REQUEST_SAVE_QUERY';
 export const FINISH_SAVE_QUERY = 'FINISH_SAVE_QUERY';
@@ -49,7 +48,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
 
         try {
             dispatch(setNoClickModalState({ message: "Loading Query", state: NotificationStates.Working }));
-            const saved = await loadSavedQuery(ref.universalId, state);
+            const saved = await loadSavedQuery(ref.universalId, state, dispatch);
 
             /* 
              * Update UI with the new query.
@@ -82,7 +81,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
 export const requestQuerySave = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
-            const state = getState();
+            let state = getState();
             const { runAfterSave, current } = state.queries;
             const panels = state.panels.map(p => panelToDto(p));
             const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
@@ -124,8 +123,11 @@ export const requestQuerySave = () => {
              * with the new query and possible category
              * as concepts.
              */
-            const newQueryConcepts = await getQueriesAsConcepts(Array.from(getState().queries.saved.values())) as ConceptExtensionInitializer;
-            dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
+            state = getState();
+            const savedQueries = [ ...state.queries.saved.values() ];
+            const imports = [ ...state.dataImport.imports.values() ];
+            const extensionConcepts = await getExtensionRootConcepts(imports, savedQueries);
+            dispatch(setExtensionRootConcepts(extensionConcepts));
 
             /*
              * Save to any network responder nodes.
@@ -180,7 +182,7 @@ export const requestQuerySave = () => {
 export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean = false, dependents: QueryDependent[] = []) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
-            const state = getState();
+            let state = getState();
             const user = state.auth.userContext!.name;
             const homeNode = state.responders.get(0)!;
 
@@ -213,8 +215,11 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                         /*
                          * Update the concept tree.
                          */
-                        const newQueryConcepts = await getQueriesAsConcepts(Array.from(getState().queries.saved.values())) as ConceptExtensionInitializer;
-                        dispatch(mergeExtensionConcepts(newQueryConcepts.concepts));
+                        state = getState();
+                        const savedQueries = [ ...state.queries.saved.values() ];
+                        const imports = [ ...state.dataImport.imports.values() ];
+                        const extensionConcepts = await getExtensionRootConcepts(imports, savedQueries);
+                        dispatch(setExtensionRootConcepts(extensionConcepts));
 
                         /*
                          * Delete from network responders.

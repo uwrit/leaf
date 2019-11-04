@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_QuerySaveInitial]    Script Date: 9/11/19 9:39:57 AM ******/
+/****** Object:  StoredProcedure [app].[sp_QuerySaveInitial]    Script Date: 11/4/2019 11:22:23 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -30,7 +30,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- ensure saving user is the owner of the query
-    DECLARE @owner NVARCHAR(200), @qid UNIQUEIDENTIFIER;
+    DECLARE @owner NVARCHAR(1000), @qid UNIQUEIDENTIFIER;
 
     SELECT @qid = Id, @owner = [Owner]
     FROM app.Query
@@ -66,6 +66,7 @@ BEGIN
     FROM app.Query
     WHERE Id = @queryid
 END
+
 
 
 

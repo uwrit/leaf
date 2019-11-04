@@ -13,7 +13,7 @@ import { TextArea } from '../../Section/TextArea';
 import { setAdminPanelFilter, removeAdminPanelFilter, deleteAdminPanelFilter } from '../../../../actions/admin/panelFilter';
 import { Checkbox } from '../../Section/Checkbox';
 import { Concept } from '../../../../models/admin/Concept';
-import { isEmbeddedQuery } from '../../../../utils/panelUtils';
+import { isNonstandard } from '../../../../utils/panelUtils';
 import { ConfirmationModalState } from '../../../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../../../actions/generalUi';
 
@@ -47,7 +47,7 @@ const panelTarget = {
     },
     canDrop (props: Props, monitor: DropTargetMonitor) {
         const concept: Concept = monitor.getItem();
-        return !isEmbeddedQuery(concept.universalId);
+        return !isNonstandard(concept.universalId);
     }
 }
 

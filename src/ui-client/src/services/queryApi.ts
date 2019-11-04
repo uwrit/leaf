@@ -12,12 +12,14 @@ import ExtensionConceptsWebWorker from '../providers/extensionConcepts/extension
 import { PanelDTO, Panel } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { NetworkIdentity } from '../models/NetworkResponder';
-import { ResourceRef, ExtensionConcept } from '../models/concept/Concept';
+import { ResourceRef, Concept } from '../models/concept/Concept';
 import { fetchConcept } from '../services/conceptApi';
 import { SubPanel } from '../models/panel/SubPanel';
 import { PreflightCheckDTO } from '../models/PatientCountDTO';
-import { getEmbeddedQueries, isEmbeddedQuery } from '../utils/panelUtils';
+import { getEmbeddedQueries, isNonstandard } from '../utils/panelUtils';
+import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 import moment from 'moment';
+import { setConcept } from '../actions/concepts';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -104,13 +106,31 @@ export const preflightSavedQuery = async (state: AppState, resourceRef: Resource
 };
 
 /*
- * Requests a Saved Cohort tree be derived and 
+ * Requests an extension tree be derived and 
  * created from the worker. The return object is 
  * merged with the Concept tree.
  */
-export const getQueriesAsConcepts = async (queries: SavedQueryRef[]) => {
-    const concepts = await worker.buildSavedCohortTree(queries);
-    return concepts;
+export const getExtensionRootConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]): Promise<Concept[]> => {
+    const concepts = await worker.buildExtensionImportTree(imports, queries);
+    return concepts as Concept[];
+};
+
+/*
+ * Request a Saved Cohort tree be derived and 
+ * created from the worker. The return object is 
+ * merged with the Concept tree.
+ */
+export const getExtensionConcept = async (id: string): Promise<Concept | undefined> => {
+    const concept = await worker.getExtensionConcept(id);
+    return concept as Concept | undefined;
+};
+
+/*
+ * Requests child extension concepts for a given concept.
+ */
+export const fetchExtensionConceptChildren = async (concept: Concept | Concept): Promise<Concept[]> => {
+    const concepts = await worker.loadConceptChildren(concept);
+    return concepts as Concept[];
 };
 
 /*
@@ -120,7 +140,7 @@ export const getQueriesAsConcepts = async (queries: SavedQueryRef[]) => {
  * any embedded queries or Concepts are still available
  * to the user.
  */
-export const deserialize = async (queryDefJson: string, state: AppState) => {
+export const deserialize = async (queryDefJson: string, state: AppState, dispatch: any) => {
     const deser = JSON.parse(queryDefJson);
 
     /*
@@ -146,11 +166,12 @@ export const deserialize = async (queryDefJson: string, state: AppState) => {
                 const resRef = panelItem.resource as ResourceRef;
 
                 // If saved query
-                if (isEmbeddedQuery(resRef.universalId)) {
-                    const embedded = state.concepts.extensionTree.get(resRef.universalId!);
-                    if (!embedded) { 
-                        throw new Error(`${resRef.uiDisplayName} is not an existing saved query.`); 
+                if (isNonstandard(resRef.universalId)) {
+                    const embedded =  await getExtensionConcept(resRef.universalId!);
+                    if (!embedded || !embedded.universalId) { 
+                        throw new Error(`${resRef.uiDisplayName} is not an existing saved query or imported dataset.`); 
                     }
+                    dispatch(setConcept(embedded))
                     panelItem.concept = embedded;
                 // Else if concept
                 } else {
@@ -193,10 +214,10 @@ const handleDate = (dateStr?: any): Date => {
  * Loads a Saved Query from the server and
  * deserializes into a panels and panel filters.
  */
-export const loadSavedQuery = async (universalId: string, state: AppState): Promise<SavedQuery> => {
+export const loadSavedQuery = async (universalId: string, state: AppState, dispatch: any): Promise<SavedQuery> => {
     const queryResp = await getSavedQueryContext(state, universalId);
     const queryRaw = queryResp.data as SavedQueryRefDTO;
-    const deser = await deserialize(queryRaw.definition, state) as SavedQueryDefinitionDTO;
+    const deser = await deserialize(queryRaw.definition, state, dispatch) as SavedQueryDefinitionDTO;
     const query = { 
         ...deser,
         ...queryRaw, 
@@ -216,8 +237,8 @@ export const hasRecursiveDependency = async (state: AppState): Promise<(string |
     const embedded = getEmbeddedQueries(state.panels);
 
     for (const e of embedded) {
-        const c = e as ExtensionConcept;
-        const resp = await preflightSavedQuery(state, { id: c.extensionId, universalId: c.universalId!, uiDisplayName: c.uiDisplayName });
+        const c = e as Concept;
+        const resp = await preflightSavedQuery(state, { id: c.extensionId!, universalId: c.universalId!, uiDisplayName: c.uiDisplayName });
         const dependents = (resp.data as PreflightCheckDTO).queryPreflight.results;
         for (const d of dependents) {
             if (d.id === curr.id) {

@@ -42,11 +42,13 @@ namespace Services.Search
 
                 var qids = refs.Queries.Select(q => q.Id.Value);
                 var cids = refs.Concepts.Select(c => c.Id.Value);
+                var iids = refs.Imports.Select(i => i.Id.Value);
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byIds,
                     new {
                         qids = ResourceIdTable.From(qids),
                         cids = ResourceIdTable.From(cids),
+                        iids = ResourceIdTable.From(iids),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
                         sessionType = user.SessionType,
@@ -56,7 +58,7 @@ namespace Services.Search
                     commandType: CommandType.StoredProcedure
                 );
 
-                return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
+                return PreflightReader.ReadResourcesById(grid, refs);
             }
         }
 
@@ -68,11 +70,13 @@ namespace Services.Search
 
                 var quids = refs.Queries.Select(q => q.UniversalId.ToString()).ToHashSet();
                 var cuids = refs.Concepts.Select(q => q.UniversalId.ToString()).ToHashSet();
+                var iuids = refs.Imports.Select(q => q.UniversalId.ToString()).ToHashSet(); 
                 var grid = await cn.QueryMultipleAsync(
                     ResourcePreflightSql.byUIds,
                     new {
                         quids = ResourceUniversalIdTable.From(quids),
                         cuids = ResourceUniversalIdTable.From(cuids),
+                        iuids = ResourceUniversalIdTable.From(iuids),
                         user = user.UUID,
                         groups = GroupMembership.From(user),
                         sessionType = user.SessionType,
@@ -82,7 +86,7 @@ namespace Services.Search
                     commandType: CommandType.StoredProcedure
                 );
 
-                return PreflightReader.ReadResourcesByUId(grid, refs.Queries);
+                return PreflightReader.ReadResourcesByUId(grid, refs);
             }
         }
 
@@ -182,29 +186,33 @@ namespace Services.Search
 
     static class PreflightReader
     {
-        public static PreflightResources ReadResourcesById(SqlMapper.GridReader grid, IEnumerable<QueryRef> directQueries)
+        public static PreflightResources ReadResourcesById(SqlMapper.GridReader grid, ResourceRefs refs)
         {
             var pq = ReadQueriesById(grid);
             var pc = ReadConcepts(grid);
+            var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(directQueries, pf)
+            return new PreflightResources(refs.Queries, refs.Imports, pf)
             {
                 DirectQueriesCheck = pq,
-                DirectConceptsCheck = pc
+                DirectConceptsCheck = pc,
+                DirectImportsCheck = im
             };
         }
 
-        public static PreflightResources ReadResourcesByUId(SqlMapper.GridReader grid, IEnumerable<QueryRef> directQueries)
+        public static PreflightResources ReadResourcesByUId(SqlMapper.GridReader grid, ResourceRefs refs)
         {
             var pq = ReadQueriesByUId(grid);
             var pc = ReadConcepts(grid);
+            var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
-            return new PreflightResources(directQueries, pf)
+            return new PreflightResources(refs.Queries, refs.Imports, pf)
             {
                 DirectQueriesCheck = pq,
-                DirectConceptsCheck = pc
+                DirectConceptsCheck = pc,
+                DirectImportsCheck = im
             };
         }
 
@@ -225,10 +233,36 @@ namespace Services.Search
             return grid.Read<GlobalPanelFilter>();
         }
 
+        public static PreflightImports ReadImportsById(SqlMapper.GridReader grid, IEnumerable<ImportRef> refs)
+        {
+            var output = new List<ImportPreflightCheckResult>();
+            var results = grid.Read<ImportPreflightCheckResult>();
+
+            foreach (var importRef in refs)
+            {
+                var matched = results.FirstOrDefault(r => r.Id == importRef.Id);
+                if (matched != null)
+                {
+                    var clone = new ImportPreflightCheckResult
+                    { 
+                        IsPresent = matched.IsPresent,
+                        IsAuthorized = matched.IsAuthorized,
+                        UniversalId = importRef.UniversalId.ToString(),
+                        ImportRef = importRef.Map()
+                    };
+                    output.Add(clone);
+                }
+            }
+
+            return new PreflightImports
+            {
+                Results = output
+            };
+        }
+
         public static PreflightQueries ReadQueriesById(SqlMapper.GridReader grid)
         {
             var records = grid.Read<QueryPreflightCheckResultRecord>();
-
             var results = records.GroupBy(r => r.QueryId).Project();
 
             return new PreflightQueries { Results = results };
@@ -237,7 +271,6 @@ namespace Services.Search
         public static PreflightQueries ReadQueriesByUId(SqlMapper.GridReader grid)
         {
             var records = grid.Read<QueryPreflightCheckResultRecord>();
-
             var results = records.GroupBy(r => r.QueryUniversalId).Project();
 
             return new PreflightQueries { Results = results };

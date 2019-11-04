@@ -14,12 +14,11 @@ import {
     SET_CONCEPTS,
     SET_ROOT_CONCEPTS,
     SET_SEARCH_TREE,
-    SET_EXTENSION_CONCEPTS,
+    SET_EXTENSION_ROOT_CONCEPTS,
     SET_EXTENSION_CONCEPT,
     SET_SELECTED_CONCEPT,
     REPARENT_CONCEPT,
-    MERGE_EXTENSION_CONCEPTS,
-    REMOVE_EXTENSION_CONCEPT,
+    DELETE_ALL_EXTENSION_CONCEPTS,
     SHOW_DRILL_TREE,
     TOGGLE_CONCEPT_OPEN,
     REMOVE_CONCEPT,
@@ -28,15 +27,15 @@ import {
 } from '../actions/concepts';
 import { ConceptsAction } from '../actions/concepts';
 import { ConceptMap, ConceptsState } from '../models/state/AppState';
-import { Concept, ExtensionConcept } from '../models/concept/Concept';
+import { Concept } from '../models/concept/Concept';
 import { getRootId } from '../utils/admin/concept';
+import { isNonstandard } from '../utils/panelUtils';
 
 export const defaultConceptsState = (): ConceptsState => {
     return {
         allowRerender: new Set<string>(),
         currentTree: new Map<string, Concept>(),
         drillTree: new Map<string, Concept>(),
-        extensionTree: new Map<string, Concept>(),
         requestingSearchTree: false,
         roots: [],
         searchTree: new Map<string, Concept>(),
@@ -45,8 +44,8 @@ export const defaultConceptsState = (): ConceptsState => {
     };
 };
 
-const getAncestors = (concept: Concept, cache: ConceptMap): Set<string> => {
-    const updateChain = new Set([concept.id]);
+const getAncestors = (concept: Concept, cache: ConceptMap, forceRerender: string[] = []): Set<string> => {
+    const updateChain = new Set([concept.id].concat(forceRerender));
     let parentId = cache.get(concept.id)!.parentId;
     
     while (parentId) {
@@ -59,6 +58,7 @@ const getAncestors = (concept: Concept, cache: ConceptMap): Set<string> => {
 const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsState => {
     const newConcept = Object.assign({}, concept, { isOpen: !concept.isOpen });
     const updated: Concept[] = [ newConcept ];
+    const forceRerender: string[] = [];
 
     // Make sure all children of newly opened concept are closed to
     // prevent odd rendering issues (if they were previously opened but
@@ -68,13 +68,14 @@ const toggleConceptOpen = (state: ConceptsState, concept: Concept): ConceptsStat
         for (const childId of newConcept.childrenIds!) {
             const childConcept = state.currentTree.get(childId);
             if (childConcept && childConcept.isOpen) {
-                const clone =  Object.assign({}, childConcept, { isOpen: false });
+                const clone = Object.assign({}, childConcept, { isOpen: false });
                 updated.push(clone);
+                forceRerender.push(clone.id);
             }
         }
     }
     return Object.assign({}, addConcepts(state, updated), {
-        allowRerender: getAncestors(concept, state.currentTree)
+        allowRerender: getAncestors(concept, state.currentTree, forceRerender)
     })
 };
 
@@ -147,7 +148,7 @@ const receiveConceptChildren = (state: ConceptsState, concept: Concept, children
 };
 
 const showDrillTree = (state: ConceptsState) => {
-    const combined = new Map([...state.drillTree, ...state.extensionTree]);
+    const combined = new Map(state.drillTree);
     const renderedDrillTreeConcepts: Set<string> = new Set();
     combined.forEach((c: Concept) => renderedDrillTreeConcepts.add(c.id));
 
@@ -170,57 +171,37 @@ const addRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState 
 };
 
 const addConcepts = (state: ConceptsState, cons: Concept[]): ConceptsState => {
-    const currentTree = new Map(state.currentTree);
-    cons.forEach(c => currentTree.set(c.id, c));
-    return Object.assign({}, state, { currentTree });
+    cons.forEach(c => state.currentTree.set(c.id, Object.assign({}, c)));
+    return Object.assign({}, state, { currentTree: new Map(state.currentTree) });
 };
 
 
-const setExtensionConcepts = (state: ConceptsState, extensionTree: ConceptMap, roots: string[]): ConceptsState => {
+const setExtensionRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState => {
+    roots.forEach(c => state.currentTree.set(c.id, c));
     return Object.assign({}, state, {
-        currentTree: new Map([...state.currentTree, ...extensionTree]),
-        roots: state.roots.slice().concat(roots),
-        extensionTree
-    });
-};
-
-const mergeExtensionConcepts = (state: ConceptsState, extensionTree: ConceptMap): ConceptsState => {
-    const ext = extensionTree as Map<string, ExtensionConcept>;
-
-    for (const c of ext) {
-        const key = c[0];
-        const val = c[1];
-        let pre = state.currentTree.get(key);
-        if (pre) {
-            const merged = Object.assign( {}, val, { isOpen: pre.isOpen });
-            state.currentTree.set(key, merged)
-        } else {
-            state.currentTree.set(key, val);
-        }
-    }
-
-    state.extensionTree.forEach((c) => {
-        if (!extensionTree.has(c.id)) {
-            state.currentTree.delete(c.id);
-        }
-    });
-    
-    return Object.assign({}, state, {
-        currentTree: state.currentTree,
-        extensionTree
+        currentTree: new Map(state.currentTree),
+        roots: [ ...new Set(state.roots.slice().concat(roots.map(r => r.id))) ],
     });
 };
 
 const setExtensionConcept = (state: ConceptsState, extensionConcept: Concept): ConceptsState => {
-    state.extensionTree.set(extensionConcept!.universalId!, extensionConcept!);
     state.currentTree.set(extensionConcept!.universalId!, extensionConcept!);
     return state;
 };
 
-const removeExtensionConcept = (state: ConceptsState, extensionConcept: Concept): ConceptsState => {
-    state.extensionTree.delete(extensionConcept.id);
-    state.currentTree.delete(extensionConcept.id);
-    return state;
+const deleteAllExtensionConcepts = (state: ConceptsState): ConceptsState => {
+    const mapped: [ string, Concept][] = [ ...state.currentTree.values() ]
+        .filter(c => !isNonstandard(c.universalId))
+        .map(c => [c.id, { 
+            ...c, 
+            childrenIds: !c.childrenIds 
+                ? undefined 
+                : new Set([...c.childrenIds].filter(id => !isNonstandard(id)))
+        }])
+    return Object.assign({}, state, { 
+        currentTree: new Map(mapped),
+        roots: state.roots.slice()
+    });
 };
 
 const setSelectedConcept = (state: ConceptsState, concept: Concept): ConceptsState => {
@@ -413,14 +394,12 @@ export const concepts = (state: ConceptsState = defaultConceptsState(), action: 
         case SET_CONCEPT:
         case SET_CONCEPTS:
             return addConcepts(state, action.concepts!);
-        case SET_EXTENSION_CONCEPTS:
-            return setExtensionConcepts(state, action.conceptMap!, action.roots!);
+        case SET_EXTENSION_ROOT_CONCEPTS:
+            return setExtensionRootConcepts(state, action.concepts!);
         case SET_EXTENSION_CONCEPT:
             return setExtensionConcept(state, action.concept!);
-        case REMOVE_EXTENSION_CONCEPT:
-            return removeExtensionConcept(state, action.concept!);
-        case MERGE_EXTENSION_CONCEPTS:
-            return mergeExtensionConcepts(state, action.conceptMap!)
+        case DELETE_ALL_EXTENSION_CONCEPTS:
+            return deleteAllExtensionConcepts(state);
         case SET_SELECTED_CONCEPT:
             return setSelectedConcept(state, action.concept!);
         case REMOVE_CONCEPT:

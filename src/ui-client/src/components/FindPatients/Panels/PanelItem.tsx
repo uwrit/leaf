@@ -108,7 +108,7 @@ export class PanelItem extends React.Component<Props> {
             connectDragSource &&
             connectDragSource(
                 <div className={classes.join(' ')}>
-                    <span className={`${c}-text`}>{concept.uiDisplayText}</span>
+                    <span className={`${c}-text`}>{panelItem.concept.uiDisplayText}</span>
                     {concept.isSpecializable && concept.specializationGroups &&
                      concept.specializationGroups.map((g) => (
                         <ConceptSpecializationGroup 

@@ -7,17 +7,24 @@
 
 import { generate as generateId } from 'shortid';
 import { SavedQueryRef } from '../../models/Query';
-import { Concept, ConceptExtensionType, ExtensionConcept } from '../../models/concept/Concept';
+import { Concept } from '../../models/concept/Concept';
 import { workerContext } from './extensionConceptsWebWorkerContext';
+import { ImportMetadata, ImportType, REDCapImportStructure } from '../../models/dataImport/ImportMetadata';
 
 const ADD_SAVED_COHORT = 'ADD_SAVED_COHORT';
-const BUILD_SAVED_COHORT_TREE = 'BUILD_SAVED_COHORT_TREE';
 const SEARCH_SAVED_COHORTS = 'SEARCH_SAVED_COHORTS';
+const BUILD_EXTENSION_TREE = 'BUILD_EXTENSION_TREE';
+const LOAD_EXTENSION_CONCEPT_CHILDREN = 'LOAD_EXTENSION_CONCEPT_CHILDREN';
+const GET_EXTENSION_CONCEPT = 'GET_EXTENSION_CONCEPT';
 
-const savedQueryType = ConceptExtensionType.SavedQuery;
+const redcapImport = ImportType.REDCapProject;
+const mrnImport = ImportType.MRN;
 
 interface InboundMessagePartialPayload {
+    concept?: Concept;
     displayThreshhold?: number;
+    id?: string;
+    imports?: ImportMetadata[];
     savedQuery?: SavedQueryRef;
     savedQueries?: SavedQueryRef[];
     message: string;
@@ -51,9 +58,10 @@ export default class ExtensionConceptsWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ADD_SAVED_COHORT, BUILD_SAVED_COHORT_TREE, SEARCH_SAVED_COHORTS])}
+            ${this.addMessageTypesToContext([ADD_SAVED_COHORT, BUILD_EXTENSION_TREE, SEARCH_SAVED_COHORTS,LOAD_EXTENSION_CONCEPT_CHILDREN,GET_EXTENSION_CONCEPT])}
             ${workerContext}
-            var savedQueryType = ${ConceptExtensionType.SavedQuery};
+            var redcapImport = ${redcapImport}
+            var mrnImport = ${mrnImport}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -64,12 +72,20 @@ export default class ExtensionConceptsWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public buildSavedCohortTree = (savedQueries: SavedQueryRef[]) => {
-        return this.postMessage({ message: BUILD_SAVED_COHORT_TREE, savedQueries })
+    public buildExtensionImportTree = (imports: ImportMetadata[], savedQueries: SavedQueryRef[]) => {
+        return this.postMessage({ message: BUILD_EXTENSION_TREE, imports, savedQueries })
     }
 
     public searchSavedCohorts = (searchString: string) => {
         return this.postMessage({ message: SEARCH_SAVED_COHORTS, searchString });
+    }
+
+    public loadConceptChildren = (concept:Concept) => {
+        return this.postMessage({ message: LOAD_EXTENSION_CONCEPT_CHILDREN, concept });
+    }
+
+    public getExtensionConcept = (id: string) => {
+        return this.postMessage({ message: GET_EXTENSION_CONCEPT, id });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -104,35 +120,92 @@ export default class ExtensionConceptsWebWorker {
         // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload) => {
             switch (payload.message) {
-                case BUILD_SAVED_COHORT_TREE:
-                    return buildSavedCohortTree(payload);
+                case BUILD_EXTENSION_TREE:
+                    return buildExtensionImportTree(payload);
                 case SEARCH_SAVED_COHORTS:
                     return search(payload);
+                case LOAD_EXTENSION_CONCEPT_CHILDREN:
+                    return loadExtensionChildrenConcepts(payload);
+                case GET_EXTENSION_CONCEPT:
+                    return getExtensionConcept(payload);
                 default:
                     return null;
             }
         };
 
-        let conceptMap: Map<string, ExtensionConcept> = new Map();
+        let conceptMap: Map<string, Concept> = new Map();
+
+        const loadExtensionChildrenConcepts = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, concept } = payload;
+            const children: Concept[] = [ ... conceptMap.values() ].filter(c => c.parentId === concept!.id)
+            return { requestId, result: children };
+        };
+
+        const getExtensionConcept = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, id } = payload;
+            const concept = conceptMap.get(id!)!;
+            return { requestId, result: concept };
+        };
+
+        /*
+         * Build the extension concept tree map.
+         */
+        const buildExtensionImportTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, imports, savedQueries } = payload;
+            const redcap = imports!.filter(i => i.type === redcapImport);
+            conceptMap = new Map();
+            buildRedcapImportTree(redcap);
+            buildSavedCohortTree(savedQueries!);
+            const roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
+
+            return { requestId, result: roots }
+        };
+
+        /*
+         * Build the REDCap Import-specific concept tree map.
+         */
+        const buildRedcapImportTree = (redcapImports: ImportMetadata[]): void => {
+            const rootId = `urn:leaf:import:redcap:root`;
+            const root: Concept = {
+                ...getEmptyConcept(),
+                id: rootId,
+                universalId: rootId,
+                isParent: true,
+                childrenOnDrop: [],
+                uiDisplayName: 'REDCap Imports'
+            };
+
+            for (let i = 0; i < redcapImports.length; i++) {
+                const impt = redcapImports[i];
+                const struct = impt.structure as REDCapImportStructure;
+
+                // Set Concepts
+                for (let j = 0; j < struct.concepts.length; j++) {
+                    const conc = struct.concepts[j] as Concept;
+                    conc.childrenIds = undefined;
+                    conc.childrenLoaded = false;
+                    conc.extensionId = impt.id!;
+                    conceptMap.set(conc.universalId!, conc);
+                }
+            }
+            conceptMap.set(root.id, root);
+        };
 
         /*
          * Build a Map object to be unioned with the Concept tree
          * to search for and display saved cohorts in patient list.
          */
-        const buildSavedCohortTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId } = payload;
-            const savedQueries = payload.savedQueries!;
-            const all: ExtensionConcept[] = [];
+        const buildSavedCohortTree = (savedQueries: SavedQueryRef[]): void => {
+            const all: Concept[] = [];
             const catIds: Set<string> = new Set();
             const prefix = 'urn:leaf:query';
             const rootId = `${prefix}:root`;
-            conceptMap = new Map();
 
             // For each saved query
             for (let i = 0; i < savedQueries.length; i++) {
                 const query = savedQueries[i];
                 const catId = `${prefix}:category:${query.category.toLowerCase()}`;
-                const concept: ExtensionConcept = cohortToConcept(catId, query, rootId);
+                const concept: Concept = cohortToConcept(catId, query, rootId);
 
                 // Add query concept
                 conceptMap.set(concept.universalId!, concept);
@@ -142,25 +215,19 @@ export default class ExtensionConceptsWebWorker {
                 // Add category as concept
                 if (conceptMap.has(catId)) {
                     const catConcept = conceptMap.get(catId)!;
-                    if (!catConcept.childrenIds!.has(concept.universalId!)) {
-                        catConcept.injectChildrenOnDrop!.push(concept);
-                        catConcept.childrenIds!.add(concept.universalId!);
-                    }
-                }
-                else {
+                    catConcept.childrenOnDrop!.push(concept);
+                } else {
                     const newCatConcept = categoryToConcept(catId, query, rootId);
                     conceptMap.set(catId, newCatConcept);
                 }
             }
 
             // Add root concept
-            const root = getRootConcept(all, catIds, rootId) as ExtensionConcept;
+            const root = getRootConcept(all, catIds, rootId);
             conceptMap.set(rootId, root);
-            
-            return { result: { concepts: conceptMap, roots: [ rootId ] }, requestId };
         };
 
-        const getEmptyConcept = (): ExtensionConcept => {
+        const getEmptyConcept = (): Concept => {
             return {
                 extensionId: '',
                 id:'',
@@ -184,9 +251,8 @@ export default class ExtensionConceptsWebWorker {
         /*
          * Returns a Concept to be displayed in UI for a given Saved Cohort.
          */ 
-        const cohortToConcept = (categoryId: string, query: SavedQueryRef, rootId: string): ExtensionConcept => {
+        const cohortToConcept = (categoryId: string, query: SavedQueryRef, rootId: string): Concept => {
             const concept = getEmptyConcept();
-            concept.extensionType = savedQueryType;
             concept.extensionId = query.id;
             concept.id = query.universalId!;
             concept.universalId = query.universalId;
@@ -201,16 +267,14 @@ export default class ExtensionConceptsWebWorker {
         /*
          * Returns a Concept to be displayed in UI for a given Saved Cohort.
          */ 
-        const categoryToConcept = (categoryId: string, query: SavedQueryRef, rootId: string): ExtensionConcept => {
+        const categoryToConcept = (categoryId: string, query: SavedQueryRef, rootId: string): Concept => {
             const childrenOnDrop = conceptMap.get(query.universalId!)!
             const concept = getEmptyConcept();
-            concept.extensionType = savedQueryType;
-            concept.injectChildrenOnDrop = [ childrenOnDrop ];
+            concept.childrenOnDrop = [ childrenOnDrop ];
             concept.isParent = true;
             concept.parentId = rootId;
             concept.rootId = rootId;
-            concept.childrenLoaded = true;
-            concept.childrenIds = new Set([ childrenOnDrop.universalId! ]);
+            concept.childrenLoaded = false;
             concept.id = categoryId;
             concept.universalId = categoryId;
             concept.uiDisplayName = query.category;
@@ -220,17 +284,15 @@ export default class ExtensionConceptsWebWorker {
         /*
          * Returns a default concept used for roots.
          */
-        const getRootConcept = (children: Concept[], directChildrenIds: Set<string>, rootId: string): ExtensionConcept => {
+        const getRootConcept = (children: Concept[], directChildrenIds: Set<string>, rootId: string): Concept => {
             const concept = getEmptyConcept();
-            concept.extensionType = savedQueryType;
             concept.isParent = true;
-            concept.childrenLoaded = true;
-            concept.childrenIds = directChildrenIds;
+            concept.childrenLoaded = false;
             concept.id = rootId;
             concept.universalId = rootId;
             concept.rootId = rootId;
             concept.uiDisplayName = 'My Saved Cohorts';
-            concept.injectChildrenOnDrop = children;
+            concept.childrenOnDrop = children;
             return concept;
         };
 

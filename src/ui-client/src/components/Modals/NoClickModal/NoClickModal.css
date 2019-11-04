@@ -16,7 +16,7 @@
 }
 
 .noclick-modal.modal-dialog {
-    width: 400px !important;
+    max-width: 450px !important;
     z-index: 100;
 }
 
@@ -27,7 +27,9 @@
 }
 
 .noclick-modal svg {
+    height: 120px;
     margin-left: 10px;
+    width: 120px;
 }
 
 .noclick-modal svg circle {

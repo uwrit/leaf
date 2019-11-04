@@ -15,20 +15,21 @@ import { fetchConceptAncestorsByConceptIds, fetchConceptAncestorsBySearchTerm, f
 import { fetchAdminConceptIfNeeded } from './admin/concept';
 import { Routes, InformationModalState } from '../models/state/GeneralUiState';
 import { showInfoModal } from './generalUi';
+import { isNonstandard } from '../utils/panelUtils';
+import { fetchExtensionConceptChildren } from '../services/queryApi';
 
 export const SET_CONCEPT = 'SET_CONCEPT';
 export const SET_CONCEPTS = 'SET_CONCEPTS';
 export const SET_ROOT_CONCEPTS = 'SET_ROOT_CONCEPTS';
 export const SET_EXTENSION_CONCEPT = 'SET_EXTENSION_CONCEPT';
-export const SET_EXTENSION_CONCEPTS = 'SET_EXTENSION_CONCEPTS';
+export const SET_EXTENSION_ROOT_CONCEPTS = 'SET_EXTENSION_ROOT_CONCEPTS';
 export const SET_SEARCH_TREE = 'SET_SEARCH_TREE';
 export const SET_SELECTED_CONCEPT = 'SET_SELECTED_CONCEPT';
 export const CREATE_CONCEPT = 'CREATE_CONCEPT';
 export const REPARENT_CONCEPT = 'REPARENT_CONCEPT';
 export const SWITCH_CONCEPTS = 'SWITCH_CONCEPTS';
 export const REMOVE_CONCEPT = 'REMOVE_CONCEPT';
-export const MERGE_EXTENSION_CONCEPTS = 'MERGE_EXTENSION_CONCEPTS';
-export const REMOVE_EXTENSION_CONCEPT = 'REMOVE_EXTENSION_CONCEPT';
+export const DELETE_ALL_EXTENSION_CONCEPTS = 'DELETE_ALL_EXTENSION_CONCEPTS';
 export const ERROR_CONCEPTS = 'ERROR_CONCEPTS';
 export const TOGGLE_CONCEPT_OPEN = 'TOGGLE_CONCEPT_OPEN';
 export const REQUEST_CONCEPT_CHILDREN = 'REQUEST_CONCEPT_CHILDREN';
@@ -58,18 +59,15 @@ const shouldfetchConceptChildren = (concept: Concept): boolean => {
 
 // Async actions
 /*
- * Request root concepts and panel filters. Called 
- * only at startup.
+ * Request root concepts and panel filters. Called at startup.
  */
-export const requestRootConcepts = () => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        const response = await fetchRootConcepts(state);
-        const concepts = response.data.concepts as Concept[];
-        const panelFilters = response.data.panelFilters as PanelFilter[];
-        dispatch(addRootConcepts(concepts));
-        dispatch(setPanelFilters(panelFilters));
-    };
+export const requestRootConcepts = async (dispatch: any, getState: () => AppState) => {
+    const state = getState();
+    const response = await fetchRootConcepts(state);
+    const concepts = response.data.concepts as Concept[];
+    const panelFilters = response.data.panelFilters as PanelFilter[];
+    dispatch(addRootConcepts(concepts));
+    dispatch(setPanelFilters(panelFilters));
 };
 
 /*
@@ -92,9 +90,16 @@ export const fetchConceptChildrenIfNeeded = (concept: Concept) => {
  */
 export const getConceptChildren = (concept: Concept) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const isStandard = !isNonstandard(concept.universalId);
         dispatch(requestConceptChildren(concept));
-        const response = await fetchConceptChildren(concept, getState());
-        dispatch(receiveConceptChildren(concept, response.data));
+
+        if (isStandard) {
+            const response = await fetchConceptChildren(concept, getState());
+            dispatch(receiveConceptChildren(concept, response.data));
+        } else {
+            const response = await fetchExtensionConceptChildren(concept);
+            dispatch(receiveConceptChildren(concept, response));
+        }
     };
 };
 
@@ -267,25 +272,16 @@ export const setExtensionConcept = (concept: Concept) => {
     }
 };
 
-export const removeExtensionConcept = (concept: Concept) => {
+export const deleteAllExtensionConcepts = () => {
     return {
-        concept,
-        type: REMOVE_EXTENSION_CONCEPT
+        type: DELETE_ALL_EXTENSION_CONCEPTS
     }
 };
 
-export const setExtensionConcepts = (conceptMap: ConceptMap, roots: string[]): ConceptsAction => {
+export const setExtensionRootConcepts = (concepts: Concept[]): ConceptsAction => {
     return {
-        conceptMap,
-        roots,
-        type: SET_EXTENSION_CONCEPTS
-    };
-};
-
-export const mergeExtensionConcepts = (conceptMap: ConceptMap): ConceptsAction => {
-    return {
-        conceptMap,
-        type: MERGE_EXTENSION_CONCEPTS
+        concepts,
+        type: SET_EXTENSION_ROOT_CONCEPTS
     };
 };
 

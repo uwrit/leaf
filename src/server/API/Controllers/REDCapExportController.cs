@@ -22,13 +22,13 @@ namespace API.Controllers
     [Authorize(Policy = TokenType.Access)]
     [Authorize(Policy = Access.Institutional)]
     [Route("api/export/redcap")]
-    public class REDCapExportController : MaybeController<REDCapOptions>
+    public class REDCapExportController : MaybeController<REDCapExportOptions>
     {
         readonly ILogger<REDCapExportController> log;
 
         public REDCapExportController(
             ILogger<REDCapExportController> log,
-            IOptions<REDCapOptions> opts) : base(opts)
+            IOptions<REDCapExportOptions> opts) : base(opts)
         {
             this.log = log;
         }

@@ -9,8 +9,8 @@ import React from 'react';
 import { Button, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { setExportClearErrorOrComplete } from '../../../actions/dataExport';
 import ExportState from '../../../models/state/Export';
-import './ExportDataModal.css';
 import REDCapExport from './REDCap/REDCapExport';
+import './ExportDataModal.css';
 
 interface Props { 
     dispatch: any;

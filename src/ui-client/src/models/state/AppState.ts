@@ -19,6 +19,7 @@ import { SavedQueriesState } from "../Query";
 import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
+import ImportState from "./Import";
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -32,7 +33,6 @@ export interface ConceptsState {
     allowRerender: Set<string>;
     currentTree: ConceptMap;
     drillTree: ConceptMap;
-    extensionTree: ConceptMap;
     requestingSearchTree: boolean;
     roots: string[];
     searchTree: ConceptMap;
@@ -69,6 +69,7 @@ export interface AppState {
     conceptSearch: ConceptsSearchState;
     cohort: CohortState;
     dataExport: ExportState;
+    dataImport: ImportState;
     datasets: DatasetsState;
     panelFilters: PanelFilter[];
     generalUi: GeneralUiState;

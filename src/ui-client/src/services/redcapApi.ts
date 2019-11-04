@@ -7,17 +7,23 @@
 
 import Axios from 'axios';
 import { AppState } from '../models/state/AppState';
-import REDCapEvent from '../models/redcapExport/Event';
-import REDCapEventMapping from '../models/redcapExport/EventMapping';
-import REDCapFieldMetadata from '../models/redcapExport/Metadata';
-import REDCapProjectRequest, { REDCapProjectPurpose } from '../models/redcapExport/Project';
-import REDCapRepeatingFormEvent from '../models/redcapExport/RepeatingFormEvent';
-import REDCapUser from '../models/redcapExport/User';
+import { REDCapEvent } from '../models/redcapApi/Event';
+import { REDCapEventMapping } from '../models/redcapApi/EventMapping';
+import { REDCapFieldMetadata } from '../models/redcapApi/Metadata';
+import { REDCapRepeatingFormEvent } from '../models/redcapApi/RepeatingFormEvent';
+import { REDCapUser } from '../models/redcapApi/User';
+import { REDCapProjectRequestInfo, REDCapProjectPurpose, REDCapProjectInfo } from '../models/redcapApi/Project';
 import { HttpFactory } from './HttpFactory';
+import { REDCapRecord, REDCapEavRecord } from '../models/redcapApi/Record';
+import { REDCapArm } from '../models/redcapApi/Arm';
+import { REDCapForm } from '../models/redcapApi/Form';
+import { REDCapRecordExportConfiguration } from '../models/redcapApi/RecordExportConfiguration';
 
-enum ContentTypes {
+export enum REDCapContentTypes {
+    Arms = 'arm',
     EventMappings = 'formEventMapping',
     Events = 'event',
+    Forms = 'instrument',
     Metadata = 'metadata',
     Project = 'project',
     Records = 'record',
@@ -31,6 +37,12 @@ interface REDCapVersion {
     minor: number;
     patch: number;
 }
+
+export const getImportOptions = (state: AppState) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    return http.get('/api/import/options');
+};
 
 export const getExportOptions = (state: AppState) => {
     const { token } = state.session.context!;
@@ -47,7 +59,7 @@ export const getREDCapVersion = (state: AppState) => {
 export const requestProjectCreation = (state: AppState, projectName: string, classic: boolean) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const project: REDCapProjectRequest = {
+    const project: REDCapProjectRequestInfo = {
         is_longitudinal: (classic ? '0' : '1'),
         project_title: projectName,
         purpose: REDCapProjectPurpose.Practice,
@@ -81,22 +93,107 @@ export class REDCapHttpConnector {
     }
 
     /*
-     * Get Project Info.
+     * Get project info. 
      */
-    public getProjectInfo = () => this.request(ContentTypes.Project);
+    public getProjectInfo = async (): Promise<REDCapProjectInfo> => {
+        const req = await this.request(REDCapContentTypes.Project);
+        return req.data as REDCapProjectInfo;
+    };
+
+    /*
+     * Get project metadata. 
+     */
+    public getMetadata = async (): Promise<REDCapFieldMetadata[]> => {
+        const req = await this.request(REDCapContentTypes.Metadata);
+        return req.data as REDCapFieldMetadata[];
+    };
+
+    /*
+     * Get project forms. 
+     */
+    public getForms = async (): Promise<REDCapForm[]> => {
+        const req = await this.request(REDCapContentTypes.Forms);
+        return req.data as REDCapForm[];
+    };
+
+    /*
+     * Get project arms. 
+     */
+    public getArms = async (): Promise<REDCapArm[]> => {
+        const req = await this.request(REDCapContentTypes.Arms);
+        return req.data as REDCapArm[];
+    };
+
+    /*
+     * Get project events. 
+     */
+    public getEvents = async (): Promise<REDCapEvent[]> => {
+        const req = await this.request(REDCapContentTypes.Events);
+        return req.data as REDCapEvent[];
+    };
+
+    /*
+     * Get project events. 
+     */
+    public getEventMappings = async (): Promise<REDCapEventMapping[]> => {
+        const req = await this.request(REDCapContentTypes.EventMappings);
+        return req.data as REDCapEventMapping[];
+    };
+
+    /*
+     * Get project repeating forms. 
+     */
+    public getRepeatingForms = async (): Promise<REDCapRepeatingFormEvent[]> => {
+        const req = await this.request(REDCapContentTypes.RepeatingFormsEvents);
+        return req.data as REDCapRepeatingFormEvent[];
+    };
+
+    /*
+     * Get project users. 
+     */
+    public getUsers = async (): Promise<REDCapUser[]> => {
+        const req = await this.request(REDCapContentTypes.Users);
+        return req.data as REDCapUser[];
+    };
+
+    /*
+     * Get project records. 
+     */
+    public getRecords = async (config?: REDCapRecordExportConfiguration): Promise<REDCapRecord[] | REDCapEavRecord[]> => {
+        let params: string[] = [];
+        if (config) {
+            if (config.type) {
+                params.push( `type=${config.type}` );
+            }
+            if (config.fields) {
+                params.push( `fields=${config.fields.join(',')}` );
+            }
+            if (config.events) {
+                params.push( `events=${config.events.join(',')}` );
+            }
+            if (config.forms) {
+                params.push( `forms=${config.forms.join(',')}` );
+            }
+            if (config.records) {
+                params.push( `records=${config.records.join(',')}` );
+            }
+        }
+
+        const req = await this.request(REDCapContentTypes.Records, null, params);
+        return req.data;
+    };
 
     /*
      * Convenience method for getting the user-facing url for
-     * a newly exportted project. This is returned at the
-     * end of an export.
+     * a newly exported project. This is returned at the end of an export.
      */
     public getProjectUrl = async (version: string) => {
-        const project: any = await this.getProjectInfo();
+        const project: REDCapProjectInfo = await this.getProjectInfo();
         const parts = [
             `${this.endpointUri.replace('/api/','')}`,
             `redcap_v${version}`,
             `DataEntry`,
-            `record_status_dashboard.php?pid=${project.data.project_id}`
+            `record_status_dashboard.php?pid=${project.project_id}`
         ];
         return parts.join('/');
     }
@@ -104,36 +201,36 @@ export class REDCapHttpConnector {
     /*
      * Export Metadata via derived fields from Leaf Patient List.
      */
-    public exportMetadata = (metadata: REDCapFieldMetadata[]) => this.request(ContentTypes.Metadata, metadata);
+    public exportMetadata = (metadata: REDCapFieldMetadata[]) => this.request(REDCapContentTypes.Metadata, metadata);
 
     /*
      * Export Events. Each instance of row within a dataset for
      * a unique patient becomes an event in REDCap.
      */
-    public exportEvents = (events: REDCapEvent[]) => this.request(ContentTypes.Events, events, [ 'action=import', 'override=0' ]);
+    public exportEvents = (events: REDCapEvent[]) => this.request(REDCapContentTypes.Events, events, [ 'action=import', 'override=0' ]);
 
     /*
      * Export Event Mappings. This links REDCap forms (which each are 
      * derived from Leaf datasets) to each of their respective Events.
      */
-    public exportEventMappings = (eventMappings: REDCapEventMapping[]) => this.request(ContentTypes.EventMappings, eventMappings);
+    public exportEventMappings = (eventMappings: REDCapEventMapping[]) => this.request(REDCapContentTypes.EventMappings, eventMappings);
 
     /*
      * Export Users. This is a single object array of the current user,
      * who will be the project owner in REDCap.
      */
-    public exportUsers = (users: REDCapUser[]) => this.request(ContentTypes.Users, users);
+    public exportUsers = (users: REDCapUser[]) => this.request(REDCapContentTypes.Users, users);
 
     /*
      * Export Repeating forms events. This was first allowed in REDCap v8.10.0 (at UW's request).
      * This method is the preferred way of creating and deploying Leaf -> REDCap projects.
      */
-    public exportRepeatingFormsEvents = (repeatingForms: REDCapRepeatingFormEvent[]) => this.request(ContentTypes.RepeatingFormsEvents, repeatingForms);
+    public exportRepeatingFormsEvents = (repeatingForms: REDCapRepeatingFormEvent[]) => this.request(REDCapContentTypes.RepeatingFormsEvents, repeatingForms);
 
     /*
      * Export records. These are rows from the Patient List.
      */
-    public exportRecords = (records: object[]) => this.request(ContentTypes.Records, records, [ 'type=flat', 'overwriteBehavior=normal', 'forceAutoNumber=false' ]);
+    public exportRecords = (records: object[]) => this.request(REDCapContentTypes.Records, records, [ 'type=flat', 'overwriteBehavior=normal', 'forceAutoNumber=false' ]);
 
     /*
      * Send REDCap API request.

@@ -13,16 +13,19 @@ namespace Model.Compiler
 {
     public class PreflightResources
     {
-        public bool Ok => DirectConceptsCheck.Ok && DirectQueriesCheck.Ok;
+        public bool Ok => DirectConceptsCheck.Ok && DirectQueriesCheck.Ok && DirectImportsCheck.Ok;
 
         public PreflightConcepts DirectConceptsCheck { get; set; }
         public PreflightQueries DirectQueriesCheck { get; set; }
+        public PreflightImports DirectImportsCheck { get; set; }
         public IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
         IEnumerable<QueryRef> DirectQueries { get; set; }
+        IEnumerable<ImportRef> DirectImports { get; set; }
 
-        public PreflightResources(IEnumerable<QueryRef> directQueries, IEnumerable<GlobalPanelFilter> globalPanelFilters)
+        public PreflightResources(IEnumerable<QueryRef> directQueries, IEnumerable<ImportRef> directImports, IEnumerable<GlobalPanelFilter> globalPanelFilters)
         {
             DirectQueries = directQueries;
+            DirectImports = directImports;
             GlobalPanelFilters = globalPanelFilters;
         }
 
@@ -31,7 +34,10 @@ namespace Model.Compiler
             if (Ok)
             {
                 var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => ToConcept(dq, opts));
-                return DirectConceptsCheck.Concepts.Concat(queryConcepts);
+                var importConcepts = DirectImportsCheck.DirectImports(DirectImports).Select(di => ToConcept(di, opts));
+                return DirectConceptsCheck.Concepts
+                    .Concat(queryConcepts)
+                    .Concat(importConcepts);
             }
             return new Concept[] { };
         }
@@ -49,6 +55,20 @@ namespace Model.Compiler
             return new PreflightResourcesErrors();
         }
 
+        Concept ToConcept(ImportRef @ref, CompilerOptions opts)
+        {
+            return new Concept
+            {
+                Id = @ref.Id.Value,
+                UniversalId = @ref.UniversalId,
+                RootId = Guid.Empty,
+                IsEncounterBased = true,
+                SqlFieldNumeric = $"{opts.Alias}.ValueNumber",
+                SqlFieldDate = $"{opts.Alias}.ValueDate",
+                SqlSetFrom = $"({@ref.ToQuery(opts)})"
+            };
+        }
+
         Concept ToConcept(QueryRef @ref, CompilerOptions opts)
         {
             var alias = $"{opts.Alias}C";
@@ -57,7 +77,7 @@ namespace Model.Compiler
                 Id = @ref.Id.Value,
                 UniversalId = @ref.UniversalId,
                 RootId = Guid.Empty,
-                SqlSetFrom = $"(SELECT {opts.FieldPersonId} = {alias}.PersonId FROM {opts.AppDb}.app.Cohort AS {alias} WHERE {alias}.QueryId = '{@ref.Id.Value}')",
+                SqlSetFrom = $"(SELECT {alias}.PersonId AS {opts.FieldPersonId} FROM {opts.AppDb}.app.Cohort AS {alias} WHERE {alias}.QueryId = '{@ref.Id.Value}')",
             };
         }
     }
@@ -66,6 +86,7 @@ namespace Model.Compiler
     {
         public IEnumerable<ConceptPreflightCheckResult> ConceptErrors { get; set; } = new ConceptPreflightCheckResult[] { };
         public IEnumerable<QueryPreflightCheckResult> QueryErrors { get; set; } = new QueryPreflightCheckResult[] { };
+        public IEnumerable<ImportPreflightCheckResult> ImportErrors { get; set; } = new ImportPreflightCheckResult[] { };
     }
 
     public class PreflightQueries
@@ -82,6 +103,42 @@ namespace Model.Compiler
         {
             return Results.Select(r => r.Errors())
                           .Where(r => r != null);
+        }
+    }
+
+    public class PreflightImports
+    {
+        public bool Ok => Results.All(r => r.Ok);
+        public IEnumerable<ImportPreflightCheckResult> Results { get; set; }
+        public IEnumerable<ImportRef> DirectImports(IEnumerable<ImportRef> refs)
+        {
+            return Results.Where(r => refs.Contains(r.ImportRef, new ImportRefEqualityComparer())).Select(r => r.ImportRef);
+        }
+
+        public IEnumerable<ImportPreflightCheckResult> Errors()
+        {
+            return Results.Select(r => r.Errors())
+                          .Where(r => r != null);
+        }
+    }
+
+    public class ImportPreflightCheckResult
+    {
+        public ImportRef ImportRef { get; set; }
+        public Guid Id { get; set; }
+        public string UniversalId { get; set; }
+        public bool IsPresent { get; set; }
+        public bool IsAuthorized { get; set; }
+
+        public bool Ok => IsPresent && IsAuthorized;
+
+        public ImportPreflightCheckResult Errors()
+        {
+            if (!Ok)
+            {
+                return this;
+            }
+            return null;
         }
     }
 

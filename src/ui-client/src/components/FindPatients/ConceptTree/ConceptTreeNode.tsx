@@ -54,18 +54,25 @@ const collectDrag = (connect: DragSourceConnector, monitor: DragSourceMonitor) =
     });
 };
 
-class ConceptTreeNode extends React.PureComponent<Props> {
+class ConceptTreeNode extends React.Component<Props> {
     
     public componentDidMount() {
-        const { connectDragPreview } = this.props;
-        if (connectDragPreview) {
+        const { connectDragPreview, concept } = this.props;
+        if (connectDragPreview && concept) {
             // Create the drag image.
             // Note: HTML5 (out of the box) can only
             // display images/canvas, so we are converting
             // text and styles to a canvas image.
-            const dragPreview = getDragPreview(this.props.concept.uiDisplayName);
+            const dragPreview = getDragPreview(concept.uiDisplayName);
             connectDragPreview(dragPreview);
         }
+    }
+
+    public shouldComponentUpdate(nextProps: Props) {
+        if (nextProps.allowRerender.has(this.props.concept.id)) {
+            return true;
+        }
+        return false;
     }
 
     public render() {
@@ -106,7 +113,6 @@ class ConceptTreeNode extends React.PureComponent<Props> {
                                 {concept.isFetching &&
                                 <LoaderIcon />
                                 }
-
                             </div>
 
                             {/* Main Text */}

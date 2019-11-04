@@ -54,6 +54,9 @@ namespace API.Options
             // Export Options
             services.ConfigureExportOptions(configuration);
 
+            // Import Options
+            services.ConfigureImportOptions(configuration);
+
             // Authentication Options
             services.ConfigureAuthenticationOptions(configuration);
 
@@ -153,7 +156,7 @@ namespace API.Options
 
         static IServiceCollection ConfigureExportOptions(this IServiceCollection services, IConfiguration config)
         {
-            var rc = new REDCapOptions { Enabled = config.GetValue<bool>(Config.Export.REDCap.Enabled) };
+            var rc = new REDCapExportOptions { Enabled = config.GetValue<bool>(Config.Export.REDCap.Enabled) };
             if (rc.Enabled)
             {
                 rc.ApiURI = config.GetValue<string>(Config.Export.REDCap.ApiURI);
@@ -163,7 +166,7 @@ namespace API.Options
                 rc.SuperToken = config.GetByProxy(Config.Export.REDCap.SuperToken);
             }
 
-            services.Configure<REDCapOptions>(opts =>
+            services.Configure<REDCapExportOptions>(opts =>
             {
                 opts.Enabled = rc.Enabled;
                 opts.ApiURI = rc.ApiURI;
@@ -178,6 +181,29 @@ namespace API.Options
                 opts.REDCap = rc;
             });
 
+            return services;
+        }
+
+        static IServiceCollection ConfigureImportOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var rc = new REDCapImportOptions { Enabled = config.GetValue<bool>(Config.Import.REDCap.Enabled) };
+            if (rc.Enabled)
+            {
+                rc.ApiURI = config.GetValue<string>(Config.Import.REDCap.ApiURI);
+                rc.BatchSize = config.GetValue<int>(Config.Import.REDCap.BatchSize);
+            }
+
+            services.Configure<REDCapImportOptions>(opts =>
+            {
+                opts.Enabled = rc.Enabled;
+                opts.ApiURI = rc.ApiURI;
+                opts.BatchSize = rc.BatchSize;
+            });
+
+            services.Configure<ImportOptions>(opts =>
+            {
+                opts.REDCap = rc;
+            });
 
             return services;
         }

@@ -25,6 +25,7 @@ using Model.Export;
 using Model.Network;
 using Model.Options;
 using Model.Search;
+using Model.Import;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Authentication;
@@ -33,6 +34,7 @@ using Services.Cohort;
 using Services.Export;
 using Services.Network;
 using Services.Search;
+using Services.Import;
 
 namespace API.Options
 {
@@ -98,6 +100,9 @@ namespace API.Options
             services.AddTransient<DatasetProvider.IDatasetExecutor, DatasetExecutor>();
 
             services.AddTransient<IQueryService, QueryService>();
+
+            services.AddTransient<DataImporter.IImportService, ImportService>();
+            services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

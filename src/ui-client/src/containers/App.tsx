@@ -30,6 +30,7 @@ import HelpButton from '../components/HelpButton/HelpButton';
 import { CohortStateType } from '../models/state/CohortState';
 import { AdminPanelPane } from '../models/state/AdminState';
 import SideNotification from '../components/SideNotification/SideNotification';
+import DataImportContainer from '../containers/DataImport/DataImport';
 import { version } from '../../package.json'
 import './App.css';
 
@@ -85,7 +86,7 @@ class App extends React.Component<Props> {
     public render() {
         const { 
             auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, 
-            informationModal, dispatch, noclickModal, routes, sideNotification
+            informationModal, dispatch, noclickModal, routes, sideNotification, sessionContext
         } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
@@ -108,10 +109,11 @@ class App extends React.Component<Props> {
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
                 <HelpButton auth={auth} />
                 <SideNotification dispatch={dispatch} state={sideNotification} />
-                {this.props.sessionContext &&
+                {sessionContext &&
                 <div id="main-content">
                     <SaveQueryPanel />
                     <MyLeafModal />
+                    <DataImportContainer />
                     {content}
                 </div>
                 }

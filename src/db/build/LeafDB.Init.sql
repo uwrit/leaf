@@ -25,6 +25,11 @@ INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (1, N'QI')
 INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (2, N'Research')
 SET IDENTITY_INSERT [ref].[SessionType] OFF
 
+SET IDENTITY_INSERT [ref].[ImportType] ON 
+INSERT [ref].[ImportType] ([Id], [Variant]) VALUES (1, N'REDCap Project')
+INSERT [ref].[ImportType] ([Id], [Variant]) VALUES (2, N'MRN')
+SET IDENTITY_INSERT [ref].[SessionType] OFF
+
 INSERT INTO [network].[Identity] ([Lock], [Name], [Abbreviation], [Description], [TotalPatients], [Latitude], [Longitude], [PrimaryColor], [SecondaryColor])
 SELECT 
     [Lock] = 'X'
@@ -38,4 +43,4 @@ SELECT
    ,[SecondaryColor] = 'rgb(183, 165, 122)'
 
 INSERT INTO [ref].[Version] (Lock, [Version])
-SELECT 'X', N'3.4.0';
+SELECT 'X', N'3.5.0';

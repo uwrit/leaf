@@ -102,7 +102,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
                                             return (
                                                 <DropdownItem 
                                                     className={classed} 
-                                                    key={t.enum} 
+                                                    key={t.enum}
                                                     onMouseUp={this.handleDropdownItemSelect.bind(null,t)}>
                                                     {t.display}
                                                 </DropdownItem>
@@ -168,6 +168,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         const { numericFilter } = this.props.panelItem;
         const newFilter = Object.assign({}, numericFilter, { filterType: ev.enum });
         this.dispatchUpdate(newFilter);
+        setTimeout(() => this.setInputFocus(), 50);
     }
 
     /*
@@ -270,6 +271,19 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
         const newFilter: NumericFilter = { filter: [null, null], filterType: NumericFilterType.None };
         this.dispatchUpdate(newFilter);
         this.setState({ showSelectionBox: false });
+    }
+
+    /*
+     * Sets focus on the input, called after dropdown select to ensure
+     * the blur() action hides the element if clicked outside, and for
+     * data entry convenience.
+     */
+    private setInputFocus = () => {
+        const c = this.className;
+        let input: any = document.getElementsByClassName(`${c}-number leaf-input`);
+        if (input[0] && input[0].focus) {
+            input[0].focus();
+        }
     }
 
     /*

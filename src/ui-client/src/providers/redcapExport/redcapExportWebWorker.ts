@@ -7,12 +7,12 @@
 
 import { generate as generateId } from 'shortid';
 import { REDCapExportOptions } from '../../models/state/Export';
-import REDCapEvent from '../../models/redcapExport/Event';
-import REDCapEventMapping from '../../models/redcapExport/EventMapping';
-import REDCapExportConfiguration from '../../models/redcapExport/ExportConfiguration';
-import REDCapFieldMetadata from '../../models/redcapExport/Metadata';
-import REDCapRepeatingFormEvent from '../../models/redcapExport/RepeatingFormEvent';
-import REDCapUser from '../../models/redcapExport/User';
+import { REDCapEvent } from '../../models/redcapApi/Event';
+import { REDCapEventMapping } from '../../models/redcapApi/EventMapping';
+import { REDCapProjectExportConfiguration } from '../../models/redcapApi/ExportConfiguration';
+import { REDCapFieldMetadata } from '../../models/redcapApi/Metadata';
+import { REDCapRepeatingFormEvent } from '../../models/redcapApi/RepeatingFormEvent';
+import { REDCapUser } from '../../models/redcapApi/User';
 import { PatientListColumnType, PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetExport } from '../../models/patientList/Dataset';
 import { workerContext } from './redcapExportWebWorkerContext';
@@ -176,7 +176,7 @@ export default class REDCapExportWebWorker {
              * Marshall the data to configure and populate the project.
              */
             const derived: REDCapExportDerivedPatientListData = deriveRecords(patientList!, useRepeatingForms!, options!.rowLimit!);
-            const config: REDCapExportConfiguration = {
+            const config: REDCapProjectExportConfiguration = {
                 data: derived.records,
                 metadata: deriveFieldMetadata(derived),
                 project: {

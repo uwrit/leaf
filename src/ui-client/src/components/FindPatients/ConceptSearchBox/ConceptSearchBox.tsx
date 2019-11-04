@@ -12,7 +12,6 @@ import { requestConceptEquivalentHint, requestConceptHints, setSearchRoot, setSe
 import { ConceptsSearchState, ConceptsState } from '../../../models/state/AppState';
 import { AggregateConceptHintRef } from '../../../models/concept/ConceptHint';
 import { HintContainer } from './HintContainer';
-import { isEmbeddedQuery } from '../../../utils/panelUtils';
 import { keys } from '../../../models/Keyboard';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 
@@ -54,8 +53,8 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
         const { conceptsState } = this.props;
         const { roots } = this.state;
 
-        if (!roots.length && conceptsState.roots.length) {
-            this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !isEmbeddedQuery(r)) ] });
+        if (roots.length <= 1 && conceptsState.roots.length) {
+            this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] });
         }
         return null;
     }

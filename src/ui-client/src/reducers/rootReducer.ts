@@ -11,6 +11,7 @@ import { cohort } from './cohort/cohort';
 import { concepts } from './concepts';
 import { conceptSearch } from './conceptSearch';
 import { dataExport } from './dataExport';
+import { dataImport } from './dataImport';
 import { generalUi } from './generalUi';
 import { map } from './map';
 import { responders } from './networkResponders';
@@ -28,6 +29,7 @@ const rootReducer = combineReducers({
     conceptSearch,
     concepts,
     dataExport,
+    dataImport,
     datasets,
     generalUi,
     map,
