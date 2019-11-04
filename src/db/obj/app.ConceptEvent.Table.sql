@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  Table [app].[ConceptEvent]    Script Date: 9/11/19 9:39:57 AM ******/
+/****** Object:  Table [app].[ConceptEvent]    Script Date: 11/4/2019 11:22:23 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -14,9 +14,9 @@ CREATE TABLE [app].[ConceptEvent](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[UiDisplayEventName] [nvarchar](50) NOT NULL,
 	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](200) NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](200) NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
  CONSTRAINT [PK_ConceptSqlEvent] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
@@ -25,7 +25,7 @@ CREATE TABLE [app].[ConceptEvent](
 GO
 SET ANSI_PADDING ON
 GO
-/****** Object:  Index [IXUniq_ConceptEvent_UiDisplayEventName]    Script Date: 9/11/19 9:39:57 AM ******/
+/****** Object:  Index [IXUniq_ConceptEvent_UiDisplayEventName]    Script Date: 11/4/2019 11:22:23 AM ******/
 CREATE UNIQUE NONCLUSTERED INDEX [IXUniq_ConceptEvent_UiDisplayEventName] ON [app].[ConceptEvent]
 (
 	[UiDisplayEventName] ASC

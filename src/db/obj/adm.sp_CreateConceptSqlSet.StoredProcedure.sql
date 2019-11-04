@@ -5,11 +5,12 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 9/11/19 9:39:57 AM ******/
+/****** Object:  StoredProcedure [adm].[sp_CreateConceptSqlSet]    Script Date: 11/4/2019 11:22:23 AM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/8/3
@@ -34,4 +35,10 @@ BEGIN
     OUTPUT inserted.Id, inserted.IsEncounterBased, inserted.IsEventBased, inserted.SqlSetFrom, inserted.SqlFieldDate, inserted.SqlFieldEvent, inserted.EventId
     SELECT @isEncounterBased, @isEventBased, @sqlSetFrom, @sqlFieldDate, @sqlFieldEvent, @eventId, GETDATE(), @user, GETDATE(), @user
 END
+
+
+
+
+
+
 GO
