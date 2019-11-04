@@ -459,10 +459,12 @@ export default class REDCapImportWebWorker {
             const byForm = deriveByFormConcept(root, config);
             concepts = byForm.concat([ root ]);
 
+            /* EXCLUDE EVENTS FOR NOW
             if (config.projectInfo.is_longitudinal) {
                 const byEvent = deriveByEventConcept(root, config);
                 concepts = concepts.concat(byEvent);
             }
+            */
 
             /* 
              * Load childrenIds for each parent.

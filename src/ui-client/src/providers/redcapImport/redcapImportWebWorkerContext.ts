@@ -310,10 +310,12 @@ var deriveConceptTree = function (config) {
     };
     var byForm = deriveByFormConcept(root, config);
     concepts = byForm.concat([root]);
+    /* EXCLUDE EVENTS FOR NOW
     if (config.projectInfo.is_longitudinal) {
         var byEvent = deriveByEventConcept(root, config);
         concepts = concepts.concat(byEvent);
     }
+    */
     /*
      * Load childrenIds for each parent.
      */

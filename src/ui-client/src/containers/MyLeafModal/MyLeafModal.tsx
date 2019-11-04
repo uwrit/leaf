@@ -20,11 +20,13 @@ import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/
 import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
 import { MyLeafTabType } from '../../models/state/GeneralUiState';
 import { FaStar } from 'react-icons/fa';
+import { toggleImportRedcapModal } from '../../actions/dataImport';
+import ImportState from '../../models/state/Import';
 import './MyLeafModal.css';
 
 interface StateProps {
     home?: NetworkIdentity;
-    imports: Map<string, ImportMetadata>;
+    imports: ImportState;
     queryState: CohortStateType;
     panels: Panel[];
     queries: SavedQueriesState;
@@ -46,7 +48,7 @@ class MyLeafModal extends React.PureComponent<Props> {
         const classes = [ c, 'leaf-modal' ];
         const { queries, dispatch, panels, queryState, home, imports, tab } = this.props;
         const isGateway = home ? home.isGateway : false;
-        const redcap = [ ...imports.values() ].filter(im => im.type === ImportType.REDCapProject);
+        const redcap = [ ...imports.imports.values() ].filter(im => im.type === ImportType.REDCapProject);
 
         return (
             <Modal isOpen={this.props.show} className={classes.join(' ')} keyboard={true}>
@@ -65,13 +67,21 @@ class MyLeafModal extends React.PureComponent<Props> {
                                 My Saved Queries
                             </NavLink>
                         </NavItem>
+                        {imports.redCap.enabled && 
                         <NavItem>
                             <NavLink active={tab === MyLeafTabType.REDCapImport} onClick={this.handleTabClick.bind(null, MyLeafTabType.REDCapImport)}>
                                 <img alt='redcap-logo' className='header-icon-redcap' src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 My REDCap Imports
                             </NavLink>
                         </NavItem>
+                        }
                     </Nav>
+
+                    {tab === MyLeafTabType.REDCapImport &&
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleImportREDCapProjectClick}>
+                        + Import REDCap Project
+                    </Button>}
+
                 </div>
 
                 {/* Body */}
@@ -100,12 +110,18 @@ class MyLeafModal extends React.PureComponent<Props> {
         const { dispatch } = this.props;
         dispatch(setMyLeafTab(tab));
     }
+
+    private handleImportREDCapProjectClick = () => {
+        const { dispatch } = this.props;
+        dispatch(toggleMyLeafModal());
+        dispatch(toggleImportRedcapModal());
+    }
 };
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         home: state.responders.get(0),
-        imports: state.dataImport.imports,
+        imports: state.dataImport,
         queryState: state.cohort.count.state,
         panels: state.panels,
         queries: state.queries,

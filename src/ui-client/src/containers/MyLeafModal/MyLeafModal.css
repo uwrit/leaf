@@ -33,6 +33,13 @@
     border-bottom: none;
 }
 
+.myleaf-modal-tab-container .leaf-button { 
+    margin: 38px 25px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
 .myleaf-modal .modal-body { 
     min-height: 300px;
 }
