@@ -56,8 +56,10 @@ var buildExtensionImportTree = function (payload) {
     var requestId = payload.requestId, imports = payload.imports, savedQueries = payload.savedQueries;
     var redcap = imports.filter(function (i) { return i.type === redcapImport; });
     conceptMap = new Map();
-    buildRedcapImportTree(redcap);
     buildSavedCohortTree(savedQueries);
+    if (redcap.length) {
+        buildRedcapImportTree(redcap);
+    }
     var roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
     return { requestId: requestId, result: roots };
 };
