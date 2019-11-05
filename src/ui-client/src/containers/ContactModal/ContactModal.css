@@ -1,0 +1,98 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .contact-modal {
+    font-family: Roboto;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-modal.modal-dialog {
+    max-width: 1200px !important;
+    width: 60% !important;
+    z-index: 99;
+}
+
+.contact-modal-close {
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+}
+
+.contact-modal .form-group {
+    margin-top: 20px;
+}
+
+.contact-modal input.leaf-input {
+    width: 400px;
+}
+
+.contact-modal textarea.leaf-input {
+    border: 2px solid rgba(0,0,0,0.1) !important;
+    height: 150px;
+}
+
+.contact-modal textarea.leaf-input:focus {
+    border-color: rgb(28, 168, 221) !important;
+}
+
+.contact-modal .leaf-input:focus::placeholder {
+    opacity: 1 !important;
+}
+
+.contact-modal label {
+    font-size: 1.3rem;
+    font-weight: 500;
+}
+
+.contact-modal label small {
+    font-size: 1.0rem;
+}
+
+.contact-modal-dropdown {
+    outline: none;
+}
+
+.contact-modal .dropdown-menu {
+    width: 100%;
+}
+
+.contact-modal-dropdown button {
+    background-color: rgba(28, 168, 221, 0.05) !important;
+    border: 1px solid rgba(28, 168, 221, 0.1) !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(28, 168, 221) !important;
+    font-family: Roboto;
+    font-size: 1.1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.contact-modal-dropdown .dropdown-item.selected,
+.contact-modal-dropdown button:active ,
+.contact-modal-dropdown button:hover {
+    background-color: rgba(28, 168, 221, 0.1) !important;
+    border-color:rgba(28, 168, 221, 0.2) !important;
+}
+
+.contact-modal-dropdown-chevron {
+    float: right;
+    margin-top: 5px;
+    transform: scale(0.7);
+}
+
+.contact-modal-dropdown .dropdown-item {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgb(50,50,50) !important;
+    cursor: pointer;
+    font-size: 1.0rem;
+    outline: none;
+}
