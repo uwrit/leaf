@@ -87,7 +87,11 @@ class Attestation extends React.PureComponent<Props, State> {
         const c = this.className;
         const showConfirmation = sessionTypeSelected && documentationStatusSelected && identificationTypeSelected;
         const showContent = !showConfirmation;
-        const progressBarClasses = `leaf-progressbar animate attestation-progressbar ${isSubmittingAttestation ? 'show' : ''}`
+        const progressBarClasses = [ 'leaf-progressbar', 'animate', 'attestation-progressbar' ]
+        
+        if (isSubmittingAttestation || !hasUserIdToken) {
+            progressBarClasses.push('show')
+        }
         
         return (
             <Modal 
@@ -113,7 +117,7 @@ class Attestation extends React.PureComponent<Props, State> {
                         <img alt='cd2h-logo' className={`${c}-cd2h-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/cd2h.png'} />
                     </div>
                 </ModalHeader>
-                <div className={progressBarClasses} style={{ width: `${sessionLoadProgressPercent}%` }} />
+                <div className={progressBarClasses.join(' ')} style={{ width: `${sessionLoadProgressPercent}%` }} />
                 {userContext && !userContext.isPhiOkay && 
                 <div className={`${c}-deidentonly`}>
                     <p>Patient data restricted to De-Identified mode only</p>

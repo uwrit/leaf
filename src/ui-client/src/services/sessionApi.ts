@@ -129,14 +129,16 @@ export const getPrevSession = (state: AppState) => {
  * her to refresh the browser, set a session storage key that signals it's okay to 
  * try a refresh once.
  */
-export const attemptLoginRetryIfPossible = () => {
+export const attemptLoginRetryIfPossible = (): boolean => {
     const key = getSessionRetryKey();
     const retry = sessionStorage.getItem(key);
     if (!retry) {
         sessionStorage.setItem(key, 'X');
         window.location.reload(true);
+        return true;
     } else {
         sessionStorage.removeItem(key);
+        return false;
     }
 };
 

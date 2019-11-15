@@ -60,11 +60,13 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
 class ConceptTreeNodeTextWrapper extends React.Component<Props> {
 
     public shouldComponentUpdate(nextProps: Props) {
-        const { canDrop, isOver } = this.props;
+        const { canDrop, isOver, concept } = this.props;
 
         if (canDrop !== nextProps.canDrop) { 
             return true;
         } else if (isOver !== nextProps.isOver) {
+            return true;
+        } else if (concept !== nextProps.concept) {
             return true;
         }
         return false;

@@ -172,7 +172,10 @@ const addRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState 
 
 const addConcepts = (state: ConceptsState, cons: Concept[]): ConceptsState => {
     cons.forEach(c => state.currentTree.set(c.id, Object.assign({}, c)));
-    return Object.assign({}, state, { currentTree: new Map(state.currentTree) });
+    return Object.assign({}, state, {
+        allowRerender: new Set(cons.map(c => c.id)),
+        currentTree: new Map(state.currentTree) 
+    });
 };
 
 
