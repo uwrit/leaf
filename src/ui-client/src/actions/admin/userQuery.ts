@@ -38,7 +38,7 @@ export const searchAdminQueryUsers = (term: string) => {
 /*
  * Fetch all queries for a user.
  */
-export const searchAdminQueriesByuser = (user: LeafUser) => {
+export const searchAdminQueriesByUser = (user: LeafUser) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         const queries = await getQueriesByUser(state, user) as SavedQueryRef[];

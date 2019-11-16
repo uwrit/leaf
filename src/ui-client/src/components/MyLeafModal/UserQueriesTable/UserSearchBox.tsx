@@ -10,7 +10,7 @@ import { Input, InputGroup } from 'reactstrap';
 import { keys } from '../../../models/Keyboard';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { AdminUserQueryState } from '../../../models/state/AdminState';
-import { setAdminUserSearchTerm, searchAdminQueryUsers } from '../../../actions/admin/userQuery';
+import { setAdminUserSearchTerm, searchAdminQueryUsers, searchAdminQueriesByUser } from '../../../actions/admin/userQuery';
 import './UserSearchBox.css';
 
 interface Props {
@@ -120,7 +120,6 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
         return newFocus;
     }
 
-    /*
     private handleEnterKeyPress = (term: string) => {
         const { userQueryState, dispatch } = this.props;
         const { debounceTimer, selectedUserIndex } = this.state;
@@ -129,67 +128,44 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
             clearTimeout(debounceTimer);
         }
 
-        if (term && term !== this.previousTerm) {
+        if (term && term !== this.prevSearchTerm) {
             
-            this.setState({ selectedUserIndex: -1, showUsersDropdown: false });
-
-            // If a hint is currently focused, find its tree
-            if (hint) {
-                dispatch(fetchSearchTreeFromConceptHint(hint));
+            const userIdx = userQueryState.users.findIndex(u => u.scopedIdentity.startsWith(term));
+            if (userIdx > -1) {
+                this.setState({ selectedUserIndex: -1, showUsersDropdown: false });
+                dispatch(searchAdminQueriesByUser(userQueryState.users[userIdx]));
             }
-            // Else need to check if we have an exact or approximate hint match
-            else {
-                const directMatchHint = hints.length === 1
-                    ? hints[0]
-                    : hints.find((h: AggregateConceptHintRef) => h.fullText === term);
-                if (directMatchHint) {
-                    dispatch(fetchSearchTreeFromConceptHint(directMatchHint));
-                }
-                // Else we could try getting approximate matches and choose the closest, but it may be that the user wants
-                // ALL related concepts returned based on the input, so grab the tree based on the search term
-                else {
-                    dispatch(fetchSearchTreeFromTerms(term));
-                }
-            }
-        }
-        else {
-            this.setState({ showUserssDropdown: false });
         }
     }
-    */
+    
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
         const { userQueryState } = this.props;
         const { selectedUserIndex } = this.state;
-        const { searchTerm, users } = userQueryState;
+        const { searchTerm } = userQueryState;
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
 
         if (!key || searchTerm.length < this.minSearchCharLength) { return; }
         let newFocus = selectedUserIndex;
 
-        /*
         switch (key) {
             case keys.ArrowUp: 
             case keys.ArrowDown:
-                newFocus = this.handleArrowUpDownKeyPress(key, users);
+                newFocus = this.handleArrowUpDownKeyPress(key);
                 k.preventDefault();
                 break;
             case keys.Backspace:
                 newFocus = -1;
                 break;
             case keys.Enter:
-                this.handleEnterKeyPress(term, currentHints);
-                break;
-            case keys.Space:
-                this.handleSpacebarKeyPress(term, newFocus, currentHints);
+                this.handleEnterKeyPress(searchTerm);
                 break;
             case keys.Escape:
                 this.handleSearchTextClear();
                 break;
         }
-        if (newFocus !== selectedHintIndex) {
-            this.setState({ selectedHintIndex: newFocus });
+        if (newFocus !== selectedUserIndex) {
+            this.setState({ selectedUserIndex: newFocus });
         }
-        */
     }
 
     private handleSearchTextClear = () => {
