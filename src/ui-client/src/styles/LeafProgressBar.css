@@ -11,13 +11,18 @@
     height: 2px;
     margin-top: -1px;
     position: absolute;
-    transition: width 0.75s;
+    transition: width 0.3s;
     width: 100%;
 }
 
 .leaf-progressbar.show {
     display: block;
 }
+
+.leaf-progressbar.slow {
+    transition: width 3s;
+}
+
 
 .leaf-progressbar.animatez {
     animation-name: moving-gradient;

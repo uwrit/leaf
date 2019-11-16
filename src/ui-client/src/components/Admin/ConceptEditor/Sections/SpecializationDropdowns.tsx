@@ -72,7 +72,7 @@ export class SpecializationDropdowns extends React.PureComponent<Props> {
             newUserConcept.specializationGroups = [];
         }
         if (enabled) {
-            newAdminConcept.specializationGroups.push({ specializationGroupId: selected.id, orderId: (selected.id ? selected.id : 1) })
+            newAdminConcept.specializationGroups.push({ specializationGroupId: selected.id, orderId: 1 })
             newUserConcept.specializationGroups!.push(selected);
         } else {
             newAdminConcept.specializationGroups = newAdminConcept.specializationGroups.filter((g) => g.specializationGroupId !== selected.id);

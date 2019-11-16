@@ -16,7 +16,9 @@ import { fetchAdminConceptIfNeeded } from './admin/concept';
 import { Routes, InformationModalState } from '../models/state/GeneralUiState';
 import { showInfoModal } from './generalUi';
 import { isNonstandard } from '../utils/panelUtils';
-import { fetchExtensionConceptChildren } from '../services/queryApi';
+import { fetchExtensionConceptChildren, getExtensionRootConcepts } from '../services/queryApi';
+import { getAllMetdata } from '../services/dataImport';
+import { setImportsMetadata } from './dataImport';
 
 export const SET_CONCEPT = 'SET_CONCEPT';
 export const SET_CONCEPTS = 'SET_CONCEPTS';
@@ -91,12 +93,23 @@ export const fetchConceptChildrenIfNeeded = (concept: Concept) => {
 export const getConceptChildren = (concept: Concept) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const isStandard = !isNonstandard(concept.universalId);
+        const state = getState();
         dispatch(requestConceptChildren(concept));
 
         if (isStandard) {
-            const response = await fetchConceptChildren(concept, getState());
+            const response = await fetchConceptChildren(concept, state);
             dispatch(receiveConceptChildren(concept, response.data));
         } else {
+
+            /*
+             * If a Saved Query or REDCap import root concept, load from server.
+             */
+            if (concept.isRoot && state.dataImport.enabled && !state.dataImport.loaded) {
+                const imports = await getAllMetdata(state);
+                const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, [ ...state.queries.saved.values() ]);
+                dispatch(setExtensionRootConcepts(extensionConcepts));
+                dispatch(setImportsMetadata(imports));
+            };
             const response = await fetchExtensionConceptChildren(concept);
             dispatch(receiveConceptChildren(concept, response));
         }

@@ -20,6 +20,7 @@ import { getEmbeddedQueries, isNonstandard } from '../utils/panelUtils';
 import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 import moment from 'moment';
 import { setConcept } from '../actions/concepts';
+import ImportState from '../models/state/Import';
 
 const worker = new ExtensionConceptsWebWorker();
 
@@ -110,8 +111,8 @@ export const preflightSavedQuery = async (state: AppState, resourceRef: Resource
  * created from the worker. The return object is 
  * merged with the Concept tree.
  */
-export const getExtensionRootConcepts = async (imports: ImportMetadata[], queries: SavedQueryRef[]): Promise<Concept[]> => {
-    const concepts = await worker.buildExtensionImportTree(imports, queries);
+export const getExtensionRootConcepts = async (state: ImportState, imports: ImportMetadata[], queries: SavedQueryRef[]): Promise<Concept[]> => {
+    const concepts = await worker.buildExtensionImportTree(state, imports, queries);
     return concepts as Concept[];
 };
 

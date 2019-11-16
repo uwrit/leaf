@@ -11,6 +11,7 @@ using Model.Search;
 using Model.Import;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
+using Model.Admin.Query;
 
 namespace Model
 {
@@ -47,6 +48,7 @@ namespace Model
             services.AddTransient<AdminDemographicsManager>();
             services.AddTransient<AdminPanelFilterManager>();
             services.AddTransient<AdminGlobalPanelFilterManager>();
+            services.AddTransient<AdminQueryManager>();
 
             return services;
         }

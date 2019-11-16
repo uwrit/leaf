@@ -104,9 +104,6 @@ class App extends React.Component<Props> {
                 <CohortCountBox />
                 <Header />
                 <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
-                <InformationModal informationModal={informationModal} dispatch={dispatch} />
-                <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
-                <NoClickModal state={noclickModal} dispatch={dispatch} />
                 <HelpButton auth={auth} />
                 <SideNotification dispatch={dispatch} state={sideNotification} />
                 {sessionContext &&
@@ -117,6 +114,9 @@ class App extends React.Component<Props> {
                     {content}
                 </div>
                 }
+                <InformationModal informationModal={informationModal} dispatch={dispatch} />
+                <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
+                <NoClickModal state={noclickModal} dispatch={dispatch} />
             </div>
         );
     }

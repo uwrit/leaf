@@ -120,21 +120,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(addSavedQueries(savedCohorts));
 
             /*
-             * Load imported metadata.
+             * Load extension concepts.
              */
-            let imports: ImportMetadata[] = [];
-            if (importOpts.redCap.enabled) {
-                dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
-                imports = await getAllMetdata(getState());
-            }
-            const extensionConcepts = await getExtensionRootConcepts(imports, savedCohorts);
+            dispatch(setSessionLoadState('Loading Extension Concepts', 80));
+            const extensionConcepts = await getExtensionRootConcepts(getState().dataImport, [], savedCohorts);
             dispatch(setExtensionRootConcepts(extensionConcepts));
-            dispatch(setImportsMetadata(imports));
 
             /* 
              * Initiliaze web worker search.
              */
-            dispatch(setSessionLoadState('Initializing Search Engine', 90));
+            dispatch(setSessionLoadState('Initializing Search Engine', 100));
             await initializeSearchEngine(dispatch, getState);
 
             /* 

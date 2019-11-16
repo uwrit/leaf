@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType } from '../models/state/GeneralUiState';
+import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates } from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -13,6 +13,10 @@ import { AppState } from '../models/state/AppState';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
+import { getAllMetdata } from '../services/dataImport';
+import { getExtensionRootConcepts } from '../services/queryApi';
+import { setExtensionRootConcepts } from './concepts';
+import { setImportsMetadata } from './dataImport';
 
 export const SET_MYLEAF_TAB = 'SET_MYLEAF_TAB';
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
@@ -82,8 +86,28 @@ export const handleSidebarTabClick = (route: Routes) => {
             }
             dispatch(setRoute(route));
         }
-    }
-}
+    };
+};
+
+/*
+ * Toggle the MyLeaf Modal show/hide state. If data imports are
+ * enabled but not yet loaded, load.
+ */
+export const toggleMyLeafModal = () => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const state = getState();
+        dispatch(toggleMyLeafModalVisibility());
+        if (state.dataImport.enabled && !state.dataImport.loaded) {
+
+            dispatch(setNoClickModalState({ message: "Loading Data", state: NotificationStates.Working }));
+            const imports = await getAllMetdata(state);
+            const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, [ ...state.queries.saved.values() ]);
+            dispatch(setExtensionRootConcepts(extensionConcepts));
+            dispatch(setImportsMetadata(imports));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+        }
+    };
+};        
 
 // Synchronous
 export const setNoClickModalState = (noclickModal: NoClickModalState): GeneralUiAction => {
@@ -155,7 +179,7 @@ export const toggleSaveQueryPane = (): GeneralUiAction => {
     };
 };
 
-export const toggleMyLeafModal = (): GeneralUiAction => {
+const toggleMyLeafModalVisibility = (): GeneralUiAction => {
     return {
         type: TOGGLE_MY_LEAF_MODAL
     };

@@ -90,7 +90,10 @@ class Attestation extends React.PureComponent<Props, State> {
         const progressBarClasses = [ 'leaf-progressbar', 'animate', 'attestation-progressbar' ]
         
         if (isSubmittingAttestation || !hasUserIdToken) {
-            progressBarClasses.push('show')
+            progressBarClasses.push('show');
+            if (!hasUserIdToken) {
+                progressBarClasses.push('slow');
+            }
         }
         
         return (

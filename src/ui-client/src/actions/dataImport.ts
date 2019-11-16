@@ -19,9 +19,9 @@ import { UserContext } from '../models/Auth';
 import { ConstraintType, Constraint } from '../models/admin/Concept';
 import { deleteAllExtensionConcepts, setExtensionRootConcepts } from './concepts';
 import { getExtensionRootConcepts } from '../services/queryApi';
-import { REDCapFieldMetadata } from '../models/redcapApi/Metadata';
 
 export const IMPORT_SET_METADATA = 'IMPORT_SET_METADATA';
+export const IMPORT_SET_LOADED = 'IMPORT_SET_LOADED';
 export const IMPORT_DELETE_METADATA = 'IMPORT_DELETE_METADATA';
 export const IMPORT_ERROR = 'IMPORT_ERROR';
 export const IMPORT_CLEAR_ERROR_OR_COMPLETE = 'IMPORT_CLEAR_ERROR_OR_COMPLETE';
@@ -51,7 +51,7 @@ export interface ImportAction {
     unmapped?: string[];
 }
 
-// Asynchronous
+// Asynchronous     
 /*
  * Load metadata from a REDCap instance.
  */
@@ -93,7 +93,7 @@ export const importMetadataFromREDCap = () => {
                         dispatch(setNoClickModalState({ message: 'Deleting previous', state: NotificationStates.Working }));
                         await deleteMetadata(state, prev);
                         const imports = [ ...state.dataImport.imports.values() ].filter(d => d.id !== prev.id);
-                        const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+                        const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, [ ...state.queries.saved.values() ]);
                         dispatch(deleteAllExtensionConcepts());
                         dispatch(setExtensionRootConcepts(extensionConcepts));
                         complete();
@@ -250,7 +250,7 @@ export const deleteREDCapImport = (meta: ImportMetadata) => {
         try {
             await deleteMetadata(state, meta);
             const imports = [ ...state.dataImport.imports.values() ].filter(d => d.id !== meta.id);
-            const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+            const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, [ ...state.queries.saved.values() ]);
             dispatch(deleteImportMetadata(meta));
             dispatch(deleteAllExtensionConcepts());
             dispatch(setExtensionRootConcepts(extensionConcepts));
@@ -381,7 +381,7 @@ export const importREDCapProjectData = () => {
              * Update concept tree.
              */
             const imports = [ ...state.dataImport.imports.values() ].concat([ meta ]);
-            const extensionConcepts = await getExtensionRootConcepts(imports, [ ...state.queries.saved.values() ]);
+            const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, [ ...state.queries.saved.values() ]);
             dispatch(deleteAllExtensionConcepts());
             dispatch(setExtensionRootConcepts(extensionConcepts));
             dispatch(setImportMetadata(meta));
@@ -421,6 +421,12 @@ export const setImportsMetadata = (meta: ImportMetadata[]): ImportAction => {
     return {
         meta,
         type: IMPORT_SET_METADATA
+    };
+};
+
+export const setImportsLoaded = (): ImportAction => {
+    return {
+        type: IMPORT_SET_LOADED
     };
 };
 

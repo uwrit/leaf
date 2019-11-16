@@ -30,8 +30,7 @@
     color: rgb(117, 109, 0);
     font-size: 0.8rem;
     left: -0.5%;
-    margin: -4px 0 0 10px;
-    padding: 2px 4px;
+    margin: 0px 0 0 10px;
     position: absolute;
 }
 
@@ -87,7 +86,7 @@
 }
 
 .sqlset-editor-table-row {
-    padding: 0px 8px 0;
+    padding: 8px 8px 0;
 }
 
 .sqlset-editor-row-id {
@@ -225,7 +224,7 @@
 }
 
 .sqlset-editor-input-container.col-md-4 {
-    padding: 4px 8px;
+    padding: 20px 8px 0;
 }
 
 .sqlset-editor-input-column .position-relative.form-group {
@@ -243,7 +242,7 @@
 
 
 .sqlset-editor-specialization-universalid {
-    margin-left: 132px;
+    margin-left: 125px;
 }
 
 .sqlset-editor-specialization-universalid::after {
@@ -260,7 +259,7 @@
 
 /* Delete Specialization Group */
 .sqlset-editor-specializationgroup-delete {
-    margin-top: -5px;
+    margin-top: -24px;
     position: absolute;
     right: 0;
     z-index: 100;

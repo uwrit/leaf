@@ -126,7 +126,7 @@ export const requestQuerySave = () => {
             state = getState();
             const savedQueries = [ ...state.queries.saved.values() ];
             const imports = [ ...state.dataImport.imports.values() ];
-            const extensionConcepts = await getExtensionRootConcepts(imports, savedQueries);
+            const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, savedQueries);
             dispatch(setExtensionRootConcepts(extensionConcepts));
 
             /*
@@ -218,7 +218,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                         state = getState();
                         const savedQueries = [ ...state.queries.saved.values() ];
                         const imports = [ ...state.dataImport.imports.values() ];
-                        const extensionConcepts = await getExtensionRootConcepts(imports, savedQueries);
+                        const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, savedQueries);
                         dispatch(setExtensionRootConcepts(extensionConcepts));
 
                         /*
