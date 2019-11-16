@@ -41,7 +41,7 @@ namespace Services.Admin.Query
             }
         }
 
-        public async Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(LeafUser user)
+        public async Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(string userId)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -49,7 +49,7 @@ namespace Services.Admin.Query
 
                 var queries = await cn.QueryAsync<BaseQuery>(
                         Sql.SavedQueriesByOwner,
-                        new { user = user.FullIdentity },
+                        new { user = userId },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: opts.DefaultTimeout
                     );

@@ -89,6 +89,13 @@ import {
     UNDO_ADMIN_GLOBAL_PANEL_FILTER_CHANGES,
     SET_ADMIN_GLOBAL_PANEL_FILTERS_UNCHANGED
 } from "../../actions/admin/globalPanelFilter";
+import {
+    SET_ADMIN_QUERIES,
+    SET_ADMIN_QUERY_FETCHING_QUERIES,
+    SET_ADMIN_QUERY_FETCHING_USERS,
+    SET_ADMIN_QUERY_USERS,
+    SET_ADMIN_QUERY_USER_SEARCH_TERM
+} from "../../actions/admin/userQuery";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -101,6 +108,7 @@ import { getDefaultIdentity, setAdminNetworkIdentity, setAdminNetworkEndpoint, s
 import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
+import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -169,7 +177,14 @@ export const defaultAdminState = (): AdminState => {
             sets: new Map(),
             uneditedSets: new Map()
         },
-        state: AdminPanelLoadState.NOT_LOADED
+        state: AdminPanelLoadState.NOT_LOADED,
+        userQueries: {
+            fetchingQueries: false,
+            fetchingUsers: false,
+            queries: [],
+            searchTerm: '',
+            users: []
+        }
     };
 };
 
@@ -316,6 +331,17 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
         case TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN:
             return setAdminNetworkCertModalShown(state, action);
 
+        // User Queries
+        case SET_ADMIN_QUERIES:
+            return setAdminUserQueries(state, action);
+        case SET_ADMIN_QUERY_FETCHING_QUERIES:
+            return setAdminUserFetchingQueries(state, action);
+        case SET_ADMIN_QUERY_FETCHING_USERS: 
+            return setAdminUserFetchingUsers(state, action);
+        case SET_ADMIN_QUERY_USERS:
+            return setAdminQueryUsers(state, action);
+        case SET_ADMIN_QUERY_USER_SEARCH_TERM:
+            return setAdminQuerySearchTerm(state, action);
         default:
             return state;
     }

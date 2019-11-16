@@ -20,7 +20,7 @@ namespace Model.Admin.Query
         public interface IAdminQueryService
         {
             Task<IEnumerable<LeafUser>> SearchUsersAsync(string term);
-            Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(LeafUser user);
+            Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(string userId);
         }
 
         readonly IAdminQueryService svc;
@@ -50,17 +50,17 @@ namespace Model.Admin.Query
             }
         }
 
-        public async Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(LeafUser user)
+        public async Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(string userId)
         {
             try
             {
-                log.LogInformation("Getting user queries. User:{@user}", user);
-                var queries = await svc.GetUserQueriesAsync(user);
+                log.LogInformation("Getting user queries. UserId:{@userId}", userId);
+                var queries = await svc.GetUserQueriesAsync(userId);
                 return queries;
             }
             catch (DbException db)
             {
-                log.LogError("Failed to get Leaf user queries. User:{@user}", user, db.ErrorCode, db.Message);
+                log.LogError("Failed to get Leaf user queries. UserId:{@userId}", userId, db.ErrorCode, db.Message);
                 db.MapThrow();
                 throw;
             }

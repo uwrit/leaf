@@ -17,16 +17,21 @@ import { Panel } from '../../models/panel/Panel';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import REDCapImportsTable from '../../components/MyLeafModal/REDCapImportsTable/REDCapImportsTable';
-import { ImportMetadata, ImportType } from '../../models/dataImport/ImportMetadata';
+import { ImportType } from '../../models/dataImport/ImportMetadata';
 import { MyLeafTabType } from '../../models/state/GeneralUiState';
 import { FaStar } from 'react-icons/fa';
 import { toggleImportRedcapModal } from '../../actions/dataImport';
 import ImportState from '../../models/state/Import';
+import UserQueriesTable from '../../components/MyLeafModal/UserQueriesTable/UserQueriesTable';
+import AdminState from '../../models/state/AdminState';
 import './MyLeafModal.css';
+import UserSearchBox from '../../components/MyLeafModal/UserQueriesTable/UserSearchBox';
 
 interface StateProps {
+    adminState?: AdminState;
     home?: NetworkIdentity;
     imports: ImportState;
+    isAdmin: boolean;
     queryState: CohortStateType;
     panels: Panel[];
     queries: SavedQueriesState;
@@ -46,7 +51,7 @@ class MyLeafModal extends React.PureComponent<Props> {
     public render() {
         const c = this.className;
         const classes = [ c, 'leaf-modal' ];
-        const { queries, dispatch, panels, queryState, home, imports, tab } = this.props;
+        const { queries, dispatch, panels, queryState, home, imports, tab, isAdmin, adminState } = this.props;
         const isGateway = home ? home.isGateway : false;
         const redcap = [ ...imports.imports.values() ].filter(im => im.type === ImportType.REDCapProject);
 
@@ -75,6 +80,13 @@ class MyLeafModal extends React.PureComponent<Props> {
                             </NavLink>
                         </NavItem>
                         }
+                        {isAdmin && adminState &&
+                        <NavItem>
+                            <NavLink active={tab === MyLeafTabType.AdminUserQuery} onClick={this.handleTabClick.bind(null, MyLeafTabType.AdminUserQuery)}>
+                                User Saved Queries
+                            </NavLink>
+                        </NavItem>
+                        }
                     </Nav>
 
                     {tab === MyLeafTabType.REDCapImport &&
@@ -92,6 +104,10 @@ class MyLeafModal extends React.PureComponent<Props> {
                         </TabPane>
                         <TabPane tabId={MyLeafTabType.REDCapImport}>
                             <REDCapImportsTable dispatch={dispatch} imports={redcap} />
+                        </TabPane>
+                        <TabPane tabId={MyLeafTabType.AdminUserQuery}>
+                            <UserSearchBox dispatch={dispatch} userQueryState={adminState!.userQueries} />
+                            <UserQueriesTable dispatch={dispatch} panels={panels} savedQueryState={queries} queryState={queryState} userQueryState={adminState!.userQueries} />
                         </TabPane>
                     </TabContent>
                 </ModalBody>
@@ -120,8 +136,10 @@ class MyLeafModal extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
+        adminState: state.admin,
         home: state.responders.get(0),
         imports: state.dataImport,
+        isAdmin: state.auth.userContext!.isAdmin,
         queryState: state.cohort.count.state,
         panels: state.panels,
         queries: state.queries,

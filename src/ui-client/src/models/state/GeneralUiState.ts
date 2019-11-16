@@ -73,7 +73,8 @@ export interface GeneralUiState {
 
 export enum MyLeafTabType {
     SavedQueries = '1',
-    REDCapImport = '2'
+    REDCapImport = '2',
+    AdminUserQuery = '3'
 }
 
 export enum BrowserType { 

@@ -15,6 +15,8 @@ import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
+import { LeafUser } from '../admin/LeafUser';
+import { SavedQueryRef } from '../Query';
 
 
 export enum AdminPanelLoadState {
@@ -99,6 +101,14 @@ export interface AdminNetworkCertificateModalState {
     show: boolean;
 }
 
+export interface AdminUserQueryState {
+    fetchingQueries: boolean;
+    fetchingUsers: boolean;
+    queries: SavedQueryRef[];
+    searchTerm: string;
+    users: LeafUser[];
+}
+
 export default interface AdminState {
     activePane: AdminPanelPane;
     concepts: AdminConceptState;
@@ -111,4 +121,5 @@ export default interface AdminState {
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
     state: AdminPanelLoadState;
+    userQueries: AdminUserQueryState;
 }

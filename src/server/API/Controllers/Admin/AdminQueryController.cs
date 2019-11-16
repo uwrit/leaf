@@ -30,7 +30,7 @@ namespace API.Controllers.Admin
             this.manager = manager;
         }
 
-        [HttpGet("search/users")]
+        [HttpGet("searchusers")]
         public async Task<ActionResult<IEnumerable<LeafUser>>> SearchUsers([FromQuery] string term)
         {
             try
@@ -50,12 +50,12 @@ namespace API.Controllers.Admin
             }
         }
 
-        [HttpGet("{id}/queries")]
-        public async Task<ActionResult<IEnumerable<BaseQueryDTO>>> GetUserQueries(LeafUser user)
+        [HttpGet("{userId}")]
+        public async Task<ActionResult<IEnumerable<BaseQueryDTO>>> GetUserQueries(string userId)
         {
             try
             {
-                var queries = await manager.GetUserQueriesAsync(user);
+                var queries = await manager.GetUserQueriesAsync(userId);
                 return Ok(queries);
             }
             catch (ArgumentNullException ane)
@@ -65,7 +65,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Failed to get user queries. User:{user} Error:{Error}", user, ex.ToString());
+                logger.LogError("Failed to get user queries. UserId:{user} Error:{Error}", userId, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
