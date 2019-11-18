@@ -24,8 +24,9 @@ import { toggleImportRedcapModal } from '../../actions/dataImport';
 import ImportState from '../../models/state/Import';
 import UserQueriesTable from '../../components/MyLeafModal/UserQueriesTable/UserQueriesTable';
 import AdminState from '../../models/state/AdminState';
-import './MyLeafModal.css';
 import UserSearchBox from '../../components/MyLeafModal/UserQueriesTable/UserSearchBox';
+import { FiUsers } from 'react-icons/fi';
+import './MyLeafModal.css';
 
 interface StateProps {
     adminState?: AdminState;
@@ -72,18 +73,19 @@ class MyLeafModal extends React.PureComponent<Props> {
                                 My Saved Queries
                             </NavLink>
                         </NavItem>
+                        {isAdmin && adminState &&
+                        <NavItem>
+                            <NavLink active={tab === MyLeafTabType.AdminUserQuery} onClick={this.handleTabClick.bind(null, MyLeafTabType.AdminUserQuery)}>
+                                <FiUsers className="myleaf-menu-icon myleaf-menu-icon-usersavedqueries" />
+                                User Saved Queries
+                            </NavLink>
+                        </NavItem>
+                        }
                         {imports.redCap.enabled && 
                         <NavItem>
                             <NavLink active={tab === MyLeafTabType.REDCapImport} onClick={this.handleTabClick.bind(null, MyLeafTabType.REDCapImport)}>
                                 <img alt='redcap-logo' className='header-icon-redcap' src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 My REDCap Imports
-                            </NavLink>
-                        </NavItem>
-                        }
-                        {isAdmin && adminState &&
-                        <NavItem>
-                            <NavLink active={tab === MyLeafTabType.AdminUserQuery} onClick={this.handleTabClick.bind(null, MyLeafTabType.AdminUserQuery)}>
-                                User Saved Queries
                             </NavLink>
                         </NavItem>
                         }
