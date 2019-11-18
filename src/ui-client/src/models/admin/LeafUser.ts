@@ -13,6 +13,8 @@ interface BaseLeafUser {
 }
 
 export interface LeafUser extends BaseLeafUser {
+    name: string;
+    scope: string;
     created: Date;
     updated: Date;
 }

@@ -55,7 +55,9 @@ export const setAdminQuerySearchTerm = (state: AdminState, action: AdminQueryAct
     return Object.assign({}, state, { 
         userQueries: {
             ...state.userQueries,
-            searchTerm: action.term
+            searchTerm: action.term,
+            queries: [],
+            users: action.term!.length ? state.userQueries.users : []
         }
     });
 };

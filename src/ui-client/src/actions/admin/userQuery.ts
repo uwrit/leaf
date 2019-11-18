@@ -31,6 +31,7 @@ export interface AdminQueryAction {
 export const searchAdminQueryUsers = (term: string) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
+        dispatch(setAdminQueryFetchingUsers());
         const users = await searchUsersByTerm(state, term) as LeafUser[];
         dispatch(setAdminQueryUsers(users));
     };
@@ -42,6 +43,7 @@ export const searchAdminQueryUsers = (term: string) => {
 export const searchAdminQueriesByUser = (user: LeafUser) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
+        dispatch(setAdminQueryFetchingQueries());
         const queries = await getQueriesByUser(state, user) as SavedQueryRef[];
         dispatch(setAdminUserQueries(queries));
     };

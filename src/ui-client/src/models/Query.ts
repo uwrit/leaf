@@ -16,7 +16,7 @@ export interface BaseQuery {
 }
 
 export interface Query extends BaseQuery {
-    id?: string   
+    id?: string;
 }
 
 export type SavedQueryMap = Map<string, SavedQueryRef>
@@ -45,6 +45,8 @@ export interface SavedQueryRef extends BaseQuery {
     updated: Date;
     id: string;
     owner: string;
+    ownerShort: string;
+    ownerScope: string;
     universalId: string;
 }
 

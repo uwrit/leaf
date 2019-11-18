@@ -8,7 +8,7 @@
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
 import { LeafUser } from '../../models/admin/LeafUser';
-import { SavedQueryRef } from '../../models/Query';
+import { SavedQueryRef, SavedQueryRefDTO } from '../../models/Query';
 
 /*
  * Get all saved queries refs for a given user.
@@ -17,5 +17,15 @@ export const getQueriesByUser = async (state: AppState, user: LeafUser): Promise
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/query/${user.fullIdentity}`);
-    return resp.data as SavedQueryRef[];
+    const dtos = resp.data as SavedQueryRefDTO[];
+    return dtos.map(dto => {
+        const ownerParts = dto.owner.split('@');
+        return {
+            ...dto,
+            ownerShort: ownerParts[0],
+            ownerScope: ownerParts[1],
+            created: new Date(dto.created),
+            updated: new Date(dto.updated)
+        };
+    })
 };

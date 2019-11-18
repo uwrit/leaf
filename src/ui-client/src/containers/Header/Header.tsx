@@ -88,8 +88,7 @@ class Header extends React.PureComponent<Props> {
                             federated={responders.size > 1}
                             imports={importState}
                             logoutClickHandler={this.handleLogoutClick} 
-                            mySavedQueriesClickHandler={this.handleMySavedQueriesClick}
-                            redcapImportClickHandler={this.handleREDCapImportClick}
+                            myLeafModalToggleHandler={this.handleMyleafModalToggleClick}
                             user={user} 
                         />
 
@@ -161,20 +160,11 @@ class Header extends React.PureComponent<Props> {
     };
 
     /*
-     * Handles MySavedQueries click, opening the modal.
+     * Handles MyLeafmodal toggle click, opening the modal and setting the appropriate tab.
      */
-    private handleMySavedQueriesClick = () => {
+    private handleMyleafModalToggleClick = (tab: MyLeafTabType) => {
         const { dispatch } = this.props;
-        dispatch(setMyLeafTab(MyLeafTabType.SavedQueries));
-        dispatch(toggleMyLeafModal());
-    }
-
-    /*
-     * Handles REDCap Import click.
-     */
-    private handleREDCapImportClick = () => {
-        const { dispatch } = this.props;
-        dispatch(setMyLeafTab(MyLeafTabType.REDCapImport));
+        dispatch(setMyLeafTab(tab));
         dispatch(toggleMyLeafModal());
     }
 }

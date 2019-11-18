@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using API.DTO.Compiler;
 using System.Threading.Tasks;
@@ -36,7 +37,7 @@ namespace API.Controllers.Admin
             try
             {
                 var queries = await manager.GetUserQueriesAsync(userId);
-                return Ok(queries);
+                return Ok(queries.Select(q => new BaseQueryDTO(q)));
             }
             catch (ArgumentNullException ane)
             {

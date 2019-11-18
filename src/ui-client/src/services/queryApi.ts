@@ -219,9 +219,12 @@ export const loadSavedQuery = async (universalId: string, state: AppState, dispa
     const queryResp = await getSavedQueryContext(state, universalId);
     const queryRaw = queryResp.data as SavedQueryRefDTO;
     const deser = await deserialize(queryRaw.definition, state, dispatch) as SavedQueryDefinitionDTO;
+    const nameParts = queryRaw.owner.split('@');
     const query = { 
         ...deser,
-        ...queryRaw, 
+        ...queryRaw,
+        ownerShort: nameParts[0],
+        ownerScope: nameParts[1],
         created: new Date(queryResp.data.created), 
         updated: new Date(queryResp.data.updated)
     } as SavedQuery;
@@ -275,6 +278,8 @@ export const deriveSavedQuery = (state: AppState, response: QuerySaveResponseDTO
         id: response.query.id,
         name: currentUiQuery.name,
         owner: `${name}@${issuer}`,
+        ownerShort: name,
+        ownerScope: issuer,
         panels,
         panelFilters,
         universalId: response.query.universalId,

@@ -12,18 +12,22 @@ import { LeafUser, LeafUserDTO } from '../../models/admin/LeafUser';
 /*
  * Search users by term.
  */ 
-export const searchUsersByTerm = async (state: AppState, term: string): Promise<LeafUser[]> => {
+export const searchUsersByTerm = async (state: AppState, name: string): Promise<LeafUser[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get('api/admin/user/search', {
         params: {
-            term
+            name
         }
     });
     const users = resp.data as LeafUserDTO[];
-    return users.map(u => ({
-       ...u,
-       created: new Date(u.created),
-       updated: new Date(u.updated)
-    }));
+    return users.map(u => {
+        const nameParts = u.scopedIdentity.split('@');
+        return {
+            ...u,
+            name: nameParts[0],
+            scope: nameParts[1],
+            created: new Date(u.created),
+            updated: new Date(u.updated)
+    }});
 };

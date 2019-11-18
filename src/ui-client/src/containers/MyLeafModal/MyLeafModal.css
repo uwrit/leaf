@@ -41,7 +41,13 @@
 }
 
 .myleaf-modal .modal-body { 
-    min-height: 300px;
+    margin-top: 10px;
+    min-height: 400px;
+}
+
+.myleaf-modal .tab-content,
+.myleaf-modal .tab-pane { 
+    height: 100%;
 }
 
 .myleaf-modal-tab-container {

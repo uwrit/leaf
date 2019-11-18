@@ -7,17 +7,17 @@
 
 import React from 'react';
 import { NavItem } from 'reactstrap';
-import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon } from 'react-icons/fi';
+import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon, FiUsers } from 'react-icons/fi';
 import { FaChevronDown, FaStar, FaDoorOpen } from 'react-icons/fa';
 import { UserContext } from '../../models/Auth';
 import ImportState from '../../models/state/Import';
+import { MyLeafTabType } from '../../models/state/GeneralUiState';
 
 interface Props {
     federated: boolean;
     imports: ImportState;
     logoutClickHandler: () => any;
-    mySavedQueriesClickHandler: () => any;
-    redcapImportClickHandler: () => any;
+    myLeafModalToggleHandler: (tab: MyLeafTabType) => any;
     user: UserContext;
 }
 
@@ -26,7 +26,7 @@ export default class UserButton extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { federated, imports, logoutClickHandler, mySavedQueriesClickHandler, redcapImportClickHandler, user } = this.props;
+        const { federated, imports, logoutClickHandler, myLeafModalToggleHandler, user } = this.props;
         const username = user ? user.name : '';
 
         return (
@@ -87,19 +87,28 @@ export default class UserButton extends React.PureComponent<Props> {
 
                         </div>}
 
-                        <div className={`${c}-option`} onClick={mySavedQueriesClickHandler}>
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.SavedQueries)}>
                             <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
                             <span>My Saved Queries</span>
                         </div>
 
+                        {user && user.isAdmin &&
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.AdminUserQuery)}>
+                            <FiUsers className="myleaf-menu-icon myleaf-menu-icon-usersavedqueries" />
+                            <span>User Saved Queries</span>
+                        </div>
+                        }
+
                         {imports.redCap.enabled && 
-                        <div className={`${c}-option`} onClick={redcapImportClickHandler}>
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.REDCapImport)}>
                             <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                             <span>My REDCap Imports</span>
                         </div>
                         }
 
-                        <div className={`${c}-option`} onClick={logoutClickHandler}>
+                        <div className={`${c}-option-divider`} />
+
+                        <div className={`${c}-option ${c}-option-logout`} onClick={logoutClickHandler}>
                             <FaDoorOpen className="myleaf-menu-icon myleaf-menu-icon-logout" />
                             <span>Log Out</span>
                         </div>

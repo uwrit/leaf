@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { SavedQuery, SavedQueryRef, Query, QueryDependent } from '../models/Query';
+import { SavedQuery, SavedQueryRef, Query, QueryDependent, QuerySaveResponseDTO } from '../models/Query';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';
@@ -17,6 +17,7 @@ import { NetworkIdentity } from '../models/NetworkResponder';
 import { resetPanels } from './panels';
 import { setPanelFilterActiveStates } from './panelFilter';
 import { setExtensionRootConcepts } from './concepts';
+import { setAdminUserQueries } from './admin/userQuery';
 
 export const REQUEST_SAVE_QUERY = 'REQUEST_SAVE_QUERY';
 export const FINISH_SAVE_QUERY = 'FINISH_SAVE_QUERY';
@@ -44,6 +45,7 @@ export interface SaveQueryAction {
 export const getSavedQuery = (ref: SavedQueryRef) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
+        const { isAdmin, name } = state.auth.userContext!;
         if (state.queries.current.id && state.queries.current.id === ref.id) { return; }
 
         try {
@@ -55,10 +57,13 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
              */
             dispatch(setNoClickModalState({ message: "Query Loaded", state: NotificationStates.Complete }));
             dispatch(setCurrentQuery(saved, true));
-            dispatch(addSavedQuery(saved));
             dispatch(openSavedQuery(saved));
             dispatch(setPanelFilterActiveStates(saved.panelFilters));
             dispatch(hideMyLeafModal());
+
+            if (!isAdmin || isAdmin && saved.ownerShort === name) {
+                dispatch(addSavedQuery(saved));
+            }
         }
         catch (err) {
             const info: InformationModalState = {
@@ -82,6 +87,7 @@ export const requestQuerySave = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
             let state = getState();
+            const { isAdmin, name } = state.auth.userContext!;
             const { runAfterSave, current } = state.queries;
             const panels = state.panels.map(p => panelToDto(p));
             const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
@@ -113,21 +119,29 @@ export const requestQuerySave = () => {
             const saved = deriveSavedQuery(state, response.data);
 
             /*
-             * Update current query in UI to this.
+             * Add to UI if not an admin, or IS an admin and the query is owned by the admin.
              */
-            dispatch(setCurrentQuery(saved, true));
-            dispatch(addSavedQuery(saved));
+            if (!isAdmin || isAdmin && saved.ownerShort === name) {
 
-            /*
-             * Regenerate extension concept tree
-             * with the new query and possible category
-             * as concepts.
-             */
-            state = getState();
-            const savedQueries = [ ...state.queries.saved.values() ];
-            const imports = [ ...state.dataImport.imports.values() ];
-            const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, savedQueries);
-            dispatch(setExtensionRootConcepts(extensionConcepts));
+                /*
+                * Update current query in UI to this.
+                */
+                dispatch(setCurrentQuery(saved, true));
+                dispatch(addSavedQuery(saved));
+
+                /*
+                * Regenerate extension concept tree
+                * with the new query and possible category
+                * as concepts.
+                */
+                state = getState();
+                const savedQueries = [ ...state.queries.saved.values() ];
+                const imports = [ ...state.dataImport.imports.values() ];
+                const extensionConcepts = await getExtensionRootConcepts(state.dataImport, imports, savedQueries);
+                dispatch(setExtensionRootConcepts(extensionConcepts));
+            } else {
+                dispatch(removeSavedQuery(saved));
+            }
 
             /*
              * Save to any network responder nodes.
@@ -183,7 +197,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
             let state = getState();
-            const user = state.auth.userContext!.name;
+            const { name } = state.auth.userContext!;
             const homeNode = state.responders.get(0)!;
 
             dispatch(setNoClickModalState({ message: "Deleting Query", state: NotificationStates.Working }));
@@ -196,11 +210,12 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                     async (response) => {
                         
                         /*
-                         * If successful on home node, delete this and 
-                         * dependent queries from state.
-                         */
+                        * If successful on home node, delete this and 
+                        * dependent queries from state.
+                        */
                         const deleted = [ query ].concat(dependents.map((d) => state.queries.saved.get(d.universalId)!));
                         dispatch(removeSavedQueries(deleted));
+                        dispatch(setAdminUserQueries(state.admin!.userQueries.queries.filter(q => q.id !== query.id)));
 
                         /*
                          * If the query being deleted (or a dependent) happens 
@@ -252,7 +267,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                             return;
                         }
                         const dependents = error.response.data.dependents as QueryDependent[];
-                        const nonOwners = dependents.filter((d) => !d.owner.startsWith(user));
+                        const nonOwners = dependents.filter((d) => !d.owner.startsWith(name));
 
                         /*
                           If there are any dependent queries that are not owned

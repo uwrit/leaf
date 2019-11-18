@@ -11,6 +11,7 @@ import { keys } from '../../../models/Keyboard';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { AdminUserQueryState } from '../../../models/state/AdminState';
 import { setAdminUserSearchTerm, searchAdminQueryUsers, searchAdminQueriesByUser } from '../../../actions/admin/userQuery';
+import { LeafUser } from '../../../models/admin/LeafUser';
 import './UserSearchBox.css';
 
 interface Props {
@@ -26,7 +27,7 @@ interface State {
 
 export default class UserSearchBox extends React.PureComponent<Props, State> {
     private className = 'admin-user-search';
-    private debounceTimeoutMs = 200;
+    private debounceTimeoutMs = 300;
     private minSearchCharLength = 1;
     private prevSearchTerm = '';
 
@@ -37,6 +38,17 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
             showUsersDropdown: false
         }
     }
+
+    public getSnapshotBeforeUpdate(nextProps: Props) {
+        const { userQueryState } = this.props;
+
+        if (nextProps.userQueryState.users.length !== userQueryState.users.length) {
+            this.setState({ selectedUserIndex: -1 });
+        }
+        return null;
+    }
+
+    public componentDidUpdate() { return; }
 
     public render() {
         const { userQueryState } = this.props;
@@ -80,8 +92,10 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
                         <div className={`${c}-hint-container`}>
                             {users.map((u,i) => {
                                 return (
-                                    <div className={`${hintClass} ${selectedUserIndex === i ? 'selected' : ''}`} key={u.id}>
-                                        {u.scopedIdentity}
+                                    <div className={`${hintClass} ${selectedUserIndex === i ? 'selected' : ''}`} key={u.id} onClick={this.handleUserNameClick.bind(null, u)}>
+                                        <span className={`${c}-hint-name`}>{u.name}</span>
+                                        <span className={`${c}-hint-scope`}>@{u.scope}</span>
+                                        <span className={`${c}-hint-query-count`}>{u.savedQueryCount} {u.savedQueryCount === 1 ? 'query' : 'queries'}</span>
                                     </div>
                                 )
                             })}
@@ -91,10 +105,6 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
                 </InputGroup>
             </div>
         )
-    }
-
-    private toggleUsersDropdown = () => {
-        this.setState({ showUsersDropdown: !this.state.showUsersDropdown });
     }
 
     private handleInputFocus = () => this.setState({ showUsersDropdown: true });
@@ -197,5 +207,11 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
         } else if (!term.length) {
             this.setState({ showUsersDropdown: false });
         }
+    }
+
+    private handleUserNameClick = (user: LeafUser) => {
+        const { dispatch } = this.props;
+        dispatch(searchAdminQueriesByUser(user));
+        dispatch(setAdminUserSearchTerm(user.scopedIdentity))
     }
 }

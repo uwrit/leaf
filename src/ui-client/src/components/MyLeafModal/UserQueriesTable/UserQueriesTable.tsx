@@ -27,13 +27,22 @@ export default class UserQueriesTable extends React.PureComponent<Props> {
     private className = 'myleaf-table';
 
     public render() {
-        const { userQueryState } = this.props;
+        const { searchTerm, queries, users } = this.props.userQueryState;
+        const summClass = 'admin-user-search-summary';
+        const emphClass = 'admin-user-search-emphasis'
 
-        if (!userQueryState.users.length) { return <div>No user queries found</div>; }
+        if (searchTerm.length && !users.length) { 
+            return (
+                <div className={summClass}>
+                    <span className={emphClass}>{searchTerm}</span>
+                    <span> doesn't appear to be a valid Leaf user.</span>
+                </div>
+            ); 
+        }
 
         const c = this.className;
-        const classes = [ `${c}-container` ];
-        const saved: SavedQueryRef[] = [ ...userQueryState.queries.values() ];
+        const classes = [ `${c}-container`, 'admin-user-query-container' ];
+        const saved: SavedQueryRef[] = [ ...queries.values() ];
         const headerClass = `${c}-header`;
         const rowClass = `${c}-row`;
         const openButtonClass = `${c}-open`;
@@ -41,6 +50,19 @@ export default class UserQueriesTable extends React.PureComponent<Props> {
 
         return  (
             <div className={classes.join(' ')}>
+
+                {/* Summary */}
+                <div className={summClass}>
+                    <span className={emphClass}>{saved.length}</span> 
+                    <span> {saved.length === 1 ? 'query' : 'queries'} found </span>
+                    {searchTerm.length > 0 && 
+                    [
+                        <span key='1'> for </span>,
+                        <span key='2' className={emphClass}>{searchTerm}</span>,
+                        <span key='3'>:</span>,
+                    ]
+                    }
+                </div>
 
                 {/* Table */}
                 <table className={c}>
@@ -72,7 +94,7 @@ export default class UserQueriesTable extends React.PureComponent<Props> {
                                 (<tr key={s.id} className={rowClass} onDoubleClick={this.handleOpenQueryClick.bind(null, s)}>
                                     <td>{s.name}</td>
                                     <td>{s.category}</td>
-                                    <td>{s.owner}</td>
+                                    <td>{s.ownerShort}</td>
                                     <td>{s.count}</td>
                                     <td>{s.created.toLocaleString()}</td>
                                     <td>{s.updated.toLocaleString()}</td>

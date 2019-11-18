@@ -85,26 +85,19 @@ namespace API.Options
             }
 
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
-
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
-
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
-
             services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
-
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
             services.AddTransient<DemographicProvider.IDemographicsExecutor, DemographicsExecutor>();
-
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
             services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryFetcher, DatasetQueryFetcher>();
             services.AddTransient<DatasetProvider.IDatasetExecutor, DatasetExecutor>();
-
             services.AddTransient<IQueryService, QueryService>();
-
             services.AddTransient<DataImporter.IImportService, ImportService>();
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
 
