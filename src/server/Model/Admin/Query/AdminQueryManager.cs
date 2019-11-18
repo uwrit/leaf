@@ -19,7 +19,6 @@ namespace Model.Admin.Query
     {
         public interface IAdminQueryService
         {
-            Task<IEnumerable<LeafUser>> SearchUsersAsync(string term);
             Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(string userId);
         }
 
@@ -32,22 +31,6 @@ namespace Model.Admin.Query
         {
             svc = service;
             this.log = log;
-        }
-
-        public async Task<IEnumerable<LeafUser>> SearchUsersAsync(string term)
-        {
-            try
-            {
-                log.LogInformation("Searching Leaf users. Term:{@term}", term);
-                var users = await svc.SearchUsersAsync(term);
-                return users;
-            }
-            catch (DbException db)
-            {
-                log.LogError("Failed to search for Leaf users. Term:{@term}", term, db.ErrorCode, db.Message);
-                db.MapThrow();
-                throw;
-            }
         }
 
         public async Task<IEnumerable<BaseQuery>> GetUserQueriesAsync(string userId)

@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 
-namespace Model.Admin.Query
+namespace Model.Admin.User
 {
     public class LeafUser
     {

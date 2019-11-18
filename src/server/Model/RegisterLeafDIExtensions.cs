@@ -12,6 +12,7 @@ using Model.Import;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
 using Model.Admin.Query;
+using Model.Admin.User;
 
 namespace Model
 {
@@ -49,6 +50,7 @@ namespace Model
             services.AddTransient<AdminPanelFilterManager>();
             services.AddTransient<AdminGlobalPanelFilterManager>();
             services.AddTransient<AdminQueryManager>();
+            services.AddTransient<AdminUserManager>();
 
             return services;
         }

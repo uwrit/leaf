@@ -8,7 +8,6 @@
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
 import { LeafUser, LeafUserDTO } from '../../models/admin/LeafUser';
-import { SavedQueryRef } from '../../models/Query';
 
 /*
  * Search users by term.
@@ -16,7 +15,7 @@ import { SavedQueryRef } from '../../models/Query';
 export const searchUsersByTerm = async (state: AppState, term: string): Promise<LeafUser[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get('api/admin/query/searchusers', {
+    const resp = await http.get('api/admin/user/search', {
         params: {
             term
         }
@@ -27,14 +26,4 @@ export const searchUsersByTerm = async (state: AppState, term: string): Promise<
        created: new Date(u.created),
        updated: new Date(u.updated)
     }));
-};
-
-/*
- * Get all saved queries refs for a given user.
- */ 
-export const getQueriesByUser = async (state: AppState, user: LeafUser): Promise<SavedQueryRef[]> => {
-    const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.get(`api/admin/query/${user.fullIdentity}`);
-    return resp.data as SavedQueryRef[];
 };

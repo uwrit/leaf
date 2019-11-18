@@ -29,6 +29,8 @@ BEGIN
 	  , L.ScopedIdentity
 	  , L.FullIdentity
 	  , SavedQueryCount = (SELECT COUNT(*) FROM [app].[Query] AS Q WHERE L.FullIdentity = Q.[Owner] AND Q.UniversalId IS NOT NULL AND Q.Nonce IS NULL)
+	  , L.Created
+	  , L.Updated
 	FROM auth.[Login] AS L
 	WHERE L.ScopedIdentity LIKE @term + '%'
 

@@ -7,8 +7,9 @@
 
 import { AppState } from "../../models/state/AppState";
 import { LeafUser } from "../../models/admin/LeafUser";
-import { searchUsersByTerm, getQueriesByUser } from "../../services/admin/userQueryApi";
 import { SavedQueryRef } from "../../models/Query";
+import { searchUsersByTerm } from "../../services/admin/userApi";
+import { getQueriesByUser } from "../../services/admin/queryApi";
 
 export const SET_ADMIN_QUERY_USERS = 'SET_ADMIN_QUERY_USERS';
 export const SET_ADMIN_QUERIES = 'SET_ADMIN_QUERIES';

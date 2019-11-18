@@ -17,6 +17,7 @@ using Model;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
 using Model.Admin.Query;
+using Model.Admin.User;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Cohort;
@@ -30,6 +31,7 @@ using Model.Import;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
+using Services.Admin.User;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
@@ -126,6 +128,7 @@ namespace API.Options
             services.AddTransient<AdminPanelFilterManager.IAdminPanelFilterService, AdminPanelFilterService>();
             services.AddTransient<AdminGlobalPanelFilterManager.IAdminGlobalPanelFilterService, AdminGlobalPanelFilterService>();
             services.AddTransient<AdminQueryManager.IAdminQueryService, AdminQueryService>();
+            services.AddTransient<AdminUserManager.IAdminUserService, AdminUserService>();
 
             return services;
         }

@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using API.DTO.Compiler;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -13,30 +12,31 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Admin.Query;
+using Model.Admin.User;
 
 namespace API.Controllers.Admin
 {
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
-    [Route("api/admin/query")]
-    public class AdminQueryController : Controller
+    [Route("api/admin/user")]
+    public class AdminUserController : Controller
     {
         readonly ILogger<AdminQueryController> logger;
-        readonly AdminQueryManager manager;
+        readonly AdminUserManager manager;
 
-        public AdminQueryController(ILogger<AdminQueryController> logger, AdminQueryManager manager)
+        public AdminUserController(ILogger<AdminQueryController> logger, AdminUserManager manager)
         {
             this.logger = logger;
             this.manager = manager;
         }
 
-        [HttpGet("{userId}")]
-        public async Task<ActionResult<IEnumerable<BaseQueryDTO>>> GetUserQueries(string userId)
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<LeafUser>>> SearchUsers([FromQuery] string name)
         {
             try
             {
-                var queries = await manager.GetUserQueriesAsync(userId);
-                return Ok(queries);
+                var users = await manager.SearchUsersAsync(name);
+                return Ok(users);
             }
             catch (ArgumentNullException ane)
             {
@@ -45,7 +45,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                logger.LogError("Failed to get user queries. UserId:{user} Error:{Error}", userId, ex.ToString());
+                logger.LogError("Failed to search users. Term:{Term} Error:{Error}", name, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
