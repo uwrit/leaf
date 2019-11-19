@@ -11,6 +11,7 @@ import { setPanelItemNumericFilter } from '../../../actions/panels';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
 import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
+import { keys } from '../../../models/Keyboard';
 import './PanelItemNumericFilter.css';
 
 interface Props {
@@ -116,6 +117,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
                                 <Input 
                                     className={`${c}-number leaf-input`} 
                                     onChange={this.handleInputOneChange}
+                                    onKeyDown={this.handleSearchKeydown}
                                     placeholder="1, 2, 3..." 
                                     value={val1} />
                                 }
@@ -128,6 +130,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
                                     <Input 
                                         className={`${c}-number ${c}-number-low leaf-input`} 
                                         onChange={this.handleInputOneChange}
+                                        onKeyDown={this.handleSearchKeydown}
                                         placeholder="Low"
                                         value={val1} 
                                     />
@@ -138,6 +141,7 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
                                     <Input 
                                         className={`${c}-number ${c}-high leaf-input`} 
                                         onChange={this.handleInputTwoChange}
+                                        onKeyDown={this.handleSearchKeydown}
                                         placeholder="High"
                                         value={val2} 
                                     />
@@ -200,6 +204,16 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
             filterType: numericFilter.filterType === NumericFilterType.None ? types[0].enum : numericFilter.filterType
         });
         this.dispatchUpdate(newFilter);
+    }
+
+    /*
+     * Handle keydown, basically looking for 'Enter' presses, which
+     * dismisses the modal.
+     */
+    private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
+        if (k.key === 'Enter') {
+            this.setState({ showSelectionBox: false });
+        }
     }
 
     private handleInputOneChange = (e: any) => this.handleNumberInputChange(e, true);

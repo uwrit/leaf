@@ -7,6 +7,7 @@
 
 import React from 'react';
 import './RightPaneSlider.css';
+import { AnyARecord } from 'dns';
 
 interface Props {
     show: boolean;
@@ -22,7 +23,7 @@ export default class RightPaneSlider extends React.Component<Props> {
         overlay: true
     }
 
-    public handleBlur = () => {
+    public handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
         if (this.mouseOut) {
             this.props.toggle();
         }
@@ -31,9 +32,22 @@ export default class RightPaneSlider extends React.Component<Props> {
     public componentDidUpdate(prevProps: Props, prevState: any) {
         // Set focus to the element body to catch blur events if clicked outside
         if (this.props.show && !prevProps.show) {
+
+            /*
+             * Try to focus on input, if present.
+             */
+            const firstInput = document.querySelector(`.${this.className}-body input`) as any;
+            if (firstInput && firstInput.focus) {
+                firstInput.focus();
+                return;
+            }
+
+            /*
+             * Else try to focus on the body itself.
+             */
             const el: any = document.getElementsByClassName(`${this.className}-body`);
             if (el && el[0]) {
-                el[0].focus();
+                 el[0].focus();
             }    
         } 
     }

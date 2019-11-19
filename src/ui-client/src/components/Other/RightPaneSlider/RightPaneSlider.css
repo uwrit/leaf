@@ -9,12 +9,12 @@
     background-color: white;
     box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
     height: 100%;
-    margin-right: -30%;
+    margin-right: -35%;
     outline: none;
     position: fixed;
     right: 0;
     transition: margin-right 0.75s;
-    width: 30%;
+    width: 35%;
     z-index: 110;
 }
 
