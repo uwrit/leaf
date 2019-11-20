@@ -20,15 +20,11 @@ INSERT [auth].[Constraint] ([Id], [Type]) VALUES (1, N'User')
 INSERT [auth].[Constraint] ([Id], [Type]) VALUES (2, N'Group')
 SET IDENTITY_INSERT [auth].[Constraint] OFF
 
-SET IDENTITY_INSERT [ref].[SessionType] ON 
 INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (1, N'QI')
 INSERT [ref].[SessionType] ([Id], [Variant]) VALUES (2, N'Research')
-SET IDENTITY_INSERT [ref].[SessionType] OFF
 
-SET IDENTITY_INSERT [ref].[ImportType] ON 
 INSERT [ref].[ImportType] ([Id], [Variant]) VALUES (1, N'REDCap Project')
 INSERT [ref].[ImportType] ([Id], [Variant]) VALUES (2, N'MRN')
-SET IDENTITY_INSERT [ref].[SessionType] OFF
 
 INSERT INTO [network].[Identity] ([Lock], [Name], [Abbreviation], [Description], [TotalPatients], [Latitude], [Longitude], [PrimaryColor], [SecondaryColor])
 SELECT 
