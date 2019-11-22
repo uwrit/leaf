@@ -67,7 +67,7 @@ namespace API.Controllers
             }
             catch (LeafAuthenticationException lae)
             {
-                logger.LogError("User is not authorized to use Leaf. Error:{Error}", lae.Message);
+                logger.LogError("User is not authorized to use Leaf. Error:{Error} User:{user}", lae.Message, HttpContext.User);
                 return StatusCode(StatusCodes.Status403Forbidden);
             }
             catch (Exception e)

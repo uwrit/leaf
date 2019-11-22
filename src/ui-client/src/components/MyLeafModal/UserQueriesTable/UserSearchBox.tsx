@@ -52,7 +52,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
 
     public render() {
         const { userQueryState } = this.props;
-        const { searchTerm, users, fetchingUsers } = userQueryState;
+        const { searchTerm, users, fetchingUsers, fetchingQueries } = userQueryState;
         const { selectedUserIndex, showUsersDropdown } = this.state;
         const c = this.className;
         const hintClass = `${c}-hint-item leaf-dropdown-item`;
@@ -88,7 +88,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
                         }
 
                         {/* Search suggestions pseudo-dropdown */}
-                        {showUsersDropdown && !fetchingUsers &&
+                        {showUsersDropdown && !fetchingQueries &&
                         <div className={`${c}-hint-container`}>
                             {users.map((u,i) => {
                                 return (
@@ -107,9 +107,18 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
         )
     }
 
+    /*
+     * Show the suggestions dropdown if the input gains focus.
+     */
     private handleInputFocus = () => this.setState({ showUsersDropdown: true });
 
-    private handleInputBlur = () => this.setState({ showUsersDropdown: false });
+    /*
+     * Hide the suggestions dropdown if the input loses focus. A bit hacky,
+     * but setTimeout() is needed to allow onClick() events for the usersDropdown to run.
+     * If there is no timeout, the onBlur() call occurs first, and the usersDropdown items are
+     * quietly hidden before the onClick() event can actually be called.
+     */
+    private handleInputBlur = () => setTimeout(() => this.setState({ showUsersDropdown: false }), 200);
 
     private handleArrowUpDownKeyPress = (key: number) => {
         const { showUsersDropdown, selectedUserIndex } = this.state;
@@ -132,7 +141,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
 
     private handleEnterKeyPress = (term: string) => {
         const { userQueryState, dispatch } = this.props;
-        const { debounceTimer, selectedUserIndex } = this.state;
+        const { debounceTimer } = this.state;
 
         if (debounceTimer) {
             clearTimeout(debounceTimer);

@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model.Validation;
@@ -47,7 +48,7 @@ namespace Model.Search
             Ensure.NotNull(term, nameof(term));
 
             var terms = term.Split(' ');
-            log.LogInformation("Searching hints by terms. Terms:{Terms}", terms);
+            log.LogInformation("Searching hints by terms. Terms:{Terms} Root:{Root}", terms, root);
             var hints = await searcher.HintsAsync(root, terms);
             log.LogInformation("Found hints. Hints:{Hints}", hints);
             return hints;
