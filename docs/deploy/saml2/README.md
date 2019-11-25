@@ -27,7 +27,8 @@ There are multiple implementations of the Service Provider role in the SAML2 pro
 ## Route Protection Setup
 There are only two routes that _must_ be protected by the SAML2 Service Provider (SP), all other routes are protected by requiring a JWT that can only be generated from a SAML2 SP protected endpoint.
 - `/` --> react app.
-- `/api/user` --> initial token generation endpoint.
+- `/api/config` --> initial API check endpoint.
+- `/api/user` --> token generation endpoint.
 
 In a non-federated deployment, you can also elect to protect the entire API surface.
 
