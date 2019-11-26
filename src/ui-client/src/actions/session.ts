@@ -30,10 +30,8 @@ import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
-import { setImportOptions, setImportsMetadata } from './dataImport';
-import { getAllMetdata } from '../services/dataImport';
+import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
-import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';

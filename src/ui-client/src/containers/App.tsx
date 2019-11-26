@@ -17,7 +17,7 @@ import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
 import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
-import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState } from '../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState, UserQuestionState } from '../models/state/GeneralUiState';
 import { SessionContext } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
@@ -32,6 +32,8 @@ import { AdminPanelPane } from '../models/state/AdminState';
 import SideNotification from '../components/SideNotification/SideNotification';
 import DataImportContainer from '../containers/DataImport/DataImport';
 import { version } from '../../package.json'
+import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
+import { SavedQueryMap } from '../models/Query';
 import './App.css';
 
 
@@ -50,9 +52,11 @@ interface StateProps {
     exportState: ExportState;
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
+    queries: SavedQueryMap;
     routes: RouteConfig[];
     sessionContext?: SessionContext;
     sideNotification: SideNotificationState;
+    userQuestion:UserQuestionState;
 }
 
 type Props = StateProps & DispatchProps & OwnProps;
@@ -85,8 +89,8 @@ class App extends React.Component<Props> {
 
     public render() {
         const { 
-            auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, 
-            informationModal, dispatch, noclickModal, routes, sideNotification, sessionContext
+            auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, queries,
+            informationModal, dispatch, noclickModal, routes, sideNotification, sessionContext, userQuestion
         } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
@@ -105,6 +109,7 @@ class App extends React.Component<Props> {
                 <Header />
                 <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
                 <HelpButton auth={auth} />
+                <UserQuestionModal dispatch={dispatch} state={userQuestion} queries={new Map()} />
                 <SideNotification dispatch={dispatch} state={sideNotification} />
                 {sessionContext &&
                 <div id="main-content">
@@ -188,9 +193,11 @@ const mapStateToProps = (state: AppState) => {
         exportState: state.dataExport,
         informationModal: state.generalUi.informationModal,
         noclickModal: state.generalUi.noclickModal,
+        queries: state.queries.saved,
         routes: state.generalUi.routes,
         sessionContext: state.session.context,
-        sideNotification: state.generalUi.sideNotification
+        sideNotification: state.generalUi.sideNotification,
+        userQuestion: state.generalUi.userQuestion
     };
 };
 

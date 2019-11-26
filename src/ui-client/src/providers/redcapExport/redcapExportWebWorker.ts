@@ -435,7 +435,18 @@ export default class REDCapExportWebWorker {
             return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
         };
 
-        const toREDCapDate = (date: Date): string => {
+        const toREDCapDate = (date?: Date): string => {
+            if (!date) {
+                return '';
+            /*
+             * Shouldn't happen but sanity check just in case it's a string.
+             */ 
+            } else if (date instanceof String) {
+                date = new Date(date)
+                if (isNaN(date.getTime())) {
+                    return '';
+                }
+            }
             const hours = date.getHours();
             const minutes = date.getMinutes();
             const strMinutes = minutes < 10 ? '0'+minutes : minutes;

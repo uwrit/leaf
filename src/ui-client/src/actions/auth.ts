@@ -9,7 +9,7 @@ import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { AppConfig, UserContext } from '../models/Auth';
 import { getAuthConfig, getUserTokenAndContext } from '../services/authApi';
-import { attemptLoginRetryIfPossible } from '../services/sessionApi';
+import { attemptLoginRetryIfPossible, removeSessionRetryKey } from '../services/sessionApi';
 import { setRouteConfig } from './generalUi';
 import { getRoutes } from '../config/routes';
 import { setSessionLoadState } from './session';
@@ -51,6 +51,7 @@ export const getIdToken = () => {
             .then((token) => {
                 dispatch(setRouteConfig(getRoutes(config, token)));
                 dispatch(receiveIdToken(token));
+                removeSessionRetryKey();
                 setTimeout(() => dispatch(setSessionLoadState('', 0)), 500);
             })
             .catch((reason) => {

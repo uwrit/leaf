@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates } from '../models/state/GeneralUiState';
+import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates, UserQuestionState } from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -34,6 +34,7 @@ export const CONFIRM_MODAL_SHOW = 'CONFIRM_MODAL_SHOW';
 export const CONFIRM_MODAL_HIDE = 'CONFIRM_MODAL_HIDE';
 export const NOCLICK_MODAL_SET_STATE = 'NOCLICK_MODAL_SET_STATE';
 export const SIDE_NOTIFICATION_SET_STATE = 'SIDE_NOTIFICATION_SET_STATE';
+export const SET_USER_QUESTION_STATE = 'SET_USER_QUESTION_STATE';
 
 export interface GeneralUiAction {
     browser?: Browser;
@@ -50,6 +51,7 @@ export interface GeneralUiAction {
     sideNotification?: SideNotificationState;
     tab?: MyLeafTabType;
     type: string;
+    userQuestion?: UserQuestionState;
 }
 
 // Asynchronous
@@ -133,7 +135,14 @@ export const setCohortCountBoxState = (cohortCountBoxVisible: boolean, cohortCou
     };
 };
 
-export const showInfoModal = (infoModal: InformationModalState) => {
+export const setUserQuestionState = (userQuestion: UserQuestionState): GeneralUiAction => {
+    return {
+        userQuestion,
+        type: SET_USER_QUESTION_STATE
+    }
+};
+
+export const showInfoModal = (infoModal: InformationModalState): GeneralUiAction => {
     return {
         infoModal,
         type: INFO_MODAL_SHOW
@@ -146,7 +155,7 @@ export const hideInfoModal = () => {
     }
 };
 
-export const showConfirmationModal = (confirmModal: ConfirmationModalState) => {
+export const showConfirmationModal = (confirmModal: ConfirmationModalState): GeneralUiAction => {
     return {
         confirmModal,
         type: CONFIRM_MODAL_SHOW

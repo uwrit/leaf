@@ -70,6 +70,9 @@ body {
         height: 44px;
         width: 170px;
     }
+    .user-question-modal .modal-body {
+        height: 610px;
+    }
 }
 
 /* Large screen - 145px */

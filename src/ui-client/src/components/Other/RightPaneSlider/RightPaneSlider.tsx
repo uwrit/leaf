@@ -7,7 +7,6 @@
 
 import React from 'react';
 import './RightPaneSlider.css';
-import { AnyARecord } from 'dns';
 
 interface Props {
     show: boolean;

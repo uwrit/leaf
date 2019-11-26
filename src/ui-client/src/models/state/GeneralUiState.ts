@@ -6,6 +6,7 @@
  */ 
 
 import { RouteConfig } from "../../config/routes";
+import { SavedQueryRef } from "../Query";
 
 export enum Routes {
     FindPatients = 1,
@@ -21,10 +22,24 @@ export enum NotificationStates {
     Hidden = 3
 }
 
+export enum UserQuestionType {
+    HelpMakingQuery = 1,
+    DataRequest = 2,
+    Other = 3
+}
+
 export interface CohortCountBoxState {
     boxVisible: boolean;
     boxMinimized: boolean;
     infoButtonVisible: boolean;
+}
+
+export interface UserQuestionState {
+    associatedQuery?: SavedQueryRef;
+    email: string;
+    show: boolean;
+    type: UserQuestionType;
+    text: string;
 }
 
 export interface InformationModalState {
@@ -69,6 +84,7 @@ export interface GeneralUiState {
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;
     sideNotification: SideNotificationState;
+    userQuestion: UserQuestionState;
 }
 
 export enum MyLeafTabType {

@@ -43,13 +43,6 @@ export const getSessionTokenAndContext = async (state: AppState, attestation: At
             ...attestation
         }
     });
-    /*
-    const request = http.get('api/user/attest', {
-        params: {
-            attestation
-        }
-    });
-    */
 
     const response = await request;
     const respData = response.data as AccessTokenDTO;
@@ -123,9 +116,9 @@ export const getPrevSession = (state: AppState) => {
 };
 
 /*
- * The browser can cache the Leaf page even if the IDP has timed out the
+ * The browser can cache the Leaf page even if the SP has timed out the
  * session token, whereby the initial login will appear to fail because the /config
- * initial call is not allowed by the IDP. Instead of confusing the user and forcing
+ * initial call is not allowed by the SP. Instead of confusing the user and forcing
  * her to refresh the browser, set a session storage key that signals it's okay to 
  * try a refresh once.
  */
@@ -141,6 +134,19 @@ export const attemptLoginRetryIfPossible = (): boolean => {
         return false;
     }
 };
+
+/*
+ * The session retry key is used to allow Leaf to forcefully restart 
+ * the browser session if login fails (thus being intercepted by the SP and re-authenticating the user) 
+ * without getting stuck in an endless refresh loop should the 2nd authentication attempt fail. (See attemptLoginRetryIfPossible() above)
+ * After a successful authentication though, the retry key can be cleared with this function to ensure the 
+ * browser will continue to attempt future re-authentication cycles if
+ * the previous attempt in this browser tab succeeded.
+ */
+export const removeSessionRetryKey = (): void => {
+    const key = getSessionRetryKey();
+    sessionStorage.removeItem(key);
+}
 
 /*
  * Creates a session object to place in Session Storage
