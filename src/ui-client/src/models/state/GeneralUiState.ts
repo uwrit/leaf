@@ -22,7 +22,7 @@ export enum NotificationStates {
     Hidden = 3
 }
 
-export enum UserQuestionType {
+export enum UserInquiryType {
     HelpMakingQuery = 1,
     DataRequest = 2,
     Other = 3
@@ -34,11 +34,11 @@ export interface CohortCountBoxState {
     infoButtonVisible: boolean;
 }
 
-export interface UserQuestionState {
+export interface UserInquiryState {
     associatedQuery?: SavedQueryRef;
     email: string;
     show: boolean;
-    type: UserQuestionType;
+    type: UserInquiryType;
     text: string;
 }
 
@@ -84,7 +84,7 @@ export interface GeneralUiState {
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;
     sideNotification: SideNotificationState;
-    userQuestion: UserQuestionState;
+    userQuestion: UserInquiryState;
 }
 
 export enum MyLeafTabType {

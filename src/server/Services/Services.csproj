@@ -30,5 +30,6 @@
     <Folder Include="Startup\" />
     <Folder Include="Authentication\" />
     <Folder Include="Admin\Network\" />
+    <Folder Include="Notification\" />
   </ItemGroup>
 </Project>

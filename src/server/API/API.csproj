@@ -25,6 +25,7 @@
     <Folder Include="DTO\Config\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.4.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

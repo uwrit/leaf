@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { UserQuestionState, UserQuestionType } from '../../models/state/GeneralUiState';
+import { UserInquiryState, UserInquiryType } from '../../models/state/GeneralUiState';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Row, Col, FormGroup, Label, FormText, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import { setUserQuestionState } from '../../actions/generalUi';
 import { FaChevronDown } from 'react-icons/fa';
@@ -16,7 +16,7 @@ import './UserQuestionModal.css';
 interface Props {
     dispatch: any;
     queries: SavedQueryMap;
-    state: UserQuestionState;
+    state: UserInquiryState;
 }
 
 interface State {
@@ -131,8 +131,8 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                                         <Label check>
                                             <Input
                                                 type="radio" name="need-help" 
-                                                onClick={this.handleTypeChange.bind(null, UserQuestionType.HelpMakingQuery)} 
-                                                checked={type === UserQuestionType.HelpMakingQuery} 
+                                                onClick={this.handleTypeChange.bind(null, UserInquiryType.HelpMakingQuery)} 
+                                                checked={type === UserInquiryType.HelpMakingQuery} 
                                             />
                                             I need help making a query
                                         </Label>
@@ -141,8 +141,8 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                                         <Label check>
                                             <Input
                                                 type="radio" name="new-data" 
-                                                onClick={this.handleTypeChange.bind(null, UserQuestionType.DataRequest)} 
-                                                checked={type === UserQuestionType.DataRequest} 
+                                                onClick={this.handleTypeChange.bind(null, UserInquiryType.DataRequest)} 
+                                                checked={type === UserInquiryType.DataRequest} 
                                             />
                                             I'd like to request new data elements
                                         </Label>
@@ -151,8 +151,8 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                                         <Label check>
                                             <Input 
                                                 type="radio" name="other" 
-                                                onClick={this.handleTypeChange.bind(null, UserQuestionType.Other)} 
-                                                checked={type === UserQuestionType.Other} 
+                                                onClick={this.handleTypeChange.bind(null, UserInquiryType.Other)} 
+                                                checked={type === UserInquiryType.Other} 
                                             />
                                             Other
                                         </Label>
@@ -209,25 +209,25 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
 
     private handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { dispatch, state } = this.props;
-        const newState: UserQuestionState = { ...state, email: e.currentTarget.value };
+        const newState: UserInquiryState = { ...state, email: e.currentTarget.value };
         dispatch(setUserQuestionState(newState));
     }
 
     private handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { dispatch, state } = this.props;
-        const newState: UserQuestionState = { ...state, text: e.currentTarget.value };
+        const newState: UserInquiryState = { ...state, text: e.currentTarget.value };
         dispatch(setUserQuestionState(newState));
     }
 
     private handleAssociatedQueryChange = (associatedQuery: SavedQueryRef) => {
         const { dispatch, state } = this.props;
-        const newState: UserQuestionState = { ...state, associatedQuery };
+        const newState: UserInquiryState = { ...state, associatedQuery };
         dispatch(setUserQuestionState(newState));
     }
 
-    private handleTypeChange = (type: UserQuestionType) => {
+    private handleTypeChange = (type: UserInquiryType) => {
         const { dispatch, state } = this.props;
-        const newState: UserQuestionState = { ...state, type };
+        const newState: UserInquiryState = { ...state, type };
         dispatch(setUserQuestionState(newState));
     }
 }

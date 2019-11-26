@@ -40,7 +40,7 @@ import {
     SELECT_CONCEPT_SPECIALIZATION,
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
-import { GeneralUiState, Routes, NotificationStates, MyLeafTabType, UserQuestionType } from '../models/state/GeneralUiState';
+import { GeneralUiState, Routes, NotificationStates, MyLeafTabType, UserInquiryType } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
 import { IMPORT_TOGGLE_MRN_MODAL, IMPORT_TOGGLE_REDCAP_MODAL } from '../actions/dataImport';
 
@@ -82,8 +82,8 @@ export const defaultGeneralUiState = (): GeneralUiState => {
         },
         userQuestion: {
             email: '',
-            show: true,
-            type: UserQuestionType.HelpMakingQuery,
+            show: false,
+            type: UserInquiryType.HelpMakingQuery,
             text: ''
         }
     };
