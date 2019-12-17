@@ -9,6 +9,7 @@ using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
 using Model.Import;
+using Model.Notification;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
 using Model.Admin.Query;
@@ -37,6 +38,7 @@ namespace Model
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DatasetQueryProvider>();
             services.AddTransient<DataImporter>();
+            services.AddTransient<NotificationManager>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();

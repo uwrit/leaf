@@ -9,43 +9,56 @@ namespace Model.Options
 {
     public class NotificationOptions
     {
+        public bool Enabled { get; set; }
         public SmtpOptions Smtp { get; set; }
 
-        public class SmtpOptions
+        public NotificationOptions()
         {
-            public string Server { get; set; }
-            public int? Port { get; set; }
+            Smtp = new SmtpOptions();
+        }
+    }
+
+    public class SmtpOptions
+    {
+        public string Server { get; set; }
+        public int? Port { get; set; }
+        public CredentailOptions Credentials { get; set; }
+        public MailAddress Sender { get; set; }
+        public MailAddress Receiver { get; set; }
+
+        public SmtpOptions()
+        {
+            Credentials = new CredentailOptions();
+            Sender = new MailAddress();
+            Receiver = new MailAddress();
+        }
+
+        public class CredentailOptions
+        {
             public bool EnableSSL { get; set; }
-            public CredentailOptions Credentials { get; set; }
-            public MailAddress Sender { get; set; }
-            public MailAddress Receiver { get; set; }
+            public string Username { get; set; }
+            public string Password { get; set; }
 
-            public class CredentailOptions
+            bool credChecked;
+            bool useDefault;
+            public bool UseDefault
             {
-                public string Username { get; set; }
-                public string Password { get; set; }
-
-                bool @checked;
-                bool useDefault;
-                public bool UseDefault
+                get
                 {
-                    get
+                    if (!credChecked)
                     {
-                        if (!@checked)
-                        {
-                            useDefault = string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password);
-                            @checked = true;
-                        }
-                        return useDefault;
+                        useDefault = string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password);
+                        credChecked = true;
                     }
+                    return useDefault;
                 }
             }
+        }
 
-            public class MailAddress
-            {
-                public string Name { get; set; }
-                public string Address { get; set; }
-            }
+        public class MailAddress
+        {
+            public string Name { get; set; }
+            public string Address { get; set; }
         }
     }
 }

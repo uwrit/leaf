@@ -30,7 +30,7 @@ namespace Services.Notification
             client = new SmtpClient(smtp.Server)
             {
                 UseDefaultCredentials = smtp.Credentials.UseDefault,
-                EnableSsl = smtp.EnableSSL
+                EnableSsl = smtp.Credentials.EnableSSL
             };
 
             if (!client.UseDefaultCredentials)

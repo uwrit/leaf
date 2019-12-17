@@ -75,6 +75,9 @@ namespace API.Options
             // Jwt Options
             services.ConfigureJwtOptions(configuration);
 
+            // Notification Options
+            services.ConfigureNotificationOptions(configuration);
+
             return services;
         }
 
@@ -204,6 +207,51 @@ namespace API.Options
             {
                 opts.REDCap = rc;
             });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureNotificationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var notify = new NotificationOptions { Enabled = config.GetValue<bool>(Config.Notification.Enabled) };
+            if (notify.Enabled)
+            {
+                var hasPort = config.TryGetValue(Config.Notification.Emall.Port, out int port);
+                var hasCred = config.TryGetValue(Config.Notification.Emall.Credential.EnableSSL, out bool _);
+
+                notify.Smtp.Server = config.GetValue<string>(Config.Notification.Emall.Server);
+                notify.Smtp.Sender.Address = config.GetValue<string>(Config.Notification.Emall.Sender.Address);
+                notify.Smtp.Sender.Name = config.GetValue<string>(Config.Notification.Emall.Sender.Name);
+                notify.Smtp.Receiver.Address = config.GetValue<string>(Config.Notification.Emall.Receiver.Address);
+                notify.Smtp.Receiver.Name = config.GetValue<string>(Config.Notification.Emall.Receiver.Name);
+
+                if (hasPort)
+                {
+                    notify.Smtp.Port = port;
+                }
+                if (hasCred)
+                {
+                    var hasUser = config.TryGetValue(Config.Notification.Emall.Credential.Username, out string usr);
+                    var hasPass = config.TryGetValue(Config.Notification.Emall.Credential.Password, out string pwd);
+
+                    notify.Smtp.Credentials.EnableSSL = config.GetValue<bool>(Config.Notification.Emall.Credential.EnableSSL);
+
+                    if (hasUser)
+                    {
+                        notify.Smtp.Credentials.Username = config.GetValue<string>(Config.Notification.Emall.Credential.Username);
+                    }
+                    if (hasPass)
+                    {
+                        notify.Smtp.Credentials.Password = config.GetValue<string>(Config.Notification.Emall.Credential.Password);
+                    }
+                }
+
+                services.Configure<NotificationOptions>(opts =>
+                {
+                    opts.Enabled = notify.Enabled;
+                    opts.Smtp = notify.Smtp;
+                });
+            }
 
             return services;
         }

@@ -28,6 +28,7 @@ using Model.Network;
 using Model.Options;
 using Model.Search;
 using Model.Import;
+using Model.Notification;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
@@ -39,6 +40,7 @@ using Services.Export;
 using Services.Network;
 using Services.Search;
 using Services.Import;
+using Services.Notification;
 
 namespace API.Options
 {
@@ -100,6 +102,7 @@ namespace API.Options
             services.AddTransient<IQueryService, QueryService>();
             services.AddTransient<DataImporter.IImportService, ImportService>();
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
+            services.AddTransient<NotificationManager.INotificationService, SmtpService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();
