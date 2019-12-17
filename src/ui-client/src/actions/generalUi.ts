@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates, UserQuestionState } from '../models/state/GeneralUiState';
+import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates, UserInquiryState } from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -51,7 +51,7 @@ export interface GeneralUiAction {
     sideNotification?: SideNotificationState;
     tab?: MyLeafTabType;
     type: string;
-    userQuestion?: UserQuestionState;
+    userQuestion?: UserInquiryState;
 }
 
 // Asynchronous
@@ -135,7 +135,7 @@ export const setCohortCountBoxState = (cohortCountBoxVisible: boolean, cohortCou
     };
 };
 
-export const setUserQuestionState = (userQuestion: UserQuestionState): GeneralUiAction => {
+export const setUserQuestionState = (userQuestion: UserInquiryState): GeneralUiAction => {
     return {
         userQuestion,
         type: SET_USER_QUESTION_STATE

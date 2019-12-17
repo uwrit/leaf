@@ -17,7 +17,7 @@ import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
 import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
-import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState, UserQuestionState } from '../models/state/GeneralUiState';
+import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState, UserInquiryState } from '../models/state/GeneralUiState';
 import { SessionContext } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
@@ -56,7 +56,7 @@ interface StateProps {
     routes: RouteConfig[];
     sessionContext?: SessionContext;
     sideNotification: SideNotificationState;
-    userQuestion:UserQuestionState;
+    userQuestion: UserInquiryState;
 }
 
 type Props = StateProps & DispatchProps & OwnProps;
