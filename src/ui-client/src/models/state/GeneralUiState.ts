@@ -36,10 +36,18 @@ export interface CohortCountBoxState {
 
 export interface UserInquiryState {
     associatedQuery?: SavedQueryRef;
-    email: string;
+    email?: string;
     show: boolean;
     type: UserInquiryType;
     text: string;
+}
+
+export interface UserInquiry {
+    associatedQuery?: SavedQueryRef;
+    email?: string;
+    show: boolean;
+    type?: UserInquiryType;
+    text?: string;
 }
 
 export interface InformationModalState {

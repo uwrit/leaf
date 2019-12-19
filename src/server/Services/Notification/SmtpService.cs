@@ -20,17 +20,21 @@ namespace Services.Notification
         readonly ILogger<SmtpService> logger;
         readonly NotificationOptions options;
         readonly SmtpClient client;
+        readonly MailAddress from;
+        readonly MailAddress to;
 
         public SmtpService(ILogger<SmtpService> logger, IOptions<NotificationOptions> options)
         {
             this.logger = logger;
             this.options = options.Value;
+            from = SetMailAddress(this.options.Smtp.Sender);
+            to = SetMailAddress(this.options.Smtp.Receiver);
 
             var smtp = this.options.Smtp;
             client = new SmtpClient(smtp.Server)
             {
                 UseDefaultCredentials = smtp.Credentials.UseDefault,
-                EnableSsl = smtp.Credentials.EnableSSL
+                EnableSsl = smtp.UseSSL
             };
 
             if (!client.UseDefaultCredentials)
@@ -43,19 +47,29 @@ namespace Services.Notification
             }
         }
 
-        public async Task<bool> NotifyAsync(string subject, string content)
+        public async Task<bool> NotifyAsync(string subject, string content, NotificationManager.ContentType bodyType)
         {
             using (var message = new MailMessage
             {
-                From = new MailAddress(options.Smtp.Sender.Address, options.Smtp.Sender.Name),
+                From = from,
                 Body = content,
-                Subject = subject
+                Subject = subject,
+                IsBodyHtml = bodyType == NotificationManager.ContentType.HTML
             })
             {
-                message.To.Add(new MailAddress(options.Smtp.Receiver.Address));
+                message.To.Add(to);
                 await client.SendMailAsync(message);
                 return true;
             }
+        }
+
+        MailAddress SetMailAddress(SmtpOptions.MailAddress settings)
+        {
+            if (!string.IsNullOrWhiteSpace(settings.Name))
+            {
+                return new MailAddress(settings.Address, settings.Name);
+            }
+            return new MailAddress(settings.Address);
         }
     }
 }

@@ -108,8 +108,8 @@ class App extends React.Component<Props> {
                 <CohortCountBox />
                 <Header />
                 <Sidebar currentRoute={currentRoute} dispatch={dispatch} routes={routes} cohortCountState={cohortCountState} currentAdminPane={currentAdminPane} />
-                <HelpButton auth={auth} />
-                <UserQuestionModal dispatch={dispatch} state={userQuestion} queries={new Map()} />
+                <HelpButton auth={auth} dispatch={dispatch} />
+                <UserQuestionModal dispatch={dispatch} state={userQuestion} queries={queries} />
                 <SideNotification dispatch={dispatch} state={sideNotification} />
                 {sessionContext &&
                 <div id="main-content">

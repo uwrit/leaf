@@ -12,10 +12,11 @@ namespace API.Options
         {
             public const string Enabled = @"Notification:Enabled";
 
-            public static class Emall
+            public static class Email
             {
                 public const string Server = @"Notification:Email:Server";
                 public const string Port = @"Notification:Email:Port";
+                public const string UseSSL = @"Notification:Email:UseSSL";
 
                 public static class Sender
                 {
@@ -29,12 +30,10 @@ namespace API.Options
                     public const string Address = @"Notification:Email:Receiver:Address";
                 }
 
-                public static class Credential
+                public static class Credentials
                 {
-                    public const string Section = @"Notification:Email:Credential";
-                    public const string EnableSSL = @"Notification:Email:Credential:EnableSSL";
-                    public const string Username = @"Notification:Email:Credential:Username";
-                    public const string Password = @"Notification:Email:Credential:Password";
+                    public const string Username = @"Notification:Email:Credentials:Username";
+                    public const string Password = @"Notification:Email:Credentials:Password";
                 }
             }
         }

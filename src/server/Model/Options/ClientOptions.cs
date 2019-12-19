@@ -22,6 +22,7 @@ namespace Model.Options
         public class HelpOptions
         {
             public bool Enabled { get; set; }
+            public bool AutoSend { get; set; }
             public string Email { get; set; }
             public string URI { get; set; }
         }

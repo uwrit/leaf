@@ -75,3 +75,11 @@
 .help-container > div {
     display: inline-block;
 }
+
+.help-contact a {
+    color: #0056b3 !important;
+}
+
+.help-contact a:hover {
+    text-decoration: underline !important;
+}

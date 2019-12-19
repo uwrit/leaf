@@ -5,7 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Routes, InformationModalState, ConfirmationModalState, NoClickModalState, SideNotificationState, MyLeafTabType, NotificationStates, UserInquiryState } from '../models/state/GeneralUiState';
+import { 
+    Routes, 
+    InformationModalState, 
+    ConfirmationModalState, 
+    NoClickModalState, 
+    SideNotificationState, 
+    MyLeafTabType, 
+    NotificationStates, 
+    UserInquiry, 
+    UserInquiryType
+} from '../models/state/GeneralUiState';
 import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
@@ -15,6 +25,7 @@ import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 import { getAllMetdata } from '../services/dataImport';
 import { getExtensionRootConcepts } from '../services/queryApi';
+import { sendUserInquiry } from '../services/notificationApi';
 import { setExtensionRootConcepts } from './concepts';
 import { setImportsMetadata } from './dataImport';
 
@@ -51,7 +62,7 @@ export interface GeneralUiAction {
     sideNotification?: SideNotificationState;
     tab?: MyLeafTabType;
     type: string;
-    userQuestion?: UserInquiryState;
+    userInquiry?: UserInquiry;
 }
 
 // Asynchronous
@@ -109,7 +120,32 @@ export const toggleMyLeafModal = () => {
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
     };
-};        
+};
+
+/*
+ * Send the current user inquiry to the API, which generates an email to admins.
+ */
+export const sendInquiry = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+
+        try {
+            dispatch(setNoClickModalState({ message: "Sending", state: NotificationStates.Working }));
+            await sendUserInquiry(state, state.generalUi.userQuestion);
+            dispatch(setNoClickModalState({ message: "Question Sent", state: NotificationStates.Complete }));
+            dispatch(setUserInquiryState({ text: '', show: false, associatedQuery: undefined, type: UserInquiryType.HelpMakingQuery }));
+        } catch (err) {
+            console.log(err);
+            const info: InformationModalState = {
+                body: "Uh oh, something went wrong when attempting notify the administrator. We are sorry for the inconvenience.",
+                header: "Error Sending Question",
+                show: true
+            };
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            dispatch(showInfoModal(info));
+        } 
+    };
+};
 
 // Synchronous
 export const setNoClickModalState = (noclickModal: NoClickModalState): GeneralUiAction => {
@@ -135,9 +171,9 @@ export const setCohortCountBoxState = (cohortCountBoxVisible: boolean, cohortCou
     };
 };
 
-export const setUserQuestionState = (userQuestion: UserInquiryState): GeneralUiAction => {
+export const setUserInquiryState = (userInquiry: UserInquiry): GeneralUiAction => {
     return {
-        userQuestion,
+        userInquiry,
         type: SET_USER_QUESTION_STATE
     }
 };

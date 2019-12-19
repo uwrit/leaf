@@ -139,3 +139,7 @@
     background-color: rgba(179, 76, 76, 0.1);
 }
 
+/* Footer */
+.myleaf-modal .modal-footer {
+    justify-content: space-between;
+}

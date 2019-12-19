@@ -15,6 +15,10 @@
     height: 640px;
 }
 
+.user-question-modal .modal-footer {
+    justify-content: space-between;
+}
+
 .user-question-modal-close {
     cursor: pointer;
     margin-right: 10px;
@@ -47,7 +51,6 @@
 }
 
 .user-question-modal-section-divider {
-    background-colorz: rgba(0,0,0,0.1);
     height: 1px;
     margin: 20px 0;
 }
@@ -66,6 +69,10 @@
 /* Dropdown */
 .user-question-modal-dropdown {
     outline: none;
+}
+
+.user-question-modal-dropdown .dropdown-menu {
+    width: 100%;
 }
 
 .user-question-modal-dropdown button {
@@ -138,7 +145,7 @@
 }
 
 .user-question-modal-type input:checked {
-    background: rgb(14, 173, 152);
+    background: #09c074;;
 }
 
 .user-question-modal-type input:checked::before {

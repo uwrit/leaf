@@ -91,11 +91,6 @@ class MyLeafModal extends React.PureComponent<Props> {
                         }
                     </Nav>
 
-                    {tab === MyLeafTabType.REDCapImport &&
-                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleImportREDCapProjectClick}>
-                        + Import REDCap Project
-                    </Button>}
-
                 </div>
 
                 {/* Body */}
@@ -117,6 +112,11 @@ class MyLeafModal extends React.PureComponent<Props> {
                 {/* Footer */}
                 <ModalFooter>
                     <Button className="leaf-button leaf-button-primary" onClick={this.handleCloseClick}>Close</Button>
+                    {tab === MyLeafTabType.REDCapImport &&
+                    <Button className='leaf-button leaf-button-addnew' onClick={this.handleImportREDCapProjectClick}>
+                        + Import REDCap Project
+                    </Button>
+                    }
                 </ModalFooter>
             </Modal>
         );

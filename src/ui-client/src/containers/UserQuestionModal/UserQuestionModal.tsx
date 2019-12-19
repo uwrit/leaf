@@ -8,7 +8,7 @@
 import React from 'react';
 import { UserInquiryState, UserInquiryType } from '../../models/state/GeneralUiState';
 import { Modal, ModalHeader, ModalBody, ModalFooter, Button, Row, Col, FormGroup, Label, FormText, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
-import { setUserQuestionState } from '../../actions/generalUi';
+import { setUserInquiryState, sendInquiry } from '../../actions/generalUi';
 import { FaChevronDown } from 'react-icons/fa';
 import { SavedQueryMap, SavedQueryRef } from '../../models/Query';
 import './UserQuestionModal.css';
@@ -64,9 +64,10 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                                     <Label>
                                         Email
                                         <span className='required'>*</span>
-                                        <FormText color="muted">Let us know the best email address to respond to.</FormText>
+                                        <FormText color="muted">Let us know the best email address to contact you with.</FormText>
                                     </Label>
                                     <Input
+                                        autoFocus={true}
                                         className={'leaf-input'}
                                         onChange={this.handleEmailChange}
                                         placeholder={'Enter a valid email address'}
@@ -85,26 +86,27 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                                 <FormGroup>
                                     <Label>
                                         Related Leaf Query
-                                        <FormText color="muted">Have you already tried a query in Leaf? Let us know which one.</FormText>
+                                        <FormText color="muted">Have you already made a query in Leaf? Let us know which one.</FormText>
                                     </Label>
                                     <div className={`${c}-dropdown`} tabIndex={0}>
                                         <Dropdown isOpen={dropdownOpen} toggle={this.toggleDropdown} >
                                             <DropdownToggle>
                                                 <div>
-                                                    {associatedQuery ? associatedQuery.name : "I don't have a query yet"} 
+                                                    {associatedQuery ? associatedQuery.name : "I haven't made a query yet"} 
                                                     <FaChevronDown className={`${c}-dropdown-chevron`}/>
                                                 </div>
                                             </DropdownToggle>
                                             <DropdownMenu>
                                                 <div className={`${c}-dropdown-item-container`}>
-                                                <DropdownItem>
-                                                    I don't have a query yet                                        
+                                                <DropdownItem onClick={this.handleAssociatedQueryChange.bind(null, undefined)}>
+                                                    I haven't made a query yet
                                                 </DropdownItem>
                                                 <DropdownItem divider={true} />
                                                 {[ ...this.props.queries.values() ].map((q) => {
                                                     return (
                                                         <DropdownItem 
-                                                            key={q.id}>
+                                                            key={q.id} onClick={this.handleAssociatedQueryChange.bind(null, q)}
+                                                            className={q === associatedQuery ? 'selected' : ''}>
                                                             {q.name}
                                                         </DropdownItem>
                                                     );
@@ -193,14 +195,28 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
                 {/* Footer */}
                 <ModalFooter>
                     <Button className="leaf-button leaf-button-primary" onClick={this.handleCloseClick}>Close</Button>
+                    <Button className="leaf-button leaf-button-addnew" onClick={this.handleSendClick} disabled={!this.sendOkay()}>Send</Button>
                 </ModalFooter>
             </Modal>
         );
     }
 
+    private sendOkay = () => {
+        const { email, text } = this.props.state;
+        if (text.length && email && email.split('@').length === 2) {
+            return true;
+        }
+        return false;
+    }
+
     private handleCloseClick = () => {
         const { dispatch, state } = this.props;
-        dispatch(setUserQuestionState({ ...state, show: false }));
+        dispatch(setUserInquiryState({ ...state, show: false }));
+    }
+
+    private handleSendClick = () => {
+        const { dispatch } = this.props;
+        dispatch(sendInquiry());
     }
 
     private toggleDropdown = () => {
@@ -210,24 +226,24 @@ export default class UserQuestionModal extends React.PureComponent<Props,State> 
     private handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { dispatch, state } = this.props;
         const newState: UserInquiryState = { ...state, email: e.currentTarget.value };
-        dispatch(setUserQuestionState(newState));
+        dispatch(setUserInquiryState(newState));
     }
 
     private handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { dispatch, state } = this.props;
         const newState: UserInquiryState = { ...state, text: e.currentTarget.value };
-        dispatch(setUserQuestionState(newState));
+        dispatch(setUserInquiryState(newState));
     }
 
-    private handleAssociatedQueryChange = (associatedQuery: SavedQueryRef) => {
+    private handleAssociatedQueryChange = (associatedQuery?: SavedQueryRef) => {
         const { dispatch, state } = this.props;
         const newState: UserInquiryState = { ...state, associatedQuery };
-        dispatch(setUserQuestionState(newState));
+        dispatch(setUserInquiryState(newState));
     }
 
     private handleTypeChange = (type: UserInquiryType) => {
         const { dispatch, state } = this.props;
         const newState: UserInquiryState = { ...state, type };
-        dispatch(setUserQuestionState(newState));
+        dispatch(setUserInquiryState(newState));
     }
 }

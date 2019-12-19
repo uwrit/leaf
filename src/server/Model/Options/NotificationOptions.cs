@@ -22,20 +22,21 @@ namespace Model.Options
     {
         public string Server { get; set; }
         public int? Port { get; set; }
-        public CredentailOptions Credentials { get; set; }
+        public bool UseSSL { get; set; }
+        public CredentialOptions Credentials { get; set; }
         public MailAddress Sender { get; set; }
         public MailAddress Receiver { get; set; }
 
         public SmtpOptions()
         {
-            Credentials = new CredentailOptions();
+            Credentials = new CredentialOptions();
             Sender = new MailAddress();
             Receiver = new MailAddress();
         }
 
-        public class CredentailOptions
+        public class CredentialOptions
         {
-            public bool EnableSSL { get; set; }
+            
             public string Username { get; set; }
             public string Password { get; set; }
 

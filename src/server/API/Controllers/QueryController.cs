@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
-using Model.Extensions;
 using Model.Search;
 using Model.Tagging;
 using Model.Error;

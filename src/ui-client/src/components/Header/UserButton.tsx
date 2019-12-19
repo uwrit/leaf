@@ -89,7 +89,7 @@ export default class UserButton extends React.PureComponent<Props> {
 
                         <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.SavedQueries)}>
                             <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
-                            <span>My Saved Queries</span>
+                            <span>Saved Queries</span>
                         </div>
 
                         {user && user.isAdmin &&
@@ -102,7 +102,7 @@ export default class UserButton extends React.PureComponent<Props> {
                         {imports.redCap.enabled && 
                         <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.REDCapImport)}>
                             <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
-                            <span>My REDCap Imports</span>
+                            <span>REDCap Imports</span>
                         </div>
                         }
 

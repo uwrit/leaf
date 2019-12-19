@@ -3,6 +3,7 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <!-- <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> -->
     <TieredCompilation>true</TieredCompilation>
+    <ReleaseVersion>3.1</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -23,9 +24,9 @@
     <Folder Include="DTO\User\" />
     <Folder Include="DTO\Admin\Network\" />
     <Folder Include="DTO\Config\" />
+    <Folder Include="DTO\Notification\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MailKit" Version="2.4.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.6">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

@@ -143,7 +143,7 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case SET_BROWSER:
             return Object.assign({}, state, { browser: action.browser! });
         case SET_USER_QUESTION_STATE:
-            return Object.assign({}, state, { userQuestion: action.userQuestion });
+            return Object.assign({}, state, { userQuestion: { ...state.userQuestion, ...action.userInquiry } });
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:

@@ -67,7 +67,7 @@ namespace API.Authorization
         IScopedIdentity ScopedIdentity => new SAML2ScopedIdentity(Identity);
 
         string identity;
-        string Identity
+        public string Identity
         {
             get
             {
