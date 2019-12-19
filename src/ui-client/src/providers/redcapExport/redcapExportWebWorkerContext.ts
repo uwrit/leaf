@@ -302,7 +302,7 @@ var toREDCapDate = function (date) {
     /*
      * Shouldn't happen but sanity check just in case it's a string.
      */ 
-    } else if (date instanceof String) {
+    } else if (typeof date === 'string') {
         date = new Date(date)
         if (isNaN(date.getTime())) {
             return '';
