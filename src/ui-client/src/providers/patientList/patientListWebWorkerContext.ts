@@ -206,8 +206,8 @@ var addDemographics = function (payload) {
         // Convert dates if applicable
         for (let j = 0; j < dateFields.length; j++) {
             const col = dateFields[j];
-            if (patient[col.id]) {
-                patient[col.id] = new Date(patient[col.id]);
+            if (patientDto[col.id]) {
+                patientDto[col.id] = new Date(patientDto[col.id]);
             }
         }
         // Add to the patId arrays
