@@ -54,7 +54,7 @@ namespace Services.Notification
                 From = from,
                 Body = content,
                 Subject = subject,
-                IsBodyHtml = bodyType == NotificationManager.ContentType.HTML
+                IsBodyHtml = bodyType == NotificationManager.ContentType.Html
             })
             {
                 message.To.Add(to);

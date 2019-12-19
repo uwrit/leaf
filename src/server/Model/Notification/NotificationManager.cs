@@ -19,7 +19,7 @@ namespace Model.Notification
 
         public enum ContentType
         {
-            HTML = 1,
+            Html = 1,
             PlainText = 2
         }
 
@@ -36,7 +36,7 @@ namespace Model.Notification
 
         public async Task<bool> SendUserInquiry(UserInquiry inquiry)
         {
-            log.LogInformation("Sending user inquiry. Inquiry:{Inquiry}", inquiry);
+            log.LogInformation("Sending user inquiry. Inquiry:{@Inquiry}", inquiry);
 
             var typeText =
                 inquiry.Type == UserInquiry.UserInquiryType.DataRequest ? "Data Request" :
@@ -57,7 +57,7 @@ namespace Model.Notification
                     </body>
                 </html>";
 
-            await svc.NotifyAsync(subject, body, ContentType.HTML);
+            await svc.NotifyAsync(subject, body, ContentType.Html);
             return true;
         }
     }

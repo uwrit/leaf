@@ -34,11 +34,11 @@ namespace API.Controllers
         }
 
         [HttpPost("inquiry")]
-        public async Task<ActionResult<bool>> NotifyUserInquiry([FromBody] UserInquiryDTO inquiryDTO)
+        public async Task<ActionResult<bool>> NotifyUserInquiry([FromBody] UserInquiryDTO inquiry)
         {
             try
             {
-                var success = await manager.SendUserInquiry(inquiryDTO.ToInquiry());
+                var success = await manager.SendUserInquiry(inquiry.ToInquiry());
                 return Ok(success);
             }
             catch (Exception e)
