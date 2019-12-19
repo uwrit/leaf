@@ -7,14 +7,17 @@
 
 import React from 'react';
 import { NavItem } from 'reactstrap';
-import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon, FiUsers } from 'react-icons/fi';
+import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon, FiUsers, FiHelpCircle } from 'react-icons/fi';
 import { FaChevronDown, FaStar, FaDoorOpen } from 'react-icons/fa';
 import { UserContext } from '../../models/Auth';
 import ImportState from '../../models/state/Import';
 import { MyLeafTabType } from '../../models/state/GeneralUiState';
+import { AuthorizationState } from '../../models/state/AppState';
 
 interface Props {
+    auth?: AuthorizationState;
     federated: boolean;
+    helpClickHandler: () => any;
     imports: ImportState;
     logoutClickHandler: () => any;
     myLeafModalToggleHandler: (tab: MyLeafTabType) => any;
@@ -26,7 +29,7 @@ export default class UserButton extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { federated, imports, logoutClickHandler, myLeafModalToggleHandler, user } = this.props;
+        const { auth, federated, imports, helpClickHandler, logoutClickHandler, myLeafModalToggleHandler, user } = this.props;
         const username = user ? user.name : '';
 
         return (
@@ -104,6 +107,17 @@ export default class UserButton extends React.PureComponent<Props> {
                             <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                             <span>REDCap Imports</span>
                         </div>
+                        }
+
+                        {auth && auth.config && auth.config.client.help.autoSend &&
+                        [
+                            <div key={1} className={`${c}-option-divider`} />,
+
+                            <div key={2} className={`${c}-option ${c}-option-help`} onClick={helpClickHandler}>
+                                <FiHelpCircle className="myleaf-menu-icon myleaf-menu-icon-help" />
+                                <span>Get Help</span>
+                            </div>
+                        ]
                         }
 
                         <div className={`${c}-option-divider`} />

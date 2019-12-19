@@ -128,7 +128,11 @@
 }
 
 .header-option {
-    padding: 10px 4px 0;
+    padding: 10px 4px;
+}
+
+.header-myleaf .header-option {
+    padding-bottom: 2px;
 }
 
 .header-option svg {
@@ -277,6 +281,10 @@
     padding-bottom: 8px;
 }
 
+.header-option-help {
+    padding-top: 4px;
+}
+
 .header-options > li:hover .header-myleaf-icon {
     color: rgb(220, 169, 223);
 }
@@ -309,14 +317,10 @@
     color: rgb(28, 202, 12);
 }
 
+.myleaf-menu-icon-help {
+    color: rgba(231, 139, 0, 0.8);
+}
+
 .myleaf-menu-icon-logout {
     color: rgba(90, 113, 219, 0.8);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-savedqueries {
-    color: rgb(255, 166, 0);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-logout {
-    color: rgb(90, 113, 219);
 }

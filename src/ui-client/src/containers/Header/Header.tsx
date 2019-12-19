@@ -8,10 +8,10 @@
 import React from 'react';
 import { connect } from 'react-redux'
 import { Navbar, Nav } from 'reactstrap';
-import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmationModal, toggleMyLeafModal, showInfoModal, setMyLeafTab } from '../../actions/generalUi';
+import { setCohortCountBoxState, toggleSaveQueryPane, setRoute, showConfirmationModal, toggleMyLeafModal, showInfoModal, setMyLeafTab, setUserInquiryState } from '../../actions/generalUi';
 import { resetPanels } from '../../actions/panels';
-import { AppState } from '../../models/state/AppState';
-import { UserContext, AppConfig } from '../../models/Auth';
+import { AppState, AuthorizationState } from '../../models/state/AppState';
+import { UserContext } from '../../models/Auth';
 import { CohortStateType } from '../../models/state/CohortState';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { Panel } from '../../models/panel/Panel';
@@ -31,7 +31,7 @@ import './Header.css';
 
 interface OwnProps {}
 interface StateProps {
-    auth: AppConfig;
+    auth: AuthorizationState;
     importState: ImportState;
     panels: Panel[];
     panelFilters: PanelFilter[];
@@ -49,7 +49,7 @@ type Props = StateProps & DispatchProps & OwnProps;
 
 class Header extends React.PureComponent<Props> {
     public render() {
-        const { user, responders, dispatch, queryState, importState } = this.props;
+        const { auth, user, responders, dispatch, queryState, importState } = this.props;
         const c = 'header';
 
         return (
@@ -84,9 +84,11 @@ class Header extends React.PureComponent<Props> {
                         }
 
                         {/* User */}
-                        <UserButton 
+                        <UserButton
+                            auth={auth}
                             federated={responders.size > 1}
                             imports={importState}
+                            helpClickHandler={this.handleGetHelpClick}
                             logoutClickHandler={this.handleLogoutClick} 
                             myLeafModalToggleHandler={this.handleMyleafModalToggleClick}
                             user={user} 
@@ -167,11 +169,16 @@ class Header extends React.PureComponent<Props> {
         dispatch(setMyLeafTab(tab));
         dispatch(toggleMyLeafModal());
     }
+
+    private handleGetHelpClick = () => {
+        const { dispatch } = this.props;
+        dispatch(setUserInquiryState({ show: true }));
+    }
 }
 
 const mapStateToProps = (state: AppState): StateProps => {
     return { 
-        auth: state.auth.config!,
+        auth: state.auth!,
         importState: state.dataImport,
         panels: state.panels,
         panelFilters: state.panelFilters,
