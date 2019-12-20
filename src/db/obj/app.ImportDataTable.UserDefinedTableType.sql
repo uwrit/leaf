@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedTableType [app].[ImportDataTable]    Script Date:******/
+/****** Object:  UserDefinedTableType [app].[ImportDataTable]    Script Date: ******/
 CREATE TYPE [app].[ImportDataTable] AS TABLE(
 	[Id] [nvarchar](200) NOT NULL,
 	[ImportMetadataId] [uniqueidentifier] NOT NULL,

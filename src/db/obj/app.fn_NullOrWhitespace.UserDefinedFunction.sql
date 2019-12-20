@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  UserDefinedFunction [app].[fn_NullOrWhitespace]    Script Date:******/
+/****** Object:  UserDefinedFunction [app].[fn_NullOrWhitespace]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
