@@ -7,11 +7,14 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
+using System.Text.RegularExpressions;
 
 namespace Model.Notification
 {
     public class NotificationManager
     {
+        readonly Regex HTML_TAGS = new Regex("<(?:[^><\"\']*?(?:([\"\']).*?\\1)?[^><\'\"]*?)+(?:>|$)");
+
         public interface INotificationService
         {
             Task<bool> NotifyAsync(string subject, string content, ContentType contentType);
@@ -38,6 +41,10 @@ namespace Model.Notification
         {
             log.LogInformation("Sending user inquiry. Inquiry:{@Inquiry}", inquiry);
 
+            // Strip any possible HTML from malicious users and
+            // replace newlines with HTML line breaks
+            var text = HTML_TAGS.Replace(inquiry.Text, "").Replace("\n", "</br>");
+
             var typeText =
                 inquiry.Type == UserInquiry.UserInquiryType.DataRequest ? "Data Request" :
                 inquiry.Type == UserInquiry.UserInquiryType.HelpMakingQuery ? "Help in making query" : "Other";
@@ -54,7 +61,7 @@ namespace Model.Notification
                         </br>
                         <span><b>Request Type</b>: {typeText}</span></br>
                         </br>
-                        <span>""{inquiry.Text.Replace("\n", "</br>")}""</span>
+                        <span>""{text}""</span>
                     </body>
                 </html>";
 

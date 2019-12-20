@@ -27,8 +27,8 @@ namespace Services.Notification
         {
             this.logger = logger;
             this.options = options.Value;
-            from = SetMailAddress(this.options.Smtp.Sender);
-            to = SetMailAddress(this.options.Smtp.Receiver);
+            from = new MailAddress(this.options.Smtp.Sender.Address);
+            to = new MailAddress(this.options.Smtp.Receiver.Address);
 
             var smtp = this.options.Smtp;
             client = new SmtpClient(smtp.Server)
@@ -61,15 +61,6 @@ namespace Services.Notification
                 await client.SendMailAsync(message);
                 return true;
             }
-        }
-
-        MailAddress SetMailAddress(SmtpOptions.MailAddress settings)
-        {
-            if (!string.IsNullOrWhiteSpace(settings.Name))
-            {
-                return new MailAddress(settings.Address, settings.Name);
-            }
-            return new MailAddress(settings.Address);
         }
     }
 }

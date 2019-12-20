@@ -28,7 +28,7 @@ namespace Model.Validation
         [MethodImpl(MethodImplOptions.AggressiveInlining), DebuggerStepThrough]
         public static void NotDefault<T>(T value, string name)
         {
-            if (value == default)
+            if (value.Equals(default))
                 throw new ArgumentException($"Value cannot be default.{Environment.NewLine}Parameter name: {name}");
         }
 

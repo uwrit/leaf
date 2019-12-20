@@ -98,6 +98,8 @@ namespace Tests
 
             public string UUID => throw new NotImplementedException();
 
+            public string Identity => throw new NotImplementedException();
+
             public bool IsInstitutional { get; }
 
             public bool IsAdmin => throw new NotImplementedException();
