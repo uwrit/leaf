@@ -193,6 +193,18 @@ Pre-build this file can be found under `src/server/API/` relative to the Leaf gi
     - [Enabled](#enabled): `true`
     - [Email](#email): `"<your_support_email>.edu"`
     - [URI](#uri): `"https://<your_support_page>"`
+- [Notification](#notification)
+  - [Enabled](#enabled-2): `false`
+  - [Email](#email)
+    - [Server](#server): `"my.server.edu"`
+    - [UseSSL](#usessl): `true`
+    - [Sender](#sender)
+      - [Address](#address): `sender@u.edu`
+    - [Receiver](#receiver)
+      - [Address](#address-1): `receiver@u.edu`
+    - [Credentials](#credentials)
+      - [Username](#username): `LEAF_SMTP_USR` **optional**
+      - [Password](#password-1): `LEAF_SMTP_PW` **optional**
 
 ## Runtime
 Contains a mode field, indicating `FULL` or `GATEWAY`. Running Gateway mode is useful when participating in a mesh in an observer role, where the gateway instance has no data of it's own. 
@@ -395,6 +407,25 @@ Boolean value indicating whether to show the `Help` button. This must be `true` 
 Email address to direct user questions to, such as `<your_support_email>.edu`. Clicking `Contact a Leaf administrator` will direct users' default email client to draft a new email to this address.
 #### URI
 Similar to [Email](#email), but instead a URL to direct users to if clicked, such as a FAQ page. This will be clickable under `Learn more here`.
+## Notification
+### Enabled 
+Boolean value indicating whether to enable automatic sending of notification emails.
+### Email
+#### Server
+The SMTP server address from which to send emails from.
+#### UseSSL
+Boolean value indicating whether the Secure-Socket-Layer protocol should be used for sending emails.
+#### Sender
+##### Address
+The email address auto-generated emails should be sent from.
+#### Receiver
+##### Address
+The email address auto-generated emails should be sent to, typically an admin list-serv.
+#### Credentials
+##### Username
+`Optional` field that can be added if you wish to specify a username to authenticate with the SMTP server. If specified, the value should be `LEAF_SMTP_USR`, which is the name of the environment variable which will contain the username.
+##### Password
+`Optional` field that can be added if you wish to specify a password to authenticate with the SMTP server. If specified, the value should be `LEAF_SMTP_PW`, which is the name of the environment variable which will contain the actual password.
 
 ## Building the API
 There are a variety of ways to build the API, as the `dotnet` CLI tool supports both self-contained builds as well as runtime dependent targets. Although .NET Core is cross-platform, some targets have quirks that should be noted. If you're curious, you can review the [build.sh](https://github.com/uwrit/leaf/blob/master/build.sh) script in the project's root directory. Self-contained builds produce an executable and embed the entire .NET runtime in the build artifacts, resulting in a much larger deployment payload but removing the need to install the .NET Core runtime on your target machine. Conversely, runtime dependent builds assume that the .NET Core runtime will be installed on your target machine and only includes the application and its 3rd party dependencies in the artifact folder.
