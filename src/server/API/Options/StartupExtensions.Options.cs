@@ -217,8 +217,6 @@ namespace API.Options
             var notify = new NotificationOptions { Enabled = config.GetValue<bool>(Config.Notification.Enabled) };
             if (notify.Enabled)
             {
-                var hasSendName = config.TryGetValue(Config.Notification.Email.Sender.Name, out string sendName);
-                var hasRecName = config.TryGetValue(Config.Notification.Email.Receiver.Name, out string recName);
                 var hasPort = config.TryGetValue(Config.Notification.Email.Port, out int port);
                 var hasCred = config.TryGetValue(Config.Notification.Email.Credentials.Username, out string _);
 
@@ -227,14 +225,6 @@ namespace API.Options
                 notify.Smtp.Sender.Address = config.GetValue<string>(Config.Notification.Email.Sender.Address);
                 notify.Smtp.Receiver.Address = config.GetValue<string>(Config.Notification.Email.Receiver.Address);
 
-                if (hasSendName)
-                {
-                    notify.Smtp.Sender.Name = sendName;
-                }
-                if (hasRecName)
-                {
-                    notify.Smtp.Receiver.Name = recName;
-                }
                 if (hasPort)
                 {
                     notify.Smtp.Port = port;

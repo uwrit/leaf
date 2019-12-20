@@ -55,8 +55,8 @@ export const getIdToken = () => {
                 setTimeout(() => dispatch(setSessionLoadState('', 0)), 500);
             })
             .catch((reason) => {
-                const forbidden = reason.response.status === 403;
-                const errored = reason.response.status === 500;
+                const forbidden = reason.response && reason.response.status === 403;
+                const errored = reason.response && reason.response.status === 500;
                 const retry = attemptLoginRetryIfPossible();
                 console.log(reason);
                 if (retry) {
@@ -70,8 +70,8 @@ export const getIdToken = () => {
                 }
             });
         }, error => {
-            const forbidden = error.response.status === 403;
-            const errored = error.response.status === 500;
+            const forbidden = error.response && error.response.status === 403;
+            const errored = error.response && error.response.status === 500;
             const retry = attemptLoginRetryIfPossible();
             console.log(error);
             if (retry) {

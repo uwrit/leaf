@@ -58,7 +58,6 @@ namespace Model.Options
 
         public class MailAddress
         {
-            public string Name { get; set; }
             public string Address { get; set; }
         }
     }

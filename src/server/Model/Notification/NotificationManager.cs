@@ -52,8 +52,9 @@ namespace Model.Notification
                         </br>
                         This email is to notify you that user <b>{user.Identity}</b> ({inquiry.EmailAddress}) has asked the following question: </br>
                         </br>
-                        <span><strong>Request Type</strong>: {typeText}</span></br>
-                        <span><strong>Question</strong>: {inquiry.Text.Replace("\n", "</br>")}</span>
+                        <span><b>Request Type</b>: {typeText}</span></br>
+                        </br>
+                        <span>""{inquiry.Text.Replace("\n", "</br>")}""</span>
                     </body>
                 </html>";
 

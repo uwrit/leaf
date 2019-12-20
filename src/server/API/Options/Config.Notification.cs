@@ -20,13 +20,11 @@ namespace API.Options
 
                 public static class Sender
                 {
-                    public const string Name = @"Notification:Email:Sender:Name";
                     public const string Address = @"Notification:Email:Sender:Address";
                 }
 
                 public static class Receiver
                 {
-                    public const string Name = @"Notification:Email:Receiver:Name";
                     public const string Address = @"Notification:Email:Receiver:Address";
                 }
 
