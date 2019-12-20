@@ -67,7 +67,7 @@ def create_bootstrap(build_file: str, sa_pw: str):
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating bootstrap file...'))
     print('Licensing bootstrap file...')
-    apply_license_and_remove_script_date(build_file)
+    prep_file(build_file)
     print('Created bootstrap file...')
 
 
@@ -100,10 +100,10 @@ def create_data(data_file: str, sa_pw: str):
 
 
 def strip_script_date(contents: str):
-    return re.sub(REGEX_SCRIPT_DATE, '', contents)
+    return re.sub(REGEX_SCRIPT_DATE, ' ', contents)
 
 
-def apply_license_and_remove_script_date(fqp: str):
+def prep_file(fqp: str):
     with open(fqp, 'r') as reader:
         contents = reader.read().lstrip()
 
@@ -114,10 +114,10 @@ def apply_license_and_remove_script_date(fqp: str):
         writer.write(sql_license + strip_script_date(contents))
 
 
-def prepare_files(dir: str):
+def prep_files(dir: str):
     for fp in os.listdir(dir):
         fqp = os.path.join(dir, fp)
-        apply_license_and_remove_script_date(fqp)
+        prep_file(fqp)
 
 
 def create_source(per_file_dir: str, sa_pw: str):
@@ -135,7 +135,7 @@ def create_source(per_file_dir: str, sa_pw: str):
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating source files...'))
     print('Licensing source files...')
-    prepare_files(per_file_dir)
+    prep_files(per_file_dir)
     print('Created source files...')
 
 def run_subprocess(args):
