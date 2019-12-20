@@ -47,6 +47,10 @@ namespace Tests
 
             var pr = new PreflightResources(new QueryRef[] { first, second }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
+                DirectImportsCheck = new PreflightImports
+                {
+                    Results = new ImportPreflightCheckResult[] { }
+                },
                 DirectConceptsCheck = new PreflightConcepts
                 {
                     PreflightCheck = new ConceptPreflightCheck
@@ -160,6 +164,10 @@ namespace Tests
             var errorUid = ConceptUrn.From("urn:leaf:concept:diag:codeset=ICD9+code=123.42");
             var pr = new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
             {
+                DirectImportsCheck = new PreflightImports
+                {
+                    Results = new ImportPreflightCheckResult[] { }
+                },
                 DirectConceptsCheck = new PreflightConcepts
                 {
                     PreflightCheck = new ConceptPreflightCheck
@@ -451,6 +459,10 @@ namespace Tests
             {
                 new PreflightResources(new QueryRef[] { }, new ImportRef[] { }, new GlobalPanelFilter[] { })
                 {
+                    DirectImportsCheck = new PreflightImports
+                    {
+                        Results = new ImportPreflightCheckResult[] { }
+                    },
                     DirectConceptsCheck = new PreflightConcepts
                     {
                         PreflightCheck = new ConceptPreflightCheck
