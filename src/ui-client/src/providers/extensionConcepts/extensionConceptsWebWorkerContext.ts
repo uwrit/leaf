@@ -6,6 +6,7 @@
  */ 
 
 export const workerContext = `
+"use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -53,14 +54,20 @@ var getExtensionConcept = function (payload) {
  * Build the extension concept tree map.
  */
 var buildExtensionImportTree = function (payload) {
-    var requestId = payload.requestId, imports = payload.imports, savedQueries = payload.savedQueries;
-    var redcap = imports.filter(function (i) { return i.type === redcapImport; });
+    var requestId = payload.requestId, state = payload.state, imports = payload.imports, savedQueries = payload.savedQueries;
     conceptMap = new Map();
+    /*
+     * Add Saved query and MRN import concepts.
+     */
     buildSavedCohortTree(savedQueries);
-    if (redcap.length) {
+    /*
+     * Add REDCap import concepts.
+     */
+    if (state.redCap.enabled) {
+        var redcap = imports.filter(function (i) { return i.type === redcapImport; });
         buildRedcapImportTree(redcap);
     }
-    var roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
+    var roots = [ ...conceptMap.values() ].filter(c => c.isRoot);
     return { requestId: requestId, result: roots };
 };
 /*
@@ -68,7 +75,7 @@ var buildExtensionImportTree = function (payload) {
  */
 var buildRedcapImportTree = function (redcapImports) {
     var rootId = "urn:leaf:import:redcap:root";
-    var root = __assign(__assign({}, getEmptyConcept()), { id: rootId, universalId: rootId, isParent: true, childrenOnDrop: [], uiDisplayName: 'REDCap Imports' });
+    var root = __assign(__assign({}, getEmptyConcept()), { id: rootId, universalId: rootId, isParent: true, isRoot: true, childrenOnDrop: [], uiDisplayName: 'REDCap Imports' });
     for (var i = 0; i < redcapImports.length; i++) {
         var impt = redcapImports[i];
         var struct = impt.structure;
@@ -176,6 +183,7 @@ var getRootConcept = function (children, directChildrenIds, rootId) {
     concept.id = rootId;
     concept.universalId = rootId;
     concept.rootId = rootId;
+    concept.isRoot = true;
     concept.uiDisplayName = 'My Saved Cohorts';
     concept.childrenOnDrop = children;
     return concept;

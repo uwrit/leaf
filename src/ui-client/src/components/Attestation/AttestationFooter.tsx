@@ -45,7 +45,7 @@ export default class AttestationFooter extends React.PureComponent<Props,State> 
                     <span>Great! Please cite this manuscript to ensure we can continue making Leaf even better:</span>
                 </div>
                 <div className={`${c}-manuscript`}>
-                    <a href='https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocz165/5583724' target='_'>
+                    <a href='https://academic.oup.com/jamia/article/27/1/109/5583724' target='_'>
                         <span className={`${c}-manuscript-authors`}>
                             Nicholas J Dobbins, Clifford H Spital, Robert A Black, Jason M Morrison, Bas de Veer, Elizabeth Zampino, Robert D Harrington, 
                             Bethene D Britt, Kari A Stephens, Adam B Wilcox, Peter Tarczy-Hornoch, Sean D Mooney.

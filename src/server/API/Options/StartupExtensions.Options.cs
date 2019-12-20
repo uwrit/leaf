@@ -41,16 +41,6 @@ namespace API.Options
             // Compiler options
             services.ConfigureCompilerOptions(configuration);
 
-            // Client options
-            services.Configure<ClientOptions>(opts =>
-            {
-                opts.Map.Enabled = configuration.GetValue<bool>(Config.Client.Map.Enabled);
-                opts.Map.TileURI = configuration.GetValue<string>(Config.Client.Map.TileURI);
-                opts.Help.Enabled = configuration.GetValue<bool>(Config.Client.Help.Enabled);
-                opts.Help.Email = configuration.GetValue<string>(Config.Client.Help.Email);
-                opts.Help.URI = configuration.GetValue<string>(Config.Client.Help.URI);
-            });
-
             // Export Options
             services.ConfigureExportOptions(configuration);
 
@@ -74,6 +64,20 @@ namespace API.Options
 
             // Jwt Options
             services.ConfigureJwtOptions(configuration);
+
+            // Notification Options
+            services.ConfigureNotificationOptions(configuration);
+
+            // Client options
+            services.Configure<ClientOptions>(opts =>
+            {
+                opts.Map.Enabled = configuration.GetValue<bool>(Config.Client.Map.Enabled);
+                opts.Map.TileURI = configuration.GetValue<string>(Config.Client.Map.TileURI);
+                opts.Help.Enabled = configuration.GetValue<bool>(Config.Client.Help.Enabled);
+                opts.Help.AutoSend = configuration.GetValue<bool>(Config.Notification.Enabled);
+                opts.Help.Email = configuration.GetValue<string>(Config.Client.Help.Email);
+                opts.Help.URI = configuration.GetValue<string>(Config.Client.Help.URI);
+            });
 
             return services;
         }
@@ -204,6 +208,39 @@ namespace API.Options
             {
                 opts.REDCap = rc;
             });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureNotificationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var notify = new NotificationOptions { Enabled = config.GetValue<bool>(Config.Notification.Enabled) };
+            if (notify.Enabled)
+            {
+                var hasPort = config.TryGetValue(Config.Notification.Email.Port, out int port);
+                var hasCred = config.TryGetValue(Config.Notification.Email.Credentials.Username, out string _);
+
+                notify.Smtp.UseSSL = config.GetValue<bool>(Config.Notification.Email.UseSSL);
+                notify.Smtp.Server = config.GetValue<string>(Config.Notification.Email.Server);
+                notify.Smtp.Sender.Address = config.GetValue<string>(Config.Notification.Email.Sender.Address);
+                notify.Smtp.Receiver.Address = config.GetValue<string>(Config.Notification.Email.Receiver.Address);
+
+                if (hasPort)
+                {
+                    notify.Smtp.Port = port;
+                }
+                if (hasCred)
+                {
+                    notify.Smtp.Credentials.Username = config.GetByProxy(Config.Notification.Email.Credentials.Username);
+                    notify.Smtp.Credentials.Password = config.GetByProxy(Config.Notification.Email.Credentials.Password);
+                }
+
+                services.Configure<NotificationOptions>(opts =>
+                {
+                    opts.Enabled = notify.Enabled;
+                    opts.Smtp = notify.Smtp;
+                });
+            }
 
             return services;
         }

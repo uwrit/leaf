@@ -19,7 +19,7 @@ import { requestRootConcepts, setExtensionRootConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { showConfirmationModal } from '../actions/generalUi';
+import { showConfirmationModal, setUserInquiryState } from '../actions/generalUi';
 import { getSavedQueries, getExtensionRootConcepts } from '../services/queryApi';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
@@ -30,10 +30,8 @@ import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
-import { setImportOptions, setImportsMetadata } from './dataImport';
-import { getAllMetdata } from '../services/dataImport';
+import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
-import { ImportMetadata } from '../models/dataImport/ImportMetadata';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -65,6 +63,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(submitAttestation(attestation));
             const ctx = await getSessionTokenAndContext(getState(), attestation) as SessionContext;
             dispatch(setSessionContext(ctx));
+            dispatch(setUserInquiryState({ email: getState().auth.userContext!.name, show: false }))
 
             /* 
              * Get home node identity.
@@ -120,21 +119,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(addSavedQueries(savedCohorts));
 
             /*
-             * Load imported metadata.
+             * Load extension concepts.
              */
-            let imports: ImportMetadata[] = [];
-            if (importOpts.redCap.enabled) {
-                dispatch(setSessionLoadState('Loading Imported REDCap projects', 70));
-                imports = await getAllMetdata(getState());
-            }
-            const extensionConcepts = await getExtensionRootConcepts(imports, savedCohorts);
+            dispatch(setSessionLoadState('Loading Extension Concepts', 80));
+            const extensionConcepts = await getExtensionRootConcepts(getState().dataImport, [], savedCohorts);
             dispatch(setExtensionRootConcepts(extensionConcepts));
-            dispatch(setImportsMetadata(imports));
 
             /* 
              * Initiliaze web worker search.
              */
-            dispatch(setSessionLoadState('Initializing Search Engine', 90));
+            dispatch(setSessionLoadState('Initializing Search Engine', 100));
             await initializeSearchEngine(dispatch, getState);
 
             /* 

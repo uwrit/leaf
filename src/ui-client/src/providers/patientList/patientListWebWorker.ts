@@ -293,7 +293,6 @@ export default class PatientListWebWorker {
                         row[f] = new Date(v);
                     }
                 }
-
                 patientData.set(def!.id, new Map(Object.entries(row)));
             }
             return def;
@@ -367,6 +366,7 @@ export default class PatientListWebWorker {
             const { datasetDefinition, demographics, responderId, requestId } = payload;
 
             if (!demographics!.length) { return { requestId }; }
+            const dateFields: PatientListColumn[] = [ ...datasetDefinition!.columns.values() ].filter((c) => c.type === typeDate);
             
             // For each patient
             for (let i = 0; i < demographics!.length; i++) {
@@ -380,6 +380,14 @@ export default class PatientListWebWorker {
                     multirowData: new Map<PatientListDatasetId, PatientListRowDTO[]>(),
                     responderId: responderId!,
                     singletonData: new Map<PatientListDatasetId, ValueByColumnKey>()
+                }
+
+                // Convert dates if applicable
+                for (let j = 0; j < dateFields.length; j++) {
+                    const col = dateFields[j];
+                    if (patientDto[col.id]) {
+                        patientDto[col.id] = new Date(patientDto[col.id]);
+                    }
                 }
 
                 // Add to the patId arrays

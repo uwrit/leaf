@@ -50,7 +50,7 @@ namespace Services.Search
 
                 var dependents = await cn.QueryAsync<QueryDependentRecord>(
                         deleteQuery,
-                        new { uid = uid.ToString(), force, user = user.UUID },
+                        new { uid = uid.ToString(), force, user = user.UUID, admin = user.IsAdmin },
                         commandType: CommandType.StoredProcedure,
                         commandTimeout: dbOpts.DefaultTimeout
                     );
@@ -97,7 +97,7 @@ namespace Services.Search
 
                 var r = await cn.QueryFirstOrDefaultAsync<QueryRecord>(
                     queryQueryByUId,
-                    new { uid = uid.ToString(), user = user.UUID, groups = GroupMembership.From(user) },
+                    new { uid = uid.ToString(), user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOpts.DefaultTimeout
                 );
@@ -172,7 +172,8 @@ namespace Services.Search
                         conceptids = ResourceIdTable.From(conceptids),
                         queryids = ResourceIdTable.From(queryids),
                         definition = query.Definition,
-                        user = user.UUID
+                        user = user.UUID,
+                        admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOpts.DefaultTimeout

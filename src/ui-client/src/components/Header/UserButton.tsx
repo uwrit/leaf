@@ -7,17 +7,20 @@
 
 import React from 'react';
 import { NavItem } from 'reactstrap';
-import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon } from 'react-icons/fi';
+import { FiUser, FiUserCheck, FiShield, FiGlobe, FiAlertOctagon, FiUsers, FiHelpCircle } from 'react-icons/fi';
 import { FaChevronDown, FaStar, FaDoorOpen } from 'react-icons/fa';
 import { UserContext } from '../../models/Auth';
 import ImportState from '../../models/state/Import';
+import { MyLeafTabType } from '../../models/state/GeneralUiState';
+import { AuthorizationState } from '../../models/state/AppState';
 
 interface Props {
+    auth?: AuthorizationState;
     federated: boolean;
+    helpClickHandler: () => any;
     imports: ImportState;
     logoutClickHandler: () => any;
-    mySavedQueriesClickHandler: () => any;
-    redcapImportClickHandler: () => any;
+    myLeafModalToggleHandler: (tab: MyLeafTabType) => any;
     user: UserContext;
 }
 
@@ -26,7 +29,7 @@ export default class UserButton extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { federated, imports, logoutClickHandler, mySavedQueriesClickHandler, redcapImportClickHandler, user } = this.props;
+        const { auth, federated, imports, helpClickHandler, logoutClickHandler, myLeafModalToggleHandler, user } = this.props;
         const username = user ? user.name : '';
 
         return (
@@ -87,19 +90,39 @@ export default class UserButton extends React.PureComponent<Props> {
 
                         </div>}
 
-                        <div className={`${c}-option`} onClick={mySavedQueriesClickHandler}>
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.SavedQueries)}>
                             <FaStar className="myleaf-menu-icon myleaf-menu-icon-savedqueries" />
-                            <span>My Saved Queries</span>
+                            <span>Saved Queries</span>
                         </div>
 
-                        {imports.redCap.enabled && 
-                        <div className={`${c}-option`} onClick={redcapImportClickHandler}>
-                            <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
-                            <span>My REDCap Imports</span>
+                        {user && user.isAdmin &&
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.AdminUserQuery)}>
+                            <FiUsers className="myleaf-menu-icon myleaf-menu-icon-usersavedqueries" />
+                            <span>User Saved Queries</span>
                         </div>
                         }
 
-                        <div className={`${c}-option`} onClick={logoutClickHandler}>
+                        {imports.redCap.enabled && 
+                        <div className={`${c}-option`} onClick={myLeafModalToggleHandler.bind(null, MyLeafTabType.REDCapImport)}>
+                            <img alt='redcap-logo' className={`${c}-icon-redcap`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
+                            <span>REDCap Imports</span>
+                        </div>
+                        }
+
+                        {auth && auth.config && auth.config.client.help.autoSend &&
+                        [
+                            <div key={1} className={`${c}-option-divider`} />,
+
+                            <div key={2} className={`${c}-option ${c}-option-help`} onClick={helpClickHandler}>
+                                <FiHelpCircle className="myleaf-menu-icon myleaf-menu-icon-help" />
+                                <span>Get Help</span>
+                            </div>
+                        ]
+                        }
+
+                        <div className={`${c}-option-divider`} />
+
+                        <div className={`${c}-option ${c}-option-logout`} onClick={logoutClickHandler}>
                             <FaDoorOpen className="myleaf-menu-icon myleaf-menu-icon-logout" />
                             <span>Log Out</span>
                         </div>

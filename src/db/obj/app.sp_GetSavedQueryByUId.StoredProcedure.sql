@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: 11/4/2019 11:22:23 AM ******/
+/****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2018/10/29
@@ -19,7 +18,8 @@ GO
 CREATE PROCEDURE [app].[sp_GetSavedQueryByUId]
     @uid app.UniversalId,
     @user auth.[User],
-    @groups auth.GroupMembership READONLY
+    @groups auth.GroupMembership READONLY,
+	@admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -59,38 +59,56 @@ BEGIN
         RETURN;
     END;
 
-    -- permission filter
-    WITH permitted AS (
-        -- user based constraint
-        SELECT
-            QueryId
-        FROM auth.QueryConstraint
-        WHERE QueryId = @id
-        AND ConstraintId = 1
-        AND ConstraintValue = @user
-        UNION
-        -- group base constraint
-        SELECT
-            QueryId
-        FROM auth.QueryConstraint
-        WHERE QueryId = @id
-        AND ConstraintId = 2
-        AND ConstraintValue IN (SELECT [Group] FROM @groups)
-    )
-    INSERT INTO @result (Id, UniversalId, [Name], [Category], [Owner], Created, Updated, [Definition])
-    SELECT
-        q.Id,
-        q.UniversalId,
-        q.[Name],
-        q.[Category],
-        q.[Owner],
-        q.Created,
-        q.Updated,
-        d.[Definition]
-    FROM app.Query q
-    JOIN app.QueryDefinition d on q.Id = d.QueryId
-    WHERE (q.[Owner] = @user OR q.Id IN (SELECT Id FROM permitted))
-		  AND q.UniversalId = @uid;
+	-- Admin can access any query
+	IF (@admin = 1)
+		INSERT INTO @result (Id, UniversalId, [Name], [Category], [Owner], Created, Updated, [Definition])
+		SELECT
+			q.Id,
+			q.UniversalId,
+			q.[Name],
+			q.[Category],
+			q.[Owner],
+			q.Created,
+			q.Updated,
+			d.[Definition]
+		FROM app.Query q
+		JOIN app.QueryDefinition d on q.Id = d.QueryId
+		WHERE q.UniversalId = @uid;
+	ELSE
+		BEGIN
+			-- permission filter
+			WITH permitted AS (
+				-- user based constraint
+				SELECT
+					QueryId
+				FROM auth.QueryConstraint
+				WHERE QueryId = @id
+				AND ConstraintId = 1
+				AND ConstraintValue = @user
+				UNION
+				-- group base constraint
+				SELECT
+					QueryId
+				FROM auth.QueryConstraint
+				WHERE QueryId = @id
+				AND ConstraintId = 2
+				AND ConstraintValue IN (SELECT [Group] FROM @groups)
+			)
+			INSERT INTO @result (Id, UniversalId, [Name], [Category], [Owner], Created, Updated, [Definition])
+			SELECT
+				q.Id,
+				q.UniversalId,
+				q.[Name],
+				q.[Category],
+				q.[Owner],
+				q.Created,
+				q.Updated,
+				d.[Definition]
+			FROM app.Query q
+			JOIN app.QueryDefinition d on q.Id = d.QueryId
+			WHERE (q.[Owner] = @user OR q.Id IN (SELECT Id FROM permitted))
+				  AND q.UniversalId = @uid;
+		END
 
     -- did not pass filter
     IF (SELECT COUNT(*) FROM @result) < 1
@@ -125,16 +143,5 @@ BEGIN
         [Count]
     FROM @result;
 END
-
-
-
-
-
-
-
-
-
-
-
 
 GO

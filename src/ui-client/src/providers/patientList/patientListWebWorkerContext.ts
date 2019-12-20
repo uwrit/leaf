@@ -189,6 +189,7 @@ var addDemographics = function (payload) {
     if (!demographics.length) {
         return { requestId: requestId };
     }
+    var dateFields = [ ...datasetDefinition.columns.values() ].filter((c) => c.type === typeDate);
     // For each patient
     for (var i = 0; i < demographics.length; i++) {
         // Add compound and responder ids
@@ -202,6 +203,13 @@ var addDemographics = function (payload) {
             responderId: responderId,
             singletonData: new Map()
         };
+        // Convert dates if applicable
+        for (let j = 0; j < dateFields.length; j++) {
+            const col = dateFields[j];
+            if (patientDto[col.id]) {
+                patientDto[col.id] = new Date(patientDto[col.id]);
+            }
+        }
         // Add to the patId arrays
         defaultPatientOrder.push(patient.compoundId);
         currentPatientOrder.push(patient.compoundId);

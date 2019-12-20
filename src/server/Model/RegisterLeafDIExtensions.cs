@@ -9,8 +9,11 @@ using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
 using Model.Import;
+using Model.Notification;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
+using Model.Admin.Query;
+using Model.Admin.User;
 
 namespace Model
 {
@@ -35,6 +38,7 @@ namespace Model
             services.AddTransient<PreflightResourceChecker>();
             services.AddTransient<DatasetQueryProvider>();
             services.AddTransient<DataImporter>();
+            services.AddTransient<NotificationManager>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();
@@ -47,6 +51,8 @@ namespace Model
             services.AddTransient<AdminDemographicsManager>();
             services.AddTransient<AdminPanelFilterManager>();
             services.AddTransient<AdminGlobalPanelFilterManager>();
+            services.AddTransient<AdminQueryManager>();
+            services.AddTransient<AdminUserManager>();
 
             return services;
         }

@@ -43,6 +43,7 @@ interface MapOptions {
 
 interface HelpOptions {
     enabled: boolean;
+    autoSend: boolean;
     email?: string;
     uri?: string;
 }

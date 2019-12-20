@@ -49,6 +49,7 @@ export interface ImportOptionsDTO {
 
 export default interface ImportState {
     enabled: boolean;
+    loaded: boolean;
     imports: Map<string, ImportMetadata>;
     isComplete: boolean;
     isErrored: boolean;

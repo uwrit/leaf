@@ -16,6 +16,7 @@
     <Folder Include="Search\" />
     <Folder Include="Error\" />
     <Folder Include="Admin\Network\" />
+    <Folder Include="Notification\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.0.0" />

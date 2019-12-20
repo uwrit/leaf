@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveInitial]    Script Date: 11/4/2019 11:22:23 AM ******/
+/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveInitial]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/1/9
@@ -34,6 +33,7 @@ BEGIN
     UPDATE app.Query
     SET
         Nonce = NULL,
+		[Owner] = @user,
         [Name] = @name,
         Category = @category,
         UniversalId = @urn,
@@ -55,12 +55,5 @@ BEGIN
     FROM @queryids;
 
 END
-
-
-
-
-
-
-
 
 GO

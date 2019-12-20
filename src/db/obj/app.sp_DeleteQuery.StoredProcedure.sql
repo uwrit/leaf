@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: 11/4/2019 11:22:23 AM ******/
+/****** Object:  StoredProcedure [app].[sp_DeleteQuery]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/3/6
@@ -19,7 +18,8 @@ GO
 CREATE PROCEDURE [app].[sp_DeleteQuery]
     @uid app.UniversalId,
     @force bit,
-    @user auth.[User]
+    @user auth.[User],
+	@admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -33,7 +33,7 @@ BEGIN
         THROW 70404, @404msg, 1;
     END;
 
-    IF (@owner != @user)
+    IF (@owner != @user AND @admin = 0)
     BEGIN;
         DECLARE @403msg1 nvarchar(400) = @user + N' does not own query ' + @uid;
         THROW 70403, @403msg1, 1;
@@ -155,8 +155,5 @@ BEGIN
     FROM @dependentRefs
     WHERE 0 = 1;
 END
-
-
-
 
 GO

@@ -17,6 +17,7 @@ namespace Model.Authorization
         string[] Groups { get; }
         string[] Roles { get; }
         string Issuer { get; }
+        string Identity { get; }
         string UUID { get; }
         bool IsInstitutional { get; }
         bool IsAdmin { get; }

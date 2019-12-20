@@ -34,8 +34,6 @@ enum DateInputType {
     End = 2
 }
 
-
-
 export default class CustomDateRangePicker extends React.PureComponent<Props, State> {
     private className = 'panel-custom-date-range';
     private noDateFilter: DateFilter = { dateIncrementType: DateIncrementType.NONE, increment: 0 };
@@ -72,7 +70,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
                     <div className={`${c}-body`}>
 
                         {/* Start date */}
-                        <div className={startDateClasses} id={`${c}-input-container-start${panel.index}`}>
+                        <div className={startDateClasses} id={`${c}-input-container-start${panel.index}`} onKeyDown={this.handleSearchKeydown}>
                             <DayPickerInput
                                 formatDate={this.formatDate}
                                 format={this.dateFormat}
@@ -88,7 +86,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
                         <span>to</span>
 
                         {/* End date */}
-                        <div className={endDateClasses} id={`${c}-input-container-end${panel.index}`}>
+                        <div className={endDateClasses} id={`${c}-input-container-end${panel.index}`} onKeyDown={this.handleSearchKeydown}>
                             <DayPickerInput
                                 format={this.dateFormat}
                                 value={endDateInput}
@@ -272,5 +270,15 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
             clearTimeout(this.focusPoller);
         }
         toggleCustomDateRangeBox(false);
+    }
+
+    /*
+     * Handle keydown, basically looking for 'Enter' presses, which
+     * dismisses the modal.
+     */
+    private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
+        if (k.key === 'Enter') {
+            this.closeCustomDateRangeBox();
+        }
     }
 }

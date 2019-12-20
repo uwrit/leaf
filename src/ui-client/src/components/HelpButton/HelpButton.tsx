@@ -6,12 +6,14 @@
  */ 
 
 import React from 'react';
+import { setUserInquiryState } from '../../actions/generalUi';
 import { AuthorizationState } from '../../models/state/AppState';
 import { MdTagFaces } from 'react-icons/md';
 import './HelpButton.css';
 
 interface Props {
     auth?: AuthorizationState;
+    dispatch: any;
 }
 
 export default class HelpButton extends React.PureComponent<Props> {
@@ -33,7 +35,12 @@ export default class HelpButton extends React.PureComponent<Props> {
                     <div className={`${c}-inner`}>
                         {!!help.email &&
                             <div className={`${c}-contact`}>
-                                <a href={`mailto:${help.email}`}>Contact a Leaf administrator</a>
+                                <a 
+                                    href={!help.autoSend ? `mailto:${help.email}` : undefined}
+                                    onClick={help.autoSend ? this.handleContactAdminClick : undefined}
+                                    >
+                                    Contact a Leaf administrator
+                                </a>
                                 {!!help.uri && 
                                 [
                                     <span key={1}> or </span>,
@@ -49,5 +56,10 @@ export default class HelpButton extends React.PureComponent<Props> {
                 </div>
             </div>
         )
+    }
+
+    private handleContactAdminClick = () => {
+        const { dispatch } = this.props;
+        dispatch(setUserInquiryState({ show: true, text: '' }));
     }
 }

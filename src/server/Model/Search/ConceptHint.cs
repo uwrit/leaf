@@ -12,5 +12,10 @@ namespace Model.Search
     {
         public Guid ConceptId { get; set; }
         public IEnumerable<string> Tokens { get; set; }
+
+        public override string ToString()
+        {
+            return ConceptId.ToString();
+        }
     }
 }

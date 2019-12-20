@@ -55,9 +55,18 @@ namespace Services.Tables
                 var row = table.NewRow();
                 row[conceptId] = cid;
                 row[specializationGroupId] = r.SpecializationGroupId;
-                row[orderId] = r.OrderId;
+                row[orderId] = ValueElseDBNull(r.OrderId);
                 table.Rows.Add(row);
             }
+        }
+
+        object ValueElseDBNull(object val)
+        {
+            if (val == null)
+            {
+                return DBNull.Value;
+            }
+            return val;
         }
 
         public static DataTable From(Guid conceptId, IEnumerable<SpecializationGroupRelationship> relas)

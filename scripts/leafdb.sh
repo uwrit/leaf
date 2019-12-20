@@ -2,6 +2,7 @@
 # Script to fully dump out LeafDB schema objects, initialization data, and executables.
 
 import os
+import re
 from argparse import ArgumentParser, Namespace
 from subprocess import Popen, PIPE
 
@@ -10,6 +11,8 @@ BUILD_FILE = 'BUILD_FILE'
 DATA_FILE = 'DATA_FILE'
 PER_FILE_DIR = 'PER_FILE_DIR'
 SCHEMA_FILE = 'SCHEMA_FILE'
+
+REGEX_SCRIPT_DATE = r'(?<=Script Date:)(.*)(?=\*\*\*\*\*\*/)'
 
 sql_license = '''-- Copyright (c) 2019, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
@@ -64,7 +67,7 @@ def create_bootstrap(build_file: str, sa_pw: str):
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating bootstrap file...'))
     print('Licensing bootstrap file...')
-    apply_license_to_file(build_file)
+    prep_file(build_file)
     print('Created bootstrap file...')
 
 
@@ -77,7 +80,7 @@ def create_schema(schema_file: str, build_file: str):
             if use == -1:
                 print('WARNING: "USE [LeafDB]" not found, did something change?')
                 use = 0
-            writer.write(sql_license + content[use:])
+            writer.write(sql_license + strip_script_date(content[use:]))
     print('Created schema file...')
 
 
@@ -96,7 +99,11 @@ def create_data(data_file: str, sa_pw: str):
     print('Created data file...')
 
 
-def apply_license_to_file(fqp: str):
+def strip_script_date(contents: str):
+    return re.sub(REGEX_SCRIPT_DATE, ' ', contents)
+
+
+def prep_file(fqp: str):
     with open(fqp, 'r') as reader:
         contents = reader.read().lstrip()
 
@@ -104,13 +111,13 @@ def apply_license_to_file(fqp: str):
         return
 
     with open(fqp, 'w') as writer:
-        writer.write(sql_license + contents)
+        writer.write(sql_license + strip_script_date(contents))
 
 
-def apply_license(dir: str):
+def prep_files(dir: str):
     for fp in os.listdir(dir):
         fqp = os.path.join(dir, fp)
-        apply_license_to_file(fqp)
+        prep_file(fqp)
 
 
 def create_source(per_file_dir: str, sa_pw: str):
@@ -128,7 +135,7 @@ def create_source(per_file_dir: str, sa_pw: str):
         raise Exception(report_error(p.stdout.read(),
                                      'Error creating source files...'))
     print('Licensing source files...')
-    apply_license(per_file_dir)
+    prep_files(per_file_dir)
     print('Created source files...')
 
 def run_subprocess(args):

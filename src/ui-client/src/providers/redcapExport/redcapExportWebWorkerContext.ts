@@ -297,6 +297,17 @@ var capitalize = function (colName) {
     return colName.charAt(0).toUpperCase() + colName.slice(1).trim();
 };
 var toREDCapDate = function (date) {
+    if (!date) {
+        return '';
+    /*
+     * Shouldn't happen but sanity check just in case it's a string.
+     */ 
+    } else if (typeof date === 'string') {
+        date = new Date(date)
+        if (isNaN(date.getTime())) {
+            return '';
+        }
+    }
     var hours = date.getHours();
     var minutes = date.getMinutes();
     var strMinutes = minutes < 10 ? '0' + minutes : minutes;

@@ -10,6 +10,7 @@ import { SavedQueryRef } from '../../models/Query';
 import { Concept } from '../../models/concept/Concept';
 import { workerContext } from './extensionConceptsWebWorkerContext';
 import { ImportMetadata, ImportType, REDCapImportStructure } from '../../models/dataImport/ImportMetadata';
+import ImportState from '../../models/state/Import';
 
 const ADD_SAVED_COHORT = 'ADD_SAVED_COHORT';
 const SEARCH_SAVED_COHORTS = 'SEARCH_SAVED_COHORTS';
@@ -31,6 +32,7 @@ interface InboundMessagePartialPayload {
     rootId?: string;
     roots?: string[];
     searchString?: string;
+    state?: ImportState;
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -72,8 +74,8 @@ export default class ExtensionConceptsWebWorker {
         this.worker.onerror = error => { console.log(error); this.reject(error) };
     }
 
-    public buildExtensionImportTree = (imports: ImportMetadata[], savedQueries: SavedQueryRef[]) => {
-        return this.postMessage({ message: BUILD_EXTENSION_TREE, imports, savedQueries })
+    public buildExtensionImportTree = (state: ImportState, imports: ImportMetadata[], savedQueries: SavedQueryRef[]) => {
+        return this.postMessage({ message: BUILD_EXTENSION_TREE, state, imports, savedQueries })
     }
 
     public searchSavedCohorts = (searchString: string) => {
@@ -151,14 +153,22 @@ export default class ExtensionConceptsWebWorker {
          * Build the extension concept tree map.
          */
         const buildExtensionImportTree = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, imports, savedQueries } = payload;
-            const redcap = imports!.filter(i => i.type === redcapImport);
+            const { requestId, state, imports, savedQueries } = payload;
             conceptMap = new Map();
+
+            /*
+             * Add Saved query and MRN import concepts.
+             */
             buildSavedCohortTree(savedQueries!);
-            if (redcap.length) {
+
+            /*
+             * Add REDCap import concepts.
+             */
+            if (state!.redCap.enabled) {
+                const redcap = imports!.filter(i => i.type === redcapImport);
                 buildRedcapImportTree(redcap);
             }
-            const roots = [ ...conceptMap.values() ].filter(c => c.id.endsWith('root'));
+            const roots = [ ...conceptMap.values() ].filter(c => c.isRoot);
 
             return { requestId, result: roots }
         };
@@ -173,6 +183,7 @@ export default class ExtensionConceptsWebWorker {
                 id: rootId,
                 universalId: rootId,
                 isParent: true,
+                isRoot: true,
                 childrenOnDrop: [],
                 uiDisplayName: 'REDCap Imports'
             };
@@ -293,6 +304,7 @@ export default class ExtensionConceptsWebWorker {
             concept.id = rootId;
             concept.universalId = rootId;
             concept.rootId = rootId;
+            concept.isRoot = true;
             concept.uiDisplayName = 'My Saved Cohorts';
             concept.childrenOnDrop = children;
             return concept;

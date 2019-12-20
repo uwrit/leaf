@@ -19,6 +19,11 @@
     display: block;
 }
 
+.leaf-progressbar.slow {
+    transition: width 3s;
+}
+
+
 .leaf-progressbar.animatez {
     animation-name: moving-gradient;
     animation-duration: 2s;

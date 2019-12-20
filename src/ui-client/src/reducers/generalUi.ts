@@ -23,7 +23,8 @@ import {
     CONFIRM_MODAL_HIDE,
     NOCLICK_MODAL_SET_STATE,
     SIDE_NOTIFICATION_SET_STATE,
-    SET_MYLEAF_TAB
+    SET_MYLEAF_TAB,
+    SET_USER_QUESTION_STATE
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -39,7 +40,7 @@ import {
     SELECT_CONCEPT_SPECIALIZATION,
     DESELECT_CONCEPT_SPECIALIZATION
  } from '../actions/panels';
-import { GeneralUiState, Routes, NotificationStates, MyLeafTabType } from '../models/state/GeneralUiState';
+import { GeneralUiState, Routes, NotificationStates, MyLeafTabType, UserInquiryType } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
 import { IMPORT_TOGGLE_MRN_MODAL, IMPORT_TOGGLE_REDCAP_MODAL } from '../actions/dataImport';
 
@@ -78,6 +79,12 @@ export const defaultGeneralUiState = (): GeneralUiState => {
         showSaveQueryPane: false,
         sideNotification: {
             state: NotificationStates.Hidden
+        },
+        userQuestion: {
+            email: '',
+            show: false,
+            type: UserInquiryType.HelpMakingQuery,
+            text: ''
         }
     };
 };
@@ -91,8 +98,6 @@ const setCohortCountBoxState = (state: GeneralUiState, boxVisible: boolean, boxM
         }
     });
 };
-
-
 
 export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), action: GeneralUiAction): GeneralUiState => {
 
@@ -137,6 +142,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { sideNotification: { ...state.sideNotification, ...action.sideNotification! } });
         case SET_BROWSER:
             return Object.assign({}, state, { browser: action.browser! });
+        case SET_USER_QUESTION_STATE:
+            return Object.assign({}, state, { userQuestion: { ...state.userQuestion, ...action.userInquiry } });
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:

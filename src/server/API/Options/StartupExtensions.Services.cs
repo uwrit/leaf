@@ -16,6 +16,8 @@ using Microsoft.Extensions.Options;
 using Model;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
+using Model.Admin.Query;
+using Model.Admin.User;
 using Model.Authentication;
 using Model.Authorization;
 using Model.Cohort;
@@ -26,8 +28,11 @@ using Model.Network;
 using Model.Options;
 using Model.Search;
 using Model.Import;
+using Model.Notification;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
+using Services.Admin.Query;
+using Services.Admin.User;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
@@ -35,6 +40,7 @@ using Services.Export;
 using Services.Network;
 using Services.Search;
 using Services.Import;
+using Services.Notification;
 
 namespace API.Options
 {
@@ -81,28 +87,22 @@ namespace API.Options
             }
 
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
-
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
-
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
-
             services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
-
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
             services.AddTransient<DemographicProvider.IDemographicsExecutor, DemographicsExecutor>();
-
             services.AddTransient<IDatasetSqlCompiler, DatasetSqlCompiler>();
             services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryFetcher, DatasetQueryFetcher>();
             services.AddTransient<DatasetProvider.IDatasetExecutor, DatasetExecutor>();
-
             services.AddTransient<IQueryService, QueryService>();
-
             services.AddTransient<DataImporter.IImportService, ImportService>();
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
+            services.AddTransient<NotificationManager.INotificationService, SmtpService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();
@@ -123,6 +123,8 @@ namespace API.Options
             services.AddTransient<AdminDemographicsManager.IAdminDemographicQueryService, AdminDemographicQueryService>();
             services.AddTransient<AdminPanelFilterManager.IAdminPanelFilterService, AdminPanelFilterService>();
             services.AddTransient<AdminGlobalPanelFilterManager.IAdminGlobalPanelFilterService, AdminGlobalPanelFilterService>();
+            services.AddTransient<AdminQueryManager.IAdminQueryService, AdminQueryService>();
+            services.AddTransient<AdminUserManager.IAdminUserService, AdminUserService>();
 
             return services;
         }

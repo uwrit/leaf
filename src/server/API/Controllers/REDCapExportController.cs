@@ -38,6 +38,7 @@ namespace API.Controllers
         {
             try
             {
+                log.LogInformation("Getting REDCap version");
                 var version = await exportService.GetREDCapVersion();
                 return Ok(version);
             }
@@ -57,6 +58,7 @@ namespace API.Controllers
         {
             try
             {
+                log.LogInformation("Creating REDCap Project. Project:{Project}", project);
                 var token = await exportService.CreateProject(project);
                 return Ok(token);
             }

@@ -1,0 +1,166 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.user-question-modal.modal-dialog {
+    margin-top: 10px !important;
+    min-width: 975px !important;
+    width: 75% !important;
+}
+
+.user-question-modal .modal-body {
+    height: 640px;
+}
+
+.user-question-modal .modal-footer {
+    justify-content: space-between;
+}
+
+.user-question-modal-close {
+    cursor: pointer;
+    margin-right: 10px;
+    position: absolute;
+    right: 0;
+}
+
+.user-question-modal .form-group > label {
+    font-weight: 500;
+}
+
+.user-question-modal .required {
+    color: rgba(221, 41, 28, 0.699);
+    margin-left: 4px;
+}
+
+.user-question-modal small {
+    color: rgb(150,150,150);
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+    margin: 0 0 2px;
+}
+
+.user-question-modal-section {
+    background-color: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 4px;
+    margin: 5px 0;
+    padding: 10px;
+}
+
+.user-question-modal-section-divider {
+    height: 1px;
+    margin: 20px 0;
+}
+
+/* Question */
+.user-question-modal-question textarea {
+    border: 2px solid rgba(28, 168, 221, 0.2) !important;
+    border-radius: 4px !important;
+    height: 170px;
+}
+
+.user-question-modal-question textarea::placeholder {
+    opacity: 1 !important;
+}
+
+/* Dropdown */
+.user-question-modal-dropdown {
+    outline: none;
+}
+
+.user-question-modal-dropdown .dropdown-menu {
+    width: 100%;
+}
+
+.user-question-modal-dropdown button {
+    background-color: rgba(28, 168, 221, 0.05) !important;
+    border: 1px solid rgba(28, 168, 221, 0.1) !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(28, 168, 221) !important;
+    font-family: Roboto;
+    font-size: 1.1rem;
+    text-align: left;
+    width: 100%;
+}
+
+.user-question-modal-dropdown .dropdown-item.selected,
+.user-question-modal-dropdown button:active ,
+.user-question-modal-dropdown button:hover {
+    background-color: rgba(28, 168, 221, 0.1) !important;
+    border-color:rgba(28, 168, 221, 0.2) !important;
+}
+
+.user-question-modal-dropdown-chevron {
+    float: right;
+    margin-top: 5px;
+    transform: scale(0.7);
+}
+
+.user-question-modal-dropdown .dropdown-item {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgb(50,50,50) !important;
+    cursor: pointer;
+    font-size: 1.0rem;
+    outline: none;
+}
+
+.user-question-modal-dropdown-item-container {
+    max-height: 370px;
+    overflow-y: auto;
+}
+
+/* Radio buttons */
+.user-question-modal-type .form-check {
+    width: 100%;
+}
+
+.user-question-modal-type input {
+    appearance: none;
+    background: #cbd1d8;
+    border-radius: 4px;
+    bottom: 0;
+    color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    left: 0;
+    height: 30px;
+    margin-right: 0.5rem;
+    outline: none;
+    position: relative;
+    right: 0;
+    top: 8px;
+    transition: all 0.15s ease-out 0s;
+    width: 30px;
+    z-index: 1000;
+}
+
+.user-question-modal-type input:hover {
+    background: #9faab7;
+}
+
+.user-question-modal-type input:checked {
+    background: #09c074;;
+}
+
+.user-question-modal-type input:checked::before {
+    height: 30px;
+    width: 30px;
+    position: absolute;
+    content: '✔';
+    display: inline-block;
+    font-size: 20px;
+    text-align: center;
+    line-height: 30px;
+}
+
+.user-question-modal-type .form-check label {
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+

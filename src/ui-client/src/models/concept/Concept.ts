@@ -22,6 +22,7 @@ export interface Concept extends BaseConcept {
     isEncounterBased: boolean;
     isPatientCountAutoCalculated: boolean;
     isSpecializable: boolean;
+    isRoot?: boolean;
     specializationGroups?: ConceptSpecializationGroup[];
     eventTypeId?: number;
 

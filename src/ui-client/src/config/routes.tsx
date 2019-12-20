@@ -73,6 +73,9 @@ const patientList = (): RouteConfig => {
     };
 };
 
+/* background-color: rgb(240,240,240);
+    height: 100%; */
+
 /*
  * Lazy-load admin panel, as most users will never see it
  */
@@ -84,7 +87,7 @@ const admin = (): RouteConfig => {
         index: Routes.AdminPanel,
         path: '/admin',
         render: () => (
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={null}>
                 <AdminPanel />
             </Suspense>
         ),

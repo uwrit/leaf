@@ -128,8 +128,11 @@
 }
 
 .header-option {
-    margin: 6px 0;
-    padding-left: 4px;
+    padding: 10px 4px;
+}
+
+.header-myleaf .header-option {
+    padding-bottom: 2px;
 }
 
 .header-option svg {
@@ -257,13 +260,29 @@
     display: block;
 }
 
-.myleaf-menu-icon-savedqueries {
+.myleaf-menu-icon-savedqueries,
+.myleaf-menu-icon-usersavedqueries {
     font-size: 0.9rem;
 }
 
 .header-myleaf-icon {
     font-size: 1rem;
     margin-top: -1px;
+}
+
+.header-option-divider {
+    background-color: rgb(1, 31, 43);
+    height: 1px;
+    margin: 10px 4px 0;
+}
+
+.header-option-logout {
+    padding-top: 4px;
+    padding-bottom: 8px;
+}
+
+.header-option-help {
+    padding-top: 4px;
 }
 
 .header-options > li:hover .header-myleaf-icon {
@@ -294,14 +313,14 @@
     color: rgba(255, 166, 0, 0.8);
 }
 
+.myleaf-menu-icon-usersavedqueries {
+    color: rgb(28, 202, 12);
+}
+
+.myleaf-menu-icon-help {
+    color: rgba(231, 139, 0, 0.8);
+}
+
 .myleaf-menu-icon-logout {
     color: rgba(90, 113, 219, 0.8);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-savedqueries {
-    color: rgb(255, 166, 0);
-}
-
-.header-myleaf-option:hover > .myleaf-menu-icon-logout {
-    color: rgb(90, 113, 219);
 }

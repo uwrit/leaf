@@ -73,8 +73,9 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
                             className={nameClasses.join(' ')}
                             autoComplete="off"
                             type="text" 
-                            id={`${c}-name`} 
+                            id={`${c}-name`}
                             onChange={this.handleQueryNameChange}
+                            onKeyDown={this.handleKeydown}
                             placeholder={namePlaceholder}
                             spellCheck={false}
                             tabIndex={tabIndex}
@@ -91,6 +92,7 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
                             type="text" 
                             id={`${c}-category`} 
                             onChange={this.handleQueryCategoryChange}
+                            onKeyDown={this.handleKeydown}
                             placeholder={catPlaceholder}
                             spellCheck={false} 
                             tabIndex={tabIndex}
@@ -189,6 +191,32 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
     }
 
     private handleCancelClick = () => this.toggle();
+
+    private handleKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
+
+        /*
+         * Attempt to save the current query if 'Enter'.
+         */
+        if (k.key === 'Enter') {
+            this.saveCurrentQuery();
+        /*
+         * If 'Tab', jump between focus on 'Name' and 'Category'.
+         */
+        } else if (k.key === 'Tab') {
+            k.preventDefault();
+            const nameClass = `${this.className}-name`;
+            const catClass = `${this.className}-category`;
+            const tabTo = k.currentTarget.id === nameClass ? catClass : nameClass;
+            this.trySetFocus(tabTo);
+        }
+    }
+
+    private trySetFocus = (id: string) => {
+        const input: any = document.getElementById(id);
+        if (input && input.focus) {
+            input.focus();
+        }
+    }
 }
 
 const mapStateToProps = (state: AppState): StateProps => {

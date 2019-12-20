@@ -47,8 +47,8 @@ export interface SpecializationGroup {
 }
 
 export interface SpecializationGroupRelationship {
-    specializationGroupId: number
-    orderId?: number
+    specializationGroupId: number;
+    orderId: number;
 }
 
 export interface SpecializationDTO {
