@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveUpdateMove]    Script Date: 11/4/2019 11:22:23 AM ******/
+/****** Object:  StoredProcedure [app].[sp_InternalQuerySaveUpdateMove]    Script Date:******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/1/9
@@ -48,11 +47,16 @@ BEGIN
     SET Created = (SELECT TOP 1 created FROM @created)
     WHERE Id = @queryid;
 
-    -- move constraints from oldqueryid that isn't user & owner record
+    -- move constraints from oldqueryid that aren't already present
     INSERT INTO auth.QueryConstraint
     SELECT @queryid, ConstraintId, ConstraintValue
-    FROM auth.QueryConstraint
-    WHERE QueryId = @oldqueryid and ConstraintId != 1 and ConstraintValue != @user;
+    FROM auth.QueryConstraint AS QC
+    WHERE QueryId = @oldqueryid
+		  AND NOT EXISTS (SELECT 1 
+						  FROM auth.QueryConstraint AS NEWQC 
+						  WHERE NEWQC.QueryId = @queryid
+								AND QC.ConstraintId = NEWQC.ConstraintId 
+								AND QC.ConstraintValue = NEWQC.ConstraintValue)
 
     -- cleanup the oldqueryid
     -- remove cached cohort
@@ -94,13 +98,5 @@ BEGIN
     DELETE FROM app.Query
     WHERE Id = @oldqueryid;
 END
-
-
-
-
-
-
-
-
 
 GO

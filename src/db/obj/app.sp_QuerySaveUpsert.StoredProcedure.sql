@@ -5,12 +5,11 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_QuerySaveUpsert]    Script Date: 11/4/2019 11:22:23 AM ******/
+/****** Object:  StoredProcedure [app].[sp_QuerySaveUpsert]    Script Date:******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2018/1/9
@@ -25,7 +24,8 @@ CREATE PROCEDURE [app].[sp_QuerySaveUpsert]
     @conceptids app.ResourceIdTable READONLY,
     @queryids app.ResourceIdTable READONLY,
     @definition app.QueryDefinitionJson,
-    @user auth.[User]
+    @user auth.[User],
+	@admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
@@ -43,7 +43,7 @@ BEGIN
         RETURN;
     END;
     
-    IF (@owner != @user)
+    IF (@owner != @user AND @admin = 0)
     BEGIN;
         DECLARE @new403msg NVARCHAR(400) = N'Query ' + cast(@queryid as nvarchar(50)) + N' is not owned by ' + @user;
         THROW 70403, @new403msg, 1;
@@ -66,7 +66,7 @@ BEGIN
         END;
         ELSE -- if yes this is a resave, ensure the old query is also owned by the user
         BEGIN;
-            IF (@oldowner != @user)
+            IF (@oldowner != @user AND @admin = 0)
             BEGIN;
                 DECLARE @old403msg NVARCHAR(400) = N'Query ' + cast(@oldqid as nvarchar(50)) + N' is not owned by ' + @user;
                 THROW 70403, @old403msg, 1;
@@ -89,8 +89,21 @@ BEGIN
             END;
             ELSE
             BEGIN;
-                -- delegate to resave sproc
-                EXEC app.sp_InternalQuerySaveUpdateMove @oldqid, @queryid, @urn, @ver, @name, @category, @conceptids, @queryids, @definition, @user;
+				
+				-- If admin is making a change, allow it but make sure the original query owner remains so.
+				IF (@admin = 0)
+					-- delegate to resave sproc
+					EXEC app.sp_InternalQuerySaveUpdateMove @oldqid, @queryid, @urn, @ver, @name, @category, @conceptids, @queryids, @definition, @user;
+				ELSE
+					BEGIN;
+						-- save changes on user's behalf
+						EXEC app.sp_InternalQuerySaveUpdateMove @oldqid, @queryid, @urn, @ver, @name, @category, @conceptids, @queryids, @definition, @oldowner;
+
+						-- remove explicit admin privileges to query
+						DELETE auth.QueryConstraint
+						WHERE QueryId = @queryid
+							  AND ConstraintValue = @user
+					END;
             END;
         END;
         COMMIT;
@@ -104,17 +117,5 @@ BEGIN
     FROM app.Query
     WHERE Id = @queryid;
 END
-
-
-
-
-
-
-
-
-
-
-
-
 
 GO
