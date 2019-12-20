@@ -88,6 +88,8 @@ Make sure the following variables are defined:
 - LEAF_CLIN_DB=<clinical_db_connection_string>
 - SERILOG_DIR=<your_logging_path>
 - LEAF_REDCAP_SUPERTOKEN=<your_token>
+- LEAF_SMTP_USR=<smpt_user> (optional)
+- LEAF_SMTP_PW=<smpt_password> (optional)
 
 
 ### Linux
@@ -103,7 +105,11 @@ LEAF_APP_DB=<leaf_app_db_connection_string>
 LEAF_CLIN_DB=<clinical_db_connection_string>
 SERILOG_DIR=/var/log/leaf/
 ASPNETCORE_URLS=http://0.0.0.0:5001
+
+# Optional
 LEAF_REDCAP_SUPERTOKEN='<your_token>'
+LEAF_SMTP_USR='<smtp_user>'
+LEAF_SMTP_PW='<smtp_password>'
 ```
 
 It's recommended that you use full paths when referencing locations on the filesystem.
@@ -120,7 +126,7 @@ Server=<server>;Database=<dbname>;uid=sa;Password=<dbpassword>;
 The [appsettings.json file](https://github.com/uwrit/leaf/blob/master/src/server/API/appsettings.json) acts as the central configuration file for your Leaf instance. 
 
 Key tasks to complete when setting up a Leaf instance for the first time:
-- Set Jwt/Issuer to match JAWT issuer parameter set during JAWT creation above
+- Set JWT/Issuer to match JWT issuer parameter set during JWT creation above
 - Define LogoutURI 
 - Set Authorization/Mechanism/SAML2/HeaderMapping/Entitlements variables to define the SAML2 header containing group membership, and the delimiter separating group names
 - Authorization/Mechanism/SAML2/RoleMapping roles to match group names provided by SAML2 
