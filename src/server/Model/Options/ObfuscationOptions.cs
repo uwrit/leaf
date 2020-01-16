@@ -4,15 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 
-namespace Model.Cohort
+namespace Model.Options
 {
-    public abstract class BasePatientCount
+    public class ObfuscationOptions
     {
-        public int Value { get; set; }
-        public int PlusMinus { get; set; }
-        public bool UnderThreshold { get; set; }
-        public IEnumerable<string> SqlStatements { get; set; }
+        public bool Enabled { get; set; }
+        public int ShiftValue { get; set; }
+
+        public bool ShouldObfuscate()
+        {
+            return Enabled;
+        }
     }
 }
