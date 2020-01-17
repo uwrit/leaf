@@ -68,9 +68,6 @@ namespace API.Options
             // Notification Options
             services.ConfigureNotificationOptions(configuration);
 
-            // Obfuscation Options
-            services.ConfigureObfuscationOptions(configuration);
-
             // Client options
             services.Configure<ClientOptions>(opts =>
             {
@@ -244,22 +241,6 @@ namespace API.Options
                     opts.Smtp = notify.Smtp;
                 });
             }
-
-            return services;
-        }
-
-        static IServiceCollection ConfigureObfuscationOptions(this IServiceCollection services, IConfiguration config)
-        {
-            var obf = new ObfuscationOptions { Enabled = config.GetValue<bool>(Config.Obfuscation.Enabled) };
-            if (obf.Enabled)
-            {
-                obf.ShiftValue = config.GetValue<int>(Config.Obfuscation.MinimumCount);
-            }
-            services.Configure<ObfuscationOptions>(opts =>
-            {
-                opts.Enabled = obf.Enabled;
-                opts.ShiftValue = obf.ShiftValue;
-            });
 
             return services;
         }

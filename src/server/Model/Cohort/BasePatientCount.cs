@@ -11,8 +11,6 @@ namespace Model.Cohort
     public abstract class BasePatientCount
     {
         public int Value { get; set; }
-        public int PlusMinus { get; set; }
-        public bool UnderThreshold { get; set; }
         public IEnumerable<string> SqlStatements { get; set; }
     }
 }
