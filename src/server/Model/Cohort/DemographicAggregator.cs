@@ -52,6 +52,10 @@ namespace Model.Cohort
 
         readonly DistributionData<AgeByGenderBucket> AgeBreakdown = new DistributionData<AgeByGenderBucket>(ageBuckets);
 
+        readonly VariableBucketSet LanguageByHeritage = new VariableBucketSet();
+
+        readonly VariableBucketSet Religion = new VariableBucketSet();
+
         readonly IEnumerable<PatientDemographic> cohort;
 
         public DemographicAggregator(PatientDemographicContext context)
@@ -72,12 +76,16 @@ namespace Model.Cohort
                 RecordVitalStatus(patient);
                 RecordHispanic(patient);
                 RecordMarried(patient);
+                RecordLanguageByHeritage(patient);
+                RecordReligion(patient);
             }
 
             return new DemographicStatistics
             {
                 BinarySplitData = new List<BinarySplitPair> { GenderSplit, VitalSplit, AARPSplit, HispanicSplit, MarriedSplit },
-                AgeByGenderData = AgeBreakdown
+                AgeByGenderData = AgeBreakdown,
+                LanguageByHeritageData = LanguageByHeritage,
+                ReligionData = Religion
             };
         }
 
@@ -148,6 +156,16 @@ namespace Model.Cohort
             return side;
         }
 
+        void RecordLanguageByHeritage(PatientDemographic patient)
+        {
+            LanguageByHeritage.Increment(patient.Race, patient.Language);
+        }
+
+        void RecordReligion(PatientDemographic patient)
+        {
+            Religion.Increment(patient.Religion);
+        }
+
         readonly static string[] ageBuckets = { "<1", "1-9", "10-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", ">84" };
         readonly static KeyValuePair<Func<int, bool>, string>[] ageSwitch =
         {
@@ -212,5 +230,7 @@ namespace Model.Cohort
                 gender.Value++;
             }
         }
+
+
     }
 }

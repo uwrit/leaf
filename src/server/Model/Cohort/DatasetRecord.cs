@@ -230,6 +230,18 @@ namespace Model.Cohort
         }
     }
 
+    static class StringExtension
+    {
+        public static string ValueElseUnknown(this string value)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+            return "Unknown";
+        }
+    }
+
     public class PatientDemographicRecord : PatientDemographic, ISalt
     {
         [Field(Name = DemographicColumns.Exported, Type = LeafType.Bool, Required = true)]
@@ -244,22 +256,22 @@ namespace Model.Cohort
             return new PatientDemographic
             {
                 PersonId = PersonId,
-                AddressPostalCode = AddressPostalCode,
-                AddressState = AddressState,
-                Ethnicity = Ethnicity,
-                Gender = Gender,
+                AddressPostalCode = AddressPostalCode.ValueElseUnknown(),
+                AddressState = AddressState.ValueElseUnknown(),
+                Ethnicity = Ethnicity.ValueElseUnknown(),
+                Gender = Gender.ValueElseUnknown(),
                 Age = Age,
-                Language = Language,
-                MaritalStatus = MaritalStatus,
-                Race = Race,
-                Religion = Religion,
+                Language = Language.ValueElseUnknown(),
+                MaritalStatus = MaritalStatus.ValueElseUnknown(),
+                Race = Race.ValueElseUnknown(),
+                Religion = Religion.ValueElseUnknown(),
                 IsMarried = IsMarried,
                 IsHispanic = IsHispanic,
                 IsDeceased = IsDeceased,
                 BirthDate = BirthDate,
                 DeathDate = DeathDate,
-                Name = Name,
-                Mrn = Mrn
+                Name = Name.ValueElseUnknown(),
+                Mrn = Mrn.ValueElseUnknown()
             };
         }
 
@@ -268,15 +280,15 @@ namespace Model.Cohort
             return new PatientDemographic
             {
                 PersonId = PersonId,
-                AddressPostalCode = AddressPostalCode,
-                AddressState = AddressState,
-                Ethnicity = Ethnicity,
-                Gender = Gender,
+                AddressPostalCode = AddressPostalCode.ValueElseUnknown(),
+                AddressState = AddressState.ValueElseUnknown(),
+                Ethnicity = Ethnicity.ValueElseUnknown(),
+                Gender = Gender.ValueElseUnknown(),
                 Age = Age > 89 ? 89 : Age,
-                Language = Language,
-                MaritalStatus = MaritalStatus,
-                Race = Race,
-                Religion = Religion,
+                Language = Language.ValueElseUnknown(),
+                MaritalStatus = MaritalStatus.ValueElseUnknown(),
+                Race = Race.ValueElseUnknown(),
+                Religion = Religion.ValueElseUnknown(),
                 IsMarried = IsMarried,
                 IsHispanic = IsHispanic,
                 IsDeceased = IsDeceased

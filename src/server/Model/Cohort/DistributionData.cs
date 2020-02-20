@@ -12,6 +12,11 @@ namespace Model.Cohort
     {
         public IDictionary<string, T> Buckets { get; set; }
 
+        public DistributionData()
+        {
+            Buckets = new Dictionary<string, T>();
+        }
+
         public DistributionData(params string[] buckets)
         {
             Buckets = new Dictionary<string, T>();
@@ -28,6 +33,13 @@ namespace Model.Cohort
                 return container;
             }
             return null;
+        }
+
+        public T AddBucket(string bucket)
+        {
+            var b = new T();
+            Buckets.Add(bucket, b);
+            return b;
         }
     }
 }
