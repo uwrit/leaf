@@ -11,6 +11,9 @@ import { NetworkCohortState } from '../../models/state/CohortState';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import { AgeByGender } from './AgeByGender';
 import { Binary } from './Binary';
+import { SectionHeader } from '../Other/SectionHeader/SectionHeader';
+import { LanguageByHeritage } from './LanguageByHeritage';
+import { Religion } from './Religion';
 
 export interface Props {
     cohort: NetworkCohortState;
@@ -21,12 +24,15 @@ export interface Props {
 
 export default class ResponderDemographics extends React.PureComponent<Props> {
     private className = 'visualize-responder';
+    private delayIncrementMs = 600;
 
     public render() {
-        const { ageByGenderData, binarySplitData } = this.props.cohort.visualization.demographics;
+        const { ageByGenderData, binarySplitData, languageByHeritageData, religionData } = this.props.cohort.visualization.demographics;
         const { primaryColor, name, enabled } = this.props.responder;
         const colWidth = this.props.width / 2;
         const c = this.className;
+        let delay = 0;
+        const getDelay = (): number => { const d = delay; delay += this.delayIncrementMs; return d; }
 
         if (!enabled) { return null; }
 
@@ -37,6 +43,7 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                 </div>
                 <Row>
                     <Col lg={6} md={12} className="visualization-agebygender-container">
+                        <SectionHeader headerText="Age by Gender" />
                         <AgeByGender 
                             data={ageByGenderData} 
                             delay={0}
@@ -45,11 +52,32 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                         />
                     </Col>
                     <Col lg={6} md={12} className="visualization-ataglance-container">
+                        <SectionHeader headerText="At a Glance" />
                         <Binary 
                             data={binarySplitData} 
                             delay={300}
                             height={this.props.height}
                             width={colWidth} 
+                        />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col lg={6} md={12} className="visualization-languagebyheritage-container">
+                        <SectionHeader headerText="Ethnic Heritage by Language" />
+                        <LanguageByHeritage
+                            bucketset={languageByHeritageData} 
+                            delay={getDelay()}
+                            height={this.props.height}
+                            width={colWidth}
+                        />
+                    </Col>
+                    <Col lg={6} md={12} className="visualization-ataglance-container">
+                        <SectionHeader headerText="Religious Beliefs" />
+                        <Religion
+                            bucketset={religionData} 
+                            delay={getDelay()}
+                            height={this.props.height}
+                            width={colWidth}
                         />
                     </Col>
                 </Row>
