@@ -39,6 +39,7 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                     <Col lg={6} md={12} className="visualization-agebygender-container">
                         <AgeByGender 
                             data={ageByGenderData} 
+                            delay={0}
                             height={this.props.height}
                             width={colWidth} 
                         />
@@ -46,6 +47,7 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                     <Col lg={6} md={12} className="visualization-ataglance-container">
                         <Binary 
                             data={binarySplitData} 
+                            delay={300}
                             height={this.props.height}
                             width={colWidth} 
                         />

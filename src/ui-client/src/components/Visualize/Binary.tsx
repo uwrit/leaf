@@ -11,8 +11,9 @@ import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis } from 'rech
 import { visualizationConfig } from '../../config/visualization';
 import { BinarySplit, BinarySplitPair} from '../../models/cohort/DemographicDTO';
 
-export interface Props {
+interface Props {
     data: BinarySplitPair[];
+    delay: number;
     height: number;
     width: number;
 }
@@ -22,8 +23,7 @@ export class Binary extends React.PureComponent<Props> {
 
     public render() {
         const config = visualizationConfig.demographics.binary;
-        const animationDelay = 300;
-        const { height, width } = this.props;
+        const { height, width, delay } = this.props;
         const colWidth = (width / 2) > this.maxColWidth ? this.maxColWidth : (width / 2);
         const leftBars = this.props.data
             .map((d: BinarySplitPair) => {
@@ -52,11 +52,11 @@ export class Binary extends React.PureComponent<Props> {
                 <div className="visualization-ataglance-column visualization-ataglance-left" style={{ height, width: colWidth }}>
                     <ResponsiveContainer>
                         <BarChart data={leftBars} barCategoryGap={1} layout={'vertical'} margin={{top: 50, right: 0, left: 50, bottom: 50}}>
-                            <XAxis type="number" hide={true}/>
+                            <XAxis type="number" hide={true} axisLine={false} />
                             <Bar barSize={1} dataKey="dummyValue" isAnimationActive={false}>
                                 <LabelList dataKey="label" position="insideBottomRight" />
                             </Bar>
-                            <Bar animationBegin={animationDelay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
+                            <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
                                 {leftBars.map((d: BinarySplit) => <Cell key={d.label} fill={d.color} />)}
                                 <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="insideRight"/>
                             </Bar>
@@ -66,11 +66,11 @@ export class Binary extends React.PureComponent<Props> {
                 <div className="visualization-ataglance-column visualization-ataglance-right" style={{ height, width: colWidth }}>
                     <ResponsiveContainer>
                         <BarChart data={rightBars} barCategoryGap={2} layout={'vertical'} margin={{top: 50, right: 50, left: 0, bottom: 50}}>
-                            <XAxis type="number" hide={true}/>
+                            <XAxis type="number" hide={true} axisLine={false} />
                             <Bar barSize={1} dataKey="dummyValue" isAnimationActive={false}>
                                 <LabelList dataKey="label" position="insideBottomLeft" />
                             </Bar>
-                            <Bar animationBegin={animationDelay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
+                            <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
                                 {rightBars.map((d: BinarySplit) => <Cell key={d.label} fill={d.color} />)}
                                 <LabelList dataKey="value" position="right" formatter={this.formatNumber} />
                             </Bar>

@@ -108,29 +108,64 @@ export default class CohortAggregatorWebWorker {
                 }
             });
 
-            const aggregate = preAgg.reduce((agg: DemographicStatistics, target: DemographicStatistics) => {
+            const aggregate = preAgg.reduce((prev: DemographicStatistics, curr: DemographicStatistics) => {
 
                 // For all age by gender buckets (eg, 35-44, 45-54, 55-64)
-                Object.keys(agg.ageByGenderData.buckets).forEach((bucketKey: any) => {
-                    const aggBucket: AgeByGenderBucket = agg.ageByGenderData.buckets[bucketKey];
-                    const targetBucket: AgeByGenderBucket = target.ageByGenderData.buckets[bucketKey];
+                Object.keys(prev.ageByGenderData.buckets).forEach((k: string) => {
+                    const prevBucket = prev.ageByGenderData.buckets[k];
+                    const currBucket = curr.ageByGenderData.buckets[k];
 
                     // For all gender identifications, sum
-                    Object.keys(aggBucket).forEach((genderKey: any) => {
-                        aggBucket[genderKey] += targetBucket[genderKey];
+                    Object.keys(prevBucket).forEach((gk: any) => {
+                        prevBucket[gk] += currBucket[gk];
                     })
                 });
                 
                 // Binary splits are in arrays which should always be in the same order, but
                 // match up by category strings to be safe
-                agg.binarySplitData.forEach((v: BinarySplitPair) => {
-                    const t = target.binarySplitData.find((x: BinarySplitPair) => x.category === v.category);
+                prev.binarySplitData.forEach((v: BinarySplitPair) => {
+                    const t = curr.binarySplitData.find((x: BinarySplitPair) => x.category === v.category);
                     if (t) {
                         v.left.value += t.left.value;
                         v.right.value += t.right.value;
                     }
                 });
-                return agg;
+
+                // Language by heritage
+                Object.keys(curr.languageByHeritageData.data.buckets).forEach((k: string) => {
+                    const currBucket = curr.languageByHeritageData.data.buckets[k];
+                    let prevBucket = prev.languageByHeritageData.data.buckets[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.languageByHeritageData.data.buckets[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket.subBuckets).forEach((sbk: string) => {
+                            if (prevBucket.subBuckets[sbk]) {
+                                prevBucket.subBuckets[sbk] += currBucket.subBuckets[sbk];
+                            }
+                        })
+                    }
+                });
+
+                // Religion
+                Object.keys(curr.religionData.data.buckets).forEach((k: string) => {
+                    const currBucket = curr.religionData.data.buckets[k];
+                    let prevBucket = prev.religionData.data.buckets[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.religionData.data.buckets[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket.subBuckets).forEach((sbk: string) => {
+                            if (prevBucket.subBuckets[sbk]) {
+                                prevBucket.subBuckets[sbk] += currBucket.subBuckets[sbk];
+                            }
+                        })
+                    }
+                });
+
+                return prev;
             })
 
             return { requestId, result: aggregate };

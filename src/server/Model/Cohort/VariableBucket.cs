@@ -11,12 +11,12 @@ namespace Model.Cohort
     public class VariableBucketSet
     {
         public DistributionData<VariableBucket> Data { get; set; }
-        public Dictionary<string,int> Summary { get; set; }
+        public Dictionary<string,int> SubBucketTotals { get; set; }
 
         public VariableBucketSet()
         {
             Data = new DistributionData<VariableBucket>();
-            Summary = new Dictionary<string, int>();
+            SubBucketTotals = new Dictionary<string, int>();
         }
 
         VariableBucket IncrementKey(string key)
@@ -35,26 +35,26 @@ namespace Model.Cohort
         void IncrementSubkey(VariableBucket bucket, string subkey)
         {
             var sk = subkey.ToLowerInvariant();
-            if (bucket.KeyValuePairs.ContainsKey(sk))
+            if (bucket.SubBuckets.ContainsKey(sk))
             {
-                bucket.KeyValuePairs[sk]++;
+                bucket.SubBuckets[sk]++;
             }
             else
             {
-                bucket.KeyValuePairs.Add(sk, 1);
+                bucket.SubBuckets.Add(sk, 1);
             }
         }
 
         void IncrementSummary(string subkey)
         {
             var sk = subkey.ToLowerInvariant();
-            if (Summary.ContainsKey(sk))
+            if (SubBucketTotals.ContainsKey(sk))
             {
-                Summary[sk]++;
+                SubBucketTotals[sk]++;
             }
             else
             {
-                Summary.Add(sk, 1);
+                SubBucketTotals.Add(sk, 1);
             }
         }
 
@@ -73,6 +73,6 @@ namespace Model.Cohort
 
     public class VariableBucket
     {
-        public Dictionary<string, int> KeyValuePairs = new Dictionary<string, int>();
+        public Dictionary<string, int> SubBuckets = new Dictionary<string, int>();
     }
 }

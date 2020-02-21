@@ -27,7 +27,19 @@ export const defaultVisualizationState = (): VisualizationState => {
                     '>84': { females: 0, males: 0, others: 0 }
                 }
             },
-            binarySplitData: []
+            binarySplitData: [],
+            languageByHeritageData: {
+                data: {
+                    buckets: {}
+                },
+                subBucketTotals: {}
+            },
+            religionData: {
+                data: {
+                    buckets: {}
+                },
+                subBucketTotals: {}
+            }
         },
         state: CohortStateType.NOT_LOADED
     };
