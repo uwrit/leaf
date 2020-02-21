@@ -54,7 +54,7 @@ namespace Model.Cohort
 
         readonly VariableBucketSet LanguageByHeritage = new VariableBucketSet();
 
-        readonly VariableBucketSet Religion = new VariableBucketSet();
+        readonly Dictionary<string,int> Religion = new Dictionary<string, int>();
 
         readonly IEnumerable<PatientDemographic> cohort;
 
@@ -163,7 +163,16 @@ namespace Model.Cohort
 
         void RecordReligion(PatientDemographic patient)
         {
-            Religion.Increment(patient.Religion);
+            var religion = patient.Religion.ToLowerInvariant();
+
+            if (Religion.ContainsKey(religion))
+            {
+                Religion[religion]++;
+            }
+            else
+            {
+                Religion.Add(religion, 1);
+            }
         }
 
         readonly static string[] ageBuckets = { "<1", "1-9", "10-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", ">84" };

@@ -51,6 +51,7 @@ export class LanguageByHeritage extends React.PureComponent<Props,State> {
             });
             return d;
         }).sort((a,b) => a.sum > b.sum ? 0 : 1);
+        const len = data.length;
         const sums: LanguageSum[] = Object.entries(bucketset.subBucketTotals).map(([k,v],i) => {
             return {
                 label: k,
@@ -67,10 +68,10 @@ export class LanguageByHeritage extends React.PureComponent<Props,State> {
             <div className={`${c}-column`} style={{ height, width: w }}>
 
                 {/* Show all toggle */}
-                {data.length > this.defaultDataLength &&
+                {len > this.defaultDataLength &&
                 <div className="visualization-showall-toggle">
-                    <span className={`visualization-showall false ${showAll ? '' : 'selected'}`} onClick={this.handleShowAllToggleClick.bind(null, false)}>Show top 20 only</span>
-                    <span className={`visualization-showall true ${showAll ? 'selected' : ''}`} onClick={this.handleShowAllToggleClick.bind(null, true)}>Show all</span>
+                    <span className={`visualization-showall false ${showAll ? '' : 'selected'}`} onClick={this.handleShowAllToggleClick.bind(null, false)}>{`Show top ${this.defaultDataLength} only`}</span>
+                    <span className={`visualization-showall true ${showAll ? 'selected' : ''}`} onClick={this.handleShowAllToggleClick.bind(null, true)}>{`Show all ${len}`}</span>
                 </div>
                 }
 
@@ -128,7 +129,7 @@ export class LanguageByHeritage extends React.PureComponent<Props,State> {
         if (i <= last) {
             return colors[i];
         }
-        return colors[Math.floor(i / last)]
+        return colors[i - (((Math.floor(i / last)) * last)) - 1]
     }
 
     private handleShowAllToggleClick = (showAll: boolean) => {
@@ -156,7 +157,6 @@ interface Payload {
 class RotatedXAxisTick extends React.PureComponent<XAxisProps> {
     render() {
       const { x, y, payload } = this.props;
-  
       return (
         <g transform={`translate(${x},${y})`}>
             <text x={0} y={-16} dy={20} textAnchor="end" transform="rotate(-35)">{payload!.value}</text>

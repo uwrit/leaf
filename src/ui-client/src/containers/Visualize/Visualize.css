@@ -165,10 +165,11 @@
 }
 
 .visualization-religion-column .recharts-yAxis .recharts-cartesian-axis-ticks {
-    display: block !important;                                                  /* Override for vertical-layout religion chart */
+    display: block !important;                                                                      /* Override for vertical-layout religion chart */
 }
 
-.visualization-religion-column .recharts-yAxis .recharts-cartesian-axis-ticks line {
+.visualization-religion-column .recharts-yAxis .recharts-cartesian-axis-ticks line,
+.visualization-religion-column .recharts-xAxis {
     display: none;
 }
 
@@ -254,14 +255,9 @@
     text-transform: capitalize;
 }
 
-.visualization-legend-value {
-    color: rgb(0, 35, 51);
-    font-family: Arial, Helvetica, sans-serif;
-}
-
 .visualization-legend-label,
 .visualization-legend-value {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 300;
     line-height: 16px;
 }

@@ -74,7 +74,7 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                     <Col lg={6} md={12} className="visualization-ataglance-container">
                         <SectionHeader headerText="Religious Beliefs" />
                         <Religion
-                            bucketset={religionData} 
+                            counts={religionData} 
                             delay={getDelay()}
                             height={this.props.height}
                             width={colWidth}

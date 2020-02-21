@@ -34,12 +34,7 @@ export const defaultVisualizationState = (): VisualizationState => {
                 },
                 subBucketTotals: {}
             },
-            religionData: {
-                data: {
-                    buckets: {}
-                },
-                subBucketTotals: {}
-            }
+            religionData: {}
         },
         state: CohortStateType.NOT_LOADED
     };

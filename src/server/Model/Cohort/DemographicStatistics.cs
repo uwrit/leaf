@@ -13,6 +13,6 @@ namespace Model.Cohort
         public ICollection<BinarySplitPair> BinarySplitData { get; set; }
         public DistributionData<AgeByGenderBucket> AgeByGenderData { get; set; }
         public VariableBucketSet LanguageByHeritageData { get; set; }
-        public VariableBucketSet ReligionData { get; set; }
+        public Dictionary<string,int> ReligionData { get; set; }
     }
 }

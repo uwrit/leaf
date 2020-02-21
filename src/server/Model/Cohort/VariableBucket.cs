@@ -58,11 +58,6 @@ namespace Model.Cohort
             }
         }
 
-        public void Increment(string key)
-        {
-            Increment(key, key);
-        }
-
         public void Increment(string key, string subkey)
         {
             var bucket = IncrementKey(key);

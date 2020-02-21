@@ -8,10 +8,10 @@
 import React from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, LabelList, Cell } from 'recharts';
 import { visualizationConfig } from '../../config/visualization';
-import { VariableBucketSet } from '../../models/cohort/DemographicDTO';
+import { PatientCountMap } from '../../models/cohort/DemographicDTO';
 
 interface Props {
-    bucketset: VariableBucketSet;
+    counts: PatientCountMap;
     delay: number;
     height: number;
     width: number;
@@ -37,11 +37,13 @@ export class Religion extends React.PureComponent<Props,State> {
     
     public render() {
         const config = visualizationConfig.demographics.religion;
-        const { height, width, bucketset, delay } = this.props;
+        const { height, width, counts, delay } = this.props;
         const { showAll, useDelay } = this.state;
         const c = this.className;
+        const del = useDelay ? delay : 0;
         const w = width > this.maxWidth ? this.maxWidth : width;
-        let data = Object.entries(bucketset.subBucketTotals).map(([key,value]) => ({ key, value }) ).sort((a,b) => a.value > b.value ? 0 : 1);
+        let data = Object.entries(counts).map(([key,value]) => ({ key, value }) ).sort((a,b) => a.value > b.value ? 0 : 1);
+        const len = data.length;
 
         if (!showAll) {
             data = data.slice(0, this.defaultDataLength);
@@ -49,12 +51,22 @@ export class Religion extends React.PureComponent<Props,State> {
         
         return (
             <div className={`${c}-column`} style={{ height, width: w }}>
+
+                {/* Show all toggle */}
+                {len > this.defaultDataLength &&
+                <div className="visualization-showall-toggle">
+                    <span className={`visualization-showall false ${showAll ? '' : 'selected'}`} onClick={this.handleShowAllToggleClick.bind(null, false)}>{`Show top ${this.defaultDataLength} only`}</span>
+                    <span className={`visualization-showall true ${showAll ? 'selected' : ''}`} onClick={this.handleShowAllToggleClick.bind(null, true)}>{`Show all ${len}`}</span>
+                </div>
+                }
+
+                {/* Chart */}
                 <div style={{ height }}>
                     <ResponsiveContainer >
-                        <BarChart data={data} margin={{top: 20, right: 30, left: 20, bottom: 5}} layout="vertical" >
-                            <XAxis type="number" label={{ width: 100 }}/>
-                            <YAxis dataKey="key" type="category" interval={0} />
-                            <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
+                        <BarChart data={data} margin={{top: 30, right: 30, left: 10, bottom: 5}} layout="vertical" >
+                            <XAxis type="number" />
+                            <YAxis dataKey="key" type="category" interval={0} width={150} />
+                            <Bar animationBegin={del} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
                                 {data.map((d,i) => <Cell key={d.key} fill={this.color(i,config.colors)} />)}
                                 <LabelList dataKey="value" formatter={this.formatNumber} position="right"/>
                             </Bar>
@@ -72,6 +84,10 @@ export class Religion extends React.PureComponent<Props,State> {
         if (i <= last) {
             return colors[i];
         }
-        return colors[Math.floor(i / last)]
+        return colors[i - (((Math.floor(i / last)) * last)) - 1]
+    }
+
+    private handleShowAllToggleClick = (showAll: boolean) => {
+        this.setState({ showAll, useDelay: false });
     }
 }

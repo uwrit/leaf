@@ -26,8 +26,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
     public render() {
         const { ageByGenderData, binarySplitData, languageByHeritageData, religionData } = this.props.cohort.visualization.demographics;
         const colWidth = this.props.width / 2;
-        let delay = 0;
-        const getDelay = (): number => { const d = delay; delay += this.delayIncrementMs; return d; }
+        const getDelay = (i: number): number => i * this.delayIncrementMs;
 
         return (
             <Container className="visualize-demographic-container aggregate" fluid={true}>
@@ -36,7 +35,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                         <SectionHeader headerText="Current Age By Gender" />
                         <AgeByGender 
                             data={ageByGenderData}
-                            delay={getDelay()}
+                            delay={getDelay(0)}
                             height={this.props.height} 
                             width={colWidth}
                         />
@@ -45,7 +44,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                         <SectionHeader headerText="At a Glance" />
                         <Binary 
                             data={binarySplitData} 
-                            delay={getDelay()}
+                            delay={getDelay(1)}
                             height={this.props.height}
                             width={colWidth} 
                         />
@@ -56,7 +55,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                         <SectionHeader headerText="Ethnic Heritage by Language" />
                         <LanguageByHeritage 
                             bucketset={languageByHeritageData} 
-                            delay={getDelay()}
+                            delay={getDelay(2)}
                             height={this.props.height}
                             width={colWidth}
                         />
@@ -64,8 +63,8 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                     <Col lg={6} md={12} className="visualization-ataglance-container">
                         <SectionHeader headerText="Religious Beliefs" />
                         <Religion
-                            bucketset={religionData} 
-                            delay={getDelay()}
+                            counts={religionData} 
+                            delay={getDelay(3)}
                             height={this.props.height}
                             width={colWidth}
                         />

@@ -149,17 +149,17 @@ export default class CohortAggregatorWebWorker {
                 });
 
                 // Religion
-                Object.keys(curr.religionData.data.buckets).forEach((k: string) => {
-                    const currBucket = curr.religionData.data.buckets[k];
-                    let prevBucket = prev.religionData.data.buckets[k];
+                Object.keys(curr.religionData).forEach((k: string) => {
+                    const currBucket = curr.religionData[k];
+                    let prevBucket = prev.religionData[k];
 
                     if (!prevBucket) {
                         prevBucket = Object.assign({}, currBucket);
-                        prev.religionData.data.buckets[k] = prevBucket;
+                        prev.religionData[k] = prevBucket;
                     } else {
-                        Object.keys(currBucket.subBuckets).forEach((sbk: string) => {
-                            if (prevBucket.subBuckets[sbk]) {
-                                prevBucket.subBuckets[sbk] += currBucket.subBuckets[sbk];
+                        Object.keys(currBucket).forEach((sbk: string) => {
+                            if (prevBucket[sbk]) {
+                                prevBucket[sbk] += currBucket[sbk];
                             }
                         })
                     }

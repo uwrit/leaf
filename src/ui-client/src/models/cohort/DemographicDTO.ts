@@ -28,7 +28,7 @@ export interface DemographicStatistics {
     binarySplitData: BinarySplitPair[];
     ageByGenderData: AgeByGenderData;
     languageByHeritageData: VariableBucketSet;
-    religionData: VariableBucketSet;
+    religionData: PatientCountMap;
 }
 
 export interface AgeByGenderData {
@@ -55,9 +55,13 @@ export interface AgeByGenderBucket {
     others: number;
 }
 
+export interface PatientCountMap {
+    [key:string]: number;
+}
+
 export interface VariableBucketSet {
     data: VariableBuckSetProperty;
-    subBucketTotals: SubBucketTotals;
+    subBucketTotals: PatientCountMap;
 }
 
 interface VariableBuckSetProperty {
@@ -74,8 +78,4 @@ interface VariableBucketMapProperty {
 
 interface VariableSubBucketMap {
     [key:string]: number
-}
-
-interface SubBucketTotals {
-    [key:string]: number;
 }
