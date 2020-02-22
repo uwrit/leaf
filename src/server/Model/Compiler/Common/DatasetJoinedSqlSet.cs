@@ -14,14 +14,14 @@ namespace Model.Compiler.Common
     {
         public Column Salt { get; protected set; }
 
-        string queryParamPlaceholder = "___param___";
+        string queryParamPlaceholder = "___queryid___";
 
         public DatasetJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
         {
             var sp = GetCachedCohortSubPanel(compilerOptions);
             var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions);
-            var next = From.First() as JoinedSequentialSqlSet;
             var first = new DatasetJoinedSequentialSqlSet(cache);
+            var next = From.First() as JoinedSequentialSqlSet;
             var last = From.Last() as JoinedSequentialSqlSet;
             
             next.On = new[] { first.PersonId == next.PersonId };
@@ -57,6 +57,20 @@ namespace Model.Compiler.Common
         }
     }
 
+    class DatasetJoinedSequentialSqlSet : Join
+    {
+        public Column PersonId { get; protected set; }
+        public Column Salt { get; protected set; }
+
+        public DatasetJoinedSequentialSqlSet(DatasetCachedPanelItemSqlSet set)
+        {
+            Set = set;
+            Alias = $"{Dialect.Alias.Sequence}C";
+            PersonId = new Column(set.PersonId, this);
+            Salt = new Column(set.Salt, this);
+        }
+    }
+
     class DatasetCachedPanelItemSqlSet : PanelItemSequentialSqlSet
     {
         public Column Salt { get; protected set; }
@@ -73,20 +87,6 @@ namespace Model.Compiler.Common
         {
             Salt = new Column("Salt");
             Select = new[] { PersonId, Salt };
-        }
-    }
-
-    class DatasetJoinedSequentialSqlSet : Join
-    {
-        public Column PersonId { get; protected set; }
-        public Column Salt { get; protected set; }
-
-        public DatasetJoinedSequentialSqlSet(DatasetCachedPanelItemSqlSet set)
-        {
-            Set = set;
-            Alias = $"{Dialect.Alias.Sequence}C";
-            PersonId = new Column(set.PersonId, this);
-            Salt = new Column(set.Salt, this);
         }
     }
 }
