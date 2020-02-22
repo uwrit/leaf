@@ -51,6 +51,14 @@ namespace Model.Compiler.SqlServer
             return sql;
         }
 
+        public string BuildDatasetEncounterFilterSql(Panel panel)
+        {
+            var sql = new DatasetJoinedSqlSet(panel, compilerOptions).ToString();
+            ValidateSql(sql);
+
+            return sql;
+        }
+
         public ISqlStatement BuildCteSql(IEnumerable<Panel> panels)
         {
             var contexts = panels.Select((p, i) =>

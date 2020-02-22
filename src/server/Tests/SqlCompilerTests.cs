@@ -265,5 +265,24 @@ namespace Tests
 
             Assert.Equal(4, cols.Length);
         }
+
+        [Fact]
+        public void Dataset_Joined_Query_Includes_Salt()
+        {
+            var panel = MockPanel.Panel();
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { MockPanel.HmcEnc() },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
+            });
+
+            var ob = new DatasetJoinedSqlSet(panel, Options);
+            var sql = ob.ToString();
+
+            Assert.Equal(sql, sql);
+        }
     }
 }

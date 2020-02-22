@@ -28,4 +28,11 @@ namespace Model.Compiler
             }
         }
     }
+
+    public class CteCohortCount : CteCohortQuery
+    {
+        public new const string CteSuffix = ") SELECT COUNT(DISTINCT personId) AS cnt FROM wrapper";
+
+        public CteCohortCount(string grab) : base(grab) { }
+    }
 }

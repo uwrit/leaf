@@ -67,9 +67,10 @@ var aggregateStatistics = function (payload) {
             }
             else {
                 Object.keys(currBucket).forEach(function (sbk) {
-                    if (prevBucket[sbk]) {
-                        prevBucket[sbk] += currBucket[sbk];
+                    if (!prevBucket[sbk]) {
+                        prevBucket[sbk] = 0;
                     }
+                    prevBucket[sbk] += currBucket[sbk];
                 });
             }
         });

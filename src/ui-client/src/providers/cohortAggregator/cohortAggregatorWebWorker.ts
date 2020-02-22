@@ -158,9 +158,10 @@ export default class CohortAggregatorWebWorker {
                         prev.religionData[k] = prevBucket;
                     } else {
                         Object.keys(currBucket).forEach((sbk: string) => {
-                            if (prevBucket[sbk]) {
-                                prevBucket[sbk] += currBucket[sbk];
+                            if (!prevBucket[sbk]) {
+                                prevBucket[sbk] = 0;
                             }
+                            prevBucket[sbk] += currBucket[sbk];
                         })
                     }
                 });

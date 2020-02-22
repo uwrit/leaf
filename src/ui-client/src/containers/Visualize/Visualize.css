@@ -59,10 +59,10 @@
 }
 
 .visualize-responder-name {
-    color: rgb(100, 100, 100);
-    font-size: 1.5rem;
+    color: white;
+    font-size: 2rem;
     font-weight: 500;
-    margin-bottom: -8px;
+    margin-bottom: 8px;
     padding-top: 8px;
 }
 

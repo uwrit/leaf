@@ -101,7 +101,7 @@ namespace Model.Compiler.Common
             {
                 /*
                  * Same Encounter.
-                 */ 
+                 */
                 case SequenceType.Encounter:
 
                     curr.On = new[] 
