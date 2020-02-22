@@ -20,16 +20,16 @@ namespace Model.Compiler.Common
         {
             var sp = GetCachedCohortSubPanel(compilerOptions);
             var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions);
-            var first = new DatasetJoinedSequentialSqlSet(cache);
-            var next = From.First() as JoinedSequentialSqlSet;
-            var last = From.Last() as JoinedSequentialSqlSet;
+            var join  = new DatasetJoinedSequentialSqlSet(cache);
+            var first = From.First() as JoinedSequentialSqlSet;
+            var last  = From.Last() as JoinedSequentialSqlSet;
             
-            next.On = new[] { first.PersonId == next.PersonId };
-            next.Type = JoinType.Inner;
+            first.On = new[] { join.PersonId == first.PersonId };
+            first.Type = JoinType.Inner;
 
-            Select  = new[] { last.PersonId, last.EncounterId, first.Salt };
-            From    = From.Prepend(first);
-            GroupBy = new[] { last.PersonId, last.EncounterId, first.Salt };
+            Select  = new[] { last.PersonId, last.EncounterId, join.Salt };
+            From    = From.Prepend(join);
+            GroupBy = new[] { last.PersonId, last.EncounterId, join.Salt };
         }
 
         public override string ToString()
