@@ -87,6 +87,7 @@ namespace API.Controllers
             [FromQuery] Shape shape,
             [FromQuery] long? early,
             [FromQuery] long? late,
+            [FromQuery] int? panelIdx,
             [FromServices] DatasetProvider provider,
             CancellationToken cancelToken)
         {
@@ -95,7 +96,7 @@ namespace API.Controllers
                 var queryref = new QueryRef(queryid);
                 var datasetref = new DatasetQueryRef(datasetid, shape);
 
-                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late);
+                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late, panelIdx);
 
                 switch (result.Context.State)
                 {

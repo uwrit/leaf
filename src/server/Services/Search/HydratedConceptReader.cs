@@ -28,7 +28,7 @@ namespace Services.Search
             var conceptJoin = concepts.GroupJoin(groupJoin,
                 c => c.Id,
                 g => g.conceptId,
-                (cr, gs) => cr.Concept(gs.Select(g => g.grp)));
+                (cr, gs) => cr.Concept(gs.Select(g => g.grp).ToArray()));
 
             return conceptJoin;
         }

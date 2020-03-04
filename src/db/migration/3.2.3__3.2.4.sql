@@ -1,4 +1,3 @@
-
 IF EXISTS (SELECT 1 FROM sysindexes WHERE name = 'IXUniq_DatasetQuery_Name')
     DROP INDEX [IXUniq_DatasetQuery_Name] ON [app].[DatasetQuery]
 GO

@@ -14,13 +14,14 @@ namespace Model.Compiler
         public DatasetQueryRef DatasetRef { get; set; }
         public DateTime? EarlyBound { get; set; }
         public DateTime? LateBound { get; set; }
+        public int? PanelIndex { get; set; }
 
         public DatasetExecutionRequest()
         {
 
         }
 
-        public DatasetExecutionRequest(QueryRef qr, DatasetQueryRef dr, long? early = null, long? late = null)
+        public DatasetExecutionRequest(QueryRef qr, DatasetQueryRef dr, long? early = null, long? late = null, int? panelIdx = null)
         {
             QueryRef = qr;
             DatasetRef = dr;
@@ -31,6 +32,10 @@ namespace Model.Compiler
             if (late.HasValue)
             {
                 LateBound = DateTimes.FromUTCTicks(late.Value);
+            }
+            if (panelIdx.HasValue)
+            {
+                PanelIndex = panelIdx;
             }
         }
     }

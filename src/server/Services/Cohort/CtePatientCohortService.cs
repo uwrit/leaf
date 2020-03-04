@@ -3,6 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System.Linq;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading;
@@ -32,7 +33,8 @@ namespace Services.Cohort
             {
                 QueryId = query.QueryId,
                 PatientIds = await GetPatientSetAsync(cteQuery, token),
-                SqlStatements = new string[] { cteQuery.SqlStatement }
+                SqlStatements = new string[] { cteQuery.SqlStatement },
+                Panels = query.Panels.Where(p => p.Domain == PanelDomain.Panel)
             };
         }
 

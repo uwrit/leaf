@@ -12,12 +12,12 @@ namespace Services.Search
 {
     static class ConceptPatientYearCountSerde
     {
-        public static IEnumerable<ConceptPatientYearCount> Deserialize(string json)
+        public static ICollection<ConceptPatientYearCount> Deserialize(string json)
         {
             return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<List<ConceptPatientYearCount>>(json);
         }
 
-        public static string Serialize(IEnumerable<ConceptPatientYearCount> counts)
+        public static string Serialize(ICollection<ConceptPatientYearCount> counts)
         {
             return counts == null ? null : JsonConvert.SerializeObject(counts);
         }

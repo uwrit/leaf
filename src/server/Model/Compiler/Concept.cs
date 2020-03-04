@@ -35,8 +35,8 @@ namespace Model.Compiler
         public string UiDisplayEventName { get; set; }
         public int? UiDisplayPatientCount { get; set; }
         public int? EventTypeId { get; set; }
-        public IEnumerable<ConceptSpecializationGroup> SpecializationGroups { get; set; }
-        public IEnumerable<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
+        public ICollection<ConceptSpecializationGroup> SpecializationGroups { get; set; }
+        public ICollection<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
     }
 

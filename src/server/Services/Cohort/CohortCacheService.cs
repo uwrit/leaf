@@ -4,21 +4,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
-using System.Linq;
 using Dapper;
 using Model.Options;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Services.Extensions;
 using Model.Cohort;
-using Services.Cohort;
-using Services.Authorization;
+using Model.Compiler;
 using Model.Authorization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Services.Cohort
 {
@@ -48,7 +46,7 @@ namespace Services.Cohort
 
                 var queryId = await cn.ExecuteScalarAsync<Guid>(
                     queryCreateUnsaved,
-                    new { user = user.UUID, nonce },
+                    new { user = user.UUID, nonce, definition = SerializePanels(cohort.Panels) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: dbOptions.DefaultTimeout
                 );
@@ -94,6 +92,26 @@ namespace Services.Cohort
                 throw new ArgumentNullException(nameof(nonce));
             }
             return nonce.Value;
+        }
+
+        string SerializePanels(IEnumerable<Panel> panels)
+        {
+            foreach (var panel in panels)
+            {
+                foreach (var subpanel in panel.SubPanels)
+                {
+                    foreach (var pi in subpanel.PanelItems)
+                    {
+                        pi.Specializations = pi.Specializations.ToList();
+                        pi.Concept.SpecializationGroups = pi.Concept.SpecializationGroups.ToList();
+                    }
+                }
+            }
+            return JsonConvert.SerializeObject(panels, new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                TypeNameHandling = TypeNameHandling.Auto,
+            });
         }
     }
 }

@@ -16,6 +16,8 @@ namespace Model.Tagging
 
         public string Value { get; protected set; }
 
+        public Urn() { }
+
         protected Urn(string urn)
         {
             Value = urn;

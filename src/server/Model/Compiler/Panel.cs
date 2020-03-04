@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Model.Compiler
 {
@@ -37,5 +36,12 @@ namespace Model.Compiler
         {
             SubPanels = new List<SubPanel>();
         }
+    }
+
+    public static class PanelDomain
+    {
+        public static string Panel = "Panel";
+        public static string PanelFilter = "PanelFilter";
+        public static string GlobalPanelFilter = "GlobalPanelFilter";
     }
 }

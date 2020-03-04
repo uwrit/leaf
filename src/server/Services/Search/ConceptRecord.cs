@@ -77,7 +77,7 @@ namespace Services.Search
             EventTypeId = c.EventTypeId;
         }
 
-        public Concept Concept(IEnumerable<ConceptSpecializationGroup> groups)
+        public Concept Concept(ICollection<ConceptSpecializationGroup> groups)
         {
             var concept = Concept();
             concept.SpecializationGroups = groups;

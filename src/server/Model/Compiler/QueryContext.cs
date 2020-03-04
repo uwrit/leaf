@@ -11,6 +11,7 @@ namespace Model.Compiler
     {
         public Guid QueryId { get; set; }
         public Guid Pepper { get; set; }
+        public string Definition { get; set; }
 
         public bool Found => Pepper != default;
     }

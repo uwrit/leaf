@@ -18,6 +18,8 @@ namespace Model.Tagging
 
         }
 
+        ConceptUrn() { }
+
         public static ConceptUrn From(string urn)
         {
             if (string.IsNullOrWhiteSpace(urn))

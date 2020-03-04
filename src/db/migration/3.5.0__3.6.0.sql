@@ -1,6 +1,3 @@
-USE [LeafDB]
-GO
-
 /*
  * Update version.
  */

@@ -59,13 +59,13 @@ namespace Model.Cohort
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="System.Data.Common.DbException"/>
-        public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null)
+        public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null, int? panelIdx = null)
         {
             log.LogInformation("Dataset starting. QueryRef:{QueryRef} DatasetRef:{DatasetRef}", query, datasetQuery);
             Ensure.NotNull(query, nameof(query));
             Ensure.NotNull(datasetQuery, nameof(datasetQuery));
 
-            var request = new DatasetExecutionRequest(query, datasetQuery, early, late);
+            var request = new DatasetExecutionRequest(query, datasetQuery, early, late, panelIdx);
             var result = new Result();
 
             log.LogInformation("Dataset execution request. Request:{@Request}", request);
