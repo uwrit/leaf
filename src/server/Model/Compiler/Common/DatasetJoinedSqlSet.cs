@@ -23,11 +23,16 @@ namespace Model.Compiler.Common
             var join  = new DatasetJoinedSequentialSqlSet(cache);
             var first = From.First() as JoinedSequentialSqlSet;
             var last  = From.Last() as JoinedSequentialSqlSet;
-            
+
             first.On = new[] { join.PersonId == first.PersonId };
             first.Type = JoinType.Inner;
 
-            Select  = new[] { last.PersonId, last.EncounterId, join.Salt };
+            Select = new ISelectable[] 
+            { 
+                new ExpressedColumn(DatasetColumns.PersonId, new Expression(last.PersonId)),
+                new ExpressedColumn(EncounterColumns.EncounterId, new Expression(last.EncounterId)), 
+                join.Salt 
+            };
             From    = From.Prepend(join);
             GroupBy = new[] { last.PersonId, last.EncounterId, join.Salt };
         }
@@ -76,15 +81,18 @@ namespace Model.Compiler.Common
         public Column Salt { get; protected set; }
         internal Panel Panel { get; set; }
         internal SubPanel SubPanel { get; set; }
+        internal CompilerOptions CompilerOptions { get; set; }
 
         public DatasetCachedPanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
         {
             Panel = panel;
             SubPanel = subpanel;
+            CompilerOptions = comp;
         }
 
         internal override void SetSelect()
         {
+            PersonId = new Column("PersonId");
             Salt = new Column("Salt");
             Select = new[] { PersonId, Salt };
         }

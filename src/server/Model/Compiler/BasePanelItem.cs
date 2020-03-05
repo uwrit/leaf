@@ -51,7 +51,7 @@ namespace Model.Compiler
                                    from s in g.Specializations
                                    from d in dto.Specializations
                                    where s.Id == d.Id || d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId
-                                   select s) : null
+                                   select s).ToList() : null
 
             };
         }

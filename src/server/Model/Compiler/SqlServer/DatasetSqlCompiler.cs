@@ -28,13 +28,13 @@ namespace Model.Compiler.SqlServer
         {
             executionContext = new DatasetExecutionContext(compilerContext.Shape, compilerContext.QueryContext, compilerContext.DatasetQuery.Id.Value);
 
-            var cohort = CteCohortInternals(compilerContext.QueryContext);
+            var cohort = CteCohortInternals(compilerContext);
 
             new SqlValidator(Dialect.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
             var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
 
             var filter = CteFilterInternals(compilerContext);
-            var select = SelectFromCTE();
+            var select = SelectFromCTE(compilerContext);
             executionContext.DatasetQuery = compilerContext.DatasetQuery;
             executionContext.CompiledQuery = Compose(cohort, dataset, filter, select);
 
@@ -46,9 +46,17 @@ namespace Model.Compiler.SqlServer
             return $"WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
         }
 
-        string CteCohortInternals(QueryContext queryContext)
+        string CteCohortInternals(DatasetCompilerContext ctx)
         {
-            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryContext.QueryId);
+            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
+
+            // If joining to a given panel to filter by encounter.
+            if (ctx.JoinToPanel)
+            {
+                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions).ToString();
+            }
+
+            // Else return standard cached cohort.
             return $"SELECT {fieldInternalPersonId} = PersonId, Salt FROM {compilerOptions.AppDb}.app.Cohort WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} AND Exported = 1";
         }
 
@@ -69,9 +77,15 @@ namespace Model.Compiler.SqlServer
             return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
         }
 
-        string SelectFromCTE()
+        string SelectFromCTE(DatasetCompilerContext ctx)
         {
-            return $"SELECT Salt, filter.* FROM filter INNER JOIN cohort ON filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
+            var query = $"SELECT Salt, filter.* FROM filter INNER JOIN cohort";
+
+            if (ctx.JoinToPanel)
+            {
+                return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{DatasetColumns.PersonId} AND filter.{EncounterColumns.EncounterId} = cohort.{EncounterColumns.EncounterId}";
+            }
+            return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
         }
     }
 

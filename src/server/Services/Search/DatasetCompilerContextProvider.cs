@@ -15,9 +15,7 @@ using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Services.Tables;
-using Model.Error;
 using Model.Authorization;
-using Model.Search;
 using Newtonsoft.Json;
 
 namespace Services.Search
@@ -105,10 +103,6 @@ namespace Services.Search
             var datasetid = request.DatasetRef.Id.Value;
             var queryid = request.QueryRef.Id.Value;
             var joinpanel = request.PanelIndex.HasValue;
-
-            // TESTING
-            joinpanel = true;
-            request.PanelIndex = 0;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {

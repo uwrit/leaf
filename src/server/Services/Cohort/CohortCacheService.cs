@@ -96,17 +96,6 @@ namespace Services.Cohort
 
         string SerializePanels(IEnumerable<Panel> panels)
         {
-            foreach (var panel in panels)
-            {
-                foreach (var subpanel in panel.SubPanels)
-                {
-                    foreach (var pi in subpanel.PanelItems)
-                    {
-                        pi.Specializations = pi.Specializations.ToList();
-                        pi.Concept.SpecializationGroups = pi.Concept.SpecializationGroups.ToList();
-                    }
-                }
-            }
             return JsonConvert.SerializeObject(panels, new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
