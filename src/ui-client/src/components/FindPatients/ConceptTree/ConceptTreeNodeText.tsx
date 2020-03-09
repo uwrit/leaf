@@ -62,11 +62,11 @@ class ConceptTreeNodeTextWrapper extends React.Component<Props> {
     public shouldComponentUpdate(nextProps: Props) {
         const { canDrop, isOver, concept } = this.props;
 
-        if (canDrop !== nextProps.canDrop) { 
+        if (nextProps.concept.uiDisplayText !== concept.uiDisplayText) {
+            return true;
+        } else if (canDrop !== nextProps.canDrop) { 
             return true;
         } else if (isOver !== nextProps.isOver) {
-            return true;
-        } else if (concept !== nextProps.concept) {
             return true;
         }
         return false;

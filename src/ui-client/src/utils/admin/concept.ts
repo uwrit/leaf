@@ -33,7 +33,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
     if (alwaysAdd.has(propName) || (userConcept[propName] !== undefined && !neverAdd.has(propName))) {
         out[propName] = val;
     }
-    return out;
+    return  out;
 };
 
 /*

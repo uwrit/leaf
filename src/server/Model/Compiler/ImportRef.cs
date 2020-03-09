@@ -73,8 +73,8 @@ namespace Model.Compiler
             var sourceMod = new Column("SourceModifier");
             var importId  = new Column("ImportMetadataId");
             var rowId     = new Column("Id");
-            var personId  = new ExpressedColumn(opts.FieldPersonId, new Expression($"{alias}.PersonId"));
-            var encId     = new ExpressedColumn(opts.FieldEncounterId, new Expression("CONVERT(NVARCHAR(10),NULL)"));
+            var personId  = new ExpressedColumn(new Expression($"{alias}.PersonId"), opts.FieldPersonId);
+            var encId     = new ExpressedColumn(new Expression("CONVERT(NVARCHAR(10),NULL)"), opts.FieldEncounterId);
 
             var where = new List<IEvaluatable>();
             where.Add(importId == MetadataId.ToString());

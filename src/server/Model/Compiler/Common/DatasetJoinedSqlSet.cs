@@ -29,8 +29,8 @@ namespace Model.Compiler.Common
 
             Select = new ISelectable[] 
             { 
-                new ExpressedColumn(DatasetColumns.PersonId, new Expression(last.PersonId)),
-                new ExpressedColumn(EncounterColumns.EncounterId, new Expression(last.EncounterId)), 
+                new ExpressedColumn(last.PersonId, DatasetColumns.PersonId),
+                new ExpressedColumn(last.EncounterId, EncounterColumns.EncounterId), 
                 join.Salt 
             };
             From    = From.Prepend(join);

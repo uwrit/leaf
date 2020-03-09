@@ -16,7 +16,7 @@ namespace Model.Compiler.Common
 
         public EventIdColumn() : base(DefaultName)
         {
-            InnerColumn = new ExpressedColumn(DefaultName, new QuotedExpression(""));
+            InnerColumn = new ExpressedColumn(new QuotedExpression(""), DefaultName);
         }
 
         public EventIdColumn(string eventIdColName, string aliasMarker, IAliasedSet set) : base(eventIdColName, set)
