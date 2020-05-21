@@ -224,7 +224,7 @@ const createConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
             const childrenIds = parent.childrenIds 
                 ? new Set<string>([ ...parent.childrenIds, concept.id ])
                 : new Set<string>([ concept.id ]);
-            state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true }));
+            state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true, isOpen: true }));
             concept.rootId = getRootId(parent, state.currentTree);
         }
     }

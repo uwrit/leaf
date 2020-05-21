@@ -26,6 +26,7 @@ interface OwnProps {
     allowReparent: boolean;
     concept: Concept;
     dispatch: any;
+    isSelected: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -60,13 +61,7 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
 class ConceptTreeNodeTextWrapper extends React.Component<Props> {
 
     public shouldComponentUpdate(nextProps: Props) {
-        const { canDrop, isOver, concept } = this.props;
-
-        if (nextProps.concept.uiDisplayText !== concept.uiDisplayText) {
-            return true;
-        } else if (canDrop !== nextProps.canDrop) { 
-            return true;
-        } else if (isOver !== nextProps.isOver) {
+        if (nextProps.isSelected) {
             return true;
         }
         return false;

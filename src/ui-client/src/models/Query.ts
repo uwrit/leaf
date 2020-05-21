@@ -17,6 +17,7 @@ export interface BaseQuery {
 
 export interface Query extends BaseQuery {
     id?: string;
+    universalId?: string;
 }
 
 export type SavedQueryMap = Map<string, SavedQueryRef>

@@ -24,9 +24,7 @@ interface Props {
 export default class ConceptTree extends React.Component<Props> {
     public render() {
         const { tree, allowReparent, allowRerender, dispatch, selectedId } = this.props;
-        const roots = this.props.roots
-            .map(id => tree.get(id)!)
-            .sort((a: Concept, b: Concept) => a.uiDisplayName > b.uiDisplayName ? 1 : -1);
+        const roots = this.props.roots.map(id => tree.get(id)!).sort(this.sortRoots);
 
         return (
             <div className="concept-tree">
@@ -46,6 +44,13 @@ export default class ConceptTree extends React.Component<Props> {
                 )})}
             </div>
         );
+    }
+
+    private sortRoots = (a: Concept, b: Concept) => {
+        if (a.isExtension && !b.isExtension) { return 1; }
+        if (!a.isExtension && b.isExtension) { return -1; }
+        if (a.uiDisplayName > b.uiDisplayName) { return 1; }
+        return -1;
     }
 }
 

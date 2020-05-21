@@ -15,7 +15,7 @@
     padding-top: 20px;
 }
 
-.save-query-panel-button-container .leaf-button-secondary {
+.save-query-panel-button-container .leaf-button-secondary, .leaf-button.save-as-new {
     margin-right: 10px;
 }
 

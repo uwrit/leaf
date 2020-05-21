@@ -271,12 +271,13 @@ export class MainEditor extends React.PureComponent<Props,State> {
      */
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
+        const { currentAdminConcept } = this.props.data.concepts;
         const { sets } = this.props.data.sqlSets;
         const defaultSet = sets.size ? sets.get(Array.from(sets.keys())[0]) : undefined;
 
-        const { adminConcept, userConcept } = createEmptyConcept();
+        const { adminConcept, userConcept } = createEmptyConcept(currentAdminConcept);
 
-        if (defaultSet) {
+        if (!currentAdminConcept && defaultSet) {
             adminConcept.sqlSetId = defaultSet.id;
             userConcept.isEncounterBased = defaultSet.isEncounterBased;
             userConcept.isEventBased = defaultSet.isEventBased;

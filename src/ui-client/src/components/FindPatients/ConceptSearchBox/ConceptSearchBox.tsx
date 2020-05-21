@@ -52,10 +52,10 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
     public getSnapshotBeforeUpdate() {
         const { conceptsState } = this.props;
         const { roots } = this.state;
+        const len = roots.length;
 
-        if (roots.length <= 1 && conceptsState.roots.length) {
-            this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] });
-        }
+        if (len === 0) { return null; }
+        if (len === 1) { this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] }); }
         return null;
     }
 

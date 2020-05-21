@@ -25,6 +25,7 @@ const RIGHT_PAREN_SPACED = ' ) ';
 export const getSqlColumns = (input: string) => {
     const split = removeParens(input).split(SELECT_FROM_SPLITTER);
     const columns: string[] = [];
+    let insideBrackets = false;
 
     if (split.length >= 3) {
         const cols = split[1].replace(BRACKETS, EMPTY).split(COMMA);
