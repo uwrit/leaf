@@ -31,11 +31,17 @@ namespace Services.Obfuscation
                 return;
             }
 
-            // Default to the minimum allowed count if under.
-            if (count.Value <= opts.ShiftValue)
+            // If low cell sizes should be masked and count less than or equal to threshold, set to threshold.
+            if (opts.LowCellSizeMasking.Enabled && count.Value <= opts.LowCellSizeMasking.Threshold)
             {
-                count.Value = opts.ShiftValue;
-                count.UnderThreshold = true;
+                count.Value = opts.LowCellSizeMasking.Threshold;
+                count.WithinLowCellThreshold = true;
+                return;
+            }
+
+            // Bail if noise obfuscation not enabled
+            if (!opts.Noise.Enabled)
+            {
                 return;
             }
 
@@ -50,10 +56,10 @@ namespace Services.Obfuscation
             var generator = new Random(BitConverter.ToInt32(hashed, 0));
 
             // Compute a random shifted value between the negative 
-            var shift = generator.Next(-opts.ShiftValue, opts.ShiftValue);
+            var shift = generator.Next(opts.Noise.LowerBound, opts.Noise.UpperBound);
 
             count.Value += shift;
-            count.PlusMinus = opts.ShiftValue;
+            count.PlusMinus = Math.Max(opts.Noise.LowerBound, opts.Noise.UpperBound);
         }
 
         string GetDeterministicConceptIdsAsString(IEnumerable<Panel> panels)

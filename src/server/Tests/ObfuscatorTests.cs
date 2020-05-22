@@ -23,15 +23,15 @@ namespace Tests
         {
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, ShiftValue = 10 };
+            var opts = new ObfuscationOptions { Enabled = true, Noise = new ObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context(); 
 
             obfuscator.Obfuscate(ref count, ctx, opts);
 
             Assert.NotEqual(orig, count.Value);
-            Assert.Equal(count.PlusMinus, opts.ShiftValue);
-            Assert.False(count.UnderThreshold);
+            Assert.Equal(count.PlusMinus, Math.Max(opts.Noise.LowerBound, opts.Noise.UpperBound));
+            Assert.False(count.WithinLowCellThreshold);
         }
 
         [Fact]
@@ -39,15 +39,15 @@ namespace Tests
         {
             var orig = 5;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, ShiftValue = 10 };
+            var opts = new ObfuscationOptions { Enabled = true, LowCellSizeMasking = new ObfuscationOptions.LowCellSizeMaskingOptions { Enabled = true, Threshold = 10 } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context();
 
             obfuscator.Obfuscate(ref count, ctx, opts);
 
             Assert.NotEqual(orig, count.Value);
-            Assert.Equal(count.Value, opts.ShiftValue);
-            Assert.True(count.UnderThreshold);
+            Assert.Equal(count.Value, opts.LowCellSizeMasking.Threshold);
+            Assert.True(count.WithinLowCellThreshold);
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Tests
             var g3 = Guid.NewGuid();
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, ShiftValue = 10 };
+            var opts = new ObfuscationOptions { Enabled = true, Noise = new ObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
 
             var count1 = new PatientCount { Value = orig };
             var count2 = new PatientCount { Value = orig };
@@ -95,14 +95,10 @@ namespace Tests
             Assert.NotEqual(orig, count2.Value);
             Assert.NotEqual(orig, count3.Value);
             Assert.NotEqual(orig, count4.Value);
-            Assert.NotEqual(count1.Value, opts.ShiftValue);
-            Assert.NotEqual(count2.Value, opts.ShiftValue);
-            Assert.NotEqual(count3.Value, opts.ShiftValue);
-            Assert.NotEqual(count4.Value, opts.ShiftValue);
-            Assert.False(count1.UnderThreshold);
-            Assert.False(count2.UnderThreshold);
-            Assert.False(count3.UnderThreshold);
-            Assert.False(count4.UnderThreshold);
+            Assert.False(count1.WithinLowCellThreshold);
+            Assert.False(count2.WithinLowCellThreshold);
+            Assert.False(count3.WithinLowCellThreshold);
+            Assert.False(count4.WithinLowCellThreshold);
             Assert.Equal(count1.Value, count2.Value);
             Assert.Equal(count1.Value, count3.Value);
             Assert.Equal(count1.Value, count4.Value);

@@ -11,8 +11,6 @@ export interface AdminConfiguration {
 
 export interface SqlConfiguration {
     alias: string;
-    setPerson: string;
-    setEncounter: string;
     fieldPersonId: string;
     fieldEncounterId: string;
 }

@@ -13,7 +13,31 @@ namespace API.Options
         {
             public const string Section = @"Obfuscation";
             public const string Enabled = @"Obfuscation:Enabled";
-            public const string MinimumCount = @"Obfuscation:ShiftValue";
+
+            public static class Noise
+            {
+                public const string Enabled = "@Obfuscation:Noise:Enabled";
+                public const string LowerBound = "@Obfuscation:Noise:LowerBound";
+                public const string UpperBound = "@Obfuscation:Noise:UpperBound";
+            }
+
+            public static class LowCellSizeMasking
+            {
+                public const string Enabled = "@Obfuscation:LowCellSizeMasking:Enabled";
+                public const string Threshold = "@Obfuscation:LowCellSizeMasking:Threshold";
+            }
+
+            public static class RowLevelData
+            {
+                public static class Local
+                {
+                    public const string Enabled = "@Obfuscation:RowLevelData:Local:Enabled";
+                }
+                public static class Federated
+                {
+                    public const string Enabled = "@Obfuscation:RowLevelData:Federated:Enabled";
+                }
+            }
         }
     }
 }

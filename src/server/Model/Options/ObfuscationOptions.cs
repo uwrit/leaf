@@ -10,11 +10,35 @@ namespace Model.Options
     public class ObfuscationOptions
     {
         public bool Enabled { get; set; }
-        public int ShiftValue { get; set; }
+        public NoiseOptions Noise = new NoiseOptions();
+        public LowCellSizeMaskingOptions LowCellSizeMasking = new LowCellSizeMaskingOptions();
+        public RowLevelDataOptions RowLevelData = new RowLevelDataOptions();
 
-        public bool ShouldObfuscate()
+        public bool ShouldObfuscate() => Enabled;
+
+        public class NoiseOptions
         {
-            return Enabled;
+            public bool Enabled { get; set; }
+            public int LowerBound { get; set; }
+            public int UpperBound { get; set; }
+        }
+
+        public class LowCellSizeMaskingOptions
+        {
+            public bool Enabled { get; set; }
+            public int Threshold { get; set; }
+        }
+
+        public class RowLevelDataOptions
+        {
+            public bool Enabled { get; set; }
+            public UserTypeOptions Local = new UserTypeOptions();
+            public UserTypeOptions Federated = new UserTypeOptions();
+
+            public class UserTypeOptions
+            {
+                public bool Enabled { get; set; }
+            }
         }
     }
 }

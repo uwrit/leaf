@@ -163,6 +163,11 @@ namespace Model.Cohort
 
         void RecordReligion(PatientDemographic patient)
         {
+            if (string.IsNullOrEmpty(patient.Religion))
+            {
+                return;
+            }
+
             var religion = patient.Religion.ToLowerInvariant();
 
             if (Religion.ContainsKey(religion))

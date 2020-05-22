@@ -117,8 +117,6 @@ export const defaultAdminState = (): AdminState => {
         configuration: {
             sql: {
                 alias: '',
-                setPerson: '',
-                setEncounter: '',
                 fieldPersonId: '',
                 fieldEncounterId: ''
             }

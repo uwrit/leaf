@@ -12,12 +12,8 @@ namespace API.Options
         {
             public const string Section = @"Compiler";
             public const string Alias = @"Compiler:Alias";
-            public const string SetPerson = @"Compiler:SetPerson";
-            public const string SetEncounter = @"Compiler:SetEncounter";
             public const string FieldPersonId = @"Compiler:FieldPersonId";
             public const string FieldEncounterId = @"Compiler:FieldEncounterId";
-            public const string FieldEncounterAdmitDate = @"Compiler:FieldEncounterAdmitDate";
-            public const string FieldEncounterDischargeDate = @"Compiler:FieldEncounterDischargeDate";
         }
     }
 }

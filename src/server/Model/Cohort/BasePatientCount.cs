@@ -12,7 +12,7 @@ namespace Model.Cohort
     {
         public int Value { get; set; }
         public int PlusMinus { get; set; }
-        public bool UnderThreshold { get; set; }
+        public bool WithinLowCellThreshold { get; set; }
         public IEnumerable<string> SqlStatements { get; set; }
     }
 }

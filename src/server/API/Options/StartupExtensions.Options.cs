@@ -253,12 +253,36 @@ namespace API.Options
             var obf = new ObfuscationOptions { Enabled = config.GetValue<bool>(Config.Obfuscation.Enabled) };
             if (obf.Enabled)
             {
-                obf.ShiftValue = config.GetValue<int>(Config.Obfuscation.MinimumCount);
+                obf.Noise.Enabled = config.GetValue<bool>(Config.Obfuscation.Noise.Enabled);
+                if (obf.Noise.Enabled)
+                {
+                    obf.Noise.LowerBound = config.GetValue<int>(Config.Obfuscation.Noise.LowerBound);
+                    obf.Noise.UpperBound = config.GetValue<int>(Config.Obfuscation.Noise.UpperBound);
+
+                    if (obf.Noise.LowerBound + obf.Noise.UpperBound == 0)
+                    {
+                        throw new LeafConfigurationException("Obfuscation Noise is enabled but Lower Bound and Upper Bound are both set to zero");
+                    }
+                }
+                obf.LowCellSizeMasking.Enabled = config.GetValue<bool>(Config.Obfuscation.LowCellSizeMasking.Enabled);
+                if (obf.LowCellSizeMasking.Enabled)
+                {
+                    obf.LowCellSizeMasking.Threshold = config.GetValue<int>(Config.Obfuscation.LowCellSizeMasking.Threshold);
+
+                    if (obf.LowCellSizeMasking.Threshold <= 0)
+                    {
+                        throw new LeafConfigurationException($"Obfuscation Low Cell Size Masking must be greater than or equal to one, but is set to {obf.LowCellSizeMasking.Threshold}");
+                    }
+                }
+                obf.RowLevelData.Local.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Local.Enabled);
+                obf.RowLevelData.Federated.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Federated.Enabled);
             }
             services.Configure<ObfuscationOptions>(opts =>
             {
                 opts.Enabled = obf.Enabled;
-                opts.ShiftValue = obf.ShiftValue;
+                opts.Noise = obf.Noise;
+                opts.LowCellSizeMasking = obf.LowCellSizeMasking;
+                opts.RowLevelData = obf.RowLevelData;
             });
 
             return services;
@@ -299,12 +323,8 @@ namespace API.Options
             services.Configure<CompilerOptions>(opts =>
             {
                 opts.Alias = compilerOptions.Alias;
-                opts.SetPerson = compilerOptions.SetPerson;
-                opts.SetEncounter = compilerOptions.SetEncounter;
                 opts.FieldPersonId = compilerOptions.FieldPersonId;
                 opts.FieldEncounterId = compilerOptions.FieldEncounterId;
-                opts.FieldEncounterAdmitDate = compilerOptions.FieldEncounterAdmitDate;
-                opts.FieldEncounterDischargeDate = compilerOptions.FieldEncounterDischargeDate;
 
                 opts.AppDb = extractor.ExtractDatabase(sp.GetService<IOptions<AppDbOptions>>().Value);
                 opts.ClinDb = extractor.ExtractDatabase(sp.GetService<IOptions<ClinDbOptions>>().Value);

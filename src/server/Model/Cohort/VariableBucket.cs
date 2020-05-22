@@ -60,6 +60,10 @@ namespace Model.Cohort
 
         public void Increment(string key, string subkey)
         {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(subkey))
+            {
+                return;
+            }
             var bucket = IncrementKey(key);
             IncrementSubkey(bucket, subkey);
             IncrementSummary(subkey);

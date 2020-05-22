@@ -9,12 +9,8 @@ namespace Model.Options
     public class CompilerOptions : IBindTarget
     {
         public string Alias { get; set; }
-        public string SetPerson { get; set; }
-        public string SetEncounter { get; set; }
         public string FieldPersonId { get; set; }
         public string FieldEncounterId { get; set; }
-        public string FieldEncounterAdmitDate { get; set; }
-        public string FieldEncounterDischargeDate { get; set; }
 
         public string AppDb { get; set; }
         public string ClinDb { get; set; }

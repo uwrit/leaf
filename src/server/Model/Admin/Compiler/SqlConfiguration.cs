@@ -11,8 +11,6 @@ namespace Model.Admin.Compiler
     public class SqlConfiguration
     {
         public string Alias { get; set; }
-        public string SetPerson { get; set; }
-        public string SetEncounter { get; set; }
         public string FieldPersonId { get; set; }
         public string FieldEncounterId { get; set; }
 
@@ -21,8 +19,6 @@ namespace Model.Admin.Compiler
             return new SqlConfiguration
             {
                 Alias = options.Alias,
-                SetPerson = options.SetPerson,
-                SetEncounter = options.SetEncounter,
                 FieldPersonId = options.FieldPersonId,
                 FieldEncounterId = options.FieldEncounterId
             };
