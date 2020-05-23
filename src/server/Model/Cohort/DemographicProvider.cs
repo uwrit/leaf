@@ -12,6 +12,8 @@ using Model.Compiler;
 using Model.Validation;
 using Model.Error;
 using System.Linq;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace Model.Cohort
 {
@@ -34,11 +36,13 @@ namespace Model.Cohort
         readonly IDemographicSqlCompiler compiler;
         readonly IDemographicsExecutor executor;
         readonly IUserContext user;
+        readonly ObfuscationOptions obfOpts;
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider(
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
+            IOptions<ObfuscationOptions> obfOpts,
             IDemographicSqlCompiler compiler,
             IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
@@ -47,6 +51,7 @@ namespace Model.Cohort
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = executor;
+            this.obfOpts = obfOpts.Value;
             this.log = log;
         }
 
@@ -66,6 +71,12 @@ namespace Model.Cohort
             log.LogInformation("Demographics starting. QueryRef:{QueryRef}", query);
             Ensure.NotNull(query, nameof(query));
             var result = new Result();
+
+            if (obfOpts.Noise.Enabled)
+            {
+                log.LogError("Demographics cannot be returned if Obfuscation Noise is enabled");
+                return result;
+            }
 
             var validationContext = await contextProvider.GetCompilerContextAsync(query);
             log.LogInformation("Demographics compiler validation context. Context:{@Context}", validationContext);

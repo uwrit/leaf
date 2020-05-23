@@ -135,7 +135,7 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case CONFIRM_MODAL_SHOW:
             return Object.assign({}, state, { confirmationModal: action.confirmModal! });
         case CONFIRM_MODAL_HIDE:
-            return Object.assign({}, state, { confirmationModal: { ...state.confirmationModal, show: false } });
+            return Object.assign({}, state, { confirmationModal: { ...state.confirmationModal, show: false, onClickNo: null, onClickYes: null, onClickCancel: null } });
         case NOCLICK_MODAL_SET_STATE:
             return Object.assign({}, state, { noclickModal: action.noclickModal! });
         case SIDE_NOTIFICATION_SET_STATE:

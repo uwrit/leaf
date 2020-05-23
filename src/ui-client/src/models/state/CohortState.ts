@@ -39,10 +39,12 @@ export interface NetworkCohortState {
 // State prop types
 export interface PatientCountState {
     duration?: number;
+    plusMinus: number;
     queryId: string;
     state: CohortStateType;
     sqlStatements: string[];
     value: number;
+    withinLowCellThreshold: boolean;
 }
 
 export interface BasePatientListState {

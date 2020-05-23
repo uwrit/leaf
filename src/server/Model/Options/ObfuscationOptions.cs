@@ -32,13 +32,6 @@ namespace Model.Options
         public class RowLevelDataOptions
         {
             public bool Enabled { get; set; }
-            public UserTypeOptions Local = new UserTypeOptions();
-            public UserTypeOptions Federated = new UserTypeOptions();
-
-            public class UserTypeOptions
-            {
-                public bool Enabled { get; set; }
-            }
         }
     }
 }

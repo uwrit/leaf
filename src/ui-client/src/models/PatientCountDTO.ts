@@ -12,8 +12,10 @@ export interface PatientCountDTO {
 }
 
 export interface PatientCountResultDTO {
+    plusMinus: number;
     sqlStatements: string[];
     value: number;
+    withinLowCellThreshold: boolean;
 }
 
 export interface PreflightCheckDTO {

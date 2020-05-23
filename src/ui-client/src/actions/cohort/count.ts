@@ -91,10 +91,10 @@ export const getCounts = () => {
                                 const countDataDto = response.data as PatientCountDTO;
 
                                 const countData: PatientCountState = {
+                                    ...countDataDto.result,
                                     queryId: countDataDto.queryId,
                                     sqlStatements: [ formatMultipleSql(countDataDto.result.sqlStatements) ],
-                                    state: CohortStateType.LOADED,
-                                    value: countDataDto.result.value
+                                    state: CohortStateType.LOADED
                                 }
                                 queryId = countData.queryId;
                                 atLeastOneSucceeded = true;

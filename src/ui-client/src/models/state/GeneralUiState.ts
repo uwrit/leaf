@@ -60,6 +60,7 @@ export interface InformationModalState {
 export interface ConfirmationModalState {
     body: any;
     header: string;
+    onClickCancel?: any;
     onClickNo: any;
     onClickYes: any;
     noButtonText: string;

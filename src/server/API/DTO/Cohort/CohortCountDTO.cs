@@ -34,8 +34,10 @@ namespace API.DTO.Cohort
             {
                 Result = new PatientCountResultDTO
                 {
+                    PlusMinus = count.PlusMinus,
+                    SqlStatements = count.SqlStatements,
                     Value = count.Value,
-                    SqlStatements = count.SqlStatements
+                    WithinLowCellThreshold = count.WithinLowCellThreshold
                 };
             }
         }

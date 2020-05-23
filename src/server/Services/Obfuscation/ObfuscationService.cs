@@ -35,6 +35,7 @@ namespace Services.Obfuscation
             if (opts.LowCellSizeMasking.Enabled && count.Value <= opts.LowCellSizeMasking.Threshold)
             {
                 count.Value = opts.LowCellSizeMasking.Threshold;
+                count.PlusMinus = opts.LowCellSizeMasking.Threshold;
                 count.WithinLowCellThreshold = true;
                 return;
             }

@@ -42,7 +42,10 @@ export default class ConfirmationModal extends React.PureComponent<Props> {
     }
 
     private handleClickCancel = () => {
-        const { dispatch } = this.props;
+        const { confirmationModal, dispatch } = this.props;
+        if (confirmationModal.onClickCancel) {
+            confirmationModal.onClickCancel();
+        }
         dispatch(hideConfirmModal());
     }
 

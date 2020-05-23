@@ -250,7 +250,9 @@ namespace API.Options
 
         static IServiceCollection ConfigureObfuscationOptions(this IServiceCollection services, IConfiguration config)
         {
+            var log = services.BuildServiceProvider().GetRequiredService<ILogger<Startup>>();
             var obf = new ObfuscationOptions { Enabled = config.GetValue<bool>(Config.Obfuscation.Enabled) };
+
             if (obf.Enabled)
             {
                 obf.Noise.Enabled = config.GetValue<bool>(Config.Obfuscation.Noise.Enabled);
@@ -259,7 +261,7 @@ namespace API.Options
                     obf.Noise.LowerBound = config.GetValue<int>(Config.Obfuscation.Noise.LowerBound);
                     obf.Noise.UpperBound = config.GetValue<int>(Config.Obfuscation.Noise.UpperBound);
 
-                    if (obf.Noise.LowerBound + obf.Noise.UpperBound == 0)
+                    if (obf.Noise.LowerBound == 0 && obf.Noise.UpperBound == 0)
                     {
                         throw new LeafConfigurationException("Obfuscation Noise is enabled but Lower Bound and Upper Bound are both set to zero");
                     }
@@ -274,8 +276,13 @@ namespace API.Options
                         throw new LeafConfigurationException($"Obfuscation Low Cell Size Masking must be greater than or equal to one, but is set to {obf.LowCellSizeMasking.Threshold}");
                     }
                 }
-                obf.RowLevelData.Local.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Local.Enabled);
-                obf.RowLevelData.Federated.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Federated.Enabled);
+                obf.RowLevelData.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Enabled);
+
+                if (obf.RowLevelData.Enabled && obf.Noise.Enabled)
+                {
+                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Noise is also enabled, which prohibits all Row Level Data. Reverting Row Level Data to disabled");
+                    obf.RowLevelData.Enabled = false;
+                }
             }
             services.Configure<ObfuscationOptions>(opts =>
             {
