@@ -29,6 +29,7 @@ interface Props {
 interface State {
     selectedDates: DateBoundary;
     showDates: boolean;
+    showEncounterPanelSelectorModal: boolean;
     showSelectorModal: boolean;
 }
 
@@ -53,6 +54,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         this.state = {
             selectedDates: dates[4],
             showDates: false,
+            showEncounterPanelSelectorModal: false,
             showSelectorModal: false
         }
     }
@@ -120,6 +122,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         className={c}
                         datasets={datasets}
                         handleClickClose={this.handleClickClose}
+                        handleByEncounterSelect={this.handleByEncounterSelect}
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
@@ -159,6 +162,10 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleDateOptionClick = (opt: DateBoundary) => {
         this.setState({ selectedDates: opt });
+    }
+
+    private handleByEncounterSelect = () => {
+        this.setState({ showEncounterPanelSelectorModal: true });
     }
 
     private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {

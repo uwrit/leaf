@@ -22,6 +22,7 @@ interface Props {
     dispatch: any;
     handleClickClose: () => void;
     handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
+    handleByEncounterSelect: () => void;
     handleDateSelect: (date: DateBoundary) => void;
     selectedDates: DateBoundary;
     showDates: boolean;
@@ -29,7 +30,7 @@ interface Props {
 
 export default class AddDatasetSelectors extends React.PureComponent<Props> {
     public render() {
-        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates } = this.props;
+        const { datasets, className, dates, dispatch, handleByEncounterSelect, handleDatasetSelect, handleClickClose, showDates } = this.props;
         const c = className ? className : 'patientlist-add-dataset';
         return (
             <div className={c}>
@@ -47,8 +48,8 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                         />
                     </Col>
                     <Col md={3} className={`${c}-select-col-right`}>
-                        {showDates &&
-                         dates.map((d: DateBoundary) => {
+                        {showDates &&   [
+                        dates.map((d: DateBoundary) => {
                             return (
                                 <div 
                                     key={d.display} 
@@ -58,7 +59,9 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                                     {d.display}
                                 </div>
                             );
-                        })}
+                        }),
+                        <div onClick={handleByEncounterSelect} className='by-encounter'>Only Certain Encounters</div>
+                        ]}
                         {!showDates &&
                         <div>This dataset cannot be filtered by dates</div>}
                     </Col>
