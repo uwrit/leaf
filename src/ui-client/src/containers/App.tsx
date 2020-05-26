@@ -35,6 +35,7 @@ import { version } from '../../package.json'
 import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
 import './App.css';
+import EncounterPanelSelector from '../components/PatientList/AddDatasetSelectors/EncounterPanelSelector';
 
 
 interface OwnProps {
@@ -104,6 +105,8 @@ class App extends React.Component<Props> {
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+                <EncounterPanelSelector />
+                {/*
                 <Attestation />
                 <CohortCountBox />
                 <Header />
@@ -122,6 +125,7 @@ class App extends React.Component<Props> {
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
+            */}
             </div>
         );
     }

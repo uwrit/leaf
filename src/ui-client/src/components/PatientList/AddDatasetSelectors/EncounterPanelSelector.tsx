@@ -6,16 +6,18 @@
  */ 
 
 import React from 'react';
-import { Col, Row, Button } from 'reactstrap';
+import { Col, Row, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../../../models/state/AppState';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import Panel from '../../FindPatients/Panels/Panel';
 import { CohortStateType } from '../../../models/state/CohortState';
+import { PatientListDatasetQuery, PatientListDatasetShape } from '../../../models/patientList/Dataset';
 import './EncounterPanelSelector.css';
 
 interface OwnProps {
-    handleByEncounterSelect: () => void;
+    dataset?: PatientListDatasetQuery;
+    handleByEncounterSelect?: () => void;
 }
 interface StateProps {
     panels: PanelModel[];
@@ -29,21 +31,47 @@ class EncounterPanelSelector extends React.PureComponent<Props> {
     private className = 'encounter-panel-selector';
 
     public render() {
-        const { handleByEncounterSelect, panels } = this.props;
+        const { panels, dataset } = this.props;
         const c = this.className;
+        const modalClasses = [ `${c}-modal` ];
+
+        // TESTING
+        const dummyDs: PatientListDatasetQuery = {
+            id: '123',
+            name: 'Diagnosis',
+            isEncounterBased: true,
+            category: '',
+            shape: PatientListDatasetShape.Encounter,
+            tags: []
+        };
+
         return (
-            <div className={`${c}-container`}>
-                {panels.map((p,i) => {
-                    return (
-                        <Panel 
-                            isFirst={i===0}
-                            dispatch={this.noOp}
-                            panel={p}
-                            queryState={CohortStateType.LOADED}
-                        />
-                    )
-                })}
-            </div>
+            <Modal isOpen={true} className={modalClasses.join(' ')} backdrop={false}>
+                <div className={`${c}-container`}>
+                    <ModalBody>
+                        <div className={`${c}-header`}>Which Encounters do you want {dummyDs.name} data from?</div>
+                        <Row>
+                            {panels.map((p,i) => {
+                                return (
+                                    <Col className={`${c}-panel-wrapper`} md={4}>
+                                        <div className={`${c}-panel-id`}>Panel {i+1}</div>
+                                        <div className={`${c}-panel-overlay-outer`}>
+                                            <div className={`${c}-panel-overlay-inner`}>
+                                                <Panel 
+                                                    isFirst={i===0}
+                                                    dispatch={this.noOp}
+                                                    panel={p}
+                                                    queryState={CohortStateType.LOADED}
+                                                />
+                                            </div>
+                                        </div>
+                                    </Col>
+                                )
+                            })}
+                        </Row>
+                    </ModalBody>
+                </div>
+            </Modal>
         )
     }
 

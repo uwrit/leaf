@@ -56,11 +56,15 @@ namespace Services.Obfuscation
             // Seed a random number generator from the hash.
             var generator = new Random(BitConverter.ToInt32(hashed, 0));
 
-            // Compute a random shifted value between the negative 
-            var shift = generator.Next(opts.Noise.LowerBound, opts.Noise.UpperBound);
+            // Compute a random shifted value between the lower and upper bounds
+            var shift = 0;
+            while (shift == 0)
+            {
+                shift = generator.Next(opts.Noise.LowerBound, opts.Noise.UpperBound);
+            }
 
             count.Value += shift;
-            count.PlusMinus = Math.Max(opts.Noise.LowerBound, opts.Noise.UpperBound);
+            count.PlusMinus = Math.Max(Math.Abs(opts.Noise.LowerBound), Math.Abs(opts.Noise.UpperBound));
         }
 
         string GetDeterministicConceptIdsAsString(IEnumerable<Panel> panels)

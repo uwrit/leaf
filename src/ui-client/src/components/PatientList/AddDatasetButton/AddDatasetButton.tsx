@@ -77,7 +77,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     public render() {
         const c = this.className;
-        const { selectedDates, showSelectorModal, showDates } = this.state;
+        const { selectedDates, showSelectorModal, showDates, showEncounterPanelSelectorModal } = this.state;
         const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
@@ -114,7 +114,13 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
          */
         } else if (showSelectorModal) {
             arr.push(
-                <div className={modalClasses.join(' ')} onBlur={this.handleBlur} onMouseLeave={this.handleMouseLeave} onMouseEnter={this.handleMouseEnter} tabIndex={0} key={4}>
+                <div 
+                    className={modalClasses.join(' ')}
+                    onBlur={this.handleBlur} 
+                    onMouseLeave={this.handleMouseLeave} 
+                    onMouseEnter={this.handleMouseEnter} 
+                    tabIndex={0} 
+                    key={4}>
                     <AddDatasetSelectors 
                         dates={dates}
                         dispatch={dispatch} 
@@ -129,7 +135,10 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         showDates={showDates}
                     />
                 </div>
-            )
+            );
+            if (showEncounterPanelSelectorModal) {
+                
+            }
         }
 
         return arr;
@@ -143,12 +152,9 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         let selectedName = '';
 
         if (selected) {
-            const name = selected.name;
-            if (name.length > 20) {
-                selectedName = name.substring(0, 20) + '...';
-            } else {
-                selectedName = name;
-            }
+            selectedName = selected.name.length > 20
+                ? selected.name.substring(0, 20) + '...'
+                : selected.name;
         }
 
         if (configuration.isFetching) {
