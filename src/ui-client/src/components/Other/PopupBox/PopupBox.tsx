@@ -42,7 +42,7 @@ export default class PopupBox extends React.PureComponent<Props, State> {
         const classes = [ c, (!this.state.shown ? 'appear' : '') ];
         const style = parentDomRect 
             ? { ...this.props.style, bottom: parentDomRect.bottom, left: parentDomRect.left, top: parentDomRect.top } 
-            : { bottom: 100, left: 0, top: 100 };
+            : undefined;
 
         return (
             createPortal(

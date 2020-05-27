@@ -27,9 +27,9 @@ interface Props {
 }
 
 interface State {
-    selectedDates: DateBoundary;
+    selectedEncounterPanel?: number; 
+    selectedDates?: DateBoundary;
     showDates: boolean;
-    showEncounterPanelSelectorModal: boolean;
     showSelectorModal: boolean;
 }
 
@@ -54,7 +54,6 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         this.state = {
             selectedDates: dates[4],
             showDates: false,
-            showEncounterPanelSelectorModal: false,
             showSelectorModal: false
         }
     }
@@ -77,7 +76,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     public render() {
         const c = this.className;
-        const { selectedDates, showSelectorModal, showDates, showEncounterPanelSelectorModal } = this.state;
+        const { selectedDates, selectedEncounterPanel, showSelectorModal, showDates } = this.state;
         const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
@@ -128,17 +127,15 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         className={c}
                         datasets={datasets}
                         handleClickClose={this.handleClickClose}
-                        handleByEncounterSelect={this.handleByEncounterSelect}
+                        handleEncounterPanelSelect={this.handleEncounterPanelSelect}
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
+                        selectedEncounterPanel={selectedEncounterPanel}
                         showDates={showDates}
                     />
                 </div>
             );
-            if (showEncounterPanelSelectorModal) {
-                
-            }
         }
 
         return arr;
@@ -167,11 +164,11 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     }
 
     private handleDateOptionClick = (opt: DateBoundary) => {
-        this.setState({ selectedDates: opt });
+        this.setState({ selectedDates: opt, selectedEncounterPanel: undefined });
     }
 
-    private handleByEncounterSelect = () => {
-        this.setState({ showEncounterPanelSelectorModal: true });
+    private handleEncounterPanelSelect = (selectedEncounterPanel: number) => {
+        this.setState({ selectedEncounterPanel });
     }
 
     private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
@@ -190,6 +187,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleBlur = () => {
         const { isFetching } = this.props.configuration;
+        return;
 
         if (this.mouseOut && !isFetching) {
             this.setState({ showSelectorModal: false });

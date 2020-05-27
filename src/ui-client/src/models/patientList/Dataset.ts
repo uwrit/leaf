@@ -139,6 +139,7 @@ export interface PatientListDatasetDefinition extends PatientListDatasetDefiniti
     columns: Map<PatientListColumnId, PatientListColumn>;
     dateBounds?: DateBoundary;
     displayName: string;
+    encounterPanelIndex?: number;
     id: PatientListDatasetId;
     responderStates: Map<number, CohortStateType>;
     summaryType?: PatientListDatasetSummaryType;

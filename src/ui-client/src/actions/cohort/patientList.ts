@@ -46,6 +46,7 @@ export interface CohortPatientListAction {
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
     dates?: DateBoundary;
+    encounterPanelIndex?: number;
     patientList?: PatientListState;
     rowCount?: number;
     rowId?: number;
@@ -73,7 +74,7 @@ const switchArrayPositions = (arr: any[], oldIdx: number, newIdx: number) => {
  * Request a patient list dataset from each responder which is 
  * enabled and has loaded demographics.
  */
-export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: DateBoundary) => {
+export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {
     return (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const responders: NetworkIdentity[] = [];
@@ -98,7 +99,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                 try {
                     if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-                        const ds = await fetchDataset(state, nr, queryId, dataset, dates);
+                        const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIndex);
                         const newPl = await addDataset(getState, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);
@@ -128,7 +129,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                 dispatch(showInfoModal(info));
             }
         })
-        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates)))
+        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates, panelIndex)))
         .catch(() => dispatch(setPatientListDatasetFailure(dataset.id, 0)));
     };
 };
@@ -293,10 +294,11 @@ export const setPatientListSingletonReceived = (id: number, rowCount: number): C
     };
 };
 
-export const setPatientListDatasetReceived = (datasetId: string, dates: DateBoundary): CohortPatientListAction => {
+export const setPatientListDatasetReceived = (datasetId: string, dates?: DateBoundary, encounterPanelIndex?: number): CohortPatientListAction => {
     return {
         datasetId,
         dates,
+        encounterPanelIndex,
         id: 0,
         type: PATIENT_LIST_DATASET_RECEIVED
     };

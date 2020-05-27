@@ -105,8 +105,6 @@ class App extends React.Component<Props> {
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
-                <EncounterPanelSelector />
-                {/*
                 <Attestation />
                 <CohortCountBox />
                 <Header />
@@ -125,7 +123,6 @@ class App extends React.Component<Props> {
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
-            */}
             </div>
         );
     }

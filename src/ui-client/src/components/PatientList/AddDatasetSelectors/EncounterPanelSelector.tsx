@@ -6,18 +6,21 @@
  */ 
 
 import React from 'react';
+import { createPortal } from 'react-dom';
 import { Col, Row, Button, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AppState } from '../../../models/state/AppState';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import Panel from '../../FindPatients/Panels/Panel';
 import { CohortStateType } from '../../../models/state/CohortState';
-import { PatientListDatasetQuery, PatientListDatasetShape } from '../../../models/patientList/Dataset';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import PopupBox from '../../Other/PopupBox/PopupBox';
 import './EncounterPanelSelector.css';
 
 interface OwnProps {
     dataset?: PatientListDatasetQuery;
-    handleByEncounterSelect?: () => void;
+    handleByEncounterSelect: (panelIndex: number) => void;
+    isOpen: boolean;
 }
 interface StateProps {
     panels: PanelModel[];
@@ -31,32 +34,24 @@ class EncounterPanelSelector extends React.PureComponent<Props> {
     private className = 'encounter-panel-selector';
 
     public render() {
-        const { panels, dataset } = this.props;
+        const { panels, dataset, isOpen, handleByEncounterSelect } = this.props;
         const c = this.className;
         const modalClasses = [ `${c}-modal` ];
 
-        // TESTING
-        const dummyDs: PatientListDatasetQuery = {
-            id: '123',
-            name: 'Diagnosis',
-            isEncounterBased: true,
-            category: '',
-            shape: PatientListDatasetShape.Encounter,
-            tags: []
-        };
+        // if (!isOpen) { return null; }
 
         return (
-            <Modal isOpen={true} className={modalClasses.join(' ')} backdrop={false}>
-                <div className={`${c}-container`}>
-                    <ModalBody>
-                        <div className={`${c}-header`}>Which Encounters do you want {dummyDs.name} data from?</div>
-                        <Row>
-                            {panels.map((p,i) => {
-                                return (
-                                    <Col className={`${c}-panel-wrapper`} md={4}>
-                                        <div className={`${c}-panel-id`}>Panel {i+1}</div>
-                                        <div className={`${c}-panel-overlay-outer`}>
-                                            <div className={`${c}-panel-overlay-inner`}>
+            createPortal(
+                <div className={modalClasses.join(' ')}>
+                    <div className={`${c}-container`}>
+                        <ModalBody>
+                            <div className={`${c}-header`}>Which Encounters do you want {dataset && dataset.name} data from?</div>
+                            <Row>
+                                {panels.map((p,i) => {
+                                    return (
+                                        <Col className={`${c}-panel-wrapper ${this.getPanelClass(p)}`} md={4}>
+                                            <div className={`${c}-panel-id`}>Panel {i+1}</div>
+                                            <div className={`${c}-panel-overlay`} onClick={handleByEncounterSelect.bind(null, i)}>
                                                 <Panel 
                                                     isFirst={i===0}
                                                     dispatch={this.noOp}
@@ -64,18 +59,29 @@ class EncounterPanelSelector extends React.PureComponent<Props> {
                                                     queryState={CohortStateType.LOADED}
                                                 />
                                             </div>
-                                        </div>
-                                    </Col>
-                                )
-                            })}
-                        </Row>
-                    </ModalBody>
+                                        </Col>
+                                    )
+                                })}
+                            </Row>
+                        </ModalBody>
+                    </div>
                 </div>
-            </Modal>
+            , document.body)
         )
     }
 
     private noOp = () => () => null;
+
+    private getPanelClass = (panel: PanelModel): string => {
+        const hasEncs = !!panel.subPanels.find(sp => sp.panelItems.find(pi => pi.concept.isEncounterBased));
+        const negated = !panel.includePanel;
+        const empty = !panel.subPanels.find(sp => sp.panelItems.length > 0);
+
+        if (negated)  { return 'excluded'; }
+        if (!hasEncs) { return 'no-encounters'; }
+        if (empty)    { return 'empty'; }
+        return 'valid';
+    }
 }
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {

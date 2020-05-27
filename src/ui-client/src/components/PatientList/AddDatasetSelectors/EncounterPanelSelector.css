@@ -6,11 +6,22 @@
  */ 
 
 .encounter-panel-selector-modal {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: rgba(0,0,0,0.3) 0px 0px 15px 0px;
     color: rgb(51, 51, 51);
     font-weight: 300;
-    margin: 8% auto !important
+    margin: auto;
+    min-height: 600px;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    width: 1100px;
+    z-index: 100;
 }
 
+/*
 .encounter-panel-selector-modal.modal-dialog {
     height: 70% !important;
     max-width: 1200px !important;
@@ -20,10 +31,9 @@
 .encounter-panel-selector-modal .modal-content {
     border: none;
     border-color: transparent;
-    border-radius: 8px;
-    box-shadow: rgba(0,0,0,0.3) 0px 0px 15px 0px;
+    
 }
-
+*/
 .encounter-panel-selector-panel-overlay {
     text-align: center;
 }
@@ -54,17 +64,12 @@
     text-align: center;
 }
 
-.encounter-panel-selector-panel-wrapper-outer {
+.encounter-panel-selector-panel-overlay {
     cursor: pointer;
-    pointer-events: all;
-}
-
-.encounter-panel-selector-panel-overlay-inner {
-    pointer-eventsz: none;
     text-align: center;
 }
 
-.encounter-panel-selector-panel-overlay-inner:after {
+.encounter-panel-selector-panel-overlay:after {
     content: '';
     position: absolute;
     left:0;
@@ -72,14 +77,14 @@
     top:0;
     bottom:0;
     background: transparent;
-    background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0),rgba(255, 255, 255, 0), white);
+    background-image: linear-gradient(top, rgba(255, 255, 255, 0),rgba(255, 255, 255, 0), white);
 }
 
 .encounter-panel-selector-panel-wrapper:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
-.encounter-panel-selector-panel-overlay-inner:hover {
-    border: 1px solid rgba(28, 168, 221, 1);
+.encounter-panel-selector-panel-wrapper:hover .panel {
+    border: 1px solid rgba(28, 168, 221, 0.5);
     box-shadow: 0 0 12px rgba(28, 168, 221, 1);
 }

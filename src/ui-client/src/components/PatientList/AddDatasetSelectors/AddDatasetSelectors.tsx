@@ -13,6 +13,7 @@ import { PatientListConfiguration } from '../../../models/patientList/Configurat
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
 import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import EncounterPanelSelector from './EncounterPanelSelector';
 
 interface Props {
     className?: string;
@@ -22,16 +23,31 @@ interface Props {
     dispatch: any;
     handleClickClose: () => void;
     handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
-    handleByEncounterSelect: () => void;
+    handleEncounterPanelSelect: (panelIndex: number) => void;
     handleDateSelect: (date: DateBoundary) => void;
-    selectedDates: DateBoundary;
+    selectedDates?: DateBoundary;
+    selectedEncounterPanel?: number;
     showDates: boolean;
 }
 
-export default class AddDatasetSelectors extends React.PureComponent<Props> {
+interface State {
+    showEncounterPanelModal: boolean;
+}
+
+export default class AddDatasetSelectors extends React.PureComponent<Props,State> {
+    public constructor(props: Props) {
+        super(props);
+        this.state = {
+            showEncounterPanelModal: false
+        }
+    }
+
     public render() {
-        const { datasets, className, dates, dispatch, handleByEncounterSelect, handleDatasetSelect, handleClickClose, showDates } = this.props;
+        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates } = this.props;
+        const { showEncounterPanelModal } = this.state;
         const c = className ? className : 'patientlist-add-dataset';
+        const selected = datasets.all.get(datasets.selected);
+
         return (
             <div className={c}>
                 <Row>
@@ -48,20 +64,22 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                         />
                     </Col>
                     <Col md={3} className={`${c}-select-col-right`}>
-                        {showDates &&   [
-                        dates.map((d: DateBoundary) => {
-                            return (
-                                <div 
-                                    key={d.display} 
-                                    className={this.setDateOptionClass(d)}
-                                    onClick={this.handleDateOptionClick.bind(null, d)}
-                                    tabIndex={0}>
-                                    {d.display}
-                                </div>
-                            );
-                        }),
-                        <div onClick={handleByEncounterSelect} className='by-encounter'>Only Certain Encounters</div>
-                        ]}
+                        {showDates && 
+                        <div>
+                            {dates.map((d: DateBoundary) => {
+                                return (
+                                    <div 
+                                        key={d.display} 
+                                        className={this.setDateOptionClass(d)}
+                                        onClick={this.handleDateOptionClick.bind(null, d)}
+                                        tabIndex={0}>
+                                        {d.display}
+                                    </div>
+                                );
+                            })}
+                            {this.getByEncounterContent()}
+                        </div>
+                        }
                         {!showDates &&
                         <div>This dataset cannot be filtered by dates</div>}
                     </Col>
@@ -75,8 +93,18 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                         Add Dataset
                     </Button>
                 </div>
+                <EncounterPanelSelector isOpen={showEncounterPanelModal} dataset={selected} handleByEncounterSelect={this.handleEncounterPanelSelect} />
             </div>
         )
+    }
+
+    private getByEncounterContent = (selectedEncounterPanel?: number) => {
+        const { className } = this.props;
+
+        if (selectedEncounterPanel === undefined) {
+            return <div onClick={this.showEncounterPanelModal} className={`${className}-by-encounter`}>Only Certain Encounters</div>;
+        }
+        return <div onClick={this.showEncounterPanelModal} className={`${className}-by-encounter selected`}>From Panel {selectedEncounterPanel+1}</div>;
     }
 
     private handleDateOptionClick = (opt: DateBoundary) => {
@@ -87,6 +115,15 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
     private setDateOptionClass = (date: DateBoundary) => {
         const { className, selectedDates } = this.props;
         return `${className}-select-date-option ${date === selectedDates ? 'selected' : ''}`
+    }
+
+    private showEncounterPanelModal = () => this.setState({ showEncounterPanelModal: true });
+
+    private handleEncounterPanelSelect = (panelIndex: number) => {
+        const { handleEncounterPanelSelect } = this.props;
+
+        this.setState({ showEncounterPanelModal: false })
+        handleEncounterPanelSelect(panelIndex);
     }
 
     private handleDatasetRequest = () => {
