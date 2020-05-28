@@ -22,6 +22,7 @@ namespace Model.Options
         public class VisualizeOptions
         {
             public bool Enabled { get; set; }
+            public bool ShowFederated { get; set; }
         }
         public class PatientListOptions
         {

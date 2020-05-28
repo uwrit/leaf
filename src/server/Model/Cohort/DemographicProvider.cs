@@ -6,6 +6,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
@@ -36,12 +37,14 @@ namespace Model.Cohort
         readonly IDemographicSqlCompiler compiler;
         readonly IDemographicsExecutor executor;
         readonly IUserContext user;
+        readonly ClientOptions clientOpts;
         readonly ObfuscationOptions obfOpts;
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider(
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
+            IOptions<ClientOptions> clientOpts,
             IOptions<ObfuscationOptions> obfOpts,
             IDemographicSqlCompiler compiler,
             IDemographicsExecutor executor,
@@ -51,6 +54,7 @@ namespace Model.Cohort
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = executor;
+            this.clientOpts = clientOpts.Value;
             this.obfOpts = obfOpts.Value;
             this.log = log;
         }
@@ -70,13 +74,8 @@ namespace Model.Cohort
         {
             log.LogInformation("Demographics starting. QueryRef:{QueryRef}", query);
             Ensure.NotNull(query, nameof(query));
+            ThrowIfSettingsInvalid();
             var result = new Result();
-
-            if (obfOpts.Noise.Enabled)
-            {
-                log.LogError("Demographics cannot be returned if Obfuscation Noise is enabled");
-                return result;
-            }
 
             var validationContext = await contextProvider.GetCompilerContextAsync(query);
             log.LogInformation("Demographics compiler validation context. Context:{@Context}", validationContext);
@@ -100,11 +99,46 @@ namespace Model.Cohort
 
             result.Demographics = new Demographic
             {
-                Patients = ctx.Exported,
-                Statistics = stats
+                Patients = GetDemographicsWithSettings(ctx.Exported),
+                Statistics = GetStatisticsWithSettings(stats)
             };
 
             return result;
+        }
+
+        IEnumerable<PatientDemographic> GetDemographicsWithSettings(IEnumerable<PatientDemographic> patients)
+        {
+            // Row level data disabled, return null
+            if (obfOpts.Enabled && !obfOpts.RowLevelData.Enabled) { return null; }
+            
+            // Patient list is disabled, return null
+            if (!clientOpts.PatientList.Enabled) { return null; }
+
+            return patients;
+        }
+
+        DemographicStatistics GetStatisticsWithSettings(DemographicStatistics stats)
+        {
+            // Visualize disabled, return null
+            if (!clientOpts.Visualize.Enabled) { return null; }
+
+            return stats;
+        }
+
+        void ThrowIfSettingsInvalid()
+        {
+            if (!clientOpts.PatientList.Enabled && !clientOpts.Visualize.Enabled)
+            {
+                throw new Exception("Both Visualize and Patient List are disabled");
+            }
+            if (obfOpts.Noise.Enabled)
+            {
+                throw new Exception("Demographics cannot be returned if Obfuscation Noise is enabled");
+            }
+            if (obfOpts.LowCellSizeMasking.Enabled)
+            {
+                throw new Exception("Demographics cannot be returned if Low Cell Size Masking is enabled");
+            }
         }
 
         // DemographicProvider associated Result type.

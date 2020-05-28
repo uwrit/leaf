@@ -16,6 +16,8 @@ using Model.Search;
 using Model.Tagging;
 using Model.Error;
 using System.Data.Common;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace Model.Search
 {
@@ -24,17 +26,35 @@ namespace Model.Search
         readonly IQueryService service;
         readonly ILogger<QueryManager> log;
         readonly IUserContext user;
+        readonly ObfuscationOptions obfuscationOptions;
         readonly PanelConverter converter;
         readonly PanelValidator validator;
 
+        bool shouldHideCountChecked = false;
+        bool shouldHideCount = false;
+        bool HideCount
+        {
+            get 
+            { 
+                if (!shouldHideCountChecked)
+                {
+                    shouldHideCount = obfuscationOptions.Enabled && (obfuscationOptions.Noise.Enabled || obfuscationOptions.LowCellSizeMasking.Enabled);
+                    shouldHideCountChecked = true;
+                }
+                return shouldHideCount;
+            }
+        }
+
         public QueryManager(
             IQueryService service,
+            IOptions<ObfuscationOptions> obfuscationOptions,
             ILogger<QueryManager> log,
             IUserContext user,
             PanelConverter converter,
             PanelValidator validator)
         {
             this.service = service;
+            this.obfuscationOptions = obfuscationOptions.Value;
             this.log = log;
             this.user = user;
             this.converter = converter;
@@ -43,8 +63,17 @@ namespace Model.Search
 
         public async Task<IEnumerable<BaseQuery>> GetQueriesAsync()
         {
-            log.LogInformation("Getting queries.");
-            return await service.GetQueriesAsync();
+            log.LogInformation("Getting queries");
+            var queries = await service.GetQueriesAsync();
+            if (HideCount)
+            {
+                queries = queries.ToList();
+                foreach (var query in queries)
+                {
+                    query.Count = null;
+                }
+            }
+            return queries;
         }
 
         public async Task<Query> GetQueryAsync(QueryUrn urn)
@@ -60,6 +89,10 @@ namespace Model.Search
                 else
                 {
                     log.LogInformation("Found query. Id:{Id} UId:{UId}", query.Id, query.UniversalId);
+                }
+                if (HideCount)
+                {
+                    query.Count = null;
                 }
                 return query;
             }

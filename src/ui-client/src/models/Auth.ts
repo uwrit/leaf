@@ -45,6 +45,7 @@ interface MapOptions {
 
 interface VisualizeOptions {
     enabled: boolean;
+    showFederated?: boolean;
 }
 
 interface PatientListOptions {

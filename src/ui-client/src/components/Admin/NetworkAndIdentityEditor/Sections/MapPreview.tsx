@@ -45,6 +45,7 @@ export class MapPreview extends React.Component<Props, State> {
         const { identity, tileUrl } = this.props;
         const { ref } = this.state;
         const latLng = this.getLatLng();
+        const dummyCount = { value: 1000, plusMinus: 0, queryId: '', withinLowCellThreshold: false, sqlStatements: [], state: CohortStateType.LOADED };
 
         if (!tileUrl || !latLng || !latLng.lat || !latLng.lng ) { return null; }
     
@@ -61,7 +62,7 @@ export class MapPreview extends React.Component<Props, State> {
                 >
                 <TileLayer url={tileUrl} />
                 <EndpointMarker position={latLng} queryState={CohortStateType.LOADED} />
-                <EndpointPopup id={{ ...identity, latitude: latLng.lat, longitude: latLng.lng }} count={1000} />
+                <EndpointPopup id={{ ...identity, latitude: latLng.lat, longitude: latLng.lng }} count={dummyCount} />
             </LeafletMap>
         );
     }

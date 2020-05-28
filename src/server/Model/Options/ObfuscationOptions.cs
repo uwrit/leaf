@@ -31,7 +31,7 @@ namespace Model.Options
 
         public class RowLevelDataOptions
         {
-            public bool Enabled { get; set; }
+            public bool Enabled = true;
         }
     }
 }

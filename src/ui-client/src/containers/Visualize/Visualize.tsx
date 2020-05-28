@@ -100,7 +100,7 @@ class Visualize extends React.Component<Props, State> {
                     height={demogHeight}
                     width={this.state.width}
                 />
-                {data.length > 1 &&
+                {data.length > 1 && auth.config!.client.visualize.showFederated &&
                 <div className={`${c}-responder-demographic-container`}>
                     {data.map((d: any, i: number) => {
                         return (

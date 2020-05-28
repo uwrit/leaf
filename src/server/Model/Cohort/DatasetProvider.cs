@@ -12,6 +12,8 @@ using Model.Compiler;
 using Model.Error;
 using Model.Validation;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Model.Options;
 
 namespace Model.Cohort
 {
@@ -31,17 +33,23 @@ namespace Model.Cohort
         readonly DatasetCompilerValidationContextProvider contextProvider;
         readonly IDatasetSqlCompiler compiler;
         readonly IDatasetExecutor executor;
+        readonly ClientOptions clientOpts;
+        readonly ObfuscationOptions obfuscationOpts;
         readonly ILogger<DatasetProvider> log;
 
         public DatasetProvider(
             DatasetCompilerValidationContextProvider contextProvider,
             IDatasetSqlCompiler compiler,
             IDatasetExecutor datasetService,
+            IOptions<ClientOptions> clientOpts,
+            IOptions<ObfuscationOptions> obfuscationOpts,
             ILogger<DatasetProvider> log)
         {
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = datasetService;
+            this.clientOpts = clientOpts.Value;
+            this.obfuscationOpts = obfuscationOpts.Value;
             this.log = log;
         }
 
@@ -64,6 +72,7 @@ namespace Model.Cohort
             log.LogInformation("Dataset starting. QueryRef:{QueryRef} DatasetRef:{DatasetRef}", query, datasetQuery);
             Ensure.NotNull(query, nameof(query));
             Ensure.NotNull(datasetQuery, nameof(datasetQuery));
+            ThrowIfSettingsInvalid();
 
             var request = new DatasetExecutionRequest(query, datasetQuery, early, late, panelIdx);
             var result = new Result();
@@ -90,6 +99,29 @@ namespace Model.Cohort
             result.Dataset = data;
 
             return result;
+        }
+
+        void ThrowIfSettingsInvalid()
+        {
+            if (!clientOpts.PatientList.Enabled)
+            {
+                throw new Exception("Patient List datasets are disabled");
+            }
+            if (obfuscationOpts.Enabled)
+            {
+                if (obfuscationOpts.Noise.Enabled)
+                {
+                    throw new Exception("Patient List datasets cannot be extracted if Obfuscation Noise is enabled");
+                }
+                if (obfuscationOpts.LowCellSizeMasking.Enabled)
+                {
+                    throw new Exception("Patient List datasets cannot be extracted if Low Cell Size Masking is enabled");
+                }
+                if (!obfuscationOpts.RowLevelData.Enabled)
+                {
+                    throw new Exception("Patient List datasets cannot be extracted if Row Level Data is disabled");
+                }
+            }
         }
 
         public class Result

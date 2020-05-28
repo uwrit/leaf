@@ -217,6 +217,14 @@ namespace API.Options
 
                 // Visualize
                 opts.Visualize.Enabled = config.GetValue<bool>(Config.Client.Visualize.Enabled);
+                if (opts.Visualize.Enabled)
+                {
+                    var hasFedSet = config.TryGetValue(Config.Client.Visualize.ShowFederated, out bool showFed);
+                    if (hasFedSet)
+                    {
+                        opts.Visualize.ShowFederated = showFed;
+                    }
+                }
 
                 // Patient List
                 opts.PatientList.Enabled = config.GetValue<bool>(Config.Client.PatientList.Enabled);
@@ -296,8 +304,11 @@ namespace API.Options
 
                 if (obf.RowLevelData.Enabled && obf.Noise.Enabled)
                 {
-                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Noise is also enabled, which prohibits all Row Level Data. Reverting Row Level Data to disabled");
-                    obf.RowLevelData.Enabled = false;
+                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Noise is also enabled, which prohibits all Row Level Data. If demographic or patient list data are requested an error will be thrown");
+                }
+                if (obf.RowLevelData.Enabled && obf.LowCellSizeMasking.Enabled)
+                {
+                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Low Cell Masking is also enabled, which prohibits all Row Level Data. If demographic or patient list data are requested an error will be thrown");
                 }
             }
             services.Configure<ObfuscationOptions>(opts =>
