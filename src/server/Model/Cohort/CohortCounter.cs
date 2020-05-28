@@ -37,7 +37,7 @@ namespace Model.Cohort
 
         readonly PanelConverter converter;
         readonly PanelValidator validator;
-        readonly ObfuscationOptions obfOpts;
+        readonly DeidentificationOptions deidentOpts;
         readonly IPatientCohortService counter;
         readonly ICohortCacheService cohortCache;
         readonly IObfuscationService obfuscator;
@@ -47,7 +47,7 @@ namespace Model.Cohort
 
         public CohortCounter(
             IOptions<RuntimeOptions> opts,
-            IOptions<ObfuscationOptions> obfOpts,
+            IOptions<DeidentificationOptions> deidentOpts,
             PanelConverter converter,
             PanelValidator validator,
             IPatientCohortService counter,
@@ -57,7 +57,7 @@ namespace Model.Cohort
             ILogger<CohortCounter> log)
         {
             this.runtime = opts.Value.Runtime;
-            this.obfOpts = obfOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
             this.converter = converter;
             this.validator = validator;
             this.counter = counter;
@@ -190,10 +190,10 @@ namespace Model.Cohort
                 }
             };
 
-            if (obfOpts.ShouldObfuscate())
+            if (deidentOpts.ObfuscateCohort)
             {
                 var count = result.Count;
-                obfuscator.Obfuscate(ref count, result.ValidationContext, obfOpts);
+                obfuscator.Obfuscate(ref count, result.ValidationContext, deidentOpts);
                 log.LogInformation("FullCount results obfuscated. Obfuscated:{@Result}", result);
             }
 

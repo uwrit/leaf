@@ -26,7 +26,7 @@ namespace Model.Options
             var tmp = value.ToUpper();
             if (!ValidRuntime(tmp))
             {
-                throw new LeafConfigurationException($"{value} is not a supported a runtime mode.");
+                throw new LeafConfigurationException($"{value} is not a supported a runtime mode");
             }
 
             switch (tmp)

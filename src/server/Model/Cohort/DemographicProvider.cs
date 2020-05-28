@@ -38,14 +38,14 @@ namespace Model.Cohort
         readonly IDemographicsExecutor executor;
         readonly IUserContext user;
         readonly ClientOptions clientOpts;
-        readonly ObfuscationOptions obfOpts;
+        readonly DeidentificationOptions deidentOpts;
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider(
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
             IOptions<ClientOptions> clientOpts,
-            IOptions<ObfuscationOptions> obfOpts,
+            IOptions<DeidentificationOptions> deidentOpts,
             IDemographicSqlCompiler compiler,
             IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
@@ -55,7 +55,7 @@ namespace Model.Cohort
             this.compiler = compiler;
             this.executor = executor;
             this.clientOpts = clientOpts.Value;
-            this.obfOpts = obfOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
             this.log = log;
         }
 
@@ -108,9 +108,6 @@ namespace Model.Cohort
 
         IEnumerable<PatientDemographic> GetDemographicsWithSettings(IEnumerable<PatientDemographic> patients)
         {
-            // Row level data disabled, return null
-            if (obfOpts.Enabled && !obfOpts.RowLevelData.Enabled) { return null; }
-            
             // Patient list is disabled, return null
             if (!clientOpts.PatientList.Enabled) { return null; }
 
@@ -131,13 +128,13 @@ namespace Model.Cohort
             {
                 throw new Exception("Both Visualize and Patient List are disabled");
             }
-            if (obfOpts.Noise.Enabled)
+            if (deidentOpts.Cohort.Noise.Enabled)
             {
-                throw new Exception("Demographics cannot be returned if Obfuscation Noise is enabled");
+                throw new Exception("Demographics cannot be returned if Cohort De-identification Noise is enabled");
             }
-            if (obfOpts.LowCellSizeMasking.Enabled)
+            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
             {
-                throw new Exception("Demographics cannot be returned if Low Cell Size Masking is enabled");
+                throw new Exception("Demographics cannot be returned if Cohort De-identification Low Cell Size Masking is enabled");
             }
         }
 

@@ -12,6 +12,6 @@ namespace Model.Obfuscation
 {
     public interface IObfuscationService
     {
-        void Obfuscate(ref PatientCount count, PanelValidationContext ctx, ObfuscationOptions opts);
+        void Obfuscate(ref PatientCount count, PanelValidationContext ctx, DeidentificationOptions opts);
     }
 }

@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Model.Extensions;
@@ -14,18 +13,27 @@ using Model.Schema;
 
 namespace Model.Anonymization
 {
-    using Actor = Action<object, PropertyInfo, Guid, Guid>;
+    using Actor = Action<object, PropertyInfo, Guid, Guid, FuzzParameters>;
 
     public class Anonymizer<T>
         where T : class, ISalt
     {
         protected Guid Pepper { get; set; }
         AnonymizationPlanner Impl { get; set; }
+        FuzzParameters FuzzParameters { get; set; }
 
         public Anonymizer(Guid pepper)
         {
             Pepper = pepper;
             Impl = new AnonymizationPlanner(typeof(T));
+            FuzzParameters = new FuzzParameters("HOUR", -1000, 1000);
+        }
+        
+        public Anonymizer(Guid pepper, string increment, int lowerBound, int upperBound)
+        {
+            Pepper = pepper;
+            Impl = new AnonymizationPlanner(typeof(T));
+            FuzzParameters = new FuzzParameters(increment, lowerBound, upperBound);
         }
 
         public void Anonymize(T record)
@@ -69,7 +77,7 @@ namespace Model.Anonymization
             {
                 throw new ArgumentException($"No anonymization actor implemented for type {prop.PropertyType.ToString()}");
             }
-            actor(record, prop, record.Salt, Pepper);
+            actor(record, prop, record.Salt, Pepper, FuzzParameters);
         }
 
         object GetDefault(PropertyInfo info)
@@ -86,9 +94,43 @@ namespace Model.Anonymization
         };
     }
 
+    public class FuzzParameters
+    {
+        public Func<DateTime, int, DateTime> DateShifter { get; protected set; }
+        public int LowerBound { get; protected set; }
+        public int UpperBound { get; protected set; }
+
+        public FuzzParameters(string incrType, int lowerBound, int upperBound)
+        {
+            SetDateShifter(incrType);
+            LowerBound = lowerBound;
+            UpperBound = upperBound;
+        }
+
+        void SetDateShifter(string incrType)
+        {
+            var tmp = incrType.ToUpper();
+            switch (tmp)
+            {
+                case "MINUTE":
+                    DateShifter = (val, shift) => val.AddMinutes(shift);
+                    break;
+                case "HOUR":
+                    DateShifter = (val, shift) => val.AddHours(shift);
+                    break;
+                case "DAY":
+                    DateShifter = (val, shift) => val.AddDays(shift);
+                    break;
+                default:
+                    DateShifter = (val, shift) => val.AddHours(shift);
+                    break;
+            }
+        }
+    }
+
     static class Fuzzer
     {
-        public static readonly Actor String = (record, prop, salt, pepper) =>
+        public static readonly Actor String = (record, prop, salt, pepper, parameters) =>
         {
             var p = pepper.ToString();
             var s = salt.ToString();
@@ -99,24 +141,24 @@ namespace Model.Anonymization
             prop.SetValue(record, composite.GetConsistentHashCode().ToString());
         };
 
-        public static readonly Actor DateTime = (record, prop, salt, pepper) =>
+        public static readonly Actor DateTime = (record, prop, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
             var value = (DateTime)prop.GetValue(record);
-            var shift = rand.Next(-1000, 1000);
+            var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
 
-            prop.SetValue(record, value.AddHours(shift));
+            prop.SetValue(record, parameters.DateShifter(value, shift));
         };
 
-        public static readonly Actor NullableDateTime = (record, prop, salt, pepper) =>
+        public static readonly Actor NullableDateTime = (record, prop, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
             var value = (DateTime?)prop.GetValue(record);
 
             if (value.HasValue)
             {
-                var shift = rand.Next(-1000, 1000);
-                prop.SetValue(record, value.Value.AddHours(shift));
+                var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
+                prop.SetValue(record, parameters.DateShifter(value.Value, shift));
             }
         };
     }

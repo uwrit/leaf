@@ -136,3 +136,13 @@
 .encounter-panel-selector-exclusion-text > svg {
     margin-right: 6px;
 }
+
+.encounter-panel-selector-close {
+    color: rgb(200,200,200);
+    cursor: pointer;
+    float: right;
+}
+
+.encounter-panel-selector-close:hover {
+    color: rgb(244, 67, 54);
+}

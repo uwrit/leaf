@@ -23,7 +23,7 @@ namespace Tests
         {
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, Noise = new ObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
+            var opts = new DeidentificationOptions { Enabled = true, Noise = new DeidentificationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context(); 
 
@@ -39,7 +39,7 @@ namespace Tests
         {
             var orig = 5;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, LowCellSizeMasking = new ObfuscationOptions.LowCellSizeMaskingOptions { Enabled = true, Threshold = 10 } };
+            var opts = new DeidentificationOptions { Enabled = true, LowCellSizeMasking = new DeidentificationOptions.LowCellSizeMaskingOptions { Enabled = true, Threshold = 10 } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context();
 
@@ -58,7 +58,7 @@ namespace Tests
             var g3 = Guid.NewGuid();
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new ObfuscationOptions { Enabled = true, Noise = new ObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
+            var opts = new DeidentificationOptions { Enabled = true, Noise = new DeidentificationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
 
             var count1 = new PatientCount { Value = orig };
             var count2 = new PatientCount { Value = orig };

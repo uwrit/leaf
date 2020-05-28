@@ -69,7 +69,7 @@ namespace API.Options
             services.ConfigureNotificationOptions(configuration);
 
             // Obfuscation Options
-            services.ConfigureObfuscationOptions(configuration);
+            services.ConfigureDeidentificationOptions(configuration);
 
             // Client options
             services.ConfigureClientOptions(configuration);
@@ -272,51 +272,60 @@ namespace API.Options
             return services;
         }
 
-        static IServiceCollection ConfigureObfuscationOptions(this IServiceCollection services, IConfiguration config)
+        static IServiceCollection ConfigureDeidentificationOptions(this IServiceCollection services, IConfiguration config)
         {
-            var log = services.BuildServiceProvider().GetRequiredService<ILogger<Startup>>();
-            var obf = new ObfuscationOptions { Enabled = config.GetValue<bool>(Config.Obfuscation.Enabled) };
+            var deident = new DeidentificationOptions();
 
-            if (obf.Enabled)
+            deident.Patient.Enabled = config.GetValue<bool>(Config.Deidentification.Patient.Enabled);
+            if (deident.Patient.Enabled)
             {
-                obf.Noise.Enabled = config.GetValue<bool>(Config.Obfuscation.Noise.Enabled);
-                if (obf.Noise.Enabled)
-                {
-                    obf.Noise.LowerBound = config.GetValue<int>(Config.Obfuscation.Noise.LowerBound);
-                    obf.Noise.UpperBound = config.GetValue<int>(Config.Obfuscation.Noise.UpperBound);
+                deident.Patient.DateShifting.WithIncrement(config.GetValue<string>(Config.Deidentification.Patient.DateShifting.Increment));
+                deident.Patient.DateShifting.LowerBound = config.GetValue<int>(Config.Deidentification.Patient.DateShifting.LowerBound);
+                deident.Patient.DateShifting.UpperBound = config.GetValue<int>(Config.Deidentification.Patient.DateShifting.UpperBound);
 
-                    if (obf.Noise.LowerBound == 0 && obf.Noise.UpperBound == 0)
-                    {
-                        throw new LeafConfigurationException("Obfuscation Noise is enabled but Lower Bound and Upper Bound are both set to zero");
-                    }
-                }
-                obf.LowCellSizeMasking.Enabled = config.GetValue<bool>(Config.Obfuscation.LowCellSizeMasking.Enabled);
-                if (obf.LowCellSizeMasking.Enabled)
+                if (deident.Patient.DateShifting.LowerBound == 0 && deident.Patient.DateShifting.UpperBound == 0)
                 {
-                    obf.LowCellSizeMasking.Threshold = config.GetValue<int>(Config.Obfuscation.LowCellSizeMasking.Threshold);
-
-                    if (obf.LowCellSizeMasking.Threshold <= 0)
-                    {
-                        throw new LeafConfigurationException($"Obfuscation Low Cell Size Masking must be greater than or equal to one, but is set to {obf.LowCellSizeMasking.Threshold}");
-                    }
+                    throw new LeafConfigurationException("Patient De-identification is enabled but Date Shifting Lower Bound and Upper Bound are both set to zero");
                 }
-                obf.RowLevelData.Enabled = config.GetValue<bool>(Config.Obfuscation.RowLevelData.Enabled);
-
-                if (obf.RowLevelData.Enabled && obf.Noise.Enabled)
+                if (deident.Patient.DateShifting.LowerBound >= deident.Patient.DateShifting.UpperBound)
                 {
-                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Noise is also enabled, which prohibits all Row Level Data. If demographic or patient list data are requested an error will be thrown");
-                }
-                if (obf.RowLevelData.Enabled && obf.LowCellSizeMasking.Enabled)
-                {
-                    log.LogWarning("Obfuscation Row Level Data is set to enabled, but Low Cell Masking is also enabled, which prohibits all Row Level Data. If demographic or patient list data are requested an error will be thrown");
+                    throw new LeafConfigurationException($"Patient De-identification Date Shifting Lower Bound must be less than Upper Bound, but is set to {deident.Patient.DateShifting.LowerBound} vs {deident.Patient.DateShifting.UpperBound}");
                 }
             }
-            services.Configure<ObfuscationOptions>(opts =>
+
+            deident.Cohort.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.Enabled);
+            if (deident.Cohort.Enabled)
             {
-                opts.Enabled = obf.Enabled;
-                opts.Noise = obf.Noise;
-                opts.LowCellSizeMasking = obf.LowCellSizeMasking;
-                opts.RowLevelData = obf.RowLevelData;
+                deident.Cohort.Noise.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.Noise.Enabled);
+                if (deident.Cohort.Noise.Enabled)
+                {
+                    deident.Cohort.Noise.LowerBound = config.GetValue<int>(Config.Deidentification.Cohort.Noise.LowerBound);
+                    deident.Cohort.Noise.UpperBound = config.GetValue<int>(Config.Deidentification.Cohort.Noise.UpperBound);
+
+                    if (deident.Cohort.Noise.LowerBound == 0 && deident.Cohort.Noise.UpperBound == 0)
+                    {
+                        throw new LeafConfigurationException("Cohort De-identification Noise is enabled but Lower Bound and Upper Bound are both set to zero");
+                    }
+                    if (deident.Cohort.Noise.LowerBound >= deident.Cohort.Noise.UpperBound)
+                    {
+                        throw new LeafConfigurationException($"Cohort De-identification Noise Lower Bound must be less than Upper Bound, but is set to {deident.Cohort.Noise.LowerBound} vs {deident.Cohort.Noise.UpperBound}");
+                    }
+                }
+
+                deident.Cohort.LowCellSizeMasking.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.LowCellSizeMasking.Enabled);
+                if (deident.Cohort.LowCellSizeMasking.Enabled)
+                {
+                    deident.Cohort.LowCellSizeMasking.Threshold = config.GetValue<int>(Config.Deidentification.Cohort.LowCellSizeMasking.Threshold);
+                    if (deident.Cohort.LowCellSizeMasking.Threshold <= 0)
+                    {
+                        throw new LeafConfigurationException($"Cohort De-identification Low Cell Size Masking must be greater than or equal to one, but is set to {deident.Cohort.LowCellSizeMasking.Threshold}");
+                    }
+                }
+            }
+            services.Configure<DeidentificationOptions>(opts =>
+            {
+                opts.Patient = deident.Patient;
+                opts.Cohort = deident.Cohort;
             });
 
             return services;

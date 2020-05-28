@@ -34,7 +34,7 @@ namespace Model.Cohort
         readonly IDatasetSqlCompiler compiler;
         readonly IDatasetExecutor executor;
         readonly ClientOptions clientOpts;
-        readonly ObfuscationOptions obfuscationOpts;
+        readonly DeidentificationOptions deidentOpts;
         readonly ILogger<DatasetProvider> log;
 
         public DatasetProvider(
@@ -42,14 +42,14 @@ namespace Model.Cohort
             IDatasetSqlCompiler compiler,
             IDatasetExecutor datasetService,
             IOptions<ClientOptions> clientOpts,
-            IOptions<ObfuscationOptions> obfuscationOpts,
+            IOptions<DeidentificationOptions> deidentOpts,
             ILogger<DatasetProvider> log)
         {
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = datasetService;
             this.clientOpts = clientOpts.Value;
-            this.obfuscationOpts = obfuscationOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
             this.log = log;
         }
 
@@ -107,20 +107,13 @@ namespace Model.Cohort
             {
                 throw new Exception("Patient List datasets are disabled");
             }
-            if (obfuscationOpts.Enabled)
+            if (deidentOpts.Cohort.Noise.Enabled)
             {
-                if (obfuscationOpts.Noise.Enabled)
-                {
-                    throw new Exception("Patient List datasets cannot be extracted if Obfuscation Noise is enabled");
-                }
-                if (obfuscationOpts.LowCellSizeMasking.Enabled)
-                {
-                    throw new Exception("Patient List datasets cannot be extracted if Low Cell Size Masking is enabled");
-                }
-                if (!obfuscationOpts.RowLevelData.Enabled)
-                {
-                    throw new Exception("Patient List datasets cannot be extracted if Row Level Data is disabled");
-                }
+                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Noise is enabled");
+            }
+            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
+            {
+                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Low Cell Size Masking is enabled");
             }
         }
 

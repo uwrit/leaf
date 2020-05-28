@@ -24,24 +24,24 @@ namespace Services.Obfuscation
             md5 = MD5.Create();
         }
 
-        public void Obfuscate(ref PatientCount count, PanelValidationContext ctx, ObfuscationOptions opts)
+        public void Obfuscate(ref PatientCount count, PanelValidationContext ctx, DeidentificationOptions opts)
         {
-            if (!opts.Enabled)
+            if (!opts.Cohort.Enabled)
             {
                 return;
             }
 
             // If low cell sizes should be masked and count less than or equal to threshold, set to threshold.
-            if (opts.LowCellSizeMasking.Enabled && count.Value <= opts.LowCellSizeMasking.Threshold)
+            if (opts.Cohort.LowCellSizeMasking.Enabled && count.Value <= opts.Cohort.LowCellSizeMasking.Threshold)
             {
-                count.Value = opts.LowCellSizeMasking.Threshold;
-                count.PlusMinus = opts.LowCellSizeMasking.Threshold;
+                count.Value = opts.Cohort.LowCellSizeMasking.Threshold;
+                count.PlusMinus = opts.Cohort.LowCellSizeMasking.Threshold;
                 count.WithinLowCellThreshold = true;
                 return;
             }
 
             // Bail if noise obfuscation not enabled
-            if (!opts.Noise.Enabled)
+            if (!opts.Cohort.Noise.Enabled)
             {
                 return;
             }
@@ -60,11 +60,11 @@ namespace Services.Obfuscation
             var shift = 0;
             while (shift == 0)
             {
-                shift = generator.Next(opts.Noise.LowerBound, opts.Noise.UpperBound);
+                shift = generator.Next(opts.Cohort.Noise.LowerBound, opts.Cohort.Noise.UpperBound);
             }
 
             count.Value += shift;
-            count.PlusMinus = Math.Max(Math.Abs(opts.Noise.LowerBound), Math.Abs(opts.Noise.UpperBound));
+            count.PlusMinus = Math.Max(Math.Abs(opts.Cohort.Noise.LowerBound), Math.Abs(opts.Cohort.Noise.UpperBound));
         }
 
         string GetDeterministicConceptIdsAsString(IEnumerable<Panel> panels)

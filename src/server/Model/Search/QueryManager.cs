@@ -26,7 +26,7 @@ namespace Model.Search
         readonly IQueryService service;
         readonly ILogger<QueryManager> log;
         readonly IUserContext user;
-        readonly ObfuscationOptions obfuscationOptions;
+        readonly DeidentificationOptions deidentOpts;
         readonly PanelConverter converter;
         readonly PanelValidator validator;
 
@@ -38,7 +38,7 @@ namespace Model.Search
             { 
                 if (!shouldHideCountChecked)
                 {
-                    shouldHideCount = obfuscationOptions.Enabled && (obfuscationOptions.Noise.Enabled || obfuscationOptions.LowCellSizeMasking.Enabled);
+                    shouldHideCount = deidentOpts.Cohort.Noise.Enabled || deidentOpts.Cohort.LowCellSizeMasking.Enabled;
                     shouldHideCountChecked = true;
                 }
                 return shouldHideCount;
@@ -47,14 +47,14 @@ namespace Model.Search
 
         public QueryManager(
             IQueryService service,
-            IOptions<ObfuscationOptions> obfuscationOptions,
+            IOptions<DeidentificationOptions> obfuscationOptions,
             ILogger<QueryManager> log,
             IUserContext user,
             PanelConverter converter,
             PanelValidator validator)
         {
             this.service = service;
-            this.obfuscationOptions = obfuscationOptions.Value;
+            this.deidentOpts = obfuscationOptions.Value;
             this.log = log;
             this.user = user;
             this.converter = converter;
