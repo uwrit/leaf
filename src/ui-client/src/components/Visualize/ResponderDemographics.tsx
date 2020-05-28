@@ -14,6 +14,7 @@ import { Binary } from './Binary';
 import { SectionHeader } from '../Other/SectionHeader/SectionHeader';
 import { LanguageByHeritage } from './LanguageByHeritage';
 import { Religion } from './Religion';
+import { NihRaceEthnicityGenderTable } from './NihRaceEthnicityGenderTable';
 
 export interface Props {
     cohort: NetworkCohortState;
@@ -27,7 +28,7 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
     private delayIncrementMs = 600;
 
     public render() {
-        const { ageByGenderData, binarySplitData, languageByHeritageData, religionData } = this.props.cohort.visualization.demographics;
+        const { ageByGenderData, binarySplitData, languageByHeritageData, religionData, nihRaceEthnicityData } = this.props.cohort.visualization.demographics;
         const { primaryColor, name, enabled } = this.props.responder;
         const colWidth = this.props.width / 2;
         const c = this.className;
@@ -79,6 +80,14 @@ export default class ResponderDemographics extends React.PureComponent<Props> {
                             height={this.props.height}
                             width={colWidth}
                         />
+                    </Col>
+                </Row>
+                <Row>
+                    <Col md={12} className="visualization-nih">
+                        <SectionHeader headerText="NIH Race, Ethnicity, and Gender" />
+                    </Col>
+                    <Col lg={{ size: 8, order: 2, offset: 2 }} md={12}>
+                        <NihRaceEthnicityGenderTable data={nihRaceEthnicityData} />
                     </Col>
                 </Row>
             </Container>

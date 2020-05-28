@@ -73,6 +73,10 @@ body {
     .user-question-modal .modal-body {
         height: 610px;
     }
+    .patientlist-scroller-left {
+        margin-left: 60px;
+        left: 0;
+    }
 }
 
 /* Large screen - 145px */

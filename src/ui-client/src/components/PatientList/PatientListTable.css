@@ -8,8 +8,16 @@
  .patientlist-table-container {
     font-family: Roboto;
     opacity: 1;
+    overflow-x: auto;
     padding: 0 20px;
     transition: opacity 1s;
+    width: calc(100vw - 170px);
+}
+
+@media only screen and (max-width: 1400px) {
+    .patientlist-table-container {
+        width: calc(100vw - 30px);
+    }
 }
 
 .patientlist-table-container.hidden {
@@ -98,6 +106,7 @@
 
 /* Tuple */
 .patientlist-tuple {
+    min-width: 80px;
     padding: 6px;
 }
 

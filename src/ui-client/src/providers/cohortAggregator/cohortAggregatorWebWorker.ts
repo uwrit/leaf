@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
-import { AgeByGenderBucket, BinarySplitPair, DemographicStatistics } from '../../models/cohort/DemographicDTO';
+import { BinarySplitPair, DemographicStatistics, NihRaceEthnicityBucket } from '../../models/cohort/DemographicDTO';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
 
@@ -162,6 +162,27 @@ export default class CohortAggregatorWebWorker {
                                 prevBucket[sbk] = 0;
                             }
                             prevBucket[sbk] += currBucket[sbk];
+                        })
+                    }
+                });
+
+                // NIH Race, Ethnicity, Gender
+                Object.keys(curr.nihRaceEthnicityData).forEach((k: string) => {
+                    const currBucket: NihRaceEthnicityBucket = curr.nihRaceEthnicityData[k];
+                    let prevBucket: NihRaceEthnicityBucket = prev.nihRaceEthnicityData[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.nihRaceEthnicityData[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket).forEach((hispType: string) => {
+                            if (!prevBucket[hispType]) {
+                                prevBucket[hispType] = currBucket[hispType];
+                            } else {
+                                Object.keys(currBucket[hispType]).forEach((genderType: string) => {
+                                    prevBucket[hispType][genderType] += currBucket[hispType][genderType];
+                                })
+                            }
                         })
                     }
                 });

@@ -146,7 +146,13 @@
     padding: 10px 0;
 }
 
+.patientlist-add-dataset-divider {
+    background-color: rgb(230, 230, 230);
+    height: 1px;
+    margin: 20px 0;
+    width: 100%;
+}
+
 .patientlist-add-dataset-by-encounter {
     cursor: pointer;
-    margin-top: 10px;
 }

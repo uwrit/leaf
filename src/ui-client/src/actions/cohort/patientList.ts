@@ -79,6 +79,15 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: 
         const state = getState();
         const responders: NetworkIdentity[] = [];
         let atLeastOneSucceeded = false;
+        let panelIdx = panelIndex;
+
+        /**
+         * Determine true panel index, if applicable (removing empty panels)
+         */
+        if (typeof panelIdx !== 'undefined') {
+            const panelsToRemove = state.panels.filter(p => p.subPanels.filter(sp => sp.panelItems.length > 0).length === 0).length;
+            panelIdx = panelIdx - panelsToRemove;
+        }
         
         state.responders.forEach((nr: NetworkIdentity) => { 
             const crt = state.cohort.networkCohorts.get(nr.id)!;
@@ -99,7 +108,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: 
                 try {
                     if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-                        const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIndex);
+                        const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIdx);
                         const newPl = await addDataset(getState, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);

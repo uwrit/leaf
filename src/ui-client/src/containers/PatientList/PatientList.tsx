@@ -26,6 +26,7 @@ import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTo
 import { RowCount } from '../../components/PatientList/RowCount';
 import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import './PatientList.css';
+import Scrollers from '../../components/PatientList/Scrollers/Scrollers';
 
 interface OwnProps {
     
@@ -115,6 +116,7 @@ class PatientList extends React.PureComponent<Props, State> {
                     show={showExportModal} 
                     toggle={toggleExportDataModal}
                 />
+                <Scrollers displayedColumnsLength={patientList.configuration.displayColumns.length} />
                 <Row className={`${c}-toprow-container`}>
                     <Col md={8}>
                         <div className={`${c}-dataset-column-selector-container`}>

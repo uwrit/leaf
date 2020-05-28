@@ -58,11 +58,11 @@ export const fetchDataset = async (
         datasetid: nr.isHomeNode ? dataset.id : dataset.universalId,
         shape: dataset.shape
     }
-    if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
+    if (typeof panelIndex !== 'undefined') {
+        params.panelIdx = panelIndex
+    } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
         params.early = deriveDateTicks(dates.start);
         params.late = deriveDateTicks(dates.end);
-    } else if (panelIndex !== undefined) {
-        params.panelIdx = panelIndex
     }
 
     const result = await http.get(`${nr.address}/api/cohort/${queryId}/dataset`, { params });

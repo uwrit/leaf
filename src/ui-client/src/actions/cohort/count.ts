@@ -185,7 +185,7 @@ const getDemographics = () => {
             if (atLeastOneSucceeded) {
                 dispatch(setCohortDemographicsFinished());
             } else {
-                dispatch(setCohortDemographicsErrored())
+                dispatch(setCohortDemographicsErrored());
             }
         });
     };

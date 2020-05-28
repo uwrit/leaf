@@ -167,8 +167,9 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         this.setState({ selectedDates: opt, selectedEncounterPanel: undefined });
     }
 
-    private handleEncounterPanelSelect = (selectedEncounterPanel: number) => {
-        this.setState({ selectedEncounterPanel });
+    private handleEncounterPanelSelect = (selectedEncounterPanel: number | undefined ) => {
+        const selectedDates = typeof selectedEncounterPanel === 'undefined' ? dates[4] : undefined;
+        this.setState({ selectedEncounterPanel, selectedDates });
     }
 
     private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {
@@ -187,7 +188,6 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleBlur = () => {
         const { isFetching } = this.props.configuration;
-        return;
 
         if (this.mouseOut && !isFetching) {
             this.setState({ showSelectorModal: false });

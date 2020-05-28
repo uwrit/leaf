@@ -74,6 +74,27 @@ var aggregateStatistics = function (payload) {
                 });
             }
         });
+        // NIH Race, Ethnicity, Gender
+        Object.keys(curr.nihRaceEthnicityData).forEach(function (k) {
+            var currBucket = curr.nihRaceEthnicityData[k];
+            var prevBucket = prev.nihRaceEthnicityData[k];
+            if (!prevBucket) {
+                prevBucket = Object.assign({}, currBucket);
+                prev.nihRaceEthnicityData[k] = prevBucket;
+            }
+            else {
+                Object.keys(currBucket).forEach(function (hispType) {
+                    if (!prevBucket[hispType]) {
+                        prevBucket[hispType] = currBucket[hispType];
+                    }
+                    else {
+                        Object.keys(currBucket[hispType]).forEach(function (genderType) {
+                            prevBucket[hispType][genderType] += currBucket[hispType][genderType];
+                        });
+                    }
+                });
+            }
+        });
         return prev;
     });
     return { requestId: requestId, result: aggregate };

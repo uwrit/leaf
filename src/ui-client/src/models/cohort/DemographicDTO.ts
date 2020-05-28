@@ -25,9 +25,10 @@ export interface BinarySplit {
 }
 
 export interface DemographicStatistics {
-    binarySplitData: BinarySplitPair[];
     ageByGenderData: AgeByGenderData;
+    binarySplitData: BinarySplitPair[];
     languageByHeritageData: VariableBucketSet;
+    nihRaceEthnicityData: NihRaceEthnicityBuckets;
     religionData: PatientCountMap;
 }
 
@@ -53,6 +54,22 @@ export interface AgeByGenderBucket {
     females: number;
     males: number;
     others: number;
+}
+
+export interface NihRaceEthnicityBuckets {
+    ethnicBackgrounds: EthnicBackgroundGenderMap;
+    total: number;
+}
+
+export interface NihRaceEthnicityBucket {
+    hispanic: AgeByGenderBucket;
+    notHispanic: AgeByGenderBucket;
+    unknown: AgeByGenderBucket;
+    total: number;
+}
+
+export interface EthnicBackgroundGenderMap {
+    [key:string]: NihRaceEthnicityBucket;
 }
 
 export interface PatientCountMap {

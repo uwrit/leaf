@@ -59,6 +59,11 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
                                 <span className={`${cs}-datefilter-value`}>{data.displayName}</span>
                             </div>
                             }
+                            {typeof data.encounterPanelIndex !== 'undefined' &&
+                            <div className={`${cs}-datefilter`}>
+                                <span className={`${cs}-datefilter-value`}>{data.displayName} - Encounters in Panel {data.encounterPanelIndex+1}</span>
+                            </div>
+                            }
                             {data.dateBounds &&
                             <div className={`${cs}-datefilter`}>
                                 <span className={`${cs}-datefilter-value`}>{data.displayName} - {data.dateBounds!.display}</span>

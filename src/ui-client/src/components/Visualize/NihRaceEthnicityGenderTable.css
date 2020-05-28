@@ -1,0 +1,78 @@
+/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.visualization-nih-container {
+    margin: 40px 0 100px;
+    text-align: center;
+    width: 100%;
+}
+
+.visualization-nih-table {
+    margin: 0 auto;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.visualization-nih-table th {
+    padding:  6px 10px;
+    text-align: center;
+}
+
+.visualization-nih-table th:nth-child(1) {
+    width: 300px;
+    vertical-align: bottom;
+}
+
+.visualization-nih-table th:nth-child(4) {
+    vertical-align: bottom;
+}
+
+.visualization-nih-table th.nih-border-bottom {
+    border-bottom: 2px solid rgb(240,240,240);
+}
+
+.visualization-nih-table th.nih-border-left {
+    border-left: 1px solid rgb(240,240,240);
+}
+
+.visualization-nih-table th.nih-border-right {
+    border-right: 1px solid rgb(240,240,240);
+}
+
+.visualization-nih-table td:nth-child(1) {
+    font-weight: 500;
+    text-align: left;
+}
+
+.visualization-nih-table tr:last-child td {
+    border-top: 1px solid rgb(240,240,240);
+    font-weight: 700;
+}
+
+.visualization-nih-table tr td:last-child {
+    border-left: 1px solid rgb(240,240,240);
+    font-weight: 700;
+}
+
+.visualization-nih-table tr:last-child td:last-child {
+    border: none;
+}
+
+.visualization-nih-table td {
+    font-weight: 700;
+    padding: 4px;
+}
+
+.visualization-nih-table .none    { color: rgb(200,200,200); font-weight: 500; }
+.visualization-nih-table .level-1 { background-color: rgb(241, 255, 246); }
+.visualization-nih-table .level-2 { background-color: rgb(223, 255, 234); }
+.visualization-nih-table .level-3 { background-color: rgb(200, 255, 220); }
+.visualization-nih-table .level-4 { background-color: rgb(172, 255, 201); }
+.visualization-nih-table .level-5 { background-color: rgb(154, 253, 189); }
+.visualization-nih-table .level-6 { background-color: rgb(142, 250, 180); }
+.visualization-nih-table .level-7 { background-color: rgb(131, 255, 174); }
+.visualization-nih-table .level-8 { background-color: rgb(122, 255, 168); }
