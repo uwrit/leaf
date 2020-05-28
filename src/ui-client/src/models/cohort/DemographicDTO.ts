@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -58,14 +58,12 @@ export interface AgeByGenderBucket {
 
 export interface NihRaceEthnicityBuckets {
     ethnicBackgrounds: EthnicBackgroundGenderMap;
-    total: number;
 }
 
 export interface NihRaceEthnicityBucket {
     hispanic: AgeByGenderBucket;
     notHispanic: AgeByGenderBucket;
     unknown: AgeByGenderBucket;
-    total: number;
 }
 
 export interface EthnicBackgroundGenderMap {

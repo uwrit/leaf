@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -67,10 +67,10 @@ export class NihRaceEthnicityGenderTable extends React.PureComponent<Props> {
     private renderHeader = () => {
         return ([
             <tr>
-                <th rowSpan={2} className='left-col nih-border-bottom'>Racial Categories</th>
+                <th rowSpan={2} className='left-col nih-border-bottom'>Heritage</th>
                 <th colSpan={2} className='nih-border-left nih-border-right'>Not Hispanic or Latino</th>
                 <th colSpan={2} className='nih-border-left nih-border-right'>Hispanic or Latino</th>
-                <th rowSpan={2}>Total</th>
+                <th rowSpan={2} className='nih-border-bottom'>Total</th>
             </tr>,
             <tr>
                 <th className='nih-border-left nih-border-bottom'>Female</th>

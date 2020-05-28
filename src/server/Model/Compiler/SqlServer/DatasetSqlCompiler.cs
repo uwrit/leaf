@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,15 +13,18 @@ namespace Model.Compiler.SqlServer
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
+        readonly ISqlCompiler compiler;
         readonly CompilerOptions compilerOptions;
         readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DatasetExecutionContext executionContext;
 
         public DatasetSqlCompiler(
+            ISqlCompiler compiler,
             IOptions<CompilerOptions> compOpts)
         {
-            compilerOptions = compOpts.Value;
+            this.compiler = compiler;
+            this.compilerOptions = compOpts.Value;
         }
 
         public DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext compilerContext)
@@ -35,15 +38,16 @@ namespace Model.Compiler.SqlServer
 
             var filter = CteFilterInternals(compilerContext);
             var select = SelectFromCTE(compilerContext);
+            var parameters = compiler.BuildContextParameterSql();
             executionContext.DatasetQuery = compilerContext.DatasetQuery;
-            executionContext.CompiledQuery = Compose(cohort, dataset, filter, select);
+            executionContext.CompiledQuery = Compose(parameters, cohort, dataset, filter, select);
 
             return executionContext;
         }
 
-        string Compose(string cohort, string dataset, string filter, string select)
+        string Compose(string parameters, string cohort, string dataset, string filter, string select)
         {
-            return $"WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
+            return $"{parameters} WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
         }
 
         string CteCohortInternals(DatasetCompilerContext ctx)

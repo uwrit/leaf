@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -73,9 +73,6 @@ const patientList = (): RouteConfig => {
     };
 };
 
-/* background-color: rgb(240,240,240);
-    height: 100%; */
-
 /*
  * Lazy-load admin panel, as most users will never see it
  */
@@ -114,12 +111,13 @@ const admin = (): RouteConfig => {
 }
 
 export const getRoutes = (config: AppConfig, userContext: UserContext): RouteConfig[] => {
-    const routes = [ findPatients(), visualize(), patientList() ];
-    if (config!.client.map.enabled) {
-        routes.splice(1, 0, map(config!.client.map.tileURI));
-    }
-    if (userContext && userContext.isAdmin) {
-        routes.push(admin());
-    }
+    const routes = [ findPatients() ];
+    const client = config!.client;
+
+    if (client.map.enabled)         { routes.push(map(client.map.tileURI)); }
+    if (client.visualize.enabled)   { routes.push(visualize()); }
+    if (client.patientList.enabled) { routes.push(patientList()); }
+    if (userContext && userContext.isAdmin) { routes.push(admin()); }
+
     return routes;
 };

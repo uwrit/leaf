@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -73,7 +73,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                 </Row>
                 <Row>
                     <Col md={12} className="visualization-nih">
-                        <SectionHeader headerText="NIH Race, Ethnicity, and Gender" />
+                        <SectionHeader headerText="NIH Race, Ethnicity, and Gender" subText="Includes only patients identifying as female or male" />
                     </Col>
                     <Col lg={{ size: 8, order: 2, offset: 2 }} md={12}>
                         <NihRaceEthnicityGenderTable data={nihRaceEthnicityData} />

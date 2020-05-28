@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -210,8 +210,6 @@ namespace Model.Cohort
                 else if (IsMale(patient))     { race.Unknown.Males += 1;   }
                 else                          { race.Unknown.Others += 1;  }
             }
-            race.Total++;
-            NihRaceEthnicity.Total++;
         }
 
         readonly static string[] ageBuckets = { "<1", "1-9", "10-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", ">84" };

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -72,15 +72,7 @@ namespace API.Options
             services.ConfigureObfuscationOptions(configuration);
 
             // Client options
-            services.Configure<ClientOptions>(opts =>
-            {
-                opts.Map.Enabled = configuration.GetValue<bool>(Config.Client.Map.Enabled);
-                opts.Map.TileURI = configuration.GetValue<string>(Config.Client.Map.TileURI);
-                opts.Help.Enabled = configuration.GetValue<bool>(Config.Client.Help.Enabled);
-                opts.Help.AutoSend = configuration.GetValue<bool>(Config.Notification.Enabled);
-                opts.Help.Email = configuration.GetValue<string>(Config.Client.Help.Email);
-                opts.Help.URI = configuration.GetValue<string>(Config.Client.Help.URI);
-            });
+            services.ConfigureClientOptions(configuration);
 
             return services;
         }
@@ -210,6 +202,30 @@ namespace API.Options
             services.Configure<ImportOptions>(opts =>
             {
                 opts.REDCap = rc;
+            });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureClientOptions(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<ClientOptions>(opts =>
+            {
+                // Map
+                opts.Map.Enabled = config.GetValue<bool>(Config.Client.Map.Enabled);
+                opts.Map.TileURI = config.GetValue<string>(Config.Client.Map.TileURI);
+
+                // Visualize
+                opts.Visualize.Enabled = config.GetValue<bool>(Config.Client.Visualize.Enabled);
+
+                // Patient List
+                opts.PatientList.Enabled = config.GetValue<bool>(Config.Client.PatientList.Enabled);
+
+                // Help
+                opts.Help.Enabled = config.GetValue<bool>(Config.Client.Help.Enabled);
+                opts.Help.AutoSend = config.GetValue<bool>(Config.Notification.Enabled);
+                opts.Help.Email = config.GetValue<string>(Config.Client.Help.Email);
+                opts.Help.URI = config.GetValue<string>(Config.Client.Help.URI);
             });
 
             return services;

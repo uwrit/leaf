@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -58,13 +58,13 @@
     font-weight: 700;
 }
 
-.visualization-nih-table tr:last-child td:last-child {
+.zvisualization-nih-table tr:last-child td:last-child {
     border: none;
 }
 
 .visualization-nih-table td {
     font-weight: 700;
-    padding: 4px;
+    padding: 2px 4px;
 }
 
 .visualization-nih-table .none    { color: rgb(200,200,200); font-weight: 500; }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,8 +15,11 @@ namespace Model.Compiler
 
         public string GrabSql { get; private set; }
 
-        public CteCohortQuery(string grab)
+        public string Parameters { get; private set; }
+
+        public CteCohortQuery(string parameters, string grab)
         {
+            Parameters = parameters;
             GrabSql = grab;
         }
 
@@ -24,7 +27,7 @@ namespace Model.Compiler
         {
             get
             {
-                return $"{CtePrefix} {GrabSql} {CteSuffix}";
+                return $"{Parameters} {CtePrefix} {GrabSql} {CteSuffix}";
             }
         }
     }
@@ -33,6 +36,6 @@ namespace Model.Compiler
     {
         public new const string CteSuffix = ") SELECT COUNT(DISTINCT personId) AS cnt FROM wrapper";
 
-        public CteCohortCount(string grab) : base(grab) { }
+        public CteCohortCount(string parameters, string grab) : base(parameters, grab) { }
     }
 }
