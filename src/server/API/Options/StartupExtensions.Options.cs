@@ -38,6 +38,9 @@ namespace API.Options
             // Runtime options
             services.ConfigureRuntimeOptions(configuration);
 
+            // Attestation options
+            services.ConfigureAttestationOptions(configuration);
+
             // Compiler options
             services.ConfigureCompilerOptions(configuration);
 
@@ -148,6 +151,16 @@ namespace API.Options
                 opts.Issuer = issuer;
                 opts.Certificate = certBytes;
                 opts.KeyId = cert.KeyId;
+            });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureAttestationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<AttestationOptions>(opts =>
+            {
+                opts.Enabled = config.GetValue<bool>(Config.Attestation.Enabled);
             });
 
             return services;

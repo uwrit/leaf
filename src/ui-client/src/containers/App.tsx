@@ -18,7 +18,7 @@ import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
 import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState, UserInquiryState } from '../models/state/GeneralUiState';
-import { SessionContext } from '../models/Session';
+import { SessionContext, SessionState } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
 import Sidebar from './Sidebar/Sidebar';
@@ -35,7 +35,6 @@ import { version } from '../../package.json'
 import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
 import './App.css';
-import EncounterPanelSelector from '../components/PatientList/AddDatasetSelectors/EncounterPanelSelector';
 
 
 interface OwnProps {
@@ -55,7 +54,7 @@ interface StateProps {
     noclickModal: NoClickModalState;
     queries: SavedQueryMap;
     routes: RouteConfig[];
-    sessionContext?: SessionContext;
+    session: SessionState;
     sideNotification: SideNotificationState;
     userQuestion: UserInquiryState;
 }
@@ -81,9 +80,9 @@ class App extends React.Component<Props> {
     }
 
     public getSnapshotBeforeUpdate(nextProps: Props) {
-        const { sessionContext } = nextProps;
-        if (sessionContext) {
-            this.handleSessionTokenRefresh(sessionContext);
+        const { session } = nextProps;
+        if (session.context) {
+            this.handleSessionTokenRefresh(session.context);
         }
         return null;
     }
@@ -91,7 +90,7 @@ class App extends React.Component<Props> {
     public render() {
         const { 
             auth, browser, cohortCountState, currentRoute, currentAdminPane, confirmationModal, queries,
-            informationModal, dispatch, noclickModal, routes, sideNotification, sessionContext, userQuestion
+            informationModal, dispatch, noclickModal, routes, sideNotification, session, userQuestion
         } = this.props;
         const content = routes.length 
             ? routes.find((r: RouteConfig) => r.index === currentRoute)!.render()
@@ -112,7 +111,7 @@ class App extends React.Component<Props> {
                 <HelpButton auth={auth} dispatch={dispatch} />
                 <UserQuestionModal dispatch={dispatch} state={userQuestion} queries={queries} />
                 <SideNotification dispatch={dispatch} state={sideNotification} />
-                {sessionContext &&
+                {session.context &&
                 <div id="main-content">
                     <SaveQueryPanel />
                     <MyLeafModal />
@@ -166,8 +165,8 @@ class App extends React.Component<Props> {
      * Handle user activity via mouse or key action, which resets the inactivity timeout.
      */
     private handleActivity = () => {
-        const { dispatch, auth, sessionContext } = this.props;
-        if (!sessionContext || auth!.config!.authentication.inactivityTimeoutMinutes <= 0) { return; }
+        const { dispatch, auth, session } = this.props;
+        if (!session.context || auth!.config!.authentication.inactivityTimeoutMinutes <= 0) { return; }
 
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
@@ -196,7 +195,7 @@ const mapStateToProps = (state: AppState) => {
         noclickModal: state.generalUi.noclickModal,
         queries: state.queries.saved,
         routes: state.generalUi.routes,
-        sessionContext: state.session.context,
+        session: state.session,
         sideNotification: state.generalUi.sideNotification,
         userQuestion: state.generalUi.userQuestion
     };

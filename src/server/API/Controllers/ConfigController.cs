@@ -26,17 +26,20 @@ namespace API.Controllers
         readonly LeafVersionOptions versionOptions;
         readonly CohortOptions cohortOptions;
         readonly ClientOptions clientOptions;
+        readonly AttestationOptions attestationOptions;
 
         public ConfigController(
             IOptions<AuthenticationOptions> authenticationOptions,
             IOptions<LeafVersionOptions> versionOptions,
             IOptions<CohortOptions> cohortOptions,
-            IOptions<ClientOptions> clientOptions)
+            IOptions<ClientOptions> clientOptions,
+            IOptions<AttestationOptions> attestationOptions)
         {
             this.authenticationOptions = authenticationOptions.Value;
             this.versionOptions = versionOptions.Value;
             this.cohortOptions = cohortOptions.Value;
             this.clientOptions = clientOptions.Value;
+            this.attestationOptions = attestationOptions.Value;
         }
 
         public ActionResult<ConfigDTO> Get()
@@ -48,6 +51,10 @@ namespace API.Controllers
                     Mechanism = authenticationOptions.Mechanism,
                     InactivityTimeoutMinutes = authenticationOptions.InactiveTimeoutMinutes,
                     LogoutURI = authenticationOptions.LogoutURI.ToString()
+                },
+                Attestation = new AttestationConfigDTO
+                {
+                    Enabled = attestationOptions.Enabled
                 },
                 Cohort = new CohortConfigDTO
                 {

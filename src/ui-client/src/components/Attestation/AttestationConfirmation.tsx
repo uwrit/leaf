@@ -8,8 +8,10 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import { SessionType } from '../../models/Session'
+import { AppConfig } from '../../models/Auth';
 
 interface Props {
+    config?: AppConfig;
     className: string;
     handleGoBackClick: () => void;
     handleIAgreeClick: () => void;
@@ -24,30 +26,33 @@ interface Props {
 export default class AttestationConfirmation extends React.PureComponent<Props> {
     public render() {
         const c = this.props.className;
-        const confirmationClass = `${c}-confirmation-container ${this.props.show ? 'show' : ''}`
-        const { isIdentified, sessionType } = this.props;
+        const { show, handleGoBackClick, handleIAgreeClick, isIdentified, sessionType, sessionLoadDisplay, hasAttested, isSubmittingAttestation, config } = this.props;
+        const confirmationClass = `${c}-confirmation-container ${show ? 'show' : ''}`
         const useDisplay = sessionType === SessionType.Research ? 'Research' : 'Quality Improvement';
         const phiDisplay = isIdentified ? 'Identified' : 'Deidentified';
+        const showText = config && config.attestation.enabled;
 
         return  (
             <div className={confirmationClass}>
-                <div className={`${c}-confirmation-settings`}>
+                {showText && [
+                <div className={`${c}-confirmation-settings`} key='1'>
                     {useDisplay} - {phiDisplay}
-                </div>
-                <p>
+                </div>,
+                <p key='2'>
                     I attest that the information I have entered is accurate and I will
                     use the application, Leaf, as I have indicated.
                 </p>
-                {!(this.props.isSubmittingAttestation || this.props.hasAttested) &&
+                ]}
+                {!(isSubmittingAttestation || hasAttested) &&
                 <div className={`${c}-confirmation-footer`}>
                     <Button 
-                        onClick={this.props.handleGoBackClick} 
+                        onClick={handleGoBackClick} 
                         tabIndex={-1}
                         className="leaf-button mr-auto">
                         Go Back
                     </Button>
                     <Button 
-                        onClick={this.props.handleIAgreeClick} 
+                        onClick={handleIAgreeClick} 
                         tabIndex={-1}
                         className="leaf-button leaf-button-primary" 
                         style={{ float: 'right' }}>
@@ -55,10 +60,10 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
                     </Button>
                 </div>
                 }
-                {(this.props.isSubmittingAttestation || this.props.hasAttested) &&
+                {(isSubmittingAttestation || hasAttested) &&
                     <div className={`${c}-session-load-display-container`}>
                         <div className={`${c}-session-load-display`}>
-                            <span>...{this.props.sessionLoadDisplay}</span>
+                            <span>...{sessionLoadDisplay}</span>
                         </div>
                     </div>
                 }

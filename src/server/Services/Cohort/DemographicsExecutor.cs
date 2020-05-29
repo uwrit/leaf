@@ -46,6 +46,7 @@ namespace Services.Cohort
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
+            var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
@@ -58,7 +59,7 @@ namespace Services.Cohort
                     {
                         var resultSchema = GetShapedSchema(context, reader);
                         var marshaller = new DemographicMarshaller(resultSchema, pepper);
-                        return marshaller.Marshal(reader, user.Anonymize(), deidentOpts);
+                        return marshaller.Marshal(reader, deidentify, deidentOpts);
                     }
                 }
             }

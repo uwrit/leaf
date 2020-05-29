@@ -13,6 +13,7 @@ export enum AuthMechanismType {
 
 export interface ConfigDTO {
     authentication: AuthenticationConfigDTO;
+    attestation: AttestationOptionsDTO;
     cohort: CohortConfigDTO;
     client: ClientOptions;
     version: string;
@@ -22,6 +23,10 @@ interface AuthenticationConfigDTO {
     mechanism: AuthMechanismType;
     inactivityTimeoutMinutes: number;
     logoutUri: string;
+}
+
+interface AttestationOptionsDTO {
+    enabled: boolean;
 }
 
 interface CohortConfigDTO {

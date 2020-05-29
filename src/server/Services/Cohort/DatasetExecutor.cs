@@ -45,6 +45,7 @@ namespace Services.Cohort
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
+            var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 
             using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
@@ -57,7 +58,7 @@ namespace Services.Cohort
                     {
                         var dbSchema = GetShapedSchema(context, reader);
                         var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
-                        var data = marshaller.Marshal(reader, user.Anonymize(), deidentOpts);
+                        var data = marshaller.Marshal(reader, deidentify, deidentOpts);
                         var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
 
                         return new Dataset(resultSchema, data);
