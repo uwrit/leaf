@@ -141,9 +141,9 @@
 
 .cohort-count-site-num {
     color: rgb(80,80,80);
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     height: 13px;
-    padding-top: 2px;
+    padding-top: 3px;
     text-align: left;
     transition: all 0.75s;
 }

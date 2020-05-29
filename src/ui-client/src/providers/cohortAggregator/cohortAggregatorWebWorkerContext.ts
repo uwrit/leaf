@@ -83,13 +83,15 @@ var aggregateStatistics = function (payload) {
                 prev.nihRaceEthnicityData[k] = prevBucket;
             }
             else {
-                Object.keys(currBucket).forEach(function (hispType) {
-                    if (!prevBucket[hispType]) {
-                        prevBucket[hispType] = currBucket[hispType];
+                Object.keys(currBucket).forEach(function (eb) {
+                    if (!prevBucket[eb]) {
+                        prevBucket[eb] = currBucket[eb];
                     }
                     else {
-                        Object.keys(currBucket[hispType]).forEach(function (genderType) {
-                            prevBucket[hispType][genderType] += currBucket[hispType][genderType];
+                        Object.keys(currBucket[eb]).forEach(function (hispType) {
+                            Object.keys(currBucket[eb][hispType]).forEach(function (genderType) {
+                                prevBucket[eb][hispType][genderType] += currBucket[eb][hispType][genderType];
+                            });
                         });
                     }
                 });

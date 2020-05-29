@@ -25,24 +25,26 @@ export class NihRaceEthnicityGenderTable extends React.PureComponent<Props> {
         return (
             <div className={`${c}-container`}>
                 <table className={`${c}-table`}>
-
+                    
                     {/* Header */}
                     {header}
 
                     {/* Body */}
-                    {Object.keys(ethnicBackgrounds).sort().map((key) => {
-                        const eb = ethnicBackgrounds[key];
-                        return (
-                            <tr>
-                                <td>{key}</td>
-                                <td className={this.proportionToClass(eb.notHispanic.females, total)}>{eb.notHispanic.females.toLocaleString()}</td>
-                                <td className={this.proportionToClass(eb.notHispanic.males, total)}>{eb.notHispanic.males.toLocaleString()}</td>
-                                <td className={this.proportionToClass(eb.hispanic.females, total)}>{eb.hispanic.females.toLocaleString()}</td>
-                                <td className={this.proportionToClass(eb.hispanic.males, total)}>{eb.hispanic.males.toLocaleString()}</td>
-                                <td>{(eb.notHispanic.females + eb.notHispanic.males + eb.hispanic.females + eb.hispanic.males).toLocaleString()}</td>
-                            </tr>
-                        );
-                    })}
+                    <tbody>
+                        {Object.keys(ethnicBackgrounds).sort().map((key) => {
+                            const eb = ethnicBackgrounds[key];
+                            return (
+                                <tr>
+                                    <td>{key}</td>
+                                    <td className={this.proportionToClass(eb.notHispanic.females, total)}>{eb.notHispanic.females.toLocaleString()}</td>
+                                    <td className={this.proportionToClass(eb.notHispanic.males, total)}>{eb.notHispanic.males.toLocaleString()}</td>
+                                    <td className={this.proportionToClass(eb.hispanic.females, total)}>{eb.hispanic.females.toLocaleString()}</td>
+                                    <td className={this.proportionToClass(eb.hispanic.males, total)}>{eb.hispanic.males.toLocaleString()}</td>
+                                    <td>{(eb.notHispanic.females + eb.notHispanic.males + eb.hispanic.females + eb.hispanic.males).toLocaleString()}</td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
 
                     {/* Footer */}
                     {footer}
@@ -65,20 +67,22 @@ export class NihRaceEthnicityGenderTable extends React.PureComponent<Props> {
     }
 
     private renderHeader = () => {
-        return ([
-            <tr>
-                <th rowSpan={2} className='left-col nih-border-bottom'>Heritage</th>
-                <th colSpan={2} className='nih-border-left nih-border-right'>Not Hispanic or Latino</th>
-                <th colSpan={2} className='nih-border-left nih-border-right'>Hispanic or Latino</th>
-                <th rowSpan={2} className='nih-border-bottom'>Total</th>
-            </tr>,
-            <tr>
-                <th className='nih-border-left nih-border-bottom'>Female</th>
-                <th className='nih-border-right nih-border-bottom'>Male</th>
-                <th className='nih-border-bottom'>Female</th>
-                <th className='nih-border-right nih-border-bottom'>Male</th>
-            </tr>
-        ]);
+        return (
+            <thead>
+                <tr>
+                    <th rowSpan={2} className='left-col nih-border-bottom'>Heritage</th>
+                    <th colSpan={2} className='nih-border-left nih-border-right'>Not Hispanic or Latino</th>
+                    <th colSpan={2} className='nih-border-left nih-border-right'>Hispanic or Latino</th>
+                    <th rowSpan={2} className='nih-border-bottom'>Total</th>
+                </tr>
+                <tr>
+                    <th className='nih-border-left nih-border-bottom'>Female</th>
+                    <th className='nih-border-right nih-border-bottom'>Male</th>
+                    <th className='nih-border-bottom'>Female</th>
+                    <th className='nih-border-right nih-border-bottom'>Male</th>
+                </tr>
+            </thead>
+        );
     }
 
     private renderFooter = (ethnicBackgrounds: EthnicBackgroundGenderMap) => {

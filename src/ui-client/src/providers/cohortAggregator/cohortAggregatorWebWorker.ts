@@ -175,13 +175,15 @@ export default class CohortAggregatorWebWorker {
                         prevBucket = Object.assign({}, currBucket);
                         prev.nihRaceEthnicityData[k] = prevBucket;
                     } else {
-                        Object.keys(currBucket).forEach((hispType: string) => {
-                            if (!prevBucket[hispType]) {
-                                prevBucket[hispType] = currBucket[hispType];
+                        Object.keys(currBucket).forEach((eb: string) => {
+                            if (!prevBucket[eb]) {
+                                prevBucket[eb] = currBucket[eb];
                             } else {
-                                Object.keys(currBucket[hispType]).forEach((genderType: string) => {
-                                    prevBucket[hispType][genderType] += currBucket[hispType][genderType];
-                                })
+                                Object.keys(currBucket[eb]).forEach((hispType: string) => {
+                                    Object.keys(currBucket[eb][hispType]).forEach((genderType: string) =>{
+                                        prevBucket[eb][hispType][genderType] += currBucket[eb][hispType][genderType];
+                                    });
+                                });
                             }
                         })
                     }

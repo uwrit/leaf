@@ -365,3 +365,52 @@ BEGIN
 END
 
 
+/*
+ * [app].[sp_CreateCachedUnsavedQuery]
+ */
+IF OBJECT_ID('app.sp_CreateCachedUnsavedQuery', 'P') IS NOT NULL
+    DROP PROCEDURE [app].[sp_CreateCachedUnsavedQuery];
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/8/13
+-- Description: Creates and constrains a new Unsaved Query.
+-- =======================================
+CREATE PROCEDURE [app].[sp_CreateCachedUnsavedQuery]
+    @user auth.[User],
+	@definition NVARCHAR(MAX),
+    @nonce UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @qid UNIQUEIDENTIFIER;
+    DECLARE @qids TABLE
+    (
+        QueryId UNIQUEIDENTIFIER NOT NULL
+    );
+
+    -- clear out previous cohort cache
+    EXEC app.sp_DeleteCachedUnsavedQueryByNonce @user, @nonce;
+
+    BEGIN TRAN;
+
+    -- create the query
+    INSERT INTO app.Query (UniversalId, Nonce, [Owner], [Definition])
+    OUTPUT inserted.Id INTO @qids
+    VALUES (null, @nonce, @user, @definition)
+
+    -- get the id
+    SELECT TOP 1
+        @qid = QueryId
+    FROM @qids;
+
+    -- constrain the query
+    INSERT INTO auth.QueryConstraint (QueryId, ConstraintId, ConstraintValue)
+    VALUES (@qid, 1, @user);
+
+    COMMIT TRAN;
+
+    SELECT @qid;
+END

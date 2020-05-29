@@ -64,6 +64,8 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
 
         if (!dataset) { return null; }
 
+        const name = dataset.category ? `${dataset.category} ${dataset.name}` : dataset.name;
+
         return (
             createPortal(
                 <div className={modalClasses.join(' ')}
@@ -73,7 +75,7 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
                     ref={this.triggerClick}>
                     <div className={`${c}-container`}>
                         <span className={`${c}-close`} onClick={toggle}>✖</span>
-                        <div className={`${c}-header`}>Which Encounters do you want {dataset.name} data from?</div>
+                        <div className={`${c}-header`}>Which Encounters do you want {name} data from?</div>
                         <Row>
                             {panels.map((p,i) => {
                                 const tp = this.getPanelType(p);
