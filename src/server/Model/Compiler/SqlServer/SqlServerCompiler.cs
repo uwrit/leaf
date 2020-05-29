@@ -94,7 +94,7 @@ namespace Model.Compiler.SqlServer
 
         public string BuildContextParameterSql()
         {
-            static int toInt(bool x) => Convert.ToInt32(x);
+            Func<bool,int> toInt = (bool x) => Convert.ToInt32(x);
             var identified = $"{Dialect.Syntax.DECLARE} @IsIdentified {Dialect.Types.BIT} = {toInt(user.Identified)}";
             var research   = $"{Dialect.Syntax.DECLARE} @IsResearch {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.Research)}";
             var qi         = $"{Dialect.Syntax.DECLARE} @IsQI {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.QualityImprovement)}";
