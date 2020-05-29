@@ -48,7 +48,7 @@
     text-align: left;
 }
 
-.visualization-nih-table tr:last-child td {
+.visualization-nih-table tfoot tr:last-child td {
     border-top: 1px solid rgb(240,240,240);
     font-weight: 700;
 }
@@ -56,10 +56,6 @@
 .visualization-nih-table tr td:last-child {
     border-left: 1px solid rgb(240,240,240);
     font-weight: 700;
-}
-
-.zvisualization-nih-table tr:last-child td:last-child {
-    border: none;
 }
 
 .visualization-nih-table td {

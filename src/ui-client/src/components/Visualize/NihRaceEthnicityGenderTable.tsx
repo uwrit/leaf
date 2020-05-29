@@ -94,14 +94,16 @@ export class NihRaceEthnicityGenderTable extends React.PureComponent<Props> {
         const total      = nonHispFem + nonHispMen + hispFem + hispMen;
 
         return ([
-            <tr>
-                <td>Total</td>
-                <td>{nonHispFem.toLocaleString()}</td>
-                <td>{nonHispMen.toLocaleString()}</td>
-                <td>{hispFem.toLocaleString()}</td>
-                <td>{hispMen.toLocaleString()}</td>
-                <td>{total.toLocaleString()}</td>
-            </tr>,
+            <tfoot>
+                <tr>
+                    <td>Total</td>
+                    <td>{nonHispFem.toLocaleString()}</td>
+                    <td>{nonHispMen.toLocaleString()}</td>
+                    <td>{hispFem.toLocaleString()}</td>
+                    <td>{hispMen.toLocaleString()}</td>
+                    <td>{total.toLocaleString()}</td>
+                </tr>
+            </tfoot>,
             total
         ]);
     }

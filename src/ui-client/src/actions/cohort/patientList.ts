@@ -85,7 +85,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: 
          * Determine true panel index, if applicable (removing empty panels)
          */
         if (typeof panelIdx !== 'undefined') {
-            const panelsToRemove = state.panels.filter(p => p.subPanels.filter(sp => sp.panelItems.length > 0).length === 0).length;
+            const panelsToRemove = state.panels.filter(p => p.index < panelIdx! && p.subPanels.filter(sp => sp.panelItems.length > 0).length === 0).length;
             panelIdx = panelIdx - panelsToRemove;
         }
         

@@ -7,7 +7,8 @@ SET [Version] = '3.7.0'
 /*
  * Add [Definition]
  */
-ALTER TABLE app.Query ADD [Definition1] NVARCHAR(MAX) NULL
+ALTER TABLE app.Query ADD [Definition] NVARCHAR(MAX) NULL
+GO
 
 /*
  * Set historical [Definition] values to empty string
@@ -104,6 +105,7 @@ BEGIN
 				dq.Id = @datasetid;
 		END
 END
+GO
 
 /*
  * [app].[sp_UpdateSearchIndexTables]
@@ -363,6 +365,7 @@ BEGIN
 	DROP TABLE #jsonTokens
 
 END
+GO
 
 
 /*
@@ -414,3 +417,4 @@ BEGIN
 
     SELECT @qid;
 END
+GO
