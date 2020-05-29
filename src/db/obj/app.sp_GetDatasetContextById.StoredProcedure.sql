@@ -1,4 +1,4 @@
--- Copyright (c) 2019, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2020, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,6 +18,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextById]
     @datasetid UNIQUEIDENTIFIER,
     @queryid UNIQUEIDENTIFIER,
+	@joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -42,7 +43,8 @@ BEGIN
     -- get pepper
     SELECT
         QueryId = Id,
-        Pepper
+        Pepper,
+		[Definition] = CASE WHEN @joinpanel = 0 THEN NULL ELSE [Definition] END
     FROM
         app.Query
     WHERE Id = @queryid;

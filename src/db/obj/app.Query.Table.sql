@@ -1,4 +1,4 @@
--- Copyright (c) 2019, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2020, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -21,11 +21,12 @@ CREATE TABLE [app].[Query](
 	[Category] [nvarchar](200) NULL,
 	[Updated] [datetime] NOT NULL,
 	[Ver] [int] NOT NULL,
+	[Definition] [nvarchar](max) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 /****** Object:  Index [IX_Query_Nonce]    Script Date: ******/
 CREATE NONCLUSTERED INDEX [IX_Query_Nonce] ON [app].[Query]

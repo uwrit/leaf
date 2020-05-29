@@ -1,4 +1,4 @@
--- Copyright (c) 2019, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2020, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,6 +18,7 @@ GO
 -- =======================================
 CREATE PROCEDURE [app].[sp_CreateCachedUnsavedQuery]
     @user auth.[User],
+	@definition NVARCHAR(MAX),
     @nonce UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -35,9 +36,9 @@ BEGIN
     BEGIN TRAN;
 
     -- create the query
-    INSERT INTO app.Query (UniversalId, Nonce, [Owner])
+    INSERT INTO app.Query (UniversalId, Nonce, [Owner], [Definition])
     OUTPUT inserted.Id INTO @qids
-    VALUES (null, @nonce, @user)
+    VALUES (null, @nonce, @user, @definition)
 
     -- get the id
     SELECT TOP 1
