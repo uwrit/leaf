@@ -139,7 +139,7 @@ export default class ExtensionConceptsWebWorker {
 
         const loadExtensionChildrenConcepts = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, concept } = payload;
-            const children: Concept[] = [ ... conceptMap.values() ].filter(c => c.parentId === concept!.id)
+            const children: Concept[] = [ ...conceptMap.values() ].filter(c => c.parentId === concept!.id)
             return { requestId, result: children };
         };
 

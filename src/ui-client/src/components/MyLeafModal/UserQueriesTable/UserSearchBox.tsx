@@ -205,7 +205,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
             clearTimeout(debounceTimer);
         }
 
-        if (term.length >= this.minSearchCharLength && !(term.startsWith(this.prevSearchTerm)) || Math.abs(term.length - this.prevSearchTerm.length) <= 2) {
+        if (term.length >= (this.minSearchCharLength && !(term.startsWith(this.prevSearchTerm))) || Math.abs(term.length - this.prevSearchTerm.length) <= 2) {
             this.prevSearchTerm = term;
             this.setState({
                 showUsersDropdown: true,

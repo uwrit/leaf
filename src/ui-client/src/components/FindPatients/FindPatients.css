@@ -22,6 +22,10 @@
     padding-bottom: 100px;
 }
 
+.find-patients-column-right > div > .row {
+    padding-left: 8px;
+}
+
 .find-patients-query-icon {
     margin-right: 12px;
     padding-top: 4px;

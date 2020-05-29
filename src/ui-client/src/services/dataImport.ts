@@ -10,7 +10,7 @@ import { REDCapImportConfiguration, REDCapConcept } from "../models/redcapApi/Im
 import { HttpFactory } from './HttpFactory';
 import { AppState } from "../models/state/AppState";
 import { ImportMetadata, ImportMetadataDTO } from "../models/dataImport/ImportMetadata";
-import { ImportRecord, ImportDataResultDTO, ImportRecordDTO } from "../models/dataImport/ImportRecord";
+import { ImportDataResultDTO, ImportRecordDTO } from "../models/dataImport/ImportRecord";
 
 const worker = new REDCapImportWebWorker();
 

@@ -11,7 +11,6 @@ import { setPanelItemNumericFilter } from '../../../actions/panels';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
 import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
-import { keys } from '../../../models/Keyboard';
 import './PanelItemNumericFilter.css';
 
 interface Props {

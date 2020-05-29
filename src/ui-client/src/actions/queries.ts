@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { SavedQuery, SavedQueryRef, Query, QueryDependent, QuerySaveResponseDTO } from '../models/Query';
+import { SavedQuery, SavedQueryRef, Query, QueryDependent } from '../models/Query';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { panelToDto } from '../models/panel/Panel';
@@ -61,7 +61,7 @@ export const getSavedQuery = (ref: SavedQueryRef) => {
             dispatch(setPanelFilterActiveStates(saved.panelFilters));
             dispatch(hideMyLeafModal());
 
-            if (!isAdmin || isAdmin && saved.ownerShort === name) {
+            if (!isAdmin || (isAdmin && saved.ownerShort === name)) {
                 dispatch(addSavedQuery(saved));
             }
         }
@@ -121,7 +121,7 @@ export const requestQuerySave = () => {
             /*
              * Add to UI if not an admin, or IS an admin and the query is owned by the admin.
              */
-            if (!isAdmin || isAdmin && saved.ownerShort === name) {
+            if (!isAdmin || (isAdmin && saved.ownerShort === name)) {
 
                 /*
                 * Update current query in UI to this.
