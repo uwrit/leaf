@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Options;
@@ -21,7 +22,7 @@ namespace Tests
         public void Should_Correctly_Represent_Observation_Shape()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -32,7 +33,7 @@ namespace Tests
         public void Should_Correctly_Represent_Encounter_Shape()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -43,7 +44,7 @@ namespace Tests
         public void Should_Correctly_Reference_AppDb()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -54,7 +55,7 @@ namespace Tests
         public void Should_Correctly_Reference_QueryId_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -66,7 +67,7 @@ namespace Tests
         public void Observation_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -78,7 +79,7 @@ namespace Tests
         public void Encounter_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -90,7 +91,7 @@ namespace Tests
         public void Observation_Should_Correctly_Reference_EarlyBound_And_LateBound_Parameter()
         {
             var compilerCtx = GetObservationCompilerContext(early: true);
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -103,7 +104,7 @@ namespace Tests
         public void Encounter_Should_Correctly_Reference_EarlyBound_And_LateBound_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext(early: true, late: true);
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             var executionCtx = compiler.BuildDatasetSql(compilerCtx);
 
@@ -117,7 +118,7 @@ namespace Tests
         {
             var compilerCtx = GetEncounterCompilerContext();
             compilerCtx.DatasetQuery.SqlStatement = "DROP TABLE encounter";
-            var compiler = new DatasetSqlCompiler(GetCompilerOptions());
+            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
             Assert.Throws<LeafCompilerException>(() => compiler.BuildDatasetSql(compilerCtx));
         }
@@ -191,6 +192,52 @@ namespace Tests
                 ConnectionString = @"Server=fake;Database=LeafDB;Trusted_Connection=True"
             };
             return Options.Create(new CompilerOptions { AppDb = extractor.ExtractDatabase(dbOpts) });
+        }
+
+        static ISqlCompiler GetSqlCompiler()
+        {
+            var compOpts = GetCompilerOptions();
+            var user = new MockUser();
+            var cohortOpts = Options.Create(new CohortOptions { FieldCohortPersonId = "person_id", SetCohort = "app.Cohort" });
+            return new SqlServerCompiler(user, compOpts, cohortOpts);
+        }
+
+        class MockUser : IUserContext
+        {
+            public MockUser(bool id = false, bool quar = false, bool ins = true)
+            {
+                IsInstitutional = ins;
+                Identified = id;
+                IsQuarantined = quar;
+            }
+
+            public string[] Groups => throw new NotImplementedException();
+
+            public string[] Roles => throw new NotImplementedException();
+
+            public string Issuer => throw new NotImplementedException();
+
+            public string UUID => throw new NotImplementedException();
+
+            public string Identity => throw new NotImplementedException();
+
+            public bool IsInstitutional { get; }
+
+            public bool IsAdmin => throw new NotImplementedException();
+
+            public bool IsQuarantined { get; }
+
+            public Guid IdNonce => throw new NotImplementedException();
+
+            public Guid? SessionNonce => throw new NotImplementedException();
+
+            public SessionType SessionType => SessionType.Research;
+
+            public bool Identified { get; set; }
+
+            public AuthenticationMechanism AuthenticationMechanism => throw new NotImplementedException();
+
+            public bool IsInRole(string role) => throw new NotImplementedException();
         }
     }
 }

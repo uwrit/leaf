@@ -23,14 +23,14 @@ namespace Tests
         {
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new DeidentificationOptions { Enabled = true, Noise = new DeidentificationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
+            var opts = new DeidentificationOptions { Cohort = new DeidentificationOptions.CohortObfuscationOptions { Enabled = true, Noise = new DeidentificationOptions.CohortObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context(); 
 
             obfuscator.Obfuscate(ref count, ctx, opts);
 
             Assert.NotEqual(orig, count.Value);
-            Assert.Equal(count.PlusMinus, Math.Max(opts.Noise.LowerBound, opts.Noise.UpperBound));
+            Assert.Equal(count.PlusMinus, Math.Max(opts.Cohort.Noise.LowerBound, opts.Cohort.Noise.UpperBound));
             Assert.False(count.WithinLowCellThreshold);
         }
 
@@ -39,14 +39,14 @@ namespace Tests
         {
             var orig = 5;
             var obfuscator = new ObfuscationService();
-            var opts = new DeidentificationOptions { Enabled = true, LowCellSizeMasking = new DeidentificationOptions.LowCellSizeMaskingOptions { Enabled = true, Threshold = 10 } };
+            var opts = new DeidentificationOptions { Cohort = new DeidentificationOptions.CohortObfuscationOptions { Enabled = true, LowCellSizeMasking = new DeidentificationOptions.CohortObfuscationOptions.LowCellSizeMaskingOptions { Enabled = true, Threshold = 10 } } };
             var count = new PatientCount { Value = orig };
             var ctx = MockPanel.Context();
 
             obfuscator.Obfuscate(ref count, ctx, opts);
 
             Assert.NotEqual(orig, count.Value);
-            Assert.Equal(count.Value, opts.LowCellSizeMasking.Threshold);
+            Assert.Equal(count.Value, opts.Cohort.LowCellSizeMasking.Threshold);
             Assert.True(count.WithinLowCellThreshold);
         }
 
@@ -58,7 +58,7 @@ namespace Tests
             var g3 = Guid.NewGuid();
             var orig = 50;
             var obfuscator = new ObfuscationService();
-            var opts = new DeidentificationOptions { Enabled = true, Noise = new DeidentificationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } };
+            var opts = new DeidentificationOptions { Cohort = new DeidentificationOptions.CohortObfuscationOptions { Enabled = true, Noise = new DeidentificationOptions.CohortObfuscationOptions.NoiseOptions { Enabled = true, LowerBound = -10, UpperBound = 10 } } };
 
             var count1 = new PatientCount { Value = orig };
             var count2 = new PatientCount { Value = orig };

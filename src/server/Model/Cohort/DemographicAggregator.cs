@@ -184,10 +184,16 @@ namespace Model.Cohort
 
         void RecordNih(PatientDemographic patient)
         {
+            if (string.IsNullOrEmpty(patient.Race))
+            {
+                return;
+            }
+
             if (!NihRaceEthnicity.EthnicBackgrounds.ContainsKey(patient.Race))
             {
                 NihRaceEthnicity.EthnicBackgrounds.Add(patient.Race, new NihRaceEthnicityBucket());
             }
+
             var race = NihRaceEthnicity.EthnicBackgrounds[patient.Race];
             if (patient.IsHispanic.HasValue)
             {
