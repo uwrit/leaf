@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +13,7 @@ import { PatientListConfiguration } from '../../../models/patientList/Configurat
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
 import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
+import EncounterPanelSelector from './EncounterPanelSelector';
 
 interface Props {
     className?: string;
@@ -22,15 +23,31 @@ interface Props {
     dispatch: any;
     handleClickClose: () => void;
     handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
+    handleEncounterPanelSelect: (panelIndex: number | undefined) => void;
     handleDateSelect: (date: DateBoundary) => void;
-    selectedDates: DateBoundary;
+    selectedDates?: DateBoundary;
+    selectedEncounterPanel?: number;
     showDates: boolean;
 }
 
-export default class AddDatasetSelectors extends React.PureComponent<Props> {
+interface State {
+    showEncounterPanelModal: boolean;
+}
+
+export default class AddDatasetSelectors extends React.PureComponent<Props,State> {
+    public constructor(props: Props) {
+        super(props);
+        this.state = {
+            showEncounterPanelModal: false
+        }
+    }
+
     public render() {
-        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates } = this.props;
+        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates, selectedEncounterPanel } = this.props;
+        const { showEncounterPanelModal } = this.state;
         const c = className ? className : 'patientlist-add-dataset';
+        const selected = datasets.all.get(datasets.selected);
+
         return (
             <div className={c}>
                 <Row>
@@ -47,18 +64,23 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                         />
                     </Col>
                     <Col md={3} className={`${c}-select-col-right`}>
-                        {showDates &&
-                         dates.map((d: DateBoundary) => {
-                            return (
-                                <div 
-                                    key={d.display} 
-                                    className={this.setDateOptionClass(d)}
-                                    onClick={this.handleDateOptionClick.bind(null, d)}
-                                    tabIndex={0}>
-                                    {d.display}
-                                </div>
-                            );
-                        })}
+                        {showDates && 
+                        <div>
+                            {dates.map((d: DateBoundary) => {
+                                return (
+                                    <div 
+                                        key={d.display} 
+                                        className={this.setDateOptionClass(d)}
+                                        onClick={this.handleDateOptionClick.bind(null, d)}
+                                        tabIndex={0}>
+                                        {d.display}
+                                    </div>
+                                );
+                            })}
+                            <div className={`${c}-divider`}></div>
+                            {this.getByEncounterContent(selectedEncounterPanel)}
+                        </div>
+                        }
                         {!showDates &&
                         <div>This dataset cannot be filtered by dates</div>}
                     </Col>
@@ -72,8 +94,24 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
                         Add Dataset
                     </Button>
                 </div>
+                {showEncounterPanelModal && 
+                <EncounterPanelSelector 
+                    dataset={selected} 
+                    handleByEncounterSelect={this.handleEncounterPanelSelect}
+                    toggle={this.hideEncounterPanelModal}
+                />
+                }
             </div>
         )
+    }
+
+    private getByEncounterContent = (selectedEncounterPanel?: number) => {
+        const { className } = this.props;
+
+        if (typeof selectedEncounterPanel === 'undefined') {
+            return <div onClick={this.showEncounterPanelModal} className={`${className}-by-encounter`}>From Specific Encounters</div>;
+        }
+        return <div onClick={this.showEncounterPanelModal} className={`${className}-by-encounter selected`}>From Panel {selectedEncounterPanel+1}</div>;
     }
 
     private handleDateOptionClick = (opt: DateBoundary) => {
@@ -86,12 +124,23 @@ export default class AddDatasetSelectors extends React.PureComponent<Props> {
         return `${className}-select-date-option ${date === selectedDates ? 'selected' : ''}`
     }
 
+    private showEncounterPanelModal = () => this.setState({ showEncounterPanelModal: true });
+
+    private hideEncounterPanelModal = () => this.setState({ showEncounterPanelModal: false });
+
+    private handleEncounterPanelSelect = (panelIndex: number | undefined) => {
+        const { handleEncounterPanelSelect } = this.props;
+
+        this.setState({ showEncounterPanelModal: false })
+        handleEncounterPanelSelect(panelIndex);
+    }
+
     private handleDatasetRequest = () => {
-        const { datasets, selectedDates, dispatch, handleDatasetSelect } = this.props;
+        const { datasets, selectedDates, selectedEncounterPanel, dispatch, handleDatasetSelect } = this.props;
 
         if (datasets.selected) {
             const ds = datasets.all.get(datasets.selected)!;
-            dispatch(getPatientListDataset(ds, selectedDates));
+            dispatch(getPatientListDataset(ds, selectedDates, selectedEncounterPanel));
             handleDatasetSelect(ds);
         }
     }

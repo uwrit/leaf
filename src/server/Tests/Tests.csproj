@@ -31,9 +31,10 @@
     <Folder Include="Util\" />
     <Folder Include="Mock\Models\Compiler\" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="Composure">
-      <HintPath>..\..\..\..\composure\src\Composure\bin\Release\netcoreapp2.2\Composure.dll</HintPath>
+      <HintPath>..\..\..\..\composure\src\Composure\bin\Debug\netcoreapp2.2\Composure.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

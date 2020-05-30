@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -25,16 +25,19 @@ namespace Services.Cohort
     {
         readonly IUserContext user;
         readonly ILogger<DatasetExecutor> log;
-        readonly ClinDbOptions opts;
+        readonly ClinDbOptions dbOpts;
+        readonly DeidentificationOptions deidentOpts;
 
         public DatasetExecutor(
             IUserContext userContext,
             ILogger<DatasetExecutor> log,
-            IOptions<ClinDbOptions> opts)
+            IOptions<ClinDbOptions> dbOpts,
+            IOptions<DeidentificationOptions> deidentOpts)
         {
             this.user = userContext;
             this.log = log;
-            this.opts = opts.Value;
+            this.dbOpts = dbOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
         }
 
         public async Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token)
@@ -42,8 +45,9 @@ namespace Services.Cohort
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
+            var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -54,7 +58,7 @@ namespace Services.Cohort
                     {
                         var dbSchema = GetShapedSchema(context, reader);
                         var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
-                        var data = marshaller.Marshal(reader, user.Anonymize());
+                        var data = marshaller.Marshal(reader, deidentify, deidentOpts);
                         var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
 
                         return new Dataset(resultSchema, data);
@@ -104,13 +108,13 @@ namespace Services.Cohort
             _schema = schema;
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
                 .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name) && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
                 .Select(f => f.ToSchemaField());
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize, fields);
+            var converter = GetConverter(anonymize, fields, opts);
 
             while (reader.Read())
             {
@@ -121,11 +125,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize, IEnumerable<SchemaFieldSelector> fields)
+        Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize, IEnumerable<SchemaFieldSelector> fields, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new DynamicAnonymizer(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new DynamicAnonymizer(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec, fields);
@@ -163,10 +168,10 @@ namespace Services.Cohort
             Plan = new ObservationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -176,11 +181,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<ObservationDatasetRecord, Observation> GetConverter(bool anonymize)
+        Func<ObservationDatasetRecord, Observation> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<ObservationDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<ObservationDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -221,10 +227,10 @@ namespace Services.Cohort
             Plan = new MedicationAdministrationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -234,11 +240,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<MedicationAdministrationDatasetRecord, MedicationAdministration> GetConverter(bool anonymize)
+        Func<MedicationAdministrationDatasetRecord, MedicationAdministration> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<MedicationAdministrationDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<MedicationAdministrationDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -277,10 +284,10 @@ namespace Services.Cohort
             Plan = new MedicationRequestMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -290,11 +297,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<MedicationRequestDatasetRecord, MedicationRequest> GetConverter(bool anonymize)
+        Func<MedicationRequestDatasetRecord, MedicationRequest> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<MedicationRequestDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<MedicationRequestDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -334,10 +342,10 @@ namespace Services.Cohort
             Plan = new AllergyMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -347,11 +355,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<AllergyDatasetRecord, Allergy> GetConverter(bool anonymize)
+        Func<AllergyDatasetRecord, Allergy> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<AllergyDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<AllergyDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -389,10 +398,10 @@ namespace Services.Cohort
             Plan = new ImmunizationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -402,11 +411,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<ImmunizationDatasetRecord, Immunization> GetConverter(bool anonymize)
+        Func<ImmunizationDatasetRecord, Immunization> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<ImmunizationDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<ImmunizationDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -445,10 +455,10 @@ namespace Services.Cohort
             Plan = new ProcedureMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -458,11 +468,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<ProcedureDatasetRecord, Procedure> GetConverter(bool anonymize)
+        Func<ProcedureDatasetRecord, Procedure> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<ProcedureDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<ProcedureDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -499,10 +510,10 @@ namespace Services.Cohort
             Plan = new ConditionMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -512,11 +523,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<ConditionDatasetRecord, Condition> GetConverter(bool anonymize)
+        Func<ConditionDatasetRecord, Condition> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<ConditionDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<ConditionDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);
@@ -555,10 +567,10 @@ namespace Services.Cohort
             Plan = new EncounterMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize)
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
-            var converter = GetConverter(anonymize);
+            var converter = GetConverter(anonymize, opts);
             while (reader.Read())
             {
                 var record = GetRecord(reader);
@@ -568,11 +580,12 @@ namespace Services.Cohort
             return records;
         }
 
-        Func<EncounterDatasetRecord, Encounter> GetConverter(bool anonymize)
+        Func<EncounterDatasetRecord, Encounter> GetConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<EncounterDatasetRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<EncounterDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);

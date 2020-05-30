@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@ using Model.Compiler;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using Model.Cohort;
+using Model.Options;
 
 namespace Services.Cohort
 {
@@ -47,6 +48,6 @@ namespace Services.Cohort
             }
         }
 
-        public abstract IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize);
+        public abstract IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts);
     }
 }

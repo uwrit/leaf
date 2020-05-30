@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,7 +27,8 @@ interface Props {
 }
 
 interface State {
-    selectedDates: DateBoundary;
+    selectedEncounterPanel?: number; 
+    selectedDates?: DateBoundary;
     showDates: boolean;
     showSelectorModal: boolean;
 }
@@ -75,7 +76,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     public render() {
         const c = this.className;
-        const { selectedDates, showSelectorModal, showDates } = this.state;
+        const { selectedDates, selectedEncounterPanel, showSelectorModal, showDates } = this.state;
         const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
@@ -112,7 +113,13 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
          */
         } else if (showSelectorModal) {
             arr.push(
-                <div className={modalClasses.join(' ')} onBlur={this.handleBlur} onMouseLeave={this.handleMouseLeave} onMouseEnter={this.handleMouseEnter} tabIndex={0} key={4}>
+                <div 
+                    className={modalClasses.join(' ')}
+                    onBlur={this.handleBlur} 
+                    onMouseLeave={this.handleMouseLeave} 
+                    onMouseEnter={this.handleMouseEnter} 
+                    tabIndex={0} 
+                    key={4}>
                     <AddDatasetSelectors 
                         dates={dates}
                         dispatch={dispatch} 
@@ -120,13 +127,15 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         className={c}
                         datasets={datasets}
                         handleClickClose={this.handleClickClose}
+                        handleEncounterPanelSelect={this.handleEncounterPanelSelect}
                         handleDatasetSelect={this.handleDatasetOptionClick}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
+                        selectedEncounterPanel={selectedEncounterPanel}
                         showDates={showDates}
                     />
                 </div>
-            )
+            );
         }
 
         return arr;
@@ -140,12 +149,9 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
         let selectedName = '';
 
         if (selected) {
-            const name = selected.name;
-            if (name.length > 20) {
-                selectedName = name.substring(0, 20) + '...';
-            } else {
-                selectedName = name;
-            }
+            selectedName = selected.name.length > 20
+                ? selected.name.substring(0, 20) + '...'
+                : selected.name;
         }
 
         if (configuration.isFetching) {
@@ -158,7 +164,12 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     }
 
     private handleDateOptionClick = (opt: DateBoundary) => {
-        this.setState({ selectedDates: opt });
+        this.setState({ selectedDates: opt, selectedEncounterPanel: undefined });
+    }
+
+    private handleEncounterPanelSelect = (selectedEncounterPanel: number | undefined ) => {
+        const selectedDates = typeof selectedEncounterPanel === 'undefined' ? dates[4] : undefined;
+        this.setState({ selectedEncounterPanel, selectedDates });
     }
 
     private handleDatasetOptionClick = (dataset: PatientListDatasetQuery) => {

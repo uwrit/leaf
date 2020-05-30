@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -95,7 +95,7 @@ export class LeafMap extends React.Component<Props, State> {
         for (const nr of responders) {
             const netCohort = cohort.networkCohorts.get(nr.id);
             markers.push(<EndpointMarker key={nr.id} position={new LatLng(nr.latitude!, nr.longitude!)} queryState={netCohort!.count.state} />);
-            popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count.value}  />)
+            popups.push(<EndpointPopup key={nr.id} id={nr} count={netCohort!.count}  />)
 
             if (home && !home.isGateway && nr.id > 0) {
                 const opts = cohort!.count.state === CohortStateType.LOADED ? antPathOptionTypes.RESULT_RECEIVED : antPathOptionTypes.SENDING_QUERY;

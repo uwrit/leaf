@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,12 +12,8 @@ namespace API.Options
         {
             public const string Section = @"Compiler";
             public const string Alias = @"Compiler:Alias";
-            public const string SetPerson = @"Compiler:SetPerson";
-            public const string SetEncounter = @"Compiler:SetEncounter";
             public const string FieldPersonId = @"Compiler:FieldPersonId";
             public const string FieldEncounterId = @"Compiler:FieldEncounterId";
-            public const string FieldEncounterAdmitDate = @"Compiler:FieldEncounterAdmitDate";
-            public const string FieldEncounterDischargeDate = @"Compiler:FieldEncounterDischargeDate";
         }
     }
 }

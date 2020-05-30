@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -25,8 +25,11 @@ export interface BinarySplit {
 }
 
 export interface DemographicStatistics {
-    binarySplitData: BinarySplitPair[];
     ageByGenderData: AgeByGenderData;
+    binarySplitData: BinarySplitPair[];
+    languageByHeritageData: VariableBucketSet;
+    nihRaceEthnicityData: NihRaceEthnicityBuckets;
+    religionData: PatientCountMap;
 }
 
 export interface AgeByGenderData {
@@ -51,4 +54,43 @@ export interface AgeByGenderBucket {
     females: number;
     males: number;
     others: number;
+}
+
+export interface NihRaceEthnicityBuckets {
+    ethnicBackgrounds: EthnicBackgroundGenderMap;
+}
+
+export interface NihRaceEthnicityBucket {
+    hispanic: AgeByGenderBucket;
+    notHispanic: AgeByGenderBucket;
+    unknown: AgeByGenderBucket;
+}
+
+export interface EthnicBackgroundGenderMap {
+    [key:string]: NihRaceEthnicityBucket;
+}
+
+export interface PatientCountMap {
+    [key:string]: number;
+}
+
+export interface VariableBucketSet {
+    data: VariableBuckSetProperty;
+    subBucketTotals: PatientCountMap;
+}
+
+interface VariableBuckSetProperty {
+    buckets: VariableBucketMap;
+}
+
+interface VariableBucketMap {
+    [key:string]: VariableBucketMapProperty;
+}
+
+interface VariableBucketMapProperty {
+    subBuckets: VariableSubBucketMap
+}
+
+interface VariableSubBucketMap {
+    [key:string]: number
 }

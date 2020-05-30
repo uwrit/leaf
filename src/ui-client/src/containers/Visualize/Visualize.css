@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,6 +17,11 @@
 .visualize-loading .loader-svg {
     top: 0 !important;
     width: 100px !important;
+}
+
+.visualize-container > div > .row {
+    font-family: Roboto;
+    padding-bottom: 20px;
 }
 
 .visualize-error {
@@ -54,11 +59,10 @@
 }
 
 .visualize-responder-name {
-    color: rgb(100, 100, 100);
-    font-family: Roboto;
-    font-size: 1.5rem;
+    color: white;
+    font-size: 2rem;
     font-weight: 500;
-    margin-bottom: -8px;
+    margin-bottom: 8px;
     padding-top: 8px;
 }
 
@@ -106,8 +110,18 @@
     width: 100%;
 }
 
+.visualization-languagebyheritage-container {
+    padding-bottom: 150px;
+}
+
+.visualization-religion-column tspan,
+.visualization-languagebyheritage-container text {
+    text-transform: capitalize;
+}
+
 .visualization-agebygender-container > div,
-.visualization-ataglance-column {
+.visualization-ataglance-column,
+.visualization-languagebyheritage-column {
     margin: auto;
 }
 
@@ -132,7 +146,6 @@
 .visualize-demographic-container tspan,
 .visualize-demographic-container span {
     fill: rgba(33, 37, 41, 1) !important;
-    font-family: Roboto;
     font-size: 0.8rem;
     font-weight: 300;
     text-rendering: optimizeLegibility;
@@ -143,9 +156,20 @@
     text-transform: capitalize;
 }
 
-.visualize-demographic-container .recharts-cartesian-axis-tick > line,
-.visualize-demographic-container .recharts-yAxis .recharts-cartesian-axis-tick-value,
-.visualize-demographic-container .recharts-cartesian-axis-line {
+
+.visualize-demographic-container .recharts-cartesian-axis > line,                                   /* y-Axis lines */
+.visualize-demographic-container .recharts-cartesian-axis.yAxis .recharts-cartesian-axis-ticks,     /* y-Axis ticks */
+.visualize-demographic-container .recharts-cartesian-axis.xAxis .recharts-cartesian-axis-ticks line /* x-Axis ticks */
+{
+    display: none;
+}
+
+.visualization-religion-column .recharts-yAxis .recharts-cartesian-axis-ticks {
+    display: block !important;                                                                      /* Override for vertical-layout religion chart */
+}
+
+.visualization-religion-column .recharts-yAxis .recharts-cartesian-axis-ticks line,
+.visualization-religion-column .recharts-xAxis {
     display: none;
 }
 
@@ -165,4 +189,82 @@
 
 .recharts-tooltip-cursor {
     fill: rgba(0,0,0,0.05);
+}
+
+.visualization-languagebyheritage-column .recharts-cartesian-axis-tick text {
+    font-size: 0.8rem;
+    font-weight: 300;
+}
+
+/* Tooltip */
+.recharts-default-tooltip {
+    border-radius: 4px;
+    border: 1px solid rgb(230,230,230) !important;
+    border: none !important;
+    box-shadow: 0px 4px 9px rgba(0, 0, 0, 0.24);
+}
+
+.recharts-tooltip-wrapper .recharts-tooltip-label,
+.recharts-tooltip-wrapper .recharts-tooltip-item-name {
+    font-weight: 800;
+    text-transform: capitalize;
+}
+
+.recharts-tooltip-wrapper .recharts-tooltip-label {
+    border-bottom: 1px solid rgb(230,230,230);
+    font-weight: 600;
+}
+
+/* Show all toggle */
+.visualization-showall-toggle {
+    left: 0;
+    font-size: 1.2rem;
+    margin: 2px 15px;
+    position: absolute;
+    z-index: 100;
+}
+
+.visualization-showall.false {
+    margin-right: 20px;
+}
+
+.visualization-showall.selected {
+    color: #3091DD;
+}
+
+.visualization-showall:hover {
+    color: #3091DD;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Custom Legend */
+.visualization-legend-row > div {
+    display: inline-block;
+    height: 16px;
+    vertical-align: middle;
+}
+
+.visualization-legend-square {
+    height: 100%;
+    margin-right: 10px;
+    width: 16px;
+}
+
+.visualization-legend-label {
+    text-transform: capitalize;
+}
+
+.visualization-legend-label,
+.visualization-legend-value {
+    font-size: 0.8rem;
+    font-weight: 300;
+    line-height: 16px;
+}
+
+.visualization-legend-divider {
+    color: rgb(200,200,200);
+    display: none;
+    line-height: 16px;
+    margin: 0 5px;
 }

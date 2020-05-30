@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -72,6 +72,10 @@ body {
     }
     .user-question-modal .modal-body {
         height: 610px;
+    }
+    .patientlist-scroller-left {
+        margin-left: 60px;
+        left: 0;
     }
 }
 

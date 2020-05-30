@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Model.Validation;
 using Model.Error;
 using Model.Options;
+using Model.Obfuscation;
 
 namespace Model.Cohort
 {
@@ -36,25 +37,31 @@ namespace Model.Cohort
 
         readonly PanelConverter converter;
         readonly PanelValidator validator;
+        readonly DeidentificationOptions deidentOpts;
         readonly IPatientCohortService counter;
         readonly ICohortCacheService cohortCache;
+        readonly IObfuscationService obfuscator;
         readonly IUserContext user;
         readonly ILogger<CohortCounter> log;
         readonly RuntimeMode runtime;
 
         public CohortCounter(
             IOptions<RuntimeOptions> opts,
+            IOptions<DeidentificationOptions> deidentOpts,
             PanelConverter converter,
             PanelValidator validator,
             IPatientCohortService counter,
             ICohortCacheService cohortCache,
+            IObfuscationService obfuscator,
             IUserContext user,
             ILogger<CohortCounter> log)
         {
             this.runtime = opts.Value.Runtime;
+            this.deidentOpts = deidentOpts.Value;
             this.converter = converter;
             this.validator = validator;
             this.counter = counter;
+            this.obfuscator = obfuscator;
             this.cohortCache = cohortCache;
             this.user = user;
             this.log = log;
@@ -126,6 +133,7 @@ namespace Model.Cohort
                 {
                     QueryId = qid,
                     Value = cohort.Count,
+                    PlusMinus = 0,
                     SqlStatements = cohort.SqlStatements
                 }
             };
@@ -171,8 +179,7 @@ namespace Model.Cohort
             token.ThrowIfCancellationRequested();
 
             var qid = await CacheCohort(cohort);
-
-            return new Result
+            var result = new Result
             {
                 ValidationContext = ctx,
                 Count = new PatientCount
@@ -182,6 +189,15 @@ namespace Model.Cohort
                     SqlStatements = cohort.SqlStatements
                 }
             };
+
+            if (deidentOpts.ObfuscateCohort)
+            {
+                var count = result.Count;
+                obfuscator.Obfuscate(ref count, result.ValidationContext, deidentOpts);
+                log.LogInformation("FullCount results obfuscated. Obfuscated:{@Result}", result);
+            }
+
+            return result;
         }
 
         async Task<Guid> CacheCohort(PatientCohort cohort)

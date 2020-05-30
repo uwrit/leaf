@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,9 +14,11 @@ import { defaultVisualizationState } from './visualize';
 export const defaultCountState = (): PatientCountState => {
     return {
         queryId: '',
+        plusMinus: 0,
         sqlStatements: [],
         state: CohortStateType.NOT_LOADED,
-        value: 0
+        value: 0,
+        withinLowCellThreshold: false
     };
 };
 
@@ -66,8 +68,11 @@ export const recalculateCohortCount = (state: CohortState, id: number, enabled: 
 };
 
 export const setNetworkCohortCount = (state: CohortState, action: CohortCountAction): CohortState => {
+
     // Update count for this network responder
-    let totalPatients: number = 0;
+    let totalPatients = 0;
+    let totalPlusMinus = 0;
+    let withinLowCellThreshold = false;
     const cohort = state.networkCohorts.get(action.id!)
     const networkCohort: NetworkCohortState = Object.assign({}, cohort, {
         count: {
@@ -84,20 +89,32 @@ export const setNetworkCohortCount = (state: CohortState, action: CohortCountAct
         },
     });
 
-    // Compute aggregate results 
     const network = new Map(state.networkCohorts)
-    network.set(action.id!, networkCohort);
-    network.forEach((nc: NetworkCohortState) => { 
-        if (nc.count.state === CohortStateType.LOADED || nc.count.state === CohortStateType.IN_ERROR) {
-            totalPatients += nc.count.value;
-        }
-    });
+
+    // Aggregate
+    let numWithinLowCellThreshold = 0;
+        let included = 0;
+        network.set(action.id!, networkCohort);
+        network.forEach((nc: NetworkCohortState) => { 
+            if (nc.count.state === CohortStateType.LOADED || nc.count.state === CohortStateType.IN_ERROR) {
+                totalPatients += nc.count.value;
+                totalPlusMinus += nc.count.plusMinus;
+                included += 1;
+
+                if (nc.count.withinLowCellThreshold) {
+                    numWithinLowCellThreshold += 1;
+                }
+            }
+        });
+        withinLowCellThreshold = numWithinLowCellThreshold === included;
 
     // Return new aggregate cohort state
     return Object.assign({}, state, {
         count: {
             ...state.count,
+            plusMinus: totalPlusMinus,
             value: totalPatients,
+            withinLowCellThreshold: withinLowCellThreshold
         },
         networkCohorts: network
     });

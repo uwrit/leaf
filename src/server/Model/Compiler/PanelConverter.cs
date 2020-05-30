@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -181,7 +181,7 @@ namespace Model.Compiler
                 var global = globalPanelFilters.ElementAt(i);
                 var pi = new PanelItem() { Concept = global.ToConcept() };
                 var sub = new SubPanel() { IncludeSubPanel = true, PanelItems = new[] { pi } };
-                var panel = new Panel() { IncludePanel = global.IsInclusion, SubPanels = new[] { sub }, Index = lastPanelIndex };
+                var panel = new Panel()  { Domain = PanelDomain.GlobalPanelFilter, IncludePanel = global.IsInclusion, SubPanels = new[] { sub }, Index = lastPanelIndex };
 
                 merge.Add(panel);
             }

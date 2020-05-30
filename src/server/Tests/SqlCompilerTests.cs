@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -264,6 +264,25 @@ namespace Tests
             var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
 
             Assert.Equal(4, cols.Length);
+        }
+
+        [Fact]
+        public void Dataset_Joined_Query_Includes_Salt()
+        {
+            var panel = MockPanel.Panel();
+            panel.SubPanels.Add(new SubPanel
+            {
+                Index = 1,
+                PanelIndex = 0,
+                IncludeSubPanel = true,
+                PanelItems = new[] { MockPanel.HmcEnc() },
+                JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
+            });
+
+            var ob = new DatasetJoinedSqlSet(panel, Options);
+            var sql = ob.ToString();
+
+            Assert.Equal(sql, sql);
         }
     }
 }

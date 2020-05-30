@@ -1,9 +1,11 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model.Compiler;
 using Model.Options;
@@ -13,9 +15,8 @@ using System.Data.SqlClient;
 using System.Data;
 using Dapper;
 using Services.Tables;
-using Model.Error;
 using Model.Authorization;
-using Model.Search;
+using Newtonsoft.Json;
 
 namespace Services.Search
 {
@@ -74,8 +75,26 @@ namespace Services.Search
                 DatasetQuery = datasetQuery,
                 QueryContext = queryCtx,
                 EarlyBound = request.EarlyBound,
-                LateBound = request.LateBound
+                LateBound = request.LateBound,
+                Panel = GetPanel(queryCtx.Definition, request.PanelIndex)
             };
+        }
+
+        Panel GetPanel(string def, int? idx)
+        {
+            if (string.IsNullOrWhiteSpace(def) || !idx.HasValue || idx.Value < 0)
+            {
+                return null;
+            }
+            var panels = JsonConvert.DeserializeObject<IEnumerable<Panel>>(def, new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Auto
+            });
+            if (panels.Count() <= idx+1)
+            {
+                return panels.ElementAt(idx.Value);
+            }
+            return null;
         }
 
         async Task<DatasetCompilerContext> ByDatasetIdQueryId(DatasetExecutionRequest request)
@@ -83,6 +102,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetId and QueryId");
             var datasetid = request.DatasetRef.Id.Value;
             var queryid = request.QueryRef.Id.Value;
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -90,7 +110,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryId,
-                    new { datasetid, queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetid, queryid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

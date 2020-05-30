@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,6 +13,7 @@ export enum AuthMechanismType {
 
 export interface ConfigDTO {
     authentication: AuthenticationConfigDTO;
+    attestation: AttestationOptionsDTO;
     cohort: CohortConfigDTO;
     client: ClientOptions;
     version: string;
@@ -24,6 +25,10 @@ interface AuthenticationConfigDTO {
     logoutUri: string;
 }
 
+interface AttestationOptionsDTO {
+    enabled: boolean;
+}
+
 interface CohortConfigDTO {
     cacheLimit: number;
     exportLimit: number;
@@ -33,12 +38,23 @@ export interface AppConfig extends ConfigDTO { }
 
 export interface ClientOptions {
     map: MapOptions;
+    visualize: VisualizeOptions;
+    patientList: PatientListOptions;
     help: HelpOptions;
 }
 
 interface MapOptions {
     enabled: boolean;
     tileURI: string;
+}
+
+interface VisualizeOptions {
+    enabled: boolean;
+    showFederated?: boolean;
+}
+
+interface PatientListOptions {
+    enabled: boolean;
 }
 
 interface HelpOptions {

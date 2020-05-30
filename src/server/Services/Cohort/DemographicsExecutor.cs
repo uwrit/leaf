@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,15 +26,18 @@ namespace Services.Cohort
     {
         readonly IUserContext user;
         readonly ILogger<DemographicsExecutor> log;
-        readonly ClinDbOptions opts;
+        readonly ClinDbOptions dbOpts;
+        readonly DeidentificationOptions deidentOpts;
 
         public DemographicsExecutor(
             IUserContext userContext,
             ILogger<DemographicsExecutor> log,
-            IOptions<ClinDbOptions> opts)
+            IOptions<ClinDbOptions> dbOpts,
+            IOptions<DeidentificationOptions> deidentOpts)
         {
             this.log = log;
-            this.opts = opts.Value;
+            this.dbOpts = dbOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
             user = userContext;
         }
 
@@ -43,8 +46,9 @@ namespace Services.Cohort
             var sql = context.CompiledQuery;
             var parameters = context.SqlParameters();
             var pepper = context.QueryContext.Pepper;
+            var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(dbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -55,7 +59,7 @@ namespace Services.Cohort
                     {
                         var resultSchema = GetShapedSchema(context, reader);
                         var marshaller = new DemographicMarshaller(resultSchema, pepper);
-                        return marshaller.Marshal(reader, user.Anonymize());
+                        return marshaller.Marshal(reader, deidentify, deidentOpts);
                     }
                 }
             }
@@ -100,11 +104,11 @@ namespace Services.Cohort
             Pepper = pepper;
         }
 
-        public PatientDemographicContext Marshal(SqlDataReader reader, bool anonymize)
+        public PatientDemographicContext Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var exported = new List<PatientDemographic>();
             var cohort = new List<PatientDemographic>();
-            var exportConverter = GetExportConverter(anonymize);
+            var exportConverter = GetExportConverter(anonymize, opts);
             while (reader.Read())
             {
                 var cohortRecord = GetCohortRecord(reader);
@@ -124,11 +128,12 @@ namespace Services.Cohort
             };
         }
 
-        Func<PatientDemographicRecord, PatientDemographic> GetExportConverter(bool anonymize)
+        Func<PatientDemographicRecord, PatientDemographic> GetExportConverter(bool anonymize, DeidentificationOptions opts)
         {
             if (anonymize)
             {
-                var anon = new Anonymizer<PatientDemographicRecord>(Pepper);
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<PatientDemographicRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
                 return (rec) =>
                 {
                     anon.Anonymize(rec);

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -57,7 +57,6 @@ export class CohortCountSiteDetail extends React.PureComponent<Props, State> {
         const containerWidth = 160;
         const width = complete ? (value / xMax * containerWidth) : 0;
         const numLeftMargin = width + 4;
-        const val = complete ? value.toLocaleString() : '';
         const c = this.className;
 
         return (
@@ -77,11 +76,21 @@ export class CohortCountSiteDetail extends React.PureComponent<Props, State> {
                 {/* Value bar and value */}
                 <div className={`${c}-bar-container`}>
                     <div className={`${c}-bar`} style={{ width, backgroundColor: data.id.primaryColor }} />
-                    <div className={`${c}-num`} style={{ marginLeft: numLeftMargin }}>{val}</div>
+                    <div className={`${c}-num`} style={{ marginLeft: numLeftMargin }}>{this.getTrailingText(complete, data.countResults)}</div>
                 </div>
 
         </div>
         );
+    }
+
+    private getTrailingText = (complete: boolean, results: PatientCountState) => {
+        const { value, withinLowCellThreshold, plusMinus } = results;
+
+        if (!complete) { return ''; }
+        const val = value.toLocaleString();
+        if (withinLowCellThreshold) { return `${val} or less`; }
+        else if (plusMinus > 0)     { return `${val} +/- ${plusMinus}`; }
+        return val;
     }
 
     private getStateDependentContent = () => {

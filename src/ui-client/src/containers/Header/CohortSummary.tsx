@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -59,8 +59,10 @@ export class CohortSummary extends React.Component<Props> {
     }
 
     public cohortCountBoxStatesAreSame = (ccb1: CohortCountBoxState, ccb2: CohortCountBoxState) => {
-        return (ccb1.boxMinimized ? '1' : '0') + (ccb1.boxVisible ? '1' : '0') + (ccb1.infoButtonVisible ? '1' : '0') === 
-        (ccb2.boxMinimized ? '1' : '0') + (ccb2.boxVisible ? '1' : '0') + (ccb2.infoButtonVisible ? '1' : '0');
+        return (
+            boolToString(ccb1.boxMinimized) + boolToString(ccb1.boxVisible) + boolToString(ccb1.infoButtonVisible) === 
+            boolToString(ccb2.boxMinimized) + boolToString(ccb2.boxVisible) + boolToString(ccb2.infoButtonVisible)
+        );
     }
 
     public toggleCohortCountBox = () => {
@@ -88,9 +90,9 @@ export class CohortSummary extends React.Component<Props> {
 
     public render() {
         const { infoButtonVisible } = this.props.cohortCountBox;
-        const count = this.props.count.value;
+        const { plusMinus, withinLowCellThreshold, value } = this.props.count;
         const infoBoxClasses = [ 'cohort-summary-info-box' ];
-        const duration = count === 0 && this.prevCount > 0 ? 0.2 : 1.0;
+        const duration = value === 0 && this.prevCount > 0 ? 0.2 : 1.0;
         const displayName = this.props.currentQuery.name === '' ? 'New Query' : this.props.currentQuery.name;
 
         if (infoButtonVisible) { infoBoxClasses.push('show'); }
@@ -103,12 +105,12 @@ export class CohortSummary extends React.Component<Props> {
                 <div className="cohort-summary-count">
                     <CountUp className="cohort-summary-count-number" 
                         start={this.prevCount} 
-                        end={count} 
+                        end={value} 
                         duration={duration} 
                         decimals={0} 
                         formattingFn={this.formatNumber} 
                     />
-                    <span className="cohort-summary-count-patients"> patients</span>
+                    {this.getTrailingText(plusMinus, withinLowCellThreshold)}
                 </div>
                 <div className={infoBoxClasses.join(' ')} onClick={this.handleInfoBoxClick}>
                     {infoButtonVisible && <FiInfo />}
@@ -116,7 +118,17 @@ export class CohortSummary extends React.Component<Props> {
             </div>
         );
     }
+
+    private getTrailingText = (plusMinus: number, withinLowCellThreshold: boolean) => {
+        let text = ' patients';
+        if (withinLowCellThreshold) { text = ' patients or less'; }
+        else if (plusMinus > 0)     { text = ` +/- ${plusMinus} patients`; }
+
+        return <span className="cohort-summary-count-patients">{text}</span>
+    }
 }
+
+const boolToString = (val: boolean) => val ? '1' : '0';
 
 const mapStateToProps = (state: AppState) => {
     return { 

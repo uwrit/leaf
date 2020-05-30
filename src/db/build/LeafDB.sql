@@ -1,4 +1,4 @@
--- Copyright (c) 2019, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2020, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,76 +7,6 @@
 GO
 /****** Object:  Database [LeafDB]    Script Date: ******/
 CREATE DATABASE [LeafDB]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'LeafDB_new', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LeafDB_new.mdf' , SIZE = 663552KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
-( NAME = N'LeafDB_new_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\DATA\LeafDB_new_log.ldf' , SIZE = 532480KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
-GO
-IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
-begin
-EXEC [LeafDB].[dbo].[sp_fulltext_database] @action = 'enable'
-end
-GO
-ALTER DATABASE [LeafDB] SET ANSI_NULL_DEFAULT OFF 
-GO
-ALTER DATABASE [LeafDB] SET ANSI_NULLS OFF 
-GO
-ALTER DATABASE [LeafDB] SET ANSI_PADDING OFF 
-GO
-ALTER DATABASE [LeafDB] SET ANSI_WARNINGS OFF 
-GO
-ALTER DATABASE [LeafDB] SET ARITHABORT OFF 
-GO
-ALTER DATABASE [LeafDB] SET AUTO_CLOSE ON 
-GO
-ALTER DATABASE [LeafDB] SET AUTO_SHRINK OFF 
-GO
-ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS ON 
-GO
-ALTER DATABASE [LeafDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
-GO
-ALTER DATABASE [LeafDB] SET CURSOR_DEFAULT  GLOBAL 
-GO
-ALTER DATABASE [LeafDB] SET CONCAT_NULL_YIELDS_NULL OFF 
-GO
-ALTER DATABASE [LeafDB] SET NUMERIC_ROUNDABORT OFF 
-GO
-ALTER DATABASE [LeafDB] SET QUOTED_IDENTIFIER OFF 
-GO
-ALTER DATABASE [LeafDB] SET RECURSIVE_TRIGGERS OFF 
-GO
-ALTER DATABASE [LeafDB] SET  ENABLE_BROKER 
-GO
-ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
-GO
-ALTER DATABASE [LeafDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
-GO
-ALTER DATABASE [LeafDB] SET TRUSTWORTHY OFF 
-GO
-ALTER DATABASE [LeafDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
-GO
-ALTER DATABASE [LeafDB] SET PARAMETERIZATION SIMPLE 
-GO
-ALTER DATABASE [LeafDB] SET READ_COMMITTED_SNAPSHOT OFF 
-GO
-ALTER DATABASE [LeafDB] SET HONOR_BROKER_PRIORITY OFF 
-GO
-ALTER DATABASE [LeafDB] SET RECOVERY SIMPLE 
-GO
-ALTER DATABASE [LeafDB] SET  MULTI_USER 
-GO
-ALTER DATABASE [LeafDB] SET PAGE_VERIFY CHECKSUM  
-GO
-ALTER DATABASE [LeafDB] SET DB_CHAINING OFF 
-GO
-ALTER DATABASE [LeafDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
-GO
-ALTER DATABASE [LeafDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
-GO
-ALTER DATABASE [LeafDB] SET DELAYED_DURABILITY = DISABLED 
-GO
-EXEC sys.sp_db_vardecimal_storage_format N'LeafDB', N'ON'
 GO
 USE [LeafDB]
 GO
@@ -1073,11 +1003,12 @@ CREATE TABLE [app].[Query](
 	[Category] [nvarchar](200) NULL,
 	[Updated] [datetime] NOT NULL,
 	[Ver] [int] NOT NULL,
+	[Definition] [nvarchar](max) NOT NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 /****** Object:  Table [app].[QueryDefinition]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -4589,6 +4520,7 @@ GO
 -- =======================================
 CREATE PROCEDURE [app].[sp_CreateCachedUnsavedQuery]
     @user auth.[User],
+	@definition NVARCHAR(MAX),
     @nonce UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -4606,9 +4538,9 @@ BEGIN
     BEGIN TRAN;
 
     -- create the query
-    INSERT INTO app.Query (UniversalId, Nonce, [Owner])
+    INSERT INTO app.Query (UniversalId, Nonce, [Owner], [Definition])
     OUTPUT inserted.Id INTO @qids
-    VALUES (null, @nonce, @user)
+    VALUES (null, @nonce, @user, @definition)
 
     -- get the id
     SELECT TOP 1
@@ -5634,6 +5566,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextById]
     @datasetid UNIQUEIDENTIFIER,
     @queryid UNIQUEIDENTIFIER,
+	@joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -5658,7 +5591,8 @@ BEGIN
     -- get pepper
     SELECT
         QueryId = Id,
-        Pepper
+        Pepper,
+		[Definition] = CASE WHEN @joinpanel = 0 THEN NULL ELSE [Definition] END
     FROM
         app.Query
     WHERE Id = @queryid;
@@ -7982,7 +7916,7 @@ AS
 BEGIN
     SET NOCOUNT ON
 
-	/*
+	/**
 	 * Find concepts where the content update
 	 * time is greater than the last
 	 * search token update time, or they've never been tokenized.
@@ -7995,8 +7929,42 @@ BEGIN
 					  FROM app.ConceptTokenizedIndex TI 
 					  WHERE C.Id = TI.ConceptId 
 						    AND TI.Updated > C.ContentLastUpdateDateTime)
+	
+	/**
+	 * Ensure concepts have RootIds set.
+	 */
+	; WITH roots AS
+	(
+		SELECT RootId = c.Id
+			 , RootUiDisplayName = c.UiDisplayName
+			 , c.IsRoot
+			 , c.Id
+			 , c.ParentId
+			 , c.UiDisplayName
+		FROM app.Concept AS c
+		WHERE c.IsRoot = 1
+ 
+		UNION ALL
+ 
+		SELECT roots.RootId
+			 , roots.RootUiDisplayName
+			 , c2.IsRoot
+			 , c2.Id
+			 , c2.ParentId
+			 , c2.UiDisplayName
+		FROM roots
+			 INNER JOIN app.Concept c2
+				ON c2.ParentId = roots.Id
+	)
+ 
+	UPDATE app.Concept
+	SET RootId = roots.RootId
+	FROM app.Concept AS C
+		 INNER JOIN roots
+			ON C.Id = roots.Id
+	WHERE C.RootId IS NULL
 
-	/*
+	/**
 	 * Insert concepts of interest for evaluation.
 	 */
 	CREATE TABLE #concepts (Id [uniqueidentifier] NULL, rootId [uniqueidentifier] NULL, uiDisplayName NVARCHAR(400) NULL)
@@ -8007,14 +7975,14 @@ BEGIN
 	FROM app.Concept C
 	WHERE EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
-	/*
+	/**
 	 * Remove puncuation and non-alphabetic characters.
 	 */
 	UPDATE #concepts
 	SET uiDisplayName = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
 						uiDisplayName,',',' '),':',' '),';',' '),'''',' '),'"',' '),']',' '),'[',' '),'(',' '),')',' '),'?',' '),'/',' '),'\',' '),'-',' ')
 
-	/*
+	/**
 	 * Loop through each word in the uiDisplayName and separate each into its own row.
 	 */
 	DECLARE @loopCount INT = 0,
@@ -8034,7 +8002,7 @@ BEGIN
 
 		BEGIN TRY DROP TABLE #currentWords END TRY BEGIN CATCH END CATCH
 
-		/* 
+		/**
 		 * Get the current left-most word (i.e. everything up to the first space " ").
 		 */
 		INSERT INTO #words
@@ -8046,12 +8014,12 @@ BEGIN
 			  ,rootId = c.rootId
 		FROM #concepts c
 
-		/* 
+		/** 
 		 * Update row count.
 		 */
 		SET @updatedRows = @@ROWCOUNT
 
-		/* 
+		/**
 		 * NULL out rows with no more spaces (their last word has already been inserted into the #words table).
 		 */
 		UPDATE #concepts
@@ -8059,27 +8027,27 @@ BEGIN
 		WHERE CHARINDEX(@delimeter, uiDisplayName) = 0
 			  OR LEN(uiDisplayName) - CHARINDEX(@delimeter, uiDisplayName) < 0
 
-		/* 
+		/**
 		 * Chop off everything to the left of the first space " ".
 		 */
 		UPDATE #concepts
 		SET uiDisplayName = NULLIF(LTRIM(RTRIM(RIGHT(uiDisplayName, LEN(uiDisplayName) - CHARINDEX(@delimeter, uiDisplayName) + 1))),'')
 		WHERE uiDisplayName IS NOT NULL 
 		  
-		/*
+		/**
 		 * DELETE from table if no text left to process.
 		 */
 		DELETE FROM #concepts
 		WHERE NULLIF(uiDisplayName,'') IS NULL
 
-		/*
+		/**
 		 * Increment the @loopCount.
 		 */ 
 		SET @loopCount += 1
 
 	END
 
-	/*
+	/**
 	 * Index the output and remove any remaining whitespace.
 	 */
 	CREATE NONCLUSTERED INDEX IDX_WORD ON #words (Word ASC, Id ASC) INCLUDE (RootId)
@@ -8090,7 +8058,7 @@ BEGIN
 	DELETE FROM #words
 	WHERE Word IN ('a','-','--','')
 
-	/*
+	/**
 	 * Clear old data.
 	 */
 	DELETE app.ConceptForwardIndex
@@ -8101,7 +8069,7 @@ BEGIN
 	FROM app.ConceptTokenizedIndex TI
 	WHERE NOT EXISTS (SELECT 1 FROM app.Concept C WHERE TI.ConceptId = C.Id)
 
-	/*
+	/**
 	 * Set the last update time on included Concepts
 	 * that were picked up here to make sure they
 	 * aren't unnecessarily rerun next time due to 
@@ -8113,7 +8081,7 @@ BEGIN
 	WHERE EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 		  AND C.ContentLastUpdateDateTime IS NULL
 
-	/*
+	/**
 	 * Add any words that didn't exist before.
 	 */
 	INSERT INTO app.ConceptInvertedIndex (Word)
@@ -8121,7 +8089,7 @@ BEGIN
 	FROM #words W
 	WHERE NOT EXISTS (SELECT 1 FROM app.ConceptInvertedIndex II WHERE W.Word = II.Word)
 
-	/*
+	/**
 	 * Update forward index.
 	 */
 	INSERT INTO app.ConceptForwardIndex (WordId, Word, ConceptId, rootId)
@@ -8131,7 +8099,7 @@ BEGIN
 		  INNER JOIN app.ConceptInvertedIndex II
 			ON W.Word = II.Word
 
-	/*
+	/**
 	 * Create JSON string array of all tokens
 	 * for a given Concept.
 	 */
@@ -8148,7 +8116,7 @@ BEGIN
 	UPDATE #jsonTokens
 	SET Tokens = '[' + LEFT(Tokens, LEN(Tokens) - 1) + ']'
 
-	/* 
+	/**
 	 * Merge into tokenized index.
 	 */
 	MERGE INTO app.ConceptTokenizedIndex AS tgt
@@ -8161,7 +8129,7 @@ BEGIN
 		INSERT (ConceptId, JsonTokens, Updated)
 		VALUES (src.Id, src.Tokens, GETDATE());
 
-	/* 
+	/**
 	 * Update word counts.
 	 */
 	; WITH wordCountCte AS
@@ -8179,7 +8147,7 @@ BEGIN
 		 INNER JOIN wordCountCte CTE
 			ON II.WordId = CTE.WordId
 
-	/* 
+	/**
 	 * Cleanup temp tables.
 	 */
 	DROP TABLE #concepts

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -271,12 +271,13 @@ export class MainEditor extends React.PureComponent<Props,State> {
      */
     private handleAddConceptClick = () => {
         const { dispatch } = this.props;
+        const { currentAdminConcept } = this.props.data.concepts;
         const { sets } = this.props.data.sqlSets;
         const defaultSet = sets.size ? sets.get(Array.from(sets.keys())[0]) : undefined;
 
-        const { adminConcept, userConcept } = createEmptyConcept();
+        const { adminConcept, userConcept } = createEmptyConcept(currentAdminConcept);
 
-        if (defaultSet) {
+        if (!currentAdminConcept && defaultSet) {
             adminConcept.sqlSetId = defaultSet.id;
             userConcept.isEncounterBased = defaultSet.isEncounterBased;
             userConcept.isEventBased = defaultSet.isEventBased;

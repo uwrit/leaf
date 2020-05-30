@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -135,7 +135,7 @@ export default class REDCapExportWebWorker {
         /*
          * Prepare a dataset or field name to be used in REDCap.
          */
-        const invalid = new Set([' ', '-', '.', ';', '!', ':', '[', ']', '{', '}', '>', '<', '=', '(', ')' ]);
+        const invalid = new Set([' ', '-', '.', ';', ',', '!', ':', '[', ']', '{', '}', '>', '<', '=', '(', ')', '/' ]);
         const cleanName = (pre: string, charLimit: number): string => {
             const arr: string[] = [];
 
@@ -402,8 +402,8 @@ export default class REDCapExportWebWorker {
                 expiration: '',
                 data_access_group: '',
                 data_access_group_id: '',
-                design: 0,
-                user_rights: 0,
+                design: 1,
+                user_rights: 1,
                 data_access_groups: 0,
                 data_export: 1,
                 reports: 1,

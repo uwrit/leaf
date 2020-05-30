@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -87,6 +87,7 @@ namespace API.Controllers
             [FromQuery] Shape shape,
             [FromQuery] long? early,
             [FromQuery] long? late,
+            [FromQuery] int? panelIdx,
             [FromServices] DatasetProvider provider,
             CancellationToken cancelToken)
         {
@@ -95,7 +96,7 @@ namespace API.Controllers
                 var queryref = new QueryRef(queryid);
                 var datasetref = new DatasetQueryRef(datasetid, shape);
 
-                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late);
+                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late, panelIdx);
 
                 switch (result.Context.State)
                 {

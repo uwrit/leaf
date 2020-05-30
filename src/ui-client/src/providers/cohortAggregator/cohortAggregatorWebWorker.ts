@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
-import { AgeByGenderBucket, BinarySplitPair, DemographicStatistics } from '../../models/cohort/DemographicDTO';
+import { BinarySplitPair, DemographicStatistics, NihRaceEthnicityBucket } from '../../models/cohort/DemographicDTO';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
 
@@ -108,29 +108,88 @@ export default class CohortAggregatorWebWorker {
                 }
             });
 
-            const aggregate = preAgg.reduce((agg: DemographicStatistics, target: DemographicStatistics) => {
+            const aggregate = preAgg.reduce((prev: DemographicStatistics, curr: DemographicStatistics) => {
 
                 // For all age by gender buckets (eg, 35-44, 45-54, 55-64)
-                Object.keys(agg.ageByGenderData.buckets).forEach((bucketKey: any) => {
-                    const aggBucket: AgeByGenderBucket = agg.ageByGenderData.buckets[bucketKey];
-                    const targetBucket: AgeByGenderBucket = target.ageByGenderData.buckets[bucketKey];
+                Object.keys(prev.ageByGenderData.buckets).forEach((k: string) => {
+                    const prevBucket = prev.ageByGenderData.buckets[k];
+                    const currBucket = curr.ageByGenderData.buckets[k];
 
                     // For all gender identifications, sum
-                    Object.keys(aggBucket).forEach((genderKey: any) => {
-                        aggBucket[genderKey] += targetBucket[genderKey];
+                    Object.keys(prevBucket).forEach((gk: any) => {
+                        prevBucket[gk] += currBucket[gk];
                     })
                 });
                 
                 // Binary splits are in arrays which should always be in the same order, but
                 // match up by category strings to be safe
-                agg.binarySplitData.forEach((v: BinarySplitPair) => {
-                    const t = target.binarySplitData.find((x: BinarySplitPair) => x.category === v.category);
+                prev.binarySplitData.forEach((v: BinarySplitPair) => {
+                    const t = curr.binarySplitData.find((x: BinarySplitPair) => x.category === v.category);
                     if (t) {
                         v.left.value += t.left.value;
                         v.right.value += t.right.value;
                     }
                 });
-                return agg;
+
+                // Language by heritage
+                Object.keys(curr.languageByHeritageData.data.buckets).forEach((k: string) => {
+                    const currBucket = curr.languageByHeritageData.data.buckets[k];
+                    let prevBucket = prev.languageByHeritageData.data.buckets[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.languageByHeritageData.data.buckets[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket.subBuckets).forEach((sbk: string) => {
+                            if (prevBucket.subBuckets[sbk]) {
+                                prevBucket.subBuckets[sbk] += currBucket.subBuckets[sbk];
+                            }
+                        })
+                    }
+                });
+
+                // Religion
+                Object.keys(curr.religionData).forEach((k: string) => {
+                    const currBucket = curr.religionData[k];
+                    let prevBucket = prev.religionData[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.religionData[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket).forEach((sbk: string) => {
+                            if (!prevBucket[sbk]) {
+                                prevBucket[sbk] = 0;
+                            }
+                            prevBucket[sbk] += currBucket[sbk];
+                        })
+                    }
+                });
+
+                // NIH Race, Ethnicity, Gender
+                Object.keys(curr.nihRaceEthnicityData).forEach((k: string) => {
+                    const currBucket: NihRaceEthnicityBucket = curr.nihRaceEthnicityData[k];
+                    let prevBucket: NihRaceEthnicityBucket = prev.nihRaceEthnicityData[k];
+
+                    if (!prevBucket) {
+                        prevBucket = Object.assign({}, currBucket);
+                        prev.nihRaceEthnicityData[k] = prevBucket;
+                    } else {
+                        Object.keys(currBucket).forEach((eb: string) => {
+                            if (!prevBucket[eb]) {
+                                prevBucket[eb] = currBucket[eb];
+                            } else {
+                                Object.keys(currBucket[eb]).forEach((hispType: string) => {
+                                    Object.keys(currBucket[eb][hispType]).forEach((genderType: string) =>{
+                                        prevBucket[eb][hispType][genderType] += currBucket[eb][hispType][genderType];
+                                    });
+                                });
+                            }
+                        })
+                    }
+                });
+
+                return prev;
             })
 
             return { requestId, result: aggregate };

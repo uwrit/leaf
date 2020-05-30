@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -91,10 +91,10 @@ export const getCounts = () => {
                                 const countDataDto = response.data as PatientCountDTO;
 
                                 const countData: PatientCountState = {
+                                    ...countDataDto.result,
                                     queryId: countDataDto.queryId,
                                     sqlStatements: [ formatMultipleSql(countDataDto.result.sqlStatements) ],
-                                    state: CohortStateType.LOADED,
-                                    value: countDataDto.result.value
+                                    state: CohortStateType.LOADED
                                 }
                                 queryId = countData.queryId;
                                 atLeastOneSucceeded = true;
@@ -185,7 +185,7 @@ const getDemographics = () => {
             if (atLeastOneSucceeded) {
                 dispatch(setCohortDemographicsFinished());
             } else {
-                dispatch(setCohortDemographicsErrored())
+                dispatch(setCohortDemographicsErrored());
             }
         });
     };

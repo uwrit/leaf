@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -27,7 +27,17 @@ export const defaultVisualizationState = (): VisualizationState => {
                     '>84': { females: 0, males: 0, others: 0 }
                 }
             },
-            binarySplitData: []
+            binarySplitData: [],
+            languageByHeritageData: {
+                data: {
+                    buckets: {}
+                },
+                subBucketTotals: {}
+            },
+            religionData: {},
+            nihRaceEthnicityData: {
+                ethnicBackgrounds: {}
+            }
         },
         state: CohortStateType.NOT_LOADED
     };

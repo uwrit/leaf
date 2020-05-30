@@ -1,4 +1,3 @@
-
 IF OBJECT_ID('app.sp_CalculatePatientCounts', 'P') IS NOT NULL
     DROP PROCEDURE [app].[sp_CalculatePatientCounts];
 GO

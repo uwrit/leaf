@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -38,6 +38,9 @@ namespace API.Options
             // Runtime options
             services.ConfigureRuntimeOptions(configuration);
 
+            // Attestation options
+            services.ConfigureAttestationOptions(configuration);
+
             // Compiler options
             services.ConfigureCompilerOptions(configuration);
 
@@ -68,16 +71,11 @@ namespace API.Options
             // Notification Options
             services.ConfigureNotificationOptions(configuration);
 
+            // Obfuscation Options
+            services.ConfigureDeidentificationOptions(configuration);
+
             // Client options
-            services.Configure<ClientOptions>(opts =>
-            {
-                opts.Map.Enabled = configuration.GetValue<bool>(Config.Client.Map.Enabled);
-                opts.Map.TileURI = configuration.GetValue<string>(Config.Client.Map.TileURI);
-                opts.Help.Enabled = configuration.GetValue<bool>(Config.Client.Help.Enabled);
-                opts.Help.AutoSend = configuration.GetValue<bool>(Config.Notification.Enabled);
-                opts.Help.Email = configuration.GetValue<string>(Config.Client.Help.Email);
-                opts.Help.URI = configuration.GetValue<string>(Config.Client.Help.URI);
-            });
+            services.ConfigureClientOptions(configuration);
 
             return services;
         }
@@ -158,6 +156,16 @@ namespace API.Options
             return services;
         }
 
+        static IServiceCollection ConfigureAttestationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<AttestationOptions>(opts =>
+            {
+                opts.Enabled = config.GetValue<bool>(Config.Attestation.Enabled);
+            });
+
+            return services;
+        }
+
         static IServiceCollection ConfigureExportOptions(this IServiceCollection services, IConfiguration config)
         {
             var rc = new REDCapExportOptions { Enabled = config.GetValue<bool>(Config.Export.REDCap.Enabled) };
@@ -212,6 +220,38 @@ namespace API.Options
             return services;
         }
 
+        static IServiceCollection ConfigureClientOptions(this IServiceCollection services, IConfiguration config)
+        {
+            services.Configure<ClientOptions>(opts =>
+            {
+                // Map
+                opts.Map.Enabled = config.GetValue<bool>(Config.Client.Map.Enabled);
+                opts.Map.TileURI = config.GetValue<string>(Config.Client.Map.TileURI);
+
+                // Visualize
+                opts.Visualize.Enabled = config.GetValue<bool>(Config.Client.Visualize.Enabled);
+                if (opts.Visualize.Enabled)
+                {
+                    var hasFedSet = config.TryGetValue(Config.Client.Visualize.ShowFederated, out bool showFed);
+                    if (hasFedSet)
+                    {
+                        opts.Visualize.ShowFederated = showFed;
+                    }
+                }
+
+                // Patient List
+                opts.PatientList.Enabled = config.GetValue<bool>(Config.Client.PatientList.Enabled);
+
+                // Help
+                opts.Help.Enabled = config.GetValue<bool>(Config.Client.Help.Enabled);
+                opts.Help.AutoSend = config.GetValue<bool>(Config.Notification.Enabled);
+                opts.Help.Email = config.GetValue<string>(Config.Client.Help.Email);
+                opts.Help.URI = config.GetValue<string>(Config.Client.Help.URI);
+            });
+
+            return services;
+        }
+
         static IServiceCollection ConfigureNotificationOptions(this IServiceCollection services, IConfiguration config)
         {
             var notify = new NotificationOptions { Enabled = config.GetValue<bool>(Config.Notification.Enabled) };
@@ -241,6 +281,65 @@ namespace API.Options
                     opts.Smtp = notify.Smtp;
                 });
             }
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureDeidentificationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var deident = new DeidentificationOptions();
+
+            deident.Patient.Enabled = config.GetValue<bool>(Config.Deidentification.Patient.Enabled);
+            if (deident.Patient.Enabled)
+            {
+                deident.Patient.DateShifting.WithIncrement(config.GetValue<string>(Config.Deidentification.Patient.DateShifting.Increment));
+                deident.Patient.DateShifting.LowerBound = config.GetValue<int>(Config.Deidentification.Patient.DateShifting.LowerBound);
+                deident.Patient.DateShifting.UpperBound = config.GetValue<int>(Config.Deidentification.Patient.DateShifting.UpperBound);
+
+                if (deident.Patient.DateShifting.LowerBound == 0 && deident.Patient.DateShifting.UpperBound == 0)
+                {
+                    throw new LeafConfigurationException("Patient De-identification is enabled but Date Shifting Lower Bound and Upper Bound are both set to zero");
+                }
+                if (deident.Patient.DateShifting.LowerBound >= deident.Patient.DateShifting.UpperBound)
+                {
+                    throw new LeafConfigurationException($"Patient De-identification Date Shifting Lower Bound must be less than Upper Bound, but is set to {deident.Patient.DateShifting.LowerBound} vs {deident.Patient.DateShifting.UpperBound}");
+                }
+            }
+
+            deident.Cohort.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.Enabled);
+            if (deident.Cohort.Enabled)
+            {
+                deident.Cohort.Noise.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.Noise.Enabled);
+                if (deident.Cohort.Noise.Enabled)
+                {
+                    deident.Cohort.Noise.LowerBound = config.GetValue<int>(Config.Deidentification.Cohort.Noise.LowerBound);
+                    deident.Cohort.Noise.UpperBound = config.GetValue<int>(Config.Deidentification.Cohort.Noise.UpperBound);
+
+                    if (deident.Cohort.Noise.LowerBound == 0 && deident.Cohort.Noise.UpperBound == 0)
+                    {
+                        throw new LeafConfigurationException("Cohort De-identification Noise is enabled but Lower Bound and Upper Bound are both set to zero");
+                    }
+                    if (deident.Cohort.Noise.LowerBound >= deident.Cohort.Noise.UpperBound)
+                    {
+                        throw new LeafConfigurationException($"Cohort De-identification Noise Lower Bound must be less than Upper Bound, but is set to {deident.Cohort.Noise.LowerBound} vs {deident.Cohort.Noise.UpperBound}");
+                    }
+                }
+
+                deident.Cohort.LowCellSizeMasking.Enabled = config.GetValue<bool>(Config.Deidentification.Cohort.LowCellSizeMasking.Enabled);
+                if (deident.Cohort.LowCellSizeMasking.Enabled)
+                {
+                    deident.Cohort.LowCellSizeMasking.Threshold = config.GetValue<int>(Config.Deidentification.Cohort.LowCellSizeMasking.Threshold);
+                    if (deident.Cohort.LowCellSizeMasking.Threshold <= 0)
+                    {
+                        throw new LeafConfigurationException($"Cohort De-identification Low Cell Size Masking must be greater than or equal to one, but is set to {deident.Cohort.LowCellSizeMasking.Threshold}");
+                    }
+                }
+            }
+            services.Configure<DeidentificationOptions>(opts =>
+            {
+                opts.Patient = deident.Patient;
+                opts.Cohort = deident.Cohort;
+            });
 
             return services;
         }
@@ -280,12 +379,8 @@ namespace API.Options
             services.Configure<CompilerOptions>(opts =>
             {
                 opts.Alias = compilerOptions.Alias;
-                opts.SetPerson = compilerOptions.SetPerson;
-                opts.SetEncounter = compilerOptions.SetEncounter;
                 opts.FieldPersonId = compilerOptions.FieldPersonId;
                 opts.FieldEncounterId = compilerOptions.FieldEncounterId;
-                opts.FieldEncounterAdmitDate = compilerOptions.FieldEncounterAdmitDate;
-                opts.FieldEncounterDischargeDate = compilerOptions.FieldEncounterDischargeDate;
 
                 opts.AppDb = extractor.ExtractDatabase(sp.GetService<IOptions<AppDbOptions>>().Value);
                 opts.ClinDb = extractor.ExtractDatabase(sp.GetService<IOptions<ClinDbOptions>>().Value);

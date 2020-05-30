@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,7 @@ import AttestationContent from '../../components/Attestation/AttestationContent'
 import AttestationFooter from '../../components/Attestation/AttestationFooter';
 import { AppState } from '../../models/state/AppState';
 import { Attestation as AttestationModel, DocumentationApproval, SessionType } from '../../models/Session';
-import { UserContext } from '../../models/Auth';
+import { UserContext, AppConfig } from '../../models/Auth';
 import { getBrowser } from '../../utils/browser';
 import { setBrowser } from '../../actions/generalUi';
 import { Browser } from '../../models/state/GeneralUiState';
@@ -30,6 +30,7 @@ interface DispatchProps {
 interface StateProps {
     authError?: string;
     browser?: Browser;
+    config?: AppConfig;
     hasAttested: boolean;
     hasUserIdToken: boolean;
     isSubmittingAttestation: boolean;
@@ -75,6 +76,18 @@ class Attestation extends React.PureComponent<Props, State> {
         }
     }
 
+    public getSnapshotBeforeUpdate() {
+        const { config, isSubmittingAttestation, userContext, hasAttested } = this.props;
+        if (hasAttested || isSubmittingAttestation) { return null; }
+        if (userContext && config && !config.attestation.enabled) {
+            this.setState({ sessionTypeSelected: true, documentationStatusSelected: true, identificationTypeSelected: true });
+            this.skipAttestationAndLoadSession();
+        }
+        return null;
+    }
+
+    public componentDidUpdate() { }
+
     public componentDidMount() {
         const { dispatch } = this.props;
         dispatch(setBrowser(getBrowser()));
@@ -82,7 +95,7 @@ class Attestation extends React.PureComponent<Props, State> {
 
     public render() {
         const { sessionTypeSelected, documentationStatusSelected, identificationTypeSelected, attestation } = this.state;
-        const { sessionLoadProgressPercent, hasAttested, isSubmittingAttestation, hasUserIdToken, authError, sessionError, sessionLoadDisplay, userContext, browser } = this.props;
+        const { sessionLoadProgressPercent, hasAttested, isSubmittingAttestation, hasUserIdToken, authError, sessionError, sessionLoadDisplay, userContext, browser, config } = this.props;
         const browserError = browser && browser.error;
         const c = this.className;
         const showConfirmation = sessionTypeSelected && documentationStatusSelected && identificationTypeSelected;
@@ -156,6 +169,7 @@ class Attestation extends React.PureComponent<Props, State> {
                         userContext={userContext}/>),
                     (<AttestationConfirmation 
                         className={this.className}
+                        config={config}
                         handleGoBackClick={this.handleConfirmGoBackClick}
                         handleIAgreeClick={this.handleConfirmIAgreeClick}
                         hasAttested={hasAttested}
@@ -229,10 +243,16 @@ class Attestation extends React.PureComponent<Props, State> {
         }, 500);
     }
 
+    private skipAttestationAndLoadSession = () => {
+        const { dispatch } = this.props;
+        dispatch(attestAndLoadSession(this.state.attestation));
+    }
+
     private handleConfirmIAgreeClick = () => {
+        const { dispatch } = this.props;
         const { documentationStatusSelected, sessionTypeSelected, identificationTypeSelected } = this.state;
         if (documentationStatusSelected && sessionTypeSelected && identificationTypeSelected) {
-            this.props.dispatch(attestAndLoadSession(this.state.attestation));
+            dispatch(attestAndLoadSession(this.state.attestation));
         }
     }
 
@@ -304,6 +324,7 @@ const mapStateToProps = (state: AppState): StateProps => {
     return { 
         authError: auth.error,
         browser: state.generalUi.browser,
+        config: state.auth.config,
         hasAttested: session.hasAttested,
         hasUserIdToken: !!auth.userContext,
         isSubmittingAttestation: session.isSubmittingAttestation,

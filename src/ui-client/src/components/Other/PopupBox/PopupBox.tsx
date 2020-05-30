@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -42,7 +42,7 @@ export default class PopupBox extends React.PureComponent<Props, State> {
         const classes = [ c, (!this.state.shown ? 'appear' : '') ];
         const style = parentDomRect 
             ? { ...this.props.style, bottom: parentDomRect.bottom, left: parentDomRect.left, top: parentDomRect.top } 
-            : { bottom: 100, left: 0, top: 100 };
+            : undefined;
 
         return (
             createPortal(

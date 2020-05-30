@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,6 +12,23 @@ import formatSql from '../formatSql';
 import { generate as generateId } from 'shortid';
 
 const year = new Date().getFullYear();
+
+interface BaseConceptProps {
+    id: string,
+    rootId: string,
+    parentId: undefined | string,
+    isNumeric: boolean,
+    isParent: boolean,
+    isRoot: boolean,
+    isPatientCountAutoCalculated: boolean,
+    isSpecializable: boolean,
+    uiDisplayName: string,
+    uiDisplayText: string,
+    uiDisplaySubtext: string,
+    uiDisplayTooltip: string,
+    universalId: string,
+    unsaved: boolean
+}
 
 /*
  * After an admin Concept is edited, copy and
@@ -33,7 +50,7 @@ export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propN
     if (alwaysAdd.has(propName) || (userConcept[propName] !== undefined && !neverAdd.has(propName))) {
         out[propName] = val;
     }
-    return out;
+    return  out;
 };
 
 /*
@@ -88,11 +105,12 @@ export interface EmptyConceptPair {
     userConcept: UserConcept;
 }
 
-export const createEmptyConcept = (): EmptyConceptPair => {
+export const createEmptyConcept = (currentAdminConcept?: AdminConcept): EmptyConceptPair => {
     const id = generateId();
-    const baseProps = {
+    const baseProps: BaseConceptProps = {
         id,
         rootId: id,
+        parentId: undefined,
         isNumeric: false,
         isParent: false,
         isRoot: true,
@@ -105,7 +123,12 @@ export const createEmptyConcept = (): EmptyConceptPair => {
         universalId: '',
         unsaved: true
     };
-    const adminConcept: AdminConcept = {
+    if (currentAdminConcept) {
+        baseProps.rootId = currentAdminConcept.rootId;
+        baseProps.isRoot = false;
+        baseProps.parentId = currentAdminConcept.id;
+    }
+    let adminConcept: AdminConcept = {
         ...baseProps,
         constraints: [],
         specializationGroups: []
@@ -118,6 +141,10 @@ export const createEmptyConcept = (): EmptyConceptPair => {
         isFetching: false,
         isOpen: false
     };
+    if (currentAdminConcept) {
+        adminConcept.sqlSetId = currentAdminConcept.sqlSetId;
+        adminConcept.sqlSetWhere = currentAdminConcept.sqlSetWhere;
+    }
 
     return { adminConcept, userConcept };
 };

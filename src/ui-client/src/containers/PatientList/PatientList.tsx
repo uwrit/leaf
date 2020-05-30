@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,6 +26,7 @@ import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTo
 import { RowCount } from '../../components/PatientList/RowCount';
 import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
 import './PatientList.css';
+import Scrollers from '../../components/PatientList/Scrollers/Scrollers';
 
 interface OwnProps {
     
@@ -115,6 +116,7 @@ class PatientList extends React.PureComponent<Props, State> {
                     show={showExportModal} 
                     toggle={toggleExportDataModal}
                 />
+                <Scrollers displayedColumnsLength={patientList.configuration.displayColumns.length} />
                 <Row className={`${c}-toprow-container`}>
                     <Col md={8}>
                         <div className={`${c}-dataset-column-selector-container`}>
@@ -149,9 +151,11 @@ class PatientList extends React.PureComponent<Props, State> {
                     </Col>
                     <Col md={4}>
                         <div className={`${c}-export-button-container`}>
+                            {exportState.redCap.enabled && patientList.totalPatients > 0 &&
                             <div className="leaf-button-main" onClick={this.handleExportClick}>
                                 <span><GoCloudDownload className={`${c}-export-button`}/>Export Data</span>
                             </div>
+                            }
                         </div>
                     </Col>
                 </Row>

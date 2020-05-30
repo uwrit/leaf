@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -139,7 +139,7 @@ export default class ExtensionConceptsWebWorker {
 
         const loadExtensionChildrenConcepts = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId, concept } = payload;
-            const children: Concept[] = [ ... conceptMap.values() ].filter(c => c.parentId === concept!.id)
+            const children: Concept[] = [ ...conceptMap.values() ].filter(c => c.parentId === concept!.id)
             return { requestId, result: children };
         };
 

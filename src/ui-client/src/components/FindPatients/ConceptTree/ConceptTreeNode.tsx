@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -54,7 +54,7 @@ const collectDrag = (connect: DragSourceConnector, monitor: DragSourceMonitor) =
     });
 };
 
-class ConceptTreeNode extends React.Component<Props> {
+class ConceptTreeNode extends React.PureComponent<Props> {
     
     public componentDidMount() {
         const { connectDragPreview, concept } = this.props;
@@ -68,21 +68,15 @@ class ConceptTreeNode extends React.Component<Props> {
         }
     }
 
-    public shouldComponentUpdate(nextProps: Props) {
-        if (nextProps.allowRerender.has(this.props.concept.id)) {
-            return true;
-        }
-        return false;
-    }
-
     public render() {
         const { allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId, connectDragSource } = this.props;
         const c = 'concept-tree-node';
         const arrowClasses = [ `${c}-arrow` ];
         const mainClasses = [ c ];
+        const isSelected = concept.id === selectedId;
 
-        if (concept.id === selectedId) { mainClasses.push(`selected`); }
-        if (concept.unsaved)           { mainClasses.push(`unsaved`); }
+        if (isSelected)      { mainClasses.push('selected'); }
+        if (concept.unsaved) { mainClasses.push('unsaved'); }
 
         // Set arrow state
         if (concept.isParent) {
@@ -120,6 +114,7 @@ class ConceptTreeNode extends React.Component<Props> {
                                 allowReparent={allowReparent}
                                 concept={concept}
                                 dispatch={dispatch}
+                                isSelected={isSelected}
                             />
 
                             {/* Learn More */}

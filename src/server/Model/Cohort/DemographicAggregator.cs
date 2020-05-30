@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -52,6 +52,12 @@ namespace Model.Cohort
 
         readonly DistributionData<AgeByGenderBucket> AgeBreakdown = new DistributionData<AgeByGenderBucket>(ageBuckets);
 
+        readonly VariableBucketSet LanguageByHeritage = new VariableBucketSet();
+
+        readonly Dictionary<string,int> Religion = new Dictionary<string, int>();
+
+        readonly NihRaceEthnicityBuckets NihRaceEthnicity = new NihRaceEthnicityBuckets();
+
         readonly IEnumerable<PatientDemographic> cohort;
 
         public DemographicAggregator(PatientDemographicContext context)
@@ -72,12 +78,18 @@ namespace Model.Cohort
                 RecordVitalStatus(patient);
                 RecordHispanic(patient);
                 RecordMarried(patient);
+                RecordLanguageByHeritage(patient);
+                RecordReligion(patient);
+                RecordNih(patient);
             }
 
             return new DemographicStatistics
             {
                 BinarySplitData = new List<BinarySplitPair> { GenderSplit, VitalSplit, AARPSplit, HispanicSplit, MarriedSplit },
-                AgeByGenderData = AgeBreakdown
+                AgeByGenderData = AgeBreakdown,
+                LanguageByHeritageData = LanguageByHeritage,
+                ReligionData = Religion,
+                NihRaceEthnicityData = NihRaceEthnicity
             };
         }
 
@@ -148,6 +160,64 @@ namespace Model.Cohort
             return side;
         }
 
+        void RecordLanguageByHeritage(PatientDemographic patient)
+        {
+            LanguageByHeritage.Increment(patient.Race, patient.Language);
+        }
+
+        void RecordReligion(PatientDemographic patient)
+        {
+            if (string.IsNullOrEmpty(patient.Religion))
+            {
+                return;
+            }
+
+            var religion = patient.Religion.ToLowerInvariant();
+
+            if (Religion.ContainsKey(religion))
+            {
+                Religion[religion]++;
+                return;
+            }
+            Religion.Add(religion, 1);
+        }
+
+        void RecordNih(PatientDemographic patient)
+        {
+            if (string.IsNullOrEmpty(patient.Race))
+            {
+                return;
+            }
+
+            if (!NihRaceEthnicity.EthnicBackgrounds.ContainsKey(patient.Race))
+            {
+                NihRaceEthnicity.EthnicBackgrounds.Add(patient.Race, new NihRaceEthnicityBucket());
+            }
+
+            var race = NihRaceEthnicity.EthnicBackgrounds[patient.Race];
+            if (patient.IsHispanic.HasValue)
+            {
+                if (patient.IsHispanic.Value)
+                {
+                    if (IsFemale(patient))    { race.Hispanic.Females += 1; }
+                    else if (IsMale(patient)) { race.Hispanic.Males += 1;   }
+                    else                      { race.Hispanic.Others += 1;  }
+                }
+                else
+                {
+                    if (IsFemale(patient))    { race.NotHispanic.Females += 1; }
+                    else if (IsMale(patient)) { race.NotHispanic.Males += 1;   }
+                    else                      { race.NotHispanic.Others += 1;  }
+                }
+            }
+            else
+            {
+                if (IsFemale(patient))        { race.Unknown.Females += 1; }
+                else if (IsMale(patient))     { race.Unknown.Males += 1;   }
+                else                          { race.Unknown.Others += 1;  }
+            }
+        }
+
         readonly static string[] ageBuckets = { "<1", "1-9", "10-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", ">84" };
         readonly static KeyValuePair<Func<int, bool>, string>[] ageSwitch =
         {
@@ -212,5 +282,7 @@ namespace Model.Cohort
                 gender.Value++;
             }
         }
+
+
     }
 }

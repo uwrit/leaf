@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,15 +14,18 @@ namespace Model.Compiler.SqlServer
 {
     public class DemographicSqlCompiler : IDemographicSqlCompiler
     {
+        readonly ISqlCompiler compiler;
         readonly CompilerOptions compilerOptions;
         readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DemographicExecutionContext executionContext;
 
         public DemographicSqlCompiler(
+            ISqlCompiler compiler,
             IOptions<CompilerOptions> compOpts)
         {
-            compilerOptions = compOpts.Value;
+            this.compiler = compiler;
+            this.compilerOptions = compOpts.Value;
         }
 
         public DemographicExecutionContext BuildDemographicSql(DemographicCompilerContext context, bool restrictPhi)
@@ -35,14 +38,15 @@ namespace Model.Compiler.SqlServer
 
             var filter = CteFilterInternals(context, restrictPhi);
             var select = SelectFromCTE();
-            executionContext.CompiledQuery = Compose(cohort, dataset, filter, select);
+            var parameters = compiler.BuildContextParameterSql();
+            executionContext.CompiledQuery = Compose(parameters, cohort, dataset, filter, select);
 
             return executionContext;
         }
 
-        string Compose(string cohort, string dataset, string filter, string select)
+        string Compose(string parameters, string cohort, string dataset, string filter, string select)
         {
-            return $"WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
+            return $"{parameters} WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
         }
 
         string CteCohortInternals(QueryContext context)

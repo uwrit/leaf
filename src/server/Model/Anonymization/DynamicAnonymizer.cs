@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,15 +11,23 @@ using Model.Extensions;
 
 namespace Model.Anonymization
 {
-    using Actor = Action<DynamicDatasetRecord, KeyValuePair<string, object>, Guid, Guid>;
+    using Actor = Action<DynamicDatasetRecord, KeyValuePair<string, object>, Guid, Guid, FuzzParameters>;
 
     public class DynamicAnonymizer
     {
         protected Guid Pepper { get; set; }
+        FuzzParameters FuzzParameters { get; set; }
 
         public DynamicAnonymizer(Guid pepper)
         {
             Pepper = pepper;
+            FuzzParameters = new FuzzParameters("HOUR", -1000, 1000);
+        }
+
+        public DynamicAnonymizer(Guid pepper, string increment, int lowerBound, int upperBound)
+        {
+            Pepper = pepper;
+            FuzzParameters = new FuzzParameters(increment, lowerBound, upperBound);
         }
 
         public void Anonymize(DynamicDatasetRecord record, IEnumerable<SchemaFieldSelector> fields)
@@ -50,7 +58,7 @@ namespace Model.Anonymization
             {
                 throw new ArgumentException($"No anonymization actor implemented for type {type.ToString()}");
             }
-            actor(record, pair, record.Salt, Pepper);
+            actor(record, pair, record.Salt, Pepper, FuzzParameters);
         }
 
         protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
@@ -63,7 +71,7 @@ namespace Model.Anonymization
 
     static class DynamicFuzzer
     {
-        public static readonly Actor String = (record, pair, salt, pepper) =>
+        public static readonly Actor String = (record, pair, salt, pepper, parameters) =>
         {
             var p = pepper.ToString();
             var s = salt.ToString();
@@ -73,24 +81,24 @@ namespace Model.Anonymization
             record.SetValue(pair.Key, composite.GetConsistentHashCode().ToString());
         };
 
-        public static readonly Actor DateTime = (record, pair, salt, pepper) =>
+        public static readonly Actor DateTime = (record, pair, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
-            var shift = rand.Next(-1000, 1000);
+            var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
             var val = (DateTime)pair.Value;
 
-            record.SetValue(pair.Key, val.AddHours(shift));
+            record.SetValue(pair.Key, parameters.DateShifter(val, shift));
         };
 
-        public static readonly Actor NullableDateTime = (record, pair, salt, pepper) =>
+        public static readonly Actor NullableDateTime = (record, pair, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
             var val = (DateTime?)pair.Value;
 
             if (val.HasValue)
             {
-                var shift = rand.Next(-1000, 1000);
-                record.SetValue(pair.Key, val.Value.AddHours(shift));
+                var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
+                record.SetValue(pair.Key, parameters.DateShifter(val.Value, shift));
             }
         };
     }

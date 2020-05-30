@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -109,13 +109,16 @@ class Header extends React.PureComponent<Props> {
         const confirm: ConfirmationModalState = {
             body: 'Do you want to save the current query?',
             header: 'Save Query',
+            onClickCancel: () => dispatch(setRunAfterSave(null)),
             onClickNo: () => startNewQuery(),
-            onClickYes: () => setTimeout(() => dispatch(toggleSaveQueryPane()), 500),
+            onClickYes: () => setTimeout(() => {
+                dispatch(setRunAfterSave(startNewQuery));
+                dispatch(toggleSaveQueryPane()); 
+            }, 500),
             show: true,
             noButtonText: 'No',
             yesButtonText: `Yes, I'll save first`
         };
-        dispatch(setRunAfterSave(startNewQuery));
 
         // Check if query is running
         if (queryState === CohortStateType.REQUESTING) {

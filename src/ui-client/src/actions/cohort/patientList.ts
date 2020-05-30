@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -46,6 +46,7 @@ export interface CohortPatientListAction {
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
     dates?: DateBoundary;
+    encounterPanelIndex?: number;
     patientList?: PatientListState;
     rowCount?: number;
     rowId?: number;
@@ -73,11 +74,20 @@ const switchArrayPositions = (arr: any[], oldIdx: number, newIdx: number) => {
  * Request a patient list dataset from each responder which is 
  * enabled and has loaded demographics.
  */
-export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: DateBoundary) => {
+export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {
     return (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const responders: NetworkIdentity[] = [];
         let atLeastOneSucceeded = false;
+        let panelIdx = panelIndex;
+
+        /**
+         * Determine true panel index, if applicable (removing empty panels)
+         */
+        if (typeof panelIdx !== 'undefined') {
+            const panelsToRemove = state.panels.filter(p => p.index < panelIdx! && p.subPanels.filter(sp => sp.panelItems.length > 0).length === 0).length;
+            panelIdx = panelIdx - panelsToRemove;
+        }
         
         state.responders.forEach((nr: NetworkIdentity) => { 
             const crt = state.cohort.networkCohorts.get(nr.id)!;
@@ -98,7 +108,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                 try {
                     if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-                        const ds = await fetchDataset(state, nr, queryId, dataset, dates);
+                        const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIdx);
                         const newPl = await addDataset(getState, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);
@@ -128,7 +138,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates: D
                 dispatch(showInfoModal(info));
             }
         })
-        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates)))
+        .then(() => dispatch(setPatientListDatasetReceived(dataset.id, dates, panelIndex)))
         .catch(() => dispatch(setPatientListDatasetFailure(dataset.id, 0)));
     };
 };
@@ -293,10 +303,11 @@ export const setPatientListSingletonReceived = (id: number, rowCount: number): C
     };
 };
 
-export const setPatientListDatasetReceived = (datasetId: string, dates: DateBoundary): CohortPatientListAction => {
+export const setPatientListDatasetReceived = (datasetId: string, dates?: DateBoundary, encounterPanelIndex?: number): CohortPatientListAction => {
     return {
         datasetId,
         dates,
+        encounterPanelIndex,
         id: 0,
         type: PATIENT_LIST_DATASET_RECEIVED
     };

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -23,7 +23,8 @@
 }
 
 .patientlist-add-dataset-button:hover,
-.patientlist-add-dataset-select-date-option:hover  {
+.patientlist-add-dataset-select-date-option:hover,
+.patientlist-add-dataset-by-encounter:hover  {
     background-color: rgba(28, 170, 221, 0.1);
     border-color: #1CA8DD;
 }
@@ -113,7 +114,8 @@
 }
 
 .patientlist-add-dataset-select-dataset-option,
-.patientlist-add-dataset-select-date-option {
+.patientlist-add-dataset-select-date-option,
+.patientlist-add-dataset-by-encounter {
     border-left: 3px solid transparent;
     color: rgb(70,70,70);
     cursor: pointer;
@@ -126,7 +128,8 @@
 .patientlist-add-dataset-select-dataset-option:hover,
 .patientlist-add-dataset-select-date-option:hover,
 .patientlist-add-dataset-select-dataset-option.selected,
-.patientlist-add-dataset-select-date-option.selected {
+.patientlist-add-dataset-select-date-option.selected,
+.patientlist-add-dataset-by-encounter.selected {
     background-color: rgba(28, 170, 221, 0.1);
     border-left-color: #1CA8DD; 
 }
@@ -141,4 +144,15 @@
     border-top: 1px solid rgb(240,240,240);
     height: 50px;
     padding: 10px 0;
+}
+
+.patientlist-add-dataset-divider {
+    background-color: rgb(230, 230, 230);
+    height: 1px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.patientlist-add-dataset-by-encounter {
+    cursor: pointer;
 }

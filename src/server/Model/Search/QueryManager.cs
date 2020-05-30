@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -16,6 +16,8 @@ using Model.Search;
 using Model.Tagging;
 using Model.Error;
 using System.Data.Common;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace Model.Search
 {
@@ -24,17 +26,35 @@ namespace Model.Search
         readonly IQueryService service;
         readonly ILogger<QueryManager> log;
         readonly IUserContext user;
+        readonly DeidentificationOptions deidentOpts;
         readonly PanelConverter converter;
         readonly PanelValidator validator;
 
+        bool shouldHideCountChecked = false;
+        bool shouldHideCount = false;
+        bool HideCount
+        {
+            get 
+            { 
+                if (!shouldHideCountChecked)
+                {
+                    shouldHideCount = deidentOpts.Cohort.Noise.Enabled || deidentOpts.Cohort.LowCellSizeMasking.Enabled;
+                    shouldHideCountChecked = true;
+                }
+                return shouldHideCount;
+            }
+        }
+
         public QueryManager(
             IQueryService service,
+            IOptions<DeidentificationOptions> obfuscationOptions,
             ILogger<QueryManager> log,
             IUserContext user,
             PanelConverter converter,
             PanelValidator validator)
         {
             this.service = service;
+            this.deidentOpts = obfuscationOptions.Value;
             this.log = log;
             this.user = user;
             this.converter = converter;
@@ -43,8 +63,17 @@ namespace Model.Search
 
         public async Task<IEnumerable<BaseQuery>> GetQueriesAsync()
         {
-            log.LogInformation("Getting queries.");
-            return await service.GetQueriesAsync();
+            log.LogInformation("Getting queries");
+            var queries = await service.GetQueriesAsync();
+            if (HideCount)
+            {
+                queries = queries.ToList();
+                foreach (var query in queries)
+                {
+                    query.Count = null;
+                }
+            }
+            return queries;
         }
 
         public async Task<Query> GetQueryAsync(QueryUrn urn)
@@ -60,6 +89,10 @@ namespace Model.Search
                 else
                 {
                     log.LogInformation("Found query. Id:{Id} UId:{UId}", query.Id, query.UniversalId);
+                }
+                if (HideCount)
+                {
+                    query.Count = null;
                 }
                 return query;
             }

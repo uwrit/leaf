@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,6 +6,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Model.Compiler;
 
 namespace Model.Cohort
 {
@@ -14,6 +15,7 @@ namespace Model.Cohort
         public Guid? QueryId { get; set; }
         public HashSet<string> PatientIds { get; set; } = new HashSet<string>();
         public IEnumerable<string> SqlStatements { get; set; } = new string[] { };
+        public IEnumerable<Panel> Panels { get; set; } = new List<Panel>();
 
         int count;
         public int Count
@@ -83,7 +85,6 @@ namespace Model.Cohort
             {
                 var done = false;
                 string candidate;
-
                 do
                 {
                     candidate = tmp.ElementAt(rnd.Next(csize - 1));

@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -125,27 +125,46 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
                             tabIndex={tabIndex}>
                             Save
                         </Button>
-                        {/*currentQuery.id && 
+                        {current.id && 
                         <Button 
-                            className="leaf-button leaf-button-secondary" 
+                            className="leaf-button save-as-new leaf-button-primary"
+                            onClick={this.saveCurrentQueryAs}
                             style={{ float: 'right' }} 
                             tabIndex={tabIndex}>
-                            Save As
-                        </Button>*/}
+                            Save As New
+                        </Button>}
                     </div>
                 </div>
             </RightPaneSlider>
         );
     }
 
-    private saveCurrentQuery = () => {
-        const { dispatch, queries } = this.props;
+    private validateInput = (): boolean => {
+        const { queries } = this.props;
         let error = false;
 
         if (!queries.current.category) { this.setState({ categoryError: true}); error = true; };
         if (!queries.current.name) { this.setState({ nameError: true}); error = true; };
 
+        return error;
+    }
+
+    private saveCurrentQuery = () => {
+        const { dispatch } = this.props;
+        const error = this.validateInput();
+
         if (!error) {
+            dispatch(requestQuerySave());
+        }
+    }
+
+    private saveCurrentQueryAs = () => {
+        const { dispatch, queries } = this.props;
+        const error = this.validateInput();
+
+        if (!error) {
+            const query: Query = { ...queries.current, universalId: undefined };
+            dispatch(setCurrentQuery(query));
             dispatch(requestQuerySave());
         }
     }

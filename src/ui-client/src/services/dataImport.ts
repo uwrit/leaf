@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,7 +10,7 @@ import { REDCapImportConfiguration, REDCapConcept } from "../models/redcapApi/Im
 import { HttpFactory } from './HttpFactory';
 import { AppState } from "../models/state/AppState";
 import { ImportMetadata, ImportMetadataDTO } from "../models/dataImport/ImportMetadata";
-import { ImportRecord, ImportDataResultDTO, ImportRecordDTO } from "../models/dataImport/ImportRecord";
+import { ImportDataResultDTO, ImportRecordDTO } from "../models/dataImport/ImportRecord";
 
 const worker = new REDCapImportWebWorker();
 

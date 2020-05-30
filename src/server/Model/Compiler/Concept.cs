@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -35,8 +35,8 @@ namespace Model.Compiler
         public string UiDisplayEventName { get; set; }
         public int? UiDisplayPatientCount { get; set; }
         public int? EventTypeId { get; set; }
-        public IEnumerable<ConceptSpecializationGroup> SpecializationGroups { get; set; }
-        public IEnumerable<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
+        public ICollection<ConceptSpecializationGroup> SpecializationGroups { get; set; }
+        public ICollection<ConceptPatientYearCount> UiDisplayPatientCountByYear { get; set; }
         public string UiNumericDefaultText { get; set; }
     }
 

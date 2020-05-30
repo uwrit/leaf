@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -43,23 +43,29 @@ export function fetchDemographics(state: AppState, nr: NetworkIdentity, queryId:
 /*
  * Fetch a dataset, which may or may not have date boundaries.
  */
-export const fetchDataset = async (state: AppState, nr: NetworkIdentity, queryId: string, dataset: PatientListDatasetQuery, dates: DateBoundary): Promise<PatientListDatasetDTO> => {
+export const fetchDataset = async (
+        state: AppState, 
+        nr: NetworkIdentity, 
+        queryId: string, 
+        dataset: PatientListDatasetQuery, 
+        dates?: DateBoundary,
+        panelIndex?: number
+    ): Promise<PatientListDatasetDTO> => {
+
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = {
         datasetid: nr.isHomeNode ? dataset.id : dataset.universalId,
         shape: dataset.shape
     }
-    if (dates.start.dateIncrementType !== DateIncrementType.NONE && 
-        dates.end.dateIncrementType !== DateIncrementType.NONE
-    ) {
+    if (typeof panelIndex !== 'undefined') {
+        params.panelIdx = panelIndex
+    } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
         params.early = deriveDateTicks(dates.start);
         params.late = deriveDateTicks(dates.end);
     }
 
-    const result = await http.get(`${nr.address}/api/cohort/${queryId}/dataset`, { 
-        params
-    });
+    const result = await http.get(`${nr.address}/api/cohort/${queryId}/dataset`, { params });
     return result.data as PatientListDatasetDTO
 };
 

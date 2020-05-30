@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -34,8 +34,10 @@ namespace API.DTO.Cohort
             {
                 Result = new PatientCountResultDTO
                 {
+                    PlusMinus = count.PlusMinus,
+                    SqlStatements = count.SqlStatements,
                     Value = count.Value,
-                    SqlStatements = count.SqlStatements
+                    WithinLowCellThreshold = count.WithinLowCellThreshold
                 };
             }
         }

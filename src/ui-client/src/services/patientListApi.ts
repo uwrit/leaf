@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -252,6 +252,7 @@ export const addDemographicsDataset = async (
     const state = getState();
     const patientList = state.cohort.patientList;
     const responder = state.responders.get(responderId)!;
+    const identified = state.session.attestation!.isIdentified;
 
     if (!patients.length) { return patientList; }
 
@@ -266,7 +267,7 @@ export const addDemographicsDataset = async (
     /* 
      * Validate definition against actual dataset.
      */
-    const def = getDemographicsDefinition(patients[0]);
+    const def = getDemographicsDefinition(identified);
 
     /* 
      * Add columns if none are displayed.
@@ -321,13 +322,15 @@ const validateDefinitionColumns = (
 /*
  * Extracts a demographics dataset definition.
  */
-const getDemographicsDefinition = (patient: PatientListRowDTO) => {
-    const realCols = Object.keys(patient);
+const getDemographicsDefinition = (identified: boolean) => {
+    const columns = identified
+        ? [ ...DemographicsDefTemplate.columns.values() ].map((c) => c.id)
+        : [ ...DemographicsDefTemplate.columns.values() ].filter((c) => !c.optional).map((c) => c.id)
     const dsName = 'demographics';
     const dsDisplayName = 'Basic Demographics';
     const def: PatientListDatasetDefinition = {
         ...DemographicsDefTemplate,
-        columns: validateDefinitionColumns(DemographicsDefTemplate, realCols, dsName),
+        columns: validateDefinitionColumns(DemographicsDefTemplate, columns, dsName),
         displayName: dsDisplayName,
         id: dsName,
         responderStates: new Map()

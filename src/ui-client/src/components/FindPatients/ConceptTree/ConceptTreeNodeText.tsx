@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -26,6 +26,7 @@ interface OwnProps {
     allowReparent: boolean;
     concept: Concept;
     dispatch: any;
+    isSelected: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -60,13 +61,7 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
 class ConceptTreeNodeTextWrapper extends React.Component<Props> {
 
     public shouldComponentUpdate(nextProps: Props) {
-        const { canDrop, isOver, concept } = this.props;
-
-        if (canDrop !== nextProps.canDrop) { 
-            return true;
-        } else if (isOver !== nextProps.isOver) {
-            return true;
-        } else if (concept !== nextProps.concept) {
+        if (nextProps.isSelected) {
             return true;
         }
         return false;

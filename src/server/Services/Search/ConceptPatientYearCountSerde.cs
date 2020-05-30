@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,12 +12,12 @@ namespace Services.Search
 {
     static class ConceptPatientYearCountSerde
     {
-        public static IEnumerable<ConceptPatientYearCount> Deserialize(string json)
+        public static ICollection<ConceptPatientYearCount> Deserialize(string json)
         {
             return string.IsNullOrWhiteSpace(json) ? null : JsonConvert.DeserializeObject<List<ConceptPatientYearCount>>(json);
         }
 
-        public static string Serialize(IEnumerable<ConceptPatientYearCount> counts)
+        public static string Serialize(ICollection<ConceptPatientYearCount> counts)
         {
             return counts == null ? null : JsonConvert.SerializeObject(counts);
         }

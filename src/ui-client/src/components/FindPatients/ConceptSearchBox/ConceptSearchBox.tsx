@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -49,13 +49,14 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
         }
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(prevProps: Props) {
         const { conceptsState } = this.props;
-        const { roots } = this.state;
+        const { roots } = conceptsState;
+        const prevLen = prevProps.conceptsState.roots.length;
+        const len = roots.length;
 
-        if (roots.length <= 1 && conceptsState.roots.length) {
-            this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] });
-        }
+        if (len === 0) { return null; }
+        if (len !== prevLen) { this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] }); }
         return null;
     }
 
@@ -64,7 +65,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
     public render() {
         const { conceptsState, conceptsSearchState, dispatch } = this.props;
         const { drillTree } = this.props.conceptsState;
-        const { roots, selectedHintIndex, showHintsDropdown } = this.state;
+        const { selectedHintIndex, showHintsDropdown, showRootsDropdown, roots } = this.state;
         const c = this.className;
         const progressBarClasses = `leaf-progressbar ${conceptsState.requestingSearchTree || conceptsSearchState.isFetching ? 'show' : ''}`;
         const selectedRootDisplay = conceptsSearchState.rootId ? drillTree.get(conceptsSearchState.rootId)!.uiDisplayName : 'All Concepts';
@@ -77,7 +78,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
                     <InputGroupButtonDropdown 
                         addonType="append" 
                         className={`${c}-roots-dropdown`}
-                        isOpen={this.state.showRootsDropdown} 
+                        isOpen={showRootsDropdown} 
                         toggle={this.toggleRootsDropdown}>
                         <DropdownToggle 
                             caret={true} 

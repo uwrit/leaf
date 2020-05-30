@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2019, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,12 +6,15 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Validation;
 using Model.Error;
 using System.Linq;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace Model.Cohort
 {
@@ -34,11 +37,15 @@ namespace Model.Cohort
         readonly IDemographicSqlCompiler compiler;
         readonly IDemographicsExecutor executor;
         readonly IUserContext user;
+        readonly ClientOptions clientOpts;
+        readonly DeidentificationOptions deidentOpts;
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider(
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
+            IOptions<ClientOptions> clientOpts,
+            IOptions<DeidentificationOptions> deidentOpts,
             IDemographicSqlCompiler compiler,
             IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
@@ -47,6 +54,8 @@ namespace Model.Cohort
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = executor;
+            this.clientOpts = clientOpts.Value;
+            this.deidentOpts = deidentOpts.Value;
             this.log = log;
         }
 
@@ -65,6 +74,7 @@ namespace Model.Cohort
         {
             log.LogInformation("Demographics starting. QueryRef:{QueryRef}", query);
             Ensure.NotNull(query, nameof(query));
+            ThrowIfSettingsInvalid();
             var result = new Result();
 
             var validationContext = await contextProvider.GetCompilerContextAsync(query);
@@ -89,11 +99,43 @@ namespace Model.Cohort
 
             result.Demographics = new Demographic
             {
-                Patients = ctx.Exported,
-                Statistics = stats
+                Patients = GetDemographicsWithSettings(ctx.Exported),
+                Statistics = GetStatisticsWithSettings(stats)
             };
 
             return result;
+        }
+
+        IEnumerable<PatientDemographic> GetDemographicsWithSettings(IEnumerable<PatientDemographic> patients)
+        {
+            // Patient list is disabled, return null
+            if (!clientOpts.PatientList.Enabled) { return null; }
+
+            return patients;
+        }
+
+        DemographicStatistics GetStatisticsWithSettings(DemographicStatistics stats)
+        {
+            // Visualize disabled, return null
+            if (!clientOpts.Visualize.Enabled) { return null; }
+
+            return stats;
+        }
+
+        void ThrowIfSettingsInvalid()
+        {
+            if (!clientOpts.PatientList.Enabled && !clientOpts.Visualize.Enabled)
+            {
+                throw new Exception("Both Visualize and Patient List are disabled");
+            }
+            if (deidentOpts.Cohort.Noise.Enabled)
+            {
+                throw new Exception("Demographics cannot be returned if Cohort De-identification Noise is enabled");
+            }
+            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
+            {
+                throw new Exception("Demographics cannot be returned if Cohort De-identification Low Cell Size Masking is enabled");
+            }
         }
 
         // DemographicProvider associated Result type.

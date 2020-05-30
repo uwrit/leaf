@@ -1,4 +1,4 @@
-/* Copyright (c) 2019, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -171,7 +171,9 @@ const addRootConcepts = (state: ConceptsState, roots: Concept[]): ConceptsState 
 };
 
 const addConcepts = (state: ConceptsState, cons: Concept[]): ConceptsState => {
-    cons.forEach(c => state.currentTree.set(c.id, Object.assign({}, c)));
+    cons.forEach(c => {
+        state.currentTree.set(c.id, Object.assign({}, c));
+    });
     return Object.assign({}, state, {
         allowRerender: new Set(cons.map(c => c.id)),
         currentTree: new Map(state.currentTree) 
@@ -222,7 +224,7 @@ const createConcept = (state: ConceptsState, concept: Concept): ConceptsState =>
             const childrenIds = parent.childrenIds 
                 ? new Set<string>([ ...parent.childrenIds, concept.id ])
                 : new Set<string>([ concept.id ]);
-            state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true }));
+            state.currentTree.set(parent.id, Object.assign({}, parent, { childrenIds, isParent: true, isOpen: true }));
             concept.rootId = getRootId(parent, state.currentTree);
         }
     }
