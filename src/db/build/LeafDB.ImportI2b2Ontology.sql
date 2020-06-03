@@ -43,6 +43,8 @@ VERSION HISTORY:
 --*** Edit this section based on your i2b2 implementation
 --***************************************************************************************************
 --***************************************************************************************************
+USE LeafDB
+GO
 
 -----------------------------------------------------------------------------------------------------
 -- Indicate the database and schema of your i2b2 ONT and CRC tables
@@ -301,7 +303,7 @@ UPDATE #i2b2
 
 --***************************************************************************************************
 --***************************************************************************************************
---*** Insert the concepts into the LeafDB
+--*** Insert the concepts into the Leaf DB
 --***************************************************************************************************
 --***************************************************************************************************
 
@@ -355,7 +357,7 @@ INSERT INTO app.Concept (
 		GETDATE(), NULL, GETDATE()
 	FROM #i2b2 i
 		CROSS JOIN #i2b2DatabaseSchema x
-		INNER JOIN LeafDB.app.ConceptSqlSet s
+		INNER JOIN app.ConceptSqlSet s
 			ON s.SqlSetFrom = x.SchemaName+'.'+(CASE WHEN i.C_TABLENAME IN ('patient_dimension','visit_dimension') THEN i.C_TABLENAME ELSE 'observation_fact' END)
 		LEFT OUTER JOIN #NumericConcepts l ON i.Id=l.Id
 		CROSS APPLY (
