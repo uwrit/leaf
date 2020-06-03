@@ -26,7 +26,7 @@ namespace Model.Compiler
             return new ConceptSpecializationGroup
             {
                 Id = Id,
-                Specializations = specializations.Select(s => s.ToConceptSpecialization()),
+                Specializations = specializations.Select(s => s.ToConceptSpecialization()).ToList(),
                 UiDefaultText = UiDefaultText,
                 OrderId = OrderId
             };

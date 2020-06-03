@@ -90,7 +90,7 @@ namespace Services.Search
             {
                 TypeNameHandling = TypeNameHandling.Auto
             });
-            if (panels.Count() <= idx+1)
+            if (panels.Count() >= idx+1)
             {
                 return panels.ElementAt(idx.Value);
             }

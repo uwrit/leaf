@@ -30,7 +30,7 @@
 }
 
 .encounter-panel-selector-modal::after {
-    background-image: linear-gradient(top, rgba(255,255,255,0), white);
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), white);
     bottom: 0;
     content: "";
     height: 300px;
