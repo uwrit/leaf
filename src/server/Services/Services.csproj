@@ -33,9 +33,4 @@
     <Folder Include="Notification\" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Composure">
-      <HintPath>..\..\..\..\composure\src\Composure\bin\Debug\netcoreapp2.2\Composure.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 </Project>
