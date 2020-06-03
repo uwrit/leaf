@@ -46,6 +46,7 @@
 .visualization-nih-table td:nth-child(1) {
     font-weight: 500;
     text-align: left;
+    text-transform: capitalize;
 }
 
 .visualization-nih-table tfoot tr:last-child td {

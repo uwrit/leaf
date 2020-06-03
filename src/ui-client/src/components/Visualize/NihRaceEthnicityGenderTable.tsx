@@ -34,7 +34,7 @@ export class NihRaceEthnicityGenderTable extends React.PureComponent<Props> {
                         {Object.keys(ethnicBackgrounds).sort().map((key) => {
                             const eb = ethnicBackgrounds[key];
                             return (
-                                <tr>
+                                <tr key={key}>
                                     <td>{key}</td>
                                     <td className={this.proportionToClass(eb.notHispanic.females, total)}>{eb.notHispanic.females.toLocaleString()}</td>
                                     <td className={this.proportionToClass(eb.notHispanic.males, total)}>{eb.notHispanic.males.toLocaleString()}</td>

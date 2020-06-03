@@ -189,32 +189,34 @@ namespace Model.Cohort
                 return;
             }
 
-            if (!NihRaceEthnicity.EthnicBackgrounds.ContainsKey(patient.Race))
+            var race = patient.Race.ToLowerInvariant();
+
+            if (!NihRaceEthnicity.EthnicBackgrounds.ContainsKey(race))
             {
-                NihRaceEthnicity.EthnicBackgrounds.Add(patient.Race, new NihRaceEthnicityBucket());
+                NihRaceEthnicity.EthnicBackgrounds.Add(race, new NihRaceEthnicityBucket());
             }
 
-            var race = NihRaceEthnicity.EthnicBackgrounds[patient.Race];
+            var bucket = NihRaceEthnicity.EthnicBackgrounds[race];
             if (patient.IsHispanic.HasValue)
             {
                 if (patient.IsHispanic.Value)
                 {
-                    if (IsFemale(patient))    { race.Hispanic.Females += 1; }
-                    else if (IsMale(patient)) { race.Hispanic.Males += 1;   }
-                    else                      { race.Hispanic.Others += 1;  }
+                    if (IsFemale(patient))    { bucket.Hispanic.Females += 1; }
+                    else if (IsMale(patient)) { bucket.Hispanic.Males += 1;   }
+                    else                      { bucket.Hispanic.Others += 1;  }
                 }
                 else
                 {
-                    if (IsFemale(patient))    { race.NotHispanic.Females += 1; }
-                    else if (IsMale(patient)) { race.NotHispanic.Males += 1;   }
-                    else                      { race.NotHispanic.Others += 1;  }
+                    if (IsFemale(patient))    { bucket.NotHispanic.Females += 1; }
+                    else if (IsMale(patient)) { bucket.NotHispanic.Males += 1;   }
+                    else                      { bucket.NotHispanic.Others += 1;  }
                 }
             }
             else
             {
-                if (IsFemale(patient))        { race.Unknown.Females += 1; }
-                else if (IsMale(patient))     { race.Unknown.Males += 1;   }
-                else                          { race.Unknown.Others += 1;  }
+                if (IsFemale(patient))        { bucket.Unknown.Females += 1; }
+                else if (IsMale(patient))     { bucket.Unknown.Males += 1;   }
+                else                          { bucket.Unknown.Others += 1;  }
             }
         }
 
