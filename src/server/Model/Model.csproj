@@ -19,6 +19,7 @@
     <Folder Include="Notification\" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Composure" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
   </ItemGroup>
@@ -27,10 +28,5 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Import\ImportMappingQuery.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Composure">
-      <HintPath>..\..\..\..\composure\src\Composure\bin\Debug\netcoreapp2.2\Composure.dll</HintPath>
-    </Reference>
   </ItemGroup>
 </Project>
