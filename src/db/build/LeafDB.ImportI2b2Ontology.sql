@@ -43,6 +43,8 @@ VERSION HISTORY:
 --*** Edit this section based on your i2b2 implementation
 --***************************************************************************************************
 --***************************************************************************************************
+USE LeafDB
+GO
 
 -----------------------------------------------------------------------------------------------------
 -- Indicate the database and schema of your i2b2 ONT and CRC tables
@@ -259,7 +261,7 @@ ALTER TABLE #NumericConcepts ADD PRIMARY KEY (Id)
 -----------------------------------------------------------------------------------------------------
 
 -- Use the C_NAME by default
-UPDATE #i2b2 SET DisplayText = C_NAME
+UPDATE #i2b2 SET DisplayText = LEFT(C_NAME, 1000)
 
 -- Remove the 'zz ' prefix that pushes concepts to the bottom of the ontology hierarchy in i2b2
 UPDATE #i2b2
@@ -301,7 +303,7 @@ UPDATE #i2b2
 
 --***************************************************************************************************
 --***************************************************************************************************
---*** Insert the concepts into the LeafDB
+--*** Insert the concepts into the Leaf DB
 --***************************************************************************************************
 --***************************************************************************************************
 
@@ -348,14 +350,14 @@ INSERT INTO app.Concept (
 			ELSE '@.'+i.C_FACTTABLECOLUMN+' in (select dt.'+i.C_FACTTABLECOLUMN+' from '+x.DatabaseName+'.'+x.SchemaName+'.'+i.C_TABLENAME+' dt where dt.'+dimSQL+')'
 			END),
 		(CASE WHEN IsLab=1 THEN '@.NVAL_NUM' ELSE NULL END),
-		i.C_NAME,
+		LEFT(i.C_NAME, 400),
 		i.DisplayText,
 		NULL, l.Units, i.C_TOOLTIP,
 		i.C_TOTALNUM, NULL, NULL, (CASE WHEN IsLab=1 THEN 'with value' ELSE NULL END),
 		GETDATE(), NULL, GETDATE()
 	FROM #i2b2 i
 		CROSS JOIN #i2b2DatabaseSchema x
-		INNER JOIN LeafDB.app.ConceptSqlSet s
+		INNER JOIN app.ConceptSqlSet s
 			ON s.SqlSetFrom = x.SchemaName+'.'+(CASE WHEN i.C_TABLENAME IN ('patient_dimension','visit_dimension') THEN i.C_TABLENAME ELSE 'observation_fact' END)
 		LEFT OUTER JOIN #NumericConcepts l ON i.Id=l.Id
 		CROSS APPLY (
