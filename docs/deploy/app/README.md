@@ -529,14 +529,6 @@ To start the service:
 systemctl start leaf_api.service
 ```
 
-
-### Defining a Windows Service
-
-Review Microsoft's official instructions for guidance on defining a Windows service with Powershell:
-https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.management/new-service?view=powershell-6
-
-
-
 ## Reviewing API Logs
 Provided that the permissions are correct for your API Service account user, logs will be located in the folder defined via the SERILOG_DIR variable in the service's leaf_api.service.conf file created earlier.
 
