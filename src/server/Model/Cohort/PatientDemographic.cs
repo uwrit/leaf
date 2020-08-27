@@ -52,7 +52,7 @@ namespace Model.Cohort
         public DateTime? BirthDate { get; set; }
 
         [Field(Name = DemographicColumns.DeathDate, Type = LeafType.DateTime, Phi = true, Mask = true)]
-        public DateTime? DeathDate { get; set; }
+        public DateTime? DeceasedDateTime { get; set; }
 
         [Field(Name = DemographicColumns.Name, Type = LeafType.String, Phi = true, Mask = false)]
         public string Name { get; set; }

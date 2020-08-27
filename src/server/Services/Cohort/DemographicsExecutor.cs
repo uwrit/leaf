@@ -167,7 +167,7 @@ namespace Services.Cohort
                 IsHispanic = reader.GetNullableBoolean(Plan.IsHispanic?.Index),
                 IsDeceased = reader.GetNullableBoolean(Plan.IsDeceased?.Index),
                 BirthDate = reader.GetNullableDateTime(Plan.BirthDate?.Index),
-                DeathDate = reader.GetNullableDateTime(Plan.DeathDate?.Index),
+                DeceasedDateTime = reader.GetNullableDateTime(Plan.DeathDate?.Index),
                 Name = reader.GetNullableString(Plan.Name?.Index),
                 Mrn = reader.GetNullableString(Plan.Mrn?.Index)
             };
