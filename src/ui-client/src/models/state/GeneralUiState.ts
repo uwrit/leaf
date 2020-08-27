@@ -13,7 +13,8 @@ export enum Routes {
     Map = 2,
     Visualize = 3,
     PatientList = 4,
-    AdminPanel = 5
+    AdminPanel = 5,
+    SidebarHelp = 6
 }
 
 export enum NotificationStates {

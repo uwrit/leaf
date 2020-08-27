@@ -90,6 +90,8 @@ export const handleSidebarTabClick = (route: Routes) => {
             dispatch(showInfoModal(info));
         } else if (route === Routes.FindPatients) {
             dispatch(setRoute(route));
+        } else if (route === Routes.SidebarHelp) {
+            dispatch(setRoute(route));
         } else if (route === Routes.AdminPanel) {
             dispatch(setRoute(route));
             dispatch(loadAdminPanelDataIfNeeded());

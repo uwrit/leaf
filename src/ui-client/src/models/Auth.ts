@@ -41,6 +41,7 @@ export interface ClientOptions {
     visualize: VisualizeOptions;
     patientList: PatientListOptions;
     help: HelpOptions;
+    sidebarHelp: SidebarHelpOptions;
 }
 
 interface MapOptions {
@@ -62,6 +63,10 @@ interface HelpOptions {
     autoSend: boolean;
     email?: string;
     uri?: string;
+}
+
+interface SidebarHelpOptions {
+    enabled: boolean;
 }
 
 export interface IdTokenDTO {

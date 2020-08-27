@@ -148,6 +148,16 @@
     border-left-color: rgb(190, 202, 12);
 }
 
+.sidebar-tab-link.help .sidebar-tab.selected .sidebar-icon,
+.sidebar-tab-link.help .sidebar-tab.enabled:hover .sidebar-icon {
+    border-left-color: rgb(230, 72, 98);
+}
+
+.sidebar-tab-link.help .sidebar-tab.selected,
+.sidebar-tab-link.help .sidebar-tab.enabled:hover {
+    border-left-color: rgb(230, 72, 98);
+}
+
 .sidebar-cd2h-logo-wrapper {
     border: 1px solid transparent;
     border-radius: 10px;

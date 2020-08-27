@@ -13,6 +13,7 @@ namespace Model.Options
         public VisualizeOptions Visualize = new VisualizeOptions();
         public PatientListOptions PatientList = new PatientListOptions();
         public HelpOptions Help = new HelpOptions();
+        public SidebarHelpOptions SidebarHelp = new SidebarHelpOptions();
 
         public class MapOptions
         {
@@ -34,6 +35,10 @@ namespace Model.Options
             public bool AutoSend { get; set; }
             public string Email { get; set; }
             public string URI { get; set; }
+        }
+        public class SidebarHelpOptions
+        {
+            public bool Enabled { get; set; }
         }
     }
 }

@@ -61,7 +61,7 @@
   },
   "Export": {
     "REDCap": {
-      "Enabled": false,
+      "Enabled": true,
       "ApiURI": "https://rcdev.iths.org/api/",
       "BatchSize": 10,
       "RowLimit": 5000,
@@ -114,9 +114,6 @@
       "Enabled": true,
       "Email": "leaf-support@example.edu",
       "URI": "https://www.example.edu/leaf-faq"
-    },
-    "SidebarHelp": {
-      "Enabled": true
     }
   },
   "Notification": {

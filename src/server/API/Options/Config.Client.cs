@@ -35,6 +35,11 @@ namespace API.Options
                 public const string Email = @"Client:Help:Email";
                 public const string URI = @"Client:Help:URI";
             }
+            public static class SidebarHelp
+            {
+                public const string Section = @"Client:SidebarHelp";
+                public const string Enabled = @"Client:SidebarHelp:Enabled";
+            }
         }
     }
 }

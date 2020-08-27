@@ -7,10 +7,11 @@
 
 import React, { Suspense } from 'react'
 import { FiBarChart2, FiMap, FiSearch } from 'react-icons/fi';
-import { MdPerson } from 'react-icons/md'
+import { MdPerson, MdHelp } from 'react-icons/md'
 import { FindPatients } from '../components/FindPatients/FindPatients';
 import LeafMap from '../containers/Map/LeafMap';
 import PatientList from '../containers/PatientList/PatientList';
+import SidebarHelp from '../containers/SidebarHelp/SidebarHelp';
 import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AppConfig } from '../models/Auth';
@@ -108,7 +109,17 @@ const admin = (): RouteConfig => {
             display: 'Network and Identity',
         }]
     };
-}
+};
+
+const help = (): RouteConfig => { 
+    return {
+        display: 'Help',
+        icon: <MdHelp />,
+        index: Routes.SidebarHelp,
+        path: '/help',
+        render: () => <SidebarHelp />
+    };
+};
 
 export const getRoutes = (config: AppConfig, userContext: UserContext): RouteConfig[] => {
     const routes = [ findPatients() ];
@@ -118,6 +129,7 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
     if (client.visualize.enabled)   { routes.push(visualize()); }
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
+    if (client.sidebarHelp.enabled) { routes.push(help()); }
 
     return routes;
 };

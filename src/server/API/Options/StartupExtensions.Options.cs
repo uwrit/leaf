@@ -247,6 +247,9 @@ namespace API.Options
                 opts.Help.AutoSend = config.GetValue<bool>(Config.Notification.Enabled);
                 opts.Help.Email = config.GetValue<string>(Config.Client.Help.Email);
                 opts.Help.URI = config.GetValue<string>(Config.Client.Help.URI);
+
+                // Sidebar Help
+                opts.SidebarHelp.Enabled = config.GetValue<bool>(Config.Client.SidebarHelp.Enabled);
             });
 
             return services;
