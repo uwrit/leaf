@@ -24,15 +24,15 @@ namespace Services.Extensions
                 return null;
             }
 
-            if (patient.IsDeceased.HasValue && patient.IsDeceased.Value && !patient.DeathDate.HasValue)
+            if (patient.IsDeceased.HasValue && patient.IsDeceased.Value && !patient.DeceasedDateTime.HasValue)
             {
                 return null;
             }
 
             DateTime upper = DateTime.Today;
-            if (patient.IsDeceased.HasValue && patient.IsDeceased.Value && patient.DeathDate.HasValue)
+            if (patient.IsDeceased.HasValue && patient.IsDeceased.Value && patient.DeceasedDateTime.HasValue)
             {
-                upper = patient.DeathDate.Value;
+                upper = patient.DeceasedDateTime.Value;
             }
 
             var bday = patient.BirthDate.Value;

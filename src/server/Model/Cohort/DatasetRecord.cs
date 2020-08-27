@@ -269,7 +269,7 @@ namespace Model.Cohort
                 IsHispanic = IsHispanic,
                 IsDeceased = IsDeceased,
                 BirthDate = BirthDate,
-                DeathDate = DeathDate,
+                DeceasedDateTime = DeceasedDateTime,
                 Name = Name.ValueElseUnknown(),
                 Mrn = Mrn.ValueElseUnknown()
             };

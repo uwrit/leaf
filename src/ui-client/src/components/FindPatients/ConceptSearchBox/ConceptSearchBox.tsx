@@ -49,6 +49,11 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
         }
     }
 
+    public componentDidMount() {
+        const { roots } = this.props.conceptsState;
+        this.setState({ roots: [ '', ...roots.filter((r) => !r.startsWith('urn:')) ] }); 
+    }
+
     public getSnapshotBeforeUpdate(prevProps: Props) {
         const { conceptsState } = this.props;
         const { roots } = conceptsState;
@@ -56,7 +61,9 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
         const len = roots.length;
 
         if (len === 0) { return null; }
-        if (len !== prevLen) { this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] }); }
+        if (len !== prevLen) { 
+            this.setState({ roots: [ '', ...conceptsState.roots.filter((r) => !r.startsWith('urn:')) ] }); 
+        }
         return null;
     }
 
@@ -186,7 +193,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
     private handleRootDropdownSelect = (id: string) => {
         const { dispatch, conceptsSearchState } = this.props;
         const { term } = conceptsSearchState;
-        if (id === this.props.conceptsSearchState.rootId) { return; }
+        if (id === conceptsSearchState.rootId) { return; }
 
         this.previousTerm = '';
         dispatch(setSearchRoot(id));

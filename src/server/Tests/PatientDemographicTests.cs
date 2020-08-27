@@ -57,7 +57,7 @@ namespace Tests
             {
                 BirthDate = new DateTime(1990, 1, 1),
                 IsDeceased = true,
-                DeathDate = new DateTime(2018, 1, 1)
+                DeceasedDateTime = new DateTime(2018, 1, 1)
             };
 
             var age = patient.CalculateAge();
