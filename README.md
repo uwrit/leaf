@@ -1,7 +1,7 @@
 # Leaf &middot; [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](https://github.com/uwrit/leaf/pulls)
 <a><img src="/src/ui-client/public/images/logos/apps/leaf.svg" width="120px" align="left" hspace="10" vspace="6"></a>
 
-**Leaf** is a powerful, fun, lightweight web application for querying clinical data. Leaf helps query clinical databases of nearly any data model for cohort estimation and data extraction. Leaf seamlessly integrates with clinical databases and existing enterprise authentication systems to unleash the potential of translational biomedical research.
+**Leaf** is a powerful, fun, lightweight web application for querying clinical data. Leaf helps query clinical databases of nearly any data model for cohort estimation and data extraction, seamlessly integrates with clinical databases and existing enterprise authentication systems to unleash the potential of translational biomedical research.
 
 ##
 <span style="display:block">
@@ -24,10 +24,4 @@ See a demo of Leaf in action at https://www.youtube.com/watch?v=ZuKKC7B8mHI.
 Information on Leaf's role in clinical informatics, architecture, and background is described in the manuscript [Leaf: an open-source, model-agnostic, data-driven web application for cohort discovery and translational biomedical research](https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocz165/5583724).
 
 ## Getting Started
-* [How Leaf can help accomplish research](https://github.com/uwrit/leaf/wiki#how-can-leaf-help-with-research)
-* [Architecture](https://github.com/uwrit/leaf/tree/master/docs/deploy#architecture)
-* [Installation](https://github.com/uwrit/leaf/tree/master/docs/deploy#installation-steps)
-* [The Building Blocks of Leaf: Concepts](https://github.com/uwrit/leaf/blob/master/docs/admin/concept/README.md#the-building-blocks-of-leaf-concepts)
-
-## Can I use Leaf now?
-Sure! Leaf is in active development and will evolve as development continues and features are added.
+Learn more about installing, configuring, and administering Leaf at [https://leafdocs.rit.uw.edu/](https://leafdocs.rit.uw.edu/).
