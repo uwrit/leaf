@@ -31,6 +31,10 @@
     <Folder Include="Authentication\" />
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
+    <Folder Include="Help\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\.editorconfig" />
+  </ItemGroup>
 </Project>
