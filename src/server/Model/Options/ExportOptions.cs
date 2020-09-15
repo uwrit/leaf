@@ -9,6 +9,7 @@ namespace Model.Options
 {
     public class ExportOptions
     {
+        public CSVExportOptions CSV { get; set; }
         public REDCapExportOptions REDCap { get; set; }
     }
 
@@ -19,6 +20,11 @@ namespace Model.Options
         public string SuperToken { get; set; }
         public int BatchSize { get; set; }
         public int RowLimit { get; set; }
+        public bool Enabled { get; set; } = false;
+    }
+
+    public class CSVExportOptions : IEnabled
+    {
         public bool Enabled { get; set; } = false;
     }
 }

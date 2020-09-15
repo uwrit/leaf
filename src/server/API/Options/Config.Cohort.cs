@@ -11,17 +11,9 @@ namespace API.Options
         public static class Cohort
         {
             public const string Section = @"Cohort";
-            public const string SetCohort = @"Cohort:SetCohort";
-            public const string SetCohortDataSet = @"Cohort:SetCohortDataSet";
-            public const string FieldCohortId = @"Cohort:FieldCohortId";
-            public const string FieldCohortPersonId = @"Cohort:FieldCohortPersonId";
-            public const string FieldCohortDataSetEncounterId = @"Cohort:FieldCohortDataSetEncounterId";
-            public const string FieldCohortDataSetFilterId = @"Cohort:FieldCohortDataSetFilterId";
-            public const string FieldCohortDataSetStartDate = @"Cohort:FieldCohortDataSetStartDate";
-            public const string FieldCohortDataSetEndDate = @"Cohort:FieldCohortDataSetEndDate";
-            public const string AliasCohort = @"Cohort:AliasCohort";
-            public const string FilterMinutesLagAllowed = @"Cohort:FilterMinutesLagAllowed";
             public const string RowLimit = @"Cohort:RowLimit";
+            public const string ExportLimit = @"Cohort:ExportLimit";
+            public const string QueryStrategy = @"Cohort:QueryStrategy";
         }
     }
 }

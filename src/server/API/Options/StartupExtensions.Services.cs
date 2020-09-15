@@ -74,6 +74,8 @@ namespace API.Options
 
             services.AddNetworkCache();
 
+            services.AddCohortQueryExecutionService();
+
             services.AddSingleton<NetworkEndpointConcurrentQueueSet>();
 
             services.AddTransient<IJwtKeyResolver, JwtKeyResolver>();
@@ -92,7 +94,6 @@ namespace API.Options
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
-            services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
@@ -163,6 +164,25 @@ namespace API.Options
             services.AddTransient<IUserJwtProvider, JwtProvider>();
             services.AddTransient<IApiJwtProvider, JwtProvider>();
             services.AddTransient<ILoginSaver, LoginSaver>();
+
+            return services;
+        }
+
+        static IServiceCollection AddCohortQueryExecutionService(this IServiceCollection services)
+        {
+            var sp = services.BuildServiceProvider();
+            var opts = sp.GetRequiredService<IOptions<CohortOptions>>().Value;
+
+            switch (opts.QueryStrategy)
+            {
+                case QueryStrategyOptions.CTE:
+                    services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
+                    break;
+
+                case QueryStrategyOptions.Parallel:
+                    services.AddTransient<CohortCounter.IPatientCohortService, ParallelPatientCohortService>();
+                    break;
+            }
 
             return services;
         }

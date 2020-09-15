@@ -13,8 +13,8 @@ const formatSql = (rawSql: string) => {
 
 const formatMultipleSql = (rawSql: string[]) => {
     return rawSql
-        .map((s: string) => formatSql(s))
-        .join('/n /n ****** /n /n');
+        .map((s: string, i: number) => `/* Query ${i+1} */\n${formatSql(s)}`)
+        .join('\n\n\n');
 }
 
 export default formatSql;

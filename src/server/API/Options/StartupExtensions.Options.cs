@@ -63,7 +63,7 @@ namespace API.Options
             });
 
             // Cohort Caching Options
-            services.Configure<CohortOptions>(configuration.GetSection(Config.Cohort.Section));
+            services.ConfigureCohortOptions(configuration);
 
             // Jwt Options
             services.ConfigureJwtOptions(configuration);
@@ -168,6 +168,7 @@ namespace API.Options
 
         static IServiceCollection ConfigureExportOptions(this IServiceCollection services, IConfiguration config)
         {
+            var csv = new CSVExportOptions { Enabled = config.GetValue<bool>(Config.Export.CSV.Enabled) };
             var rc = new REDCapExportOptions { Enabled = config.GetValue<bool>(Config.Export.REDCap.Enabled) };
             if (rc.Enabled)
             {
@@ -190,6 +191,7 @@ namespace API.Options
 
             services.Configure<ExportOptions>(opts =>
             {
+                opts.CSV = csv;
                 opts.REDCap = rc;
             });
 
@@ -339,6 +341,25 @@ namespace API.Options
             {
                 opts.Patient = deident.Patient;
                 opts.Cohort = deident.Cohort;
+            });
+
+            return services;
+        }
+
+        static IServiceCollection ConfigureCohortOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var cohortOpts = new CohortOptions
+            {
+                RowLimit = config.GetValue<int>(Config.Cohort.RowLimit),
+                ExportLimit = config.GetValue<int>(Config.Cohort.ExportLimit)
+            }
+            .WithQueryStrategy(config.GetValue<string>(Config.Cohort.QueryStrategy));
+
+            services.Configure<CohortOptions>(opts =>
+            {
+                opts.RowLimit = cohortOpts.RowLimit;
+                opts.ExportLimit = cohortOpts.ExportLimit;
+                opts.QueryStrategy = cohortOpts.QueryStrategy;
             });
 
             return services;

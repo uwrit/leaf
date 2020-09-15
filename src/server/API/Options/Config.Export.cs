@@ -21,6 +21,11 @@ namespace API.Options
                 public const string SuperToken = @"Export:REDCap:SuperToken";
                 public const string Enabled = @"Export:REDCap:Enabled";
             }
+            public static class CSV
+            {
+                public const string Section = @"Export:CSV";
+                public const string Enabled = @"Export:Enabled";
+            }
         }
     }
 }

@@ -18,6 +18,9 @@ export function defaultExportState(): ExportState {
             estimatedSecondsRemaining: 0,
             text: ''
         },
+        csv: {
+            enabled: false
+        },
         redCap: {
             enabled: false
         }
@@ -42,6 +45,7 @@ export const dataExport = (state: ExportState = defaultExportState(), action: Ex
             });
         case EXPORT_SET_OPTIONS:
             return Object.assign({}, state, {
+                csv: action.exportOptions!.csv,
                 redCap: action.exportOptions!.redCap
             });
         case EXPORT_SET_PROGRESS:

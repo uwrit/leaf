@@ -10,6 +10,7 @@ import { Button, Col, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 're
 import { setExportClearErrorOrComplete } from '../../../actions/dataExport';
 import ExportState from '../../../models/state/Export';
 import REDCapExport from './REDCap/REDCapExport';
+import CSVExport from './CSV/CSVExport';
 import './ExportDataModal.css';
 
 interface Props { 
@@ -24,6 +25,11 @@ interface State {
     selected: string;
 }
 
+const opts = {
+    csv: 'csv',
+    redcap: 'redcap'
+};
+
 export default class ExportDataModal extends React.PureComponent<Props, State> {
     private clickExportHandler: any;
     
@@ -36,33 +42,54 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
 
     public render() {
         const c = 'patientlist-export-modal';
-        const { exportState, rowCount } = this.props;
-        const { redCap, isExporting } = exportState;
+        const { exportState, rowCount, show } = this.props;
+        const { selected } = this.state;
+        const { csv, redCap, isExporting } = exportState;
         const modalClasses = [ c, 'leaf-modal', (isExporting ? 'exporting' : '') ];
+        const anyEnabled = !!csv || !!redCap;
+        const redcapSelected = selected === opts.redcap;
+        const csvSelected = selected === opts.csv;
 
         return (
-            <Modal isOpen={this.props.show} className={modalClasses.join(' ')} backdrop={true} size="lg">
+            <Modal isOpen={show} className={modalClasses.join(' ')} backdrop={true} size="lg">
                 <ModalHeader>Export Data</ModalHeader>
                 <ModalBody>
                     {redCap.enabled &&
                     <Row>
                         <Col className={`${c}-options`} md={3}>
-                            <div className={`${c}-option selected`}>
+                            {redCap.enabled &&
+                            <div className={`${c}-option ${redcapSelected ? 'selected' : ''}`} onClick={this.handleExportOptionClick.bind(null, opts.redcap)}>
                                 <img alt='redcap-logo' className={`${c}-option-logo`} src={`${process.env.PUBLIC_URL}/images/logos/apps/redcap.png`}/>
                                 <span>REDCap</span>
                             </div>
+                            }
+                            {csv.enabled &&
+                            <div className={`${c}-option ${csvSelected ? 'selected' : ''}`} onClick={this.handleExportOptionClick.bind(null, opts.csv)}>
+                                <img alt='csv-logo' className={`${c}-option-logo`} src={`${process.env.PUBLIC_URL}/images/logos/apps/csv.png`}/>
+                                <span>CSV</span>
+                            </div>
+                            }
                         </Col>
                         <Col className={`${c}-selected-option`} md={9}>
+                            {redcapSelected && 
                             <REDCapExport 
-                                exportState={this.props.exportState} 
+                                exportState={exportState} 
                                 handleClickClearErrorOrComplete={this.handleClickClearErrorOrComplete} 
                                 registerClickExportHandler={this.setClickExportHandler}
                                 rowCount={rowCount}
                             />
+                            }
+                            {csvSelected && 
+                            <CSVExport
+                                exportState={exportState} 
+                                handleClickClearErrorOrComplete={this.handleClickClearErrorOrComplete} 
+                                registerClickExportHandler={this.setClickExportHandler}
+                            />
+                            }
                         </Col>
                     </Row>
                     }
-                    {!redCap.enabled &&
+                    {!anyEnabled &&
                     <div className={`${c}-no-options`}>
                         <p>
                             Whoops! It doesn't look like you have any export options configured. 
@@ -77,6 +104,10 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
                 </ModalFooter>
             </Modal>
         );
+    }
+
+    private handleExportOptionClick = (selected: string) => {
+        this.setState({ selected });
     }
 
     private handleClickClearErrorOrComplete = () => {
