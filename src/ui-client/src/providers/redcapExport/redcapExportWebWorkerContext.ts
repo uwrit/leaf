@@ -76,6 +76,15 @@ var createExportConfiguration = function (payload) {
     }
     return { requestId: requestId, result: config };
 };
+/**
+ * Remove any characters which may possibly blow up REDCap JSON decoding
+ */
+var toREDCapValue = function(val) {
+    if (typeof val === 'string') {
+        return val.replace('&',' ');
+    }
+    return val;
+}
 /*
  * Create a superset object of PatientListDatasetExport[]
  * which includes a derived field_name for REDCap
@@ -147,7 +156,7 @@ var deriveRecords = function (pl, useRepeatingForms, rowLimit) {
                     var rcCol = ds.columns[l];
                     var val = r[rcCol.id];
                     if (val) {
-                        record[rcCol.redcapFieldName] = (rcCol.type === typeDate ? toREDCapDate(val) : val);
+                        record[rcCol.redcapFieldName] = (rcCol.type === typeDate ? toREDCapDate(val) : toREDCapValue(val));
                     }
                 }
                 derived.records.push(record);
@@ -258,7 +267,7 @@ var deriveUser = function (options, patientList, username) {
     var forms = {};
     patientList.forEach(function (d) { return forms[d.datasetId] = 1; });
     var user = {
-        username: username + "@" + options.scope,
+        username: options.includeScopeInUsername ? username + "@" + options.scope : username,
         email: "",
         firstname: 'Project',
         lastname: 'Owner',

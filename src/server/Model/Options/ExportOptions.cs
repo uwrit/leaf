@@ -20,6 +20,7 @@ namespace Model.Options
         public string SuperToken { get; set; }
         public int BatchSize { get; set; }
         public int RowLimit { get; set; }
+        public bool IncludeScopeInUsername { get; set; }
         public bool Enabled { get; set; } = false;
     }
 

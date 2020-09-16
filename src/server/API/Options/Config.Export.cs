@@ -19,12 +19,13 @@ namespace API.Options
                 public const string RowLimit = @"Export:REDCap:RowLimit";
                 public const string Scope = @"Export:REDCap:Scope";
                 public const string SuperToken = @"Export:REDCap:SuperToken";
+                public const string IncludeScopeInUsername = @"Export:REDCap:IncludeScopeInUsername";
                 public const string Enabled = @"Export:REDCap:Enabled";
             }
             public static class CSV
             {
                 public const string Section = @"Export:CSV";
-                public const string Enabled = @"Export:Enabled";
+                public const string Enabled = @"Export:CSV:Enabled";
             }
         }
     }

@@ -17,6 +17,7 @@ export interface REDCapExportOptionsDTO {
     enabled: boolean;
     rowLimit?: number;
     scope?: string;
+    includeScopeInUsername?: boolean;
 }
 
 export interface REDCapExportOptions extends REDCapExportOptionsDTO {

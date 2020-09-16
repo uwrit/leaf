@@ -201,6 +201,16 @@ export default class REDCapExportWebWorker {
             return { requestId, result: config }
         };
 
+        /**
+         * Remove any characters which may possibly blow up REDCap JSON decoding
+         */
+        const toREDCapValue = (val: any): string => {
+            if (typeof val === 'string') {
+                return val.replace('&',' ');
+            }
+            return val;
+        }
+
         /*
          * Create a superset object of PatientListDatasetExport[]
          * which includes a derived field_name for REDCap
@@ -277,7 +287,7 @@ export default class REDCapExportWebWorker {
                             const rcCol = ds.columns[l] as REDCapExportDerivedPatientListColumn;
                             const val = r[rcCol.id];
                             if (val) {
-                                record[rcCol.redcapFieldName] = (rcCol.type === typeDate ? toREDCapDate(val) : val);
+                                record[rcCol.redcapFieldName] = (rcCol.type === typeDate ? toREDCapDate(val) : toREDCapValue(val));
                             }
                         }
                         derived.records.push(record);
@@ -395,7 +405,7 @@ export default class REDCapExportWebWorker {
             patientList.forEach((d: PatientListDatasetExport) => forms[d.datasetId] = 1);
 
             const user: REDCapUser = {
-                username: `${username}@${options.scope}`,
+                username: options.includeScopeInUsername ? `${username}@${options.scope}` : username,
                 email: ``,
                 firstname: 'Project',
                 lastname: 'Owner',
