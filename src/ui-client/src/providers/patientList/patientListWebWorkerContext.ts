@@ -598,8 +598,15 @@ var deriveNonNumericSummaryFromDataset = function (def, ids) {
 /*
  * Convert tuple objects to csv-friendly strings.
  */
-var valueToCsvString = function (d) {
-    return d;
+var valueToCsvString = (d) => {
+    return (
+        !d ? '' 
+       : d instanceof Date ? d.toISOString().replace(',','') 
+       : String(d)
+            .replace(/(\\r\\n|\\n|\\r|\\s+|\\t|&nbsp;)/gm,' ')
+            .replace(/"/g, '""')
+            .replace(/ +(?= )/g,'')
+    );
 };
 /*
  * Pulls all cache data for all datasets into a
@@ -672,7 +679,8 @@ var getAllData = function (payload) {
  */
 var getMultirowDataCsv = function (payload) {
     var datasetId = payload.datasetId, requestId = payload.requestId;
-    var nl = '';
+    var nl = '\\n';
+    var q = '"';
     var rows = [];
     var cols = [{ id: personId, datasetId: datasetId, index: 0, isDisplayed: true, type: typeString }];
     multirowDatasets.get(datasetId).columns.forEach(function (col) { return cols.push(col); });
@@ -687,7 +695,7 @@ var getMultirowDataCsv = function (payload) {
                 var vals = ds[i];
                 for (var j = 0; j < cols.length; j++) {
                     var d = vals[cols[j].id];
-                    row.push(valueToCsvString(d));
+                    row.push(q+valueToCsvString(d)+q);
                 }
                 rows.push(row.join(','));
             }
@@ -702,7 +710,8 @@ var getMultirowDataCsv = function (payload) {
  */
 var getSingletonDataCsv = function (payload) {
     var config = payload.config, requestId = payload.requestId, useDisplayedColumnsOnly = payload.useDisplayedColumnsOnly;
-    var nl = '';
+    var nl = '\\n';
+    var q = '"';
     var rows = [];
     var cols = [];
     // Use only the columns currently displayed or retrieve all (user selects one option or the other)
@@ -726,7 +735,7 @@ var getSingletonDataCsv = function (payload) {
         cols.forEach(function (col) {
             var ds = p.singletonData.get(col.datasetId);
             var d = ds ? ds.get(col.id) : undefined;
-            row.push(valueToCsvString(d));
+            row.push(q+valueToCsvString(d)+q);
         });
         rows.push(row.join(','));
     });

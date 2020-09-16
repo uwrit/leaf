@@ -25,6 +25,7 @@ namespace API.DTO.Export
             public string Scope { get; set; }
             public int BatchSize { get; set; }
             public int RowLimit { get; set; }
+            public bool IncludeScopeInUsername { get; set; }
             public bool Enabled { get; set; }
 
             public REDCapExportOptionsDTO(REDCapExportOptions redcapOptions)
@@ -32,6 +33,7 @@ namespace API.DTO.Export
                 ApiURI = redcapOptions.ApiURI;
                 Scope = redcapOptions.Scope;
                 BatchSize = redcapOptions.BatchSize;
+                IncludeScopeInUsername = redcapOptions.IncludeScopeInUsername;
                 RowLimit = redcapOptions.RowLimit;
                 Enabled = redcapOptions.Enabled;
             }

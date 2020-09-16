@@ -177,6 +177,7 @@ namespace API.Options
                 rc.RowLimit = config.GetValue<int>(Config.Export.REDCap.RowLimit);
                 rc.Scope = config.GetValue<string>(Config.Export.REDCap.Scope);
                 rc.SuperToken = config.GetByProxy(Config.Export.REDCap.SuperToken);
+                rc.IncludeScopeInUsername = config.GetValue<bool>(Config.Export.REDCap.IncludeScopeInUsername);
             }
 
             services.Configure<REDCapExportOptions>(opts =>

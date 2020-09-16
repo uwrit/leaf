@@ -9,12 +9,13 @@ import { Action, Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { ExportOptionsDTO, ExportProgress } from '../models/state/Export';
 import { REDCapProjectExportConfiguration } from '../models/redcapApi/ExportConfiguration';
-import { getAllData, getREDCapExportData } from '../services/patientListApi';
+import { getAllData, getREDCapExportData, getBasicDemographicsCSV, getMultirowDatasetCSV } from '../services/patientListApi';
 import { REDCapHttpConnector, requestProjectCreation, getREDCapVersion, repeatableFormsAllowed } from '../services/redcapApi';
 import { formatSmallNumber } from '../utils/formatNumber';
 import { PatientListDatasetExport } from '../models/patientList/Dataset';
 
-export const EXPORT_COMPLETE = 'EXPORT_COMPLETE'
+export const EXPORT_COMPLETE = 'EXPORT_COMPLETE';
+export const EXPORT_REDCAP_COMPLETE = 'EXPORT_REDCAP_COMPLETE';
 export const EXPORT_ERROR = 'EXPORT_ERROR';
 export const EXPORT_CLEAR_ERROR_OR_COMPLETE = 'EXPORT_CLEAR_ERROR_OR_COMPLETE';
 export const EXPORT_SET_OPTIONS = 'EXPORT_SET_OPTIONS';
@@ -29,6 +30,42 @@ export interface ExportAction {
 }
 
 // Asynchronous
+export const exportToCSV = () => {
+    return async(dispatch: Dispatch<Action<any>>, getState: () => AppState) => {
+        try {
+            const state = getState();
+            const datasets = [ ...state.cohort.patientList.configuration.multirowDatasets.values() ];
+            const csvCount = datasets.length+1;
+            const baseFileName = `leaf_cohort_${Date.now()}_`;
+            const initialPct = 10;
+            
+            /**
+             * Get Basic Demographics csv
+             */
+            dispatch(setExportProgress(initialPct, 'Loading Basic Demographics'));
+            const basicDems = await getBasicDemographicsCSV(state);
+            downloadCsv(basicDems, baseFileName + 'demographics.csv');
+
+            /**
+             * Load remaining datasets sequentially.
+             */
+            for (let i = 0; i < datasets.length; i++) {
+                const ds = datasets[i];
+                dispatch(setExportProgress((i / csvCount * 100) - initialPct, `Loading ${ds.displayName}`));
+                const dataset = await getMultirowDatasetCSV(state, ds.id);
+                downloadCsv(dataset, `${baseFileName}${ds.displayName.toLowerCase()}.csv`);
+            }
+
+            dispatch(setExportProgress(100, 'CSV download completed'));
+            dispatch(setExportComplete());
+
+        } catch (err) {
+            console.log(err);
+            dispatch(setExportError());
+        }
+    };
+}
+
 /*
  * Attempt to export results to a REDCap instance. If the REDCap version
  * does not allow repeating forms, this will fall back to a longitudinal
@@ -139,9 +176,15 @@ export const setExportOptions = (exportOptions: ExportOptionsDTO): ExportAction 
     };
 };
 
+export const setExportComplete = (): ExportAction => {
+    return {
+        type: EXPORT_COMPLETE
+    };
+}
+
 export const setREDCapUrl = (url: string): ExportAction => {
     return {
-        type: EXPORT_COMPLETE,
+        type: EXPORT_REDCAP_COMPLETE,
         url
     };
 };
@@ -178,4 +221,25 @@ const calculateExportCompletionTime = (percentComplete: number): number => {
     const secondsElapsed = (new Date().getTime() - startTime) / 1000;
     const estimate = Math.round((1 - (percentComplete / 100)) * (secondsElapsed / percentComplete) * 100);
     return secondsElapsed < 1 ? 60 : estimate;
+};
+
+/*
+ * Download a dataset (already transformed to a string) to a CSV file in browser.
+ */
+const downloadCsv = (content: string, fileName: string) => {
+    const packageCsv = (csv: string) => new Blob([ csv ], { type: 'text/csv;encoding:utf-8' });
+    const a = document.createElement('a');
+
+     // IE10
+    if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(packageCsv(content), fileName);
+    } else if (URL && 'download' in a) { 
+        a.href = URL.createObjectURL(packageCsv(content));
+        a.setAttribute('download', fileName);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    } else {
+        window.location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
+    }
 };

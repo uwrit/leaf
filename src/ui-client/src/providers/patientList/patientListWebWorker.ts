@@ -803,7 +803,7 @@ export default class PatientListWebWorker {
         const valueToCsvString = (d: any) => {
             return (
                 !d ? '' 
-               : d instanceof Date ? d.toLocaleString().replace(',','') 
+               : d instanceof Date ? d.toISOString().replace(',','') 
                : String(d)
                     .replace(/(\r\n|\n|\r|\s+|\t|&nbsp;)/gm,' ')
                     .replace(/"/g, '""')
@@ -888,7 +888,7 @@ export default class PatientListWebWorker {
          */
         const getMultirowDataCsv = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { datasetId, requestId } = payload;
-            const nl = '\r\n';
+            const nl = '\n';
             const rows: string[] =[];
             const cols: PatientListColumn[] = [ { id: personId, datasetId: datasetId!, index: 0, isDisplayed: true, type: typeString } ];
             multirowDatasets.get(datasetId!)!.columns.forEach((col: PatientListColumn) => cols.push(col));
@@ -921,7 +921,7 @@ export default class PatientListWebWorker {
          */
         const getSingletonDataCsv = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { config, requestId, useDisplayedColumnsOnly } = payload;
-            const nl = '\r\n';
+            const nl = '\n';
             const rows: string[] =[];
             let cols: PatientListColumn[] = [];
 

@@ -36,7 +36,7 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selected: 'REDCap'
+            selected: props.exportState.redCap ? opts.redcap : props.exportState.csv ? opts.csv : ''
         }
     }
 
@@ -107,11 +107,23 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
     }
 
     private handleExportOptionClick = (selected: string) => {
+        const { exportState } = this.props;
+        const { isErrored, isExporting } = exportState;
+
+        if (isExporting || isErrored) { return; }
         this.setState({ selected });
     }
 
     private handleClickClearErrorOrComplete = () => {
-        this.props.dispatch(setExportClearErrorOrComplete());
+        const { dispatch, toggle, exportState } = this.props;
+        const { isComplete, isErrored } = exportState;
+
+        if (isErrored) {
+            dispatch(setExportClearErrorOrComplete());
+        } else if (isComplete) {
+            dispatch(toggle());
+            setTimeout(() => dispatch(setExportClearErrorOrComplete()), 2000);
+        }
     }
 
     private handleClickClose = () => {

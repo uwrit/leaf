@@ -53,39 +53,20 @@ export const getREDCapExportData = (
     return redcapExportProvider.createProjectConfiguration(options, plData, projectTitle, username, useRepeatingForms);
 };
 
-/*
- * Extracts datasets as CSV files. This is not yet fully implemented.
+/**
+ * Extract Basic Demographics dataset as a CSV. 
  */
-export const getCsvs = async (config: PatientListConfiguration) => {
-    /*
-    const base: any = await patientListProvider.getSingletonCsv(config, false);
-    const pl: any = await patientListProvider.getMultirowCsv('Platelet');
-
-    downloadCsv(base, 'demographics');
-    downloadCsv(pl, 'platelets');
-    */
+export const getBasicDemographicsCSV = async(state: AppState) => {
+    const base: any = await patientListProvider.getSingletonCsv(state.cohort.patientList.configuration, false);
+    return base;
 };
 
-/*
- * Download a dataset (already transformed to a string) to a CSV file in browser.
+/**
+ * Extract a multirow dataset as a CSV. 
  */
-// eslint-disable-next-line
-const downloadCsv = (content: string, fileName: string) => {
-    const packageCsv = (csv: string) => new Blob([ csv ], { type: 'text/csv;encoding:utf-8' });
-    const a = document.createElement('a');
-
-     // IE10
-    if (navigator.msSaveBlob) {
-        navigator.msSaveBlob(packageCsv(content), fileName);
-    } else if (URL && 'download' in a) { 
-        a.href = URL.createObjectURL(packageCsv(content));
-        a.setAttribute('download', fileName);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-    } else {
-        window.location.href = 'data:application/octet-stream,' + encodeURIComponent(content);
-    }
+export const getMultirowDatasetCSV = async(state: AppState, datasetId: string) => {
+    const ds: any = await patientListProvider.getMultirowCsv(datasetId);
+    return ds;
 };
 
 /*
