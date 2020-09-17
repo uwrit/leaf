@@ -13,7 +13,7 @@ namespace API.DTO.Config
         public AuthenticationConfigDTO Authentication { get; set; }
         public AttestationConfigDTO Attestation { get; set; }
         public CohortConfigDTO Cohort { get; set; }
-        public ClientOptions Client { get;set; }
+        public ClientOptionsDTO Client { get;set; }
         public string Version { get; set; }
     }
 
@@ -33,5 +33,35 @@ namespace API.DTO.Config
     public class AttestationConfigDTO
     {
         public bool Enabled { get; set; }
+    }
+
+    public class ClientOptionsDTO
+    {
+        public MapOptionsDTO Map = new MapOptionsDTO();
+        public VisualizeOptionsDTO Visualize = new VisualizeOptionsDTO();
+        public PatientListOptionsDTO PatientList = new PatientListOptionsDTO();
+        public HelpOptionsDTO Help = new HelpOptionsDTO();
+
+        public class MapOptionsDTO
+        {
+            public bool Enabled { get; set; }
+            public string TileURI { get; set; }
+        }
+        public class VisualizeOptionsDTO
+        {
+            public bool Enabled { get; set; }
+            public bool ShowFederated { get; set; }
+        }
+        public class PatientListOptionsDTO
+        {
+            public bool Enabled { get; set; }
+        }
+        public class HelpOptionsDTO
+        {
+            public bool Enabled { get; set; }
+            public bool AutoSend { get; set; }
+            public string Email { get; set; }
+            public string URI { get; set; }
+        }
     }
 }

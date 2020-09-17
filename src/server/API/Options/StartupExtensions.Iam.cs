@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -13,7 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using Model.Authorization;
 using Model.Network;
 using Model.Options;
-using Services.Network;
 using API.Jwt;
 
 namespace API.Options

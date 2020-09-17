@@ -904,8 +904,14 @@ export default class PatientListWebWorker {
                         const row: any[] = [];
                         const vals: any = ds[i];
                         for (let j = 0; j < cols.length; j++) {
-                            const d = vals[cols[j].id];
-                            row.push(`"${valueToCsvString(d)}"`);
+                            // Multirow datasets store uppercase 'PersonId', from server
+                            if (cols[j].id === personId) { 
+                                row.push(`"${valueToCsvString(vals['PersonId'])}"`);
+                            // else lookup value
+                            } else {
+                                const d = vals[cols[j].id];  
+                                row.push(`"${valueToCsvString(d)}"`);
+                            }
                         }
                         rows.push(row.join(','));
                     }

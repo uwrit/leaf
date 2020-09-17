@@ -17,7 +17,7 @@ namespace Model.Authentication
         {
             if (string.IsNullOrWhiteSpace(scopedId))
             {
-                throw new FormatException($"SAML scoped identity vale is missing.");
+                throw new FormatException($"SAML scoped identity value is missing.");
             }
             var parts = scopedId.Split('@');
             if (parts.Length != 2)

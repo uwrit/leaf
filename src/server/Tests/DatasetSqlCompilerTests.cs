@@ -198,7 +198,7 @@ namespace Tests
         {
             var compOpts = GetCompilerOptions();
             var user = new MockUser();
-            var cohortOpts = Options.Create(new CohortOptions { FieldCohortPersonId = "person_id", SetCohort = "app.Cohort" });
+            var cohortOpts = Options.Create(new CohortOptions());
             return new SqlServerCompiler(user, compOpts, cohortOpts);
         }
 

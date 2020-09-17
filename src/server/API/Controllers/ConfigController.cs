@@ -61,7 +61,30 @@ namespace API.Controllers
                     CacheLimit = cohortOptions.RowLimit,
                     ExportLimit = cohortOptions.ExportLimit
                 },
-                Client = clientOptions,
+                Client = new ClientOptionsDTO
+                {
+                    Map = new ClientOptionsDTO.MapOptionsDTO
+                    {
+                        Enabled = clientOptions.Map.Enabled,
+                        TileURI = clientOptions.Map.TileURI
+                    },
+                    Visualize = new ClientOptionsDTO.VisualizeOptionsDTO
+                    {
+                        Enabled = clientOptions.Visualize.Enabled,
+                        ShowFederated = clientOptions.Visualize.ShowFederated
+                    },
+                    PatientList = new ClientOptionsDTO.PatientListOptionsDTO
+                    {
+                        Enabled = clientOptions.PatientList.Enabled
+                    },
+                    Help = new ClientOptionsDTO.HelpOptionsDTO
+                    {
+                        Enabled = clientOptions.Help.Enabled,
+                        AutoSend = clientOptions.Help.AutoSend,
+                        Email = clientOptions.Help.Email,
+                        URI = clientOptions.Help.URI
+                    }
+                },
                 Version = versionOptions.Version.ToString()
             };
 
