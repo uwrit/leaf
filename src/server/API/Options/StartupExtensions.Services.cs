@@ -171,15 +171,15 @@ namespace API.Options
         static IServiceCollection AddCohortQueryExecutionService(this IServiceCollection services)
         {
             var sp = services.BuildServiceProvider();
-            var opts = sp.GetRequiredService<IOptions<CohortOptions>>().Value;
+            var opts = sp.GetRequiredService<IOptions<ClinDbOptions>>().Value;
 
-            switch (opts.QueryStrategy)
+            switch (opts.Cohort.QueryStrategy)
             {
-                case QueryStrategyOptions.CTE:
+                case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE:
                     services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
                     break;
 
-                case QueryStrategyOptions.Parallel:
+                case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel:
                     services.AddTransient<CohortCounter.IPatientCohortService, ParallelPatientCohortService>();
                     break;
             }

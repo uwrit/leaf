@@ -353,14 +353,12 @@ namespace API.Options
             {
                 RowLimit = config.GetValue<int>(Config.Cohort.RowLimit),
                 ExportLimit = config.GetValue<int>(Config.Cohort.ExportLimit)
-            }
-            .WithQueryStrategy(config.GetValue<string>(Config.Cohort.QueryStrategy));
+            };
 
             services.Configure<CohortOptions>(opts =>
             {
                 opts.RowLimit = cohortOpts.RowLimit;
                 opts.ExportLimit = cohortOpts.ExportLimit;
-                opts.QueryStrategy = cohortOpts.QueryStrategy;
             });
 
             return services;
@@ -392,10 +390,29 @@ namespace API.Options
             {
                 opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
+                opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));
+
+                if (opts.Cohort.QueryStrategy == ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel)
+                {
+                    if (!config.TryGetValue<int>(Config.Db.Clin.Cohort.MaxParallelThreads, out var maxThreads))
+                    {
+                        opts.Cohort.MaxParallelThreads = 5;
+                    }
+                    else
+                    {
+                        opts.Cohort.MaxParallelThreads = maxThreads;
+                    }
+
+                    if (opts.Cohort.MaxParallelThreads <= 0)
+                    {
+                        throw new LeafConfigurationException($"ClinDb Cohort MaxParallelThreads must be greater than zero, but is set to {maxThreads}");
+                    }
+                }
             });
 
             var extractor = new DatabaseExtractor();
             var sp = services.BuildServiceProvider();
+
             // SQL Compiler Options
             config.TryBind<CompilerOptions>(Config.Compiler.Section, out var compilerOptions);
             services.Configure<CompilerOptions>(opts =>

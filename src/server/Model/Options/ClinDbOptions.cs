@@ -5,12 +5,15 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Model.Options
 {
     public class ClinDbOptions : IConnectionString
     {
+        public const string CTE = "CTE";
+        public const string Parallel = "PARALLEL";
+
         string connectionString;
         public string ConnectionString
         {
@@ -36,6 +39,56 @@ namespace Model.Options
                     throw new InvalidOperationException($"{nameof(ClinDbOptions)}.{nameof(DefaultTimeout)} is immutable");
                 }
                 defaultTimeout = value;
+            }
+        }
+
+        public ClinDbCohortOptions Cohort = new ClinDbCohortOptions();
+
+        public class ClinDbCohortOptions
+        {
+            public QueryStrategyOptions QueryStrategy { get; set; }
+
+            public static readonly IEnumerable<string> ValidQueryStrategies = new string[] { CTE, Parallel };
+
+            static bool ValidQueryStrategy(string value) => ValidQueryStrategies.Contains(value);
+
+            public void WithQueryStrategy(string value)
+            {
+                var tmp = value.ToUpper();
+                if (!ValidQueryStrategy(tmp))
+                {
+                    throw new LeafConfigurationException($"{value} is not a supported a cohort query strategy");
+                }
+
+                switch (tmp)
+                {
+                    case CTE:
+                        QueryStrategy = QueryStrategyOptions.CTE;
+                        break;
+                    case Parallel:
+                        QueryStrategy = QueryStrategyOptions.Parallel;
+                        break;
+                }
+            }
+
+            int defaultMaxParallelThreads;
+            public int MaxParallelThreads
+            {
+                get { return defaultMaxParallelThreads; }
+                set
+                {
+                    if (defaultMaxParallelThreads != default)
+                    {
+                        throw new InvalidOperationException($"{nameof(ClinDbCohortOptions)}.{nameof(MaxParallelThreads)} is immutable");
+                    }
+                    defaultMaxParallelThreads = value;
+                }
+            }
+
+            public enum QueryStrategyOptions : ushort
+            {
+                CTE = 1,
+                Parallel = 2
             }
         }
     }

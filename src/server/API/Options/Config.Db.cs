@@ -25,6 +25,12 @@ namespace API.Options
                 public const string Section = @"Db:Clin";
                 public const string Connection = @"Db:Clin:Connection";
                 public const string DefaultTimeout = @"Db:Clin:DefaultTimeout";
+
+                public static class Cohort
+                {
+                    public const string QueryStrategy = @"Db:Clin:Cohort:QueryStrategy";
+                    public const string MaxParallelThreads = @"Db:Clin:Cohort:MaxParallelThreads";
+                }
             }
         }
     }

@@ -13,7 +13,6 @@ namespace API.Options
             public const string Section = @"Cohort";
             public const string RowLimit = @"Cohort:RowLimit";
             public const string ExportLimit = @"Cohort:ExportLimit";
-            public const string QueryStrategy = @"Cohort:QueryStrategy";
         }
     }
 }

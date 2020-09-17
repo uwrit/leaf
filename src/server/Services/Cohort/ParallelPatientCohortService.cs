@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -21,6 +22,7 @@ namespace Services.Cohort
     public class ParallelPatientCohortService : PatientCohortService
     {
         readonly PatientCountAggregator patientCountAggregator;
+        readonly ClinDbOptions clinDbOpts;
 
         public ParallelPatientCohortService(
             ISqlCompiler compiler,
@@ -29,6 +31,7 @@ namespace Services.Cohort
             ILogger<PatientCohortService> logger) : base(compiler, clinOpts, logger)
         {
             this.patientCountAggregator = patientCountAggregator;
+            this.clinDbOpts = clinOpts.Value;
         }
 
         protected override async Task<PatientCohort> GetCohortAsync(PatientCountQuery query, CancellationToken token)
@@ -45,9 +48,24 @@ namespace Services.Cohort
 
         async Task<HashSet<string>> GetPatientSetAsync(IReadOnlyCollection<LeafQuery> queries, CancellationToken token)
         {
-            var all = queries.Select(q => GetPartialContext(q, token));
-            var partials = await Task.WhenAll(all);
-
+            var partials = new ConcurrentBag<PartialPatientCountContext>();
+            var tasks = new List<Task>();
+            using (var throttler = new SemaphoreSlim(clinDbOpts.Cohort.MaxParallelThreads))
+            {
+                foreach (var q in queries)
+                {
+                    await throttler.WaitAsync();
+                    tasks.Add(
+                        Task.Run(async () =>
+                        {
+                            var result = await GetPartialContext(q, token);
+                            throttler.Release();
+                            partials.Add(result);
+                        })
+                    );
+                }
+                await Task.WhenAll(tasks);
+            }
             token.ThrowIfCancellationRequested();
 
             return patientCountAggregator.Aggregate(partials);
