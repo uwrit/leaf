@@ -25,7 +25,7 @@ namespace API.Authentication
         {
             var mapping = options.Headers.ScopedIdentity;
             var headers = context.Request.Headers;
-            if (!headers.TryGetValue(mapping, out var scoped))
+            if (!headers.TryGetValue(mapping, out var scoped) || string.IsNullOrWhiteSpace(scoped.ToString()))
             {
                 throw new LeafAuthenticationException($"{mapping} header not found, no scoped identity available");
             }

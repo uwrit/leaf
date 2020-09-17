@@ -693,6 +693,16 @@ var getMultirowDataCsv = function (payload) {
             for (var i = 0; i < ds.length; i++) {
                 var row = [];
                 var vals = ds[i];
+                for (let j = 0; j < cols.length; j++) {
+                    // Multirow datasets store uppercase 'PersonId', from server
+                    if (cols[j].id === personId) { 
+                        row.push(q+valueToCsvString(vals['PersonId'])+q);
+                    // else lookup value
+                    } else {
+                        const d = vals[cols[j].id];  
+                        row.push(q+valueToCsvString(d)+q);
+                    }
+                }
                 for (var j = 0; j < cols.length; j++) {
                     var d = vals[cols[j].id];
                     row.push(q+valueToCsvString(d)+q);
