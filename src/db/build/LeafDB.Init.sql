@@ -39,4 +39,4 @@ SELECT
    ,[SecondaryColor] = 'rgb(183, 165, 122)'
 
 INSERT INTO [ref].[Version] (Lock, [Version])
-SELECT 'X', N'3.7.2';
+SELECT 'X', N'3.8.0';
