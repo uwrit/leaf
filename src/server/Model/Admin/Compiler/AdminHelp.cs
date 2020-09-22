@@ -7,17 +7,22 @@ using System;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminHelpPageSQL
+    public class AdminHelpPageCreateSql
     {
-        public int Id { get; set; }
-        public int CategoryId { get; set; }
         public string Title { get; set; }
+        public string Category { get; set; }
+        public int OrderId { get; set; }
+        public string Type { get; set; }
+        public string TextContent { get; set; }
+        public byte[] ImageContent { get; set; }
+        public string ImageId { get; set; }
     }
 
     public class AdminHelpPageContentSql
     {
-        public int Id { get; set; }
         public int PageId { get; set; }
+        public string Title { get; set; }
+        public string Category { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }

@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +13,7 @@ using API.DTO.Admin;
 using Model.Authorization;
 using Model.Error;
 using Model.Admin.Compiler;
+using API.DTO.Admin.Compiler;
 
 namespace API.Controllers.Admin
 {
@@ -32,11 +34,12 @@ namespace API.Controllers.Admin
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminHelp>> Get(Guid id)
+        public async Task<ActionResult<AdminHelp>> Get(int id)
         {
             try
             {
-                // TODO(mh2727) 
+                var page = await manager.GetAsync(id);
+                return Ok(new AdminHelpDTO(page));
             }
             catch (Exception e)
             {
@@ -46,11 +49,15 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<AdminHelpDTO>> Update(Guid id, [FromBody] AdminHelpDTO o)
+        public async Task<ActionResult<AdminHelp>> Update(int id, [FromBody] AdminHelpDTO o)
         {
             try
             {
-                // TODO(mh2727) 
+                if (o != null)
+                {
+                    // TODO(mh2727) 
+                    //o.HelpPageSql = id;
+                }
             }
             catch (ArgumentException ae)
             {
@@ -65,7 +72,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<ActionResult<AdminHelpDTO>> Create([FromBody] AdminHelpDTO o)
+        public async Task<ActionResult<AdminHelp>> Create([FromBody] AdminHelpDTO o)
         {
             try
             {
@@ -85,19 +92,20 @@ namespace API.Controllers.Admin
 
         // Deletes help page and content
         [HttpDelete("{id}")]
-        public async Task<ActionResult<HelpPageDeleteResponse>> Delete(Guid id)
+        public async Task<ActionResult<int?>> Delete(int id)
         {
             try
             {
-                // TODO(mh2727) 
-            }
-            catch (LeafRPCException le)
-            {
-                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+                var deleted = await manager.DeleteAsync(id);
+                if (!deleted.HasValue)
+                {
+                    return NotFound();
+                }
+                return Ok();
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to delete help page. Error:{Error}", e.ToString());
+                logger.LogError("Failed to delete help page. Id:{Id} Error:{Error}", id, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
