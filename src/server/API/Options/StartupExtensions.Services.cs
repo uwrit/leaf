@@ -24,6 +24,7 @@ using Model.Cohort;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Export;
+using Model.Help;
 using Model.Network;
 using Model.Options;
 using Model.Search;
@@ -38,6 +39,7 @@ using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
 using Services.Export;
+using Services.Help;
 using Services.Network;
 using Services.Search;
 using Services.Import;
@@ -106,6 +108,7 @@ namespace API.Options
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
             services.AddTransient<NotificationManager.INotificationService, SmtpService>();
             services.AddTransient<IObfuscationService, ObfuscationService>();
+            services.AddTransient<HelpPages.IHelpPages, HelpPageService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();
@@ -128,6 +131,7 @@ namespace API.Options
             services.AddTransient<AdminGlobalPanelFilterManager.IAdminGlobalPanelFilterService, AdminGlobalPanelFilterService>();
             services.AddTransient<AdminQueryManager.IAdminQueryService, AdminQueryService>();
             services.AddTransient<AdminUserManager.IAdminUserService, AdminUserService>();
+            services.AddTransient<AdminHelpManager.IAdminHelpPageService, AdminHelpService>();
 
             return services;
         }

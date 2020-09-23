@@ -11,6 +11,7 @@ using Model.Admin.Compiler;
 using Model.Authorization;
 using Model.Options;
 using Microsoft.Extensions.Options;
+using System.Threading.Tasks;
 
 namespace Services.Admin.Compiler
 {
@@ -35,15 +36,15 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<AdminHelp> GetAsync(int id)
+        public async Task<AdminHelpPageContentSql> GetAsync(int id)
         {
-            // TODO(mh2727)
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var page = await cn.QuerySingleAsync(
+                var page = await cn.QueryFirstOrDefaultAsync<AdminHelpPageContentSql>(
                     Sql.Get,
+                    new { id },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -52,17 +53,74 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelp> CreateAsync(int id)
+        public async Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p)
         {
-            // TODO(mh2727) 
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var created = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateSql>(
+                    Sql.Create,
+                    new
+                    {
+                        title = p.Title,
+                        category = p.Category,
+                        orderId = p.OrderId,
+                        type = p.Type,
+                        textContent = p.TextContent,
+                        //imageContent = p.ImageContent,
+                        imageId = p.ImageId,
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return created;
+            }
         }
-        public async Task<AdminHelp> UpdateAsync(int id)
+        public async Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p)
         {
-            // TODO(mh2727) 
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageContentSql>(
+                    Sql.Update,
+                    new
+                    {
+                        pageId = p.PageId,
+                        title = p.Title,
+                        category = p.Category,
+                        orderId = p.OrderId,
+                        type = p.Type,
+                        textContent = p.TextContent,
+                        //imageContent = p.ImageContent,
+                        imageId = p.ImageId,
+                        user = user.UUID
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return updated;
+            }
         }
-        public async Task<AdminHelp> DeleteAsync(int id)
+        public async Task<int?> DeleteAsync(int id)
         {
-            // TODO(mh2727) 
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var deleted = await cn.QueryFirstOrDefaultAsync<int?>(
+                    Sql.Delete,
+                    new { id },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return deleted;
+            }
         }
     }
 }

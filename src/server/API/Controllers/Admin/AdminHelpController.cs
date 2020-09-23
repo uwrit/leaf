@@ -34,12 +34,12 @@ namespace API.Controllers.Admin
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminHelp>> Get(int id)
+        public async Task<ActionResult<AdminHelpPageContentSql>> Get(int id)
         {
             try
             {
                 var page = await manager.GetAsync(id);
-                return Ok(new AdminHelpDTO(page));
+                return Ok(new AdminHelpContentDTO(page));
             }
             catch (Exception e)
             {
@@ -49,43 +49,54 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<AdminHelp>> Update(int id, [FromBody] AdminHelpDTO o)
+        public async Task<ActionResult<AdminHelpPageContentSql>> Update(int id, [FromBody] AdminHelpPageContentSql p)
         {
             try
             {
-                if (o != null)
+                if (p != null)
                 {
-                    // TODO(mh2727) 
-                    //o.HelpPageSql = id;
+                    p.PageId = id;
                 }
+
+                var updated = await manager.UpdateAsync(p);
+                return Ok(new AdminHelpContentDTO(updated));
             }
             catch (ArgumentException ae)
             {
-                logger.LogError("Invalid update help page. Error:{Error}", ae.Message);
-                //return BadRequest()
+                logger.LogError("Invalid update help page. Page:{@Page} Error:{Error}", p, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageContentSql)} is missing or incomplete."));
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to update help page. Error:{Error}", e.ToString());
+                logger.LogError("Failed to update help page. Page:{@Page} Error:{Error}", p, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPost]
-        public async Task<ActionResult<AdminHelp>> Create([FromBody] AdminHelpDTO o)
+        public async Task<ActionResult<AdminHelpPageCreateSql>> Create([FromBody] AdminHelpPageCreateSql p)
         {
             try
             {
-                // TODO(mh2727)
+                var created = await manager.CreateAsync(p);
+                return Ok(new AdminHelpCreateDTO(created));
             }
             catch (ArgumentException ae)
             {
-                logger.LogError("Invalid create help page. Error:{Error}", ae.Message);
-                //return BadRequest()
+                logger.LogError("Invalid create help page. Page:{@Page} Error:{Error}", p, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCreateSql)} is missing or incomplete."));
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to create help page. Error:{Error}", e.ToString());
+                logger.LogError("Failed to create help page. Page:{@Page} Error:{Error}", p, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -102,6 +113,10 @@ namespace API.Controllers.Admin
                     return NotFound();
                 }
                 return Ok();
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
             }
             catch (Exception e)
             {

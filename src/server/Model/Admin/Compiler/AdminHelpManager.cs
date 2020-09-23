@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using System.Data.Common;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
@@ -17,9 +18,9 @@ namespace Model.Admin.Compiler
     {
         public interface IAdminHelpPageService
         {
-            Task<AdminHelp> GetAsync(int id);
-            Task<AdminHelp> CreateAsync(AdminHelp h);
-            Task<AdminHelp> UpdateAsync(AdminHelp h);
+            Task<AdminHelpPageContentSql> GetAsync(int id);
+            Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p);
+            Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p);
             Task<int?> DeleteAsync(int id);
         }
 
@@ -34,43 +35,43 @@ namespace Model.Admin.Compiler
             this.svc = svc;
         }
 
-        public async Task<AdminHelp> GetAsync(int id)
+        public async Task<AdminHelpPageContentSql> GetAsync(int id)
         {
             log.LogInformation("Getting help page. Id:{Id}", id);
             return await svc.GetAsync(id);
         }
 
-        public async Task<AdminHelp> CreateAsync(AdminHelp h)
+        public async Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p)
         {
-            ThrowIfInvalid(h);
+            ThrowIfCreateInvalid(p);
 
             try
             {
-                var created = await svc.CreateAsync(h);
+                var created = await svc.CreateAsync(p);
                 log.LogInformation("Created help page. Page:{@Page}", created);
                 return created;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", h, de.ErrorCode, de.Message);
+                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", p, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
         }
 
-        public async Task<AdminHelp> UpdateAsync(AdminHelp h)
+        public async Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p)
         {
-            ThrowIfInvalid(h);
+            ThrowIfContentInvalid(p);
 
             try
             {
-                var updated = await svc.UpdateAsync(h);
+                var updated = await svc.UpdateAsync(p);
                 log.LogInformation("Updated help page. Page:{@Page}", updated);
                 return updated;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", h, de.ErrorCode, de.Message);
+                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", p, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -93,9 +94,15 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfInvalid(AdminHelp h)
+        void ThrowIfCreateInvalid(AdminHelpPageCreateSql c)
         {
-            Ensure.NotNull(h, nameof(h));
+            Ensure.NotNull(c, nameof(c));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void ThrowIfContentInvalid(AdminHelpPageContentSql c)
+        {
+            Ensure.NotNull(c, nameof(c));
         }
     }
 }
