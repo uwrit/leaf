@@ -15,7 +15,7 @@ namespace API.DTO.Admin.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        //public byte[] ImageContent { get; set; }
+        public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
 
         public AdminHelpCreateDTO() { }
@@ -27,7 +27,7 @@ namespace API.DTO.Admin.Compiler
             OrderId = p.OrderId;
             Type = p.Type;
             TextContent = p.TextContent;
-            //ImageContent = p.ImageContent;
+            ImageContent = p.ImageContent;
             ImageId = p.ImageId;
         }
     }
@@ -40,7 +40,7 @@ namespace API.DTO.Admin.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        //public byte[] ImageContent { get; set; }
+        public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
 
         public AdminHelpContentDTO() { }
@@ -53,7 +53,7 @@ namespace API.DTO.Admin.Compiler
             OrderId = p.OrderId;
             Type = p.Type;
             TextContent = p.TextContent;
-            //ImageContent = p.ImageContent;
+            ImageContent = p.ImageContent;
             ImageId = p.ImageId;
         }
     }

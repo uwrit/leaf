@@ -25,7 +25,7 @@ namespace Services.Help
 
         readonly AppDbOptions opts;
 
-        public HelpPageService(IOptions<AppDbOptions> dbOpts, IUserContext userContext)
+        public HelpPageService(IOptions<AppDbOptions> dbOpts)
         {
             opts = dbOpts.Value;
         }

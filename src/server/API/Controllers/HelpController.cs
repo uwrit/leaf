@@ -68,10 +68,5 @@ namespace API.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
-
-        // 1. HelpController - get pages, get page content
-        // 2. adminhelpcontroller - create, read, update, delete
-        // 3. service - which will run the SP
-        //      write sp for each call- admin update call; payload of page id, content
     }
 }

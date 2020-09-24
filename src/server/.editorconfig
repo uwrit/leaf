@@ -4,4 +4,7 @@
 dotnet_analyzer_diagnostic.category-Design.severity = warning
 
 # Default severity for all analyzer diagnostics
-dotnet_analyzer_diagnostic.severity = error
+dotnet_analyzer_diagnostic.severity = none
+
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = none

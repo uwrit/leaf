@@ -68,7 +68,7 @@ namespace Services.Admin.Compiler
                         orderId = p.OrderId,
                         type = p.Type,
                         textContent = p.TextContent,
-                        //imageContent = p.ImageContent,
+                        imageContent = p.ImageContent,
                         imageId = p.ImageId,
                         user = user.UUID
                     },
@@ -95,7 +95,7 @@ namespace Services.Admin.Compiler
                         orderId = p.OrderId,
                         type = p.Type,
                         textContent = p.TextContent,
-                        //imageContent = p.ImageContent,
+                        imageContent = p.ImageContent,
                         imageId = p.ImageId,
                         user = user.UUID
                     },
