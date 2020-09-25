@@ -35,7 +35,7 @@
     "react-leaflet-div-icon": "^1.1.0",
     "react-paginate": "^6.3.0",
     "react-redux": "^7.1.0",
-    "react-scripts": "^3.4.0",
+    "react-scripts": "^3.4.3",
     "react-textarea-autosize": "^7.1.0",
     "reactstrap": "^8.0.1",
     "recharts": "^2.0.0-beta.1",
@@ -44,7 +44,7 @@
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.10",
     "sql-formatter": "^2.3.3",
-    "ts-jest": "^24.0.2",
+    "ts-jest": "^26.4.0",
     "tslint": "^5.19.0"
   },
   "scripts": {
