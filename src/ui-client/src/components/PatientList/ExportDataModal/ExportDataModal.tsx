@@ -36,7 +36,7 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selected: props.exportState.redCap ? opts.redcap : props.exportState.csv ? opts.csv : ''
+            selected: props.exportState.redCap.enabled ? opts.redcap : props.exportState.csv.enabled ? opts.csv : ''
         }
     }
 
@@ -44,7 +44,7 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
         const c = 'patientlist-export-modal';
         const { exportState, rowCount, show } = this.props;
         const { selected } = this.state;
-        const { csv, redCap, isExporting } = exportState;
+        const { enabled, csv, redCap, isExporting } = exportState;
         const modalClasses = [ c, 'leaf-modal', (isExporting ? 'exporting' : '') ];
         const anyEnabled = !!csv || !!redCap;
         const redcapSelected = selected === opts.redcap;
@@ -54,7 +54,7 @@ export default class ExportDataModal extends React.PureComponent<Props, State> {
             <Modal isOpen={show} className={modalClasses.join(' ')} backdrop={true} size="lg">
                 <ModalHeader>Export Data</ModalHeader>
                 <ModalBody>
-                    {redCap.enabled &&
+                    {enabled &&
                     <Row>
                         <Col className={`${c}-options`} md={3}>
                             {redCap.enabled &&

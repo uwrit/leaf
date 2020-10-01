@@ -10,6 +10,7 @@ import ExportState from '../models/state/Export';
 
 export function defaultExportState(): ExportState {
     return {
+        enabled: false,
         isComplete: false,
         isErrored: false,
         isExporting: false,
@@ -49,6 +50,7 @@ export const dataExport = (state: ExportState = defaultExportState(), action: Ex
             });
         case EXPORT_SET_OPTIONS:
             return Object.assign({}, state, {
+                enabled: (action.exportOptions!.redCap.enabled || action.exportOptions!.csv.enabled),
                 csv: action.exportOptions!.csv,
                 redCap: action.exportOptions!.redCap
             });

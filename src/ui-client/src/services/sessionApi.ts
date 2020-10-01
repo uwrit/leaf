@@ -162,5 +162,17 @@ const getStoredSessionObject = (state: AppState): StoredSessionState => {
     };
 };
 
+/**
+ * Add a custom CSS file by filename specified.
+ */
+const addCssFile = (filename: string) => {
+    const head = document.getElementsByTagName('head')[0];
+    const style = document.createElement('link');
+    style.href = filename;
+    style.type = 'text/css';
+    style.rel = 'stylesheet';
+    head.append(style);
+};
+
 const getSessionStorageKey = (state: AppState) => `__leaf_session_v${state.auth.config!.version}_${window.location.pathname}__`;
 const getSessionRetryKey = () => `__leaf_session_retry__`;
