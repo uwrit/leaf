@@ -151,7 +151,7 @@ class PatientList extends React.PureComponent<Props, State> {
                     </Col>
                     <Col md={4}>
                         <div className={`${c}-export-button-container`}>
-                            {exportState.redCap.enabled && patientList.totalPatients > 0 &&
+                            {exportState.enabled && patientList.totalPatients > 0 &&
                             <div className="leaf-button-main" onClick={this.handleExportClick}>
                                 <span><GoCloudDownload className={`${c}-export-button`}/>Export Data</span>
                             </div>

@@ -36,6 +36,7 @@ export interface ExportOptionsDTO {
 }
 
 export default interface ExportState {
+    enabled: boolean;
     isComplete: boolean;
     isErrored: boolean;
     isExporting: boolean;
