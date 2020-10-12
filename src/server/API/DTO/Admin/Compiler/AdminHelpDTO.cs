@@ -4,12 +4,14 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using Model.Admin.Compiler;
 
 namespace API.DTO.Admin.Compiler
 {
-    public class AdminHelpCreateDTO
+    public class AdminHelpCreateUpdateDTO
     {
+        public int PageId { get; set; }
         public string Title { get; set; }
         public string Category { get; set; }
         public int OrderId { get; set; }
@@ -18,10 +20,11 @@ namespace API.DTO.Admin.Compiler
         public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
 
-        public AdminHelpCreateDTO() { }
+        public AdminHelpCreateUpdateDTO() { }
 
-        public AdminHelpCreateDTO(AdminHelpPageCreateSql p)
+        public AdminHelpCreateUpdateDTO(AdminHelpPageCreateUpdateSql p)
         {
+            PageId = p.PageId;
             Title = p.Title;
             Category = p.Category;
             OrderId = p.OrderId;
@@ -34,27 +37,19 @@ namespace API.DTO.Admin.Compiler
 
     public class AdminHelpContentDTO
     {
-        public int PageId { get; set; }
         public string Title { get; set; }
-        public string Category { get; set; }
-        public int OrderId { get; set; }
-        public string Type { get; set; }
-        public string TextContent { get; set; }
-        public byte[] ImageContent { get; set; }
-        public string ImageId { get; set; }
+
+        public HelpPageCategory Category { get; set; }
+
+        public IEnumerable<HelpPageContent> Content { get; set; }
 
         public AdminHelpContentDTO() { }
 
         public AdminHelpContentDTO(AdminHelpPageContentSql p)
         {
-            PageId = p.PageId;
             Title = p.Title;
             Category = p.Category;
-            OrderId = p.OrderId;
-            Type = p.Type;
-            TextContent = p.TextContent;
-            ImageContent = p.ImageContent;
-            ImageId = p.ImageId;
+            Content = p.Content;
         }
     }
 }

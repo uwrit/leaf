@@ -4,15 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using API.DTO.Admin;
 using Model.Authorization;
 using Model.Error;
 using Model.Admin.Compiler;
+using API.DTO.Admin;
 using API.DTO.Admin.Compiler;
 
 namespace API.Controllers.Admin
@@ -49,7 +51,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<AdminHelpPageContentSql>> Update(int id, [FromBody] AdminHelpPageContentSql p)
+        public async Task<ActionResult<AdminHelpPageCreateUpdateSql>> Update(int id, [FromBody] AdminHelpPageCreateUpdateSql p)
         {
             try
             {
@@ -59,12 +61,12 @@ namespace API.Controllers.Admin
                 }
 
                 var updated = await manager.UpdateAsync(p);
-                return Ok(new AdminHelpContentDTO(updated));
+                return Ok(new AdminHelpCreateUpdateDTO(updated));
             }
             catch (ArgumentException ae)
             {
                 logger.LogError("Invalid update help page. Page:{@Page} Error:{Error}", p, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageContentSql)} is missing or incomplete."));
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCreateUpdateSql)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -78,17 +80,17 @@ namespace API.Controllers.Admin
         }
 
         [HttpPost]
-        public async Task<ActionResult<AdminHelpPageCreateSql>> Create([FromBody] AdminHelpPageCreateSql p)
+        public async Task<ActionResult<AdminHelpPageCreateUpdateSql>> Create([FromBody] AdminHelpPageCreateUpdateSql p)
         {
             try
             {
                 var created = await manager.CreateAsync(p);
-                return Ok(new AdminHelpCreateDTO(created));
+                return Ok(new AdminHelpCreateUpdateDTO(created));
             }
             catch (ArgumentException ae)
             {
                 logger.LogError("Invalid create help page. Page:{@Page} Error:{Error}", p, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCreateSql)} is missing or incomplete."));
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCreateUpdateSql)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -101,8 +103,8 @@ namespace API.Controllers.Admin
             }
         }
 
-        // Deletes help page and content
-        [HttpDelete("{id}")]
+        //Deletes help page and content
+       [HttpDelete("{id}")]
         public async Task<ActionResult<int?>> Delete(int id)
         {
             try

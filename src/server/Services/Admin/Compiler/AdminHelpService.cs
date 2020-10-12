@@ -3,15 +3,16 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
-using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 using Dapper;
 using Model.Admin.Compiler;
 using Model.Authorization;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Services.Admin.Compiler
 {
@@ -42,24 +43,24 @@ namespace Services.Admin.Compiler
             {
                 await cn.OpenAsync();
 
-                var page = await cn.QueryFirstOrDefaultAsync<AdminHelpPageContentSql>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.Get,
-                    new { id },
+                    new { id, user = user.UUID },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return page;
+                return AdminHelpReader.Read(grid);
             }
         }
 
-        public async Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p)
+        public async Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var created = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateSql>(
+                var created = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
                     Sql.Create,
                     new
                     {
@@ -79,13 +80,14 @@ namespace Services.Admin.Compiler
                 return created;
             }
         }
-        public async Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p)
+
+        public async Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageContentSql>(
+                var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
                     Sql.Update,
                     new
                     {
@@ -106,6 +108,7 @@ namespace Services.Admin.Compiler
                 return updated;
             }
         }
+
         public async Task<int?> DeleteAsync(int id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -114,13 +117,46 @@ namespace Services.Admin.Compiler
 
                 var deleted = await cn.QueryFirstOrDefaultAsync<int?>(
                     Sql.Delete,
-                    new { id },
+                    new { id, user = user.UUID },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
                 return deleted;
             }
+        }
+    }
+
+    static class AdminHelpReader
+    {
+        public static AdminHelpPageContentSql Read(SqlMapper.GridReader grid)
+        {
+            var page = grid.ReadFirstOrDefault<HelpPageRecord>();
+            if (page == null)
+            {
+                return null;
+            }
+
+            var category = grid.ReadSingle<HelpPageCategory>();
+
+            var content = grid.Read<HelpPageContent>();
+
+            return page.Content(category, content);
+        }
+    }
+
+    class HelpPageRecord
+    {
+        public string Title { get; set; }
+
+        public AdminHelpPageContentSql Content(HelpPageCategory category = null, IEnumerable<HelpPageContent> content = null)
+        {
+            return new AdminHelpPageContentSql
+            {
+                Title = Title,
+                Category = category,
+                Content = content ?? new List<HelpPageContent>()
+            };
         }
     }
 }

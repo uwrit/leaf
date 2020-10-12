@@ -19,8 +19,8 @@ namespace Model.Admin.Compiler
         public interface IAdminHelpPageService
         {
             Task<AdminHelpPageContentSql> GetAsync(int id);
-            Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p);
-            Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p);
+            Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p);
+            Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p);
             Task<int?> DeleteAsync(int id);
         }
 
@@ -41,7 +41,7 @@ namespace Model.Admin.Compiler
             return await svc.GetAsync(id);
         }
 
-        public async Task<AdminHelpPageCreateSql> CreateAsync(AdminHelpPageCreateSql p)
+        public async Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p)
         {
             ThrowIfCreateInvalid(p);
 
@@ -59,9 +59,9 @@ namespace Model.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageContentSql> UpdateAsync(AdminHelpPageContentSql p)
+        public async Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p)
         {
-            ThrowIfContentInvalid(p);
+            ThrowIfCreateInvalid(p);
 
             try
             {
@@ -94,13 +94,7 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfCreateInvalid(AdminHelpPageCreateSql c)
-        {
-            Ensure.NotNull(c, nameof(c));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfContentInvalid(AdminHelpPageContentSql c)
+        void ThrowIfCreateInvalid(AdminHelpPageCreateUpdateSql c)
         {
             Ensure.NotNull(c, nameof(c));
         }

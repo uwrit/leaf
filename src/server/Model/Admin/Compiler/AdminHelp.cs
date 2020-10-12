@@ -4,11 +4,13 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminHelpPageCreateSql
+    public class AdminHelpPageCreateUpdateSql
     {
+        public int PageId { get; set; }
         public string Title { get; set; }
         public string Category { get; set; }
         public int OrderId { get; set; }
@@ -20,9 +22,21 @@ namespace Model.Admin.Compiler
 
     public class AdminHelpPageContentSql
     {
-        public int PageId { get; set; }
         public string Title { get; set; }
+
+        public HelpPageCategory Category { get; set; }
+
+        public IEnumerable<HelpPageContent> Content { get; set; }
+    }
+
+    public class HelpPageCategory
+    {
         public string Category { get; set; }
+    }
+
+    public class HelpPageContent
+    {
+        public int PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
