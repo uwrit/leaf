@@ -21,6 +21,7 @@ import { queries } from './queries';
 import { session } from './session';
 import { admin } from './admin/admin';
 import { datasets } from './datasets';
+import { helpPages } from './helpPages';
 
 const rootReducer = combineReducers({
     admin,
@@ -32,11 +33,12 @@ const rootReducer = combineReducers({
     dataImport,
     datasets,
     generalUi,
+    helpPages,
     map,
     panelFilters,
     panels,
-    responders,
     queries,
+    responders,
     session
 });
 

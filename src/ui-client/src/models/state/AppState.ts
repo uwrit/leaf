@@ -20,6 +20,7 @@ import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 import ImportState from "./Import";
+import { HelpPages, HelpPageContent } from "../Help/HelpPages";
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -62,6 +63,11 @@ export interface DatasetsState {
     selected: string;
 }
 
+export interface HelpPagesState {
+    pages: HelpPages[];
+    pageContent: HelpPageContent;
+}
+
 export interface AppState {
     admin?: AdminState;
     auth: AuthorizationState;
@@ -71,11 +77,12 @@ export interface AppState {
     dataExport: ExportState;
     dataImport: ImportState;
     datasets: DatasetsState;
-    panelFilters: PanelFilter[];
     generalUi: GeneralUiState;
+    help: HelpPagesState;
     map: MapState;
-    responders: NetworkResponderMap;
+    panelFilters: PanelFilter[];
     panels: Panel[];
     queries: SavedQueriesState;
+    responders: NetworkResponderMap;
     session: SessionState;
 }

@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, LabelList, Tooltip, Legend, LegendPayload } from 'recharts';
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, LabelList, Tooltip, Legend } from 'recharts';
 import { visualizationConfig } from '../../config/visualization';
 import { VariableBucketSet } from '../../models/cohort/DemographicDTO';
 

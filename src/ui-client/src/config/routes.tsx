@@ -11,7 +11,7 @@ import { MdPerson, MdHelp } from 'react-icons/md'
 import { FindPatients } from '../components/FindPatients/FindPatients';
 import LeafMap from '../containers/Map/LeafMap';
 import PatientList from '../containers/PatientList/PatientList';
-import SidebarHelp from '../containers/SidebarHelp/SidebarHelp';
+import Help from '../containers/Help/Help';
 import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AppConfig } from '../models/Auth';
@@ -115,9 +115,9 @@ const help = (): RouteConfig => {
     return {
         display: 'Help',
         icon: <MdHelp />,
-        index: Routes.SidebarHelp,
+        index: Routes.Help,
         path: '/help',
-        render: () => <SidebarHelp />
+        render: () => <Help />
     };
 };
 
@@ -130,6 +130,9 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
     if (client.sidebarHelp.enabled) { routes.push(help()); }
+    // why is sidebarHelp okay? where do i change the file?
+
+    // if (client.helpPages.enabled) { routes.push(help()); }
 
     return routes;
 };

@@ -5,11 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-/* Loading icon */
-.sidebarhelp-loading {
-    width: 100%;
+.pages-searchbar {
+    display: block;
+    margin: auto;
+    margin-top: 4%;
+    max-width: 75%;
 }
 
-.sidebar-help-searchbar {
+.pages-category {
     margin-top: 4%;
+    /* margin-left: 40px; */
 }

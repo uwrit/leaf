@@ -41,7 +41,9 @@ export interface ClientOptions {
     visualize: VisualizeOptions;
     patientList: PatientListOptions;
     help: HelpOptions;
-    sidebarHelp: SidebarHelpOptions;
+    helpPages: HelpPagesOptions;
+    // edit
+    sidebarHelp: HelpPagesOptions;
 }
 
 interface MapOptions {
@@ -65,7 +67,7 @@ interface HelpOptions {
     uri?: string;
 }
 
-interface SidebarHelpOptions {
+interface HelpPagesOptions {
     enabled: boolean;
 }
 
