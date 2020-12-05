@@ -24,7 +24,7 @@ import { defaultPanelState } from '../reducers/panels';
 import { defaultQueriesState } from '../reducers/queries';
 import { defaultSessionState } from '../reducers/session';
 import { defaultDatasetsState } from '../reducers/datasets';
-import { defaultHelpPagesState } from '../reducers/helpPages';
+import { defaultHelpPagesState } from '../reducers/help';
 import configureStore from '../store/configureStore';
 import App from './App';
 

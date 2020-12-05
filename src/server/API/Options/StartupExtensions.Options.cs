@@ -249,7 +249,7 @@ namespace API.Options
                 opts.Help.URI = config.GetValue<string>(Config.Client.Help.URI);
 
                 // Sidebar Help
-                opts.SidebarHelp.Enabled = config.GetValue<bool>(Config.Client.SidebarHelp.Enabled);
+                opts.HelpPages.Enabled = config.GetValue<bool>(Config.Client.HelpPages.Enabled);
             });
 
             return services;

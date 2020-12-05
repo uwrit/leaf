@@ -24,4 +24,10 @@ namespace Model.Compiler
         public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
     }
+
+    public class HelpPageCategorySql
+    {
+        public int Id { get; set; }
+        public string Category { get; set; }
+    }
 }

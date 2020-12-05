@@ -21,6 +21,7 @@ namespace Services.Help
     public class HelpPageService : HelpPages.IHelpPages
     {
         const string getAllHelpPages = @"app.sp_GetHelpPages";
+        const string getHelpPageCategories = @"app.sp_GetHelpCategories";
         const string getPageContentById = @"app.sp_GetHelpPageContentByPageId";
 
         readonly AppDbOptions opts;
@@ -46,6 +47,25 @@ namespace Services.Help
                     Id = p.Id,
                     CategoryId = p.CategoryId,
                     Title = p.Title
+                });
+            }
+        }
+
+        public async Task<IEnumerable<HelpPageCategorySql>> GetHelpPageCategoriesAsync()
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+                var cat = await cn.QueryAsync<HelpPageCategorySql>(
+                    getHelpPageCategories,
+                    commandTimeout: opts.DefaultTimeout,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return cat.Select(c => new HelpPageCategorySql
+                {
+                    Id = c.Id,
+                    Category = c.Category
                 });
             }
         }

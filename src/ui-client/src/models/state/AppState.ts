@@ -20,7 +20,7 @@ import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 import ImportState from "./Import";
-import { HelpPages, HelpPageContent } from "../Help/HelpPages";
+import { HelpPagesState } from './HelpState';
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -61,11 +61,6 @@ export interface DatasetsState {
     displayOrder: Map<string, PatientListDatasetQueryIndex>;
     searchTerm: string;
     selected: string;
-}
-
-export interface HelpPagesState {
-    pages: HelpPages[];
-    pageContent: HelpPageContent;
 }
 
 export interface AppState {

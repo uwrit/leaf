@@ -11,9 +11,10 @@ export interface HelpPages {
     title: string;
 }
 
-// export interface HelpPagesDTO extends HelpPages {
-
-// }
+export interface HelpPageCategory {
+    id: number;
+    category: string;
+}
 
 export interface HelpPageContent {
     id: number;
@@ -24,27 +25,3 @@ export interface HelpPageContent {
     imageContent: Uint16Array;
     imageId: string;
 }
-
-// export interface HelpPageContentDTO extends HelpPageContent {
-
-// }
-
-// export const HelpPagesDTO = (helpPages: HelpPages): HelpPagesDTO => {
-//     return {
-//         id: helpPages.id,
-//         categoryId: helpPages.categoryId,
-//         title: helpPages.title
-//     }
-// }
-
-// export const HelpPageContentDTO = (helpPageContent: HelpPageContent): HelpPageContentDTO => {
-//     return {
-//         id: helpPageContent.id,
-//         pageId: helpPageContent.pageId,
-//         orderId: helpPageContent.orderId,
-//         type: helpPageContent.type,
-//         textContent: helpPageContent.textContent,
-//         imageContent: helpPageContent.imageContent,
-//         imageId: helpPageContent.imageId
-//     }
-// }

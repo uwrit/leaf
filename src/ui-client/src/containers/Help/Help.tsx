@@ -7,17 +7,14 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import Pages from '../../components/Help/Pages';
-import { HelpPages, HelpPageContent } from '../../models/Help/HelpPages';
-import { HelpPagesState } from '../../models/state/AppState';
+import { Pages } from '../../components/Help/Pages';
+import { AppState } from '../../models/state/AppState';
+import { HelpPagesState } from '../../models/state/HelpState';
 
-interface OwnProps {
-    
-}
+interface OwnProps { }
 
 interface StateProps {
-    pages: HelpPages[];
-    pageContent: HelpPageContent;
+    helpPages: HelpPagesState;
 }
 
 interface DispatchProps {
@@ -27,24 +24,24 @@ interface DispatchProps {
 type Props = StateProps & OwnProps & DispatchProps;
 
 export class Help extends React.PureComponent<Props> {
+
     public render() {
-        const { dispatch } = this.props;
+        const { dispatch, helpPages } = this.props;
+
         return (
-            <Pages dispatch={dispatch} />
+            <Pages dispatch={dispatch} data={helpPages} />
         );
     };
 };
 
-const mapStateToProps = (state: HelpPagesState, ownProps: OwnProps): StateProps => {
+const mapStateToProps = (state: AppState): StateProps => {
     return {
-        pages: state.pages,
-        pageContent: state.pageContent!
+        helpPages: state.help
     };
 }
 
-const mapDispatchToProps = (dispatch: any, ownProps: OwnProps) : DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return { dispatch };
 }
 
-export default connect<StateProps, DispatchProps, OwnProps, HelpPagesState>
-    (mapStateToProps, mapDispatchToProps)(Help)
+export default connect(mapStateToProps, mapDispatchToProps)(Help)

@@ -6,67 +6,65 @@
  */ 
 
 import React from 'react';
-import { Container, Input, Row } from 'reactstrap';
-import { fetchSingleHelpPage } from '../../actions/helpPages';
+import { Container, Input, Row, Col, Table } from 'reactstrap';
+import { Page } from './Page';
+import { Category } from './Category';
 import './Pages.css';
+import { HelpPagesState, HelpPagesLoadState } from '../../models/state/HelpState';
+import { HelpPages } from '../../models/Help/HelpPages';
 
 interface Props {
     dispatch: any;
-    // pages: HelpPages[];
-    // pageContent: HelpPageContent;
-    // handleClick: () => any;
+    data: HelpPagesState;
 }
 
 interface State {
-    show: boolean;
+    
 }
 
-export default class Pages extends React.Component<Props, State> {
+export class Pages extends React.Component<Props, State> {
 
+    private className = "pages";
+    
     constructor(props: Props) {
         super(props);
-        this.state = {
-            show: false
-        }
+        this.state = { }
     }
 
     public render() {
-        // const { pageContent } = this.props;
-        const { show } = this.state;
-        // const content = this.getContent()
+        const { data } = this.props;
+        const c = this.className;
+
         return (
-            <Container fluid={true}>
+            <Container fluid={true} className={c}>
+
                 <Row>
-                    <Input className="pages-searchbar" type="text" name="pages-search" id="pages-search" placeholder="Search..." bsSize="lg" />
+                    <Input className={`${c}-searchbar`} type="text" name="pages-search" id="pages-search" placeholder="Search..." bsSize="lg" />
                 </Row>
-            
-                <Row className="pages-category">
-                    <div className="pages"> {/* TODO: change className to something else */}
-                        <button type="submit" onClick={this.handleClick}>Get Help Pages</button>
-                        {show && "content"}
-                    </div>
+
+                <Row className={`${c}-category`}>
+                    {data.state === HelpPagesLoadState.LOADED &&
+                        data.pageCategory.map(cat =>
+                            <div>
+                                <Col>
+                                {/* add Category.css file so that you can change font size: div.a { font-size: 15px; }  */}
+                                    <Category key={cat.id} category={cat} />
+                                </Col>
+                                
+                                <Col className={`${c}-page`}>
+                                    {data.pages.map(p =>
+                                        p.categoryId === cat.id &&
+                                            <Page key={p.id} page={p} />
+                                        )
+                                    }
+                                </Col>
+                            </div>
+                        )
+                    }
                 </Row>
+
             </Container>
         );
     }
-
-    private handleClick = () => {
-        // const { dispatch } = this.props;
-        this.setState({
-            show: !this.state.show
-        })
-        // dispatch(fetchSingleHelpPage(1));
-    };
-
-    private getContent = () => {
-        const { dispatch } = this.props;
-        // const pageId = pageContent.pageId;
-        // const { pageId } = pageContent!;
-        // console.log("got called");
-        dispatch(fetchSingleHelpPage(1));
-        console.log(dispatch(fetchSingleHelpPage(1)));
-        // return pageContent
-    }
-
 }
 

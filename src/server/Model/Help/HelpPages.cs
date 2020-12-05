@@ -17,6 +17,7 @@ namespace Model.Help
         {
             Task<IEnumerable<HelpPageSql>> GetAllPagesAsync();
             Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid);
+            Task<IEnumerable<HelpPageCategorySql>> GetHelpPageCategoriesAsync();
         }
 
         readonly IHelpPages help;
@@ -38,6 +39,21 @@ namespace Model.Help
             catch (DbException de)
             {
                 log.LogError("Failed to get all help pages. Error:{Error}", de.Message);
+                de.MapThrow();
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<HelpPageCategorySql>> GetHelpPageCategoriesAsync()
+        {
+            log.LogInformation("Getting all help categories.");
+            try
+            {
+                return await help.GetHelpPageCategoriesAsync();
+            }
+            catch (DbException de)
+            {
+                log.LogError("Failed to get help page categories. Error:{Error}", de.Message);
                 de.MapThrow();
                 throw;
             }

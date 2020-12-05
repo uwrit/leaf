@@ -21,6 +21,7 @@ import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
+import { loadHelpPagesAndCategoriesIfNeeded } from './helpPages';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 import { getAllMetdata } from '../services/dataImport';
@@ -92,6 +93,7 @@ export const handleSidebarTabClick = (route: Routes) => {
             dispatch(setRoute(route));
         } else if (route === Routes.Help) {
             dispatch(setRoute(route));
+            dispatch(loadHelpPagesAndCategoriesIfNeeded());
         } else if (route === Routes.AdminPanel) {
             dispatch(setRoute(route));
             dispatch(loadAdminPanelDataIfNeeded());

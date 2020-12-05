@@ -48,6 +48,26 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("category")]
+        public async Task<ActionResult<IEnumerable<HelpPageCategoryDTO>>> GetHelpPageCategories(
+            [FromServices] HelpPages helpPage)
+        {
+            try
+            {
+                var cat = await helpPage.GetHelpPageCategoriesAsync();
+                return Ok(cat.Select(c => new HelpPageCategoryDTO(c)));
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
+            }
+            catch (Exception e)
+            {
+                log.LogError("Failed to fetch help page categories. Error:{Error}", e.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpGet("{pageid}/content")]
         public async Task<ActionResult<IEnumerable<HelpPageContentDTO>>> GetHelpPageContent(
             int pageid,

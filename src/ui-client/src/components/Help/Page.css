@@ -5,18 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.pages-searchbar {
-    margin: auto;
-    margin-top: 7%;
-    max-width: 75%;
-}
-
-.pages-category {
-    margin-top: 7%;
-    padding-left: 13%;
-    padding-right: 13%;
-}
-
-.pages-page {
-    margin-top: 20px;
+ .page {
+    margin-top: 10px;
 }

@@ -5,18 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.pages-searchbar {
-    margin: auto;
-    margin-top: 7%;
-    max-width: 75%;
+import { HelpPages, HelpPageContent, HelpPageCategory } from "../Help/HelpPages";
+
+export enum HelpPagesLoadState {
+    NOT_LOADED = 1,
+    LOADING = 2,
+    LOADED = 3,
+    ERROR = 4
 }
 
-.pages-category {
-    margin-top: 7%;
-    padding-left: 13%;
-    padding-right: 13%;
-}
-
-.pages-page {
-    margin-top: 20px;
+export interface HelpPagesState {
+    pages: HelpPages[];
+    pageCategory: HelpPageCategory[];
+    pageContent: HelpPageContent[];
+    state: HelpPagesLoadState;
 }

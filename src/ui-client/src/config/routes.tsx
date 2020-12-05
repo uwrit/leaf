@@ -129,10 +129,7 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
     if (client.visualize.enabled)   { routes.push(visualize()); }
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
-    if (client.sidebarHelp.enabled) { routes.push(help()); }
-    // why is sidebarHelp okay? where do i change the file?
-
-    // if (client.helpPages.enabled) { routes.push(help()); }
+    if (client.helpPages.enabled)   { routes.push(help()); }
 
     return routes;
 };

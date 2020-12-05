@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { HelpPageContent } from '../models/Help/HelpPages';
+import { HelpPageContent, HelpPages, HelpPageCategory } from '../models/Help/HelpPages';
 import { HttpFactory } from './HttpFactory';
 
 /*
@@ -24,8 +24,17 @@ const makeRequest = async (state: AppState, requestString: string, requestParams
 /*
  * Fetch help pages.
  */
-export const fetchHelpPages = (state: AppState) => {
-    return makeRequest(state, 'api/help');
+export const fetchHelpPages = async (state: AppState) => {
+    const pages = await makeRequest(state, 'api/help');
+    return pages.data as HelpPages[];
+};
+
+/*
+ * Fetch help page categories.
+ */
+export const fetchHelpPageCategories = async (state: AppState) => {
+    const cat = await makeRequest(state, 'api/help/category');
+    return cat.data as HelpPageCategory[];
 };
 
 /*
@@ -33,5 +42,5 @@ export const fetchHelpPages = (state: AppState) => {
  */
 export const fetchHelpPageContent = async (state: AppState, pageId: number) => {
     const content = await makeRequest(state, `api/help/${pageId.toString()}/content`);
-    return content.data as HelpPageContent;
+    return content.data as HelpPageContent[];
 };

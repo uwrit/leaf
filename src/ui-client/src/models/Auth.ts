@@ -42,8 +42,6 @@ export interface ClientOptions {
     patientList: PatientListOptions;
     help: HelpOptions;
     helpPages: HelpPagesOptions;
-    // edit
-    sidebarHelp: HelpPagesOptions;
 }
 
 interface MapOptions {
