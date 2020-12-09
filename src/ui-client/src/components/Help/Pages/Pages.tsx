@@ -6,33 +6,25 @@
  */ 
 
 import React from 'react';
-import { Container, Input, Row, Col, Table } from 'reactstrap';
-import { Page } from './Page';
-import { Category } from './Category';
+import { Container, Input, Row, Col } from 'reactstrap';
+import { Category } from '../Category/Category';
+import { Page } from '../Page/Page';
+import { HelpPagesState, HelpPageLoadState } from '../../../models/state/HelpState';
 import './Pages.css';
-import { HelpPagesState, HelpPagesLoadState } from '../../models/state/HelpState';
-import { HelpPages } from '../../models/Help/HelpPages';
+
 
 interface Props {
     dispatch: any;
-    data: HelpPagesState;
+    handleHelpPageSelected: (pageTitle: string) => any;
+    pages: HelpPagesState;
 }
 
-interface State {
-    
-}
-
-export class Pages extends React.Component<Props, State> {
+export class Pages extends React.Component<Props> {
 
     private className = "pages";
-    
-    constructor(props: Props) {
-        super(props);
-        this.state = { }
-    }
 
     public render() {
-        const { data } = this.props;
+        const { dispatch, handleHelpPageSelected, pages } = this.props;
         const c = this.className;
 
         return (
@@ -43,18 +35,21 @@ export class Pages extends React.Component<Props, State> {
                 </Row>
 
                 <Row className={`${c}-category`}>
-                    {data.state === HelpPagesLoadState.LOADED &&
-                        data.pageCategory.map(cat =>
-                            <div>
+                    {pages.state === HelpPageLoadState.LOADED &&
+                        pages.pageCategory.map((cat, i) =>
+                            <div key={i}>
                                 <Col>
-                                {/* add Category.css file so that you can change font size: div.a { font-size: 15px; }  */}
                                     <Category key={cat.id} category={cat} />
                                 </Col>
                                 
                                 <Col className={`${c}-page`}>
-                                    {data.pages.map(p =>
-                                        p.categoryId === cat.id &&
-                                            <Page key={p.id} page={p} />
+                                    {pages.pages.map(p =>
+                                        (p.categoryId === cat.id) &&
+                                            <Page key={p.id}
+                                                  dispatch={dispatch}
+                                                  handleHelpPageSelected={handleHelpPageSelected}
+                                                  page={p}
+                                            />
                                         )
                                     }
                                 </Col>
@@ -65,6 +60,5 @@ export class Pages extends React.Component<Props, State> {
 
             </Container>
         );
-    }
-}
-
+    };
+};

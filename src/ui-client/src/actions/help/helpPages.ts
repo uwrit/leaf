@@ -5,15 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { Dispatch } from 'redux';
-import { AppState } from '../models/state/AppState';
-import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
-import { showInfoModal, setNoClickModalState } from "./generalUi";
-import { HelpPagesLoadState } from '../models/state/HelpState';
-import { HelpPages, HelpPageContent, HelpPageCategory } from '../models/Help/HelpPages';
-import { fetchHelpPages, fetchHelpPageContent, fetchHelpPageCategories } from '../services/helpPagesApi';
+import { AppState } from '../../models/state/AppState';
+import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
+import { showInfoModal, setNoClickModalState } from "../generalUi";
+import { HelpPageLoadState } from '../../models/state/HelpState';
+import { HelpPages, HelpPageCategory } from '../../models/Help/HelpPages';
+import { fetchHelpPages, fetchHelpPageCategories } from '../../services/helpPagesApi';
 
-export const SET_HELP_PAGE = 'SET_HELP_PAGE';
 export const SET_HELP_PAGES = 'SET_HELP_PAGES';
 export const SET_HELP_PAGE_CATEGORIES = 'SET_HELP_PAGE_CATEGORIES';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
@@ -21,8 +19,7 @@ export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
 export interface HelpPagesAction {
     pages?: HelpPages[];
     pageCategory?: HelpPageCategory[];
-    pageContent?: HelpPageContent[];
-    state?: HelpPagesLoadState;
+    state?: HelpPageLoadState;
     type: string;
 }
 
@@ -34,7 +31,7 @@ export interface HelpPagesAction {
 export const loadHelpPagesAndCategoriesIfNeeded = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        if (state.help.state === HelpPagesLoadState.NOT_LOADED) {
+        if (state.help.state === HelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
@@ -53,7 +50,7 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                 /*
                  * Finish.
                  */
-                dispatch(setHelpPageLoadState(HelpPagesLoadState.LOADED));
+                dispatch(setHelpPageLoadState(HelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
                 const info: InformationModalState = {
@@ -68,50 +65,8 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
     };
 };
 
-/*
- * Fetch all help pages.
- */
-export const fetchAllHelpPages = () => {
-    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        try {
-            const response = await fetchHelpPages(getState());
-            dispatch(addHelpPages(response));
-        } catch (err) {
-            console.log(err);
-        }
-    };
-};
-
-/*
- * Fetch help page categories.
- */
-export const fetchAllHelpPageCategories = () => {
-    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        try {
-            const response = await fetchHelpPageCategories(getState());
-            dispatch(addHelpPageCategories(response));
-        } catch (err) {
-            console.log(err);
-        }
-    };
-};
-
-/*
- * Fetch a single help page and its content.
- */
-export const fetchSingleHelpPage = (pageId: number) => {
-    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        try {
-            const response = await fetchHelpPageContent(getState(), pageId);
-            dispatch(addHelpPage(response));
-        } catch (err) {
-            console.log(err);
-        }
-    };
-};
-
 // Synchronous actions
-export const setHelpPageLoadState = (state: HelpPagesLoadState): HelpPagesAction => {
+export const setHelpPageLoadState = (state: HelpPageLoadState): HelpPagesAction => {
     return {
         state,
         type: SET_HELP_PAGE_LOAD_STATE
@@ -125,16 +80,9 @@ export const addHelpPages = (pages: HelpPages[]): HelpPagesAction => {
     };
 };
 
-export const addHelpPage = (page: HelpPageContent[]): HelpPagesAction => {
+export const addHelpPageCategories = (pageCategory: HelpPageCategory[]): HelpPagesAction => {
     return {
-        pageContent: page,
-        type: SET_HELP_PAGE
-    };
-};
-
-export const addHelpPageCategories = (category: HelpPageCategory[]): HelpPagesAction => {
-    return {
-        pageCategory: category,
+        pageCategory,
         type: SET_HELP_PAGE_CATEGORIES
     };
 };

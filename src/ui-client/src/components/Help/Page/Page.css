@@ -5,18 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.pages-searchbar {
-    margin: auto;
-    margin-top: 7%;
-    max-width: 75%;
+
+/* Can solve alignment using below css, but what's a better way? Or is this fine? */
+
+.page {
+    margin-bottom: 10px;
 }
 
-.pages-category {
-    margin-top: 7%;
-    padding-left: 13%;
-    padding-right: 13%;
-}
-
-.pages-page {
-    margin-top: 20px;
+.page button {
+    display: contents;
 }

@@ -3,8 +3,20 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
 
- .page {
-    margin-top: 10px;
+.pages-searchbar {
+    margin: auto;
+    margin-top: 7%;
+    max-width: 75%;
+}
+
+.pages-category {
+    margin-top: 10%;
+    padding-left: 13%;
+    padding-right: 13%;
+}
+
+.pages-page {
+    margin-top: 20px;
 }

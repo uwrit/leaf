@@ -7,16 +7,21 @@
 
 import { HelpPages, HelpPageContent, HelpPageCategory } from "../Help/HelpPages";
 
-export enum HelpPagesLoadState {
+export enum HelpPageLoadState {
     NOT_LOADED = 1,
     LOADING = 2,
     LOADED = 3,
     ERROR = 4
 }
 
+export interface HelpPageContentState {
+    content: HelpPageContent[];
+    state: HelpPageLoadState;
+}
+
 export interface HelpPagesState {
     pages: HelpPages[];
     pageCategory: HelpPageCategory[];
-    pageContent: HelpPageContent[];
-    state: HelpPagesLoadState;
+    pageContent: HelpPageContentState;
+    state: HelpPageLoadState;
 }

@@ -6,7 +6,8 @@
  */ 
 
 import React from 'react';
-import { HelpPageCategory } from '../../models/Help/HelpPages';
+import { HelpPageCategory } from '../../../models/Help/HelpPages';
+import './Category.css';
 
 interface Props {
     category: HelpPageCategory;
@@ -15,6 +16,7 @@ interface Props {
 interface State { }
 
 export class Category extends React.Component<Props, State> {
+    private className = "category"
 
     constructor(props: Props) {
         super(props);
@@ -23,10 +25,11 @@ export class Category extends React.Component<Props, State> {
 
     public render() {
         const { category } = this.props;
+        const c = this.className;
 
         return (
-            <div>
-                <div><b>{category.category.toUpperCase()}</b></div>
+            <div className={c}>
+                <b>{category.category.toUpperCase()}</b>
             </div>
         )
     }

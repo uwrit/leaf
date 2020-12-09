@@ -68,7 +68,7 @@ namespace Model.Help
             }
             catch (DbException de)
             {
-                log.LogError("Failed to get all help pages. PageId:{PageId} Error:{Error}", pageid, de.Message);
+                log.LogError("Failed to get help page content. PageId:{PageId} Error:{Error}", pageid, de.Message);
                 de.MapThrow();
                 throw;
             }

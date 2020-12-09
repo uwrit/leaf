@@ -7,57 +7,91 @@
 
 import {
     SET_HELP_PAGES,
-    SET_HELP_PAGE,
     SET_HELP_PAGE_CATEGORIES,
     SET_HELP_PAGE_LOAD_STATE
-} from '../actions/helpPages';
-import { HelpPagesAction } from '../actions/helpPages';
-import { HelpPagesLoadState, HelpPagesState } from '../models/state/HelpState';
-import { HelpPages, HelpPageContent, HelpPageCategory } from '../models/Help/HelpPages';
+} from '../actions/help/helpPages';
+import {
+    SET_HELP_PAGE_CONTENT,
+    SET_HELP_PAGE_CONTENT_TO_EMPTY,
+    SET_HELP_PAGE_CONTENT_LOAD_STATE
+} from '../actions/help/helpPageContent';
+import { HelpPagesAction } from '../actions/help/helpPages';
+import { HelpPageContentAction } from '../actions/help/helpPageContent';
+import { HelpPageLoadState, HelpPagesState } from '../models/state/HelpState';
 
 export const defaultHelpPagesState = (): HelpPagesState => {
     return {
         pages: [],
         pageCategory: [],
-        pageContent: [],
-        state: HelpPagesLoadState.NOT_LOADED
+        pageContent: {
+            content: [],
+            state: HelpPageLoadState.NOT_LOADED
+        },
+        state: HelpPageLoadState.NOT_LOADED
     }
 };
 
-const setHelpPageLoadState = (state: HelpPagesState, loadState: HelpPagesLoadState): HelpPagesState => {
+const addHelpPages = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
     return Object.assign({}, state, {
-        state: loadState
+        pages: action.pages
     });
 };
 
-const addHelpPages = (state: HelpPagesState, pages: HelpPages[]): HelpPagesState => {
+const addHelpPageCategories = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
     return Object.assign({}, state, {
-        pages: pages
+        pageCategory: action.pageCategory
     });
 };
 
-const addHelpPage = (state: HelpPagesState, content: HelpPageContent[]): HelpPagesState => {
+const setHelpPageLoadState = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
     return Object.assign({}, state, {
-        pageContent: content
+        state: action.state
     });
 };
 
-const addHelpPageCategories = (state: HelpPagesState, category: HelpPageCategory[]): HelpPagesState => {
+const addHelpPageContent = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
     return Object.assign({}, state, {
-        pageCategory: category
+        pageContent: {
+            ...state.pageContent,
+            content: action.content
+        }
     });
 };
 
-export const help = (state: HelpPagesState = defaultHelpPagesState(), action: HelpPagesAction): HelpPagesState => {
+const setHelpPageContentToEmpty = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
+    return Object.assign({}, state, {
+        pageContent: {
+            ...state.pageContent,
+            content: action.content
+        }
+    });
+};
+
+const setHelpPageContentLoadState = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
+    return Object.assign({}, state, {
+        pageContent: {
+            ...state.pageContent,
+            state: action.state
+        }
+    });
+};
+
+type HelpAction = HelpPagesAction | HelpPageContentAction;
+
+export const help = (state: HelpPagesState = defaultHelpPagesState(), action: HelpAction): HelpPagesState => {
     switch (action.type) {
-        case SET_HELP_PAGE_LOAD_STATE:
-            return setHelpPageLoadState(state, action.state!);
         case SET_HELP_PAGES:
-            return addHelpPages(state, action.pages!);
-        case SET_HELP_PAGE:
-            return addHelpPage(state, action.pageContent!);
+            return addHelpPages(state, action);
         case SET_HELP_PAGE_CATEGORIES:
-            return addHelpPageCategories(state, action.pageCategory!);
+            return addHelpPageCategories(state, action);
+        case SET_HELP_PAGE_LOAD_STATE:
+            return setHelpPageLoadState(state, action);
+        case SET_HELP_PAGE_CONTENT:
+            return addHelpPageContent(state, action);
+        case SET_HELP_PAGE_CONTENT_LOAD_STATE:
+            return setHelpPageContentLoadState(state, action);
+        case SET_HELP_PAGE_CONTENT_TO_EMPTY:
+            return setHelpPageContentToEmpty(state, action);
         default:
             return state;
     }
