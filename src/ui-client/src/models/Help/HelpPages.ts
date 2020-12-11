@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export interface HelpPages {
+export interface HelpPage {
     id: number;
     categoryId: number;
     title: string;
@@ -24,4 +24,9 @@ export interface HelpPageContent {
     textContent: string;
     imageContent: Uint16Array;
     imageId: string;
+}
+
+export interface HelpPageCategoryPair {
+    category: string;
+    pages: HelpPage[];
 }

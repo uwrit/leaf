@@ -30,7 +30,7 @@ export interface HelpPageContentAction {
 export const fetchSingleHelpPageContent = (pageId: number) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        if (state.help.pageContent.state === HelpPageLoadState.NOT_LOADED) {
+        if (state.help.content.state === HelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
@@ -38,7 +38,7 @@ export const fetchSingleHelpPageContent = (pageId: number) => {
                  * Fetch help page content.
                  */
                 const content = await fetchHelpPageContent(getState(), pageId);
-                dispatch(addHelpPageContent(content));
+                dispatch(setHelpPageContent(content));
 
                 /*
                  * Finish.
@@ -81,7 +81,7 @@ export const setHelpPageContentLoadState = (state: HelpPageLoadState): HelpPageC
     };
 };
 
-export const addHelpPageContent = (content: HelpPageContent[]): HelpPageContentAction => {
+export const setHelpPageContent = (content: HelpPageContent[]): HelpPageContentAction => {
     return {
         content,
         type: SET_HELP_PAGE_CONTENT

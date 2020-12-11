@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { HelpPageContent, HelpPages, HelpPageCategory } from '../models/Help/HelpPages';
+import { HelpPageContent, HelpPage, HelpPageCategory } from '../models/Help/HelpPages';
 import { HttpFactory } from './HttpFactory';
 
 /*
@@ -26,7 +26,7 @@ const makeRequest = async (state: AppState, requestString: string, requestParams
  */
 export const fetchHelpPages = async (state: AppState) => {
     const pages = await makeRequest(state, 'api/help');
-    return pages.data as HelpPages[];
+    return pages.data as HelpPage[];
 };
 
 /*

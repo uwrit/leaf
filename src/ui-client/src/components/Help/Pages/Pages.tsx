@@ -9,23 +9,22 @@ import React from 'react';
 import { Container, Input, Row, Col } from 'reactstrap';
 import { Category } from '../Category/Category';
 import { Page } from '../Page/Page';
-import { HelpPagesState, HelpPageLoadState } from '../../../models/state/HelpState';
+import { HelpPagesState, HelpPageLoadState, PairedState } from '../../../models/state/HelpState';
 import './Pages.css';
 
 
 interface Props {
+    data: HelpPagesState;
     dispatch: any;
     handleHelpPageSelected: (pageTitle: string) => any;
-    pages: HelpPagesState;
 }
 
 export class Pages extends React.Component<Props> {
-
     private className = "pages";
 
     public render() {
-        const { dispatch, handleHelpPageSelected, pages } = this.props;
         const c = this.className;
+        const { data, dispatch, handleHelpPageSelected } = this.props;
 
         return (
             <Container fluid={true} className={c}>
@@ -35,23 +34,21 @@ export class Pages extends React.Component<Props> {
                 </Row>
 
                 <Row className={`${c}-category`}>
-                    {pages.state === HelpPageLoadState.LOADED &&
-                        pages.pageCategory.map((cat, i) =>
+                    {(data.state === HelpPageLoadState.LOADED && data.paired === PairedState.PAIRED) &&
+                        data.pairedPagesCategories.map((pair, i) =>
                             <div key={i}>
                                 <Col>
-                                    <Category key={cat.id} category={cat} />
+                                    <Category category={pair.category} />
                                 </Col>
-                                
+
                                 <Col className={`${c}-page`}>
-                                    {pages.pages.map(p =>
-                                        (p.categoryId === cat.id) &&
-                                            <Page key={p.id}
-                                                  dispatch={dispatch}
-                                                  handleHelpPageSelected={handleHelpPageSelected}
-                                                  page={p}
-                                            />
-                                        )
-                                    }
+                                    {pair.pages.map(p =>
+                                        <Page key={p.id}
+                                              dispatch={dispatch}
+                                              handleHelpPageSelected={handleHelpPageSelected}
+                                              page={p}
+                                        />
+                                    )}
                                 </Col>
                             </div>
                         )

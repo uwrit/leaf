@@ -8,13 +8,13 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import { fetchSingleHelpPageContent, resetHelpPageContent } from '../../../actions/help/helpPageContent';
-import { HelpPages } from '../../../models/Help/HelpPages';
+import { HelpPage } from '../../../models/Help/HelpPages';
 import './Page.css';
 
 interface Props {
     dispatch: any;
     handleHelpPageSelected: (pageTitle: string) => any;
-    page: HelpPages;
+    page: HelpPage;
 }
 
 export class Page extends React.Component<Props> {

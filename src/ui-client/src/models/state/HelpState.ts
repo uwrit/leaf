@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { HelpPages, HelpPageContent, HelpPageCategory } from "../Help/HelpPages";
+import { HelpPage, HelpPageContent, HelpPageCategory, HelpPageCategoryPair } from "../Help/HelpPages";
 
 export enum HelpPageLoadState {
     NOT_LOADED = 1,
@@ -14,14 +14,21 @@ export enum HelpPageLoadState {
     ERROR = 4
 }
 
+export enum PairedState {
+    NOT_PAIRED = 1,
+    PAIRED = 2
+}
+
 export interface HelpPageContentState {
     content: HelpPageContent[];
     state: HelpPageLoadState;
 }
 
 export interface HelpPagesState {
-    pages: HelpPages[];
-    pageCategory: HelpPageCategory[];
-    pageContent: HelpPageContentState;
+    pages: HelpPage[];
+    categories: HelpPageCategory[];
+    content: HelpPageContentState;
+    pairedPagesCategories: HelpPageCategoryPair[];
+    paired: PairedState;
     state: HelpPageLoadState;
 }

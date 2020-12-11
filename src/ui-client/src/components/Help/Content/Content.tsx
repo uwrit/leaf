@@ -6,26 +6,40 @@
  */ 
 
 import React from 'react';
+import { Container, Button } from 'reactstrap';
+import { resetHelpPageContent } from '../../../actions/help/helpPageContent';
+import { ContentText } from './ContentText';
 import { HelpPageContent } from '../../../models/Help/HelpPages';
 
 interface Props {
-    content: HelpPageContent;
+    data: HelpPageContent[];
+    dispatch: any;
+    title: string;
 }
 
 export class Content extends React.Component<Props> {
     private className = "content"
 
     public render() {
-        const { content } = this.props;
         const c = this.className;
+        const { data, title } = this.props;
 
         return (
-            <div className={c}>
-                {content.textContent}
+            <Container fluid={true}>
+                <div className={c}>
+                    <b>{title}</b>
+                    {data.map((c, i) =>
+                        <ContentText key={i} content={c} />
+                    )}
 
-                {/* Check out Media from reactstraps for images */}
-                {/* <img src={`data:image/jpeg;base64,${content.imageContent}`} /> */}
-            </div>
-        )
-    }
+                    <Button className={`${c}-button`} color="primary" onClick={this.handleContentGoBackClick}>GO BACK</Button>
+                </div>
+            </Container>
+        );
+    };
+
+    private handleContentGoBackClick = () => {
+        const { dispatch } = this.props;
+        dispatch(resetHelpPageContent());
+    };
 }

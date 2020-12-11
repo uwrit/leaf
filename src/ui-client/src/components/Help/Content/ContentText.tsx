@@ -6,29 +6,24 @@
  */ 
 
 import React from 'react';
-import './Category.css';
+import { HelpPageContent } from '../../../models/Help/HelpPages';
 
 interface Props {
-    category: string;
+    content: HelpPageContent;
 }
 
-interface State { }
-
-export class Category extends React.Component<Props, State> {
-    private className = "category"
-
-    constructor(props: Props) {
-        super(props);
-        this.state = { }
-    }
+export class ContentText extends React.Component<Props> {
+    private className = "content-text"
 
     public render() {
         const c = this.className;
-        const { category } = this.props;
+        const { content } = this.props;
 
         return (
             <div className={c}>
-                <b>{category.toUpperCase()}</b>
+                {content.textContent}
+
+                {content.imageContent != null && <img src={`data:image/jpeg;base64,${content.imageContent}`} />}
             </div>
         )
     }

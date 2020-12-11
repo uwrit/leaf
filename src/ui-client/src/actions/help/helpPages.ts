@@ -8,17 +8,21 @@
 import { AppState } from '../../models/state/AppState';
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState } from "../generalUi";
-import { HelpPageLoadState } from '../../models/state/HelpState';
-import { HelpPages, HelpPageCategory } from '../../models/Help/HelpPages';
+import { HelpPageLoadState, PairedState } from '../../models/state/HelpState';
+import { HelpPage, HelpPageCategory, HelpPageCategoryPair } from '../../models/Help/HelpPages';
 import { fetchHelpPages, fetchHelpPageCategories } from '../../services/helpPagesApi';
 
 export const SET_HELP_PAGES = 'SET_HELP_PAGES';
 export const SET_HELP_PAGE_CATEGORIES = 'SET_HELP_PAGE_CATEGORIES';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
+export const PAIR_HELP_PAGES_AND_CATEGORIES = 'PAIR_HELP_PAGES_AND_CATEGORIES';
+export const IS_PAIRED = 'IS_PAIRED';
 
 export interface HelpPagesAction {
-    pages?: HelpPages[];
-    pageCategory?: HelpPageCategory[];
+    pages?: HelpPage[];
+    categories?: HelpPageCategory[];
+    pairedPagesCategories?: HelpPageCategoryPair[];
+    paired?: PairedState;
     state?: HelpPageLoadState;
     type: string;
 }
@@ -39,19 +43,24 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                  * Fetch all help pages.
                  */
                 const pages = await fetchHelpPages(getState());
-                dispatch(addHelpPages(pages));
+                dispatch(setHelpPages(pages));
 
                 /*
                  * Fetch help page categories.
                  */
                 const categories = await fetchHelpPageCategories(getState());
-                dispatch(addHelpPageCategories(categories));
+                dispatch(setHelpPageCategories(categories));
 
                 /*
                  * Finish.
                  */
                 dispatch(setHelpPageLoadState(HelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+
+                /*
+                 * After pages are loaded, pair up pages and categories.
+                 */
+                dispatch(pairPagesAndCategories());
             } catch (err) {
                 const info: InformationModalState = {
                     body: "Leaf encountered an error while attempting to load Help pages. Please check the Leaf log files for more information.",
@@ -65,7 +74,46 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
     };
 };
 
+export const pairPagesAndCategories = () => {
+    return (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        const pairs = [] as HelpPageCategoryPair[];
+
+        if (state.help.state === HelpPageLoadState.LOADED && state.help.paired === PairedState.NOT_PAIRED) {
+            state.help.categories.map(c => {
+                const pages = [] as HelpPage[];
+                
+                state.help.pages.map(p =>
+                    (p.categoryId === c.id) && pages.push(p)
+                )
+
+                pairs.push({
+                    category: c.category,
+                    pages: pages
+                })
+            })
+            
+            dispatch(pairHelpPagesAndCategories(pairs));
+            dispatch(isPaired(PairedState.PAIRED));
+        }
+    };
+};
+
 // Synchronous actions
+export const isPaired = (paired: PairedState): HelpPagesAction => {
+    return {
+        paired,
+        type: IS_PAIRED
+    };
+};
+
+export const pairHelpPagesAndCategories = (pairedPagesCategories: HelpPageCategoryPair[]): HelpPagesAction => {
+    return {
+        pairedPagesCategories,
+        type: PAIR_HELP_PAGES_AND_CATEGORIES
+    };
+};
+
 export const setHelpPageLoadState = (state: HelpPageLoadState): HelpPagesAction => {
     return {
         state,
@@ -73,16 +121,16 @@ export const setHelpPageLoadState = (state: HelpPageLoadState): HelpPagesAction 
     };
 };
 
-export const addHelpPages = (pages: HelpPages[]): HelpPagesAction => {
+export const setHelpPages = (pages: HelpPage[]): HelpPagesAction => {
     return {
         pages,
         type: SET_HELP_PAGES
     };
 };
 
-export const addHelpPageCategories = (pageCategory: HelpPageCategory[]): HelpPagesAction => {
+export const setHelpPageCategories = (categories: HelpPageCategory[]): HelpPagesAction => {
     return {
-        pageCategory,
+        categories,
         type: SET_HELP_PAGE_CATEGORIES
     };
 };
