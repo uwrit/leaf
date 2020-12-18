@@ -32,6 +32,7 @@ interface AttestationOptionsDTO {
 interface CohortConfigDTO {
     cacheLimit: number;
     exportLimit: number;
+    deidentificationEnabled: boolean;
 }
 
 export interface AppConfig extends ConfigDTO { }

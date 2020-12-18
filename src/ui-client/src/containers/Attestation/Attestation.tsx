@@ -80,8 +80,12 @@ class Attestation extends React.PureComponent<Props, State> {
         const { config, isSubmittingAttestation, userContext, hasAttested } = this.props;
         if (hasAttested || isSubmittingAttestation) { return null; }
         if (userContext && config && !config.attestation.enabled) {
-            this.setState({ sessionTypeSelected: true, documentationStatusSelected: true, identificationTypeSelected: true });
-            this.skipAttestationAndLoadSession();
+            this.setState({ 
+                sessionTypeSelected: true, 
+                documentationStatusSelected: true, 
+                identificationTypeSelected: true,
+                attestation: { ...this.state.attestation, isIdentified: !config.cohort.deidentificationEnabled }
+            }, () => this.skipAttestationAndLoadSession());
         }
         return null;
     }
