@@ -89,7 +89,8 @@ namespace Model.Cohort
 
             token.ThrowIfCancellationRequested();
 
-            var exeContext = compiler.BuildDemographicSql(validationContext.Context, user.Anonymize());
+            var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
+            var exeContext = compiler.BuildDemographicSql(validationContext.Context, deidentify);
             log.LogInformation("Compiled demographic execution context. Context:{@Context}", exeContext);
 
             var ctx = await executor.ExecuteDemographicsAsync(exeContext, token);

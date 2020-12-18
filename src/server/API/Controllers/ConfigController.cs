@@ -27,19 +27,22 @@ namespace API.Controllers
         readonly CohortOptions cohortOptions;
         readonly ClientOptions clientOptions;
         readonly AttestationOptions attestationOptions;
+        readonly DeidentificationOptions deidentOptions;
 
         public ConfigController(
             IOptions<AuthenticationOptions> authenticationOptions,
             IOptions<LeafVersionOptions> versionOptions,
             IOptions<CohortOptions> cohortOptions,
             IOptions<ClientOptions> clientOptions,
-            IOptions<AttestationOptions> attestationOptions)
+            IOptions<AttestationOptions> attestationOptions,
+            IOptions<DeidentificationOptions> deidentOptions)
         {
             this.authenticationOptions = authenticationOptions.Value;
             this.versionOptions = versionOptions.Value;
             this.cohortOptions = cohortOptions.Value;
             this.clientOptions = clientOptions.Value;
             this.attestationOptions = attestationOptions.Value;
+            this.deidentOptions = deidentOptions.Value;
         }
 
         public ActionResult<ConfigDTO> Get()
@@ -59,7 +62,8 @@ namespace API.Controllers
                 Cohort = new CohortConfigDTO
                 {
                     CacheLimit = cohortOptions.RowLimit,
-                    ExportLimit = cohortOptions.ExportLimit
+                    ExportLimit = cohortOptions.ExportLimit,
+                    DeidentificationEnabled = deidentOptions.Patient.Enabled
                 },
                 Client = new ClientOptionsDTO
                 {

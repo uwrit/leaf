@@ -42,7 +42,8 @@ namespace Services.Cohort
             {
                 QueryId = query.QueryId,
                 PatientIds = await GetPatientSetAsync(leafQueries, token),
-                SqlStatements = leafQueries.Select(q => q.SqlStatement)
+                SqlStatements = leafQueries.Select(q => q.SqlStatement),
+                Panels = query.Panels.Where(p => p.Domain == PanelDomain.Panel)
             };
         }
 
