@@ -6,66 +6,66 @@
  */ 
 
 import {
-    SET_HELP_PAGES,
     SET_HELP_PAGE_CATEGORIES,
-    SET_HELP_PAGE_LOAD_STATE,
-    PAIR_HELP_PAGES_AND_CATEGORIES,
-    IS_PAIRED
-} from '../actions/help/helpPages';
+    SET_HELP_PAGES,
+    SET_HELP_PAGE_LOAD_STATE
+} from '../actions/help/helpPage';
 import {
     SET_HELP_PAGE_CONTENT,
     SET_HELP_PAGE_CONTENT_TO_EMPTY,
     SET_HELP_PAGE_CONTENT_LOAD_STATE
 } from '../actions/help/helpPageContent';
-import { HelpPagesAction } from '../actions/help/helpPages';
+import { HelpPageAction } from '../actions/help/helpPage';
 import { HelpPageContentAction } from '../actions/help/helpPageContent';
-import { HelpPageLoadState, PairedState, HelpPagesState } from '../models/state/HelpState';
+import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
+import { categoryId, HelpPageDTO, HelpPageMap } from '../models/Help/Help';
 
-export const defaultHelpPagesState = (): HelpPagesState => {
+export const defaultHelpPagesState = (): HelpPageState => {
     return {
-        pages: [],
         categories: [],
         content: {
             content: [],
             state: HelpPageLoadState.NOT_LOADED
         },
-        pairedPagesCategories: [],
-        paired: PairedState.NOT_PAIRED,
+        pages: new Map<categoryId, HelpPageDTO[]>(),
         state: HelpPageLoadState.NOT_LOADED
     }
 };
 
-const isPaired = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
-    return Object.assign({}, state, {
-        paired: action.paired
-    });
+const mapPages = (pages: HelpPageDTO[]): HelpPageMap => {
+    const mappedPages = new Map<categoryId, HelpPageDTO[]>();
+
+    for (let p of pages) {
+        if (mappedPages.has(p.categoryId)) {
+            mappedPages.set(p.categoryId, [...mappedPages.get(p.categoryId)!, p]);
+        } else {
+            mappedPages.set(p.categoryId, [...[], p]);
+        }
+    };
+
+    return mappedPages;
 };
 
-const pairHelpPagesAndCategories = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
-    return Object.assign({}, state, {
-        pairedPagesCategories: action.pairedPagesCategories
-    });
-};
-
-const setHelpPages = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
-    return Object.assign({}, state, {
-        pages: action.pages
-    });
-};
-
-const setHelpPageCategories = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
+const SetHelpPageCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {    
     return Object.assign({}, state, {
         categories: action.categories
     });
 };
 
-const setHelpPageLoadState = (state: HelpPagesState, action: HelpPagesAction): HelpPagesState => {
+const SetHelpPages = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+    const mappedPages = mapPages(action.pages!);
+    return Object.assign({}, state, {
+        pages: mappedPages
+    });
+};
+
+const setHelpPageLoadState = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     return Object.assign({}, state, {
         state: action.state
     });
 };
 
-const setHelpPageContent = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
+const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction): HelpPageState => {
     return Object.assign({}, state, {
         content: {
             ...state.content,
@@ -74,7 +74,7 @@ const setHelpPageContent = (state: HelpPagesState, action: HelpPageContentAction
     });
 };
 
-const setHelpPageContentToEmpty = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
+const setHelpPageContentToEmpty = (state: HelpPageState, action: HelpPageContentAction): HelpPageState => {
     return Object.assign({}, state, {
         content: {
             ...state.content,
@@ -83,7 +83,7 @@ const setHelpPageContentToEmpty = (state: HelpPagesState, action: HelpPageConten
     });
 };
 
-const setHelpPageContentLoadState = (state: HelpPagesState, action: HelpPageContentAction): HelpPagesState => {
+const setHelpPageContentLoadState = (state: HelpPageState, action: HelpPageContentAction): HelpPageState => {
     return Object.assign({}, state, {
         content: {
             ...state.content,
@@ -92,26 +92,22 @@ const setHelpPageContentLoadState = (state: HelpPagesState, action: HelpPageCont
     });
 };
 
-type HelpAction = HelpPagesAction | HelpPageContentAction;
+type HelpAction = HelpPageAction | HelpPageContentAction;
 
-export const help = (state: HelpPagesState = defaultHelpPagesState(), action: HelpAction): HelpPagesState => {
+export const help = (state: HelpPageState = defaultHelpPagesState(), action: HelpAction): HelpPageState => {
     switch (action.type) {
-        case SET_HELP_PAGES:
-            return setHelpPages(state, action);
         case SET_HELP_PAGE_CATEGORIES:
-            return setHelpPageCategories(state, action);
+            return SetHelpPageCategories(state, action);
+        case SET_HELP_PAGES:
+            return SetHelpPages(state, action);
         case SET_HELP_PAGE_LOAD_STATE:
             return setHelpPageLoadState(state, action);
         case SET_HELP_PAGE_CONTENT:
             return setHelpPageContent(state, action);
-        case SET_HELP_PAGE_CONTENT_LOAD_STATE:
-            return setHelpPageContentLoadState(state, action);
         case SET_HELP_PAGE_CONTENT_TO_EMPTY:
             return setHelpPageContentToEmpty(state, action);
-        case PAIR_HELP_PAGES_AND_CATEGORIES:
-            return pairHelpPagesAndCategories(state, action);
-        case IS_PAIRED:
-            return isPaired(state, action);
+        case SET_HELP_PAGE_CONTENT_LOAD_STATE:
+            return setHelpPageContentLoadState(state, action);
         default:
             return state;
     }

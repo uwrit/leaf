@@ -21,7 +21,7 @@ import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
-import { loadHelpPagesAndCategoriesIfNeeded } from './help/helpPages';
+import { loadHelpPagesAndCategoriesIfNeeded } from './help/helpPage';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 import { getAllMetdata } from '../services/dataImport';

@@ -7,15 +7,15 @@ using System;
 using Model.Compiler;
 namespace API.DTO.Compiler
 {
-    public class HelpPagesDTO
+    public class HelpPageDTO
     {
         public int Id { get; set; }
         public int CategoryId { get; set; }
         public string Title { get; set; }
 
-        public HelpPagesDTO() { }
+        public HelpPageDTO() { }
 
-        public HelpPagesDTO(HelpPageSql page)
+        public HelpPageDTO(HelpPageSql page)
         {
             Id = page.Id;
             CategoryId = page.CategoryId;

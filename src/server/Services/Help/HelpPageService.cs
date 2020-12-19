@@ -18,7 +18,7 @@ using System.Linq;
 
 namespace Services.Help
 {
-    public class HelpPageService : HelpPages.IHelpPages
+    public class HelpPageService : HelpPage.IHelpPage
     {
         const string getAllHelpPages = @"app.sp_GetHelpPages";
         const string getHelpPageCategories = @"app.sp_GetHelpCategories";

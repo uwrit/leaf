@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { HelpPageContent } from '../../../models/Help/HelpPages';
+import { HelpPageContent } from '../../../models/Help/Help';
 
 interface Props {
     content: HelpPageContent;

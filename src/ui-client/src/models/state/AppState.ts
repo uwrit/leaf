@@ -20,7 +20,7 @@ import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 import ImportState from "./Import";
-import { HelpPagesState } from './HelpState';
+import { HelpPageState } from './HelpState';
 
 export type ConceptMap = Map<string, Concept>;
 
@@ -73,7 +73,7 @@ export interface AppState {
     dataImport: ImportState;
     datasets: DatasetsState;
     generalUi: GeneralUiState;
-    help: HelpPagesState;
+    help: HelpPageState;
     map: MapState;
     panelFilters: PanelFilter[];
     panels: Panel[];

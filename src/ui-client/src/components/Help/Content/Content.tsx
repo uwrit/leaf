@@ -9,7 +9,7 @@ import React from 'react';
 import { Container, Button } from 'reactstrap';
 import { resetHelpPageContent } from '../../../actions/help/helpPageContent';
 import { ContentText } from './ContentText';
-import { HelpPageContent } from '../../../models/Help/HelpPages';
+import { HelpPageContent } from '../../../models/Help/Help';
 
 interface Props {
     data: HelpPageContent[];
@@ -25,7 +25,7 @@ export class Content extends React.Component<Props> {
         const { data, title } = this.props;
 
         return (
-            <Container fluid={true}>
+            <Container>
                 <div className={c}>
                     <b>{title}</b>
                     {data.map((c, i) =>

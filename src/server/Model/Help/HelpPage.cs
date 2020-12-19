@@ -11,19 +11,19 @@ using Microsoft.Extensions.Logging;
 using Model.Error;
 namespace Model.Help
 {
-    public class HelpPages
+    public class HelpPage
     {
-        public interface IHelpPages
+        public interface IHelpPage
         {
             Task<IEnumerable<HelpPageSql>> GetAllPagesAsync();
-            Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid);
             Task<IEnumerable<HelpPageCategorySql>> GetHelpPageCategoriesAsync();
+            Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid);
         }
 
-        readonly IHelpPages help;
-        readonly ILogger<HelpPages> log;
+        readonly IHelpPage help;
+        readonly ILogger<HelpPage> log;
 
-        public HelpPages(IHelpPages help, ILogger<HelpPages> logger)
+        public HelpPage(IHelpPage help, ILogger<HelpPage> logger)
         {
             this.help = help;
             log = logger;

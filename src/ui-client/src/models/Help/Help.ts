@@ -5,18 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export interface HelpPage {
+export interface HelpPageDTO {
     id: number;
     categoryId: number;
     title: string;
 }
 
-export interface HelpPageCategory {
+export interface HelpPageCategoryDTO {
     id: number;
     category: string;
 }
 
-export interface HelpPageContent {
+export interface HelpPageContentDTO {
     id: number;
     pageId: number;
     orderId: number;
@@ -26,7 +26,12 @@ export interface HelpPageContent {
     imageId: string;
 }
 
-export interface HelpPageCategoryPair {
-    category: string;
-    pages: HelpPage[];
+export type categoryId = number;
+export type HelpPageMap = Map<categoryId, HelpPageDTO[]>;
+
+export interface HelpPageCategory extends HelpPageCategoryDTO {
+    showAllCategoryPages?: boolean;
 }
+
+export interface HelpPage extends HelpPageDTO { }
+export interface HelpPageContent extends HelpPageContentDTO { }

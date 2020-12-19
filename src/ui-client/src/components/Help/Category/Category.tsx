@@ -6,21 +6,13 @@
  */ 
 
 import React from 'react';
-import './Category.css';
 
 interface Props {
     category: string;
 }
 
-interface State { }
-
-export class Category extends React.Component<Props, State> {
+export class Category extends React.Component<Props> {
     private className = "category"
-
-    constructor(props: Props) {
-        super(props);
-        this.state = { }
-    }
 
     public render() {
         const c = this.className;
@@ -28,8 +20,8 @@ export class Category extends React.Component<Props, State> {
 
         return (
             <div className={c}>
-                <b>{category.toUpperCase()}</b>
+                <strong>{category.toUpperCase()}</strong>
             </div>
-        )
-    }
-}
+        );
+    };
+};

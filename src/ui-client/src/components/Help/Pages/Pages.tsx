@@ -6,17 +6,18 @@
  */ 
 
 import React from 'react';
-import { Container, Input, Row, Col } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
+import { HelpPageDTO, HelpPageCategory, HelpPageMap } from '../../../models/Help/Help';
 import { Category } from '../Category/Category';
 import { Page } from '../Page/Page';
-import { HelpPagesState, HelpPageLoadState, PairedState } from '../../../models/state/HelpState';
+import { PagesButton } from './PagesButton';
 import './Pages.css';
 
-
 interface Props {
-    data: HelpPagesState;
+    categories: HelpPageCategory[];
     dispatch: any;
-    handleHelpPageSelected: (pageTitle: string) => any;
+    handleHelpPageClick: (pageTitle: string) => any;
+    pages: HelpPageMap;
 }
 
 export class Pages extends React.Component<Props> {
@@ -24,38 +25,50 @@ export class Pages extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { data, dispatch, handleHelpPageSelected } = this.props;
-
+        const { categories, dispatch, handleHelpPageClick, pages } = this.props;
+        
         return (
-            <Container fluid={true} className={c}>
+            <Row className={c}>
+                {categories.map((c, i) =>
+                    (pages.has(c.id) &&
+                        <div key={i}>
+                            <Col>
+                                <Category key={c.id} category={c.category} />
+                            </Col>
 
-                <Row>
-                    <Input className={`${c}-searchbar`} type="text" name="pages-search" id="pages-search" placeholder="Search..." bsSize="lg" />
-                </Row>
-
-                <Row className={`${c}-category`}>
-                    {(data.state === HelpPageLoadState.LOADED && data.paired === PairedState.PAIRED) &&
-                        data.pairedPagesCategories.map((pair, i) =>
-                            <div key={i}>
-                                <Col>
-                                    <Category category={pair.category} />
-                                </Col>
-
-                                <Col className={`${c}-page`}>
-                                    {pair.pages.map(p =>
-                                        <Page key={p.id}
-                                              dispatch={dispatch}
-                                              handleHelpPageSelected={handleHelpPageSelected}
-                                              page={p}
-                                        />
-                                    )}
-                                </Col>
-                            </div>
-                        )
-                    }
-                </Row>
-
-            </Container>
+                            <Col>
+                                {this.getPages(c).map(p =>
+                                    <Page
+                                        key={p.id}
+                                        dispatch={dispatch}
+                                        handleHelpPageClick={handleHelpPageClick}
+                                        page={p}
+                                    />
+                                )}
+                            </Col>
+                    
+                            <Col>
+                                <PagesButton
+                                    key={c.id}
+                                    category={c}
+                                    numberOfPages={pages.get(c.id)!.length}
+                                />
+                            </Col>
+                        </div>  
+                    )
+                )}
+            </Row>
         );
+    };
+
+    private getPages = (category: HelpPageCategory): HelpPageDTO[] => {
+        const { pages } = this.props;
+        const categoryPages = pages.get(category.id)!;
+        const start = 0;
+        const defaultEnd = 5; // Maximum of 5 help pages will show by default.
+        const end = category.showAllCategoryPages ? categoryPages.length : defaultEnd;
+        const slicedPages = categoryPages.slice(start, end);
+
+        return slicedPages;
     };
 };

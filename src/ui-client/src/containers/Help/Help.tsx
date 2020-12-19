@@ -7,15 +7,17 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
+import { Container, Input, Row } from 'reactstrap';
 import { Content } from '../../components/Help/Content/Content';
 import { Pages } from '../../components/Help/Pages/Pages';
 import { AppState } from '../../models/state/AppState';
-import { HelpPagesState, HelpPageLoadState } from '../../models/state/HelpState';
+import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
+import './Help.css';
 
 interface OwnProps { }
 
 interface StateProps {
-    helpPages: HelpPagesState;
+    helpPages: HelpPageState;
 }
 
 interface DispatchProps {
@@ -29,6 +31,7 @@ interface State {
 type Props = StateProps & OwnProps & DispatchProps;
 
 export class Help extends React.PureComponent<Props, State> {
+    private className = "help-page";
 
     constructor(props: Props) {
         super(props);
@@ -38,6 +41,7 @@ export class Help extends React.PureComponent<Props, State> {
     }
 
     public render() {
+        const c = this.className;
         const { dispatch, helpPages } = this.props;
         const { pageTitle } = this.state;
 
@@ -46,30 +50,37 @@ export class Help extends React.PureComponent<Props, State> {
         };
 
         return (
-            <Pages
-                data={helpPages}
-                dispatch={dispatch}
-                handleHelpPageSelected={this.handleHelpPageSelected}
-            />
+            <Container className={c}>
+                <Row>
+                    <Input className={`${c}-searchbar`} type="text" name="pages-search" id="pages-search" placeholder="Search..." bsSize="lg" />
+                </Row>
+
+                {(helpPages.state === HelpPageLoadState.LOADED) &&
+                    <Pages
+                        categories={helpPages.categories}
+                        dispatch={dispatch}
+                        handleHelpPageClick={this.handleHelpPageClick}
+                        pages={helpPages.pages}
+                    />
+                }
+            </Container>
         );
     };
 
-    private handleHelpPageSelected = (pageTitle: string) => {
-        this.setState({
-            pageTitle: pageTitle
-        });
+    private handleHelpPageClick = (pageTitle: string) => {
+        this.setState({ pageTitle: pageTitle });
     };
 
-}
+};
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         helpPages: state.help
     };
-}
+};
 
 const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return { dispatch };
-}
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Help)

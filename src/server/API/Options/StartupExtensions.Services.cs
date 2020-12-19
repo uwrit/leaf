@@ -108,7 +108,7 @@ namespace API.Options
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
             services.AddTransient<NotificationManager.INotificationService, SmtpService>();
             services.AddTransient<IObfuscationService, ObfuscationService>();
-            services.AddTransient<HelpPages.IHelpPages, HelpPageService>();
+            services.AddTransient<HelpPage.IHelpPage, HelpPageService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

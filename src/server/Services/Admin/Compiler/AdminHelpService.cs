@@ -25,7 +25,7 @@ namespace Services.Admin.Compiler
         {
             public const string Get = "adm.sp_GetHelpPageAndContent";
             public const string Update = "adm.sp_UpdateHelpPageAndContent";
-            public const string Create = "adm.sp_CreateHelpPage";
+            public const string Create = "adm.sp_CreateHelpPageAndContent";
             public const string Delete = "adm.sp_DeleteHelpPageAndContent";
         }
 

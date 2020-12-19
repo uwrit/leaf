@@ -40,7 +40,7 @@ namespace Model
             services.AddTransient<DatasetQueryProvider>();
             services.AddTransient<DataImporter>();
             services.AddTransient<NotificationManager>();
-            services.AddTransient<HelpPages>();
+            services.AddTransient<HelpPage>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();

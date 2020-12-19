@@ -8,12 +8,12 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import { fetchSingleHelpPageContent, resetHelpPageContent } from '../../../actions/help/helpPageContent';
-import { HelpPage } from '../../../models/Help/HelpPages';
+import { HelpPage } from '../../../models/Help/Help';
 import './Page.css';
 
 interface Props {
     dispatch: any;
-    handleHelpPageSelected: (pageTitle: string) => any;
+    handleHelpPageClick: (pageTitle: string) => any;
     page: HelpPage;
 }
 
@@ -26,20 +26,19 @@ export class Page extends React.Component<Props> {
 
         return (
             <div className={c}>
-                <Button color="link" onClick={this.handlePageTitleClick}>
-                    {page.title.toUpperCase()}
+                <Button color="link" onClick={this.handleHelpPageTitleClick}>
+                    {page.title}
                 </Button>
             </div>
         );
     };
 
-    private handlePageTitleClick = () => {
-        const { dispatch, handleHelpPageSelected, page } = this.props;
+    private handleHelpPageTitleClick = () => {
+        const { dispatch, handleHelpPageClick, page } = this.props;
 
         dispatch(resetHelpPageContent());
         dispatch(fetchSingleHelpPageContent(page.id));
 
-        handleHelpPageSelected(page.title);
+        handleHelpPageClick(page.title);
     };
-
-}
+};

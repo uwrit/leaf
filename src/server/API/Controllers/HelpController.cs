@@ -29,13 +29,13 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<HelpPagesDTO>>> GetHelpPages(
-            [FromServices] HelpPages helpPage)
+        public async Task<ActionResult<IEnumerable<HelpPageDTO>>> GetHelpPages(
+            [FromServices] HelpPage helpPage)
         {
             try
             {
                 var pages = await helpPage.GetAllPagesAsync();
-                return Ok(pages.Select(p => new HelpPagesDTO(p)));
+                return Ok(pages.Select(p => new HelpPageDTO(p)));
             }
             catch (LeafRPCException le)
             {
@@ -50,7 +50,7 @@ namespace API.Controllers
 
         [HttpGet("category")]
         public async Task<ActionResult<IEnumerable<HelpPageCategoryDTO>>> GetHelpPageCategories(
-            [FromServices] HelpPages helpPage)
+            [FromServices] HelpPage helpPage)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace API.Controllers
         [HttpGet("{pageid}/content")]
         public async Task<ActionResult<IEnumerable<HelpPageContentDTO>>> GetHelpPageContent(
             int pageid,
-            [FromServices] HelpPages helpPage)
+            [FromServices] HelpPage helpPage)
         {
             try
             {

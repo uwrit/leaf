@@ -9,7 +9,7 @@ import { AppState } from '../../models/state/AppState';
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState } from "../generalUi";
 import { HelpPageLoadState } from '../../models/state/HelpState';
-import { HelpPageContent } from '../../models/Help/HelpPages';
+import { HelpPageContentDTO } from '../../models/Help/Help';
 import { fetchHelpPageContent } from '../../services/helpPagesApi';
 
 export const SET_HELP_PAGE_CONTENT = 'SET_HELP_PAGE_CONTENT';
@@ -17,7 +17,7 @@ export const SET_HELP_PAGE_CONTENT_TO_EMPTY = 'SET_HELP_PAGE_CONTENT_TO_EMPTY';
 export const SET_HELP_PAGE_CONTENT_LOAD_STATE = 'SET_HELP_PAGE_CONTENT_LOAD_STATE';
 
 export interface HelpPageContentAction {
-    content?: HelpPageContent[];
+    content?: HelpPageContentDTO[];
     state?: HelpPageLoadState;
     type: string;
 }
@@ -65,7 +65,7 @@ export const resetHelpPageContent = () => {
             dispatch(setHelpPageContentLoadState(HelpPageLoadState.NOT_LOADED));
         
             // Reset existing page content to empty for new page content to load.
-            const content = [] as HelpPageContent[];
+            const content = [] as HelpPageContentDTO[];
             dispatch(setHelpPageContentToEmpty(content));
         } catch (err) {
             console.log(err);
@@ -74,23 +74,23 @@ export const resetHelpPageContent = () => {
 };
 
 // Synchronous actions
-export const setHelpPageContentLoadState = (state: HelpPageLoadState): HelpPageContentAction => {
-    return {
-        state,
-        type: SET_HELP_PAGE_CONTENT_LOAD_STATE
-    };
-};
-
-export const setHelpPageContent = (content: HelpPageContent[]): HelpPageContentAction => {
+export const setHelpPageContent = (content: HelpPageContentDTO[]): HelpPageContentAction => {
     return {
         content,
         type: SET_HELP_PAGE_CONTENT
     };
 };
 
-export const setHelpPageContentToEmpty = (content: HelpPageContent[]): HelpPageContentAction => {
+export const setHelpPageContentToEmpty = (content: HelpPageContentDTO[]): HelpPageContentAction => {
     return {
         content,
         type: SET_HELP_PAGE_CONTENT_TO_EMPTY
+    };
+};
+
+export const setHelpPageContentLoadState = (state: HelpPageLoadState): HelpPageContentAction => {
+    return {
+        state,
+        type: SET_HELP_PAGE_CONTENT_LOAD_STATE
     };
 };
