@@ -23,6 +23,11 @@ namespace API.Options
                 public const string Enabled = @"Client:Visualize:Enabled";
                 public const string ShowFederated = @"Client:Visualize:ShowFederated";
             }
+            public static class Timelines
+            {
+                public const string Section = @"Client:Timelines";
+                public const string Enabled = @"Client:Timelines:Enabled";
+            }
             public static class PatientList
             {
                 public const string Section = @"Client:PatientList";

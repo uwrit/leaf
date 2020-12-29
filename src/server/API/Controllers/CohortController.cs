@@ -22,7 +22,9 @@ using Model.Options;
 
 namespace API.Controllers
 {
-    [Authorize(Policy = TokenType.Access)]
+    // [Authorize(Policy = TokenType.Access)]
+    [AllowAnonymous]
+
     [Route("api/cohort")]
     public class CohortController : MaybeController<RuntimeOptions>
     {
@@ -77,6 +79,27 @@ namespace API.Controllers
             {
                 log.LogError("Failed to fetch demographics. QueryID:{QueryID} Error:{Error}", queryid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{queryid}/conceptDataset")]
+        public async Task<ActionResult<int>> ConceptDataset(
+            string queryid,
+            [FromQuery] string conceptid,
+            [FromServices] ConceptDatasetProvider provider)
+        {
+            try
+            {
+                var queryRef = new QueryRef(queryid);
+                var queryDto = new ConceptDatasetQueryDTO(queryid, conceptid);
+                var result = await provider.GetConceptDatasetAsync(queryDto, queryRef);
+
+                return Ok(42);
+            }
+            catch (FormatException fe)
+            {
+                log.LogWarning("Malformed concept identifier. Error:{Error}", fe.Message);
+                return BadRequest();
             }
         }
 

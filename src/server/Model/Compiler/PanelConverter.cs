@@ -102,6 +102,13 @@ namespace Model.Compiler
             return new PanelValidationContext(query, resources, merged);
         }
 
+        /// <summary>
+        /// Crosswalks panel items to associated import dataset reference ids.
+        /// The returned AST is unvalidated.
+        /// </summary>
+        /// <returns>The panels.</returns>
+        /// <param name="panels">PanelDTOs.</param>
+        /// <param name="importRefs">Import panel items referenced in panels.</param>
         public IEnumerable<IPanelDTO> CrosswalkImportIds(IEnumerable<IPanelDTO> panels, IEnumerable<ImportRef> importRefs)
         {
             var mapped = panels.Select(p => p).ToList();

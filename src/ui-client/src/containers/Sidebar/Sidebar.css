@@ -91,7 +91,7 @@
     color: rgba(150,150,150, 0.75);
 }
 
-/* Hardcode colors for now, need better solution */
+/* Find Patients */
 .sidebar-tab-link.findpatients .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.findpatients .sidebar-tab.enabled:hover .sidebar-icon  {
     color: rgb(14, 173, 152);
@@ -102,6 +102,7 @@
     border-left-color: rgb(14, 173, 152);
 }
 
+/* Map */
 .sidebar-tab-link.map .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.map .sidebar-tab.enabled:hover .sidebar-icon  {
     color: rgb(56, 197, 80);
@@ -112,14 +113,13 @@
     border-left-color:rgb(56, 197, 80);
 }
 
+/* Visualize */
 .sidebar-tab-link.visualize .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.visualize .sidebar-tab.enabled:hover .sidebar-icon  {
     color: rgb(255, 132, 8);
 }
 
 .sidebar-tab-link.visualize .sidebar-icon > svg {
-    stroke-width: 3;
-    stroke-linecap: square;
     transform: scaleX(1.5) scaleY(1.2);
 }
 
@@ -128,6 +128,22 @@
     border-left-color:rgb(255, 132, 8);
 }
 
+/* Timelines */
+.sidebar-tab-link.timelines .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.timelines .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(196, 91, 152);
+}
+
+.sidebar-tab-link.timelines .sidebar-icon > svg {
+    transform: rotate(90deg);
+}
+
+.sidebar-tab-link.timelines .sidebar-tab.selected,
+.sidebar-tab-link.timelines .sidebar-tab.enabled.enabled:hover {
+    border-left-color:rgb(196, 91, 152);
+}
+
+/* Patient List */
 .sidebar-tab-link.patientlist .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.patientlist .sidebar-tab.enabled:hover .sidebar-icon  {
     color: rgb(186, 67, 223);
@@ -138,6 +154,7 @@
     border-left-color:rgb(186, 67, 223);
 }
 
+/* Admin */
 .sidebar-tab-link.admin .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.admin .sidebar-tab.enabled:hover .sidebar-icon  {
     color: rgb(190, 202, 12);

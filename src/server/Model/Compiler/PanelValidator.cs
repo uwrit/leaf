@@ -131,7 +131,7 @@ namespace Model.Compiler
                                specialization = d,
                                matches = panelItem.Concept.SpecializationGroups
                                                   .SelectMany(s => s.Specializations)
-                                                  .Where(s => s.Id == d.Id || d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId)
+                                                  .Where(s => s.Id == d.Id || (d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId))
                            };
                        });
 

@@ -1,0 +1,81 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .directional-slider-body {
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 0px 20px 0px;
+    height: 100%;
+    outline: none;
+    position: fixed;
+    width: 35%;
+    z-index: 110;
+}
+
+.directional-slider-container.right .directional-slider-body {
+    margin-right: -35%;
+    right: 0;
+    transition: margin-right 0.75s;
+}
+
+.directional-slider-container.right.show > .directional-slider-body {
+    margin-right: 0%;
+}
+
+.directional-slider-container.left .directional-slider-body {
+    margin-left: -35%;
+    left: 150px;
+    transition: margin-left 0.75s;
+}
+
+.directional-slider-container.left.show > .directional-slider-body {
+    margin-left: 0%;
+}
+
+.directional-slider-overlay {
+    background-color: rgba(0,0,0,0);
+    display: none;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 101;
+}
+
+.show > .directional-slider-overlay {
+    background-color: rgba(0,0,0,0.5);
+    display: block;
+}
+
+/*
+ * Don't display the overlay on Edge, as there is some
+ * z-index bug which causes it to cover the right pane as well.
+ */
+.app-container.edge .directional-slider-overlay {
+    display: none !important;
+}
+
+
+/* Small screen - 45px icons only */
+@media only screen and (max-width: 1400px) {
+    .directional-slider-container.left .directional-slider-body {
+        left: 45px;
+    }
+}
+
+/* Large screen - 145px */
+@media only screen and (min-width: 1401px) {
+    .directional-slider-container.left .directional-slider-body {
+        left: 145px;
+    }
+}
+
+/* Extra large screen - 160px */
+@media only screen and (min-width: 1701px) {
+    .directional-slider-container.left .directional-slider-body {
+        left: 160px;
+    }
+}

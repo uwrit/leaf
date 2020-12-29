@@ -11,7 +11,7 @@ import { Button, FormGroup, Input, Label } from 'reactstrap';
 import { Dispatch } from 'redux';
 import { toggleSaveQueryPane } from '../../actions/generalUi';
 import { setCurrentQuery, requestQuerySave, setRunAfterSave } from '../../actions/queries';
-import RightPaneSlider from '../../components/Other/RightPaneSlider/RightPaneSlider';
+import { Direction, DirectionalSlider } from '../../components/Other/DirectionalSlider/DirectionalSlider';
 import { AppState } from '../../models/state/AppState';
 import { SavedQueriesState, Query, SavedQuery } from '../../models/Query';
 import './SaveQueryPanel.css';
@@ -60,8 +60,9 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
         }
 
         return (
-            <RightPaneSlider
+            <DirectionalSlider
                 show={this.props.show}
+                from={Direction.Right}
                 toggle={this.toggle}>
                 <div className={`${c}-container`}>
                     <FormGroup>
@@ -135,7 +136,7 @@ class SaveQueryPanel extends React.PureComponent<Props, State> {
                         </Button>}
                     </div>
                 </div>
-            </RightPaneSlider>
+            </DirectionalSlider>
         );
     }
 

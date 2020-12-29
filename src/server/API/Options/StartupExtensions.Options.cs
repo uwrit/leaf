@@ -242,6 +242,9 @@ namespace API.Options
                     }
                 }
 
+                // Timelines
+                opts.Timelines.Enabled = config.GetValue<bool>(Config.Client.Timelines.Enabled);
+
                 // Patient List
                 opts.PatientList.Enabled = config.GetValue<bool>(Config.Client.PatientList.Enabled);
 

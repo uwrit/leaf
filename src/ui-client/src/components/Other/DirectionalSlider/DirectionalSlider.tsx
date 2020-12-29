@@ -6,16 +6,19 @@
  */ 
 
 import React from 'react';
-import './RightPaneSlider.css';
+import './DirectionalSlider.css';
 
 interface Props {
     show: boolean;
+    from: Direction;
     toggle: () => any;
     overlay?: boolean;
 }
 
-export default class RightPaneSlider extends React.Component<Props> {
-    private className = 'right-pane-slider';
+export enum Direction { Right, Left }
+
+export class DirectionalSlider extends React.Component<Props> {
+    private className = 'directional-slider';
     private mouseOut = true;
 
     public static defaultProps = {
@@ -58,7 +61,7 @@ export default class RightPaneSlider extends React.Component<Props> {
     public render() {
         const { overlay } = this.props;
         const c = this.className;
-        const classes = `${c}-container ${this.props.show ? 'show' : ''}`
+        const classes = `${c}-container ${this.props.show ? 'show' : ''} ${this.props.from === Direction.Left ? 'left' : 'right'}`
 
         return (
             <div className={classes}>

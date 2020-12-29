@@ -9,6 +9,7 @@
     font-family: Roboto;
     margin-top: 2px;
     padding: 10px;
+    text-align: left;
 }
 
 .concept-search-container > .input-group {
