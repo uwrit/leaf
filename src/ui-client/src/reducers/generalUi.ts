@@ -24,7 +24,9 @@ import {
     NOCLICK_MODAL_SET_STATE,
     SIDE_NOTIFICATION_SET_STATE,
     SET_MYLEAF_TAB,
-    SET_USER_QUESTION_STATE
+    SET_USER_QUESTION_STATE,
+    TIMELINES_CONCEPT_PANE_SHOW,
+    TIMELINES_CONCEPT_PANE_HIDE
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -72,6 +74,7 @@ export const defaultGeneralUiState = (): GeneralUiState => {
             state: NotificationStates.Hidden
         },
         routes: [],
+        showTimelinesConceptsPane: false,
         showImportMrnModal: false,
         showImportRedcapModal: false,
         showExportDataModal: false,
@@ -144,6 +147,10 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { browser: action.browser! });
         case SET_USER_QUESTION_STATE:
             return Object.assign({}, state, { userQuestion: { ...state.userQuestion, ...action.userInquiry } });
+        case TIMELINES_CONCEPT_PANE_SHOW:
+            return Object.assign({}, state, { showTimelinesConceptsPane: true });
+        case TIMELINES_CONCEPT_PANE_HIDE:
+            return Object.assign({}, state, { showTimelinesConceptsPane: false });
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:

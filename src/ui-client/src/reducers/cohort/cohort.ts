@@ -72,12 +72,14 @@ import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkC
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
+import { defaultNetworkTimelinesState, defaultTimelinesState } from './timelines';
 
 export const defaultCohortState = (): CohortState => {
     return {
         count: defaultCountState(),
         networkCohorts: new Map<number, NetworkCohortState>(),
         patientList: defaultPatientListState(),
+        timelines: defaultTimelinesState(),
         visualization: defaultVisualizationState()
     } as CohortState;
 };
@@ -88,6 +90,7 @@ const registerCohorts = (state: CohortState, action: CohortCountAction): CohortS
         const newCohort: NetworkCohortState = {
             count: defaultCountState(),
             id: r.id,
+            timelines: defaultNetworkTimelinesState(),
             patientList: defaultNetworkPatientListState(),
             visualization: defaultVisualizationState()
         }
@@ -276,6 +279,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkCohortVisualization(state, action);
         case VISUALIZATION_SET_AGGREGATE:
             return setAggregateCohortVisualization(state, action);
+
+        // Timelines
 
         // Patient List
         case SET_PATIENT_LIST_DISPLAY:

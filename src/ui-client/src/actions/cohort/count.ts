@@ -109,7 +109,7 @@ export const getCounts = () => {
                                 dispatch(errorNetworkCohortCount(nr.id, error.response));
                             }
                         })
-                        .then(() => resolve());
+                        .then(() => resolve(null));
                 })
             })                
         ).then( async () => {
@@ -177,7 +177,7 @@ const getDemographics = () => {
                             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
                             dispatch(errorNetworkCohortDemographics(nr.id, error.response));
                         })
-                        .then(() => resolve());
+                        .then(() => resolve(null));
                 })
             })                
         ).then(() => {

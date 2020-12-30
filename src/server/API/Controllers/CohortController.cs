@@ -23,7 +23,6 @@ using Model.Options;
 namespace API.Controllers
 {
     [Authorize(Policy = TokenType.Access)]
-
     [Route("api/cohort")]
     public class CohortController : MaybeController<RuntimeOptions>
     {

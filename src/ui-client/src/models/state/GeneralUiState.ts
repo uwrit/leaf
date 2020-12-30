@@ -88,6 +88,7 @@ export interface GeneralUiState {
     informationModal: InformationModalState;
     noclickModal: NoClickModalState;
     routes: RouteConfig[];
+    showTimelinesConceptsPane: boolean;
     showImportMrnModal: boolean;
     showImportRedcapModal: boolean;
     showMyLeafModal: boolean;
