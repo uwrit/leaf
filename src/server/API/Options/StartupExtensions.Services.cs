@@ -109,6 +109,8 @@ namespace API.Options
             services.AddTransient<IObfuscationService, ObfuscationService>();
             services.AddTransient<IConceptDatasetSqlCompiler, ConceptDatasetSqlCompiler>();
             services.AddTransient<ConceptDatasetCompilerValidationContextProvider.ICompilerContextProvider, ConceptDatasetCompilerContextProvider>();
+            services.AddTransient<IPanelDatasetSqlCompiler, PanelDatasetSqlCompiler>();
+            services.AddTransient<PanelDatasetCompilerValidationContextProvider.ICompilerContextProvider, PanelDatasetCompilerContextProvider>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

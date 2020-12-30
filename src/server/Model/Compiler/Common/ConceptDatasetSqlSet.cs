@@ -30,7 +30,7 @@ namespace Model.Compiler.Common
         internal override void SetSelect()
         {
             // Ensure personId and encounterId are always strings
-            static Expression toNvarchar(Column x) => new Expression($"CONVERT(NVARCHAR(100),{x})");
+            static Expression toNvarchar(Column x) => new Expression($"CONVERT(NVARCHAR(100), {x})");
 
             var cols = new List<ExpressedColumn>();
             var personId = new ExpressedColumn(toNvarchar(PersonId), DatasetColumns.PersonId);
@@ -61,8 +61,7 @@ namespace Model.Compiler.Common
         public Column Salt = new Column("Salt");
         public Column QueryId = new Column("QueryId");
         public Column Exported = new Column("Exported");
-
-        string queryParamPlaceholder = "___queryid___";
+        readonly string queryParamPlaceholder = "___queryid___";
 
         public CachedCohortSqlSet(CompilerOptions compilerOptions)
         {

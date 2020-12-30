@@ -4,17 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-
 namespace Model.Compiler
 {
-    [Flags]
-    public enum CompilerContextState
+    public interface IPanelDatasetSqlCompiler
     {
-        Ok = 0,
-        QueryNotFound = 1,
-        DatasetNotFound = 2,
-        ConceptNotFound = 3,
-        PanelNotFound = 4,
-        DatasetShapeMismatch = 5,
+        ConceptDatasetExecutionContext BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext);
     }
 }

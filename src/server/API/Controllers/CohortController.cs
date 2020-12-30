@@ -22,8 +22,7 @@ using Model.Options;
 
 namespace API.Controllers
 {
-    // [Authorize(Policy = TokenType.Access)]
-    [AllowAnonymous]
+    [Authorize(Policy = TokenType.Access)]
 
     [Route("api/cohort")]
     public class CohortController : MaybeController<RuntimeOptions>
@@ -102,9 +101,61 @@ namespace API.Controllers
                 log.LogWarning("Malformed concept identifier. Error:{Error}", fe.Message);
                 return BadRequest();
             }
+            catch (OperationCanceledException)
+            {
+                log.LogInformation("Request cancelled. QueryID:{QueryID} ConceptId:{ConceptId}", queryid, conceptid);
+                return NoContent();
+            }
+            catch (LeafRPCException lde)
+            {
+                return StatusCode(lde.StatusCode);
+            }
+            catch (LeafCompilerException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
             catch (Exception ex)
             {
                 log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} ConceptID:{DatasetID} Error:{Error}", queryid, conceptid, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet("{queryid}/paneldataset")]
+        public async Task<ActionResult<DatasetDTO>> PanelDataset(
+            string queryid,
+            [FromQuery] int panelIdx,
+            [FromServices] PanelDatasetProvider provider,
+            CancellationToken cancelToken)
+        {
+            try
+            {
+                var queryRef = new QueryRef(queryid);
+                var result = await provider.GetPanelDatasetAsync(queryRef, panelIdx, cancelToken);
+
+                return Ok(new DatasetDTO(result.Dataset));
+            }
+            catch (FormatException fe)
+            {
+                log.LogWarning("Malformed panel dataset identifiers. Error:{Error}", fe.Message);
+                return BadRequest();
+            }
+            catch (OperationCanceledException)
+            {
+                log.LogInformation("Request cancelled. QueryID:{QueryID} PanelIndex:{PanelIndex}", queryid, panelIdx);
+                return NoContent();
+            }
+            catch (LeafRPCException lde)
+            {
+                return StatusCode(lde.StatusCode);
+            }
+            catch (LeafCompilerException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to fetch panel dataset. QueryID:{QueryID} PanelIndex:{PanelIdx} Error:{Error}", queryid, panelIdx, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

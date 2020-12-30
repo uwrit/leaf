@@ -22,8 +22,10 @@ namespace Services.Search
 
     public class ConceptDatasetCompilerContextProvider : ConceptDatasetCompilerValidationContextProvider.ICompilerContextProvider
     {
-        const string contextById = @"app.sp_GetConceptDatasetContextById";
-        const string contextByUId = @"app.sp_GetConceptDatasetContextByUId";
+        const string contextByQueryIdConceptId = @"app.sp_GetConceptDatasetContextByQueryIdConceptId";
+        const string contextByQueryIdConceptUId = @"app.sp_GetConceptDatasetContextByQueryIdConceptUId";
+        const string contextByQueryUIdConceptUId = @"app.sp_GetConceptDatasetContextByQueryUIdConceptUId";
+        const string contextByQueryUIdConceptId = @"app.sp_GetConceptDatasetContextByQueryUIdConceptId";
 
         readonly IUserContext user;
         readonly AppDbOptions opts;
@@ -41,18 +43,29 @@ namespace Services.Search
 
         public async Task<ConceptDatasetCompilerContext> GetCompilerContextAsync(QueryRef queryRef, ConceptRef conceptRef)
         {
-            var hydrator = GetContextHydrator(queryRef);
+            var hydrator = GetContextHydrator(queryRef, conceptRef);
             var context = await hydrator(queryRef, conceptRef);
             return context;
         }
 
-        Hydrator GetContextHydrator(QueryRef queryRef)
+        Hydrator GetContextHydrator(QueryRef queryRef, ConceptRef conceptRef)
         {
             if (queryRef.UseUniversalId())
             {
-                return ByQueryUId;
+                if (conceptRef.UseUniversalId())
+                {
+                    return ByQueryUIdConceptUId;
+                }
+                return ByQueryUIdConceptId;
             }
-            return ByQueryId;
+            else
+            {
+                if (conceptRef.UseUniversalId())
+                {
+                    return ByQueryIdConceptUId;
+                }
+            }
+            return ByQueryIdConceptId;
         }
 
         ConceptDatasetCompilerContext ReadContextGrid(SqlMapper.GridReader gridReader)
@@ -67,9 +80,9 @@ namespace Services.Search
             };
         }
 
-        async Task<ConceptDatasetCompilerContext> ByQueryId(QueryRef queryRef, ConceptRef conceptRef)
+        async Task<ConceptDatasetCompilerContext> ByQueryIdConceptId(QueryRef queryRef, ConceptRef conceptRef)
         {
-            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryId");
+            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryId and ConceptId");
             var queryid = queryRef.Id.Value;
             var conceptid = conceptRef.Id.Value;
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -77,7 +90,7 @@ namespace Services.Search
                 await cn.OpenAsync();
 
                 var grid = await cn.QueryMultipleAsync(
-                    contextById,
+                    contextByQueryIdConceptId,
                     new { queryid, conceptid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
@@ -87,9 +100,29 @@ namespace Services.Search
             }
         }
 
-        async Task<ConceptDatasetCompilerContext> ByQueryUId(QueryRef queryRef, ConceptRef conceptRef)
+        async Task<ConceptDatasetCompilerContext> ByQueryIdConceptUId(QueryRef queryRef, ConceptRef conceptRef)
         {
-            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryUId");
+            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryId and ConceptUId");
+            var queryid = queryRef.Id.Value;
+            var conceptuid = conceptRef.UniversalId.ToString();
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                    contextByQueryIdConceptId,
+                    new { queryid, conceptuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return ReadContextGrid(grid);
+            }
+        }
+
+        async Task<ConceptDatasetCompilerContext> ByQueryUIdConceptUId(QueryRef queryRef, ConceptRef conceptRef)
+        {
+            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryUId and ConceptUId");
             var queryuid = queryRef.UniversalId.ToString();
             var uid = conceptRef.UniversalId.ToString();
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -97,8 +130,28 @@ namespace Services.Search
                 await cn.OpenAsync();
 
                 var grid = await cn.QueryMultipleAsync(
-                    contextByUId,
+                    contextByQueryUIdConceptUId,
                     new { queryuid, uid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return ReadContextGrid(grid);
+            }
+        }
+
+        async Task<ConceptDatasetCompilerContext> ByQueryUIdConceptId(QueryRef queryRef, ConceptRef conceptRef)
+        {
+            log.LogInformation("Getting ConceptDatasetCompilerContext by QueryUId and ConceptId");
+            var queryuid = queryRef.UniversalId.ToString();
+            var conceptid = conceptRef.Id.Value;
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                    contextByQueryUIdConceptUId,
+                    new { queryuid, conceptid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

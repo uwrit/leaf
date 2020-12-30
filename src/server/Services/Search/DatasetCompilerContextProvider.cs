@@ -27,6 +27,10 @@ namespace Services.Search
         readonly IUserContext user;
         readonly ILogger<DatasetCompilerContextProvider> log;
         readonly AppDbOptions opts;
+        readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        };
 
         public DatasetCompilerContextProvider(
             IUserContext userContext,
@@ -86,10 +90,7 @@ namespace Services.Search
             {
                 return null;
             }
-            var panels = JsonConvert.DeserializeObject<IEnumerable<Panel>>(def, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
+            var panels = JsonConvert.DeserializeObject<IEnumerable<Panel>>(def, jsonSettings);
             if (panels.Count() >= idx+1)
             {
                 return panels.ElementAt(idx.Value);
@@ -163,7 +164,7 @@ namespace Services.Search
 
         async Task<DatasetCompilerContext> ByDatasetUIdQueryUId(DatasetExecutionRequest request)
         {
-            log.LogInformation("Getting DatasetQueryCompilerContext bty DatasetUId and QueryUId");
+            log.LogInformation("Getting DatasetQueryCompilerContext by DatasetUId and QueryUId");
             var datasetuid = request.DatasetRef.UniversalId.ToString();
             var queryuid = request.QueryRef.UniversalId.ToString();
 

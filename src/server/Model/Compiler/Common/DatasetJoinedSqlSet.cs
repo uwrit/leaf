@@ -13,7 +13,6 @@ namespace Model.Compiler.Common
     public class DatasetJoinedSqlSet : PanelSequentialSqlSet
     {
         public Column Salt { get; protected set; }
-
         readonly string queryParamPlaceholder = "___queryid___";
 
         public DatasetJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
