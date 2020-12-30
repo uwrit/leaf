@@ -17,6 +17,8 @@ namespace Model.Cohort
         {
             switch (shape)
             {
+                case Shape.Concept:
+                    return ConceptDatasetContract.Contract;
                 case Shape.Observation:
                     return ObservationContract.Contract;
                 case Shape.Encounter:
@@ -36,7 +38,7 @@ namespace Model.Cohort
                 case Shape.MedicationAdministration:
                     return MedicationAdministrationContract.Contract;
                 default:
-                    throw new ArgumentException($"{shape.ToString()} is not implemented in ShapedDatasetContract.For");
+                    throw new ArgumentException($"{shape} is not implemented in ShapedDatasetContract.For");
             }
         }
 
@@ -88,6 +90,19 @@ namespace Model.Cohort
                 SqlFieldValueNumeric = SqlFieldValueNumeric,
                 IsEncounterBased = IsEncounterBased
             };
+        }
+    }
+
+    public sealed class ConceptDatasetContract : ShapedDatasetContract
+    {
+        static Lazy<ConceptDatasetContract> _contract = new Lazy<ConceptDatasetContract>(() => new ConceptDatasetContract());
+
+        public static ConceptDatasetContract Contract => _contract.Value;
+
+        ConceptDatasetContract()
+        {
+            Shape = Shape.Concept;
+            Fields = ShapedDatasetSchemaExtractor.Extract<ConceptDataset>();
         }
     }
 

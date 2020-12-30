@@ -107,8 +107,8 @@ namespace API.Options
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
             services.AddTransient<NotificationManager.INotificationService, SmtpService>();
             services.AddTransient<IObfuscationService, ObfuscationService>();
-            services.AddTransient<ConceptDatasetProvider.IConceptDatasetService, ConceptDatasetService>();
             services.AddTransient<IConceptDatasetSqlCompiler, ConceptDatasetSqlCompiler>();
+            services.AddTransient<ConceptDatasetCompilerValidationContextProvider.ICompilerContextProvider, ConceptDatasetCompilerContextProvider>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

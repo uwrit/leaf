@@ -13,6 +13,7 @@ namespace Model.Compiler
         Ok = 0,
         QueryNotFound = 1,
         DatasetNotFound = 2,
+        ConceptNotFound = 3,
         DatasetShapeMismatch = 4,
     }
 }

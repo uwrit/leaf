@@ -14,7 +14,7 @@ namespace Model.Compiler.Common
     {
         public Column Salt { get; protected set; }
 
-        string queryParamPlaceholder = "___queryid___";
+        readonly string queryParamPlaceholder = "___queryid___";
 
         public DatasetJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
         {

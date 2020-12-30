@@ -5,10 +5,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
 
 namespace Model.Cohort
 {
@@ -20,60 +20,54 @@ namespace Model.Cohort
     /// </remarks>
     public class ConceptDatasetProvider
     {
-        public interface IConceptDatasetService
-        {
-            Task<ConceptDataset> GetConceptDatasetAsync(Panel panel, QueryRef queryRef);
-        }
-
-        readonly PanelConverter converter;
-        readonly PanelValidator validator;
-        readonly IConceptDatasetService conceptDatasetService;
+        readonly DatasetProvider.IDatasetExecutor executor;
+        readonly ConceptDatasetCompilerValidationContextProvider contextProvider;
         readonly ILogger<ConceptDatasetProvider> log;
-
-        // Testing
         readonly IConceptDatasetSqlCompiler conceptDatasetSqlCompiler;
 
         public ConceptDatasetProvider(
-            PanelConverter converter,
-            PanelValidator validator,
-            IConceptDatasetService conceptDatasetService,
+            ConceptDatasetCompilerValidationContextProvider contextProvider,
+            DatasetProvider.IDatasetExecutor executor,
             ILogger<ConceptDatasetProvider> log,
 
             IConceptDatasetSqlCompiler conceptDatasetSqlCompiler)
         {
-            this.converter = converter;
-            this.validator = validator;
-            this.conceptDatasetService = conceptDatasetService;
+            this.contextProvider = contextProvider;
+            this.executor = executor;
             this.log = log;
             this.conceptDatasetSqlCompiler = conceptDatasetSqlCompiler;
         }
 
-        public async Task<Result> GetConceptDatasetAsync(IQueryDefinition queryDef, QueryRef queryRef)
+        public async Task<Result> GetConceptDatasetAsync(QueryRef queryRef, ConceptRef conceptRef, CancellationToken cancel)
         {
-            log.LogInformation("Concept Dataset extraction starting. Query:{@QueryDef}", queryDef);
-            var ctx = await converter.GetPanelsAsync(queryDef);
+            log.LogInformation("ConceptDataset extraction starting. ConceptRef:{@ConceptRef} Query:{@QueryRef}", queryRef, conceptRef);
 
-            log.LogInformation("Concept Dataset validation context. Context:{@Context}", ctx);
+            var result = new Result();
 
-            if (!ctx.PreflightPassed)
+            var validationContext = await contextProvider.GetCompilerContextAsync(queryRef, conceptRef);
+            log.LogInformation("ConceptDataset compiler validation context. Context:{@Context}", validationContext);
+
+            result.Context = validationContext;
+            if (validationContext.State != CompilerContextState.Ok)
             {
-                return new Result
-                {
-                    ValidationContext = ctx
-                };
+                log.LogError("ConceptDatasetCompilerContext error. State:{State}", validationContext.State);
+                return result;
             }
+            var exeContext = conceptDatasetSqlCompiler.BuildConceptDatasetSql(validationContext.Context);
+            log.LogInformation("Compiled ConceptDataset execution context. Context:{@Context}", exeContext);
 
-            var query = validator.Validate(ctx);
-            var x = conceptDatasetSqlCompiler.BuildConceptDatasetSql(queryRef, query.Panels.First());
-            // conceptDatasetService.GetConceptDatasetAsync(query.Panels.First(), queryRef);
+            var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
+            log.LogInformation("ConceptDataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
 
-            return null;
+            result.Dataset = data;
+
+            return result;
         }
 
         public class Result
         {
-            public PanelValidationContext ValidationContext { get; internal set; }
-            public ConceptDataset Dataset { get; internal set; }
+            public CompilerValidationContext<ConceptDatasetCompilerContext> Context { get; internal set; }
+            public Dataset Dataset { get; internal set; }
         }
     }
 }

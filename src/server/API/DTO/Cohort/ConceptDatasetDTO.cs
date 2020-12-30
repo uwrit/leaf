@@ -11,11 +11,13 @@ namespace API.DTO.Cohort
 {
     public class ConceptDatasetDTO
     {
+        /*
         public IEnumerable<ConceptDataset.ConceptDatasetRow> Rows { get; private set; }
 
         public ConceptDatasetDTO(ConceptDataset conceptDataset)
         {
             this.Rows = conceptDataset.Rows;
         }
+        */
     }
 }

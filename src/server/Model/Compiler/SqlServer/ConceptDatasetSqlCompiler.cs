@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Model.Compiler.Common;
@@ -20,12 +21,47 @@ namespace Model.Compiler.SqlServer
             this.compilerOptions = compOpts.Value;
         }
 
-        public ConceptDatasetExecutionContext BuildConceptDatasetSql(QueryRef queryRef, Panel panel)
+        public ConceptDatasetExecutionContext BuildConceptDatasetSql(ConceptDatasetCompilerContext compilerContext)
         {
-            var sp = panel.SubPanels.First();
+            var p = From(compilerContext.Concept);
+            var sp = p.SubPanels.First();
             var pi = sp.PanelItems.First();
-            var conceptSql = new ConceptJoinedDatasetSqlSet(panel, compilerOptions);
-            return new ConceptDatasetExecutionContext(queryRef.Id, conceptSql.ToString());
+            var cohortSql = new CachedCohortSqlSet(compilerOptions).ToString();
+            var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions).ToString();
+            new SqlValidator(Dialect.IllegalCommands).Validate(conceptSql);
+
+            var exeContext = new ConceptDatasetExecutionContext(compilerContext.QueryContext, compilerContext.QueryContext.QueryId);
+            exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, compilerContext.QueryContext.QueryId);
+            exeContext.CompiledQuery = Compose(cohortSql, conceptSql);
+
+            return exeContext;
+        }
+
+        string Compose(string cohortSql, string conceptSql)
+        {
+            var select = $"SELECT DS.*, C.Salt FROM dataset AS DS INNER JOIN cohort AS C ON DS.{DatasetColumns.PersonId} = C.{DatasetColumns.PersonId}";
+
+            return $"WITH cohort AS ( {cohortSql} ), dataset AS ( {conceptSql} ) {select}";
+        }
+
+        Panel From(Concept concept)
+        {
+            return new Panel
+            {
+                SubPanels = new List<SubPanel>
+                {
+                    new SubPanel
+                    {
+                        PanelItems = new List<PanelItem>
+                        {
+                            new PanelItem
+                            {
+                                Concept = concept
+                            }
+                        }
+                    }
+                }
+            };
         }
     }
 }

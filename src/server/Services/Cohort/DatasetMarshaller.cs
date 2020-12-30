@@ -25,6 +25,8 @@ namespace Services.Cohort
         {
             switch (context.Shape)
             {
+                case Shape.Concept:
+                    return new ConceptMarshaller(schema, pepper);
                 case Shape.Dynamic:
                     return new DynamicMarshaller(context, schema, pepper);
                 case Shape.Observation:
@@ -44,7 +46,7 @@ namespace Services.Cohort
                 case Shape.MedicationAdministration:
                     return new MedicationAdministrationMarshaller(schema, pepper);
                 default:
-                    throw new ArgumentException($"{context.Shape.ToString()} switch branch not implemented");
+                    throw new ArgumentException($"{context.Shape} switch branch not implemented");
             }
         }
 

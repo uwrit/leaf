@@ -159,6 +159,58 @@ namespace Services.Cohort
         }
     }
 
+    sealed class ConceptMarshaller : DatasetMarshaller
+    {
+        public ConceptMarshalPlan Plan { get; set; }
+
+        public ConceptMarshaller(DatasetResultSchema schema, Guid pepper) : base(pepper)
+        {
+            Plan = new ConceptMarshalPlan(schema);
+        }
+
+        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        {
+            var records = new List<ShapedDataset>();
+            var converter = GetConverter(anonymize, opts);
+            while (reader.Read())
+            {
+                var record = GetRecord(reader);
+                var obs = converter(record);
+                records.Add(obs);
+            }
+            return records;
+        }
+
+        Func<ConceptDatasetRecord, ConceptDataset> GetConverter(bool anonymize, DeidentificationOptions opts)
+        {
+            if (anonymize)
+            {
+                var shift = opts.Patient.DateShifting;
+                var anon = new Anonymizer<ConceptDatasetRecord>(Pepper, shift.Increment.ToString(), shift.LowerBound, shift.UpperBound);
+                return (rec) =>
+                {
+                    anon.Anonymize(rec);
+                    return rec.ToConceptDataset();
+                };
+            }
+            return (rec) => rec.ToConceptDataset();
+        }
+
+        ConceptDatasetRecord GetRecord(SqlDataReader reader)
+        {
+            var rec = new ConceptDatasetRecord
+            {
+                Salt = reader.GetGuid(Plan.Salt.Index),
+                PersonId = reader.GetNullableString(Plan.PersonId?.Index),
+                EncounterId = reader.GetNullableString(Plan.EncounterId?.Index),
+                DateField = reader.GetNullableDateTime(Plan.DateField?.Index),
+                NumberField = reader.GetNullableObject(Plan.NumberField?.Index)
+            };
+
+            return rec;
+        }
+    }
+
     sealed class ObservationMarshaller : DatasetMarshaller
     {
         public ObservationMarshalPlan Plan { get; set; }

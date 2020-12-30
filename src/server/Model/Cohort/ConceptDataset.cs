@@ -4,39 +4,20 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Linq;
-using System.Collections.Generic;
+using Model.Compiler;
+using Model.Schema;
 namespace Model.Cohort
 {
-    public class ConceptDataset
+    [Schema(Shape = Shape.Concept)]
+    public class ConceptDataset : ShapedDataset
     {
-        public IReadOnlyCollection<ConceptDatasetRow> Rows { get; private set; }
+        [Field(Name = ConceptColumns.EncounterId, Type = LeafType.String, Phi = true, Mask = true, Required = true)]
+        public string EncounterId { get; set; }
 
-        public ConceptDataset() { }
+        [Field(Name = ConceptColumns.DateField, Type = LeafType.DateTime, Phi = true, Mask = true, Required = true)]
+        public DateTime? DateField { get; set; }
 
-        public ConceptDataset(IEnumerable<ConceptDatasetRow> rows)
-        {
-            Rows = rows.ToList().AsReadOnly();
-        }
-
-        public class ConceptDatasetRow
-        {
-            public string PersonId { get; private set; }
-            public DateTime Date { get; private set; }
-            public decimal NumericValue { get; private set; }
-
-            public ConceptDatasetRow(string personId, DateTime date)
-            {
-                PersonId = personId;
-                Date = date;
-            }
-
-            public ConceptDatasetRow(string personId, DateTime date, decimal numericValue)
-            {
-                PersonId = personId;
-                Date = date;
-                NumericValue = numericValue;
-            }
-        }
+        [Field(Name = ConceptColumns.NumberField, Type = LeafType.Numeric)]
+        public object NumberField { get; set; }
     }
 }

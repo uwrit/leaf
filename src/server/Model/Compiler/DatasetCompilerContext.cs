@@ -33,6 +33,12 @@ namespace Model.Compiler
         public DemographicQuery DemographicQuery { get; set; }
     }
 
+    public sealed class ConceptDatasetCompilerContext : ShapedDatasetCompilerContext
+    {
+        public override Shape Shape => Shape.Concept;
+        public Concept Concept { get; set; }
+    }
+
     public class CompilerValidationContext<T> where T : ShapedDatasetCompilerContext
     {
         T _context;

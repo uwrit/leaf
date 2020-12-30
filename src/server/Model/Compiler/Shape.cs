@@ -9,6 +9,7 @@ namespace Model.Compiler
 {
     public enum Shape
     {
+        Concept = -2,
         Dynamic = -1,
         Observation = 1,
         Encounter = 2,
@@ -25,6 +26,15 @@ namespace Model.Compiler
     {
         public const string Salt = "Salt";
         public const string PersonId = "personId";
+        public const string EncounterId = "encounterId";
+    }
+
+    public static class ConceptColumns
+    {
+        public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
+        public const string DateField = "dateField";
+        public const string NumberField = "numberField";
     }
 
     public static class ObservationColumns
@@ -33,7 +43,7 @@ namespace Model.Compiler
         public const string Category = "category";
         public const string Code = "code";
         public const string EffectiveDate = "effectiveDate";
-        public const string EncounterId = "encounterId";
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string ReferenceRangeLow = "referenceRangeLow";
         public const string ReferenceRangeHigh = "referenceRangeHigh";
         public const string SpecimenType = "specimenType";
@@ -45,12 +55,12 @@ namespace Model.Compiler
     public static class EncounterColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string AdmitDate = "admitDate";
         public const string AdmitSource = "admitSource";
         public const string Class = "class";
         public const string DischargeDate = "dischargeDate";
         public const string DischargeDisposition = "dischargeDisposition";
-        public const string EncounterId = "encounterId";
         public const string Location = "location";
         public const string Status = "status";
     }
@@ -79,11 +89,11 @@ namespace Model.Compiler
     public static class ConditionColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string AbatementDateTime = "abatementDateTime";
         public const string Category = "category";
         public const string Code = "code";
         public const string Coding = "coding";
-        public const string EncounterId = "encounterId";
         public const string OnsetDateTime = "onsetDateTime";
         public const string RecordedDate = "recordedDate";
         public const string Text = "text";
@@ -92,10 +102,10 @@ namespace Model.Compiler
     public static class ProcedureColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string Category = "category";
         public const string Code = "code";
         public const string Coding = "coding";
-        public const string EncounterId = "encounterId";
         public const string PerformedDateTime = "performedDateTime";
         public const string Text = "text";
     }
@@ -103,10 +113,10 @@ namespace Model.Compiler
     public static class ImmunizationColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string Coding = "coding";
         public const string DoseQuantity = "doseQuantity";
         public const string DoseUnit = "doseUnit";
-        public const string EncounterId = "encounterId";
         public const string OccurrenceDateTime = "occurrenceDateTime";
         public const string Route = "route";
         public const string Text = "text";
@@ -116,10 +126,10 @@ namespace Model.Compiler
     public static class AllergyColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string Category = "category";
         public const string Code = "code";
         public const string Coding = "coding";
-        public const string EncounterId = "encounterId";
         public const string OnsetDateTime = "onsetDateTime";
         public const string RecordedDate = "recordedDate";
         public const string Text = "text";
@@ -128,12 +138,12 @@ namespace Model.Compiler
     public static class MedicationRequestColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string Amount = "amount";
         public const string AuthoredOn = "authoredOn";
         public const string Category = "category";
         public const string Code = "code";
         public const string Coding = "coding";
-        public const string EncounterId = "encounterId";
         public const string Form = "form";
         public const string Text = "text";
         public const string Unit = "unit";
@@ -142,11 +152,11 @@ namespace Model.Compiler
     public static class MedicationAdministrationColumns
     {
         public const string PersonId = DatasetColumns.PersonId;
+        public const string EncounterId = DatasetColumns.EncounterId;
         public const string Code = "code";
         public const string Coding = "coding";
         public const string DoseQuantity = "doseQuantity";
         public const string DoseUnit = "doseUnit";
-        public const string EncounterId = "encounterId";
         public const string EffectiveDateTime = "effectiveDateTime";
         public const string Route = "route";
         public const string Text = "text";

@@ -8,6 +8,6 @@ namespace Model.Compiler
 {
     public interface IConceptDatasetSqlCompiler
     {
-        ConceptDatasetExecutionContext BuildConceptDatasetSql(QueryRef queryRef, Panel panel);
+        ConceptDatasetExecutionContext BuildConceptDatasetSql(ConceptDatasetCompilerContext compilerContext);
     }
 }

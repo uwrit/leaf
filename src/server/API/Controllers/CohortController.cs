@@ -82,24 +82,30 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{queryid}/conceptDataset")]
-        public async Task<ActionResult<int>> ConceptDataset(
+        [HttpGet("{queryid}/conceptdataset")]
+        public async Task<ActionResult<DatasetDTO>> ConceptDataset(
             string queryid,
             [FromQuery] string conceptid,
-            [FromServices] ConceptDatasetProvider provider)
+            [FromServices] ConceptDatasetProvider provider,
+            CancellationToken cancelToken)
         {
             try
             {
                 var queryRef = new QueryRef(queryid);
-                var queryDto = new ConceptDatasetQueryDTO(queryid, conceptid);
-                var result = await provider.GetConceptDatasetAsync(queryDto, queryRef);
+                var conceptRef = new ConceptRef(conceptid);
+                var result = await provider.GetConceptDatasetAsync(queryRef, conceptRef, cancelToken);
 
-                return Ok(42);
+                return Ok(new DatasetDTO(result.Dataset));
             }
             catch (FormatException fe)
             {
                 log.LogWarning("Malformed concept identifier. Error:{Error}", fe.Message);
                 return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} ConceptID:{DatasetID} Error:{Error}", queryid, conceptid, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 

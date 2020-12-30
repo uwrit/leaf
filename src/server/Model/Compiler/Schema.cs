@@ -62,7 +62,7 @@ namespace Model.Compiler
                 result.State = SchemaValidationState.Warning;
                 foreach (var unrec in overflow)
                 {
-                    result.AddMessage($"Unrecognized field '{unrec.Name}' is not a member of {Shape.ToString()} and will be dropped");
+                    result.AddMessage($"Unrecognized field '{unrec.Name}' is not a member of {Shape} and will be dropped");
                 }
             }
             return result;
@@ -82,6 +82,8 @@ namespace Model.Compiler
         {
             switch (context.Shape)
             {
+                case Shape.Concept:
+                    return ConceptValidationSchema.Schema;
                 case Shape.Dynamic:
                     return new DynamicValidationSchema(context);
                 case Shape.Observation:
@@ -103,12 +105,12 @@ namespace Model.Compiler
                 case Shape.MedicationAdministration:
                     return MedicationAdministrationValidationSchema.Schema;
                 default:
-                    throw new ArgumentException($"{context.Shape.ToString()} is not implemented in ValidationSchema.For");
+                    throw new ArgumentException($"{context.Shape} is not implemented in ValidationSchema.For");
             }
         }
     }
 
-    public class DynamicValidationSchema : ValidationSchema
+    public sealed class DynamicValidationSchema : ValidationSchema
     {
         public DynamicValidationSchema(ShapedDatasetExecutionContext context)
         {
@@ -116,6 +118,19 @@ namespace Model.Compiler
             var fields = schema.Fields.Select(f => f.ToSchemaField());
             Shape = Shape.Dynamic;
             Fields = fields.ToArray();
+        }
+    }
+
+    public sealed class ConceptValidationSchema : ValidationSchema
+    {
+        static Lazy<ConceptValidationSchema> _schema = new Lazy<ConceptValidationSchema>(() => new ConceptValidationSchema());
+
+        public static ConceptValidationSchema Schema => _schema.Value;
+
+        ConceptValidationSchema()
+        {
+            Shape = Shape.Concept;
+            Fields = ShapedDatasetSchemaExtractor.Extract<ConceptDatasetRecord>();
         }
     }
 

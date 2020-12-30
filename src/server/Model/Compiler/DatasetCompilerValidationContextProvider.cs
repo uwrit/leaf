@@ -34,12 +34,12 @@ namespace Model.Compiler
         }
 
         /// <summary>
-        /// Get the <see cref="DatasetCompilerContext"/> from the provider, validates it's state, and wraps it in <see cref="CompilerValidationContext{DatasetCompilerContext}"/>.
+        /// Get the <see cref="DatasetCompilerContext"/> from the provider, validates its state, and wraps it in <see cref="CompilerValidationContext{DatasetCompilerContext}"/>.
         /// </summary>
         /// <returns>The compiler validation context.</returns>
         /// <param name="request">Execution request.</param>
         /// <exception cref="Validation.LeafRPCException"/>
-        /// <exception cref="System.Data.Common.DbException"/>
+        /// <exception cref="DbException"/>
         public async Task<CompilerValidationContext<DatasetCompilerContext>> GetCompilerContextAsync(DatasetExecutionRequest request)
         {
             log.LogInformation("Getting dataset query compiler context. Request:{@Request}", request);
