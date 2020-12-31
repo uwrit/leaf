@@ -1,0 +1,47 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.timelines-control-panel-step {
+    background-color: white;
+    border: 1px solid rgb(230,230,230);
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px 0;
+    padding: 4px;
+    transition: background-color 0.2s;
+}
+
+.timelines-control-panel-step:hover {
+    background-color: rgb(224, 244, 253);
+    border-color: rgb(164, 222, 248);
+}
+
+.timelines-control-panel-step-number,
+.timelines-control-panel-step-text {
+    display: inline-block;
+}
+
+.timelines-control-panel-step-number {
+    background-image: linear-gradient(60deg, rgb(0, 130, 177), rgb(28, 168, 221));
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    text-align: center;
+    width: 24px;
+}
+
+.timelines-control-panel-step-text {
+    margin-left: 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.timelines-control-panel-step-subtext {
+    color: rgb(63, 62, 62);
+    font-size: 0.9rem;
+    padding: 8px;
+}

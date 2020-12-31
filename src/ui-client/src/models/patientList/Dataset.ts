@@ -53,7 +53,7 @@ export interface PatientListDatasetDTO {
     schema: PatientListDatasetSchema;
 }
 
-interface PatientListDatasetSchema {
+export interface PatientListDatasetSchema {
     fields: PatientListDatasetSchemaField[],
     shape: PatientListDatasetShape;
 }
@@ -65,7 +65,7 @@ export interface PatientListDatasetDynamicSchema extends PatientListDatasetSchem
     sqlFieldValueNumeric?: string;
 }
 
-interface PatientListDatasetSchemaField {
+export interface PatientListDatasetSchemaField {
     name: string;
     type: PatientListColumnType;
 }

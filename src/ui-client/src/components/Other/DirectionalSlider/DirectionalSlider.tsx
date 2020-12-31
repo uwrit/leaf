@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import { generate as generateId } from 'shortid';
 import './DirectionalSlider.css';
 
 interface Props {
@@ -13,12 +14,14 @@ interface Props {
     from: Direction;
     toggle: () => any;
     overlay?: boolean;
+    overlayContent?: JSX.Element;
 }
 
 export enum Direction { Right, Left }
 
 export class DirectionalSlider extends React.Component<Props> {
     private className = 'directional-slider';
+    private instanceName = '';
     private mouseOut = true;
 
     public static defaultProps = {
@@ -31,20 +34,24 @@ export class DirectionalSlider extends React.Component<Props> {
         }
     }
 
+    public componentWillMount() {
+        this.instanceName = `${this.className}-${generateId()}`;
+    }
+
     public componentDidUpdate(prevProps: Props, prevState: any) {
         // Set focus to the element body to catch blur events if clicked outside
         if (this.props.show && !prevProps.show) {
 
-            /*
+            /**
              * Try to focus on input, if present.
              */
-            const firstInput = document.querySelector(`.${this.className}-body input`) as any;
+            const firstInput = document.querySelector(`#${this.instanceName} input`) as any;
             if (firstInput && firstInput.focus) {
                 firstInput.focus();
                 return;
             }
 
-            /*
+            /**
              * Else try to focus on the body itself.
              */
             const el: any = document.getElementsByClassName(`${this.className}-body`);
@@ -59,16 +66,18 @@ export class DirectionalSlider extends React.Component<Props> {
     public handleMouseLeave = () => this.mouseOut = true;
 
     public render() {
-        const { overlay } = this.props;
+        const { overlay, overlayContent } = this.props;
         const c = this.className;
         const classes = `${c}-container ${this.props.show ? 'show' : ''} ${this.props.from === Direction.Left ? 'left' : 'right'}`
 
         return (
             <div className={classes}>
                 {overlay && 
-                <div className={`${c}-overlay`} />
+                <div className={`${c}-overlay`}>
+                    {overlayContent}
+                </div>
                 }
-                <div className={`${c}-body`} 
+                <div className={`${c}-body`} id={this.instanceName} 
                     onBlur={this.handleBlur}
                     onMouseLeave={this.handleMouseLeave.bind(null)} 
                     onMouseEnter={this.handleMouseEnter.bind(null)}

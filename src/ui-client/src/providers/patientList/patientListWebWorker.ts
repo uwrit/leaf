@@ -168,7 +168,7 @@ export default class PatientListWebWorker {
     }
 
     private workerContext = () => {
-        let patientMap = new Map<string, Patient>();
+        let patientMap = new Map<PatientId, Patient>();
         let singletonDatasets = new Map<PatientListDatasetId, PatientListDatasetDefinition>();
         let multirowDatasets = new Map<PatientListDatasetId, PatientListDatasetDefinition>();
         let defaultPatientOrder: PatientId[] = [];

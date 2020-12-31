@@ -63,13 +63,13 @@ class Visualize extends React.Component<Props, State> {
             }
         });
 
-        /*
+        /**
          * If too many patients for caching, let user know.
          */
         if (cohort.networkCohorts.size === 1 && cohort.count.value > cacheLimit) {
             return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
-        /*
+        /**
          * Show a loading spinner if no responders have completed yet.
          */
         if (cohort.visualization.state === CohortStateType.IN_ERROR) {
@@ -82,7 +82,7 @@ class Visualize extends React.Component<Props, State> {
                 </div>
             );
         } 
-        /*
+        /**
          * Show a loading spinner if no responders have completed yet.
          */
         if (completedResponders === 0 || cohort.visualization.state !== CohortStateType.LOADED) {

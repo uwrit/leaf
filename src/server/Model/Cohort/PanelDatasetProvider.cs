@@ -13,7 +13,7 @@ using Model.Compiler;
 namespace Model.Cohort
 {
     /// <summary>
-    /// Encapsulates Leaf's concept dataset extraction use case.
+    /// Encapsulates Leaf's panel dataset extraction use case.
     /// </summary>
     /// <remarks>
     /// Required services throw exceptions that bubble up.

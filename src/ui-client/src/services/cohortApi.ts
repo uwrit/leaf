@@ -59,7 +59,7 @@ export const fetchConceptDataset = (
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = { conceptid: nr.isHomeNode ? concept.id : concept.universalId };
-    return http.get(`${nr.address}/api/cohort/${queryId}/conceptdataset`, params );
+    return http.get(`${nr.address}/api/cohort/${queryId}/conceptdataset`, { params } );
 };
 
 /**
@@ -74,7 +74,7 @@ export const fetchPanelDataset = (
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = { panelIdx };
-    return http.get(`${nr.address}/api/cohort/${queryId}/paneldataset`, params );
+    return http.get(`${nr.address}/api/cohort/${queryId}/paneldataset`, { params } );
 };
 
 /**

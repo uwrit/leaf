@@ -14,10 +14,11 @@ export interface TimelinesDateConfiguration {
 
 export interface TimelinesConfiguration {
     concepts: Concept[];
+    dateIncrement: TimelinesDateConfiguration;
     indexEvent?: Concept;
     mode: TimelinesDisplayMode;
 }
 
 export enum TimelinesDisplayMode { PATIENT = 1, AGGREGATE = 2 }
 export enum DateDisplayMode { BEFORE = 1, AFTER = 2, BEFORE_AND_AFTER = 3 }
-export enum DateIncrementType { DAY, HOUR, MINUTE, MONTH, WEEK, YEAR }
+export enum DateIncrementType { DAY = 1, HOUR = 2, MINUTE = 3, MONTH = 4, WEEK = 5, YEAR = 6 }

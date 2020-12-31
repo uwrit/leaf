@@ -10,8 +10,8 @@ import { Modal, ModalBody, Row, Col } from 'reactstrap';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { FiCheckCircle } from 'react-icons/fi';
 import { setNoClickModalState } from '../../../actions/generalUi';
-import './NoClickModal.css';
 import { NoClickModalState, NotificationStates } from '../../../models/state/GeneralUiState';
+import './NoClickModal.css';
 
 interface Props { 
     dispatch: any;
@@ -31,7 +31,9 @@ export default class NoClickModal extends React.Component<Props> {
                 state: NotificationStates.Hidden
             }
 
-            // Auto-hide the modal after timeout
+            /**
+             * Auto-hide after timeout
+             */ 
             setTimeout(() => dispatch(setNoClickModalState(noclickState)), this.hideTimeoutOnCompleteMs);
         }
     }

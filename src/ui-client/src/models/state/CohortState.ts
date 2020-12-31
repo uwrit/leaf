@@ -10,7 +10,7 @@ import { PatientListConfiguration } from '../patientList/Configuration';
 import { PatientListRow } from '../patientList/Patient';
 import { DemographicStatistics } from '../cohort/DemographicDTO';
 import { TimelinesConfiguration } from '../timelines/Configuration';
-import { TimelinesAggregateDataRow, TimelinesPatientDataRow } from '../timelines/Data';
+import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -74,17 +74,17 @@ export interface PatientListNetworkState extends BasePatientListState {
 }
 
 export interface BaseTimelinesState {
-    state: CohortStateType;
+    indexConceptState: CohortStateType;
+    stateByConcept: Map<String, CohortStateType>;
 }
 
 export interface TimelinesState extends BaseTimelinesState {
-    aggregateData: TimelinesAggregateDataRow[];
+    aggregateData: TimelinesAggregateDataset;
     configuration: TimelinesConfiguration;
     patientData: TimelinesPatientDataRow[];
 }
 
 export interface TimelinesNetworkState extends BaseTimelinesState {
-
 }
 
 export interface VisualizationState {

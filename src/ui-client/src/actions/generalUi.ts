@@ -45,7 +45,7 @@ export const CONFIRM_MODAL_SHOW = 'CONFIRM_MODAL_SHOW';
 export const CONFIRM_MODAL_HIDE = 'CONFIRM_MODAL_HIDE';
 export const NOCLICK_MODAL_SET_STATE = 'NOCLICK_MODAL_SET_STATE';
 export const SIDE_NOTIFICATION_SET_STATE = 'SIDE_NOTIFICATION_SET_STATE';
-export const SET_USER_QUESTION_STATE = 'SET_USER_QUESTION_STATE';
+export const SET_USER_QUESTION_STATE = 'SET_USER_QUESTION_STATE'
 export const TIMELINES_CONCEPT_PANE_SHOW = 'TIMELINES_CONCEPT_PANE_SHOW';
 export const TIMELINES_CONCEPT_PANE_HIDE = 'TIMELINES_CONCEPT_PANE_HIDE';
 
@@ -241,18 +241,6 @@ export const hideMyLeafModal = (): GeneralUiAction => {
 export const showMyLeafModal = (): GeneralUiAction => {
     return {
         type: MY_LEAF_MODAL_SHOW
-    };
-};
-
-export const showTimelinesConceptsPane = (): GeneralUiAction => {
-    return {
-        type: TIMELINES_CONCEPT_PANE_SHOW
-    };
-};
-
-export const hideTimelinesConceptsPane = (): GeneralUiAction => {
-    return {
-        type: TIMELINES_CONCEPT_PANE_HIDE
     };
 };
 

@@ -1,0 +1,37 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.timelines-concept-drag-overlay {
+    background-color: transparent;
+    height: 100%;
+    width: 100%;
+}
+
+.timelines-concept-drag-overlay-inner {
+    background-color: rgb(240, 240, 240);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: black;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 40%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+}
+
+.timelines-concept-drag-overlay-inner p {
+    font-size: 2.0rem;
+    font-weight: 100;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner {
+    background-color: rgb(175, 231, 252);
+}

@@ -37,6 +37,20 @@ import {
     VISUALIZATION_SET_AGGREGATE,
     VISUALIZATION_SET_NETWORK
 } from '../../actions/cohort/visualize';
+
+import {
+    TIMELINES_CONCEPT_DATASET_START,
+    TIMELINES_CONCEPT_DATASET_FINISH,
+    TIMELINES_CONCEPT_DATASET_NETWORK_DATASET,
+    TIMELINES_CONCEPT_DATASET_NETWORK_ERROR,
+    TIMELINES_CONCEPT_DATASET_NETWORK_NOT_IMPLEMENTED,
+    TIMELINES_INDEX_DATASET_START,
+    TIMELINES_INDEX_DATASET_FINISH,
+    TIMELINES_INDEX_DATASET_NETWORK_DATASET,
+    TIMELINES_INDEX_DATASET_NETWORK_ERROR,
+    TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED,
+    TIMELINES_SET_AGGREGATE_DATASET
+} from '../../actions/cohort/timelines';
 import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
 import { 
@@ -72,7 +86,7 @@ import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkC
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
-import { defaultNetworkTimelinesState, defaultTimelinesState } from './timelines';
+import { defaultNetworkTimelinesState, defaultTimelinesState, setTimelinesNetworkConceptDataset, setTimelinesConceptDatasetState, setTimelinesPanelDatasetState, setTimelinesNetworkPanelDataset, setTimelinesAggregateDataset } from './timelines';
 
 export const defaultCohortState = (): CohortState => {
     return {
@@ -281,6 +295,28 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setAggregateCohortVisualization(state, action);
 
         // Timelines
+        case TIMELINES_SET_AGGREGATE_DATASET:
+            return setTimelinesAggregateDataset(state, action);
+        case TIMELINES_CONCEPT_DATASET_START:
+            return setTimelinesConceptDatasetState(state, CohortStateType.REQUESTING, action);
+        case TIMELINES_CONCEPT_DATASET_FINISH:
+            return setTimelinesConceptDatasetState(state, CohortStateType.LOADED, action);
+        case TIMELINES_CONCEPT_DATASET_NETWORK_DATASET:
+            return setTimelinesNetworkConceptDataset(state, CohortStateType.LOADED, action);
+        case TIMELINES_CONCEPT_DATASET_NETWORK_NOT_IMPLEMENTED:
+            return setTimelinesNetworkConceptDataset(state, CohortStateType.NOT_IMPLEMENTED, action);
+        case TIMELINES_CONCEPT_DATASET_NETWORK_ERROR:
+            return setTimelinesNetworkConceptDataset(state, CohortStateType.IN_ERROR, action);         
+        case TIMELINES_INDEX_DATASET_START:
+            return setTimelinesPanelDatasetState(state, CohortStateType.REQUESTING, action);
+        case TIMELINES_INDEX_DATASET_FINISH:
+            return setTimelinesPanelDatasetState(state, CohortStateType.LOADED, action);
+        case TIMELINES_INDEX_DATASET_NETWORK_DATASET:
+            return setTimelinesNetworkPanelDataset(state, CohortStateType.LOADED, action);
+        case TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED:
+            return setTimelinesNetworkPanelDataset(state, CohortStateType.NOT_IMPLEMENTED, action);
+        case TIMELINES_INDEX_DATASET_NETWORK_ERROR:
+            return setTimelinesNetworkPanelDataset(state, CohortStateType.IN_ERROR, action);            
 
         // Patient List
         case SET_PATIENT_LIST_DISPLAY:

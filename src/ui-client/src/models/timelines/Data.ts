@@ -5,12 +5,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
- export interface TimelinesAggregateDataRow {
-    conceptId: string;
-    timepointId: string;
-    value: number;
- }
+import { Concept, ConceptId } from "../concept/Concept";
 
- export interface TimelinesPatientDataRow {
+export type TimePointId = string;
+
+export interface TimelinesAggregateDataset {
+    concepts: Map<ConceptId, TimelinesAggregateConcept>;
+}
+
+export interface TimelinesAggregateConcept {
+    concept: Concept;
+    data: TimelinesAggregateDataRow[];
+}
+
+export interface TimelinesAggregateDataRow {
+    timepointId: TimePointId;
+    value: number;
+}
+
+export interface TimelinesAggregateTimeBin {
+    label: string;
+    minNum?: number;
+    maxNum?: number;
+}
+
+export interface TimelinesPatientDataRow {
      
- }
+}

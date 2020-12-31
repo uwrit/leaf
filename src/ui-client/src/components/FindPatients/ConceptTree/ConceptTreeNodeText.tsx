@@ -46,7 +46,6 @@ const conceptNodeTarget = {
             !props.concept.isExtension &&
             con.id !== props.concept.parentId
         );
-
     }
 }
 
@@ -54,7 +53,7 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
     return ({
         canDrop: monitor.canDrop(),
         connectDropTarget: connect.dropTarget(),
-        isOver: monitor.isOver({ shallow: true })
+        isOver: monitor.isOver()
     });
 };
 
