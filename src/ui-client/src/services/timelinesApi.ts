@@ -8,7 +8,6 @@
 import { ConceptDatasetDTO } from '../models/cohort/ConceptDataset';
 import { Concept } from '../models/concept/Concept';
 import { TimelinesConfiguration } from '../models/timelines/Configuration';
-import { TimelinesAggregateDataset } from '../models/timelines/Data';
 import TimelinesWebWorker from '../providers/timelines/timelinesWebWorker';
 
 const timelinesProvider = new TimelinesWebWorker();
@@ -23,8 +22,8 @@ export const getChartData = (config: TimelinesConfiguration) => {
 /**
  * Add a Concept Dataset
  */
-export const addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number) => {
-    return timelinesProvider.addConceptDataset(dataset, responderId);
+export const addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, concept: Concept) => {
+    return timelinesProvider.addConceptDataset(dataset, responderId, concept);
 };
 
 /**

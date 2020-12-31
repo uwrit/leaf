@@ -14,7 +14,7 @@ import { CohortStateType } from '../../models/state/CohortState';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
-import { addConceptDataset, getChartData } from '../../services/timelinesApi';
+import { addConceptDataset, addIndexDataset, getChartData } from '../../services/timelinesApi';
 import { showInfoModal } from '../generalUi';
 
 export const TIMELINES_SET_AGGREGATE_DATASET = 'TIMELINES_SET_AGGREGATE_DATASET';
@@ -34,7 +34,7 @@ export const TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED = 'TIMELINES_INDEX_
 export interface CohortTimelinesAction {
     aggregateDataset?: TimelinesAggregateDataset;
     concept?: Concept;
-    data?: ConceptDatasetDTO;
+    data?: ConceptDatasetDTO | null;
     id?: number;
     type: string;
 }
@@ -47,6 +47,7 @@ export const getConceptDataset = (concept: Concept) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         let atLeastOneSucceeded = false;
         const state = getState();
+        const timelines = state.cohort.timelines;
         const responders: NetworkIdentity[] = [];
         state.responders.forEach((nr: NetworkIdentity) => { 
             if (concept.universalId || nr.enabled) { 
@@ -64,13 +65,13 @@ export const getConceptDataset = (concept: Concept) => {
 
                     // Request concept dataset
                     fetchConceptDataset(getState(), nr, queryId, concept)
-                        .then(
-                            response => {
+                        .then( async response => {
                                 // Make sure query hasn't been cancelled
                                 if (getState().cohort.timelines.stateByConcept.get(concept.id) !== CohortStateType.REQUESTING) { return; }
 
                                 // Update state
                                 const dto = response.data as ConceptDatasetDTO;
+                                await addConceptDataset(dto, nr.id, concept);
 
                                 atLeastOneSucceeded = true;
                                 dispatch(setTimelinesNetworkConceptDataset(nr.id, concept, dto));
@@ -91,10 +92,12 @@ export const getConceptDataset = (concept: Concept) => {
             if (getState().cohort.timelines.stateByConcept.get(concept.id) !== CohortStateType.REQUESTING) { return; }
             dispatch(setTimelinesConceptDatasetExtractFinished(concept));
 
-            if (atLeastOneSucceeded) {
-                const timeline = await getChartData(state.cohort.timelines.configuration) as TimelinesAggregateDataset;
+            if (atLeastOneSucceeded && timelines.indexConceptState) {
+                const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 dispatch(setTimelinesAggregateDataset(timeline));
-            } else {
+                console.log(timeline);
+
+            } else if (!atLeastOneSucceeded) {
                 const info : InformationModalState = {
                     header: "Error Running Query",
                     body: "Leaf encountered an error while extracting the data. If this continues, please contact your Leaf administrator.",
@@ -114,6 +117,7 @@ export const getPanelIndexDataset = (panelIdx: number) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         let atLeastOneSucceeded = false;
         const state = getState();
+        const timelines = state.cohort.timelines;
         const responders: NetworkIdentity[] = [];
         state.responders.forEach((nr: NetworkIdentity) => { 
             if (nr.enabled) { 
@@ -137,7 +141,7 @@ export const getPanelIndexDataset = (panelIdx: number) => {
 
                                 // Send to web worker
                                 const dto = response.data as ConceptDatasetDTO;
-                                await addConceptDataset(dto, nr.id);
+                                await addIndexDataset(dto, nr.id);
 
                                 atLeastOneSucceeded = true;
                                 dispatch(setTimelinesNetworkIndexDataset(nr.id));
@@ -158,10 +162,11 @@ export const getPanelIndexDataset = (panelIdx: number) => {
             if (getState().cohort.timelines.indexConceptState !== CohortStateType.REQUESTING) { return; }
             dispatch(setTimelinesIndexDatasetExtractFinished());
 
-            if (atLeastOneSucceeded) {
-                const timeline = await getChartData(state.cohort.timelines.configuration) as TimelinesAggregateDataset;
+            if (atLeastOneSucceeded && timelines.aggregateData.concepts.size > 0) {
+                const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 dispatch(setTimelinesAggregateDataset(timeline));
-            } else {
+
+            } else if (!atLeastOneSucceeded) {
                 const info : InformationModalState = {
                     header: "Error Running Query",
                     body: "Leaf encountered an error while extracting the data. If this continues, please contact your Leaf administrator.",

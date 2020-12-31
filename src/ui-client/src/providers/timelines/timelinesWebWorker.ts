@@ -11,7 +11,7 @@ import { Concept, ConceptId } from '../../models/concept/Concept';
 import { PatientId } from '../../models/patientList/Patient';
 import { DateDisplayMode, DateIncrementType, TimelinesConfiguration, TimelinesDisplayMode } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataRow, TimelinesAggregateDataset, TimelinesAggregateTimeBin } from '../../models/timelines/Data';
-import { IndexPatient, Patient } from '../../models/timelines/Patient';
+import { IndexPatient } from '../../models/timelines/Patient';
 import { ConceptDatasetStore, IndexDatasetStore } from '../../models/timelines/Patient';
 import { workerContext } from './timelinesWebWorkerContext';
 
@@ -89,8 +89,8 @@ export default class TimelinesWebWorker {
         this.worker.onerror = error => this.reject(error);
     }
 
-    public addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number) => {
-        return this.postMessage({ message: ADD_CONCEPT_DATASET, dataset, responderId });
+    public addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, concept: Concept) => {
+        return this.postMessage({ message: ADD_CONCEPT_DATASET, dataset, responderId, concept });
     }
 
     public addIndexDataset = (dataset: ConceptDatasetDTO, responderId: number) => {
@@ -160,7 +160,7 @@ export default class TimelinesWebWorker {
 
         const query = (payload: InboundMessagePayload) => {
             if (payload.config!.mode === configQueryAggregate) {
-                return queryAggregate(payload);
+                return { requestId: payload.requestId, result: queryAggregate(payload) };
             } else {
                 return null;
             }
@@ -212,13 +212,13 @@ export default class TimelinesWebWorker {
                     let d;
 
                     if (!bin.minNum) {
-                        d = p.rows.find((r) => r.dateField && dateDiffer(indexDate, r.dateField) < bin.maxNum!);
+                        d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) < bin.maxNum!);
                     } else if (!bin.maxNum) {
-                        d = p.rows.find((r) => r.dateField && dateDiffer(indexDate, r.dateField) > bin.minNum!);
+                        d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) > bin.minNum!);
                     } else {
                         d = p.rows.find((r) => {
                             if (!r.dateField) { return false; }
-                            const diff = dateDiffer(indexDate, r.dateField);
+                            const diff = dateDiffer(r.dateField, indexDate);
                             if (diff >= bin.minNum! && diff <= bin.maxNum!) {
                                 return true;
                             }
@@ -229,7 +229,7 @@ export default class TimelinesWebWorker {
                         totalCount += 1;
                     }
                 }
-                output.push({ timepointId: bin.label, value: totalCount });
+                output.push({ conceptId: concept.id, timepointId: bin.label, value: totalCount });
             });
 
             return output;
@@ -270,7 +270,7 @@ export default class TimelinesWebWorker {
             if (config.dateIncrement.mode === dateDisplayModeAfter) {
                 lowerBound = 0;
                 upperBound = incr * maxBins;
-                startBin = { label: `<${incr}`, maxNum: incr };
+                startBin = { label: `<${incr}`, minNum: 1, maxNum: incr };
                 lastBin  = { label: `>${upperBound}`, minNum: upperBound };
             } 
             // Before
@@ -278,7 +278,7 @@ export default class TimelinesWebWorker {
                 lowerBound = -(incr * maxBins);
                 currIdx = lowerBound+incr;
                 startBin = { label: `<${lowerBound}`, maxNum: lowerBound };
-                lastBin  = { label: ``, minNum: 0 };
+                lastBin  = { label: ``, maxNum: -1 };
             }
             // Before & After
             else {
@@ -320,7 +320,7 @@ export default class TimelinesWebWorker {
             const responderId = payload.responderId!;
             const dataset = payload.dataset!;
             const concept = payload.concept!;
-            const uniquePatients: PatientId[] = Object.keys(dataset!);
+            const uniquePatients: PatientId[] = Object.keys(dataset.results);
             let store;
 
             if (!conceptDatasetMap.has(concept.id)) {
@@ -353,6 +353,8 @@ export default class TimelinesWebWorker {
                 const pat = { compoundId, id: p, responderId, rows: convRows };
                 store.patients.set(compoundId, pat);
             }
+
+            return { requestId: payload.requestId };
         };
 
         /**
@@ -361,7 +363,7 @@ export default class TimelinesWebWorker {
         const addIndexDataset = (payload: InboundMessagePayload) => {
             const responderId = payload.responderId!;
             const dataset = payload.dataset!;
-            const uniquePatients: PatientId[] = Object.keys(dataset!);
+            const uniquePatients: PatientId[] = Object.keys(dataset.results);
 
             // For each row
             for (let i = 0; i < uniquePatients.length; i++) {
@@ -393,6 +395,7 @@ export default class TimelinesWebWorker {
                 const pat: IndexPatient = { compoundId, id: p, responderId, rows: convRows, initialDate, finalDate };
                 indexDataset.patients.set(compoundId, pat);
             }
+            return { requestId: payload.requestId };
         };
     }
 }

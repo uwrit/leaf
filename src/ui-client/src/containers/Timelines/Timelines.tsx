@@ -19,6 +19,7 @@ import PanelSelectorModal from '../../components/Modals/PanelSelectorModal/Panel
 import TimelinesConceptDragOverlay from '../../components/Timelines/TimelinesConceptDragOverlay';
 import { Dispatch } from 'redux';
 import './Timelines.css';
+import { getPanelIndexDataset } from '../../actions/cohort/timelines';
 
 interface OwnProps { }
 interface StateProps {
@@ -83,7 +84,7 @@ class Timelines extends React.Component<Props, State> {
                             <div className={`${c}-chart`}>
                                 {/* Aggregate chart */}
                                 {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                <AggregateTimelineChart timelines={timelines}/>}
+                                <AggregateTimelineChart data={timelines}/>}
                             </div>
                         </Col>
 
@@ -135,7 +136,11 @@ class Timelines extends React.Component<Props, State> {
     };
 
     private handlePanelSelect = (panelIndex?: number) => {
-        
+        const { dispatch } = this.props;
+        if (typeof(panelIndex) !== 'undefined') {
+            dispatch(getPanelIndexDataset(panelIndex));
+            this.setState({ showPanelSelector: false });
+        }
     };
 }
 

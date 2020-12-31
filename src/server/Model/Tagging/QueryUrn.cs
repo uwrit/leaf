@@ -11,7 +11,7 @@ namespace Model.Tagging
     {
         const string resourceSegment = ResourceType.Query;
 
-        QueryUrn(string urn) : base(urn)
+        public QueryUrn(string urn) : base(urn)
         {
 
         }

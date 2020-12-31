@@ -11,7 +11,7 @@ import { TimelinesState } from '../../models/state/CohortState';
 import './AggregateTimelineChart.css';
 
 interface Props { 
-    timelines: TimelinesState;
+    data: TimelinesState;
 }
 
 export default class AggregateTimelineChart extends React.Component<Props> {
@@ -34,19 +34,19 @@ export default class AggregateTimelineChart extends React.Component<Props> {
 
     public render() {
         const c = this.className;
+        const data = [ ...this.props.data.aggregateData.concepts.values() ];
 
         return  (
-            <div>
+            <div style={{ height: 500, width: 500 }}>
                 <ResponsiveContainer >
                     <ScatterChart width={730} height={250}
                         margin={{ top: 20, right: 20, bottom: 10, left: 10 }}>
-                        <XAxis dataKey="x" name="stature" unit="cm" />
-                        <YAxis dataKey="y" name="weight" unit="kg" />
-                        <ZAxis dataKey="z" range={[64, 144]} name="score" unit="km" />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        <Legend />
-                        <Scatter name="A school" data={[]} fill="#8884d8" />
-                        <Scatter name="B school" data={[]} fill="#82ca9d" />
+                        <XAxis dataKey="timepointId" type="category" />
+                        <YAxis dataKey="conceptId" type="category" />
+                        <ZAxis dataKey="value" scale="auto" />
+                        {data.map((d) => {
+                            return <Scatter key={d.concept.id} name={d.concept.uiDisplayName} data={d.data} fill="#8884d8" />
+                        })}
                     </ScatterChart>
                 </ResponsiveContainer>
             </div>

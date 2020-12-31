@@ -19,6 +19,7 @@ export interface TimelinesAggregateConcept {
 }
 
 export interface TimelinesAggregateDataRow {
+    conceptId: ConceptId;
     timepointId: TimePointId;
     value: number;
 }
