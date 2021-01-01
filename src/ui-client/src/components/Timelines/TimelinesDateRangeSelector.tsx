@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
-import { TimelinesDateConfiguration, DateIncrementType } from '../../models/timelines/Configuration';
-import { setTimelinesConfigurationDates } from '../../actions/cohort/timelines';
+import { DateIncrementType, TimelinesConfiguration } from '../../models/timelines/Configuration';
+import { setTimelinesConfigurationDates, getLatestTimelinesDataFromConfig } from '../../actions/cohort/timelines';
 import './TimelinesDateRangeSelector.css';
 
 interface Props {
-    config: TimelinesDateConfiguration;
+    config: TimelinesConfiguration;
     dispatch: any;
 }
 
@@ -38,7 +38,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
     public render() {
         const c = this.className;
         const { incrementTypeDropdownOpen, modeDropdownOpen } = this.state;
-        const { increment, incrementType, mode }  = this.props.config;
+        const { increment, incrementType, mode }  = this.props.config.dateIncrement;
 
         return (
             <div>
@@ -96,19 +96,23 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
 
     private handleDateIncrementTypeChange = (incrementType: DateIncrementType) => {
         const { dispatch, config } = this.props;
-        const newConfig = Object.assign({}, config, {
+        const newDateConfig = Object.assign({}, config.dateIncrement, {
             incrementType
         });
-        dispatch(setTimelinesConfigurationDates(newConfig))
+        const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
+        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
     private handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
         const increment = parseInt(e.currentTarget.value);
         const { dispatch, config } = this.props;
-        const newConfig = Object.assign({}, config, {
+        const newDateConfig = Object.assign({}, config.dateIncrement, {
             increment
         });
-        dispatch(setTimelinesConfigurationDates(newConfig))
+        const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
+        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
     private toggleIncrementTypeDropdown = () => {

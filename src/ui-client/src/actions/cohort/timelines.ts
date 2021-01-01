@@ -12,7 +12,7 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { InformationModalState } from '../../models/state/GeneralUiState';
-import { TimelinesDateConfiguration } from '../../models/timelines/Configuration';
+import { TimelinesConfiguration, TimelinesDateConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
 import { addConceptDataset, addIndexDataset, getChartData } from '../../services/timelinesApi';
@@ -178,6 +178,16 @@ export const getPanelIndexDataset = (panelIdx: number) => {
                 dispatch(showInfoModal(info));
             }
         });
+    };
+};
+
+export const getLatestTimelinesDataFromConfig = (config: TimelinesConfiguration) => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        const state = getState();
+        if (state.cohort.timelines.indexConceptState) {
+            const timeline = await getChartData(config) as TimelinesAggregateDataset;
+            dispatch(setTimelinesAggregateDataset(timeline));
+        }
     };
 };
 

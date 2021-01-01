@@ -110,7 +110,7 @@ class Timelines extends React.Component<Props, State> {
                                     subtext={<span>
                                         {'Set the range of dates to see timelines for'}
                                      </span>}
-                                    subComponent={<TimelinesDateRangeSelector dispatch={dispatch} config={timelines.configuration.dateIncrement} />}
+                                    subComponent={<TimelinesDateRangeSelector dispatch={dispatch} config={timelines.configuration} />}
                                 />
                             </div>
                         </Col>
