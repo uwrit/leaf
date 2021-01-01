@@ -15,9 +15,11 @@ import React from 'react';
 import './TimelinesControlPanelStep.css';
 
 interface Props { 
-    handleClick: () => void;
+    clickable: boolean;
+    handleClick?: () => void;
     number: number;
     subtext?: string | JSX.Element;
+    subComponent?: JSX.Element;
     text: string;
 }
 
@@ -27,16 +29,24 @@ export default class TimelinesControlPanelStep extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { handleClick, number, subtext, text } = this.props;
+        const { clickable, number, subtext, text, subComponent } = this.props;
 
         return  (
-            <div className={c} onClick={handleClick}>
+            <div className={`${c} ${(clickable ? 'clickable' : '')}`} onClick={this.handleClick}>
                 <div className={`${c}-number`}>{number}</div>
                 <div className={`${c}-text`}>{text}</div>
                 {subtext && 
                 <div className={`${c}-subtext`}>{subtext}</div>
                 }
+                {subComponent && subComponent}
             </div>
         )
+    }
+
+    private handleClick = () => {
+        const { clickable, handleClick } = this.props;
+        if (clickable && handleClick) {
+            handleClick()
+        }
     }
 }

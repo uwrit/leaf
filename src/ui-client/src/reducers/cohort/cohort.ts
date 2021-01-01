@@ -49,7 +49,8 @@ import {
     TIMELINES_INDEX_DATASET_NETWORK_DATASET,
     TIMELINES_INDEX_DATASET_NETWORK_ERROR,
     TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED,
-    TIMELINES_SET_AGGREGATE_DATASET
+    TIMELINES_SET_AGGREGATE_DATASET,
+    TIMELINES_CONFIG_SET_DATES
 } from '../../actions/cohort/timelines';
 import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
@@ -86,7 +87,7 @@ import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkC
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
-import { defaultNetworkTimelinesState, defaultTimelinesState, setTimelinesNetworkConceptDataset, setTimelinesConceptDatasetState, setTimelinesPanelDatasetState, setTimelinesNetworkPanelDataset, setTimelinesAggregateDataset } from './timelines';
+import { defaultNetworkTimelinesState, defaultTimelinesState, setTimelinesNetworkConceptDataset, setTimelinesConceptDatasetState, setTimelinesPanelDatasetState, setTimelinesNetworkPanelDataset, setTimelinesAggregateDataset, setTimelinesDateConfiguration } from './timelines';
 
 export const defaultCohortState = (): CohortState => {
     return {
@@ -128,14 +129,16 @@ const resetCohorts = (state: CohortState): CohortState => {
     state.networkCohorts.forEach((n: NetworkCohortState) => {
         const count = defaultCountState()
         const patientList = defaultNetworkPatientListState();
+        const timelines = defaultNetworkTimelinesState();
         const visualization = defaultVisualizationState();
-        network.set(n.id, Object.assign({}, n, { count, patientList, visualization }));
+        network.set(n.id, Object.assign({}, n, { count, patientList, timelines, visualization }));
     });
 
     return Object.assign({}, state, {
         count: defaultCountState(),
         networkCohorts: network,
         patientList: defaultPatientListState(),
+        timelines: defaultTimelinesState(),
         visualization: defaultVisualizationState()
     });
 };
@@ -295,6 +298,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setAggregateCohortVisualization(state, action);
 
         // Timelines
+        case TIMELINES_CONFIG_SET_DATES:
+            return setTimelinesDateConfiguration(state, action);
         case TIMELINES_SET_AGGREGATE_DATASET:
             return setTimelinesAggregateDataset(state, action);
         case TIMELINES_CONCEPT_DATASET_START:

@@ -12,12 +12,14 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { InformationModalState } from '../../models/state/GeneralUiState';
+import { TimelinesDateConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
 import { addConceptDataset, addIndexDataset, getChartData } from '../../services/timelinesApi';
 import { showInfoModal } from '../generalUi';
 
 export const TIMELINES_SET_AGGREGATE_DATASET = 'TIMELINES_SET_AGGREGATE_DATASET';
+export const TIMELINES_CONFIG_SET_DATES = 'TIMELINES_CONFIG_SET_DATES';
 
 export const TIMELINES_CONCEPT_DATASET_START = 'TIMELINES_CONCEPT_DATASET_START';
 export const TIMELINES_CONCEPT_DATASET_FINISH = 'TIMELINES_CONCEPT_DATASET_FINISH';
@@ -33,6 +35,7 @@ export const TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED = 'TIMELINES_INDEX_
 
 export interface CohortTimelinesAction {
     aggregateDataset?: TimelinesAggregateDataset;
+    dateConfig?: TimelinesDateConfiguration;
     concept?: Concept;
     data?: ConceptDatasetDTO | null;
     id?: number;
@@ -175,6 +178,14 @@ export const getPanelIndexDataset = (panelIdx: number) => {
                 dispatch(showInfoModal(info));
             }
         });
+    };
+};
+
+// Synchronous
+export const setTimelinesConfigurationDates = (dateConfig: TimelinesDateConfiguration): CohortTimelinesAction => {
+    return {
+        dateConfig,
+        type: TIMELINES_CONFIG_SET_DATES
     };
 };
 

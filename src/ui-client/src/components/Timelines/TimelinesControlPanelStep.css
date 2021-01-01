@@ -9,13 +9,16 @@
     background-color: white;
     border: 1px solid rgb(230,230,230);
     border-radius: 8px;
-    cursor: pointer;
     margin: 10px 0;
     padding: 4px;
+}
+
+.timelines-control-panel-step.clickable {
+    cursor: pointer;
     transition: background-color 0.2s;
 }
 
-.timelines-control-panel-step:hover {
+.timelines-control-panel-step.clickable:hover {
     background-color: rgb(224, 244, 253);
     border-color: rgb(164, 222, 248);
 }

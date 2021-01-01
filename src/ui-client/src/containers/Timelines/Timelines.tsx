@@ -17,9 +17,9 @@ import { TimelinesDisplayMode } from '../../models/timelines/Configuration';
 import AggregateTimelineChart from '../../components/Timelines/AggregateTimelineChart';
 import PanelSelectorModal from '../../components/Modals/PanelSelectorModal/PanelSelectorModal';
 import TimelinesConceptDragOverlay from '../../components/Timelines/TimelinesConceptDragOverlay';
-import { Dispatch } from 'redux';
-import './Timelines.css';
+import TimelinesDateRangeSelector from '../../components/Timelines/TimelinesDateRangeSelector'
 import { getPanelIndexDataset } from '../../actions/cohort/timelines';
+import './Timelines.css';
 
 interface OwnProps { }
 interface StateProps {
@@ -48,8 +48,8 @@ class Timelines extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, patientCount, timelines } = this.props;
-        const { showConcepts, showPanelSelector } = this.state;
+        const { dispatch, timelines } = this.props;
+        const { showPanelSelector } = this.state;
 
         return  (
             <div className={`${c}-container scrollable-offset-by-header`}>
@@ -84,14 +84,14 @@ class Timelines extends React.Component<Props, State> {
                             <div className={`${c}-chart`}>
                                 {/* Aggregate chart */}
                                 {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                <AggregateTimelineChart data={timelines}/>}
+                                <AggregateTimelineChart data={timelines} />}
                             </div>
                         </Col>
 
                         {/* Control panel */}
                         <Col md={3}>
                             <div className={`${c}-control-panel`}>
-                                <TimelinesControlPanelStep number={1}
+                                <TimelinesControlPanelStep number={1} clickable={true}
                                     text={'Choose an index event'} handleClick={this.handleAddIndexEventClick}
                                     subtext={<span>
                                                 {'Index events serve as the starting point for a timeline. Events can be ' +
@@ -99,19 +99,28 @@ class Timelines extends React.Component<Props, State> {
                                                 'event, the '}<strong>earliest</strong>{' is used'}
                                              </span>}
                                 />
-                                <TimelinesControlPanelStep number={2}
+                                <TimelinesControlPanelStep number={2} clickable={true}
                                     text={'Drag Concepts over to view data'} handleClick={this.handleAddDataClick}
                                     subtext={<span>
                                         {'Concepts can be dropped anywhere to the right to add them to the chart'}
                                      </span>}
+                                />
+                                <TimelinesControlPanelStep number={3} clickable={false}
+                                    text={'Configure time spans'} handleClick={this.doNothing}
+                                    subtext={<span>
+                                        {'Set the range of dates to see timelines for'}
+                                     </span>}
+                                    subComponent={<TimelinesDateRangeSelector dispatch={dispatch} config={timelines.configuration.dateIncrement} />}
                                 />
                             </div>
                         </Col>
                     </Row>
                 </Container>
             </div>
-        )
+        );
     }
+
+    private doNothing = () => null;
 
     private toggleShowConcepts = () => {
         this.setState({ 
@@ -151,7 +160,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     };
 };
 
-const mapDispatchToProps = (dispatch: Dispatch): DispatchProps => {
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
     return {
         dispatch
     }

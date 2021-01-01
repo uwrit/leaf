@@ -21,7 +21,15 @@ export interface TimelinesAggregateConcept {
 export interface TimelinesAggregateDataRow {
     conceptId: ConceptId;
     timepointId: TimePointId;
-    value: number;
+    displayValueX: number;
+    displayValueY: number;
+    values: TimelinesAggregateDataRowValue;
+}
+
+export interface TimelinesAggregateDataRowValue {
+    percent: number;
+    size: 0 | 1 | 2 | 3 | 4 | 5;
+    total: number;
 }
 
 export interface TimelinesAggregateTimeBin {

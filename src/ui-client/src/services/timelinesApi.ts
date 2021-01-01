@@ -43,6 +43,6 @@ export const removeConceptDataset = (config: TimelinesConfiguration, concept: Co
 /**
  * Clear all data
  */
-export const clearAllData = () => {
+export const clearAllTimelinesData = () => {
     return timelinesProvider.clear();
 };

@@ -92,3 +92,9 @@ export const setTimelinesNetworkPanelDataset = (state: CohortState, type: Cohort
     state.networkCohorts.set(action.id!, network);
     return Object.assign({}, state);
 };
+
+export const setTimelinesDateConfiguration = (state: CohortState, action: CohortTimelinesAction): CohortState => {
+    return Object.assign({}, state, {
+        dateConfig: action.dateConfig
+    });
+};

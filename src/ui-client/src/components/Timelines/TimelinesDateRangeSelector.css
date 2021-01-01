@@ -4,24 +4,3 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
-
-.timelines-container {
-    padding: 0 10px;
-}
-
-.timelines-main {
-    margin-top: 50px;
-}
-
-.timelines-chart {
-    border-radius: 8px;
-    margin: 0;
-    min-height: calc(100vh - 200px);
-}
-
-.timelines-control-panel {
-    border: 1px solid rgb(230,230,230);
-    border-radius: 8px;
-    background-color: rgb(238,238,238);
-    padding: 0 20px;
-}

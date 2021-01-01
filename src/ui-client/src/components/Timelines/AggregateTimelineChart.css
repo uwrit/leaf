@@ -3,4 +3,26 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
+
+.timelines-aggregate {
+}
+
+.timelines-aggregate .recharts-cartesian-grid {
+    background-color: rgb(245,245,245);
+}
+
+.timelines-aggregate .recharts-cartesian-grid line {
+    stroke: white;
+    stroke-width: 2;
+}
+
+.timelines-aggregate-dot {
+    fill: rgb(154, 93, 223);
+    opacity: 0.6;
+}
+
+.timelines-aggregate-dot:hover {
+    fill: rgb(137, 76, 207);
+    opacity: 1;
+}

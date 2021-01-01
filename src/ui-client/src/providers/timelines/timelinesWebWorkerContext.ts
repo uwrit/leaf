@@ -6,6 +6,7 @@
  */ 
 
 export const workerContext = `
+console.log('timelines worker up');
 "use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -53,17 +54,19 @@ var queryAggregate = function (payload) {
     var output = { concepts: new Map() };
     var bins = getTimeBins(config);
     var dateDiffer = getDateDiffFunc(config);
+    var totalPats = indexDataset.patients.size;
     // Foreach concept
     conceptDatasetMap.forEach(function (v, k) {
-        var data = getAggregateCounts(v.concept, bins, dateDiffer);
+        var data = getAggregateCounts(totalPats, v.concept, bins, dateDiffer);
         output.concepts.set(k, { concept: v.concept, data: data });
     });
     return output;
 };
+"use strict";
 /**
- * Aggregate counts relative to index date
- */
-var getAggregateCounts = function (concept, bins, dateDiffer) {
+         * Aggregate counts relative to index date
+         */
+var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
     var output = [];
     var conceptData = conceptDatasetMap.get(concept.id);
     if (!conceptData) {
@@ -72,7 +75,7 @@ var getAggregateCounts = function (concept, bins, dateDiffer) {
     var pats = [ ...conceptData.patients.values() ];
     // For each bin
     bins.forEach(function (bin) {
-        var totalCount = 0;
+        var binCount = 0;
         var _loop_1 = function (i) {
             var p = pats[i];
             var idxp = indexDataset.patients.get(p.compoundId);
@@ -81,10 +84,10 @@ var getAggregateCounts = function (concept, bins, dateDiffer) {
             }
             var indexDate = idxp.initialDate;
             var d = void 0;
-            if (!bin.minNum) {
+            if (typeof (bin.minNum) === 'undefined') {
                 d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate) < bin.maxNum; });
             }
-            else if (!bin.maxNum) {
+            else if (typeof (bin.maxNum) === 'undefined') {
                 d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate) > bin.minNum; });
             }
             else {
@@ -100,16 +103,46 @@ var getAggregateCounts = function (concept, bins, dateDiffer) {
                 });
             }
             if (d) {
-                totalCount += 1;
-            }
+                binCount += 1;
+            }            
         };
         // For each patient
         for (var i = 0; i < pats.length; i++) {
             _loop_1(i);
         }
-        output.push({ conceptId: concept.id, timepointId: bin.label, value: totalCount });
+        var values = { percent: (binCount / totalPats), size: getCohortBinSize(binCount, totalPats), total: binCount };
+        var dataRow = {
+            conceptId: concept.id,
+            timepointId: bin.label,
+            displayValueX: values.size,
+            displayValueY: 1,
+            values: values
+        };
+        output.push(dataRow);
     });
     return output;
+};
+/**
+ * Get cohort bin size
+ */
+var getCohortBinSize = function (binTotal, cohortTotal) {
+    if (cohortTotal === 0) {
+        return 0;
+    }
+    var proportion = binTotal / cohortTotal * 100.0;
+    if (proportion < 20) {
+        return 1;
+    }
+    else if (proportion < 40) {
+        return 2;
+    }
+    else if (proportion < 60) {
+        return 3;
+    }
+    else if (proportion < 80) {
+        return 4;
+    }
+    return 5;
 };
 /**
  * Get datediff function
@@ -186,6 +219,8 @@ var getTimeBins = function (config) {
  */
 var clearData = function (payload) {
     conceptDatasetMap = new Map();
+    indexDataset = { patients: new Map() };
+    return { requestId: payload.requestId };
 };
 /**
  * Remove concept dataset
@@ -193,6 +228,7 @@ var clearData = function (payload) {
 var removeConceptDataset = function (payload) {
     var concept = payload.concept;
     conceptDatasetMap.delete(concept.id);
+    return { requestId: payload.requestId };
 };
 /**
  *  Add concept dataset

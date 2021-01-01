@@ -174,10 +174,13 @@ export default class TimelinesWebWorker {
             const output: TimelinesAggregateDataset = { concepts: new Map() };
             const bins = getTimeBins(config);
             const dateDiffer = getDateDiffFunc(config);
+            const totalPats = indexDataset.patients.size;
+
+            if (totalPats === 0) { return output; }
             
             // Foreach concept
             conceptDatasetMap.forEach((v,k) => {
-                const data = getAggregateCounts(v.concept, bins, dateDiffer);
+                const data = getAggregateCounts(totalPats, v.concept, bins, dateDiffer);
                 output.concepts.set(k, { concept: v.concept, data });
             });
 
@@ -188,6 +191,7 @@ export default class TimelinesWebWorker {
          * Aggregate counts relative to index date
          */
         const getAggregateCounts = (
+            totalPats: number,
             concept: Concept, 
             bins: TimelinesAggregateTimeBin[], 
             dateDiffer: (d1: Date, d2: Date) => number): TimelinesAggregateDataRow[] => {
@@ -200,7 +204,7 @@ export default class TimelinesWebWorker {
 
             // For each bin
             bins.forEach((bin) => {
-                let totalCount = 0;
+                let binCount = 0;
 
                 // For each patient
                 for (let i = 0; i < pats.length; i++) {
@@ -211,9 +215,9 @@ export default class TimelinesWebWorker {
                     const indexDate = idxp.initialDate;
                     let d;
 
-                    if (!bin.minNum) {
+                    if (typeof(bin.minNum) === 'undefined') {
                         d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) < bin.maxNum!);
-                    } else if (!bin.maxNum) {
+                    } else if (typeof(bin.maxNum) === 'undefined') {
                         d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) > bin.minNum!);
                     } else {
                         d = p.rows.find((r) => {
@@ -226,13 +230,35 @@ export default class TimelinesWebWorker {
                         });
                     }
                     if (d) {
-                        totalCount += 1;
+                        binCount += 1;
                     }
                 }
-                output.push({ conceptId: concept.id, timepointId: bin.label, value: totalCount });
+                const values = { percent: (binCount / totalPats), size: getCohortBinSize(binCount, totalPats), total: binCount };
+                const dataRow: TimelinesAggregateDataRow = {
+                    conceptId: concept.id,
+                    timepointId: bin.label,
+                    displayValueX: values.size,
+                    displayValueY: 1,
+                    values
+                };
+                output.push(dataRow);
             });
 
             return output;
+        };
+
+        /**
+         * Get cohort bin size
+         */
+        const getCohortBinSize = (binTotal: number, cohortTotal: number): 0 | 1 | 2 | 3 | 4 | 5 => {
+            if (cohortTotal === 0) { return 0; }
+
+            const proportion = binTotal / cohortTotal * 100.0;
+            if      (proportion < 20.0) { return 1; }
+            else if (proportion < 40.0) { return 2; }
+            else if (proportion < 60.0) { return 3; }
+            else if (proportion < 80.0) { return 4; }
+            return 5;
         };
 
         /**
@@ -240,17 +266,17 @@ export default class TimelinesWebWorker {
          */
         const getDateDiffFunc = (config: TimelinesConfiguration): any => {
             const type = config.dateIncrement.incrementType
-            let multiplier = 1000;
+            let divider = 1000;
 
             switch (type) {
-                case dateIncrementMinute: multiplier = (1000*60); break;
-                case dateIncrementHour:   multiplier = (1000*60*60); break;
-                case dateIncrementDay:    multiplier = (1000*60*60*24); break;
-                case dateIncrementWeek:   multiplier = (1000*60*60*24*7); break;
-                case dateIncrementMonth:  multiplier = (1000*60*60*24*30); break;
-                case dateIncrementYear:   multiplier = (1000*60*60*24*365); break;
+                case dateIncrementMinute: divider = (1000*60); break;
+                case dateIncrementHour:   divider = (1000*60*60); break;
+                case dateIncrementDay:    divider = (1000*60*60*24); break;
+                case dateIncrementWeek:   divider = (1000*60*60*24*7); break;
+                case dateIncrementMonth:  divider = (1000*60*60*24*30); break;
+                case dateIncrementYear:   divider = (1000*60*60*24*365); break;
             }
-            return (rowDate: Date, initialDate: Date) => ((rowDate.getTime() - initialDate.getTime()) / multiplier);
+            return (rowDate: Date, initialDate: Date) => ((rowDate.getTime() - initialDate.getTime()) / divider);
         };
 
         /**
@@ -303,6 +329,8 @@ export default class TimelinesWebWorker {
          */
         const clearData = (payload: InboundMessagePayload) => {
             conceptDatasetMap = new Map<ConceptId, ConceptDatasetStore>();
+            indexDataset = { patients: new Map<PatientId, IndexPatient>() };
+            return { requestId: payload.requestId };
         };
 
         /**
@@ -311,6 +339,7 @@ export default class TimelinesWebWorker {
         const removeConceptDataset = (payload: InboundMessagePayload) => {
             const concept = payload.concept!;
             conceptDatasetMap.delete(concept.id);
+            return { requestId: payload.requestId };
         };
 
         /**
