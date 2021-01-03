@@ -6,6 +6,7 @@
  */
 
 .timelines-aggregate {
+    z-index: 99;
 }
 
 .timelines-aggregate .recharts-cartesian-grid {

@@ -49,17 +49,16 @@ class Timelines extends React.Component<Props, State> {
     public render() {
         const c = this.className;
         const { dispatch, timelines } = this.props;
-        const { showPanelSelector } = this.state;
+        const { showPanelSelector, showConcepts } = this.state;
 
         return  (
-            <div className={`${c}-container scrollable-offset-by-header`}>
+            <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
 
                 {/* Concept slider from right */}
                 <DirectionalSlider 
                     show={this.state.showConcepts}
                     from={Direction.Left}
-                    overlay={true}
-                    overlayContent={<TimelinesConceptDragOverlay dispatch={dispatch} toggleOverlay={this.toggleShowConcepts}/>}
+                    overlay={false}
                     toggle={this.toggleShowConcepts}>
                     <div>
                         <ConceptColumnContainer />
@@ -79,24 +78,15 @@ class Timelines extends React.Component<Props, State> {
                 <Container fluid={true} className={`${c}-main`}>
                     <Row>
 
-                        {/* Chart */}
-                        <Col md={9}>
-                            <div className={`${c}-chart`}>
-                                {/* Aggregate chart */}
-                                {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                <AggregateTimelineChart data={timelines} />}
-                            </div>
-                        </Col>
-
                         {/* Control panel */}
                         <Col md={3}>
                             <div className={`${c}-control-panel`}>
                                 <TimelinesControlPanelStep number={1} clickable={true}
                                     text={'Choose an index event'} handleClick={this.handleAddIndexEventClick}
                                     subtext={<span>
-                                                {'Index events serve as the starting point for a timeline. Events can be ' +
-                                                'chosen from the panels used to identify the cohort. If a patient has more than one ' +
-                                                'event, the '}<strong>earliest</strong>{' is used'}
+                                                {'Index events serve as the '}<strong>starting point</strong>{' for a timeline. Events can be ' +
+                                                 'chosen from the panels used to define the cohort. If a patient has more than one ' +
+                                                 'event, the '}<strong>earliest</strong>{' is used'}
                                              </span>}
                                 />
                                 <TimelinesControlPanelStep number={2} clickable={true}
@@ -114,6 +104,22 @@ class Timelines extends React.Component<Props, State> {
                                 />
                             </div>
                         </Col>
+
+                        {/* Chart */}
+                        <Col md={9}>
+                            <div className={`${c}-chart`}>
+
+                                {/* Overlay */}
+                                {showConcepts && 
+                                <TimelinesConceptDragOverlay dispatch={dispatch} toggleOverlay={this.toggleShowConcepts}/>}
+
+                                {/* Aggregate chart */}
+                                {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
+                                <AggregateTimelineChart data={timelines} />}
+
+                            </div>
+                        </Col>
+
                     </Row>
                 </Container>
             </div>

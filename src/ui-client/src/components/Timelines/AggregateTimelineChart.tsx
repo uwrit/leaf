@@ -74,7 +74,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                             {i === lastConcept &&
                             <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false} />
                             }
-                            <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150}
+                            <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
                                 tick={<CustomizedAxisTick text={d.concept.uiDisplayName} />} 
                             />
                             <ZAxis type="number" dataKey="displayValueX" domain={[0,5]} range={[0,1000]} />
@@ -119,8 +119,8 @@ class CustomizedAxisTick extends React.PureComponent<TickProps> {
 
         return (
             <Text 
-                className="timelines-aggregate-yaxis-label" x={x-5} y={y-4} width={150} 
-                textAnchor="end" verticalAnchor="start">
+                className="timelines-aggregate-yaxis-label" x={x+5} y={y-4} width={150} 
+                textAnchor="start" verticalAnchor="start">
                     {text}
             </Text>
         );
@@ -136,7 +136,7 @@ interface DotProps {
 class CustomizedDot extends React.PureComponent<DotProps> {
     public render () {
         const { cx, cy, payload } = this.props;
-        if (!payload) { return null; }
+        if (!payload || payload.values.total === 0) { return null; }
 
         return (
             <svg className="timelines-aggregate-dot">
@@ -146,6 +146,15 @@ class CustomizedDot extends React.PureComponent<DotProps> {
     }
 
     private getSize = (payload: TimelinesAggregateDataRow): number => {
+        const minSize = 3;
+        const maxSize = 40;
+        const size = Math.floor(payload.values.percent * maxSize);
+
+        if (size < minSize) {
+            return minSize;
+        }
+        return size;
+
         switch (payload.values.size) {
             case 0: return 0;
             case 1: return 3;

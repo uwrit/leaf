@@ -8,7 +8,9 @@
 .timelines-concept-drag-overlay {
     background-color: transparent;
     height: 100%;
+    position: absolute;
     width: 100%;
+    z-index: 100;
 }
 
 .timelines-concept-drag-overlay-inner {
@@ -20,7 +22,7 @@
     padding: 20px;
     position: absolute;
     top: 40%;
-    left: 70%;
+    left: 55%;
     transform: translate(-50%, -50%);
     width: 450px;
 }

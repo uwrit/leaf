@@ -96,7 +96,7 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
                         return false;
                     }
                     var diff = dateDiffer(r.dateField, indexDate);
-                    if (diff >= bin.minNum && diff <= bin.maxNum) {
+                    if (diff >= bin.minNum && diff < bin.maxNum) {
                         return true;
                     }
                     return false;
@@ -188,7 +188,7 @@ var getTimeBins = function (config) {
     if (config.dateIncrement.mode === dateDisplayModeAfter) {
         lowerBound = 0;
         upperBound = incr * maxBins;
-        startBin = { label: "<" + incr, minNum: 1, maxNum: incr };
+        startBin = { label: "<" + incr, minNum: 0.0001, maxNum: incr };
         lastBin = { label: ">" + upperBound, minNum: upperBound };
     }
     // Before
