@@ -69,7 +69,7 @@ namespace API
             {
                 builder.WithOrigins("*");
                 builder.WithHeaders("Accept", "Content-Type", "Origin", "Authorization");
-                builder.WithMethods("POST", "GET", "OPTIONS");
+                builder.WithMethods("POST", "GET", "OPTIONS", "PUT", "DELETE");
             });
 
             app.UseAuthentication();
