@@ -65,8 +65,8 @@ export const resetHelpPageContent = () => {
             dispatch(setHelpPageContentLoadState(HelpPageLoadState.NOT_LOADED));
         
             // Reset existing page content to empty for new page content to load.
-            const content = [] as HelpPageContentDTO[];
-            dispatch(setHelpPageContentToEmpty(content));
+            // const content = [] as HelpPageContentDTO[];
+            // dispatch(setHelpPageContentToEmpty(content));
         } catch (err) {
             console.log(err);
         }

@@ -5,11 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.page {
-    margin-top: 10px;
-    margin-bottom: 10px;
+.categories {
+    margin-top: 10%;
+    padding-left: 5%;
+    padding-right: 5%;
 }
 
-.page button {
+.categories button {
     display: contents;
 }

@@ -5,12 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.pages {
-    margin-top: 10%;
-    padding-left: 5%;
-    padding-right: 5%;
+.pages-page {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
-.pages button {
+.pages-page button {
     display: contents;
+}
+
+.pages-all {
+    margin-bottom: 25px;
 }

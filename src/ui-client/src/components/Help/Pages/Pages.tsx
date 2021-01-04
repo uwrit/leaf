@@ -6,69 +6,78 @@
  */ 
 
 import React from 'react';
-import { Col, Row } from 'reactstrap';
-import { HelpPageDTO, HelpPageCategory, HelpPageMap } from '../../../models/Help/Help';
-import { Category } from '../Category/Category';
-import { Page } from '../Page/Page';
-import { PagesButton } from './PagesButton';
+import { Button, Col } from 'reactstrap';
+import { fetchSingleHelpPageContent, resetHelpPageContent } from '../../../actions/help/helpPageContent';
+import { HelpPageCategory } from '../../../models/Help/Help';
+import { HelpPage } from '../../../models/Help/Help';
 import './Pages.css';
 
+
 interface Props {
-    categories: HelpPageCategory[];
+    category: HelpPageCategory;
     dispatch: any;
     handleHelpPageClick: (pageTitle: string) => any;
-    pages: HelpPageMap;
+    pages: HelpPage[];
 }
 
-export class Pages extends React.Component<Props> {
-    private className = "pages";
+interface State {
+    show: boolean;
+}
+
+export class Pages extends React.Component<Props, State> {
+    private className = "pages"
+    state = { show: false };
 
     public render() {
         const c = this.className;
-        const { categories, dispatch, handleHelpPageClick, pages } = this.props;
-        
-        return (
-            <Row className={c}>
-                {categories.map((c, i) =>
-                    (pages.has(c.id) &&
-                        <div key={i}>
-                            <Col>
-                                <Category key={c.id} category={c.category} />
-                            </Col>
+        const { category, pages } = this.props;
+        const { show } = this.state;
 
-                            <Col>
-                                {this.getPages(c).map(p =>
-                                    <Page
-                                        key={p.id}
-                                        dispatch={dispatch}
-                                        handleHelpPageClick={handleHelpPageClick}
-                                        page={p}
-                                    />
-                                )}
-                            </Col>
-                    
-                            <Col>
-                                <PagesButton
-                                    key={c.id}
-                                    category={c}
-                                    numberOfPages={pages.get(c.id)!.length}
-                                />
-                            </Col>
-                        </div>  
-                    )
+        const numberOfPages = pages.length;
+        const start = 0;
+        const defaultEnd = 5; // Maximum of 5 help pages will show by default.
+        const end = category.showAllCategoryPages ? numberOfPages : defaultEnd;
+        const slicedPages = pages.slice(start, end);
+
+        return (
+            <Col className={c} xs="4">
+                <div>
+                    <strong>{category.category.toUpperCase()}</strong>
+                </div>
+
+                {slicedPages.map(p =>
+                    <div key={p.id} className={`${c}-page`}>
+                        <Button color="link" onClick={() => this.handleHelpPageTitleClick(p)}>
+                            {p.title}
+                        </Button>
+                    </div>
                 )}
-            </Row>
+
+                <div className={`${c}-all`}>
+                    <Button color="link" onClick={this.handleSeeAllPagesClick}>
+                        {show
+                            ? <span>Less ...</span>
+                            : <span>See all {numberOfPages} pages</span>
+                        }
+                    </Button>
+                </div>
+            </Col>
         );
     };
 
-    private getPages = (category: HelpPageCategory): HelpPageDTO[] => {
-        const { pages } = this.props;
-        const categoryPages = pages.get(category.id)!;
-        const start = 0;
-        const defaultEnd = 5; // Maximum of 5 help pages will show by default.
-        const end = category.showAllCategoryPages ? categoryPages.length : defaultEnd;
-        const slicedPages = categoryPages.slice(start, end);
+    private handleHelpPageTitleClick = (page: HelpPage) => {
+        const { dispatch, handleHelpPageClick } = this.props;
 
-        return slicedPages;
+        // dispatch(resetHelpPageContent());
+        dispatch(fetchSingleHelpPageContent(page.id));
+
+        handleHelpPageClick(page.title);
+    };
+
+    private handleSeeAllPagesClick = () => {
+        const { category } = this.props;
+
+        this.setState({ show: !this.state.show })
+        category.showAllCategoryPages = !this.state.show;
     };
 };

@@ -9,7 +9,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Container, Input, Row } from 'reactstrap';
 import { Content } from '../../components/Help/Content/Content';
-import { Pages } from '../../components/Help/Pages/Pages';
+import { Categories } from '../../components/Help/Categories/Categories';
 import { AppState } from '../../models/state/AppState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import './Help.css';
@@ -46,7 +46,10 @@ export class Help extends React.PureComponent<Props, State> {
         const { pageTitle } = this.state;
 
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
-            return <Content data={helpPages.content.content} dispatch={dispatch} title={pageTitle} />
+            return (
+                <div style={{backgroundColor:"rgb(240,240,240)"}}>
+                    <Content data={helpPages.content.content} dispatch={dispatch} title={pageTitle} />
+                </div>)
         };
 
         return (
@@ -56,7 +59,7 @@ export class Help extends React.PureComponent<Props, State> {
                 </Row>
 
                 {(helpPages.state === HelpPageLoadState.LOADED) &&
-                    <Pages
+                    <Categories
                         categories={helpPages.categories}
                         dispatch={dispatch}
                         handleHelpPageClick={this.handleHelpPageClick}

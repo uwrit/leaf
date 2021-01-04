@@ -7,6 +7,8 @@
 
 import React from 'react';
 import { HelpPageContent } from '../../../models/Help/Help';
+import TextareaAutosize from 'react-textarea-autosize';
+import './ContentText.css';
 
 interface Props {
     content: HelpPageContent;
@@ -21,9 +23,22 @@ export class ContentText extends React.Component<Props> {
 
         return (
             <div className={c}>
-                {content.textContent}
+                {/* Load text if and only if it exists. */}
+                {content.textContent != null &&
+                    <TextareaAutosize
+                        readOnly={true}
+                        spellCheck={false}
+                        value={content.textContent}>
+                    </TextareaAutosize>
+                }
+                
+                {/* Load image if and only if it exists. */}
 
-                {content.imageContent != null && <img src={`data:image/jpeg;base64,${content.imageContent}`} />}
+                <div className={`${c}-image`}>
+                    {content.imageContent != null &&
+                        <img src={`data:image/jpeg;base64,${content.imageContent}`} />
+                    }
+                </div>
             </div>
         )
     }

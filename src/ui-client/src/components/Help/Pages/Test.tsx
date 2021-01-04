@@ -6,32 +6,34 @@
  */ 
 
 import React from 'react';
-import { Button } from 'reactstrap';
+import { Button, Col } from 'reactstrap';
 import { HelpPageCategory } from '../../../models/Help/Help';
 
 interface Props {
     category: HelpPageCategory;
-    numberOfPages: number;
 }
 
 interface State {
     show: boolean;
 }
 
-export class PagesButton extends React.Component<Props, State> {
+export class Test extends React.Component<Props, State> {
     state = { show: false };
 
     public render() {
-        const { numberOfPages } = this.props;
         const { show } = this.state;
 
         return (
-            <Button color="link" onClick={this.handleSeeAllPagesClick}>
-                {show
-                    ? <span>Less ...</span>
-                    : <span>See all {numberOfPages} pages</span>
-                }
-            </Button>
+            <Col xs="4">
+                <div>
+                    <Button color="link" onClick={this.handleSeeAllPagesClick}>
+                        {show
+                            ? <span>Less ...</span>
+                            : <span>See all 10 pages</span>
+                        }
+                    </Button>
+                </div>
+            </Col>
         );
     };
 
