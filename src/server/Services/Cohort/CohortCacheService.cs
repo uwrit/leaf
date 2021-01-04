@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using Dapper;
 using Model.Options;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Model.Cohort;
 using Model.Compiler;
@@ -27,14 +28,17 @@ namespace Services.Cohort
 
         readonly AppDbOptions dbOptions;
         readonly CohortOptions cohortOptions;
+        readonly ILogger<PatientCohortService> logger;
 
         public CohortCacheService(
             IOptions<AppDbOptions> appDbOptions,
-            IOptions<CohortOptions> cohortOptions
+            IOptions<CohortOptions> cohortOptions,
+            ILogger<PatientCohortService> logger
         )
         {
             dbOptions = appDbOptions.Value;
             this.cohortOptions = cohortOptions.Value;
+            this.logger = logger;
         }
 
         public async Task<Guid> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user)
@@ -96,7 +100,7 @@ namespace Services.Cohort
 
         string SerializePanels(IEnumerable<Panel> panels)
         {
-            return JsonConvert.SerializeObject(panels, new JsonSerializerSettings
+            return JsonConvert.SerializeObject(panels.ToArray(), new JsonSerializerSettings
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 TypeNameHandling = TypeNameHandling.Auto,

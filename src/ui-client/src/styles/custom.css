@@ -1,0 +1,122 @@
+/* Header Logo */
+.header-content-side .header-title {
+ 
+    /* Example
+    display: block;
+    width: 90px;
+    height: 35px;
+    background: url("http://files.alz.washington.edu/images/nacc-logo-app.svg") no-repeat transparent;
+    background-size: auto !important;
+    background-position: center;
+    */
+}
+ 
+/* Header background color */
+#header-container.d-flex.justify-content-between.mb-3.navbar {
+ 
+    /* Example
+    background-color: #003f7f;
+    background-image: linear-gradient(60deg,#003f7f,#136fcc) !important;
+    */
+}
+ 
+/* Header options in upper-right */
+.header-options > .nav-item:hover,
+.header-option-inner {
+   
+    /* Example
+    font-size: inherit;
+    background-color: #082542;
+    */
+}
+ 
+/* 'New Query' text' */
+.cohort-summary-name {
+ 
+    /* Example
+    color: #cee6ff;
+    text-transform: uppercase;
+    */
+}
+ 
+/* Left Sidebar */
+#sidebar-container {
+ 
+    /* Example
+    background-color: #082542;
+    background-image: -webkit-gradient(linear,left top,left bottom,from(#082542),to(#0c3a67));
+    background-image: linear-gradient(#082542,#0c3a67);
+    */
+}
+ 
+/* Buttons */
+.leaf-button-main,
+.leaf-button-primary,
+.leaf-button.leaf-button-primary.btn.btn-secondary {
+ 
+    /* Example
+    font-size: 1.25em;
+    font-weight: 400;
+    text-transform: uppercase;
+    border-radius: 5px;
+    border: 0 none transparent !important;
+    background-color: #d39911 !important;
+    background-image: none !important;
+    */
+}
+ 
+/* Buttons hover state */
+.leaf-button-main:hover,
+.leaf-button-primary:hover,
+.leaf-button.leaf-button-primary.btn.btn-secondary:hover {
+ 
+    /* Example
+    background-color: #bd890f !important;
+    */
+}
+ 
+/* Information modal */
+.modal-dialog.leaf-modal .modal-content .modal-header {
+ 
+    /* Example
+    background-color: #003f7f;
+    */
+}
+ 
+/* Concept Search box */
+input.concept-search-input.leaf-input.form-control {
+   
+    /* Example
+    border: solid 2px #cee6ff;
+    border-radius: 3px;
+    padding-left: 10px;
+    box-shadow: none !important;
+    background-color: #f0f7ff;
+    */
+}
+ 
+/* Concept Search box on focus */
+input.concept-search-input.leaf-input.form-control:focus {
+   
+    /* Example
+    border-color: #ffeabb !important;
+    background-color: #fff6e2 !important;
+    */
+}
+ 
+/* Concept Search dropdown */
+button.concept-search-roots-dropdown-toggle.dropdown-toggle.btn.btn-secondary {
+ 
+    /* Example
+    color: #0058b2;
+    */
+}
+ 
+/* Concept Search dropdown hover */
+button.concept-search-roots-dropdown-toggle.dropdown-toggle.btn.btn-secondary:hover {
+ 
+    /* Example
+    background-color: transparent;
+    */
+}
+ 

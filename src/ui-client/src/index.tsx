@@ -9,6 +9,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './containers/Root';
 import './index.css';
+import './styles/custom.css';
 import './styles/fonts.css';
 import './styles/bootstrap.min.css';
 import './styles/LeafButton.css';
