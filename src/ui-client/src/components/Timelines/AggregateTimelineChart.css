@@ -18,6 +18,10 @@
     stroke-width: 2;
 }
 
+.timelines-aggregate .recharts-cartesian-axis-tick-value {
+    fill: black;
+}
+
 .timelines-aggregate .recharts-xAxis tspan {
     color: black;
     text-shadow: none;
@@ -41,15 +45,81 @@
     background-color: white;
     border-radius: 4px;
     box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 16px 0px;
-    padding: 10px 20px;
+    padding: 0 10px;
 }
 
 .timelines-aggregate-tooltip-count {
-    font-size: 1.8rem;
-    margin-right: 4px;
+    font-size: 3rem;
+}
+
+.timelines-aggregate-tooltip-denom {
+    font-size: 1.2rem;
 }
 
 .timelines-aggregate-tooltip-percent {
     color: green;
-    margin-left: 4px;
+}
+
+.timelines-aggregate-tooltip-subtext {
+    color: rgb(150,150,150);
+}
+
+.timelines-aggregate-yaxis {
+    height: 70px;
+    width: 150px;
+}
+
+.timelines-aggregate-yaxis-container { 
+    background-color: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 100%;
+    padding: 4px;
+    position: relative;
+}
+
+.timelines-aggregate-yaxis-container:hover { 
+    background-color: rgba(0,0,0,0.5);
+}
+
+.timelines-aggregate-yaxis-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.timelines-aggregate-yaxis-remove {
+    background-color: transparent;
+    border-radius: 50%;
+    height: 38px;
+    left: 50%;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px;
+}
+
+.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove {
+    background-color: rgba(40, 28, 27, 0.9);
+}
+
+.timelines-aggregate-yaxis-remove svg {
+    height: 35px;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 35px;
+    top: 50%;
+}
+
+.timelines-aggregate-yaxis-remove svg path {
+    fill: transparent;
+}
+
+.timelines-aggregate-yaxis-container:hover path {
+    fill: white;
+}
+
+.timelines-aggregate-yaxis-remove svg:hover path {
+    fill: rgb(252, 74, 74);
 }

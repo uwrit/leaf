@@ -15,11 +15,12 @@ import { InformationModalState } from '../../models/state/GeneralUiState';
 import { TimelinesConfiguration, TimelinesDateConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
-import { addConceptDataset, addIndexDataset, getChartData } from '../../services/timelinesApi';
+import { addConceptDataset, addIndexDataset, getChartData, removeConceptDataset } from '../../services/timelinesApi';
 import { showInfoModal } from '../generalUi';
 
 export const TIMELINES_SET_AGGREGATE_DATASET = 'TIMELINES_SET_AGGREGATE_DATASET';
 export const TIMELINES_CONFIG_SET_DATES = 'TIMELINES_CONFIG_SET_DATES';
+export const TIMELINES_REMOVE_CONCEPT_DATASET = 'TIMELINES_REMOVE_CONCEPT_DATASET';
 
 export const TIMELINES_CONCEPT_DATASET_START = 'TIMELINES_CONCEPT_DATASET_START';
 export const TIMELINES_CONCEPT_DATASET_FINISH = 'TIMELINES_CONCEPT_DATASET_FINISH';
@@ -182,6 +183,18 @@ export const getPanelIndexDataset = (panelIdx: number) => {
     };
 };
 
+export const deleteConceptDataset = (concept: Concept) => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        dispatch(deleteTimelinesConceptDataset(concept));
+
+        const config = getState().cohort.timelines.configuration;
+        await removeConceptDataset(config, concept);
+
+        const timeline = await getChartData(config) as TimelinesAggregateDataset;
+        dispatch(setTimelinesAggregateDataset(timeline));
+    };
+}
+
 export const getLatestTimelinesDataFromConfig = (config: TimelinesConfiguration) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
@@ -193,6 +206,13 @@ export const getLatestTimelinesDataFromConfig = (config: TimelinesConfiguration)
 };
 
 // Synchronous
+export const deleteTimelinesConceptDataset = (concept: Concept): CohortTimelinesAction => {
+    return {
+        concept,
+        type: TIMELINES_REMOVE_CONCEPT_DATASET
+    };
+};
+
 export const setTimelinesIndexPanelId = (indexPanel: number): CohortTimelinesAction => {
     return {
         indexPanel,

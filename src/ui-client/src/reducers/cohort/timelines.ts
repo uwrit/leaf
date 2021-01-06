@@ -116,3 +116,18 @@ export const setTimelinesDateConfiguration = (state: CohortState, action: Cohort
         }
     });
 };
+
+export const removeTimelinesConceptDataset = (state: CohortState, action: CohortTimelinesAction): CohortState => {
+    const stateByConcept = new Map(state.timelines.stateByConcept);
+    stateByConcept.delete(action.concept!.id);
+    state.networkCohorts.forEach((nr) => {
+        nr.timelines.stateByConcept.delete(action.concept!.id);
+    })
+
+    return Object.assign({}, state, {
+        timelines: {
+            ...state.timelines,
+            stateByConcept
+        }
+    });
+};

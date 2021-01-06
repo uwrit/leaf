@@ -9,7 +9,7 @@ import React from 'react';
 import { connect } from 'react-redux'
 import { Col, Container, Row } from 'reactstrap';
 import { Direction, DirectionalSlider } from '../../components/Other/DirectionalSlider/DirectionalSlider';
-import { AppState } from '../../models/state/AppState';
+import { AppState, AuthorizationState } from '../../models/state/AppState';
 import { CohortStateType, TimelinesState } from '../../models/state/CohortState';
 import ConceptColumnContainer from '../FindPatients/ConceptColumnContainer';
 import TimelinesControlPanelStep from '../../components/Timelines/TimelinesControlPanelStep';
@@ -25,6 +25,7 @@ import './Timelines.css';
 
 interface OwnProps { }
 interface StateProps {
+    auth: AuthorizationState;
     patientCount: number;
     timelines: TimelinesState;
 }
@@ -50,7 +51,7 @@ class Timelines extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, timelines } = this.props;
+        const { dispatch, auth, patientCount, timelines } = this.props;
         const { showPanelSelector, showConcepts } = this.state;
         const hasConcepts = timelines.stateByConcept.size > 0;
 
@@ -141,7 +142,7 @@ class Timelines extends React.Component<Props, State> {
 
                                 {/* Aggregate chart */}
                                 {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                <AggregateTimelineChart data={timelines} />}
+                                <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
 
                             </div>
                         </Col>
@@ -220,6 +221,7 @@ class Timelines extends React.Component<Props, State> {
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return {
+        auth: state.auth,
         patientCount: state.cohort.count.value,
         timelines: state.cohort.timelines
     };

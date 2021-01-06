@@ -25,8 +25,8 @@ import { NetworkResponderMap } from '../../models/NetworkResponder';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { RowCount } from '../../components/PatientList/RowCount';
 import { PatientListDatasetDefinition } from '../../models/patientList/Dataset';
-import './PatientList.css';
 import Scrollers from '../../components/PatientList/Scrollers/Scrollers';
+import './PatientList.css';
 
 interface OwnProps {
     

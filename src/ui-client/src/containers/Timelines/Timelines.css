@@ -23,7 +23,7 @@
 .timelines-chart {
     border-radius: 8px;
     margin: 0;
-    min-height: calc(100vh - 200px);
+    height: calc(85vh);
 }
 
 .timelines-control-panel {

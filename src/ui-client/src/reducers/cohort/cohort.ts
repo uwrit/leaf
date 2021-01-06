@@ -51,7 +51,8 @@ import {
     TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED,
     TIMELINES_SET_AGGREGATE_DATASET,
     TIMELINES_CONFIG_SET_DATES,
-    TIMELINES_INDEX_SET_PANEL_ID
+    TIMELINES_INDEX_SET_PANEL_ID,
+    TIMELINES_REMOVE_CONCEPT_DATASET
 } from '../../actions/cohort/timelines';
 import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
@@ -88,7 +89,18 @@ import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkC
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
-import { defaultNetworkTimelinesState, defaultTimelinesState, setTimelinesNetworkConceptDataset, setTimelinesConceptDatasetState, setTimelinesPanelDatasetState, setTimelinesNetworkPanelDataset, setTimelinesAggregateDataset, setTimelinesDateConfiguration, setTimelinesPanelIndexId } from './timelines';
+import { 
+    defaultNetworkTimelinesState, 
+    defaultTimelinesState, 
+    setTimelinesNetworkConceptDataset, 
+    setTimelinesConceptDatasetState, 
+    setTimelinesPanelDatasetState, 
+    setTimelinesNetworkPanelDataset, 
+    setTimelinesAggregateDataset, 
+    setTimelinesDateConfiguration, 
+    setTimelinesPanelIndexId,
+    removeTimelinesConceptDataset
+} from './timelines';
 
 export const defaultCohortState = (): CohortState => {
     return {
@@ -303,6 +315,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setTimelinesDateConfiguration(state, action);
         case TIMELINES_SET_AGGREGATE_DATASET:
             return setTimelinesAggregateDataset(state, action);
+        case TIMELINES_REMOVE_CONCEPT_DATASET:
+            return removeTimelinesConceptDataset(state, action);
         case TIMELINES_CONCEPT_DATASET_START:
             return setTimelinesConceptDatasetState(state, CohortStateType.REQUESTING, action);
         case TIMELINES_CONCEPT_DATASET_FINISH:
