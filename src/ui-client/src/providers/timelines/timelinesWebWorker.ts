@@ -233,11 +233,11 @@ export default class TimelinesWebWorker {
                         binCount += 1;
                     }
                 }
-                const values = { percent: (binCount / totalPats), size: getCohortBinSize(binCount, totalPats), total: binCount };
+                const values = { percent: (binCount / totalPats), total: binCount };
                 const dataRow: TimelinesAggregateDataRow = {
                     conceptId: concept.id,
                     timepointId: bin.label,
-                    displayValueX: values.size,
+                    displayValueX: values.total,
                     displayValueY: 1,
                     values
                 };
@@ -245,20 +245,6 @@ export default class TimelinesWebWorker {
             });
 
             return output;
-        };
-
-        /**
-         * Get cohort bin size
-         */
-        const getCohortBinSize = (binTotal: number, cohortTotal: number): 0 | 1 | 2 | 3 | 4 | 5 => {
-            if (cohortTotal === 0) { return 0; }
-
-            const proportion = binTotal / cohortTotal * 100.0;
-            if      (proportion < 20.0) { return 1; }
-            else if (proportion < 40.0) { return 2; }
-            else if (proportion < 60.0) { return 3; }
-            else if (proportion < 80.0) { return 4; }
-            return 5;
         };
 
         /**

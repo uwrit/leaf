@@ -13,6 +13,12 @@
     padding: 4px;
 }
 
+.timelines-control-panel-step.disabled {
+    background-color: rgba(0,0,0,0.2);
+    color: rgb(100,100,100);
+    opacity: 0.5;
+}
+
 .timelines-control-panel-step.clickable {
     cursor: pointer;
     transition: background-color 0.2s;
@@ -43,8 +49,21 @@
     font-weight: 500;
 }
 
+.timelines-control-panel-step.disabled .timelines-control-panel-step-number {
+    background-image: none;
+    background-color: rgba(0,0,0,0.5);
+}
+
 .timelines-control-panel-step-subtext {
     color: rgb(63, 62, 62);
     font-size: 0.9rem;
     padding: 8px;
+}
+
+.timelines-control-panel-step-subcomponent {
+    background: rgb(245,245,245);
+    border: 1px solid rgb(235,235,235);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
 }

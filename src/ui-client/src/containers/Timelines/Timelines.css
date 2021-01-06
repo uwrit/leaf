@@ -32,3 +32,59 @@
     background-color: rgb(238,238,238);
     padding: 0 20px;
 }
+
+.timelines-no-concepts {
+    background-color: rgba(28, 170, 221, 0.05);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: black;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+}
+
+.timelines-no-concepts p {
+    font-size: 1.4rem;
+    font-weight: 100;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.timelines-index-control-panel {
+    text-align: center;
+}
+
+.timelines-control-panel-step .clickable {
+    color: rgb(28, 168, 221);
+    cursor: pointer;
+}
+
+.timelines-control-panel-step .clickable:hover {
+    text-decoration: underline;
+}
+
+.timelines-index-control-panel-loaded {
+    height: 20px;
+}
+
+.timelines-index-control-panel-loaded svg {
+    font-size: 2rem;
+    margin: -4px 8px 0 0;
+}
+
+.timelines-index-control-panel-loaded svg circle {
+    stroke-width: 2px !important;
+}
+
+.timelines-index-control-panel-loaded svg path,
+.timelines-index-control-panel-loaded svg polyline {
+    stroke: rgb(7, 192, 69);
+}
+
+.timelines-index-control-panel-loaded span {
+    vertical-align: top;
+}

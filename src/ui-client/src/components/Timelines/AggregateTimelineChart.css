@@ -10,7 +10,7 @@
 }
 
 .timelines-aggregate .recharts-cartesian-grid {
-    background-color: rgb(245,245,245);
+    background-color: rgb(244, 231, 255);
 }
 
 .timelines-aggregate .recharts-cartesian-grid line {
@@ -18,12 +18,38 @@
     stroke-width: 2;
 }
 
+.timelines-aggregate .recharts-xAxis tspan {
+    color: black;
+    text-shadow: none;
+}
+
 .timelines-aggregate-dot {
     fill: rgb(154, 93, 223);
     opacity: 0.6;
+    stroke: rgb(130, 51, 219);
+    stroke-width: 2px;
+    stroke-linejoin: round;
 }
 
 .timelines-aggregate-dot:hover {
     fill: rgb(137, 76, 207);
-    opacity: 1;
+    opacity: 0.9;
+    stroke: rgb(110, 26, 206);
+}
+
+.timelines-aggregate-tooltip {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 16px 0px;
+    padding: 10px 20px;
+}
+
+.timelines-aggregate-tooltip-count {
+    font-size: 1.8rem;
+    margin-right: 4px;
+}
+
+.timelines-aggregate-tooltip-percent {
+    color: green;
+    margin-left: 4px;
 }

@@ -15,7 +15,7 @@ export interface TimelinesDateConfiguration {
 export interface TimelinesConfiguration {
     concepts: Concept[];
     dateIncrement: TimelinesDateConfiguration;
-    indexEvent?: Concept;
+    indexPanel?: number;
     mode: TimelinesDisplayMode;
 }
 

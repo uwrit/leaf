@@ -131,16 +131,17 @@
 /* Timelines */
 .sidebar-tab-link.timelines .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.timelines .sidebar-tab.enabled:hover .sidebar-icon  {
-    color: rgb(196, 91, 152);
+    color: rgb(61, 104, 197);
 }
 
 .sidebar-tab-link.timelines .sidebar-icon > svg {
+    stroke-width: 3;
     transform: rotate(90deg);
 }
 
 .sidebar-tab-link.timelines .sidebar-tab.selected,
 .sidebar-tab-link.timelines .sidebar-tab.enabled.enabled:hover {
-    border-left-color:rgb(196, 91, 152);
+    border-left-color: rgb(61, 104, 197);
 }
 
 /* Patient List */

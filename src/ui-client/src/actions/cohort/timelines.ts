@@ -27,6 +27,7 @@ export const TIMELINES_CONCEPT_DATASET_NETWORK_DATASET = 'TIMELINES_CONCEPT_DATA
 export const TIMELINES_CONCEPT_DATASET_NETWORK_ERROR = 'TIMELINES_CONCEPT_DATASET_NETWORK_ERROR';
 export const TIMELINES_CONCEPT_DATASET_NETWORK_NOT_IMPLEMENTED = 'TIMELINES_CONCEPT_DATASET_NETWORK_NOT_IMPLEMENTED';
 
+export const TIMELINES_INDEX_SET_PANEL_ID = 'TIMELINES_INDEX_SET_PANEL_ID';
 export const TIMELINES_INDEX_DATASET_START = 'TIMELINES_INDEX_DATASET_START';
 export const TIMELINES_INDEX_DATASET_FINISH = 'TIMELINES_INDEX_DATASET_FINISH';
 export const TIMELINES_INDEX_DATASET_NETWORK_DATASET = 'TIMELINES_INDEX_DATASET_NETWORK_DATASET';
@@ -39,6 +40,7 @@ export interface CohortTimelinesAction {
     concept?: Concept;
     data?: ConceptDatasetDTO | null;
     id?: number;
+    indexPanel?: number;
     type: string;
 }
 
@@ -98,7 +100,6 @@ export const getConceptDataset = (concept: Concept) => {
             if (atLeastOneSucceeded && timelines.indexConceptState) {
                 const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 dispatch(setTimelinesAggregateDataset(timeline));
-                console.log(timeline);
 
             } else if (!atLeastOneSucceeded) {
                 const info : InformationModalState = {
@@ -192,6 +193,13 @@ export const getLatestTimelinesDataFromConfig = (config: TimelinesConfiguration)
 };
 
 // Synchronous
+export const setTimelinesIndexPanelId = (indexPanel: number): CohortTimelinesAction => {
+    return {
+        indexPanel,
+        type: TIMELINES_INDEX_SET_PANEL_ID
+    };
+};
+
 export const setTimelinesConfigurationDates = (dateConfig: TimelinesDateConfiguration): CohortTimelinesAction => {
     return {
         dateConfig,

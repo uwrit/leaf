@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Text, Tooltip, CartesianGrid, Dot } from 'recharts';
+import { DateIncrementType } from '../../models/panel/Date';
 import { TimelinesState } from '../../models/state/CohortState';
 import { TimelinesAggregateDataRow } from '../../models/timelines/Data';
 import './AggregateTimelineChart.css';
@@ -60,6 +61,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
     public render() {
         const c = this.className;
         const { chartWidth, chartHeight } = this.state;
+        const { dateIncrement } = this.props.data.configuration;
         const data = [ ...this.props.data.aggregateData.concepts.values() ];
         const margins = { top: 0, right: 10, bottom: 0, left: 0 };
         const swimlaneHeight = chartHeight / data.length;
@@ -72,7 +74,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                         <ScatterChart key={d.concept.id} width={chartWidth} height={swimlaneHeight} margin={margins}>
                             <CartesianGrid fill={'rgb(245,245,245)'} />
                             {i === lastConcept &&
-                            <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false} />
+                            <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false} unit={this.getIncrementTypeText(dateIncrement.incrementType)} />
                             }
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
                                 tick={<CustomizedAxisTick text={d.concept.uiDisplayName} />} 
@@ -87,17 +89,32 @@ export default class AggregateTimelineChart extends React.Component<Props, State
         )
     }
 
+    private getIncrementTypeText = (type: DateIncrementType): string => {
+        switch (type) {
+            case DateIncrementType.DAY:    return 'days';
+            case DateIncrementType.HOUR:   return 'hours';
+            case DateIncrementType.MINUTE: return 'minutes';
+            case DateIncrementType.MONTH:  return 'months';
+            case DateIncrementType.WEEK:   return 'weeks';
+            case DateIncrementType.YEAR:   return 'years';
+        }
+        return '';
+    }
+
     private renderTooltip = (props: any) => {
         const { active, payload } = props;
         if (active && payload && payload.length) {
             const data = (payload[0] && payload[0].payload) as TimelinesAggregateDataRow;
+            const pct = (data.values.percent * 100).toFixed(1);
+            const count = data.values.total;
+            const c = 'timelines-aggregate-tooltip';
     
             return (
-                <div style={{ backgroundColor: '#fff', border: '1px solid #999', margin: 0, padding: 10 }} >
-                    <p>{data.values.total}</p>
-                    <p>
-                        <span>{data.values.percent}%</span>
-                    </p>
+                <div className={c}>
+                    <span className={`${c}-count`}>{count}</span>
+                    <span>patients (</span>
+                    <span className={`${c}-percent`}>{pct}%</span>
+                    <span>)</span>
                 </div>
           );
         }
@@ -116,15 +133,21 @@ class CustomizedAxisTick extends React.PureComponent<TickProps> {
     public render () {
         const { x, y, payload, text } = this.props;
         if (payload.value !== 1) { return null;}
+        const data = payload as TimelinesAggregateDataRow;
+        console.log(data);
 
         return (
             <Text 
-                className="timelines-aggregate-yaxis-label" x={x+5} y={y-4} width={150} 
-                textAnchor="start" verticalAnchor="start">
+                className="timelines-aggregate-yaxis-label" 
+                x={x+5} y={y-4} width={150} 
+                textAnchor="start" 
+                verticalAnchor="start"
+                >
                     {text}
             </Text>
         );
     }
+
 };
 
 interface DotProps {
@@ -154,14 +177,5 @@ class CustomizedDot extends React.PureComponent<DotProps> {
             return minSize;
         }
         return size;
-
-        switch (payload.values.size) {
-            case 0: return 0;
-            case 1: return 3;
-            case 2: return 10;
-            case 3: return 15;
-            case 4: return 20;
-            case 5: return 25;
-        }
     }
 };

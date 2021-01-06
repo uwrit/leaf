@@ -6,32 +6,45 @@
  */ 
 
 .timelines-concept-drag-overlay {
-    background-color: transparent;
     height: 100%;
     position: absolute;
     width: 100%;
-    z-index: 100;
+    z-index: 105;
 }
 
 .timelines-concept-drag-overlay-inner {
-    background-color: rgb(240, 240, 240);
+    background-color: rgb(250, 250, 250);
     border: 2px dashed rgba(28, 170, 221, 0.699);
     border-radius: 8px;
     color: black;
+    display: relative;
+    height: 300px;
     margin: 0;
-    padding: 20px;
     position: absolute;
     top: 40%;
     left: 55%;
     transform: translate(-50%, -50%);
     width: 450px;
+    vertical-align: middle;
 }
 
-.timelines-concept-drag-overlay-inner p {
+.timelines-concept-drag-overlay-inner svg {
+    margin-right: 0;
+}
+
+.timelines-concept-drag-overlay-inner > div {
     font-size: 2.0rem;
     font-weight: 100;
     margin-bottom: 0;
+    padding: 20px;
+    position: absolute;
     text-align: center;
+    top: 30%;
+    width: 100%;
+}
+
+.timelines-concept-drag-overlay-loading {
+    font-size: 2.5rem;
 }
 
 .timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner {

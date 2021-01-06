@@ -28,7 +28,6 @@ export interface TimelinesAggregateDataRow {
 
 export interface TimelinesAggregateDataRowValue {
     percent: number;
-    size: 0 | 1 | 2 | 3 | 4 | 5;
     total: number;
 }
 

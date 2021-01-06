@@ -10,7 +10,7 @@ import { connect } from 'react-redux'
 import { Col, Container, Row } from 'reactstrap';
 import { Direction, DirectionalSlider } from '../../components/Other/DirectionalSlider/DirectionalSlider';
 import { AppState } from '../../models/state/AppState';
-import { TimelinesState } from '../../models/state/CohortState';
+import { CohortStateType, TimelinesState } from '../../models/state/CohortState';
 import ConceptColumnContainer from '../FindPatients/ConceptColumnContainer';
 import TimelinesControlPanelStep from '../../components/Timelines/TimelinesControlPanelStep';
 import { TimelinesDisplayMode } from '../../models/timelines/Configuration';
@@ -18,7 +18,9 @@ import AggregateTimelineChart from '../../components/Timelines/AggregateTimeline
 import PanelSelectorModal from '../../components/Modals/PanelSelectorModal/PanelSelectorModal';
 import TimelinesConceptDragOverlay from '../../components/Timelines/TimelinesConceptDragOverlay';
 import TimelinesDateRangeSelector from '../../components/Timelines/TimelinesDateRangeSelector'
-import { getPanelIndexDataset } from '../../actions/cohort/timelines';
+import { getPanelIndexDataset, setTimelinesIndexPanelId } from '../../actions/cohort/timelines';
+import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
+import { FiCheck } from 'react-icons/fi';
 import './Timelines.css';
 
 interface OwnProps { }
@@ -50,6 +52,7 @@ class Timelines extends React.Component<Props, State> {
         const c = this.className;
         const { dispatch, timelines } = this.props;
         const { showPanelSelector, showConcepts } = this.state;
+        const hasConcepts = timelines.stateByConcept.size > 0;
 
         return  (
             <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
@@ -58,7 +61,7 @@ class Timelines extends React.Component<Props, State> {
                 <DirectionalSlider 
                     show={this.state.showConcepts}
                     from={Direction.Left}
-                    overlay={false}
+                    overlay={true}
                     toggle={this.toggleShowConcepts}>
                     <div>
                         <ConceptColumnContainer />
@@ -81,22 +84,36 @@ class Timelines extends React.Component<Props, State> {
                         {/* Control panel */}
                         <Col md={3}>
                             <div className={`${c}-control-panel`}>
-                                <TimelinesControlPanelStep number={1} clickable={true}
-                                    text={'Choose an index event'} handleClick={this.handleAddIndexEventClick}
+
+                                {/* Index event */}
+                                <TimelinesControlPanelStep number={1}
+                                    enabled={true}
+                                    text={'Choose an index event'}
                                     subtext={<span>
                                                 {'Index events serve as the '}<strong>starting point</strong>{' for a timeline. Events can be ' +
                                                  'chosen from the panels used to define the cohort. If a patient has more than one ' +
                                                  'event, the '}<strong>earliest</strong>{' is used'}
                                              </span>}
+                                    subComponent={this.getIndexControlPanelComponent()}
                                 />
-                                <TimelinesControlPanelStep number={2} clickable={true}
-                                    text={'Drag Concepts over to view data'} handleClick={this.handleAddDataClick}
+
+                                {/* Add Concepts */}
+                                <TimelinesControlPanelStep number={2}
+                                    enabled={timelines.indexConceptState === CohortStateType.LOADED}
+                                    text={'Drag Concepts over to view data'}
                                     subtext={<span>
                                         {'Concepts can be dropped anywhere to the right to add them to the chart'}
-                                     </span>}
+                                            </span>}
+                                    subComponent={(
+                                        <div>
+                                            <span className="clickable" onClick={this.toggleShowConcepts.bind(null, true)}>+ Add Concepts</span>
+                                        </div>)}
                                 />
-                                <TimelinesControlPanelStep number={3} clickable={false}
-                                    text={'Configure time spans'} handleClick={this.doNothing}
+
+                                {/* Date range bins */}
+                                <TimelinesControlPanelStep number={3}
+                                    enabled={hasConcepts}
+                                    text={'Configure time spans'}
                                     subtext={<span>
                                         {'Set the range of dates to see timelines for'}
                                      </span>}
@@ -109,9 +126,18 @@ class Timelines extends React.Component<Props, State> {
                         <Col md={9}>
                             <div className={`${c}-chart`}>
 
+                                {/* No concepts added */}
+                                {!hasConcepts && !showConcepts &&
+                                <div className={`${c}-no-concepts`}>
+                                    <p>
+                                        Add Concepts on the left to view their timelines
+                                    </p>
+                                </div>
+                                }
+
                                 {/* Overlay */}
                                 {showConcepts && 
-                                <TimelinesConceptDragOverlay dispatch={dispatch} toggleOverlay={this.toggleShowConcepts}/>}
+                                <TimelinesConceptDragOverlay dispatch={dispatch} timelines={timelines} toggleOverlay={this.toggleShowConcepts}/>}
 
                                 {/* Aggregate chart */}
                                 {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
@@ -126,11 +152,19 @@ class Timelines extends React.Component<Props, State> {
         );
     }
 
-    private doNothing = () => null;
+    private toggleShowConcepts = (show?: boolean) => {
+        const showConcepts = typeof(show) === 'undefined' ? !this.state.showConcepts : show;
 
-    private toggleShowConcepts = () => {
+        if (!show) {
+            const { timelines } = this.props;
+            const isLoading = [ ...timelines.stateByConcept.values() ].find((s) => s === CohortStateType.REQUESTING);
+            if (isLoading) {
+                return;
+            }
+        }
+
         this.setState({ 
-            showConcepts: !this.state.showConcepts,
+            showConcepts: showConcepts,
             showPanelSelector: false 
         });
     };
@@ -146,17 +180,42 @@ class Timelines extends React.Component<Props, State> {
         this.toggleShowPanelSelector();
     };
 
-    private handleAddDataClick = () => {
-        this.toggleShowConcepts();
-    };
 
     private handlePanelSelect = (panelIndex?: number) => {
         const { dispatch } = this.props;
         if (typeof(panelIndex) !== 'undefined') {
+            dispatch(setTimelinesIndexPanelId(panelIndex));
             dispatch(getPanelIndexDataset(panelIndex));
             this.setState({ showPanelSelector: false });
         }
     };
+
+    private getIndexControlPanelComponent = () => {
+        const { timelines } = this.props;
+        const c = `${this.className}-index-control-panel`;
+
+        if (timelines.indexConceptState === CohortStateType.REQUESTING) {
+            return (
+                <div className={`${c} ${c}-loading`}>
+                    <LoaderIcon size={15} />
+                    <span>Loading...</span>
+                </div>
+            );
+        } else if (timelines.indexConceptState === CohortStateType.LOADED) {
+            const idx = timelines.configuration.indexPanel!+1;
+            return (
+                <div className={`${c} ${c}-loaded`}>
+                    <FiCheck/>
+                    <span className="clickable" onClick={this.handleAddIndexEventClick}>Panel {idx} (click to change)</span>
+                </div>
+            );
+        }
+        return (
+            <div className={`${c} ${c}-not-loaded`}>
+                <span className="clickable" onClick={this.handleAddIndexEventClick}>+ Choose Index Event</span>
+            </div>
+        );
+    }
 }
 
 const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {

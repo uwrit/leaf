@@ -15,8 +15,8 @@ import React from 'react';
 import './TimelinesControlPanelStep.css';
 
 interface Props { 
-    clickable: boolean;
-    handleClick?: () => void;
+    clickHandler?: () => void;
+    enabled: boolean;
     number: number;
     subtext?: string | JSX.Element;
     subComponent?: JSX.Element;
@@ -26,27 +26,34 @@ interface Props {
 export default class TimelinesControlPanelStep extends React.Component<Props> {
     private className = 'timelines-control-panel-step'
 
-
     public render() {
         const c = this.className;
-        const { clickable, number, subtext, text, subComponent } = this.props;
+        const { clickHandler, enabled, number, subtext, text, subComponent } = this.props;
+        const classes = [ `${c}` ];
+
+        if (clickHandler) { classes.push('enabled'); }
+        if (!enabled)     { classes.push('disabled'); }
 
         return  (
-            <div className={`${c} ${(clickable ? 'clickable' : '')}`} onClick={this.handleClick}>
+            <div className={classes.join(' ')} onClick={this.handleClick}>
                 <div className={`${c}-number`}>{number}</div>
                 <div className={`${c}-text`}>{text}</div>
                 {subtext && 
                 <div className={`${c}-subtext`}>{subtext}</div>
                 }
-                {subComponent && subComponent}
+                {subComponent && enabled &&
+                <div className={`${c}-subcomponent`}>
+                    {subComponent}
+                </div>
+                }
             </div>
         )
     }
 
     private handleClick = () => {
-        const { clickable, handleClick } = this.props;
-        if (clickable && handleClick) {
-            handleClick()
+        const { clickHandler, enabled } = this.props;
+        if (enabled && clickHandler) {
+            clickHandler()
         }
     }
 }

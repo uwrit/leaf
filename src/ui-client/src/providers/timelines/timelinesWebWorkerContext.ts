@@ -62,7 +62,6 @@ var queryAggregate = function (payload) {
     });
     return output;
 };
-"use strict";
 /**
          * Aggregate counts relative to index date
          */
@@ -110,39 +109,17 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
         for (var i = 0; i < pats.length; i++) {
             _loop_1(i);
         }
-        var values = { percent: (binCount / totalPats), size: getCohortBinSize(binCount, totalPats), total: binCount };
+        var values = { percent: (binCount / totalPats), total: binCount };
         var dataRow = {
             conceptId: concept.id,
             timepointId: bin.label,
-            displayValueX: values.size,
+            displayValueX: values.total,
             displayValueY: 1,
             values: values
         };
         output.push(dataRow);
     });
     return output;
-};
-/**
- * Get cohort bin size
- */
-var getCohortBinSize = function (binTotal, cohortTotal) {
-    if (cohortTotal === 0) {
-        return 0;
-    }
-    var proportion = binTotal / cohortTotal * 100.0;
-    if (proportion < 20) {
-        return 1;
-    }
-    else if (proportion < 40) {
-        return 2;
-    }
-    else if (proportion < 60) {
-        return 3;
-    }
-    else if (proportion < 80) {
-        return 4;
-    }
-    return 5;
 };
 /**
  * Get datediff function

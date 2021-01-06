@@ -88,7 +88,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
             }
         }
         
-        /*
+        /**
          * Create array of React components.
          */
         const arr = [
@@ -99,7 +99,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
             <div className={`${c}-button`} onClick={this.handleClick} key={2}>{this.getButtonContent()}</div>
         ];
         
-        /*
+        /**
          * Display the site summary if fetching a dataset.
          */
         if (configuration.isFetching) {
@@ -108,7 +108,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                     <ResponderStatusSummary cohortMap={cohortMap} responderMap={responderMap} />
                 </div>
             )
-        /*
+        /**
          * Show the selector modal.
          */
         } else if (showSelectorModal) {

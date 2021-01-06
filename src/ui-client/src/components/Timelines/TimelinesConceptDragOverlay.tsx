@@ -10,6 +10,8 @@ import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, D
 import { MdAccessTime } from 'react-icons/md';
 import { getConceptDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
+import { CohortStateType, TimelinesState } from '../../models/state/CohortState';
+import LoaderIcon from '../Other/LoaderIcon/LoaderIcon';
 import './TimelinesConceptDragOverlay.css';
 
 interface DndProps {
@@ -24,6 +26,7 @@ interface DndProps {
 
 interface OwnProps {
     dispatch: any;
+    timelines: TimelinesState;
     toggleOverlay: () => void;
 }
 
@@ -31,8 +34,13 @@ type Props = DndProps & OwnProps
 
 const conceptNodeTarget = {
     drop(props: Props, monitor: DropTargetMonitor, component: any) {
-        const { dispatch } = props;
+        const { dispatch, timelines } = props;
         const concept: Concept = monitor.getItem();
+        const loadingConcept = [ ...timelines.stateByConcept.values() ].find((s) => s === CohortStateType.REQUESTING);
+
+        if (loadingConcept || timelines.stateByConcept.get(concept.id)) {
+            return;
+        }
 
         dispatch(getConceptDataset(concept));
     },
@@ -50,22 +58,30 @@ const collectDrop = (connect: DropTargetConnector, monitor: DropTargetMonitor) =
     });
 };
 
-class TimelinesConceptDragOverlay extends React.Component<Props> {
+class TimelinesConceptDragOverlay extends React.PureComponent<Props> {
     private className = 'timelines-concept-drag-overlay';
 
     public render() {
         const c = this.className;
-        const { connectDropTarget, canDrop, isOver } = this.props;
+        const { connectDropTarget, canDrop, isOver, timelines } = this.props;
         const clock = <MdAccessTime className={'concept-tree-node-icon concept-tree-node-icon-clock'} />;
+        const loadingConcept = [ ...timelines.stateByConcept.values() ].find((s) => s === CohortStateType.REQUESTING);
 
         return (
             connectDropTarget &&
             connectDropTarget(
                 <div className={`${c} ${canDrop && isOver ? 'can-drop' : ''}`}>
                     <div className={`${c}-inner`}>
-                        <p>
-                            Drag any Concept that has dates (the {clock} symbol) here
-                        </p>
+
+                        <div>
+                            {!loadingConcept && 
+                            <div>Drop any Concept with associated dates (the {clock} symbol) here</div>
+                            }
+                            {loadingConcept && 
+                            <div className={`${c}-loading`}><LoaderIcon size={30} /> Updating timeline...</div>
+                            }
+                        </div>
+
                     </div>
                 </div>
             )
