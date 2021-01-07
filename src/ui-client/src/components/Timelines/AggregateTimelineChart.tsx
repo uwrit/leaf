@@ -11,9 +11,8 @@ import { deleteConceptDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
 import { AuthorizationState } from '../../models/state/AppState';
 import { TimelinesState } from '../../models/state/CohortState';
-import { DateDisplayMode, DateIncrementType } from '../../models/timelines/Configuration';
+import { DateIncrementType } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataRow } from '../../models/timelines/Data';
-import TimelinesAggregateTitle from './TimelinesAggregateTimelineTitle';
 import './AggregateTimelineChart.css';
 
 interface Props {
@@ -76,15 +75,9 @@ export default class AggregateTimelineChart extends React.Component<Props, State
         const swimlaneHeight = chartHeight / data.length;
         const lastConcept = data.length-1;
         const dateIncrText = this.getIncrementTypeText(dateIncrement.incrementType);
-        const xAxisLabel = dateIncrement.mode === DateDisplayMode.BEFORE
-            ? `${dateIncrText} Preceding Index Event`
-            : `${dateIncrText} Following Index Event`;
 
         return (
             <div className={c}>
-
-                {/* Header */}
-                <TimelinesAggregateTitle auth={auth} patientCount={patientCount} timelines={timelines} />
 
                 {data.map((d,i) => {
                     return (
@@ -115,7 +108,9 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                     );
                 })}
                 <div className={`${c}-xAxis-label-container`}>
-                    {xAxisLabel}
+                    <strong>
+                        {dateIncrText}
+                    </strong>
                 </div>
             </div>
         )

@@ -7,15 +7,15 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { setPanelInclusion, setSubPanelInclusion } from '../../../actions/panels';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
+import { PanelHandlers } from './PanelGroup';
 
 interface State {
     dropdownOpen: boolean
 }
 
 interface Props {
-    dispatch: any
+    handlers: PanelHandlers;
     inclusionDropdownType: string,
     isFirst: boolean,
     index: number,
@@ -31,26 +31,6 @@ export default class InclusionDropdown extends React.PureComponent<Props, State>
     constructor(props: Props) {
         super(props);
         this.state = { dropdownOpen: false };
-    }
-    
-    public toggle = () => {
-        this.setState((prevState: State) => ({
-            dropdownOpen: !prevState.dropdownOpen
-        }));
-    }
-
-    public selectItem = (item: any) => {
-        const { dispatch, inclusionDropdownType } = this.props;
-        const text = item.target.innerText;
-        const include = text === 'Patients Who' || text === 'And' ? true : false;
-
-        // Update state
-        if (inclusionDropdownType === INCLUSION_DROPDOWN_TYPE.PANEL) { 
-            dispatch(setPanelInclusion(this.props.panel.index, include));
-        }
-        else {
-            dispatch(setSubPanelInclusion(this.props.panel.index, this.props.index, include));
-        }
     }
 
     public render() {
@@ -92,5 +72,24 @@ export default class InclusionDropdown extends React.PureComponent<Props, State>
                 </DropdownMenu>
             </Dropdown>
         );
+    }
+
+    private toggle = () => {
+        this.setState((prevState: State) => ({
+            dropdownOpen: !prevState.dropdownOpen
+        }));
+    }
+
+    private selectItem = (item: any) => {
+        const { index, inclusionDropdownType, panel, handlers } = this.props;
+        const text = item.target.innerText;
+        const include = text === 'Patients Who' || text === 'And' ? true : false;
+
+        // Update state
+        if (inclusionDropdownType === INCLUSION_DROPDOWN_TYPE.PANEL) {
+            handlers.handlePanelInclusion(panel.index, include);
+        } else {
+            handlers.handleSubPanelInclusion(panel.index, index, include);
+        }
     }
 }

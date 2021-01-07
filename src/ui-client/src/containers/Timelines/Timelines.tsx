@@ -21,6 +21,7 @@ import TimelinesDateRangeSelector from '../../components/Timelines/TimelinesDate
 import { getPanelIndexDataset, setTimelinesIndexPanelId } from '../../actions/cohort/timelines';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
 import { FiCheck } from 'react-icons/fi';
+import TimelinesChartTitle from '../../components/Timelines/TimelinesChartTitle';
 import './Timelines.css';
 
 interface OwnProps { }
@@ -134,9 +135,18 @@ class Timelines extends React.Component<Props, State> {
                                 {showConcepts && 
                                 <TimelinesConceptDragOverlay dispatch={dispatch} timelines={timelines} toggleOverlay={this.toggleShowConcepts}/>}
 
-                                {/* Aggregate chart */}
-                                {hasConcepts && timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
+                                {/* Charts */}
+                                {hasConcepts &&
+                                <div>
+
+                                    {/* Header */}
+                                    <TimelinesChartTitle auth={auth} patientCount={patientCount} timelines={timelines} />
+                                    
+                                    {/* Aggregate chart */}
+                                    {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
+                                    <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
+
+                                </div>}
 
                             </div>
                         </Col>

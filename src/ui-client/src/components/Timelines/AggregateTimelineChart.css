@@ -29,8 +29,10 @@
 }
 
 .timelines-aggregate-xAxis-label-container {
-    left: 35%;
-    font-size: 1.5rem;
+    left: 40%;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 300;
     margin-top: 10px;
     position: absolute;
     width: 100%;
@@ -88,7 +90,7 @@
 }
 
 .timelines-aggregate-yaxis-container:hover { 
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.2);
 }
 
 .timelines-aggregate-yaxis-label {
@@ -109,7 +111,7 @@
 }
 
 .timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove {
-    background-color: rgba(40, 28, 27, 0.9);
+    background-color: rgba(40, 28, 27, 0.4);
 }
 
 .timelines-aggregate-yaxis-remove svg {
@@ -131,19 +133,4 @@
 
 .timelines-aggregate-yaxis-remove svg:hover path {
     fill: rgb(252, 74, 74);
-}
-
-/* Title */
-.timelines-chart-title {
-    font-size: 2rem;
-    font-weight: 300;
-    text-align: center;
-}
-.timelines-chart-title > div {
-    display: inline-block;
-}
-
-.timelines-chart-title-emphasis {
-    color: rgb(28, 168, 221);
-    margin: 0 4px;   
 }

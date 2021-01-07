@@ -8,15 +8,15 @@
 import moment from 'moment';
 import React from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
-import { setPanelDateFilter } from '../../../actions/panels';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import PopupBox from '../../Other/PopupBox/PopupBox';
+import { PanelHandlers } from './PanelGroup';
 import 'react-day-picker/lib/style.css';
 import './CustomDateRangePicker.css';
 
 interface Props { 
-    dispatch: any;
+    handlers: PanelHandlers;
     panel: PanelModel;
     parentDomRect: DOMRect;
     toggleCustomDateRangeBox: (show?: boolean) => any;
@@ -132,13 +132,13 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Updates the store with a DateBoundary object based on current input.
      */
     private setDateBoundary = (startDate: DateFilter, endDate: DateFilter) => {
-        const { panel, dispatch } = this.props;
+        const { panel, handlers } = this.props;
         const dateBoundary: DateBoundary = {
             display: `${startDate.date!.toLocaleDateString()} - ${endDate.date!.toLocaleDateString()}`,
             end: { date: endDate.date, dateIncrementType: DateIncrementType.SPECIFIC },
             start: { date: startDate.date, dateIncrementType: DateIncrementType.SPECIFIC }
         };
-        dispatch(setPanelDateFilter(panel.index, dateBoundary));
+        handlers.handlePanelDateFilter(panel.index, dateBoundary);
     }
 
     /*
@@ -190,7 +190,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Handles changes to the end date.
      */
     private handleEndDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
-        const { panel, dispatch } = this.props;
+        const { panel, handlers } = this.props;
         const { startDateInput } = this.state;
 
         if (updateDate && date) {
@@ -208,11 +208,11 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ endDateValid: false });
-            dispatch(setPanelDateFilter(panel.index, this.anytime));
+            handlers.handlePanelDateFilter(panel.index, this.anytime);
         }
         else {
             this.setState({ startDateValid: true });
-            dispatch(setPanelDateFilter(panel.index, this.anytime));
+            handlers.handlePanelDateFilter(panel.index, this.anytime);
         }
     }
 
@@ -220,7 +220,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Handles changes to the start date.
      */
     private handleStartDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
-        const { panel, dispatch } = this.props;
+        const { panel, handlers } = this.props;
         const { endDateInput } = this.state;
 
         if (updateDate && date) {
@@ -238,11 +238,10 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ startDateValid: false });
-            dispatch(setPanelDateFilter(panel.index, this.anytime));
-        }
-        else {
+            handlers.handlePanelDateFilter(panel.index, this.anytime);
+        } else {
             this.setState({ startDateValid: true });
-            dispatch(setPanelDateFilter(panel.index, this.anytime));
+            handlers.handlePanelDateFilter(panel.index, this.anytime);
         }
     }
 
@@ -256,8 +255,8 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * the filter to 'Anytime'.
      */
     private handleClearClick = () => {
-        const { panel, dispatch } = this.props;
-        dispatch(setPanelDateFilter(panel.index, this.anytime));
+        const { panel, handlers } = this.props;
+        handlers.handlePanelDateFilter(panel.index, this.anytime);
         this.closeCustomDateRangeBox();
     }
 

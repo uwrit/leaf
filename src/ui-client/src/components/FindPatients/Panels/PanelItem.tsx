@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd'
-import { removePanelItem, hidePanelItem } from '../../../actions/panels';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
 import getDragPreview from '../../../utils/getDragPreview';
 import PanelItemNumericFilter from './PanelItemNumericFilter';
 import ConceptSpecializationGroup from './ConceptSpecializationGroup';
 import { SubPanel, SequenceType } from '../../../models/panel/SubPanel';
 import { CohortStateType } from '../../../models/state/CohortState';
+import { PanelHandlers } from './PanelGroup';
 
 interface DndProps {
     connectDragSource?: ConnectDragSource;
@@ -24,7 +24,7 @@ interface DndProps {
 }
 
 interface OwnProps {
-    dispatch: any;
+    handlers: PanelHandlers;
     panelItem: PanelItemModel;
     queryState: CohortStateType;
     subPanel: SubPanel;
@@ -36,7 +36,7 @@ type Props = DndProps & OwnProps
 // be sent to the panel on the drop() event.
 const conceptNodeSource = {
     beginDrag(props: Props) {
-        const { dispatch, panelItem } = props;
+        const { handlers, panelItem } = props;
         /*
          * Hide the panel item, but keep in DOM until drop event. This is needed
          * so React-dnd can detect the drop has occurred (and thus update UI correctly),
@@ -45,13 +45,13 @@ const conceptNodeSource = {
          * Html5 dnd events on hidden DOM objects. Odd as it seems, this flow seems to work well.
          */
         setTimeout(() => {
-            dispatch(hidePanelItem(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index));
+            handlers.handleHidePanelItem(panelItem);
         }, 50);
         return panelItem.concept;
     },
     endDrag(props: Props) {
-        const { dispatch, panelItem } = props;
-        dispatch(removePanelItem(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index));
+        const { handlers, panelItem } = props;
+        handlers.handleRemovePanelItem(panelItem);
     },
     canDrag(props: Props) {
         return props.queryState !== CohortStateType.REQUESTING;
@@ -85,7 +85,7 @@ export class PanelItem extends React.Component<Props> {
     }
     
     public render(): any {
-        const { connectDragSource, dispatch, panelItem, subPanel, canDrag } = this.props;
+        const { connectDragSource, handlers, panelItem, subPanel, canDrag } = this.props;
         const { concept, specializations } = panelItem;
         const c = this.className;
         const classes = [ c ]; 
@@ -112,7 +112,7 @@ export class PanelItem extends React.Component<Props> {
                     {concept.isSpecializable && concept.specializationGroups &&
                      concept.specializationGroups.map((g) => (
                         <ConceptSpecializationGroup 
-                            dispatch={dispatch} 
+                            handlers={handlers}
                             key={g.id} 
                             panelItem={panelItem} 
                             selected={specializations} 
@@ -120,7 +120,7 @@ export class PanelItem extends React.Component<Props> {
                         />
                     ))}
                     {concept.isNumeric &&
-                    <PanelItemNumericFilter panelItem={panelItem} dispatch={dispatch}/>
+                    <PanelItemNumericFilter panelItem={panelItem} handlers={handlers}/>
                     }
                     {invalidEventId &&
                     <span className={`${c}-invalid-eventid-info`}>

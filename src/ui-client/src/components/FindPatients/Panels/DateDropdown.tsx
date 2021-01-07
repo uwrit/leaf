@@ -7,17 +7,17 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { setPanelDateFilter } from '../../../actions/panels';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import { futureDates, none, pastDates } from './DateDropdownOptions';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
+import { PanelHandlers } from './PanelGroup';
 
 interface State {
     dropdownOpen: boolean;
 }
 
 interface Props {
-    dispatch: any;
+    handlers: PanelHandlers;
     handleCustomDateClick: (e: any) => void;
     panel: PanelModel;
 }
@@ -63,8 +63,8 @@ export default class DateDropdown extends React.PureComponent<Props, State> {
     }
 
     private handleClick = (dateFilter: DateBoundary) => {
-        const { dispatch, panel } = this.props;
-        dispatch(setPanelDateFilter(panel.index, dateFilter));
+        const { handlers, panel } = this.props;
+        handlers.handlePanelDateFilter(panel.index, dateFilter);
     }
 
     private setDropdownItemClasses = (dates: DateBoundary) => {

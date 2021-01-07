@@ -81,7 +81,6 @@ class PanelSelectorModal extends React.PureComponent<Props, State> {
                                         <div className={`${c}-panel-overlay`} onClick={this.handlePanelSelect.bind(null, p, i)}>
                                             <Panel 
                                                 isFirst={i===0}
-                                                dispatch={this.noOp}
                                                 panel={p}
                                                 queryState={CohortStateType.LOADED}
                                             />
@@ -103,8 +102,6 @@ class PanelSelectorModal extends React.PureComponent<Props, State> {
             handleByPanelSelect(panelIndex);
         }
     }
-
-    private noOp = () => () => null;
 
     private getPanelExclusionText = (tp: PanelType) => {
         if (tp === PanelType.Valid) { return null; }

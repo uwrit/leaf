@@ -7,14 +7,14 @@
 
 import React from 'react';
 import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
-import { setPanelItemNumericFilter } from '../../../actions/panels';
 import PopupBox from '../../Other/PopupBox/PopupBox';
 import { PanelItem } from '../../../models/panel/PanelItem';
 import { NumericFilterType, NumericFilter } from '../../../models/panel/NumericFilter';
+import { PanelHandlers } from './PanelGroup';
 import './PanelItemNumericFilter.css';
 
 interface Props {
-    dispatch: any;
+    handlers: PanelHandlers;
     panelItem: PanelItem;
 }
 
@@ -159,9 +159,8 @@ export default class PanelItemNumericFilter extends React.Component<Props, State
      * Dispatches an update to Redux store after input change.
      */
     private dispatchUpdate = (filter: NumericFilter) => {
-        const { panelItem, dispatch } = this.props;
-        const pi = panelItem;
-        dispatch(setPanelItemNumericFilter(pi.concept, pi.panelIndex, pi.subPanelIndex, pi.index, filter));
+        const { panelItem, handlers } = this.props;
+        handlers.handlePanelItemNumericFilter(panelItem, filter);
     }
 
     /*
