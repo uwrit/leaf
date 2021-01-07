@@ -11,8 +11,9 @@ import { deleteConceptDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
 import { AuthorizationState } from '../../models/state/AppState';
 import { TimelinesState } from '../../models/state/CohortState';
-import { DateIncrementType } from '../../models/timelines/Configuration';
+import { DateDisplayMode, DateIncrementType } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataRow } from '../../models/timelines/Data';
+import TimelinesAggregateTitle from './TimelinesAggregateTimelineTitle';
 import './AggregateTimelineChart.css';
 
 interface Props {
@@ -75,9 +76,16 @@ export default class AggregateTimelineChart extends React.Component<Props, State
         const swimlaneHeight = chartHeight / data.length;
         const lastConcept = data.length-1;
         const dateIncrText = this.getIncrementTypeText(dateIncrement.incrementType);
+        const xAxisLabel = dateIncrement.mode === DateDisplayMode.BEFORE
+            ? `${dateIncrText} Preceding Index Event`
+            : `${dateIncrText} Following Index Event`;
 
-        return  (
+        return (
             <div className={c}>
+
+                {/* Header */}
+                <TimelinesAggregateTitle auth={auth} patientCount={patientCount} timelines={timelines} />
+
                 {data.map((d,i) => {
                     return (
                         <ScatterChart key={d.concept.id} width={chartWidth} height={swimlaneHeight} margin={margins}>
@@ -87,7 +95,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                             {/* X-axis (lower-most chart only) */}
                             {i === lastConcept &&
-                            <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false} unit={' ' + dateIncrText}/>}
+                            <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false}/>}
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
@@ -95,7 +103,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                             />
 
                             {/* Z-axis (bubble size) */}
-                            <ZAxis type="number" dataKey="displayValueX" domain={[0,5]} range={[0,1000]} />
+                            <ZAxis type="number" dataKey="displayValueX" range={[0,1000]} />
 
                             {/* Tooltip */}
                             <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, exportLimit, patientCount)} />
@@ -106,6 +114,9 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                         </ScatterChart>
                     );
                 })}
+                <div className={`${c}-xAxis-label-container`}>
+                    {xAxisLabel}
+                </div>
             </div>
         )
     }
@@ -117,22 +128,22 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
     private getIncrementTypeText = (type: DateIncrementType): string => {
         switch (type) {
-            case DateIncrementType.DAY:    return 'days';
-            case DateIncrementType.HOUR:   return 'hours';
-            case DateIncrementType.MINUTE: return 'minutes';
-            case DateIncrementType.MONTH:  return 'months';
-            case DateIncrementType.WEEK:   return 'weeks';
-            case DateIncrementType.YEAR:   return 'years';
+            case DateIncrementType.DAY:    return 'Days';
+            case DateIncrementType.HOUR:   return 'Hours';
+            case DateIncrementType.MINUTE: return 'Minutes';
+            case DateIncrementType.MONTH:  return 'Months';
+            case DateIncrementType.WEEK:   return 'Weeks';
+            case DateIncrementType.YEAR:   return 'Years';
         }
     }
 
     private renderTooltip = (exportLimit: number, patientCount: number, props: any) => {
         const { active, payload } = props;
         if (active && payload && payload.length) {
+            const c = 'timelines-aggregate-tooltip';
             const data = (payload[0] && payload[0].payload) as TimelinesAggregateDataRow;
             const pct = (data.values.percent * 100).toFixed(1);
             const count = data.values.total;
-            const c = 'timelines-aggregate-tooltip';
             const denom = Math.min(patientCount, exportLimit);
     
             return (
@@ -150,6 +161,9 @@ export default class AggregateTimelineChart extends React.Component<Props, State
     };
 }
 
+/**
+ * Left-side Y-Axis labels
+ */
 interface TickProps {
     clickHandler: (c: Concept) => void;
     concept: Concept;
@@ -187,6 +201,9 @@ class CustomizedAxisTick extends React.PureComponent<TickProps> {
     }
 };
 
+/**
+ * Bubbles
+ */
 interface DotProps {
     conceptsCount: number;
     cx?: number;
@@ -210,7 +227,7 @@ class CustomizedDot extends React.PureComponent<DotProps> {
         const conceptsNoPenaltyLimit = 6;
         const sizeLimitPenalty = 3;
         const sizePadding = 3;
-        const maxSize = 40;
+        const maxSize = 35;
         const size = Math.floor(percent * maxSize) + sizePadding;
 
         if (conceptsCount > conceptsNoPenaltyLimit) {

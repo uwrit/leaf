@@ -29,7 +29,7 @@ export default class TimelinesControlPanelStep extends React.Component<Props> {
     public render() {
         const c = this.className;
         const { clickHandler, enabled, number, subtext, text, subComponent } = this.props;
-        const classes = [ `${c}` ];
+        const classes = [ c ];
 
         if (clickHandler) { classes.push('enabled'); }
         if (!enabled)     { classes.push('disabled'); }

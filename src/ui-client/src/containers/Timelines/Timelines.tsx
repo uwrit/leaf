@@ -107,7 +107,9 @@ class Timelines extends React.Component<Props, State> {
                                             </span>}
                                     subComponent={(
                                         <div>
-                                            <span className="clickable" onClick={this.toggleShowConcepts.bind(null, true)}>+ Add Concepts</span>
+                                            <span className="clickable" onClick={this.toggleShowConcepts.bind(null, true)}>
+                                                + Add Concepts ({timelines.stateByConcept.size} selected)
+                                            </span>
                                         </div>)}
                                 />
 
@@ -115,9 +117,10 @@ class Timelines extends React.Component<Props, State> {
                                 <TimelinesControlPanelStep number={3}
                                     enabled={hasConcepts}
                                     text={'Configure time spans'}
-                                    subtext={<span>
-                                        {'Set the range of dates to see timelines for'}
-                                     </span>}
+                                    subtext={(
+                                        <span>
+                                            Configure timeline date increments
+                                        </span>)}
                                     subComponent={<TimelinesDateRangeSelector dispatch={dispatch} config={timelines.configuration} />}
                                 />
                             </div>
@@ -127,21 +130,12 @@ class Timelines extends React.Component<Props, State> {
                         <Col md={9}>
                             <div className={`${c}-chart`}>
 
-                                {/* No concepts added */}
-                                {!hasConcepts && !showConcepts &&
-                                <div className={`${c}-no-concepts`}>
-                                    <p>
-                                        Add Concepts on the left to view their timelines
-                                    </p>
-                                </div>
-                                }
-
                                 {/* Overlay */}
                                 {showConcepts && 
                                 <TimelinesConceptDragOverlay dispatch={dispatch} timelines={timelines} toggleOverlay={this.toggleShowConcepts}/>}
 
                                 {/* Aggregate chart */}
-                                {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
+                                {hasConcepts && timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
                                 <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
 
                             </div>

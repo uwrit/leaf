@@ -7,7 +7,7 @@
 
 .timelines-container {
     background-color: white;
-    padding: 0 10px;
+    padding: 2px 10px;
     transition: background-color 0.5s;
 }
 
@@ -22,8 +22,8 @@
 
 .timelines-chart {
     border-radius: 8px;
-    margin: 0;
-    height: calc(85vh);
+    margin: -37px 0 0;
+    height: calc(82vh);
 }
 
 .timelines-control-panel {
@@ -87,4 +87,27 @@
 
 .timelines-index-control-panel-loaded span {
     vertical-align: top;
+}
+
+.timelines-control-panel-step .input-group-append > button {
+    background-color: rgb(245, 245, 245) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: rgb(28, 168, 221) !important;
+    padding: 4px !important;
+}
+
+.timelines-control-panel-step .input-group-append > button:hover {
+    background-color: rgb(230, 230, 230) !important;
+}
+
+.timelines-date-range-selector-number {
+    appearance: none;
+    margin: 0;
+    text-align: center;
+}
+
+.timelines-control-panel-step-subcomponent,
+.timelines-control-panel-step .input-group-append button {
+    font-size: 1.1rem !important;
 }

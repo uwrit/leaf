@@ -6,6 +6,7 @@
  */
 
 .timelines-aggregate {
+    font-family: Roboto;
     z-index: 99;
 }
 
@@ -25,6 +26,14 @@
 .timelines-aggregate .recharts-xAxis tspan {
     color: black;
     text-shadow: none;
+}
+
+.timelines-aggregate-xAxis-label-container {
+    left: 35%;
+    font-size: 1.5rem;
+    margin-top: 10px;
+    position: absolute;
+    width: 100%;
 }
 
 .timelines-aggregate-dot {
@@ -122,4 +131,19 @@
 
 .timelines-aggregate-yaxis-remove svg:hover path {
     fill: rgb(252, 74, 74);
+}
+
+/* Title */
+.timelines-chart-title {
+    font-size: 2rem;
+    font-weight: 300;
+    text-align: center;
+}
+.timelines-chart-title > div {
+    display: inline-block;
+}
+
+.timelines-chart-title-emphasis {
+    color: rgb(28, 168, 221);
+    margin: 0 4px;   
 }

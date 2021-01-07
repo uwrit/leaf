@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+import { config } from 'process';
 import { generate as generateId } from 'shortid';
 import { ConceptDatasetDTO, ConceptDatasetRow } from '../../models/cohort/ConceptDataset';
 import { Concept, ConceptId } from '../../models/concept/Concept';
@@ -180,7 +181,7 @@ export default class TimelinesWebWorker {
             
             // Foreach concept
             conceptDatasetMap.forEach((v,k) => {
-                const data = getAggregateCounts(totalPats, v.concept, bins, dateDiffer);
+                const data = getAggregateCounts(totalPats, config, v.concept, bins, dateDiffer);
                 output.concepts.set(k, { concept: v.concept, data });
             });
 
@@ -192,6 +193,7 @@ export default class TimelinesWebWorker {
          */
         const getAggregateCounts = (
             totalPats: number,
+            config: TimelinesConfiguration,
             concept: Concept, 
             bins: TimelinesAggregateTimeBin[], 
             dateDiffer: (d1: Date, d2: Date) => number): TimelinesAggregateDataRow[] => {
@@ -244,6 +246,18 @@ export default class TimelinesWebWorker {
                 output.push(dataRow);
             });
 
+            // Add index date bin
+            const indexDate = {
+                conceptId: concept.id, timepointId: 'Index Event',
+                displayValueX: 0, displayValueY: 1,
+                values: { percent: 0, total: 0 }
+            };
+            if (config.dateIncrement.mode === dateDisplayModeBefore) {
+                output.push(indexDate);
+            } else if (config.dateIncrement.mode === dateDisplayModeAfter) {
+                output.unshift(indexDate);
+            }
+
             return output;
         };
 
@@ -284,29 +298,29 @@ export default class TimelinesWebWorker {
                 upperBound = incr * maxBins;
                 startBin = { label: `<${incr}`, minNum: 0.0001, maxNum: incr };
                 lastBin  = { label: `>${upperBound}`, minNum: upperBound };
-            } 
-            // Before
-            else if (config.dateIncrement.mode === dateDisplayModeBefore) {
-                lowerBound = -(incr * maxBins);
-                currIdx = lowerBound+incr;
-                startBin = { label: `<${lowerBound}`, maxNum: lowerBound };
-                lastBin  = { label: ``, maxNum: -1 };
-            }
-            // Before & After
-            else {
-                lowerBound = Math.trunc((incr * maxBins / 2));
-                upperBound = -lowerBound;
-                currIdx = lowerBound+incr;
-                startBin = { label: `<${lowerBound}`, maxNum: lowerBound+incr };
-                lastBin  = { label: ``, minNum: -incr };
+
+                while (currIdx < upperBound) {
+                    bins.push({ label: `${currIdx}-${Math.abs(currIdx+incr)}`, minNum: currIdx, maxNum: currIdx+incr });
+                    currIdx += incr;
+                }
+                bins.unshift(startBin);
+                bins.push(lastBin);
             }
 
-            while (currIdx < upperBound) {
-                bins.push({ label: `${currIdx}-${currIdx+incr}`, minNum: currIdx, maxNum: currIdx+incr });
-                currIdx += incr;
+            // Before
+            else if (config.dateIncrement.mode === dateDisplayModeBefore) {
+                upperBound = 0;
+                lowerBound = -(incr * maxBins);
+                currIdx = -incr;
+                startBin = { label: `>${Math.abs(lowerBound)}`, maxNum: lowerBound };
+
+                while (currIdx >= lowerBound) {
+                    bins.unshift({ label: `${Math.abs(currIdx+incr)}-${Math.abs(currIdx)}`, minNum: currIdx, maxNum: currIdx+incr });
+                    currIdx -= incr;
+                }
+                bins.unshift(startBin);
             }
-            bins.unshift(startBin);
-            bins.push(lastBin);
+            
             return bins;
         };
 

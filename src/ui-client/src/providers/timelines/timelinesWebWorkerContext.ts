@@ -55,17 +55,20 @@ var queryAggregate = function (payload) {
     var bins = getTimeBins(config);
     var dateDiffer = getDateDiffFunc(config);
     var totalPats = indexDataset.patients.size;
+    if (totalPats === 0) {
+        return output;
+    }
     // Foreach concept
     conceptDatasetMap.forEach(function (v, k) {
-        var data = getAggregateCounts(totalPats, v.concept, bins, dateDiffer);
+        var data = getAggregateCounts(totalPats, config, v.concept, bins, dateDiffer);
         output.concepts.set(k, { concept: v.concept, data: data });
     });
     return output;
 };
 /**
-         * Aggregate counts relative to index date
-         */
-var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
+ * Aggregate counts relative to index date
+ */
+var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer) {
     var output = [];
     var conceptData = conceptDatasetMap.get(concept.id);
     if (!conceptData) {
@@ -81,20 +84,20 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
             if (!idxp || !idxp.initialDate) {
                 return "continue";
             }
-            var indexDate = idxp.initialDate;
+            var indexDate_1 = idxp.initialDate;
             var d = void 0;
             if (typeof (bin.minNum) === 'undefined') {
-                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate) < bin.maxNum; });
+                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate_1) < bin.maxNum; });
             }
             else if (typeof (bin.maxNum) === 'undefined') {
-                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate) > bin.minNum; });
+                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate_1) > bin.minNum; });
             }
             else {
                 d = p.rows.find(function (r) {
                     if (!r.dateField) {
                         return false;
                     }
-                    var diff = dateDiffer(r.dateField, indexDate);
+                    var diff = dateDiffer(r.dateField, indexDate_1);
                     if (diff >= bin.minNum && diff < bin.maxNum) {
                         return true;
                     }
@@ -103,7 +106,7 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
             }
             if (d) {
                 binCount += 1;
-            }            
+            }
         };
         // For each patient
         for (var i = 0; i < pats.length; i++) {
@@ -119,6 +122,18 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
         };
         output.push(dataRow);
     });
+    // Add index date bin
+    var indexDate = {
+        conceptId: concept.id, timepointId: 'Index Event',
+        displayValueX: 0, displayValueY: 1,
+        values: { percent: 0, total: 0 }
+    };
+    if (config.dateIncrement.mode === dateDisplayModeBefore) {
+        output.push(indexDate);
+    }
+    else if (config.dateIncrement.mode === dateDisplayModeAfter) {
+        output.unshift(indexDate);
+    }
     return output;
 };
 /**
@@ -126,28 +141,28 @@ var getAggregateCounts = function (totalPats, concept, bins, dateDiffer) {
  */
 var getDateDiffFunc = function (config) {
     var type = config.dateIncrement.incrementType;
-    var multiplier = 1000;
+    var divider = 1000;
     switch (type) {
         case dateIncrementMinute:
-            multiplier = (1000 * 60);
+            divider = (1000 * 60);
             break;
         case dateIncrementHour:
-            multiplier = (1000 * 60 * 60);
+            divider = (1000 * 60 * 60);
             break;
         case dateIncrementDay:
-            multiplier = (1000 * 60 * 60 * 24);
+            divider = (1000 * 60 * 60 * 24);
             break;
         case dateIncrementWeek:
-            multiplier = (1000 * 60 * 60 * 24 * 7);
+            divider = (1000 * 60 * 60 * 24 * 7);
             break;
         case dateIncrementMonth:
-            multiplier = (1000 * 60 * 60 * 24 * 30);
+            divider = (1000 * 60 * 60 * 24 * 30);
             break;
         case dateIncrementYear:
-            multiplier = (1000 * 60 * 60 * 24 * 365);
+            divider = (1000 * 60 * 60 * 24 * 365);
             break;
     }
-    return function (rowDate, initialDate) { return ((rowDate.getTime() - initialDate.getTime()) / multiplier); };
+    return function (rowDate, initialDate) { return ((rowDate.getTime() - initialDate.getTime()) / divider); };
 };
 /**
  * Get Timebins
@@ -167,28 +182,25 @@ var getTimeBins = function (config) {
         upperBound = incr * maxBins;
         startBin = { label: "<" + incr, minNum: 0.0001, maxNum: incr };
         lastBin = { label: ">" + upperBound, minNum: upperBound };
+        while (currIdx < upperBound) {
+            bins.push({ label: currIdx + "-" + Math.abs(currIdx + incr), minNum: currIdx, maxNum: currIdx + incr });
+            currIdx += incr;
+        }
+        bins.unshift(startBin);
+        bins.push(lastBin);
     }
     // Before
     else if (config.dateIncrement.mode === dateDisplayModeBefore) {
+        upperBound = 0;
         lowerBound = -(incr * maxBins);
-        currIdx = lowerBound + incr;
-        startBin = { label: "<" + lowerBound, maxNum: -1 };
-        lastBin = { label: "", minNum: 0 };
+        currIdx = -incr;
+        startBin = { label: ">" + Math.abs(lowerBound), maxNum: lowerBound };
+        while (currIdx >= lowerBound) {
+            bins.unshift({ label: Math.abs(currIdx+incr) + "-" + Math.abs(currIdx), minNum: currIdx, maxNum: currIdx + incr });
+            currIdx -= incr;
+        }
+        bins.unshift(startBin);
     }
-    // Before & After
-    else {
-        lowerBound = Math.trunc((incr * maxBins / 2));
-        upperBound = -lowerBound;
-        currIdx = lowerBound + incr;
-        startBin = { label: "<" + lowerBound, maxNum: lowerBound + incr };
-        lastBin = { label: "", minNum: -incr };
-    }
-    while (currIdx < upperBound) {
-        bins.push({ label: currIdx + "-" + (currIdx + incr), minNum: currIdx, maxNum: currIdx + incr });
-        currIdx += incr;
-    }
-    bins.unshift(startBin);
-    bins.push(lastBin);
     return bins;
 };
 /**

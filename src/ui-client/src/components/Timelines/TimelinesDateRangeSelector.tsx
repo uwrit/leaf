@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
-import { DateIncrementType, TimelinesConfiguration } from '../../models/timelines/Configuration';
+import { DateDisplayMode, DateIncrementType, TimelinesConfiguration } from '../../models/timelines/Configuration';
 import { setTimelinesConfigurationDates, getLatestTimelinesDataFromConfig } from '../../actions/cohort/timelines';
 import './TimelinesDateRangeSelector.css';
 
@@ -21,6 +21,7 @@ interface State {
     modeDropdownOpen: boolean;
 }
 
+const dateModes = [ DateDisplayMode.BEFORE, DateDisplayMode.AFTER ];
 const dateTypes = [ DateIncrementType.MINUTE, DateIncrementType.HOUR, DateIncrementType.DAY,
                     DateIncrementType.WEEK, DateIncrementType.MONTH, DateIncrementType.YEAR ];
 
@@ -43,6 +44,33 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         return (
             <div>
                 <InputGroup>
+
+                    {/* Before, After, Before+After */}
+                    <InputGroupButtonDropdown 
+                        addonType="append" 
+                        isOpen={modeDropdownOpen} 
+                        toggle={this.toggleDateDisplayModeDropdown}>
+                        <DropdownToggle 
+                            caret={true} 
+                            className={`${c}-mode`}>
+                            {this.getDateDisplayModeText(mode)}
+                        </DropdownToggle>
+                        <DropdownMenu>
+
+                            {/* Date modes */}
+                            {dateModes.map((m) => {
+                                const classed = `leaf-dropdown-item ${m === mode ? 'selected' : ''}`;
+                                return (
+                                    <DropdownItem
+                                        className={classed} 
+                                        key={m}
+                                        onMouseUp={this.handleDateDisplayModeChange.bind(null, m)}>
+                                        {this.getDateDisplayModeText(m)}
+                                    </DropdownItem>
+                            )})}
+
+                        </DropdownMenu>
+                    </InputGroupButtonDropdown>
 
                     {/* Increment */}
                     <Input
@@ -78,9 +106,18 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
 
                         </DropdownMenu>
                     </InputGroupButtonDropdown>
+
                 </InputGroup>
             </div>
         );
+    }
+
+    private getDateDisplayModeText = (mode: DateDisplayMode): string => {
+        switch (mode) {
+            case DateDisplayMode.BEFORE: return 'Before Index Event';
+            case DateDisplayMode.AFTER: return 'After Index Event';
+            case DateDisplayMode.BEFORE_AND_AFTER: return 'Before and After Index Event';
+        }
     }
 
     private getIncrementTypeText = (type: DateIncrementType): string => {
@@ -94,11 +131,17 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         }
     }
 
+    private handleDateDisplayModeChange = (mode: DateDisplayMode) => {
+        const { dispatch, config } = this.props;
+        const newDateConfig = Object.assign({}, config.dateIncrement, { mode });
+        const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
+        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(getLatestTimelinesDataFromConfig(newConfig));
+    }
+
     private handleDateIncrementTypeChange = (incrementType: DateIncrementType) => {
         const { dispatch, config } = this.props;
-        const newDateConfig = Object.assign({}, config.dateIncrement, {
-            incrementType
-        });
+        const newDateConfig = Object.assign({}, config.dateIncrement, { incrementType });
         const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
         dispatch(setTimelinesConfigurationDates(newDateConfig))
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
@@ -107,9 +150,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
     private handleInputChange = (e: React.FormEvent<HTMLInputElement>) => {
         const increment = parseInt(e.currentTarget.value);
         const { dispatch, config } = this.props;
-        const newDateConfig = Object.assign({}, config.dateIncrement, {
-            increment
-        });
+        const newDateConfig = Object.assign({}, config.dateIncrement, { increment });
         const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
         dispatch(setTimelinesConfigurationDates(newDateConfig))
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
@@ -117,5 +158,9 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
 
     private toggleIncrementTypeDropdown = () => {
         this.setState({ incrementTypeDropdownOpen: !this.state.incrementTypeDropdownOpen });
+    }
+
+    private toggleDateDisplayModeDropdown = () => {
+        this.setState({ modeDropdownOpen: !this.state.modeDropdownOpen });
     }
 }
