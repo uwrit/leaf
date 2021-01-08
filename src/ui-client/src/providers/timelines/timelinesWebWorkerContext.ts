@@ -176,6 +176,10 @@ var getTimeBins = function (config) {
     var lowerBound = 0;
     var upperBound = 0;
     var currIdx = incr;
+    // Bail if increment invalid
+    if (config.dateIncrement.increment <= 0 || isNaN(config.dateIncrement.increment)) {
+        return bins;
+    }
     // After
     if (config.dateIncrement.mode === dateDisplayModeAfter) {
         lowerBound = 0;

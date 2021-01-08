@@ -14,7 +14,7 @@
 
 .timelines-concept-drag-overlay-inner {
     background-color: rgb(250, 250, 250);
-    border: 2px dashed rgba(28, 170, 221, 0.699);
+    border: 2px solid transparent;
     border-radius: 8px;
     color: black;
     display: relative;
@@ -28,11 +28,17 @@
     vertical-align: middle;
 }
 
+/* Waiting for drop and loading */
+.timelines-concept-drag-overlay-inner.waiting,
+.timelines-concept-drag-overlay-inner.loading {
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+}
+
 .timelines-concept-drag-overlay-inner svg {
     margin-right: 0;
 }
 
-.timelines-concept-drag-overlay-inner > div {
+.timelines-concept-drag-overlay-inner.waiting > div {
     font-size: 2.0rem;
     font-weight: 100;
     margin-bottom: 0;
@@ -49,4 +55,52 @@
 
 .timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner {
     background-color: rgb(175, 231, 252);
+}
+
+/* Configuring concept */
+.timelines-concept-drag-overlay-inner.selecting {
+    height: 400px;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container {
+    margin-top: 20px;
+}
+
+.timelines-concept-drag-overlay-panel-selection-explanation {
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 300;
+    height: 80px;
+    margin: 10px 0;
+    padding: 0 50px;
+    text-align: center;
+}
+
+.timelines-concept-drag-overlay-panel-selection-emphasis {
+    color: rgb(28, 168, 221);
+    font-weight: 500;
+    margin: 0 4px;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container .panel-column {
+    flex: 0 0 100% !important;
+    margin: 0 auto !important;
+    max-width: 500px !important;
+    padding: 0 50px !important;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container .subpanel-body {
+    min-height: 150px !important;
+}
+
+.timelines-concept-drag-overlay-panel-selection-footer {
+    border-top: 1px solid rgb(233, 236, 239);
+    bottom: 0;
+    padding: 10px;
+    position: fixed; 
+    width: 100%;
+}
+
+.timelines-concept-drag-overlay-panel-selection-footer .leaf-button-primary {
+    float: right;
 }

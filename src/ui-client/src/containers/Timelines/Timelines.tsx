@@ -35,6 +35,7 @@ interface DispatchProps {
 }
 type Props = StateProps & OwnProps & DispatchProps;
 interface State {
+    configuringConcept: boolean;
     showConcepts: boolean;
     showPanelSelector: boolean;
 }
@@ -45,6 +46,7 @@ class Timelines extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            configuringConcept: false,
             showConcepts: false,
             showPanelSelector: false
         }
@@ -53,8 +55,8 @@ class Timelines extends React.Component<Props, State> {
     public render() {
         const c = this.className;
         const { dispatch, auth, patientCount, timelines } = this.props;
-        const { showPanelSelector, showConcepts } = this.state;
-        const hasConcepts = timelines.stateByConcept.size > 0;
+        const { configuringConcept, showPanelSelector, showConcepts } = this.state;
+        const hasConcepts = timelines.configuration.concepts.length > 0;
 
         return  (
             <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
@@ -109,7 +111,7 @@ class Timelines extends React.Component<Props, State> {
                                     subComponent={(
                                         <div>
                                             <span className="clickable" onClick={this.toggleShowConcepts.bind(null, true)}>
-                                                + Add Concepts ({timelines.stateByConcept.size} selected)
+                                                + Add Concepts ({timelines.configuration.concepts.length} selected)
                                             </span>
                                         </div>)}
                                 />
@@ -133,7 +135,10 @@ class Timelines extends React.Component<Props, State> {
 
                                 {/* Overlay */}
                                 {showConcepts && 
-                                <TimelinesConceptDragOverlay dispatch={dispatch} timelines={timelines} toggleOverlay={this.toggleShowConcepts}/>}
+                                <TimelinesConceptDragOverlay 
+                                    configuringConcept={configuringConcept} handleConfiguringConceptChange={this.setConfiguringConcept} dispatch={dispatch} 
+                                    timelines={timelines} toggleOverlay={this.toggleShowConcepts}
+                                />}
 
                                 {/* Charts */}
                                 {hasConcepts &&
@@ -157,13 +162,21 @@ class Timelines extends React.Component<Props, State> {
         );
     }
 
+    private setConfiguringConcept = (configuringConcept: boolean) => {
+        if (!configuringConcept) {
+            this.setState({ configuringConcept, showConcepts: false });
+        } else {
+            this.setState({ configuringConcept });
+        }
+    }
+
     private toggleShowConcepts = (show?: boolean) => {
+        const { configuringConcept } = this.state;
         const showConcepts = typeof(show) === 'undefined' ? !this.state.showConcepts : show;
 
         if (!show) {
             const { timelines } = this.props;
-            const isLoading = [ ...timelines.stateByConcept.values() ].find((s) => s === CohortStateType.REQUESTING);
-            if (isLoading) {
+            if (configuringConcept || timelines.state === CohortStateType.REQUESTING) {
                 return;
             }
         }

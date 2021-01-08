@@ -73,7 +73,7 @@ export const getConceptDataset = (concept: Concept) => {
                     fetchConceptDataset(getState(), nr, queryId, concept)
                         .then( async response => {
                                 // Make sure query hasn't been cancelled
-                                if (getState().cohort.timelines.stateByConcept.get(concept.id) !== CohortStateType.REQUESTING) { return; }
+                                if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
 
                                 // Update state
                                 const dto = response.data as ConceptDatasetDTO;
@@ -83,7 +83,7 @@ export const getConceptDataset = (concept: Concept) => {
                                 dispatch(setTimelinesNetworkConceptDataset(nr.id, concept, dto));
                                 
                         },  error => {
-                            if (getState().cohort.timelines.stateByConcept.get(concept.id) !== CohortStateType.REQUESTING) { return; }
+                            if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
 
                             if (error.response && error.response.status === 400) {
                                 dispatch(setTimelinesNetworkConceptDatasetNotImplemented(nr.id, concept))
@@ -95,7 +95,7 @@ export const getConceptDataset = (concept: Concept) => {
                 });
             })
         ).then( async () => {
-            if (getState().cohort.timelines.stateByConcept.get(concept.id) !== CohortStateType.REQUESTING) { return; }
+            if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
             dispatch(setTimelinesConceptDatasetExtractFinished(concept));
 
             if (atLeastOneSucceeded && timelines.indexConceptState) {

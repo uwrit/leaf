@@ -5,13 +5,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import { CohortTimelinesAction } from "../../actions/cohort/timelines";
+import { ConceptId } from "../../models/concept/Concept";
+import { PanelItem } from "../../models/panel/PanelItem";
 import { CohortState, CohortStateType, TimelinesNetworkState, TimelinesState } from "../../models/state/CohortState";
 import { DateDisplayMode, DateIncrementType, TimelinesDisplayMode } from "../../models/timelines/Configuration";
 
 export const defaultNetworkTimelinesState = (): TimelinesNetworkState => {
     return {
         indexConceptState: CohortStateType.NOT_LOADED,
-        stateByConcept: new Map<string, CohortStateType>()
+        cohortStateByConcept: new Map<string, CohortStateType>(),
+        
     };
 };
 
@@ -29,7 +32,8 @@ export const defaultTimelinesState = (): TimelinesState => {
         },
         patientData: [],
         indexConceptState: CohortStateType.NOT_LOADED,
-        stateByConcept: new Map<string, CohortStateType>()
+        state: CohortStateType.NOT_LOADED,
+        panelItemByConcept: new Map<ConceptId, PanelItem>()
     };
 };
 
@@ -43,28 +47,26 @@ export const setTimelinesAggregateDataset = (state: CohortState, action: CohortT
 };
 
 export const setTimelinesConceptDatasetState = (state: CohortState, type: CohortStateType, action: CohortTimelinesAction): CohortState => {
-    const stateByConcept = new Map(state.timelines.stateByConcept);
-    stateByConcept.set(action.concept!.id, type);
 
     // Set all network responders to REQUESTING if
     // query just started.
     if (type === CohortStateType.REQUESTING) {
         state.networkCohorts.forEach((nr) => {
-            nr.timelines.stateByConcept.set(action.concept!.id, type);
+            nr.timelines.cohortStateByConcept.set(action.concept!.id, type);
         })
     }
 
     return Object.assign({}, state, {
         timelines: {
             ...state.timelines,
-            stateByConcept
+            state: CohortStateType.REQUESTING
         }
     });
 };
 
 export const setTimelinesNetworkConceptDataset = (state: CohortState, type: CohortStateType, action: CohortTimelinesAction): CohortState => {
     const network = Object.assign({}, state.networkCohorts.get(action.id!)!);
-    network.timelines.stateByConcept.set(action.concept!.id, type);
+    network.timelines.cohortStateByConcept.set(action.concept!.id, type);
     state.networkCohorts.set(action.id!, network);
     return Object.assign({}, state);
 };
@@ -118,16 +120,13 @@ export const setTimelinesDateConfiguration = (state: CohortState, action: Cohort
 };
 
 export const removeTimelinesConceptDataset = (state: CohortState, action: CohortTimelinesAction): CohortState => {
-    const stateByConcept = new Map(state.timelines.stateByConcept);
-    stateByConcept.delete(action.concept!.id);
     state.networkCohorts.forEach((nr) => {
-        nr.timelines.stateByConcept.delete(action.concept!.id);
+        nr.timelines.cohortStateByConcept.delete(action.concept!.id);
     })
 
     return Object.assign({}, state, {
         timelines: {
-            ...state.timelines,
-            stateByConcept
+            ...state.timelines
         }
     });
 };
