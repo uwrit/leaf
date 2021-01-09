@@ -14,7 +14,6 @@ import {
 import { HelpPageAction, HelpPageContentAction } from '../actions/helpPage';
 import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
 import { categoryId, HelpCategoryMap, HelpPage, HelpPageCategory, HelpPageCategoryDTO, HelpPageDTO } from '../models/Help/Help';
-import { stat } from 'fs';
 
 export const defaultHelpPagesState = (): HelpPageState => {
     return {

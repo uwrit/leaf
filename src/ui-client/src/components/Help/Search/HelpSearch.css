@@ -44,7 +44,11 @@
 
 .help-search-input {
     text-align: left !important;
-    width: 100%;
+    /* width: 100%; */
+}
+
+.help-search .leaf-input {
+    border-bottom: 2px solid rgba(0,0,0,0.2) !important;
 }
 
 .help-form-control {

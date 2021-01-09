@@ -6,8 +6,8 @@
  */
 
 .help-page {
-    background-color: rgb(240,240,240);
-    /* background-color: white; */
+    /* background-color: rgb(240,240,240); */
+    background-color: white;
     height: calc(100vh - 55px);
     overflow-x: hidden;
     overflow-y: auto;

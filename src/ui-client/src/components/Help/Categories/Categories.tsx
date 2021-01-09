@@ -7,13 +7,12 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { HelpCategoryMap, HelpPage } from '../../../models/Help/Help';
+import { HelpCategoryMap } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
     categories: HelpCategoryMap;
-    currentPage?: HelpPage; // TODO
     dispatch: any;
 }
 
@@ -22,8 +21,9 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categories, currentPage, dispatch } = this.props;
+        const { categories, dispatch } = this.props;
         const cats = [ ...categories.values() ];
+        // cats.forEach(c => c.showAllCategoryPages = false);
 
         return (
             <Row className={c}>

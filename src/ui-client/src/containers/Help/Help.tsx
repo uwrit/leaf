@@ -55,7 +55,6 @@ export class Help extends React.PureComponent<Props, State> {
                     {(helpPages.state === HelpPageLoadState.LOADED) &&
                         <Categories
                             categories={helpPages.categories}
-                            // currentPage={helpPages.currentPage}
                             dispatch={dispatch}
                         />
                     }

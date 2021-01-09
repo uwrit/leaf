@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Button, Col } from 'reactstrap';
-import { fetchSingleHelpPageContent, setCurrentSelectedPage } from '../../../actions/helpPage';
+import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
 import { HelpPageCategory } from '../../../models/Help/Help';
 import { HelpPage } from '../../../models/Help/Help';
 import './Pages.css';
@@ -30,6 +30,9 @@ export class Pages extends React.Component<Props, State> {
         const c = this.className;
         const { category } = this.props;
         const { show } = this.state;
+
+        // TODO: fix going back and forth between routes and button display
+        console.log(category.showAllCategoryPages)
 
         const pages = category.categoryPages;
         const numberOfPages = pages.length;
@@ -56,7 +59,7 @@ export class Pages extends React.Component<Props, State> {
                 <div className={`${c}-all`}>
                     <Button color="link" onClick={this.handleSeeAllPagesClick}>
                         {numberOfPagesGreaterThanFive &&
-                            (show
+                            (category.showAllCategoryPages
                                 ? <span>Less ...</span>
                                 : <span>See all {numberOfPages} pages</span>
                             )
@@ -69,15 +72,14 @@ export class Pages extends React.Component<Props, State> {
 
     private handleHelpPageTitleClick = (page: HelpPage) => {
         const { dispatch } = this.props;
-        
-        dispatch(fetchSingleHelpPageContent(page.id));
-        dispatch(setCurrentSelectedPage(page));
+        dispatch(fetchSingleHelpPageContent(page));
     };
 
     private handleSeeAllPagesClick = () => {
         const { category } = this.props;
         
         this.setState({ show: !this.state.show })
-        category.showAllCategoryPages = !this.state.show;
+        // category.showAllCategoryPages = !this.state.show;
+        category.showAllCategoryPages = !category.showAllCategoryPages;
     };
 };

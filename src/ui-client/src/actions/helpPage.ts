@@ -69,21 +69,10 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
     };
 };
 
-export const setCurrentSelectedPage = (page: HelpPage) => {
-    return (dispatch: any) => {
-        try {
-            // Set user selected help page as current selected page.
-            dispatch(SetCurrentHelpPage(page));
-        } catch (err) {
-            console.log(err);
-        }
-    };
-};
-
 /*
  * Fetch a single help page and its content.
  */
-export const fetchSingleHelpPageContent = (pageId: number) => {
+export const fetchSingleHelpPageContent = (page: HelpPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         if (state.help.content.state === HelpPageLoadState.NOT_LOADED) {
@@ -93,9 +82,11 @@ export const fetchSingleHelpPageContent = (pageId: number) => {
                 /*
                  * Fetch help page content.
                  */
-                const content = await fetchHelpPageContent(getState(), pageId);
+                const content = await fetchHelpPageContent(getState(), page.id);
                 dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
-
+                
+                // Set user selected help page as current selected page.
+                dispatch(SetCurrentHelpPage(page));
                 /*
                  * Finish.
                  */
