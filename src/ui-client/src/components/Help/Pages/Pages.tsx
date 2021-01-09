@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Button, Col } from 'reactstrap';
-import { fetchSingleHelpPageContent, resetHelpPageContent } from '../../../actions/help/helpPageContent';
+import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
 import { HelpPageCategory } from '../../../models/Help/Help';
 import { HelpPage } from '../../../models/Help/Help';
 import './Pages.css';
@@ -16,7 +16,6 @@ import './Pages.css';
 interface Props {
     category: HelpPageCategory;
     dispatch: any;
-    handleHelpPageClick: (pageTitle: string) => any;
     pages: HelpPage[];
 }
 
@@ -34,6 +33,7 @@ export class Pages extends React.Component<Props, State> {
         const { show } = this.state;
 
         const numberOfPages = pages.length;
+        const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
         const defaultEnd = 5; // Maximum of 5 help pages will show by default.
         const end = category.showAllCategoryPages ? numberOfPages : defaultEnd;
@@ -41,8 +41,8 @@ export class Pages extends React.Component<Props, State> {
 
         return (
             <Col className={c} xs="4">
-                <div>
-                    <strong>{category.category.toUpperCase()}</strong>
+                <div className={`${c}-category`}>
+                    <b>{category.category.toUpperCase()}</b>
                 </div>
 
                 {slicedPages.map(p =>
@@ -55,9 +55,11 @@ export class Pages extends React.Component<Props, State> {
 
                 <div className={`${c}-all`}>
                     <Button color="link" onClick={this.handleSeeAllPagesClick}>
-                        {show
-                            ? <span>Less ...</span>
-                            : <span>See all {numberOfPages} pages</span>
+                        {numberOfPagesGreaterThanFive &&
+                            (show
+                                ? <span>Less ...</span>
+                                : <span>See all {numberOfPages} pages</span>
+                            )
                         }
                     </Button>
                 </div>
@@ -66,17 +68,13 @@ export class Pages extends React.Component<Props, State> {
     };
 
     private handleHelpPageTitleClick = (page: HelpPage) => {
-        const { dispatch, handleHelpPageClick } = this.props;
-
-        // dispatch(resetHelpPageContent());
+        const { dispatch } = this.props;
         dispatch(fetchSingleHelpPageContent(page.id));
-
-        handleHelpPageClick(page.title);
     };
 
     private handleSeeAllPagesClick = () => {
         const { category } = this.props;
-
+        
         this.setState({ show: !this.state.show })
         category.showAllCategoryPages = !this.state.show;
     };

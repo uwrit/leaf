@@ -5,7 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.help-page-searchbar {
-    margin: auto;
-    margin-top: 7%;
+.help-page {
+    background-color: rgb(240,240,240);
+    /* background-color: white; */
+    height: calc(100vh - 55px);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.help-page-display {
+    margin: 10px 50px 10px 50px;
+}
+
+.help-page-content {
+    background-color: rgb(240,240,240);
+    height: calc(100vh - 55px);
 }

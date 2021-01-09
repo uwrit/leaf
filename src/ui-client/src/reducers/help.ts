@@ -8,17 +8,12 @@
 import {
     SET_HELP_PAGE_CATEGORIES,
     SET_HELP_PAGES,
-    SET_HELP_PAGE_LOAD_STATE
-} from '../actions/help/helpPage';
-import {
-    SET_HELP_PAGE_CONTENT,
-    SET_HELP_PAGE_CONTENT_TO_EMPTY,
-    SET_HELP_PAGE_CONTENT_LOAD_STATE
-} from '../actions/help/helpPageContent';
-import { HelpPageAction } from '../actions/help/helpPage';
-import { HelpPageContentAction } from '../actions/help/helpPageContent';
+    SET_HELP_PAGE_LOAD_STATE,
+    SET_HELP_PAGE_CONTENT
+} from '../actions/helpPage';
+import { HelpPageAction, HelpPageContentAction } from '../actions/helpPage';
 import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
-import { categoryId, HelpPageDTO, HelpPageMap } from '../models/Help/Help';
+import { categoryId, HelpPageCategoryDTO, HelpPageDTO, HelpPageMap } from '../models/Help/Help';
 
 export const defaultHelpPagesState = (): HelpPageState => {
     return {
@@ -29,6 +24,11 @@ export const defaultHelpPagesState = (): HelpPageState => {
         },
         pages: new Map<categoryId, HelpPageDTO[]>(),
         state: HelpPageLoadState.NOT_LOADED
+
+        // new model
+        // currentPage: optional
+        // categories: new Map<categoryId, HelpPageCategoryDTO>()
+        // pages nested in HelpPageCategoryDTO
     }
 };
 
@@ -69,24 +69,7 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
     return Object.assign({}, state, {
         content: {
             ...state.content,
-            content: action.content
-        }
-    });
-};
-
-const setHelpPageContentToEmpty = (state: HelpPageState, action: HelpPageContentAction): HelpPageState => {
-    return Object.assign({}, state, {
-        content: {
-            ...state.content,
-            content: action.content
-        }
-    });
-};
-
-const setHelpPageContentLoadState = (state: HelpPageState, action: HelpPageContentAction): HelpPageState => {
-    return Object.assign({}, state, {
-        content: {
-            ...state.content,
+            content: (action.state === HelpPageLoadState.LOADED) ? action.content : undefined,
             state: action.state
         }
     });
@@ -104,10 +87,6 @@ export const help = (state: HelpPageState = defaultHelpPagesState(), action: Hel
             return setHelpPageLoadState(state, action);
         case SET_HELP_PAGE_CONTENT:
             return setHelpPageContent(state, action);
-        case SET_HELP_PAGE_CONTENT_TO_EMPTY:
-            return setHelpPageContentToEmpty(state, action);
-        case SET_HELP_PAGE_CONTENT_LOAD_STATE:
-            return setHelpPageContentLoadState(state, action);
         default:
             return state;
     }

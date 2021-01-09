@@ -6,9 +6,7 @@
  */
 
 .categories {
-    margin-top: 10%;
-    padding-left: 5%;
-    padding-right: 5%;
+    padding: 50px 100px 0px;
 }
 
 .categories button {

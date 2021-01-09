@@ -1,0 +1,52 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.help-search {
+    /* padding-top: 40px; */
+    /* padding-left: 50px; */
+    padding: 50px 50px 0px;
+}
+
+.help-search-input-container {
+    display: inline-block;
+    flex: 1 0 auto;
+    flex-grow: 1;
+    order: 1;
+    position: relative;
+    width: 100%;
+}
+
+/* Close button */
+.help-search-input-clear {
+    background-color: transparent;
+    /* background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,1) 100%); */
+    color: rgba(28, 168, 221, 0.5);
+    font-size: 1.3rem;
+    margin-right: 5px;
+    position: absolute;
+    right: 0;
+    text-align: right;
+    top: 14%;
+    width: 40px;
+}
+
+.help-search-input-clear > span {
+    cursor: pointer;
+}
+
+.help-search-input-clear > span:hover {
+    color: rgba(28, 168, 221, 1);
+}
+
+.help-search-input {
+    text-align: left !important;
+    width: 100%;
+}
+
+.help-form-control {
+    background-color: transparent !important;
+}

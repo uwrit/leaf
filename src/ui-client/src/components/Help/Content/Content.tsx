@@ -6,17 +6,15 @@
  */ 
 
 import React from 'react';
-import { Container, Button } from 'reactstrap';
 import { IoIosArrowRoundBack } from 'react-icons/io';
-import { resetHelpPageContent } from '../../../actions/help/helpPageContent';
-import { ContentText } from './ContentText';
+import { resetHelpPageContent } from '../../../actions/helpPage';
 import { HelpPageContent } from '../../../models/Help/Help';
+import TextareaAutosize from 'react-textarea-autosize';
 import './Content.css';
 
 interface Props {
-    data: HelpPageContent[];
+    content: HelpPageContent[];
     dispatch: any;
-    title: string;
 }
 
 export class Content extends React.Component<Props> {
@@ -24,21 +22,38 @@ export class Content extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { data, title } = this.props;
+        const altText = "content-image";
+        const { content } = this.props;
 
         return (
-            <Container className={c}>
+            <div className={c}>
                 <IoIosArrowRoundBack className={`${c}-back-arrow`} onClick={this.handleContentGoBackClick} />
                 
                 <div className={`${c}-display`}>
-                    <b>{title}</b>
-                    {data.map((c, i) =>
-                        <ContentText key={i} content={c} />
-                    )}
+                    <div className={`${c}-title`}>
+                        <b>TITLE GOES HERE</b>
+                    </div>
 
-                    {/* <Button className={`${c}-back-button`} color="primary" onClick={this.handleContentGoBackClick}>GO BACK</Button> */}
+                    {content.map((content, i) =>
+                        <div className={`${c}-text`} key={i}>
+                            {content.textContent != null &&
+                                <TextareaAutosize
+                                    readOnly={true}
+                                    spellCheck={false}
+                                    value={content.textContent}>
+                                </TextareaAutosize>
+                            }
+
+                            {/* Load image if and only if it exists. */}
+                            <div className={`${c}-image`}>
+                                {content.imageContent != null &&
+                                    <img src={`data:image/jpeg;base64,${content.imageContent}`} alt={altText} />
+                                }
+                            </div>
+                        </div>
+                    )}
                 </div>
-            </Container>
+            </div>
         );
     };
 

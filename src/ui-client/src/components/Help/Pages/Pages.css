@@ -5,6 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
+.pages-category {
+    font-size: 14px;
+}
+
 .pages-page {
     margin-top: 10px;
     margin-bottom: 10px;

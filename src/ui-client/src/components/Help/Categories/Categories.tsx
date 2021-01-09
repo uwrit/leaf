@@ -9,13 +9,11 @@ import React from 'react';
 import { Row } from 'reactstrap';
 import { HelpPageCategory, HelpPageMap } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
-import { Test } from '../Pages/Test';
 import './Categories.css';
 
 interface Props {
     categories: HelpPageCategory[];
     dispatch: any;
-    handleHelpPageClick: (pageTitle: string) => any;
     pages: HelpPageMap;
 }
 
@@ -24,7 +22,7 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categories, dispatch, handleHelpPageClick, pages } = this.props;
+        const { categories, dispatch, pages } = this.props;
         
         return (
             <Row className={c}>
@@ -34,15 +32,8 @@ export class Categories extends React.Component<Props> {
                             key={c.id}
                             category={c}
                             dispatch={dispatch}
-                            handleHelpPageClick={handleHelpPageClick}
                             pages={pages.get(c.id)!}
                         />
-
-                        // ASK NIC: So, why is it that the above works, but not below?
-                        // <Test
-                        //     key={c.id}
-                        //     category={c}
-                        // />
                 )}
             </Row>
         );

@@ -7,9 +7,9 @@
 
 import React from 'react';
 import { connect } from 'react-redux';
-import { Container, Input, Row } from 'reactstrap';
 import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
+import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { AppState } from '../../models/state/AppState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import './Help.css';
@@ -24,56 +24,41 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface State {
-    pageTitle: string;
-}
+interface State { }
 
 type Props = StateProps & OwnProps & DispatchProps;
 
 export class Help extends React.PureComponent<Props, State> {
     private className = "help-page";
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            pageTitle: ''
-        }
-    }
-
     public render() {
         const c = this.className;
         const { dispatch, helpPages } = this.props;
-        const { pageTitle } = this.state;
 
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
             return (
-                <div style={{backgroundColor:"rgb(240,240,240)"}}>
-                    <Content data={helpPages.content.content} dispatch={dispatch} title={pageTitle} />
-                </div>)
+                <div className={`${c}-content`}>
+                    <Content content={helpPages.content.content} dispatch={dispatch} />
+                </div>
+            );
         };
 
         return (
-            <Container className={c}>
-                <Row>
-                    <Input className={`${c}-searchbar`} type="text" name="pages-search" id="pages-search" placeholder="Search..." bsSize="lg" />
-                </Row>
+            <div className={c}>
+                <div className={`${c}-display`}>
+                    <HelpSearch />
 
-                {(helpPages.state === HelpPageLoadState.LOADED) &&
-                    <Categories
-                        categories={helpPages.categories}
-                        dispatch={dispatch}
-                        handleHelpPageClick={this.handleHelpPageClick}
-                        pages={helpPages.pages}
-                    />
-                }
-            </Container>
+                    {(helpPages.state === HelpPageLoadState.LOADED) &&
+                        <Categories
+                            categories={helpPages.categories}
+                            dispatch={dispatch}
+                            pages={helpPages.pages}
+                        />
+                    }
+                </div>
+            </div>
         );
     };
-
-    private handleHelpPageClick = (pageTitle: string) => {
-        this.setState({ pageTitle: pageTitle });
-    };
-
 };
 
 const mapStateToProps = (state: AppState): StateProps => {
