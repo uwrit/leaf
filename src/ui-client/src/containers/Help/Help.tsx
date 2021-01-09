@@ -38,7 +38,11 @@ export class Help extends React.PureComponent<Props, State> {
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
             return (
                 <div className={`${c}-content`}>
-                    <Content content={helpPages.content.content} dispatch={dispatch} />
+                    <Content
+                        content={helpPages.content.content}
+                        currentPage={helpPages.currentSelectedPage}
+                        dispatch={dispatch}
+                    />
                 </div>
             );
         };
@@ -50,12 +54,9 @@ export class Help extends React.PureComponent<Props, State> {
 
                     {(helpPages.state === HelpPageLoadState.LOADED) &&
                         <Categories
-                            categoriesA={helpPages.categoriesA}
-                            currentPage={helpPages.currentPage}
-
-                            // categories={helpPages.categories}
+                            categories={helpPages.categories}
+                            // currentPage={helpPages.currentPage}
                             dispatch={dispatch}
-                            pages={helpPages.pages}
                         />
                     }
                 </div>

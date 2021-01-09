@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { HelpPageContentDTO, HelpPage, HelpPageMap, HelpCategoryMap, HelpPageCategoryDTO } from "../Help/Help";
+import { HelpCategoryMap, HelpPage, HelpPageContentDTO } from "../Help/Help";
 
 export enum HelpPageLoadState {
     NOT_LOADED = 1,
@@ -20,11 +20,8 @@ export interface HelpPageContentState {
 }
 
 export interface HelpPageState {
-    categories: HelpPageCategoryDTO[];
+    categories: HelpCategoryMap;
+    currentSelectedPage: HelpPage;
     content: HelpPageContentState;
-    pages: HelpPageMap;
     state: HelpPageLoadState;
-
-    categoriesA: HelpCategoryMap;
-    currentPage?: HelpPage;
 }

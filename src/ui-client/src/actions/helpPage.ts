@@ -8,20 +8,18 @@
 import { AppState } from '../models/state/AppState';
 import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState } from "./generalUi";
-import { HelpPageCategoryDTO, HelpPageDTO, HelpPageContentDTO } from '../models/Help/Help';
+import { HelpPage, HelpPageDTO, HelpPageCategoryDTO, HelpPageContentDTO } from '../models/Help/Help';
 import { HelpPageLoadState } from '../models/state/HelpState';
 import { fetchHelpPages, fetchHelpPageCategories, fetchHelpPageContent } from '../services/helpPagesApi';
 
 export const SET_HELP_PAGES_AND_CATEGORIES = 'SET_HELP_PAGES_AND_CATEGORIES';
-
-export const SET_HELP_PAGE_CATEGORIES = 'SET_HELP_PAGE_CATEGORIES';
-export const SET_HELP_PAGES = 'SET_HELP_PAGES';
+export const SET_CURRENT_HELP_PAGE = 'SET_CURRENT_HELP_PAGE';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
-
 export const SET_HELP_PAGE_CONTENT = 'SET_HELP_PAGE_CONTENT';
 
 export interface HelpPageAction {
-    categories?: HelpPageCategoryDTO[]; 
+    categories?: HelpPageCategoryDTO[];
+    currentSelectedPage?: HelpPage;
     pages?: HelpPageDTO[];
     state?: HelpPageLoadState;
     type: string;
@@ -46,16 +44,10 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
                 /*
-                 * Fetch help page categories.
+                 * Fetch help pages and categories.
                  */
                 const categories = await fetchHelpPageCategories(getState());
-                dispatch(SetHelpPageCategories(categories));
-
-                /*
-                 * Fetch help pages.
-                 */
                 const pages = await fetchHelpPages(getState());
-                dispatch(SetHelpPages(pages));
 
                 dispatch(SetHelpPagesAndCategories(categories, pages));
 
@@ -73,6 +65,17 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                 dispatch(showInfoModal(info));
             }
+        }
+    };
+};
+
+export const setCurrentSelectedPage = (page: HelpPage) => {
+    return (dispatch: any) => {
+        try {
+            // Set user selected help page as current selected page.
+            dispatch(SetCurrentHelpPage(page));
+        } catch (err) {
+            console.log(err);
         }
     };
 };
@@ -130,17 +133,10 @@ export const SetHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pag
     };
 };
 
-export const SetHelpPageCategories = (categories: HelpPageCategoryDTO[]): HelpPageAction => {
+export const SetCurrentHelpPage = (currentSelectedPage: HelpPage): HelpPageAction => {
     return {
-        categories,
-        type: SET_HELP_PAGE_CATEGORIES
-    };
-};
-
-export const SetHelpPages = (pages: HelpPageDTO[]): HelpPageAction => {
-    return {
-        pages,
-        type: SET_HELP_PAGES
+        currentSelectedPage,
+        type: SET_CURRENT_HELP_PAGE
     };
 };
 

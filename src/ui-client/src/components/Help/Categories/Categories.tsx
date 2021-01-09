@@ -7,17 +7,14 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { HelpPageCategory, HelpPageMap, HelpCategoryMap, HelpPage } from '../../../models/Help/Help';
+import { HelpCategoryMap, HelpPage } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
-    // categories: HelpPageCategory[];
+    categories: HelpCategoryMap;
+    currentPage?: HelpPage; // TODO
     dispatch: any;
-    pages: HelpPageMap;
-
-    categoriesA: HelpCategoryMap;
-    currentPage?: HelpPage;
 }
 
 export class Categories extends React.Component<Props> {
@@ -25,28 +22,16 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categoriesA, currentPage, dispatch, pages } = this.props;
-        const cat = [...categoriesA!.values()] //.filter(c => c.pages.length > 0);
+        const { categories, currentPage, dispatch } = this.props;
+        const cats = [ ...categories.values() ];
 
         return (
             <Row className={c}>
-                {/* {categories.map(c =>
-                    pages.has(c.id) &&
-                        <Pages
-                            key={c.id}
-                            category={c}
-                            dispatch={dispatch}
-                            pages={pages.get(c.id)!}
-                        />
-                )} */}
-
-                {cat.map(c=>
-                    // (c.pages!.length>0) &&
+                {cats.map(c =>
                     <Pages
                         key={c.id}
-                        category={c && c}
+                        category={c}
                         dispatch={dispatch}
-                        pages={c.pages}
                     />
                 )}
             </Row>

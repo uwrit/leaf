@@ -7,54 +7,58 @@
 
 import {
     SET_HELP_PAGES_AND_CATEGORIES,
-    SET_HELP_PAGE_CATEGORIES,
-    SET_HELP_PAGES,
+    SET_CURRENT_HELP_PAGE,
     SET_HELP_PAGE_LOAD_STATE,
     SET_HELP_PAGE_CONTENT,
 } from '../actions/helpPage';
 import { HelpPageAction, HelpPageContentAction } from '../actions/helpPage';
 import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
-import { categoryId, HelpPageCategoryDTO, HelpPageCategory, HelpPageDTO, HelpPageMap, HelpCategoryMap } from '../models/Help/Help';
+import { categoryId, HelpCategoryMap, HelpPage, HelpPageCategory, HelpPageCategoryDTO, HelpPageDTO } from '../models/Help/Help';
+import { stat } from 'fs';
 
 export const defaultHelpPagesState = (): HelpPageState => {
     return {
-        categories: [],
+        categories: new Map<categoryId, HelpPageCategory>(),
+        currentSelectedPage: Object.assign({}) as HelpPage,
         content: {
             content: [],
             state: HelpPageLoadState.NOT_LOADED
         },
-        pages: new Map<categoryId, HelpPageDTO[]>(),
         state: HelpPageLoadState.NOT_LOADED,
-
-        categoriesA: new Map<categoryId, HelpPageCategory>(),
-        currentPage: undefined
     };
 };
 
-const mapPages = (pages: HelpPageDTO[]): HelpPageMap => {
-    const mappedPages = new Map<categoryId, HelpPageDTO[]>();
+const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpCategoryMap => {
+    const mappedCategories = new Map<categoryId, HelpPageCategory>();
 
-    for (let p of pages) {
-        if (mappedPages.has(p.categoryId)) {
-            mappedPages.set(p.categoryId, [...mappedPages.get(p.categoryId)!, p]);
-        } else {
-            mappedPages.set(p.categoryId, [...[], p]);
-        }
+    for (let c of categories) {
+        const categoryPages = pages.filter(p => p.categoryId === c.id);
+        const updatedCategory = Object.assign({ ...c, categoryPages }) as HelpPageCategory;
+
+        // If pages for the category exist, then proceed; else, no need to for category without pages.
+        if (categoryPages.length > 0) {
+            if (mappedCategories.has(c.id)) {
+                mappedCategories.set(c.id, updatedCategory);
+            } else {
+                mappedCategories.set(c.id, updatedCategory);
+            }
+        };
     };
 
-    return mappedPages;
+    return mappedCategories;
 };
 
-const SetHelpPageCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {    
+const SetHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+    const mappedCategories = mapCategories(action.categories!, action.pages!);
+
     return Object.assign({}, state, {
-        categories: action.categories
+        categories: mappedCategories
     });
 };
 
-const SetHelpPages = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
-    const mappedPages = mapPages(action.pages!);
+const SetCurrentHelpPage = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     return Object.assign({}, state, {
-        pages: mappedPages
+        currentSelectedPage: action.currentSelectedPage
     });
 };
 
@@ -74,41 +78,14 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
     });
 };
 
-
-const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpCategoryMap => {
-    const mappedCategories = new Map<categoryId, HelpPageCategory>();
-
-    for (let c of categories) {
-        const categoryPages = pages.filter(p => p.categoryId === c.id);
-        const updatedCategory = Object.assign({ ...c, categoryPages }) as HelpPageCategory;
-
-        if (mappedCategories.has(c.id)) {
-            mappedCategories.set(c.id, updatedCategory);
-        } else {
-            mappedCategories.set(c.id, updatedCategory);
-        }
-    };
-
-    return mappedCategories;
-};
-
-const SetHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
-    const mappedCategories = mapCategories(action.categories!, action.pages!);
-    return Object.assign({}, state, {
-        categoriesA: mappedCategories
-    });
-};
-
 type HelpAction = HelpPageAction | HelpPageContentAction;
 
 export const help = (state: HelpPageState = defaultHelpPagesState(), action: HelpAction): HelpPageState => {
     switch (action.type) {
         case SET_HELP_PAGES_AND_CATEGORIES:
             return SetHelpPagesAndCategories(state, action);
-        case SET_HELP_PAGE_CATEGORIES:
-            return SetHelpPageCategories(state, action);
-        case SET_HELP_PAGES:
-            return SetHelpPages(state, action);
+        case SET_CURRENT_HELP_PAGE:
+            return SetCurrentHelpPage(state, action);
         case SET_HELP_PAGE_LOAD_STATE:
             return setHelpPageLoadState(state, action);
         case SET_HELP_PAGE_CONTENT:

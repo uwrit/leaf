@@ -8,12 +8,13 @@
 import React from 'react';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { resetHelpPageContent } from '../../../actions/helpPage';
-import { HelpPageContent } from '../../../models/Help/Help';
+import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
 import TextareaAutosize from 'react-textarea-autosize';
 import './Content.css';
 
 interface Props {
     content: HelpPageContent[];
+    currentPage: HelpPage;
     dispatch: any;
 }
 
@@ -23,7 +24,7 @@ export class Content extends React.Component<Props> {
     public render() {
         const c = this.className;
         const altText = "content-image";
-        const { content } = this.props;
+        const { content, currentPage } = this.props;
 
         return (
             <div className={c}>
@@ -31,7 +32,7 @@ export class Content extends React.Component<Props> {
                 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
-                        <b>TITLE GOES HERE</b>
+                        <b>{currentPage.title}</b>
                     </div>
 
                     {content.map((content, i) =>

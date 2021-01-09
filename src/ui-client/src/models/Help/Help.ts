@@ -27,12 +27,10 @@ export interface HelpPageContentDTO {
 }
 
 export type categoryId = number;
-export type HelpPageMap = Map<categoryId, HelpPageDTO[]>;
-
 export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
 
 export interface HelpPageCategory extends HelpPageCategoryDTO {
-    pages: HelpPageDTO[];
+    categoryPages: HelpPageDTO[];
     showAllCategoryPages?: boolean;
 }
 
