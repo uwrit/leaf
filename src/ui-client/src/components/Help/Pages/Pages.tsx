@@ -32,12 +32,12 @@ export class Pages extends React.Component<Props, State> {
         const { category, pages } = this.props;
         const { show } = this.state;
 
-        const numberOfPages = pages.length;
+        const numberOfPages = pages? pages.length : 5;
         const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
         const defaultEnd = 5; // Maximum of 5 help pages will show by default.
         const end = category.showAllCategoryPages ? numberOfPages : defaultEnd;
-        const slicedPages = pages.slice(start, end);
+        const slicedPages = pages && pages.slice(start, end);
 
         return (
             <Col className={c} xs="4">

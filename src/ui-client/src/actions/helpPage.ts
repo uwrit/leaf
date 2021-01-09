@@ -12,6 +12,8 @@ import { HelpPageCategoryDTO, HelpPageDTO, HelpPageContentDTO } from '../models/
 import { HelpPageLoadState } from '../models/state/HelpState';
 import { fetchHelpPages, fetchHelpPageCategories, fetchHelpPageContent } from '../services/helpPagesApi';
 
+export const SET_HELP_PAGES_AND_CATEGORIES = 'SET_HELP_PAGES_AND_CATEGORIES';
+
 export const SET_HELP_PAGE_CATEGORIES = 'SET_HELP_PAGE_CATEGORIES';
 export const SET_HELP_PAGES = 'SET_HELP_PAGES';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
@@ -54,6 +56,8 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                  */
                 const pages = await fetchHelpPages(getState());
                 dispatch(SetHelpPages(pages));
+
+                dispatch(SetHelpPagesAndCategories(categories, pages));
 
                 /*
                  * Finish.
@@ -118,6 +122,14 @@ export const resetHelpPageContent = () => {
 };
 
 // Synchronous actions
+export const SetHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpPageAction => {
+    return {
+        categories,
+        pages,
+        type: SET_HELP_PAGES_AND_CATEGORIES
+    };
+};
+
 export const SetHelpPageCategories = (categories: HelpPageCategoryDTO[]): HelpPageAction => {
     return {
         categories,

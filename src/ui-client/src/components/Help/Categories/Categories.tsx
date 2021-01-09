@@ -7,14 +7,17 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { HelpPageCategory, HelpPageMap } from '../../../models/Help/Help';
+import { HelpPageCategory, HelpPageMap, HelpCategoryMap, HelpPage } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
-    categories: HelpPageCategory[];
+    // categories: HelpPageCategory[];
     dispatch: any;
     pages: HelpPageMap;
+
+    categoriesA: HelpCategoryMap;
+    currentPage?: HelpPage;
 }
 
 export class Categories extends React.Component<Props> {
@@ -22,11 +25,12 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categories, dispatch, pages } = this.props;
-        
+        const { categoriesA, currentPage, dispatch, pages } = this.props;
+        const cat = [...categoriesA!.values()] //.filter(c => c.pages.length > 0);
+
         return (
             <Row className={c}>
-                {categories.map(c =>
+                {/* {categories.map(c =>
                     pages.has(c.id) &&
                         <Pages
                             key={c.id}
@@ -34,6 +38,16 @@ export class Categories extends React.Component<Props> {
                             dispatch={dispatch}
                             pages={pages.get(c.id)!}
                         />
+                )} */}
+
+                {cat.map(c=>
+                    // (c.pages!.length>0) &&
+                    <Pages
+                        key={c.id}
+                        category={c && c}
+                        dispatch={dispatch}
+                        pages={c.pages}
+                    />
                 )}
             </Row>
         );

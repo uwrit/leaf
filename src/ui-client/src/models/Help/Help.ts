@@ -5,15 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+export interface HelpPageCategoryDTO {
+    id: number;
+    category: string;
+}
+
 export interface HelpPageDTO {
     id: number;
     categoryId: number;
     title: string;
-}
-
-export interface HelpPageCategoryDTO {
-    id: number;
-    category: string;
 }
 
 export interface HelpPageContentDTO {
@@ -29,7 +29,7 @@ export interface HelpPageContentDTO {
 export type categoryId = number;
 export type HelpPageMap = Map<categoryId, HelpPageDTO[]>;
 
-export type HelpCategoryMap = Map<categoryId, HelpPageCategoryDTO>;
+export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
 
 export interface HelpPageCategory extends HelpPageCategoryDTO {
     pages: HelpPageDTO[];

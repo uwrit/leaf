@@ -6,14 +6,15 @@
  */ 
 
 import {
+    SET_HELP_PAGES_AND_CATEGORIES,
     SET_HELP_PAGE_CATEGORIES,
     SET_HELP_PAGES,
     SET_HELP_PAGE_LOAD_STATE,
-    SET_HELP_PAGE_CONTENT
+    SET_HELP_PAGE_CONTENT,
 } from '../actions/helpPage';
 import { HelpPageAction, HelpPageContentAction } from '../actions/helpPage';
 import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
-import { categoryId, HelpPageCategoryDTO, HelpPageDTO, HelpPageMap } from '../models/Help/Help';
+import { categoryId, HelpPageCategoryDTO, HelpPageCategory, HelpPageDTO, HelpPageMap, HelpCategoryMap } from '../models/Help/Help';
 
 export const defaultHelpPagesState = (): HelpPageState => {
     return {
@@ -23,13 +24,11 @@ export const defaultHelpPagesState = (): HelpPageState => {
             state: HelpPageLoadState.NOT_LOADED
         },
         pages: new Map<categoryId, HelpPageDTO[]>(),
-        state: HelpPageLoadState.NOT_LOADED
+        state: HelpPageLoadState.NOT_LOADED,
 
-        // new model
-        // currentPage: optional
-        // categories: new Map<categoryId, HelpPageCategoryDTO>()
-        // pages nested in HelpPageCategoryDTO
-    }
+        categoriesA: new Map<categoryId, HelpPageCategory>(),
+        currentPage: undefined
+    };
 };
 
 const mapPages = (pages: HelpPageDTO[]): HelpPageMap => {
@@ -75,10 +74,37 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
     });
 };
 
+
+const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpCategoryMap => {
+    const mappedCategories = new Map<categoryId, HelpPageCategory>();
+
+    for (let c of categories) {
+        const categoryPages = pages.filter(p => p.categoryId === c.id);
+        const updatedCategory = Object.assign({ ...c, categoryPages }) as HelpPageCategory;
+
+        if (mappedCategories.has(c.id)) {
+            mappedCategories.set(c.id, updatedCategory);
+        } else {
+            mappedCategories.set(c.id, updatedCategory);
+        }
+    };
+
+    return mappedCategories;
+};
+
+const SetHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+    const mappedCategories = mapCategories(action.categories!, action.pages!);
+    return Object.assign({}, state, {
+        categoriesA: mappedCategories
+    });
+};
+
 type HelpAction = HelpPageAction | HelpPageContentAction;
 
 export const help = (state: HelpPageState = defaultHelpPagesState(), action: HelpAction): HelpPageState => {
     switch (action.type) {
+        case SET_HELP_PAGES_AND_CATEGORIES:
+            return SetHelpPagesAndCategories(state, action);
         case SET_HELP_PAGE_CATEGORIES:
             return SetHelpPageCategories(state, action);
         case SET_HELP_PAGES:
