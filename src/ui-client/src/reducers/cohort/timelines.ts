@@ -47,7 +47,6 @@ export const setTimelinesAggregateDataset = (state: CohortState, action: CohortT
 };
 
 export const setTimelinesConceptDatasetState = (state: CohortState, type: CohortStateType, action: CohortTimelinesAction): CohortState => {
-
     // Set all network responders to REQUESTING if
     // query just started.
     if (type === CohortStateType.REQUESTING) {
@@ -57,9 +56,10 @@ export const setTimelinesConceptDatasetState = (state: CohortState, type: Cohort
     }
 
     return Object.assign({}, state, {
+        networkCohorts: new Map(state.networkCohorts),
         timelines: {
             ...state.timelines,
-            state: CohortStateType.REQUESTING
+            state: type
         }
     });
 };
@@ -92,7 +92,9 @@ export const setTimelinesNetworkPanelDataset = (state: CohortState, type: Cohort
     const network = Object.assign({}, state.networkCohorts.get(action.id!)!);
     network.timelines.indexConceptState = type;
     state.networkCohorts.set(action.id!, network);
-    return Object.assign({}, state);
+    return Object.assign({}, state, { 
+        networkCohorts: new Map(state.networkCohorts) 
+    });
 };
 
 export const setTimelinesPanelIndexId = (state: CohortState, action: CohortTimelinesAction): CohortState => {

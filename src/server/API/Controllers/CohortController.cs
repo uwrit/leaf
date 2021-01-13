@@ -19,6 +19,8 @@ using Model.Compiler;
 using Model.Error;
 using API.Controllers.Base;
 using Model.Options;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace API.Controllers
 {
@@ -80,6 +82,49 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("{queryid}/conceptpaneldataset")]
+        public async Task<ActionResult<DatasetDTO>> ConceptPanelDataset(
+            string queryid,
+            [FromQuery] long? early,
+            [FromQuery] long? late,
+            [FromQuery] string panelItem,
+            [FromServices] ConceptDatasetProvider provider,
+            CancellationToken cancelToken)
+        {
+            try
+            {
+                var queryRef = new QueryRef(queryid);
+                var pi = JsonConvert.DeserializeObject<PanelItemDTO>(panelItem);
+                var paneldto = new ConceptDatasetPanelDTO(panel);
+                var result = await provider.GetConceptDatasetAsync(queryRef, paneldto, cancelToken);
+
+                return Ok(new DatasetDTO(result.Dataset));
+            }
+            catch (FormatException fe)
+            {
+                log.LogWarning("Malformed concept identifier. Error:{Error}", fe.Message);
+                return BadRequest();
+            }
+            catch (OperationCanceledException)
+            {
+                log.LogInformation("Request cancelled. QueryID:{QueryID} Panel:{Panel}", queryid, panelJson);
+                return NoContent();
+            }
+            catch (LeafRPCException lde)
+            {
+                return StatusCode(lde.StatusCode);
+            }
+            catch (LeafCompilerException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} Panel:{Panel} Error:{Error}", queryid, panelJson, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpGet("{queryid}/conceptdataset")]
         public async Task<ActionResult<DatasetDTO>> ConceptDataset(
             string queryid,
@@ -115,7 +160,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} ConceptID:{DatasetID} Error:{Error}", queryid, conceptid, ex.ToString());
+                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} ConceptID:{ConceptID} Error:{Error}", queryid, conceptid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

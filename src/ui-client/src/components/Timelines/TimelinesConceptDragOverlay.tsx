@@ -9,7 +9,7 @@ import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd';
 import { MdAccessTime } from 'react-icons/md';
 import { Button } from 'reactstrap';
-import { getConceptDataset } from '../../actions/cohort/timelines';
+import { getConceptDataset, getConceptPanelDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
 import { Panel as PanelModel } from '../../models/panel/Panel';
 import { CohortStateType, TimelinesState } from '../../models/state/CohortState';
@@ -102,7 +102,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
             <div className={`${c} ${canDrop && isOver ? 'can-drop' : ''}`}>
 
                 {/* User picking Concepts */}
-                {mode === OverlayMode.Waiting && 
+                {mode === OverlayMode.Waiting && !loadingConcept &&
                 connectDropTarget &&
                 connectDropTarget(
                 <div className={`${c}-inner waiting`}>
@@ -131,7 +131,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 </div>}
 
                 {/* Concept requested */}
-                {mode !== OverlayMode.Waiting && loadingConcept && 
+                {loadingConcept && 
                 <div className={`${c}-inner update`}>
                     <div>
                         <div className={`${c}-loading`}><LoaderIcon size={30} /> Updating timeline...</div>
@@ -148,7 +148,11 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
     }
 
     private handlePanelGetDataClick = () => {
-
+        const { dispatch } = this.props;
+        const { panel } = this.state;
+        if (panel) {
+            dispatch(getConceptPanelDataset(panel));
+        }
     }
 
     private handleConceptDrop = (concept: Concept) => {

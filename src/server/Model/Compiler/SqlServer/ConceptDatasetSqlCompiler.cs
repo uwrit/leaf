@@ -21,6 +21,21 @@ namespace Model.Compiler.SqlServer
             this.compilerOptions = compOpts.Value;
         }
 
+        public ConceptDatasetExecutionContext BuildConceptDatasetSql(PanelDatasetCompilerContext ctx)
+        {
+            var sp = ctx.Panel.SubPanels.First();
+            var pi = sp.PanelItems.First();
+            var cohortSql = new CachedCohortSqlSet(compilerOptions).ToString();
+            var conceptSql = new ConceptDatasetSqlSet(ctx.Panel, sp, pi, compilerOptions).ToString();
+            new SqlValidator(Dialect.IllegalCommands).Validate(conceptSql);
+
+            var exeContext = new ConceptDatasetExecutionContext(ctx.QueryContext, ctx.QueryContext.QueryId);
+            exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
+            exeContext.CompiledQuery = Compose(cohortSql, conceptSql);
+
+            return exeContext;
+        }
+
         public ConceptDatasetExecutionContext BuildConceptDatasetSql(ConceptDatasetCompilerContext compilerContext)
         {
             var p = From(compilerContext.Concept);

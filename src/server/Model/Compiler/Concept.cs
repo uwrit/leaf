@@ -96,6 +96,22 @@ namespace Model.Compiler
             }
         }
 
+        public ConceptRef(ResourceRef res)
+        {
+            if (res.UseUniversalId() && ConceptUrn.TryParse(res.UniversalId.ToString(), out var urn))
+            {
+                UniversalId = urn;
+            }
+            else if (Guid.TryParse(res.Id.ToString(), out var guid))
+            {
+                Id = guid;
+            }
+            else
+            {
+                throw new FormatException($"Resouce reference {res} is not a valid Guid or Urn");
+            }
+        }
+
         public ConceptRef(Concept c)
         {
             Id = c.Id;

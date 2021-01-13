@@ -8,7 +8,7 @@
 import { CancelTokenSource } from 'axios';
 import { AppState } from '../models/state/AppState';
 import { NetworkIdentity } from '../models/NetworkResponder';
-import { PanelDTO } from '../models/panel/Panel';
+import { Panel, PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';
 import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Date';
@@ -60,6 +60,21 @@ export const fetchConceptDataset = (
     const http = HttpFactory.authenticated(token);
     const params: any = { conceptid: nr.isHomeNode ? concept.id : concept.universalId };
     return http.get(`${nr.address}/api/cohort/${queryId}/conceptdataset`, { params } );
+};
+
+/**
+ * Fetch a concept panel dataset.
+ */
+export const fetchConceptPanelDataset = (
+    state: AppState, 
+    nr: NetworkIdentity, 
+    queryId: string, 
+    panel: PanelDTO) => {
+
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const params: any = { 'panelJson': JSON.stringify(panel) };
+    return http.get(`${nr.address}/api/cohort/${queryId}/conceptpaneldataset`, { params } );
 };
 
 /**

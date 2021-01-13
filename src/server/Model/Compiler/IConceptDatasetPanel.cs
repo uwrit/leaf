@@ -6,10 +6,7 @@
 using System;
 namespace Model.Compiler
 {
-    public class IConceptDatasetPanel
+    public interface IConceptDatasetPanel : IQueryDefinition
     {
-        public IConceptDatasetPanel()
-        {
-        }
     }
 }
