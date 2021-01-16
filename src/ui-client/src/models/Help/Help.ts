@@ -31,7 +31,6 @@ export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
 
 export interface HelpPageCategory extends HelpPageCategoryDTO {
     categoryPages: HelpPageDTO[];
-    showAllCategoryPages?: boolean;
 }
 
 export interface HelpPage extends HelpPageDTO { }

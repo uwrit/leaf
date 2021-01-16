@@ -21,6 +21,7 @@ export class HelpSearch extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
+        const { searchValue } = this.state;
 
         return (
             // <div className={c}>
@@ -46,12 +47,14 @@ export class HelpSearch extends React.Component<Props, State> {
                         // onKeyDown={this.handleSearchKeydown}
                         placeholder="Search..." 
                         spellCheck={false}
-                        value={this.state.searchValue}
+                        value={searchValue}
                     />
 
                     {/* Clear search text button */}
                     <div className={`${c}-input-clear`}>
-                        <span onClick={this.handleSearchTextClear}>✖</span>
+                        {searchValue &&
+                            <span onClick={this.handleSearchTextClear}>✖</span>
+                        }
                     </div>
                 </div>
             </div>

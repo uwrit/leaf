@@ -23,36 +23,21 @@ export class Content extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const altText = "content-image";
         const { content, currentPage } = this.props;
 
         return (
             <div className={c}>
-                <IoIosArrowRoundBack className={`${c}-back-arrow`} onClick={this.handleContentGoBackClick} />
+                <IoIosArrowRoundBack
+                    className={`${c}-back-arrow`}
+                    onClick={this.handleContentGoBackClick}
+                />
                 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
                         <b>{currentPage.title}</b>
                     </div>
 
-                    {content.map((content, i) =>
-                        <div className={`${c}-text`} key={i}>
-                            {content.textContent != null &&
-                                <TextareaAutosize
-                                    readOnly={true}
-                                    spellCheck={false}
-                                    value={content.textContent}>
-                                </TextareaAutosize>
-                            }
-
-                            {/* Load image if and only if it exists. */}
-                            <div className={`${c}-image`}>
-                                {content.imageContent != null &&
-                                    <img src={`data:image/jpeg;base64,${content.imageContent}`} alt={altText} />
-                                }
-                            </div>
-                        </div>
-                    )}
+                    {content.map(content => this.getContent(content) )}
                 </div>
             </div>
         );
@@ -61,5 +46,34 @@ export class Content extends React.Component<Props> {
     private handleContentGoBackClick = () => {
         const { dispatch } = this.props;
         dispatch(resetHelpPageContent());
+    };
+
+    private getContent = (content: HelpPageContent) => {
+        const c = this.className;
+        const altText = "content-image";
+
+        if (content.textContent != null) {
+            return (
+                <div className={`${c}-text`}>
+                    <TextareaAutosize
+                        readOnly={true}
+                        spellCheck={false}
+                        value={content.textContent}>
+                    </TextareaAutosize>
+                </div>
+            );
+        } else if (content.imageContent != null) {
+            return (
+                <div className={`${c}-image`}>
+                    <img
+                        // src={`data:image/jpeg;base64,${content.imageContent}`}
+                        src={`data:image;base64,${content.imageContent}`}
+                        alt={altText}
+                    />
+                </div>
+            );
+        }
+
+        return ;
     };
 }

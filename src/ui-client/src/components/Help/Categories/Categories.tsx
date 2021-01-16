@@ -23,7 +23,6 @@ export class Categories extends React.Component<Props> {
         const c = this.className;
         const { categories, dispatch } = this.props;
         const cats = [ ...categories.values() ];
-        // cats.forEach(c => c.showAllCategoryPages = false);
 
         return (
             <Row className={c}>

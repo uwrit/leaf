@@ -31,15 +31,12 @@ export class Pages extends React.Component<Props, State> {
         const { category } = this.props;
         const { show } = this.state;
 
-        // TODO: fix going back and forth between routes and button display
-        console.log(category.showAllCategoryPages)
-
         const pages = category.categoryPages;
         const numberOfPages = pages.length;
         const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
         const defaultEnd = 5; // Maximum of 5 help pages will show by default.
-        const end = category.showAllCategoryPages ? numberOfPages : defaultEnd;
+        const end = show ? numberOfPages : defaultEnd;
         const slicedPages = pages.slice(start, end);
 
         return (
@@ -59,7 +56,7 @@ export class Pages extends React.Component<Props, State> {
                 <div className={`${c}-all`}>
                     <Button color="link" onClick={this.handleSeeAllPagesClick}>
                         {numberOfPagesGreaterThanFive &&
-                            (category.showAllCategoryPages
+                            (show
                                 ? <span>Less ...</span>
                                 : <span>See all {numberOfPages} pages</span>
                             )
@@ -75,11 +72,5 @@ export class Pages extends React.Component<Props, State> {
         dispatch(fetchSingleHelpPageContent(page));
     };
 
-    private handleSeeAllPagesClick = () => {
-        const { category } = this.props;
-        
-        this.setState({ show: !this.state.show })
-        // category.showAllCategoryPages = !this.state.show;
-        category.showAllCategoryPages = !category.showAllCategoryPages;
-    };
+    private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };
 };

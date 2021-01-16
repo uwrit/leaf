@@ -35,7 +35,7 @@ const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]):
         const updatedCategory = Object.assign({ ...c, categoryPages }) as HelpPageCategory;
 
         // If pages for the category exist, then proceed; else, no need to for category without pages.
-        if (categoryPages.length > 0) {
+        if (categoryPages.length) {
             if (mappedCategories.has(c.id)) {
                 mappedCategories.set(c.id, updatedCategory);
             } else {
