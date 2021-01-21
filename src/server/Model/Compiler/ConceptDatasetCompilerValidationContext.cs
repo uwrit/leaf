@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Model.Error;
 using System.Data.Common;
+using System.Linq;
 
 namespace Model.Compiler
 {
@@ -14,7 +15,7 @@ namespace Model.Compiler
     {
         public interface ICompilerContextProvider
         {
-            Task<ConceptDatasetCompilerContext> GetCompilerContextAsync(QueryRef queryRef, ConceptRef conceptRef);
+            Task<PanelDatasetCompilerContext> GetCompilerContextAsync(ConceptDatasetExecutionRequest request);
         }
 
         readonly ICompilerContextProvider contextProvider;
@@ -28,14 +29,15 @@ namespace Model.Compiler
             this.log = log;
         }
 
-        public async Task<CompilerValidationContext<ConceptDatasetCompilerContext>> GetCompilerContextAsync(QueryRef qr, ConceptRef conceptRef)
+        public async Task<CompilerValidationContext<PanelDatasetCompilerContext>> GetCompilerContextAsync(ConceptDatasetExecutionRequest request)
         {
-            log.LogInformation("Getting ConceptDatasetCompilerContext. ConceptRef:{@ConceptRef}, QueryRef:{@QueryRef}", conceptRef, qr);
+            log.LogInformation("Getting ConceptDatasetCompilerContext. ConceptDatasetExecutionRequest:{@Request}", request);
             try
             {
-                var context = await contextProvider.GetCompilerContextAsync(qr, conceptRef);
+                var conceptRef = new ConceptRef(request.PanelItem.Resource);
+                var context = await contextProvider.GetCompilerContextAsync(request);
                 var state = GetContextState(context);
-                return new CompilerValidationContext<ConceptDatasetCompilerContext>
+                return new CompilerValidationContext<PanelDatasetCompilerContext>
                 {
                     Context = context,
                     State = state
@@ -43,15 +45,15 @@ namespace Model.Compiler
             }
             catch (DbException de)
             {
-                log.LogError("Failed to get ConceptDatasetCompilerContext. Query:{@QueryRef} Code:{Code} Error:{Error}", qr, de.ErrorCode, de.Message);
+                log.LogError("Failed to get ConceptDatasetCompilerContext. Request:{@Request} Code:{Code} Error:{Error}", request, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
         }
 
-        CompilerContextState GetContextState(ConceptDatasetCompilerContext context)
+        CompilerContextState GetContextState(PanelDatasetCompilerContext context)
         {
-            if (context.Concept == null)
+            if (context.Panel.SubPanels.First().PanelItems.First().Concept == null)
             {
                 log.LogError("No concept found Leaf database for ConceptDatasetCompilerContext.");
                 return CompilerContextState.ConceptNotFound;

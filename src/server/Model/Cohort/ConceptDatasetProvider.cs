@@ -4,7 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,24 +21,18 @@ namespace Model.Cohort
     public class ConceptDatasetProvider
     {
         readonly DatasetProvider.IDatasetExecutor executor;
-        readonly PanelConverter converter;
-        readonly PanelValidator validator;
         readonly ConceptDatasetCompilerValidationContextProvider contextProvider;
         readonly ILogger<ConceptDatasetProvider> log;
         readonly IConceptDatasetSqlCompiler conceptDatasetSqlCompiler;
 
         public ConceptDatasetProvider(
             ConceptDatasetCompilerValidationContextProvider contextProvider,
-            PanelConverter converter,
-            PanelValidator validator,
             DatasetProvider.IDatasetExecutor executor,
             ILogger<ConceptDatasetProvider> log,
 
             IConceptDatasetSqlCompiler conceptDatasetSqlCompiler)
         {
             this.contextProvider = contextProvider;
-            this.converter = converter;
-            this.validator = validator;
             this.executor = executor;
             this.log = log;
             this.conceptDatasetSqlCompiler = conceptDatasetSqlCompiler;
@@ -47,33 +40,12 @@ namespace Model.Cohort
 
         public async Task<Result> GetConceptDatasetAsync(QueryRef queryRef, IPanelItemDTO panelitem, long? early, long? late, CancellationToken cancel)
         {
-            log.LogInformation("ConceptDataset extraction starting. ConceptRef:{@ConceptRef} Query:{@QueryRef}", queryRef, panel);
+            log.LogInformation("ConceptDataset extraction starting. ConceptRef:{@ConceptRef}, PanelItem:{@PanelItem}, Early:{@Early}, Late:{@Late}", queryRef, panelitem, early, late);
+
+            var request = new ConceptDatasetExecutionRequest(queryRef, panelitem, early, late);
             var result = new Result();
 
-            var ctx = await converter.GetPanelsAsync(panel, cancel);
-            log.LogInformation("FullCount panel validation context. Context:{@Context}", ctx);
-
-            var validationContext = validator.ValidateConceptPanel(ctx, queryRef);
-            log.LogInformation("ConceptDataset compiler validation context. Context:{@Context}", validationContext);
-
-            var exeContext = conceptDatasetSqlCompiler.BuildConceptDatasetSql(validationContext);
-            log.LogInformation("Compiled ConceptDataset execution context. Context:{@Context}", exeContext);
-
-            var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
-            log.LogInformation("ConceptDataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
-
-            result.Dataset = data;
-
-            return result;
-        }
-
-        public async Task<Result> GetConceptDatasetAsync(QueryRef queryRef, ConceptRef conceptRef, CancellationToken cancel)
-        {
-            log.LogInformation("ConceptDataset extraction starting. ConceptRef:{@ConceptRef} Query:{@QueryRef}", queryRef, conceptRef);
-
-            var result = new Result();
-
-            var validationContext = await contextProvider.GetCompilerContextAsync(queryRef, conceptRef);
+            var validationContext = await contextProvider.GetCompilerContextAsync(request);
             log.LogInformation("ConceptDataset compiler validation context. Context:{@Context}", validationContext);
 
             result.Context = validationContext;
@@ -92,10 +64,10 @@ namespace Model.Cohort
 
             return result;
         }
-
+       
         public class Result
         {
-            public CompilerValidationContext<ConceptDatasetCompilerContext> Context { get; internal set; }
+            public CompilerValidationContext<PanelDatasetCompilerContext> Context { get; internal set; }
             public Dataset Dataset { get; internal set; }
         }
     }

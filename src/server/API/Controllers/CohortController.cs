@@ -82,7 +82,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{queryid}/conceptpaneldataset")]
+        [HttpGet("{queryid}/conceptdataset")]
         public async Task<ActionResult<DatasetDTO>> ConceptPanelDataset(
             string queryid,
             [FromQuery] long? early,
@@ -95,8 +95,7 @@ namespace API.Controllers
             {
                 var queryRef = new QueryRef(queryid);
                 var pi = JsonConvert.DeserializeObject<PanelItemDTO>(panelItem);
-                var paneldto = new ConceptDatasetPanelDTO(panel);
-                var result = await provider.GetConceptDatasetAsync(queryRef, paneldto, cancelToken);
+                var result = await provider.GetConceptDatasetAsync(queryRef, pi, early, late, cancelToken);
 
                 return Ok(new DatasetDTO(result.Dataset));
             }
@@ -107,7 +106,7 @@ namespace API.Controllers
             }
             catch (OperationCanceledException)
             {
-                log.LogInformation("Request cancelled. QueryID:{QueryID} Panel:{Panel}", queryid, panelJson);
+                log.LogInformation("Request cancelled. QueryID:{QueryID} PanelItem:{PanelItem}", queryid, panelItem);
                 return NoContent();
             }
             catch (LeafRPCException lde)
@@ -120,47 +119,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} Panel:{Panel} Error:{Error}", queryid, panelJson, ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("{queryid}/conceptdataset")]
-        public async Task<ActionResult<DatasetDTO>> ConceptDataset(
-            string queryid,
-            [FromQuery] string conceptid,
-            [FromServices] ConceptDatasetProvider provider,
-            CancellationToken cancelToken)
-        {
-            try
-            {
-                var queryRef = new QueryRef(queryid);
-                var conceptRef = new ConceptRef(conceptid);
-                var result = await provider.GetConceptDatasetAsync(queryRef, conceptRef, cancelToken);
-
-                return Ok(new DatasetDTO(result.Dataset));
-            }
-            catch (FormatException fe)
-            {
-                log.LogWarning("Malformed concept identifier. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (OperationCanceledException)
-            {
-                log.LogInformation("Request cancelled. QueryID:{QueryID} ConceptId:{ConceptId}", queryid, conceptid);
-                return NoContent();
-            }
-            catch (LeafRPCException lde)
-            {
-                return StatusCode(lde.StatusCode);
-            }
-            catch (LeafCompilerException)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} ConceptID:{ConceptID} Error:{Error}", queryid, conceptid, ex.ToString());
+                log.LogError("Failed to fetch concept dataset. QueryID:{QueryID} PanelItem:{PanelItem} Error:{Error}", queryid, panelItem, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
