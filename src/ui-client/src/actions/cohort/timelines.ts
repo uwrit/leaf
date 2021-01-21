@@ -15,7 +15,7 @@ import { CohortStateType } from '../../models/state/CohortState';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { TimelinesConfiguration, TimelinesDateConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
-import { fetchConceptDataset, fetchConceptPanelDataset, fetchPanelDataset } from '../../services/cohortApi';
+import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
 import { addConceptDataset, addIndexDataset, getChartData, removeConceptDataset } from '../../services/timelinesApi';
 import { showInfoModal } from '../generalUi';
 
@@ -47,10 +47,10 @@ export interface CohortTimelinesAction {
 }
 
 /**
- * Request timeline concept panel datasets from all enabled nodes, in parallel.
+ * Request timeline concept datasets from all enabled nodes, in parallel.
  * If a result comes back after query is cancelled, it is discarded.
  */
-export const getConceptPanelDataset = (panel: Panel) => {
+export const getConceptDataset = (panel: Panel) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         let atLeastOneSucceeded = false;
         const state = getState();
@@ -73,7 +73,7 @@ export const getConceptPanelDataset = (panel: Panel) => {
                     let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
 
                     // Request concept dataset
-                    fetchConceptPanelDataset(getState(), nr, queryId, dto)
+                    fetchConceptDataset(getState(), nr, queryId, dto)
                         .then( async response => {
                                 // Make sure query hasn't been cancelled
                                 if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
@@ -104,75 +104,6 @@ export const getConceptPanelDataset = (panel: Panel) => {
             if (atLeastOneSucceeded && timelines.indexConceptState) {
                 const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 console.log(timeline);
-                dispatch(setTimelinesAggregateDataset(timeline));
-
-            } else if (!atLeastOneSucceeded) {
-                const info : InformationModalState = {
-                    header: "Error Running Query",
-                    body: "Leaf encountered an error while extracting the data. If this continues, please contact your Leaf administrator.",
-                    show: true
-                }
-                dispatch(showInfoModal(info));
-            }
-        });
-    };
-};
-
-/**
- * Request timeline concept datasets from all enabled nodes, in parallel.
- * If a result comes back after query is cancelled, it is discarded.
- */
-export const getConceptDataset = (concept: Concept) => {
-    return async (dispatch: Dispatch, getState: () => AppState) => {
-        let atLeastOneSucceeded = false;
-        const state = getState();
-        const timelines = state.cohort.timelines;
-        const responders: NetworkIdentity[] = [];
-        state.responders.forEach((nr: NetworkIdentity) => { 
-            if (concept.universalId || nr.enabled) { 
-                responders.push(nr); 
-            } 
-        });
-        dispatch(setTimelinesConceptDatasetExtractStarted(concept));
-
-        // Wrap entire query action in Promise.all
-        Promise.all(
-            // For each enabled responder
-            responders.map((nr: NetworkIdentity, i: number) => { 
-                return new Promise( async(resolve, reject) => {
-                    let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-
-                    // Request concept dataset
-                    fetchConceptDataset(getState(), nr, queryId, concept)
-                        .then( async response => {
-                                // Make sure query hasn't been cancelled
-                                if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
-
-                                // Update state
-                                const dto = response.data as ConceptDatasetDTO;
-                                await addConceptDataset(dto, nr.id, concept);
-
-                                atLeastOneSucceeded = true;
-                                dispatch(setTimelinesNetworkConceptDataset(nr.id, concept, dto));
-                                
-                        },  error => {
-                            if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
-
-                            if (error.response && error.response.status === 400) {
-                                dispatch(setTimelinesNetworkConceptDatasetNotImplemented(nr.id, concept))
-                            } else {
-                                dispatch(setTimelinesNetworkConceptDatasetError(nr.id, concept));
-                            }
-                        })
-                        .then(() => resolve(null));
-                });
-            })
-        ).then( async () => {
-            if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
-            dispatch(setTimelinesConceptDatasetExtractFinished(concept));
-
-            if (atLeastOneSucceeded && timelines.indexConceptState) {
-                const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 dispatch(setTimelinesAggregateDataset(timeline));
 
             } else if (!atLeastOneSucceeded) {
