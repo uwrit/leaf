@@ -80,8 +80,10 @@ export default class AggregateTimelineChart extends React.Component<Props, State
             <div className={c}>
 
                 {data.map((d,i) => {
+                    const concept = d.panel.subPanels[0].panelItems[0].concept;
+
                     return (
-                        <ScatterChart key={d.concept.id} width={chartWidth} height={swimlaneHeight} margin={margins}>
+                        <ScatterChart key={concept.id} width={chartWidth} height={swimlaneHeight} margin={margins}>
 
                             {/* Grid */}
                             <CartesianGrid fill={'rgb(245,245,245)'} />
@@ -92,7 +94,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
-                                tick={<CustomizedAxisTick concept={d.concept} clickHandler={this.handleLabelClick}/>}
+                                tick={<CustomizedAxisTick concept={concept} clickHandler={this.handleLabelClick}/>}
                             />
 
                             {/* Z-axis (bubble size) */}

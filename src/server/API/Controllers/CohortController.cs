@@ -19,7 +19,6 @@ using Model.Compiler;
 using Model.Error;
 using API.Controllers.Base;
 using Model.Options;
-using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace API.Controllers

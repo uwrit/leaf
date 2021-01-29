@@ -5,7 +5,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import { Concept, ConceptId } from "../concept/Concept";
+import { ConceptId } from "../concept/Concept";
+import { Panel } from "../panel/Panel";
 
 export type TimePointId = string;
 
@@ -14,7 +15,7 @@ export interface TimelinesAggregateDataset {
 }
 
 export interface TimelinesAggregateConcept {
-    concept: Concept;
+    panel: Panel;
     data: TimelinesAggregateDataRow[];
 }
 
