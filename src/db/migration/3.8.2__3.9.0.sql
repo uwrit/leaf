@@ -233,3 +233,89 @@ BEGIN
 
 END
 GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/12/5
+-- Description: Retrieves the app.Query.Pepper and app.DatasetQuery by Query.UniversalId and DatasetQuery.Id.
+-- =======================================
+ALTER PROCEDURE [app].[sp_GetDatasetContextByDatasetIdQueryUId]
+    @datasetid UNIQUEIDENTIFIER,
+    @queryuid app.UniversalId,
+    @joinpanel BIT,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert queryuid to queryid
+    DECLARE @qid UNIQUEIDENTIFIER;
+    SELECT TOP 1 @qid = Id
+    FROM app.Query
+    WHERE app.Query.UniversalId = @queryuid;
+
+    EXEC app.sp_GetDatasetContextById @datasetid, @qid, @user, @joinpanel, @groups, @admin = @admin;
+END
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/12/6
+-- Description: Retrieves the app.Query.Pepper and app.DatasetQuery by Query.Id and DatasetQuery.UniversalId.
+-- =======================================
+ALTER PROCEDURE [app].[sp_GetDatasetContextByDatasetUIdQueryId]
+    @datasetuid app.UniversalId,
+    @queryid UNIQUEIDENTIFIER,
+    @joinpanel BIT,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert datasetuid to datasetid
+    DECLARE @did UNIQUEIDENTIFIER;
+    SELECT TOP 1 @did = Id
+    FROM app.DatasetQuery
+    WHERE app.DatasetQuery.UniversalId = @datasetuid;
+
+    -- do the normal thing
+    EXEC app.sp_GetDatasetContextById @did, @queryid, @joinpanel, @user, @groups, @admin = @admin;
+END
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/12/6
+-- Description: Retrieves the app.Query.Pepper and app.DatasetQuery by Query.UniversalId and DatasetQuery.UniversalId.
+-- =======================================
+ALTER PROCEDURE [app].[sp_GetDatasetContextByDatasetUIdQueryUId]
+    @datasetuid app.UniversalId,
+    @queryuid app.UniversalId,
+    @joinpanel BIT,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert datasetuid to datasetid
+    DECLARE @did UNIQUEIDENTIFIER;
+    SELECT TOP 1 @did = Id
+    FROM app.DatasetQuery
+    WHERE app.DatasetQuery.UniversalId = @datasetuid;
+
+    -- convert queryuid to queryid
+    DECLARE @qid UNIQUEIDENTIFIER;
+    SELECT TOP 1 @qid = Id
+    FROM app.DatasetQuery
+    WHERE app.DatasetQuery.UniversalId = @queryuid;
+
+    -- do the normal thing
+    EXEC app.sp_GetDatasetContextById @did, @qid, @joinpanel, @user, @groups, @admin = @admin;
+END
+GO

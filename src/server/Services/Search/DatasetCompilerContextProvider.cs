@@ -125,6 +125,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetId and QueryUId");
             var datasetid = request.DatasetRef.Id.Value;
             var queryuid = request.QueryRef.UniversalId.ToString();
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -132,7 +133,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryUId,
-                    new { datasetid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetid, queryuid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -146,6 +147,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetUId and QueryId");
             var datasetuid = request.DatasetRef.UniversalId.ToString();
             var queryid = request.QueryRef.Id.Value;
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -153,7 +155,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryId,
-                    new { datasetuid, queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetuid, queryid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -167,6 +169,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetUId and QueryUId");
             var datasetuid = request.DatasetRef.UniversalId.ToString();
             var queryuid = request.QueryRef.UniversalId.ToString();
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -174,7 +177,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryUId,
-                    new { datasetuid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetuid, queryuid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
