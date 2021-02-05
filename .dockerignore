@@ -5,8 +5,5 @@
 .vscode
 *.bak
 .git
-src/db
-src/ui-client
-src/server/Dockerfile.dev
-src/server/.gitignore
-src/server/.dockerignore
+src/ui-client/node_modules
+src/ui-client/build

@@ -1,0 +1,7 @@
+src/ui-client/node_modules
+#src/ui-client/build
+npm-debug.log
+**/.git
+**/.DS_Store
+**/node_modules
+**/build
