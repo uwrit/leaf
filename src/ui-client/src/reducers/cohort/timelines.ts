@@ -22,13 +22,13 @@ export const defaultTimelinesState = (): TimelinesState => {
     return {
         aggregateData: { concepts: new Map() },
         configuration: {
-            concepts: [],
             dateIncrement: {
                 increment: 30,
                 incrementType: DateIncrementType.DAY,
                 mode: DateDisplayMode.AFTER
             },
-            mode: TimelinesDisplayMode.AGGREGATE
+            mode: TimelinesDisplayMode.AGGREGATE,
+            panels: []
         },
         patientData: [],
         indexConceptState: CohortStateType.NOT_LOADED,
@@ -49,9 +49,10 @@ export const setTimelinesAggregateDataset = (state: CohortState, action: CohortT
 export const setTimelinesConceptDatasetState = (state: CohortState, type: CohortStateType, action: CohortTimelinesAction): CohortState => {
     // Set all network responders to REQUESTING if
     // query just started.
+    const concept = action.panel!.subPanels[0].panelItems[0].concept;
     if (type === CohortStateType.REQUESTING) {
         state.networkCohorts.forEach((nr) => {
-            nr.timelines.cohortStateByConcept.set(action.concept!.id, type);
+            nr.timelines.cohortStateByConcept.set(concept!.id, type);
         })
     }
 
@@ -66,7 +67,8 @@ export const setTimelinesConceptDatasetState = (state: CohortState, type: Cohort
 
 export const setTimelinesNetworkConceptDataset = (state: CohortState, type: CohortStateType, action: CohortTimelinesAction): CohortState => {
     const network = Object.assign({}, state.networkCohorts.get(action.id!)!);
-    network.timelines.cohortStateByConcept.set(action.concept!.id, type);
+    const concept = action.panel!.subPanels[0].panelItems[0].concept;
+    network.timelines.cohortStateByConcept.set(concept!.id, type);
     state.networkCohorts.set(action.id!, network);
     return Object.assign({}, state);
 };
@@ -122,8 +124,9 @@ export const setTimelinesDateConfiguration = (state: CohortState, action: Cohort
 };
 
 export const removeTimelinesConceptDataset = (state: CohortState, action: CohortTimelinesAction): CohortState => {
+    const concept = action.panel!.subPanels[0].panelItems[0].concept;
     state.networkCohorts.forEach((nr) => {
-        nr.timelines.cohortStateByConcept.delete(action.concept!.id);
+        nr.timelines.cohortStateByConcept.delete(concept!.id);
     })
 
     return Object.assign({}, state, {

@@ -7,6 +7,7 @@
 
 import { ConceptDatasetDTO } from '../models/cohort/ConceptDataset';
 import { Concept } from '../models/concept/Concept';
+import { Panel } from '../models/panel/Panel';
 import { TimelinesConfiguration } from '../models/timelines/Configuration';
 import TimelinesWebWorker from '../providers/timelines/timelinesWebWorker';
 
@@ -22,8 +23,8 @@ export const getChartData = (config: TimelinesConfiguration) => {
 /**
  * Add a Concept Dataset
  */
-export const addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, concept: Concept) => {
-    return timelinesProvider.addConceptDataset(dataset, responderId, concept);
+export const addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, panel: Panel) => {
+    return timelinesProvider.addConceptDataset(dataset, responderId, panel);
 };
 
 /**
@@ -36,8 +37,8 @@ export const addIndexDataset = (dataset: ConceptDatasetDTO, responderId: number)
 /**
  * Remove Dataset
  */
-export const removeConceptDataset = (config: TimelinesConfiguration, concept: Concept) => {
-    return timelinesProvider.removeConceptDataset(config, concept);
+export const removeConceptDataset = (config: TimelinesConfiguration, panel: Panel) => {
+    return timelinesProvider.removeConceptDataset(config, panel);
 };
 
 /**

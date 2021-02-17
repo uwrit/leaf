@@ -7,7 +7,6 @@
 
 import { Dispatch } from 'redux';
 import { ConceptDatasetDTO } from '../../models/cohort/ConceptDataset';
-import { Concept } from '../../models/concept/Concept';
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import { Panel, panelToDto } from '../../models/panel/Panel';
 import { AppState } from '../../models/state/AppState';
@@ -39,10 +38,10 @@ export const TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED = 'TIMELINES_INDEX_
 export interface CohortTimelinesAction {
     aggregateDataset?: TimelinesAggregateDataset;
     dateConfig?: TimelinesDateConfiguration;
-    concept?: Concept;
     data?: ConceptDatasetDTO | null;
     id?: number;
     indexPanel?: number;
+    panel?: Panel;
     type: string;
 }
 
@@ -63,7 +62,7 @@ export const getConceptDataset = (panel: Panel) => {
                 responders.push(nr); 
             } 
         });
-        dispatch(setTimelinesConceptDatasetExtractStarted(concept));
+        dispatch(setTimelinesConceptDatasetExtractStarted(panel));
 
         // Wrap entire query action in Promise.all
         Promise.all(
@@ -80,18 +79,18 @@ export const getConceptDataset = (panel: Panel) => {
 
                                 // Update state
                                 const dto = response.data as ConceptDatasetDTO;
-                                await addConceptDataset(dto, nr.id, concept);
+                                await addConceptDataset(dto, nr.id, panel);
 
                                 atLeastOneSucceeded = true;
-                                dispatch(setTimelinesNetworkConceptDataset(nr.id, concept, dto));
+                                dispatch(setTimelinesNetworkConceptDataset(nr.id, panel, dto));
                                 
                         },  error => {
                             if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
 
                             if (error.response && error.response.status === 400) {
-                                dispatch(setTimelinesNetworkConceptDatasetNotImplemented(nr.id, concept))
+                                dispatch(setTimelinesNetworkConceptDatasetNotImplemented(nr.id, panel))
                             } else {
-                                dispatch(setTimelinesNetworkConceptDatasetError(nr.id, concept));
+                                dispatch(setTimelinesNetworkConceptDatasetError(nr.id, panel));
                             }
                         })
                         .then(() => resolve(null));
@@ -99,7 +98,7 @@ export const getConceptDataset = (panel: Panel) => {
             })
         ).then( async () => {
             if (getState().cohort.timelines.state !== CohortStateType.REQUESTING) { return; }
-            dispatch(setTimelinesConceptDatasetExtractFinished(concept));
+            dispatch(setTimelinesConceptDatasetExtractFinished(panel));
 
             if (atLeastOneSucceeded && timelines.indexConceptState) {
                 const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
@@ -187,12 +186,12 @@ export const getPanelIndexDataset = (panelIdx: number) => {
     };
 };
 
-export const deleteConceptDataset = (concept: Concept) => {
+export const deleteConceptDataset = (panel: Panel) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
-        dispatch(deleteTimelinesConceptDataset(concept));
+        dispatch(deleteTimelinesConceptDataset(panel));
 
         const config = getState().cohort.timelines.configuration;
-        await removeConceptDataset(config, concept);
+        await removeConceptDataset(config, panel);
 
         const timeline = await getChartData(config) as TimelinesAggregateDataset;
         dispatch(setTimelinesAggregateDataset(timeline));
@@ -210,9 +209,9 @@ export const getLatestTimelinesDataFromConfig = (config: TimelinesConfiguration)
 };
 
 // Synchronous
-export const deleteTimelinesConceptDataset = (concept: Concept): CohortTimelinesAction => {
+export const deleteTimelinesConceptDataset = (panel: Panel): CohortTimelinesAction => {
     return {
-        concept,
+        panel,
         type: TIMELINES_REMOVE_CONCEPT_DATASET
     };
 };
@@ -238,41 +237,41 @@ export const setTimelinesAggregateDataset = (aggregateDataset: TimelinesAggregat
     };
 };
 
-export const setTimelinesConceptDatasetExtractStarted = (concept: Concept): CohortTimelinesAction => {
+export const setTimelinesConceptDatasetExtractStarted = (panel: Panel): CohortTimelinesAction => {
     return {
-        concept,
+        panel,
         type: TIMELINES_CONCEPT_DATASET_START
     };
 };
 
-export const setTimelinesConceptDatasetExtractFinished = (concept: Concept): CohortTimelinesAction => {
+export const setTimelinesConceptDatasetExtractFinished = (panel: Panel): CohortTimelinesAction => {
     return {
-        concept,
+        panel,
         type: TIMELINES_CONCEPT_DATASET_FINISH
     };
 };
 
-export const setTimelinesNetworkConceptDataset = (id: number, concept: Concept, data: ConceptDatasetDTO): CohortTimelinesAction => {
+export const setTimelinesNetworkConceptDataset = (id: number, panel: Panel, data: ConceptDatasetDTO): CohortTimelinesAction => {
     return {
         id,
-        concept,
+        panel,
         data,
         type: TIMELINES_CONCEPT_DATASET_NETWORK_DATASET
     };
 };
 
-export const setTimelinesNetworkConceptDatasetNotImplemented = (id: number, concept: Concept): CohortTimelinesAction => {
+export const setTimelinesNetworkConceptDatasetNotImplemented = (id: number, panel: Panel): CohortTimelinesAction => {
     return {
         id,
-        concept,
+        panel,
         type: TIMELINES_CONCEPT_DATASET_NETWORK_NOT_IMPLEMENTED
     };
 };
 
-export const setTimelinesNetworkConceptDatasetError = (id: number, concept: Concept): CohortTimelinesAction => {
+export const setTimelinesNetworkConceptDatasetError = (id: number, panel: Panel): CohortTimelinesAction => {
     return {
         id,
-        concept,
+        panel,
         type: TIMELINES_CONCEPT_DATASET_NETWORK_ERROR
     };
 };

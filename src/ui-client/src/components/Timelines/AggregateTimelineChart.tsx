@@ -9,6 +9,7 @@ import React from 'react';
 import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
+import { Panel } from '../../models/panel/Panel';
 import { AuthorizationState } from '../../models/state/AppState';
 import { TimelinesState } from '../../models/state/CohortState';
 import { DateIncrementType } from '../../models/timelines/Configuration';
@@ -94,7 +95,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
-                                tick={<CustomizedAxisTick concept={concept} clickHandler={this.handleLabelClick}/>}
+                                tick={<CustomizedAxisTick panel={d.panel} clickHandler={this.handleLabelClick}/>}
                             />
 
                             {/* Z-axis (bubble size) */}
@@ -118,9 +119,9 @@ export default class AggregateTimelineChart extends React.Component<Props, State
         )
     }
 
-    private handleLabelClick = (concept: Concept) => {
+    private handleLabelClick = (panel: Panel) => {
         const { dispatch } = this.props;
-        dispatch(deleteConceptDataset(concept));
+        dispatch(deleteConceptDataset(panel));
     }
 
     private getIncrementTypeText = (type: DateIncrementType): string => {
@@ -162,8 +163,8 @@ export default class AggregateTimelineChart extends React.Component<Props, State
  * Left-side Y-Axis labels
  */
 interface TickProps {
-    clickHandler: (c: Concept) => void;
-    concept: Concept;
+    clickHandler: (panel: Panel) => void;
+    panel: Panel;
     x?: any;
     y?: any;
     payload?: any;
@@ -177,15 +178,16 @@ const closeX = (
 class CustomizedAxisTick extends React.PureComponent<TickProps> {
     public render () {
         const c = 'timelines-aggregate-yaxis';
-        const { x, y, payload, concept, clickHandler } = this.props;
+        const { x, y, payload, panel, clickHandler } = this.props;
         if (payload.value !== 1) { return null; }
+        const concept = panel.subPanels[0].panelItems[0].concept;
         const text = concept.uiDisplayName.split(' ').length > 1 
             ? concept.uiDisplayName
             : concept.uiDisplayText;
 
         return (
             <foreignObject className={c} x={x+1} y={y-13}>
-                <div className={`${c}-container`} onClick={clickHandler.bind(null, concept)}>
+                <div className={`${c}-container`} onClick={clickHandler.bind(null, panel)}>
                     <div className={`${c}-remove`}>
                         {closeX}
                     </div>

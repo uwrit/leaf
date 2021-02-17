@@ -6,7 +6,6 @@
  */ 
 
 export const workerContext = `
-console.log('timelines worker up');
 "use strict";
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -60,8 +59,9 @@ var queryAggregate = function (payload) {
     }
     // Foreach concept
     conceptDatasetMap.forEach(function (v, k) {
-        var data = getAggregateCounts(totalPats, config, v.concept, bins, dateDiffer);
-        output.concepts.set(k, { concept: v.concept, data: data });
+        var concept = v.panel.subPanels[0].panelItems[0].concept;
+        var data = getAggregateCounts(totalPats, config, concept, bins, dateDiffer);
+        output.concepts.set(k, { panel: v.panel, data: data });
     });
     return output;
 };
@@ -200,7 +200,7 @@ var getTimeBins = function (config) {
         currIdx = -incr;
         startBin = { label: ">" + Math.abs(lowerBound), maxNum: lowerBound };
         while (currIdx >= lowerBound) {
-            bins.unshift({ label: Math.abs(currIdx+incr) + "-" + Math.abs(currIdx), minNum: currIdx, maxNum: currIdx + incr });
+            bins.unshift({ label: Math.abs(currIdx + incr) + "-" + Math.abs(currIdx), minNum: currIdx, maxNum: currIdx + incr });
             currIdx -= incr;
         }
         bins.unshift(startBin);
@@ -219,7 +219,7 @@ var clearData = function (payload) {
  * Remove concept dataset
  */
 var removeConceptDataset = function (payload) {
-    var concept = payload.concept;
+    var concept = payload.panel.subPanels[0].panelItems[0].concept;
     conceptDatasetMap.delete(concept.id);
     return { requestId: payload.requestId };
 };
@@ -229,12 +229,13 @@ var removeConceptDataset = function (payload) {
 var addConceptDataset = function (payload) {
     var responderId = payload.responderId;
     var dataset = payload.dataset;
-    var concept = payload.concept;
+    var panel = payload.panel;
+    var concept = payload.panel.subPanels[0].panelItems[0].concept;
     var uniquePatients = Object.keys(dataset.results);
     var store;
     if (!conceptDatasetMap.has(concept.id)) {
         store = {
-            concept: concept,
+            panel: panel,
             patients: new Map()
         };
         conceptDatasetMap.set(concept.id, store);

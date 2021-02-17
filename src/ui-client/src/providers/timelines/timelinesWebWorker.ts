@@ -5,10 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { config } from 'process';
 import { generate as generateId } from 'shortid';
 import { ConceptDatasetDTO, ConceptDatasetRow } from '../../models/cohort/ConceptDataset';
 import { Concept, ConceptId } from '../../models/concept/Concept';
+import { Panel } from '../../models/panel/Panel';
 import { PatientId } from '../../models/patientList/Patient';
 import { DateDisplayMode, DateIncrementType, TimelinesConfiguration, TimelinesDisplayMode } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataRow, TimelinesAggregateDataset, TimelinesAggregateTimeBin } from '../../models/timelines/Data';
@@ -35,10 +35,10 @@ const dateIncrementMonth = DateIncrementType.MONTH;
 const dateIncrementYear = DateIncrementType.YEAR;
 
 interface InboundMessagePartialPayload {
-    concept?: Concept;
     config?: TimelinesConfiguration;
     dataset?: ConceptDatasetDTO;
     message: string;
+    panel?: Panel;
     responderId?: number;
 }
 
@@ -90,16 +90,16 @@ export default class TimelinesWebWorker {
         this.worker.onerror = error => this.reject(error);
     }
 
-    public addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, concept: Concept) => {
-        return this.postMessage({ message: ADD_CONCEPT_DATASET, dataset, responderId, concept });
+    public addConceptDataset = (dataset: ConceptDatasetDTO, responderId: number, panel: Panel) => {
+        return this.postMessage({ message: ADD_CONCEPT_DATASET, dataset, responderId, panel });
     }
 
     public addIndexDataset = (dataset: ConceptDatasetDTO, responderId: number) => {
         return this.postMessage({ message: ADD_INDEX_DATASET, dataset, responderId });
     }
 
-    public removeConceptDataset = (config: TimelinesConfiguration, concept: Concept) => {
-        return this.postMessage({ message: REMOVE_CONCEPT_DATASET, config, concept})
+    public removeConceptDataset = (config: TimelinesConfiguration, panel: Panel) => {
+        return this.postMessage({ message: REMOVE_CONCEPT_DATASET, config, panel})
     }
 
     public query = (config: TimelinesConfiguration) => {
@@ -181,8 +181,9 @@ export default class TimelinesWebWorker {
             
             // Foreach concept
             conceptDatasetMap.forEach((v,k) => {
-                const data = getAggregateCounts(totalPats, config, v.concept, bins, dateDiffer);
-                output.concepts.set(k, { concept: v.concept, data });
+                const concept = v.panel.subPanels[0].panelItems[0].concept;
+                const data = getAggregateCounts(totalPats, config, concept, bins, dateDiffer);
+                output.concepts.set(k, { panel: v.panel, data });
             });
 
             return output;
@@ -342,7 +343,7 @@ export default class TimelinesWebWorker {
          * Remove concept dataset
          */
         const removeConceptDataset = (payload: InboundMessagePayload) => {
-            const concept = payload.concept!;
+            const concept = payload.panel!.subPanels[0].panelItems[0].concept;
             conceptDatasetMap.delete(concept.id);
             return { requestId: payload.requestId };
         };
@@ -353,13 +354,14 @@ export default class TimelinesWebWorker {
         const addConceptDataset = (payload: InboundMessagePayload) => {
             const responderId = payload.responderId!;
             const dataset = payload.dataset!;
-            const concept = payload.concept!;
+            const panel = payload.panel!;
+            const concept = payload.panel!.subPanels[0].panelItems[0].concept;
             const uniquePatients: PatientId[] = Object.keys(dataset.results);
             let store;
 
             if (!conceptDatasetMap.has(concept.id)) {
                 store = {
-                    concept,
+                    panel,
                     patients: new Map()
                 };
                 conceptDatasetMap.set(concept.id, store);

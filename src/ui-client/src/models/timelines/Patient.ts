@@ -5,12 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import { ConceptDatasetRow } from "../cohort/ConceptDataset";
-import { Concept } from "../concept/Concept";
+import { Panel } from "../panel/Panel";
 import { PatientId } from "../patientList/Patient";
 
 // Concept model stored in web worker 
 export interface ConceptDatasetStore {
-    concept: Concept;
+    panel: Panel;
     patients: Map<PatientId, Patient>;
 }
 
