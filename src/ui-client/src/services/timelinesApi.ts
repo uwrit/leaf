@@ -6,7 +6,6 @@
  */ 
 
 import { ConceptDatasetDTO } from '../models/cohort/ConceptDataset';
-import { Concept } from '../models/concept/Concept';
 import { Panel } from '../models/panel/Panel';
 import { TimelinesConfiguration } from '../models/timelines/Configuration';
 import TimelinesWebWorker from '../providers/timelines/timelinesWebWorker';

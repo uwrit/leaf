@@ -4,6 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
+import { ConceptId } from "../concept/Concept";
 import { Panel } from "../panel/Panel";
 
 export interface TimelinesDateConfiguration {
@@ -13,7 +14,7 @@ export interface TimelinesDateConfiguration {
 }
 
 export interface TimelinesConfiguration {
-    panels: Panel[];
+    panels: Map<ConceptId, Panel>;
     dateIncrement: TimelinesDateConfiguration;
     indexPanel?: number;
     mode: TimelinesDisplayMode;

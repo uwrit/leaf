@@ -8,7 +8,7 @@
 import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd';
 import { MdAccessTime } from 'react-icons/md';
-import { Button } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import { getConceptDataset } from '../../actions/cohort/timelines';
 import { Concept } from '../../models/concept/Concept';
 import { Panel as PanelModel } from '../../models/panel/Panel';
@@ -39,6 +39,7 @@ interface OwnProps {
 type Props = DndProps & OwnProps
 
 interface State {
+    hovered: HoverDropType;
     mode: OverlayMode,
     panel?: PanelModel
 }
@@ -46,6 +47,11 @@ interface State {
 enum OverlayMode {
     Waiting = 1,
     Selected = 2
+}
+
+enum HoverDropType {
+    All = 1,
+    Specific = 2
 }
 
 /**
@@ -58,7 +64,7 @@ const conceptNodeTarget = {
         const concept: Concept = monitor.getItem();
         const loadingConcept = timelines.state === CohortStateType.REQUESTING;
 
-        if (loadingConcept || timelines.panelItemByConcept.get(concept.id)) {
+        if (loadingConcept || timelines.configuration.panels.get(concept.id)) {
             return;
         }
         conceptDropFunc(concept);
@@ -87,13 +93,14 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
         super(props);
         conceptDropFunc = this.handleConceptDrop;
         this.state = {
+            hovered: HoverDropType.All,
             mode: OverlayMode.Waiting
         }
     }
 
     public render() {
         const c = this.className;
-        const { mode, panel } = this.state;
+        const { hovered, mode, panel } = this.state;
         const { connectDropTarget, canDrop, isOver, timelines } = this.props;
         const clock = <MdAccessTime className={'concept-tree-node-icon concept-tree-node-icon-clock'} />;
         const loadingConcept = timelines.state === CohortStateType.REQUESTING;
@@ -106,11 +113,21 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 connectDropTarget &&
                 connectDropTarget(
                 <div className={`${c}-inner waiting`}>
-                    <div>
-                        {!loadingConcept && 
-                        <div>Drop any Concept with associated dates (the {clock} symbol) here</div>
-                        }
-                    </div>
+                    <Row>
+                        <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts below</Col>
+                        <Col sm={6} className={`${c}-all-data ${hovered == HoverDropType.All ? 'hovered' : ''}`} 
+                            onDragOver={this.toggleUseAllData.bind(null, HoverDropType.All)}>
+                            <div>
+                                All Data
+                            </div>
+                        </Col>
+                        <Col sm={6} className={`${c}-specific-data ${hovered == HoverDropType.Specific ? 'hovered' : ''}`} 
+                            onDragOver={this.toggleUseAllData.bind(null, HoverDropType.Specific)}>
+                            <div>
+                                Only Specific Dates or Values
+                            </div>
+                        </Col>
+                    </Row>
                 </div>)}
 
                 {/* Concept dropped */}
@@ -120,7 +137,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                         <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED}/>
                         <div className={`${c}-panel-selection-explanation`}>
                             <span>Specify any date, numeric, or other filters, then click</span>
-                            <span className={`${c}-panel-selection-emphasis`}>Get Timeline of Data</span>
+                            <span className={`${c}-panel-selection-emphasis`}>Add to Timeline</span>
                             <span>below</span>
                         </div>
                         <div className={`${c}-panel-selection-footer`}>
@@ -148,26 +165,37 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
     }
 
     private handlePanelGetDataClick = () => {
-        const { dispatch } = this.props;
+        const { dispatch, handleConfiguringConceptChange } = this.props;
         const { panel } = this.state;
-        if (panel) {
+        if (panel) {  
             dispatch(getConceptDataset(panel));
+            this.setState({ panel: undefined, mode: OverlayMode.Waiting });
+            handleConfiguringConceptChange(false);
         }
     }
 
     private handleConceptDrop = (concept: Concept) => {
-        const { handleConfiguringConceptChange } = this.props;
-        handleConfiguringConceptChange(true);
-        this.setState({ 
-            panel: this.createPanel(concept),
-            mode: OverlayMode.Selected
-        });
+        const { dispatch, handleConfiguringConceptChange } = this.props;
+        const { hovered } = this.state;
+        const panel = this.createPanel(concept);
+
+        if (hovered == HoverDropType.All) {
+            this.setState({ mode: OverlayMode.Waiting });
+            dispatch(getConceptDataset(panel));
+        } else {
+            handleConfiguringConceptChange(true);
+            this.setState({ panel, mode: OverlayMode.Selected });
+        }
     }
 
     private createPanel = (concept: Concept): PanelModel => {
         const panel = generateDummyPanel();
         panel.subPanels[0].panelItems[0].concept = concept;
         return panel;
+    }
+
+    private toggleUseAllData = (hovered: HoverDropType) => {
+        this.setState({ hovered });
     }
 }
 

@@ -56,7 +56,7 @@ class Timelines extends React.Component<Props, State> {
         const c = this.className;
         const { dispatch, auth, patientCount, timelines } = this.props;
         const { configuringConcept, showPanelSelector, showConcepts } = this.state;
-        const hasConcepts = timelines.configuration.panels.length > 0;
+        const hasConcepts = timelines.configuration.panels.size > 0;
 
         return  (
             <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
@@ -111,7 +111,7 @@ class Timelines extends React.Component<Props, State> {
                                     subComponent={(
                                         <div>
                                             <span className="clickable" onClick={this.toggleShowConcepts.bind(null, true)}>
-                                                + Add Concepts ({timelines.configuration.panels.length} selected)
+                                                + Add Concepts ({timelines.configuration.panels.size} selected)
                                             </span>
                                         </div>)}
                                 />
@@ -163,8 +163,11 @@ class Timelines extends React.Component<Props, State> {
     }
 
     private setConfiguringConcept = (configuringConcept: boolean) => {
+        const { timelines } = this.props;
+
         if (!configuringConcept) {
-            this.setState({ configuringConcept, showConcepts: false });
+            const showConcepts = timelines.state === CohortStateType.REQUESTING;
+            this.setState({ configuringConcept, showConcepts });
         } else {
             this.setState({ configuringConcept });
         }

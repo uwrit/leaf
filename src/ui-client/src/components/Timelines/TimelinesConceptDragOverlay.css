@@ -24,37 +24,57 @@
     top: 40%;
     left: 55%;
     transform: translate(-50%, -50%);
-    width: 450px;
+    width: 600px;
     vertical-align: middle;
 }
 
 /* Waiting for drop and loading */
 .timelines-concept-drag-overlay-inner.waiting,
 .timelines-concept-drag-overlay-inner.loading {
-    border: 2px dashed rgba(28, 170, 221, 0.699);
+    zborder: 2px dashed rgba(28, 170, 221, 0.699);
 }
 
 .timelines-concept-drag-overlay-inner svg {
     margin-right: 0;
 }
 
-.timelines-concept-drag-overlay-inner.waiting > div {
+.timelines-concept-drag-overlay-inner.waiting {
+    padding: 0 20px 30px !important;
+}
+
+.timelines-concept-drag-overlay-title-text {
     font-size: 2.0rem;
-    font-weight: 100;
+    font-weight: 300;
+    text-align: center;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .row {
+    height: 100%;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .col-sm-6 {
+    height: 100%;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .col-sm-6 > div {
+    font-size: 2.0rem;
     margin-bottom: 0;
-    padding: 20px;
     position: absolute;
     text-align: center;
-    top: 30%;
-    width: 100%;
+    top: 20%;
+    width: 90%;
+}
+
+.timelines-concept-drag-overlay-all-data {
+    border-right: 1px solid rgb(200,200,200);
 }
 
 .timelines-concept-drag-overlay-loading {
     font-size: 2.5rem;
 }
 
-.timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner {
-    background-color: rgb(175, 231, 252);
+.timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner .col-sm-6.hovered {
+    background-color: rgba(175, 231, 252, 0.5);
 }
 
 /* Configuring concept */
@@ -72,7 +92,10 @@
     font-weight: 300;
     height: 80px;
     margin: 10px 0;
-    padding: 0 50px;
+    padding: 0 20%;
+}
+
+.timelines-concept-drag-overlay-panel-selection-explanation span {
     text-align: center;
 }
 
@@ -85,7 +108,7 @@
 .timelines-concept-drag-overlay-panel-selection-container .panel-column {
     flex: 0 0 100% !important;
     margin: 0 auto !important;
-    max-width: 500px !important;
+    max-width: 400px !important;
     padding: 0 50px !important;
 }
 

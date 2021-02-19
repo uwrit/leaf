@@ -85,7 +85,6 @@ export interface TimelinesState extends BaseTimelinesState {
     indexConceptState: CohortStateType;
     patientData: TimelinesPatientDataRow[];
     state: CohortStateType;
-    panelItemByConcept: Map<ConceptId, PanelItem>;
 }
 
 export interface TimelinesNetworkState {

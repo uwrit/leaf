@@ -14,7 +14,6 @@ export const defaultNetworkTimelinesState = (): TimelinesNetworkState => {
     return {
         indexConceptState: CohortStateType.NOT_LOADED,
         cohortStateByConcept: new Map<string, CohortStateType>(),
-        
     };
 };
 
@@ -28,12 +27,11 @@ export const defaultTimelinesState = (): TimelinesState => {
                 mode: DateDisplayMode.AFTER
             },
             mode: TimelinesDisplayMode.AGGREGATE,
-            panels: []
+            panels: new Map()
         },
         patientData: [],
         indexConceptState: CohortStateType.NOT_LOADED,
-        state: CohortStateType.NOT_LOADED,
-        panelItemByConcept: new Map<ConceptId, PanelItem>()
+        state: CohortStateType.NOT_LOADED
     };
 };
 
@@ -111,13 +109,13 @@ export const setTimelinesPanelIndexId = (state: CohortState, action: CohortTimel
     });
 };
 
-export const setTimelinesDateConfiguration = (state: CohortState, action: CohortTimelinesAction): CohortState => {
+export const setTimelinesConfiguration = (state: CohortState, action: CohortTimelinesAction): CohortState => {
     return Object.assign({}, state, {
         timelines: {
             ...state.timelines,
             configuration: {
                 ...state.timelines.configuration,
-                dateIncrement: action.dateConfig
+                ...action.config
             }
         }
     });

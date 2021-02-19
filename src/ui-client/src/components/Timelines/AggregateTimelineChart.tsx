@@ -8,7 +8,6 @@
 import React from 'react';
 import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
-import { Concept } from '../../models/concept/Concept';
 import { Panel } from '../../models/panel/Panel';
 import { AuthorizationState } from '../../models/state/AppState';
 import { TimelinesState } from '../../models/state/CohortState';

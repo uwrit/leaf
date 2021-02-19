@@ -12,14 +12,14 @@ import { Panel, panelToDto } from '../../models/panel/Panel';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
 import { InformationModalState } from '../../models/state/GeneralUiState';
-import { TimelinesConfiguration, TimelinesDateConfiguration } from '../../models/timelines/Configuration';
+import { TimelinesConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
 import { addConceptDataset, addIndexDataset, getChartData, removeConceptDataset } from '../../services/timelinesApi';
 import { showInfoModal } from '../generalUi';
 
 export const TIMELINES_SET_AGGREGATE_DATASET = 'TIMELINES_SET_AGGREGATE_DATASET';
-export const TIMELINES_CONFIG_SET_DATES = 'TIMELINES_CONFIG_SET_DATES';
+export const TIMELINES_SET_CONFIG = 'TIMELINES_SET_CONFIG';
 export const TIMELINES_REMOVE_CONCEPT_DATASET = 'TIMELINES_REMOVE_CONCEPT_DATASET';
 
 export const TIMELINES_CONCEPT_DATASET_START = 'TIMELINES_CONCEPT_DATASET_START';
@@ -37,7 +37,7 @@ export const TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED = 'TIMELINES_INDEX_
 
 export interface CohortTimelinesAction {
     aggregateDataset?: TimelinesAggregateDataset;
-    dateConfig?: TimelinesDateConfiguration;
+    config?: TimelinesConfiguration;
     data?: ConceptDatasetDTO | null;
     id?: number;
     indexPanel?: number;
@@ -63,11 +63,12 @@ export const getConceptDataset = (panel: Panel) => {
             } 
         });
         dispatch(setTimelinesConceptDatasetExtractStarted(panel));
+        timelines.configuration.panels.set(concept.id, panel);
 
         // Wrap entire query action in Promise.all
         Promise.all(
             // For each enabled responder
-            responders.map((nr: NetworkIdentity, i: number) => { 
+            responders.map((nr) => { 
                 return new Promise( async(resolve, reject) => {
                     let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
 
@@ -103,6 +104,7 @@ export const getConceptDataset = (panel: Panel) => {
             if (atLeastOneSucceeded && timelines.indexConceptState) {
                 const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
                 console.log(timeline);
+                dispatch(setTimelinesConfiguration(timelines.configuration));
                 dispatch(setTimelinesAggregateDataset(timeline));
 
             } else if (!atLeastOneSucceeded) {
@@ -189,11 +191,14 @@ export const getPanelIndexDataset = (panelIdx: number) => {
 export const deleteConceptDataset = (panel: Panel) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         dispatch(deleteTimelinesConceptDataset(panel));
-
-        const config = getState().cohort.timelines.configuration;
+        const timelines = getState().cohort.timelines;
+        const concept = panel.subPanels[0].panelItems[0].concept;
+        const config = timelines.configuration;
+        config.panels.delete(concept.id);
         await removeConceptDataset(config, panel);
 
         const timeline = await getChartData(config) as TimelinesAggregateDataset;
+        dispatch(setTimelinesConfiguration(timelines.configuration));
         dispatch(setTimelinesAggregateDataset(timeline));
     };
 }
@@ -223,10 +228,10 @@ export const setTimelinesIndexPanelId = (indexPanel: number): CohortTimelinesAct
     };
 };
 
-export const setTimelinesConfigurationDates = (dateConfig: TimelinesDateConfiguration): CohortTimelinesAction => {
+export const setTimelinesConfiguration = (config: TimelinesConfiguration): CohortTimelinesAction => {
     return {
-        dateConfig,
-        type: TIMELINES_CONFIG_SET_DATES
+        config,
+        type: TIMELINES_SET_CONFIG
     };
 };
 

@@ -8,7 +8,7 @@
 import React from 'react';
 import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
 import { DateDisplayMode, DateIncrementType, TimelinesConfiguration } from '../../models/timelines/Configuration';
-import { setTimelinesConfigurationDates, getLatestTimelinesDataFromConfig } from '../../actions/cohort/timelines';
+import { setTimelinesConfiguration, getLatestTimelinesDataFromConfig } from '../../actions/cohort/timelines';
 import './TimelinesDateRangeSelector.css';
 
 interface Props {
@@ -135,7 +135,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         const { dispatch, config } = this.props;
         const newDateConfig = Object.assign({}, config.dateIncrement, { mode });
         const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
-        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(setTimelinesConfiguration(newConfig))
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
@@ -143,7 +143,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         const { dispatch, config } = this.props;
         const newDateConfig = Object.assign({}, config.dateIncrement, { incrementType });
         const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
-        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(setTimelinesConfiguration(newConfig))
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
@@ -152,7 +152,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         const { dispatch, config } = this.props;
         const newDateConfig = Object.assign({}, config.dateIncrement, { increment });
         const newConfig = Object.assign({}, config, { dateIncrement: newDateConfig });
-        dispatch(setTimelinesConfigurationDates(newDateConfig))
+        dispatch(setTimelinesConfiguration(newConfig))
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 

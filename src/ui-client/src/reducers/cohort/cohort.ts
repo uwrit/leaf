@@ -50,7 +50,7 @@ import {
     TIMELINES_INDEX_DATASET_NETWORK_ERROR,
     TIMELINES_INDEX_DATASET_NETWORK_NOT_IMPLEMENTED,
     TIMELINES_SET_AGGREGATE_DATASET,
-    TIMELINES_CONFIG_SET_DATES,
+    TIMELINES_SET_CONFIG,
     TIMELINES_INDEX_SET_PANEL_ID,
     TIMELINES_REMOVE_CONCEPT_DATASET
 } from '../../actions/cohort/timelines';
@@ -97,7 +97,7 @@ import {
     setTimelinesPanelDatasetState, 
     setTimelinesNetworkPanelDataset, 
     setTimelinesAggregateDataset, 
-    setTimelinesDateConfiguration, 
+    setTimelinesConfiguration, 
     setTimelinesPanelIndexId,
     removeTimelinesConceptDataset
 } from './timelines';
@@ -311,8 +311,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setAggregateCohortVisualization(state, action);
 
         // Timelines
-        case TIMELINES_CONFIG_SET_DATES:
-            return setTimelinesDateConfiguration(state, action);
+        case TIMELINES_SET_CONFIG:
+            return setTimelinesConfiguration(state, action);
         case TIMELINES_SET_AGGREGATE_DATASET:
             return setTimelinesAggregateDataset(state, action);
         case TIMELINES_REMOVE_CONCEPT_DATASET:
