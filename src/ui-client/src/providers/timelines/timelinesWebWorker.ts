@@ -206,7 +206,14 @@ export default class TimelinesWebWorker {
             const pats = [ ...conceptData.patients.values() ];
 
             // For each bin
-            bins.forEach((bin) => {
+            for (let bi = 0; bi < bins.length; bi++) {
+
+                // If placeholder for index date
+                const bin = bins[bi];
+                if (bin === null) {
+                    output.push(null as any);
+                    continue;
+                }
                 let binCount = 0;
 
                 // For each patient
@@ -245,7 +252,7 @@ export default class TimelinesWebWorker {
                     values
                 };
                 output.push(dataRow);
-            });
+            };
 
             // Add index date bin
             const indexDate = {
@@ -253,11 +260,10 @@ export default class TimelinesWebWorker {
                 displayValueX: 0, displayValueY: 1,
                 values: { percent: 0, total: 0 }
             };
-            if (config.dateIncrement.mode === dateDisplayModeBefore) {
-                output.push(indexDate);
-            } else if (config.dateIncrement.mode === dateDisplayModeAfter) {
-                output.unshift(indexDate);
-            }
+            
+            // Swap null placeholder out with IndexDate
+            const placeholder = output.findIndex((dr) => dr === null);
+            output[placeholder] = indexDate;
 
             return output;
         };
@@ -298,6 +304,39 @@ export default class TimelinesWebWorker {
                 return bins;
             }
 
+            // Before & After
+            if (config.dateIncrement.mode === dateDisplayModeBeforeAfter) {
+
+                // Before
+                upperBound = 0;
+                lowerBound = -(incr * maxBins);
+                currIdx = -incr;
+                startBin = { label: `>${Math.abs(lowerBound)}`, maxNum: lowerBound };
+
+                while (currIdx >= lowerBound) {
+                    bins.unshift({ label: `${Math.abs(currIdx+incr)}-${Math.abs(currIdx)}`, minNum: currIdx, maxNum: currIdx+incr });
+                    currIdx -= incr;
+                }
+                bins.unshift(startBin);
+
+                // Add Index data with null placeholder
+                bins.push(null as any);
+
+                // After
+                currIdx = incr;
+                lowerBound = 0;
+                upperBound = incr * maxBins;
+                startBin = { label: `<${incr}`, minNum: 0.0001, maxNum: incr };
+                lastBin  = { label: `>${upperBound}`, minNum: upperBound };
+
+                bins.push(startBin);
+                while (currIdx < upperBound) {
+                    bins.push({ label: `${currIdx}-${Math.abs(currIdx+incr)}`, minNum: currIdx, maxNum: currIdx+incr });
+                    currIdx += incr;
+                }
+                bins.push(lastBin);
+            }
+
             // After
             if (config.dateIncrement.mode === dateDisplayModeAfter) {
                 lowerBound = 0;
@@ -310,6 +349,7 @@ export default class TimelinesWebWorker {
                     currIdx += incr;
                 }
                 bins.unshift(startBin);
+                bins.unshift(null as any);
                 bins.push(lastBin);
             }
 
@@ -325,6 +365,7 @@ export default class TimelinesWebWorker {
                     currIdx -= incr;
                 }
                 bins.unshift(startBin);
+                bins.push(null as any);
             }
             
             return bins;

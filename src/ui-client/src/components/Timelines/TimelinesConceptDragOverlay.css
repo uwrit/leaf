@@ -28,12 +28,6 @@
     vertical-align: middle;
 }
 
-/* Waiting for drop and loading */
-.timelines-concept-drag-overlay-inner.waiting,
-.timelines-concept-drag-overlay-inner.loading {
-    zborder: 2px dashed rgba(28, 170, 221, 0.699);
-}
-
 .timelines-concept-drag-overlay-inner svg {
     margin-right: 0;
 }
@@ -50,14 +44,27 @@
 
 .timelines-concept-drag-overlay-inner.waiting .row {
     height: 100%;
+    font-weight: 100;
+    padding: 0 10px;
 }
 
 .timelines-concept-drag-overlay-inner.waiting .col-sm-6 {
-    height: 100%;
+    height: 85%;
+    margin-top: 14px;
+}
+
+.timelines-concept-drag-overlay-all-data {
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.timelines-concept-drag-overlay-specific-data {
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
 .timelines-concept-drag-overlay-inner.waiting .col-sm-6 > div {
-    font-size: 2.0rem;
+    font-size: 2rem;
     margin-bottom: 0;
     position: absolute;
     text-align: center;
@@ -71,6 +78,19 @@
 
 .timelines-concept-drag-overlay-loading {
     font-size: 2.5rem;
+    font-weight: 100;
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+}
+
+.timelines-concept-drag-overlay-loading .col-md-8 > div {
+    top: 25%;
+    position: absolute;
 }
 
 .timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner .col-sm-6.hovered {

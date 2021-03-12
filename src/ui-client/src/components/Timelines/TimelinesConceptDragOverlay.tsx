@@ -10,8 +10,12 @@ import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, D
 import { MdAccessTime } from 'react-icons/md';
 import { Button, Col, Row } from 'reactstrap';
 import { getConceptDataset } from '../../actions/cohort/timelines';
-import { Concept } from '../../models/concept/Concept';
+import { Concept, ConceptSpecialization, ConceptSpecializationGroup } from '../../models/concept/Concept';
+import { DateBoundary } from '../../models/panel/Date';
+import { NumericFilter } from '../../models/panel/NumericFilter';
 import { Panel as PanelModel } from '../../models/panel/Panel';
+import { PanelItem } from '../../models/panel/PanelItem';
+import { SubPanel, SubPanelJoinSequence } from '../../models/panel/SubPanel';
 import { CohortStateType, TimelinesState } from '../../models/state/CohortState';
 import { generateDummyPanel } from '../../reducers/admin/concept';
 import Panel from '../FindPatients/Panels/Panel';
@@ -102,7 +106,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
         const c = this.className;
         const { hovered, mode, panel } = this.state;
         const { connectDropTarget, canDrop, isOver, timelines } = this.props;
-        const clock = <MdAccessTime className={'concept-tree-node-icon concept-tree-node-icon-clock'} />;
+        const panelHandlers = this.packageHandlers();
         const loadingConcept = timelines.state === CohortStateType.REQUESTING;
 
         return (
@@ -114,7 +118,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 connectDropTarget(
                 <div className={`${c}-inner waiting`}>
                     <Row>
-                        <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts below</Col>
+                        <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts here for</Col>
                         <Col sm={6} className={`${c}-all-data ${hovered == HoverDropType.All ? 'hovered' : ''}`} 
                             onDragOver={this.toggleUseAllData.bind(null, HoverDropType.All)}>
                             <div>
@@ -134,7 +138,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 {mode === OverlayMode.Selected && panel &&
                 <div className={`${c}-inner selecting`}>
                     <div className={`${c}-panel-selection-container`}>
-                        <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED}/>
+                        <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers}/>
                         <div className={`${c}-panel-selection-explanation`}>
                             <span>Specify any date, numeric, or other filters, then click</span>
                             <span className={`${c}-panel-selection-emphasis`}>Add to Timeline</span>
@@ -150,8 +154,13 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 {/* Concept requested */}
                 {loadingConcept && 
                 <div className={`${c}-inner update`}>
-                    <div>
-                        <div className={`${c}-loading`}><LoaderIcon size={30} /> Updating timeline...</div>
+                    <div className={`${c}-loading`}>
+                        <Row>
+                            <Col md={4}><LoaderIcon size={100} /></Col>
+                            <Col md={8}>
+                                <div className={`${c}-loading-text`}>Updating timeline...</div>
+                            </Col>
+                        </Row>
                     </div>
                 </div>}
             </div>
@@ -195,7 +204,66 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
     }
 
     private toggleUseAllData = (hovered: HoverDropType) => {
-        this.setState({ hovered });
+        if (hovered !== this.state.hovered) {
+            this.setState({ hovered });
+        }
+    }
+
+    /**
+     * Panel handlers
+     */
+    private packageHandlers = () => {
+        return {
+            handlePanelInclusion: (panelIndex: number, include: boolean) => null,
+            handleSubPanelInclusion: (panelIndex: number, subpanelIndex: number, include: boolean) => null,
+            handlePanelDateFilter: this.handlePanelDateFilter,
+            handleSubPanelCount: (panelIndex: number, subpanelIndex: number, minCount: number) => null,
+            handleDeselectSpecialization: this.handleDeselectSpecialization,
+            handleSelectSpecialization: this.handleSelectSpecialization,
+            handleAddPanelItem: (concept: Concept, subPanel: SubPanel) => null,
+            handlePanelItemNumericFilter: this.handlePanelItemNumericFilter,
+            handleHidePanelItem: (panelItem: PanelItem) => null,
+            handleRemovePanelItem: (panelItem: PanelItem) => null,
+            handleSubPanelJoinSequence: (subPanel: SubPanel, joinSequence: SubPanelJoinSequence) => null
+        };
+    }
+
+    private handlePanelDateFilter = (panelIndex: number, dateFilter: DateBoundary) => {
+        const panel = Object.assign({}, this.state.panel, { dateFilter } );
+        this.setState({ panel });
+    }
+
+    private handleDeselectSpecialization = (panelItem: PanelItem, conceptSpecializationGroup: ConceptSpecializationGroup) => {
+        const pi = Object.assign({}, this.state.panel!.subPanels[0].panelItems[0]);
+        const sp = Object.assign({}, this.state.panel!.subPanels[0]);
+        const panel = Object.assign({}, this.state.panel, { subPanels: [{
+            ...sp, panelItems: [{
+                ...pi,
+                specializations: pi.specializations.slice().filter((s) => s.specializationGroupId != conceptSpecializationGroup.id)
+            }]
+        }]});
+        this.setState({ panel });
+    }
+
+    private handleSelectSpecialization = (panelItem: PanelItem, conceptSpecialization: ConceptSpecialization) => {
+        const pi = Object.assign({}, this.state.panel!.subPanels[0].panelItems[0]);
+        const sp = Object.assign({}, this.state.panel!.subPanels[0]);
+        pi.specializations = pi.specializations.slice().filter((s) => s.specializationGroupId !== conceptSpecialization.specializationGroupId);
+        pi.specializations.push(conceptSpecialization);
+        const panel = Object.assign({}, this.state.panel, { subPanels: [{
+            ...sp, panelItems: [ pi ]
+        }]});
+        this.setState({ panel });
+    }
+
+    private handlePanelItemNumericFilter = (panelItem: PanelItem, filter: NumericFilter) => {
+        const pi = Object.assign({}, this.state.panel!.subPanels[0].panelItems[0]);
+        const sp = Object.assign({}, this.state.panel!.subPanels[0]);
+        pi.numericFilter = filter;
+        const panel = Object.assign({}, this.state.panel, { subPanels: [{
+            ...sp, panelItems: [ pi ]
+        }]});
+        this.setState({ panel });
     }
 }
 
