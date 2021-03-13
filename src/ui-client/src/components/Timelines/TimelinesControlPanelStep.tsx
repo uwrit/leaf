@@ -19,7 +19,7 @@ interface Props {
     enabled: boolean;
     number: number;
     subtext?: string | JSX.Element;
-    subComponent?: JSX.Element;
+    subComponent?: JSX.Element | JSX.Element[];
     text: string;
 }
 

@@ -14,10 +14,11 @@ export interface TimelinesDateConfiguration {
 }
 
 export interface TimelinesConfiguration {
-    panels: Map<ConceptId, Panel>;
     dateIncrement: TimelinesDateConfiguration;
+    firstEventOnly: boolean;
     indexPanel?: number;
     mode: TimelinesDisplayMode;
+    panels: Map<ConceptId, Panel>;
 }
 
 export enum TimelinesDisplayMode { PATIENT = 1, AGGREGATE = 2 }

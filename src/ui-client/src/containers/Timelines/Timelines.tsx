@@ -18,10 +18,11 @@ import AggregateTimelineChart from '../../components/Timelines/AggregateTimeline
 import PanelSelectorModal from '../../components/Modals/PanelSelectorModal/PanelSelectorModal';
 import TimelinesConceptDragOverlay from '../../components/Timelines/TimelinesConceptDragOverlay';
 import TimelinesDateRangeSelector from '../../components/Timelines/TimelinesDateRangeSelector'
-import { getPanelIndexDataset, setTimelinesIndexPanelId } from '../../actions/cohort/timelines';
+import { getLatestTimelinesDataFromConfig, getPanelIndexDataset, setTimelinesConfiguration, setTimelinesIndexPanelId } from '../../actions/cohort/timelines';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
 import { FiCheck } from 'react-icons/fi';
 import TimelinesChartTitle from '../../components/Timelines/TimelinesChartTitle';
+import CheckboxSlider from '../../components/Other/CheckboxSlider/CheckboxSlider';
 import './Timelines.css';
 
 interface OwnProps { }
@@ -57,6 +58,7 @@ class Timelines extends React.Component<Props, State> {
         const { dispatch, auth, patientCount, timelines } = this.props;
         const { configuringConcept, showPanelSelector, showConcepts } = this.state;
         const hasConcepts =  timelines.configuration.panels.size > 0;
+        const config = timelines.configuration;
 
         return  (
             <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
@@ -126,6 +128,25 @@ class Timelines extends React.Component<Props, State> {
                                         </span>)}
                                     subComponent={<TimelinesDateRangeSelector dispatch={dispatch} config={timelines.configuration} />}
                                 />
+
+                                {/* Additional Options */}
+                                <TimelinesControlPanelStep number={4}
+                                    enabled={hasConcepts}
+                                    text={'Additional Options'}
+                                    subComponent={
+                                        <Row className={`${c}-additional-options`}>
+                                            <Col md={8}>
+                                                <div className={`${c}-additional-options-text`}> Count only first occurrence</div>
+                                            </Col>
+                                            <Col md={4}>
+                                                <CheckboxSlider
+                                                    checked={config.firstEventOnly} 
+                                                    onClick={this.handleFirstEventOnlyClick} 
+                                                />
+                                            </Col>
+                                        </Row>
+                                    }
+                                />
                             </div>
                         </Col>
 
@@ -160,6 +181,13 @@ class Timelines extends React.Component<Props, State> {
                 </Container>
             </div>
         );
+    }
+
+    private handleFirstEventOnlyClick = () => {
+        const { dispatch, timelines } = this.props;
+        const newConfig = Object.assign({}, timelines.configuration, { firstEventOnly: !timelines.configuration.firstEventOnly });
+        dispatch(setTimelinesConfiguration(newConfig))
+        dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
     private setConfiguringConcept = (configuringConcept: boolean) => {

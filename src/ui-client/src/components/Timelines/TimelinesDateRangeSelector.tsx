@@ -21,7 +21,7 @@ interface State {
     modeDropdownOpen: boolean;
 }
 
-const dateModes = [ DateDisplayMode.BEFORE, DateDisplayMode.AFTER ];
+const dateModes = [ DateDisplayMode.BEFORE_AND_AFTER, DateDisplayMode.BEFORE, DateDisplayMode.AFTER ];
 const dateTypes = [ DateIncrementType.MINUTE, DateIncrementType.HOUR, DateIncrementType.DAY,
                     DateIncrementType.WEEK, DateIncrementType.MONTH, DateIncrementType.YEAR ];
 
@@ -75,10 +75,11 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
                     {/* Increment */}
                     <Input
                         className={`${c}-number leaf-input`} 
-                        type="number"
+                        pattern={'0-9+'}
                         onChange={this.handleInputChange}
                         placeholder="1, 2, 3..." 
-                        value={increment} />
+                        value={isNaN(increment) ? '' : increment} 
+                    />
 
                     {/* Increment Type */}
                     <InputGroupButtonDropdown 
@@ -116,7 +117,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         switch (mode) {
             case DateDisplayMode.BEFORE: return 'Before Index Event';
             case DateDisplayMode.AFTER: return 'After Index Event';
-            case DateDisplayMode.BEFORE_AND_AFTER: return 'Before and After Index Event';
+            case DateDisplayMode.BEFORE_AND_AFTER: return 'Before+After Index Event';
         }
     }
 

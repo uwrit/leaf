@@ -223,14 +223,15 @@ class CustomizedDot extends React.PureComponent<DotProps> {
 
     private getSize = (conceptsCount: number, percent: number): number => {
         const conceptsNoPenaltyLimit = 6;
-        const sizeLimitPenalty = 3;
+        const sizeLimitPenalty = 0.8;
         const sizePadding = 3;
         const maxSize = 35;
+        const minSize = 3;
         const size = Math.floor(percent * maxSize) + sizePadding;
 
         if (conceptsCount > conceptsNoPenaltyLimit) {
-            const penalty = sizeLimitPenalty * conceptsCount;
-            return size - penalty;
+            const penalty = sizeLimitPenalty / (conceptsCount - conceptsNoPenaltyLimit);
+            return Math.max(minSize, size - penalty);
         }
 
         return size;

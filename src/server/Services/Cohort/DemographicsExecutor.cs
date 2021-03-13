@@ -18,8 +18,6 @@ using Model.Compiler;
 using Model.Options;
 using Services.Extensions;
 
-// TODO(cspital) split anonymization from executor return step, model should anonymize, not a service impl
-
 namespace Services.Cohort
 {
     public class DemographicsExecutor : DemographicProvider.IDemographicsExecutor

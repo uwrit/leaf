@@ -204,6 +204,9 @@ export default class TimelinesWebWorker {
             if (!conceptData) { return output; }
 
             const pats = [ ...conceptData.patients.values() ];
+            const afterMatchHandler = config.firstEventOnly
+                ? (i: number) => { pats.splice(i, 1) }
+                : (i: number) => null;
 
             // For each bin
             for (let bi = 0; bi < bins.length; bi++) {
@@ -241,6 +244,7 @@ export default class TimelinesWebWorker {
                     }
                     if (d) {
                         binCount += 1;
+                        afterMatchHandler(i);
                     }
                 }
                 const values = { percent: (binCount / totalPats), total: binCount };
@@ -290,7 +294,6 @@ export default class TimelinesWebWorker {
          * Get Timebins
          */
         const getTimeBins = (config: TimelinesConfiguration): TimelinesAggregateTimeBin[] => {
-            const maxBins = 5;
             const bins: TimelinesAggregateTimeBin[] = [];
             const incr = config.dateIncrement.increment;
             let startBin;
@@ -298,6 +301,7 @@ export default class TimelinesWebWorker {
             let lowerBound = 0;
             let upperBound = 0;
             let currIdx = incr;
+            let maxBins = 10;
 
             // Bail if increment invalid
             if (config.dateIncrement.increment <= 0 || isNaN(config.dateIncrement.increment)) {
@@ -308,6 +312,7 @@ export default class TimelinesWebWorker {
             if (config.dateIncrement.mode === dateDisplayModeBeforeAfter) {
 
                 // Before
+                maxBins = 5;
                 upperBound = 0;
                 lowerBound = -(incr * maxBins);
                 currIdx = -incr;
@@ -338,7 +343,7 @@ export default class TimelinesWebWorker {
             }
 
             // After
-            if (config.dateIncrement.mode === dateDisplayModeAfter) {
+            else if (config.dateIncrement.mode === dateDisplayModeAfter) {
                 lowerBound = 0;
                 upperBound = incr * maxBins;
                 startBin = { label: `<${incr}`, minNum: 0.0001, maxNum: incr };

@@ -24,6 +24,10 @@ export default class TimelinesChartTitle extends React.Component<Props> {
         const { timelines } = this.props;
         const { mode } = timelines.configuration;
 
+        if (isNaN(timelines.configuration.dateIncrement.increment)) {
+            return null;
+        }
+
         return  (
             <div className={c}>
                 <div className={`${c}-inner`}>
@@ -70,11 +74,17 @@ export default class TimelinesChartTitle extends React.Component<Props> {
                 <div>increments</div>
 
                 {/* Before/After index event */}
-                <div className={emphClass}>{dateIncrement.mode === DateDisplayMode.BEFORE ? 'Before' : 'After'}</div>
+                <div className={emphClass}>{this.getDisplayModeText(dateIncrement.mode)}</div>
                 <div>index event</div>
 
             </div>
         );
+    }
+
+    private getDisplayModeText = (mode: DateDisplayMode): string => {
+        if (mode === DateDisplayMode.BEFORE_AND_AFTER) return "Before and After"; 
+        else if (mode === DateDisplayMode.BEFORE)      return "Before"; 
+        return "After";
     }
 
     private getIncrementTypeText = (type: DateIncrementType): string => {

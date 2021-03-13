@@ -5,4 +5,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- 
+ .timelines-date-range-selector-number.input[type=number]::-webkit-inner-spin-button,
+ .timelines-date-range-selector-number.input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+.timelines-date-range-selector-mode {
+    width: 188px;
+}
+
+.timelines-date-range-selector-number {
+    width: 33px;
+}
+
+.timelines-date-range-selector-type {
+    width: 73px;
+}

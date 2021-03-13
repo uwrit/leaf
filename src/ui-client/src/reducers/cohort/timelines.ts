@@ -24,8 +24,9 @@ export const defaultTimelinesState = (): TimelinesState => {
             dateIncrement: {
                 increment: 30,
                 incrementType: DateIncrementType.DAY,
-                mode: DateDisplayMode.AFTER
+                mode: DateDisplayMode.BEFORE_AND_AFTER
             },
+            firstEventOnly: true,
             mode: TimelinesDisplayMode.AGGREGATE,
             panels: new Map()
         },

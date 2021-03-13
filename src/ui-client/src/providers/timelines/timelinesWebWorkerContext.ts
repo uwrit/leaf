@@ -75,10 +75,18 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
         return output;
     }
     var pats = [ ...conceptData.patients.values() ];
-    // For each bin
-    bins.forEach(function (bin) {
+    var afterMatchHandler = config.firstEventOnly
+        ? function (i) { pats.splice(i, 1); }
+        : function (i) { return null; };
+    var _loop_1 = function (bi) {
+        // If placeholder for index date
+        var bin = bins[bi];
+        if (bin === null) {
+            output.push(null);
+            return "continue";
+        }
         var binCount = 0;
-        var _loop_1 = function (i) {
+        var _loop_2 = function (i) {
             var p = pats[i];
             var idxp = indexDataset.patients.get(p.compoundId);
             if (!idxp || !idxp.initialDate) {
@@ -106,11 +114,12 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
             }
             if (d) {
                 binCount += 1;
+                afterMatchHandler(i);
             }
         };
         // For each patient
         for (var i = 0; i < pats.length; i++) {
-            _loop_1(i);
+            _loop_2(i);
         }
         var values = { percent: (binCount / totalPats), total: binCount };
         var dataRow = {
@@ -121,19 +130,21 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
             values: values
         };
         output.push(dataRow);
-    });
+    };
+    // For each bin
+    for (var bi = 0; bi < bins.length; bi++) {
+        _loop_1(bi);
+    }
+    ;
     // Add index date bin
     var indexDate = {
         conceptId: concept.id, timepointId: 'Index Event',
         displayValueX: 0, displayValueY: 1,
         values: { percent: 0, total: 0 }
     };
-    if (config.dateIncrement.mode === dateDisplayModeBefore) {
-        output.push(indexDate);
-    }
-    else if (config.dateIncrement.mode === dateDisplayModeAfter) {
-        output.unshift(indexDate);
-    }
+    // Swap null placeholder out with IndexDate
+    var placeholder = output.findIndex(function (dr) { return dr === null; });
+    output[placeholder] = indexDate;
     return output;
 };
 /**
@@ -168,7 +179,7 @@ var getDateDiffFunc = function (config) {
  * Get Timebins
  */
 var getTimeBins = function (config) {
-    var maxBins = 5;
+    var maxBins = 10;
     var bins = [];
     var incr = config.dateIncrement.increment;
     var startBin;
@@ -180,8 +191,36 @@ var getTimeBins = function (config) {
     if (config.dateIncrement.increment <= 0 || isNaN(config.dateIncrement.increment)) {
         return bins;
     }
+    // Before & After
+    if (config.dateIncrement.mode === dateDisplayModeBeforeAfter) {
+        // Before
+        maxBins = 5;
+        upperBound = 0;
+        lowerBound = -(incr * maxBins);
+        currIdx = -incr;
+        startBin = { label: ">" + Math.abs(lowerBound), maxNum: lowerBound };
+        while (currIdx >= lowerBound) {
+            bins.unshift({ label: Math.abs(currIdx + incr) + "-" + Math.abs(currIdx), minNum: currIdx, maxNum: currIdx + incr });
+            currIdx -= incr;
+        }
+        bins.unshift(startBin);
+        // Add Index data with null placeholder
+        bins.push(null);
+        // After
+        currIdx = incr;
+        lowerBound = 0;
+        upperBound = incr * maxBins;
+        startBin = { label: "<" + incr, minNum: 0.0001, maxNum: incr };
+        lastBin = { label: ">" + upperBound, minNum: upperBound };
+        bins.push(startBin);
+        while (currIdx < upperBound) {
+            bins.push({ label: currIdx + "-" + Math.abs(currIdx + incr), minNum: currIdx, maxNum: currIdx + incr });
+            currIdx += incr;
+        }
+        bins.push(lastBin);
+    }
     // After
-    if (config.dateIncrement.mode === dateDisplayModeAfter) {
+    else if (config.dateIncrement.mode === dateDisplayModeAfter) {
         lowerBound = 0;
         upperBound = incr * maxBins;
         startBin = { label: "<" + incr, minNum: 0.0001, maxNum: incr };
@@ -191,6 +230,7 @@ var getTimeBins = function (config) {
             currIdx += incr;
         }
         bins.unshift(startBin);
+        bins.unshift(null);
         bins.push(lastBin);
     }
     // Before
@@ -204,6 +244,7 @@ var getTimeBins = function (config) {
             currIdx -= incr;
         }
         bins.unshift(startBin);
+        bins.push(null);
     }
     return bins;
 };

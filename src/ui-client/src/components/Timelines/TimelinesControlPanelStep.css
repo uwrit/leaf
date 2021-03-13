@@ -67,3 +67,12 @@
     padding: 8px;
     text-align: center;
 }
+
+.timelines-additional-options-text {
+    color: rgb(28, 168, 221);
+    font-size: 1.1rem;
+}
+
+.timelines-additional-options.row .checkbox-slider-container label {
+    float: right;
+}
