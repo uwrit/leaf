@@ -11,13 +11,16 @@ import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { AppState } from '../../models/state/AppState';
+import { UserContext } from '../../models/Auth';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
+import { AdminHelp } from '../Admin/AdminHelp';
 import './Help.css';
 
 interface OwnProps { }
 
 interface StateProps {
     helpPages: HelpPageState;
+    user: UserContext;
 }
 
 interface DispatchProps {
@@ -33,9 +36,19 @@ export class Help extends React.PureComponent<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, helpPages } = this.props;
+        const { dispatch, helpPages, user } = this.props;
 
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
+            if (user.isAdmin) {
+                return (
+                    <AdminHelp
+                        content={helpPages.content.content}
+                        currentPage={helpPages.currentSelectedPage}
+                        dispatch={dispatch}
+                    />
+                );
+            };
+
             return (
                 <div className={`${c}-content`}>
                     <Content
@@ -66,7 +79,8 @@ export class Help extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
-        helpPages: state.help
+        helpPages: state.help,
+        user: state.auth.userContext!
     };
 };
 

@@ -29,15 +29,20 @@ export class Content extends React.Component<Props> {
             <div className={c}>
                 <IoIosArrowRoundBack
                     className={`${c}-back-arrow`}
-                    onClick={this.handleContentGoBackClick}
-                />
-                
+                    onClick={this.handleContentGoBackClick}>
+
+                    {/* TODO: on hover, show text below */}
+                    {/* <span className={`${c}-back-arrow-text`}>
+                        Go back
+                    </span> */}
+                </IoIosArrowRoundBack>
+
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
                         <b>{currentPage.title}</b>
                     </div>
 
-                    {content.map(content => this.getContent(content) )}
+                    {content.map(content => this.getContent(content))}
                 </div>
             </div>
         );
