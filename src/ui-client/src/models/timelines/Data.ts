@@ -24,6 +24,7 @@ export interface TimelinesAggregateDataRow {
     timepointId: TimePointId;
     displayValueX: number;
     displayValueY: number;
+    displayValues: number[];
     values: TimelinesAggregateDataRowValue;
 }
 

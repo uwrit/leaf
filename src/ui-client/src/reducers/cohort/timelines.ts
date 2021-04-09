@@ -22,8 +22,8 @@ export const defaultTimelinesState = (): TimelinesState => {
         aggregateData: { concepts: new Map() },
         configuration: {
             dateIncrement: {
-                increment: 30,
-                incrementType: DateIncrementType.DAY,
+                increment: 6,
+                incrementType: DateIncrementType.MONTH,
                 mode: DateDisplayMode.BEFORE_AND_AFTER
             },
             firstEventOnly: true,

@@ -88,7 +88,7 @@ class Timelines extends React.Component<Props, State> {
                     <Row>
 
                         {/* Control panel */}
-                        <Col md={3}>
+                        <div className={`${c}-control-panel-container`}>
                             <div className={`${c}-control-panel`}>
 
                                 {/* Index event */}
@@ -148,34 +148,32 @@ class Timelines extends React.Component<Props, State> {
                                     }
                                 />
                             </div>
-                        </Col>
+                        </div>
 
                         {/* Chart */}
-                        <Col md={9}>
-                            <div className={`${c}-chart`}>
+                        <div className={`${c}-chart`}>
 
-                                {/* Overlay */}
-                                {showConcepts && 
-                                <TimelinesConceptDragOverlay 
-                                    configuringConcept={configuringConcept} handleConfiguringConceptChange={this.setConfiguringConcept} dispatch={dispatch} 
-                                    timelines={timelines} toggleOverlay={this.toggleShowConcepts}
-                                />}
+                            {/* Overlay */}
+                            {showConcepts && 
+                            <TimelinesConceptDragOverlay 
+                                configuringConcept={configuringConcept} handleConfiguringConceptChange={this.setConfiguringConcept} dispatch={dispatch} 
+                                timelines={timelines} toggleOverlay={this.toggleShowConcepts}
+                            />}
 
-                                {/* Charts */}
-                                {hasConcepts &&
-                                <div>
+                            {/* Charts */}
+                            {hasConcepts &&
+                            <div>
 
-                                    {/* Header */}
-                                    <TimelinesChartTitle auth={auth} patientCount={patientCount} timelines={timelines} />
-                                    
-                                    {/* Aggregate chart */}
-                                    {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
-                                    <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
+                                {/* Header */}
+                                <TimelinesChartTitle auth={auth} patientCount={patientCount} timelines={timelines} />
+                                
+                                {/* Aggregate chart */}
+                                {timelines.configuration.mode === TimelinesDisplayMode.AGGREGATE && 
+                                <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
 
-                                </div>}
+                            </div>}
 
-                            </div>
-                        </Col>
+                        </div>
 
                     </Row>
                 </Container>

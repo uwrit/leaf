@@ -253,6 +253,7 @@ export default class TimelinesWebWorker {
                     timepointId: bin.label,
                     displayValueX: values.total,
                     displayValueY: 1,
+                    displayValues: [ -values.total, values.total ],
                     values
                 };
                 output.push(dataRow);
@@ -261,7 +262,7 @@ export default class TimelinesWebWorker {
             // Add index date bin
             const indexDate = {
                 conceptId: concept.id, timepointId: 'Index Event',
-                displayValueX: 0, displayValueY: 1,
+                displayValueX: 0, displayValueY: 1, displayValues: [0,0],
                 values: { percent: 0, total: 0 }
             };
             

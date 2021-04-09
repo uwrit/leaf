@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
+import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid, Area, AreaChart } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
 import { Panel } from '../../models/panel/Panel';
 import { AuthorizationState } from '../../models/state/AppState';
@@ -83,7 +83,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                     const concept = d.panel.subPanels[0].panelItems[0].concept;
 
                     return (
-                        <ScatterChart key={concept.id} width={chartWidth} height={swimlaneHeight} margin={margins}>
+                        <ScatterChart key={concept.id} width={chartWidth} height={swimlaneHeight} margin={margins} data={d.data} >
 
                             {/* Grid */}
                             <CartesianGrid fill={'rgb(245,245,245)'} />
@@ -96,6 +96,8 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
                                 tick={<CustomizedAxisTick panel={d.panel} clickHandler={this.handleLabelClick}/>}
                             />
+
+                            {/* <Area type="linear" dataKey="displayValues"/> */}
 
                             {/* Z-axis (bubble size) */}
                             <ZAxis type="number" dataKey="displayValueX" range={[0,1000]} />
@@ -231,7 +233,7 @@ class CustomizedDot extends React.PureComponent<DotProps> {
 
         if (conceptsCount > conceptsNoPenaltyLimit) {
             const penalty = sizeLimitPenalty / (conceptsCount - conceptsNoPenaltyLimit);
-            return Math.max(minSize, size - penalty);
+            return Math.max(minSize, size * penalty);
         }
 
         return size;

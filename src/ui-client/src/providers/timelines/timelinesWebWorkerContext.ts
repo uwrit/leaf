@@ -127,6 +127,7 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
             timepointId: bin.label,
             displayValueX: values.total,
             displayValueY: 1,
+            displayValues: [ -values.total, values.total ],
             values: values
         };
         output.push(dataRow);
@@ -139,7 +140,7 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
     // Add index date bin
     var indexDate = {
         conceptId: concept.id, timepointId: 'Index Event',
-        displayValueX: 0, displayValueY: 1,
+        displayValueX: 0, displayValueY: 1, displayValues: [0,0],
         values: { percent: 0, total: 0 }
     };
     // Swap null placeholder out with IndexDate

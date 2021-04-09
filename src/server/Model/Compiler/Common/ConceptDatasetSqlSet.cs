@@ -43,7 +43,7 @@ namespace Model.Compiler.Common
 
             if (PanelItem != null && PanelItem.Concept.IsNumeric)
             {
-                var numericField = new ExpressedColumn(new Column(Number), ConceptColumns.NumberField);
+                var numericField = new ExpressedColumn(Number, ConceptColumns.NumberField);
                 cols.Add(numericField);
             }
 
