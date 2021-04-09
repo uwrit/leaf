@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
-import { Content } from '../../Help/Content/Content';
 import { TextArea } from '../Section/TextArea';
+import TextareaAutosize from 'react-textarea-autosize';
 import './ContentEditor.css';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
 }
 
 interface State {
-    txt: string;
+    selected: boolean;
 }
 
 export class ContentEditor extends React.Component<Props, State> {
@@ -26,7 +26,9 @@ export class ContentEditor extends React.Component<Props, State> {
 
     constructor(props: Props){
         super(props)
-        this.state = {txt: ''}
+        this.state = {
+            selected: false
+        }
     }
 
     public render() {
@@ -35,23 +37,25 @@ export class ContentEditor extends React.Component<Props, State> {
 
         return (
             <div className={c}>
-                {content.map(c =>
-                    <TextArea
-                        changeHandler={this.handleChange}
-                        propName={c.id.toString()}
-                        // value={c.textContent}
-                        value={this.state.txt}
-                    >
-
-                    </TextArea>
+                {content.map(c => c.textContent &&
+                    <div className={`${this.className}-text`}>
+                        <TextareaAutosize
+                            readOnly={false}
+                            spellCheck={true}
+                            value={c.textContent}
+                            onClick={this.handleContentEditClick}
+                        >
+                        </TextareaAutosize>
+                    </div>
                 )}
             </div>
         );
     };
 
-    private handleChange = (val: any, propName: string) => {
-        this.setState({txt: val})
-    }
+    private handleContentEditClick = () => {
+        const selected = this.state.selected;
+        this.setState({
+            selected: !selected
+        })
+    };
 }
-
-// changeHandler: (val: any, propName: string) => any;

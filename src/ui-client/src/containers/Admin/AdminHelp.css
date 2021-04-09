@@ -5,14 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .admin-help {
-    float: right;
-    padding: 20px 20px 0px 0px;
+.admin-help {
+    background-color: rgb(240,240,240);
+    height: calc(100vh - 55px);
+    padding-top: 20px; /* why do i need this padding? otherwise the size changes (ask nic)  */
+    overflow-y: auto;
 }
 
 .admin-help-edit-button {
     color: rgb(0, 130, 177);
     cursor: pointer;
+    float: right;
     height: 25px;
     width: 25px;
     margin-right: 50px;

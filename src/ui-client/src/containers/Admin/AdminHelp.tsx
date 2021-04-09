@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { FaRegEdit } from "react-icons/fa";
+import { FaCheckSquare, FaRegEdit } from "react-icons/fa";
 import { HelpPage, HelpPageContent } from '../../models/Help/Help';
 import { Content } from '../../components/Help/Content/Content';
 import { ContentEditor } from '../../components/Admin/HelpEditor/ContentEditor';
@@ -18,44 +18,37 @@ interface Props {
     dispatch: any;
 }
 
-interface State {
-    editMode: boolean;
-}
+// interface State {
+//     selected: boolean;
+// }
 
-export class AdminHelp extends React.Component<Props, State> {
+export class AdminHelp extends React.Component<Props> {
     private className = "admin-help"
 
-    constructor(props: Props) {
-        super(props);
-        this.state = {
-            editMode: false
-        }
-    }
+    // constructor(props: Props) {
+    //     super(props);
+    //     this.state = {
+    //         selected: false
+    //     }
+    // }
 
     public render() {
         const c = this.className;
         const { content, currentPage, dispatch } = this.props;
-        const { editMode } = this.state;
 
         return (
             <div className={c}>
-                <FaRegEdit
+                {/* <FaRegEdit
                 className={`${c}-edit-button`}
                 onClick={this.handleContentEditClick}
-                />
+                /> */}
 
-                {editMode
-                    ? <ContentEditor content={content} currentPage={currentPage} dispatch={dispatch} />
-                    : <Content content={content} currentPage={currentPage} dispatch={dispatch} />
-                }
+                <ContentEditor
+                    content={content}
+                    currentPage={currentPage}
+                    dispatch={dispatch}
+                />
             </div>
         );
-    };
-
-    private handleContentEditClick = () => {
-        const editMode = this.state.editMode;
-        this.setState({
-            editMode: !editMode
-        })
     };
 }
