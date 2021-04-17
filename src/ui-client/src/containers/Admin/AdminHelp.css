@@ -7,9 +7,17 @@
 
 .admin-help {
     background-color: rgb(240,240,240);
+    font-family: "Source Serif Pro";
     height: calc(100vh - 55px);
-    padding-top: 20px; /* why do i need this padding? otherwise the size changes (ask nic)  */
+    padding-top: 20px;
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.admin-help-content-title {
+    color: rgb(78, 78, 78);
+    font-size: 23px;
+    margin-left: 20%;
 }
 
 .admin-help-edit-button {

@@ -6,21 +6,69 @@
  */
 
 .content-editor {
-    margin: 35px;
-}
-
-.content-editor-text {
-    font-family: "Source Serif Pro";
     font-size: 17px;
+    width: 100%;
     margin-left: 20%;
-    width: 50%;
 }
 
-.content-editor-text > textarea {
-    background-color: rgb(240,240,240);
-    border: none;
-    color: rgb(50,50,50);
-    /* pointer-events: none; */
-    /* resize: none; */
-    width: 100%;
+.content-editor-markdown {
+    font-size: 17px;
+    width: 50%;
+    /* margin-left: 20%; */
+}
+
+.content-editor-markdown-slide-left {
+    position: relative;
+    animation-name: markdownTextMoveLeft;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes markdownTextMoveLeft {
+    0% { }
+    /* perhaps break it down as 0, 25, 50, 75, 100 */
+    100% { margin-left: -25%; width: 75%}
+}
+
+.content-editor-text-edit {
+    position: relative;
+    animation-name: textEditMoveLeft;
+    animation-duration: 3s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+
+@keyframes textEditMoveLeft {
+    0% { margin-left: 60%;}
+    100% { margin-left: -45%; }
+}
+
+.content-editor-text-edit > textarea {
+    width: 60%;
+}
+
+
+
+
+
+/*  */
+
+.content-editor-left {
+    /* margin: 35px; */
+
+    font-size: 17px;
+    /* width: 50%; */
+    /* margin-left: 10%;
+    margin-right: 10%; */
+    transition: 2s;
+    
+}
+
+.content-editor-edit-row {
+    /* margin: 35px; */
+
+    font-size: 17px;
+    width: 70%;
+    
 }

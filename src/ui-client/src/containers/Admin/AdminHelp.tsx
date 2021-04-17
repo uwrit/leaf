@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { FaCheckSquare, FaRegEdit } from "react-icons/fa";
 import { HelpPage, HelpPageContent } from '../../models/Help/Help';
 import { Content } from '../../components/Help/Content/Content';
@@ -43,11 +44,22 @@ export class AdminHelp extends React.Component<Props> {
                 onClick={this.handleContentEditClick}
                 /> */}
 
-                <ContentEditor
+                <ReactMarkdown className={`${c}-content-title`} children={currentPage.title} />
+
+                {content.map((c,i) => c.textContent &&
+                    <div key={i}>
+                        <ContentEditor
+                            content={c}
+                            currentPage={currentPage}
+                            dispatch={dispatch}
+                        />
+                    </div>
+                )}
+                {/* <ContentEditor
                     content={content}
                     currentPage={currentPage}
                     dispatch={dispatch}
-                />
+                /> */}
             </div>
         );
     };
