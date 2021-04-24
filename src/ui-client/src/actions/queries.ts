@@ -152,8 +152,8 @@ export const requestQuerySave = () => {
                 return new Promise( async(resolve, reject) => {
                     const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                     saveQueryFedNode(getState(), nr, panels, panelFilters, queryId, saved.universalId!).then(
-                        response => resolve(),
-                        error => resolve()
+                        response => resolve(null),
+                        error => resolve(null)
                     );
                 });
             }));
@@ -244,7 +244,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                         Promise.all(responders.map((nr: NetworkIdentity) => { 
                             return new Promise( async(resolve, reject) => {
                                 deleteSavedQuery(state, nr, query, force)
-                                    .then(response => resolve(), error => resolve());
+                                    .then(response => resolve(null), error => resolve(null));
                                 });
                             })
                         ).then(() => dispatch(setNoClickModalState({ message: "Query Deleted", state: NotificationStates.Complete })));
@@ -306,7 +306,7 @@ export const deleteSavedQueryAndCohort = (query: SavedQueryRef, force: boolean =
                                     : `Another saved query, "${ex.name}" depends on this query. Do you want to proceed? ` +
                                       `This will delete both "${query.name}" and "${ex.name}".`,
                                 header: 'Delete Dependent Queries',
-                                onClickNo: () => null,
+                                onClickNo: () => null as any,
                                 onClickYes: () => { dispatch(deleteSavedQueryAndCohort(query, true, dependents)); },
                                 show: true,
                                 noButtonText: `No`,

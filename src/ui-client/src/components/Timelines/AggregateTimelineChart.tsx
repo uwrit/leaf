@@ -227,7 +227,7 @@ class CustomizedDot extends React.PureComponent<DotProps> {
         const conceptsNoPenaltyLimit = 6;
         const sizeLimitPenalty = 0.8;
         const sizePadding = 3;
-        const maxSize = 35;
+        const maxSize = 45;
         const minSize = 3;
         const size = Math.floor(percent * maxSize) + sizePadding;
 

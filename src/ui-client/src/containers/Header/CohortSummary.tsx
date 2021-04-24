@@ -54,7 +54,7 @@ export class CohortSummary extends React.Component<Props> {
         this.prevCount = count;
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         return this.props.count.value;
     }
 

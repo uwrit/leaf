@@ -168,7 +168,7 @@ export const getResponderIdentities = async (getState: () => AppState, attestati
                     .then(
                         response => responders.push({ ...response.data, address: nr.address, enabled: true, id: (id + 1), isHomeNode: false }),
                         error => errorResponder(nr.id, error))
-                    .then(() => resolve())
+                    .then(() => resolve(null))
             });
         })); 
     }
@@ -300,7 +300,7 @@ const handleSessionReload = (dispatch: Dispatch<any>, state: AppState) => {
             const confirm: ConfirmationModalState = {
                 body: `Do you want to resume your previous session (saved ${diffDisplay})?`,
                 header: 'Continue previous session',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes,
                 show: true,
                 noButtonText: `No, I'll start fresh`,

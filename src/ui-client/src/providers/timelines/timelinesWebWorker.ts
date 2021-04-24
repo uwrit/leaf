@@ -206,7 +206,7 @@ export default class TimelinesWebWorker {
             const pats = [ ...conceptData.patients.values() ];
             const afterMatchHandler = config.firstEventOnly
                 ? (i: number) => { pats.splice(i, 1) }
-                : (i: number) => null;
+                : (i: number) => null as any;
 
             // For each bin
             for (let bi = 0; bi < bins.length; bi++) {

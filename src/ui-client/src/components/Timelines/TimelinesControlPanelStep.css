@@ -77,3 +77,7 @@
 .timelines-additional-options.row .checkbox-slider-container label {
     float: right;
 }
+
+.timelines-control-panel-step .checkbox-slider-container label {
+    border: 1px solid rgb(220,220,220);
+}

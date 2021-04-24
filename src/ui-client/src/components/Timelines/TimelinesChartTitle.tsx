@@ -24,9 +24,11 @@ export default class TimelinesChartTitle extends React.Component<Props> {
         const { timelines } = this.props;
         const { mode } = timelines.configuration;
 
+        /*
         if (isNaN(timelines.configuration.dateIncrement.increment)) {
             return null;
         }
+        */
 
         return  (
             <div className={c}>

@@ -94,15 +94,15 @@ export default class Panel extends React.PureComponent<Props> {
         };
     }
 
-    private handlePanelInclusion = (panelIndex: number, include: boolean) => null;
-    private handleSubPanelInclusion = (panelIndex: number, subpanelIndex: number, include: boolean) => null;
-    private handlePanelDateFilter = (panelIndex: number, dateFilter: DateBoundary) => null;
-    private handleSubPanelCount = (panelIndex: number, subpanelIndex: number, minCount: number) => null;
-    private handleDeselectSpecialization = (panelItem: PanelItem, conceptSpecializationGroup: ConceptSpecializationGroup) => null;
-    private handleSelectSpecialization = (panelItem: PanelItem, conceptSpecialization: ConceptSpecialization) => null;
-    private handleAddPanelItem = (concept: Concept, subPanel: SubPanelModel) => null;
-    private handlePanelItemNumericFilter = (panelItem: PanelItem, filter: NumericFilter) => null;
-    private handleHidePanelItem = (panelItem: PanelItem) => null;
-    private handleRemovePanelItem = (panelItem: PanelItem) => null;
-    private handleSubPanelJoinSequence = (subPanel: SubPanelModel, joinSequence: SubPanelJoinSequence) => null;
+    private handlePanelInclusion = (panelIndex: number, include: boolean) => null as any;
+    private handleSubPanelInclusion = (panelIndex: number, subpanelIndex: number, include: boolean) => null as any;
+    private handlePanelDateFilter = (panelIndex: number, dateFilter: DateBoundary) => null as any;
+    private handleSubPanelCount = (panelIndex: number, subpanelIndex: number, minCount: number) => null as any;
+    private handleDeselectSpecialization = (panelItem: PanelItem, conceptSpecializationGroup: ConceptSpecializationGroup) => null as any;
+    private handleSelectSpecialization = (panelItem: PanelItem, conceptSpecialization: ConceptSpecialization) => null as any;
+    private handleAddPanelItem = (concept: Concept, subPanel: SubPanelModel) => null as any;
+    private handlePanelItemNumericFilter = (panelItem: PanelItem, filter: NumericFilter) => null as any;
+    private handleHidePanelItem = (panelItem: PanelItem) => null as any;
+    private handleRemovePanelItem = (panelItem: PanelItem) => null as any;
+    private handleSubPanelJoinSequence = (subPanel: SubPanelModel, joinSequence: SubPanelJoinSequence) => null as any;
 }

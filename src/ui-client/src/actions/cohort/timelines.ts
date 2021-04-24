@@ -11,12 +11,12 @@ import { NetworkIdentity } from '../../models/NetworkResponder';
 import { Panel, panelToDto } from '../../models/panel/Panel';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType } from '../../models/state/CohortState';
-import { InformationModalState } from '../../models/state/GeneralUiState';
+import { InformationModalState, NotificationStates } from '../../models/state/GeneralUiState';
 import { TimelinesConfiguration } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataset } from '../../models/timelines/Data';
 import { fetchConceptDataset, fetchPanelDataset } from '../../services/cohortApi';
 import { addConceptDataset, addIndexDataset, getChartData, removeConceptDataset } from '../../services/timelinesApi';
-import { showInfoModal } from '../generalUi';
+import { setNoClickModalState, showInfoModal } from '../generalUi';
 
 export const TIMELINES_SET_AGGREGATE_DATASET = 'TIMELINES_SET_AGGREGATE_DATASET';
 export const TIMELINES_SET_CONFIG = 'TIMELINES_SET_CONFIG';
@@ -135,6 +135,7 @@ export const getPanelIndexDataset = (panelIdx: number) => {
             } 
         });
         dispatch(setTimelinesIndexDatasetExtractStarted());
+        dispatch(setNoClickModalState({ message: "Extracting", state: NotificationStates.Working }));
 
         // Wrap entire query action in Promise.all
         Promise.all(
@@ -171,6 +172,7 @@ export const getPanelIndexDataset = (panelIdx: number) => {
         ).then( async () => {
             if (getState().cohort.timelines.indexConceptState !== CohortStateType.REQUESTING) { return; }
             dispatch(setTimelinesIndexDatasetExtractFinished());
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
 
             if (atLeastOneSucceeded && timelines.aggregateData.concepts.size > 0) {
                 const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;

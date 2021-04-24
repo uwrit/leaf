@@ -35,12 +35,12 @@ export default class Scrollers extends React.PureComponent<Props, State> {
         setTimeout(() => { this.setContainer(); this.setScroll() }, 500);
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         this.setContainer();    
         return null; 
     }
 
-    public componentDidUpdate() { return null; }
+    public componentDidUpdate(): any { return null; }
 
     public render() {
         const canScroll = this.canScroll();

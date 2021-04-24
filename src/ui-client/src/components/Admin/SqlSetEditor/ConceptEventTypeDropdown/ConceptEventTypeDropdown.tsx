@@ -181,7 +181,7 @@ export class ConceptEventTypeDropdown extends React.PureComponent<Props,State> {
             body: `Are you sure you want to delete the Concept Event, "${ev.uiDisplayEventName}" (id: ${ev.id})? ` +
                   `This will take effect immediately and can't be undone.`,
             header: 'Delete Concept',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => dispatch(deleteAdminConceptEvent(ev)),
             show: true,
             noButtonText: `No`,

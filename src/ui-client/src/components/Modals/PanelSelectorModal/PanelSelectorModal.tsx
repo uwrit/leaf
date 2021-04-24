@@ -121,7 +121,7 @@ class PanelSelectorModal extends React.PureComponent<Props, State> {
     }
 
     private getPanelType = (panel: PanelModel): PanelType => {
-        const noEncs = !panel.subPanels.find(sp => sp.panelItems.find(pi => pi.concept.isEncounterBased));
+        const noEncs = !panel.subPanels.find(sp => sp.panelItems.find(pi => pi.concept.isEncounterBased) as any);
         const excluded = !panel.includePanel;
         const empty = !panel.subPanels.find(sp => sp.panelItems.length > 0);
 

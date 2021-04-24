@@ -7,9 +7,9 @@
 
 import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd';
-import { MdAccessTime } from 'react-icons/md';
-import { Button, Col, Row } from 'reactstrap';
+import { Button, Col, Modal, ModalBody, ModalFooter, Row } from 'reactstrap';
 import { getConceptDataset } from '../../actions/cohort/timelines';
+import { TimelinesOverlayMode } from '../../containers/Timelines/Timelines';
 import { Concept, ConceptSpecialization, ConceptSpecializationGroup } from '../../models/concept/Concept';
 import { DateBoundary } from '../../models/panel/Date';
 import { NumericFilter } from '../../models/panel/NumericFilter';
@@ -33,30 +33,29 @@ interface DndProps {
 }
 
 interface OwnProps {
-    configuringConcept: boolean;
     dispatch: any;
-    handleConfiguringConceptChange: (configuringConcept: boolean) => any;
+    handleOverlayModeChange: (mode: TimelinesOverlayMode) => any;
+    handleShowConceptsChange: () => any;
+    mode: TimelinesOverlayMode;
     timelines: TimelinesState;
-    toggleOverlay: () => void;
 }
 
 type Props = DndProps & OwnProps
 
 interface State {
     hovered: HoverDropType;
-    mode: OverlayMode,
     panel?: PanelModel
-}
-
-enum OverlayMode {
-    Waiting = 1,
-    Selected = 2
 }
 
 enum HoverDropType {
     All = 1,
     Specific = 2
 }
+
+const closeX = 
+    <svg viewBox='0 0 24 24'>
+        <path d='M13.414 12l5.793-5.793c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0L12 10.586 6.207 4.793c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414L10.586 12l-5.793 5.793c-.39.39-.39 1.023 0 1.414.195.195.45.293.707.293s.512-.098.707-.293L12 13.414l5.793 5.793c.195.195.45.293.707.293s.512-.098.707-.293c.39-.39.39-1.023 0-1.414L13.414 12z'></path>
+    </svg>;
 
 /**
  * Dnd handlers
@@ -97,28 +96,26 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
         super(props);
         conceptDropFunc = this.handleConceptDrop;
         this.state = {
-            hovered: HoverDropType.All,
-            mode: OverlayMode.Waiting
+            hovered: HoverDropType.All
         }
     }
 
     public render() {
         const c = this.className;
-        const { hovered, mode, panel } = this.state;
-        const { connectDropTarget, canDrop, isOver, timelines } = this.props;
+        const { hovered, panel } = this.state;
+        const { connectDropTarget, canDrop, isOver, mode, timelines } = this.props;
         const panelHandlers = this.packageHandlers();
-        const loadingConcept = timelines.state === CohortStateType.REQUESTING;
 
         return (
             <div className={`${c} ${canDrop && isOver ? 'can-drop' : ''}`}>
 
                 {/* User picking Concepts */}
-                {mode === OverlayMode.Waiting && !loadingConcept &&
+                {mode === TimelinesOverlayMode.WaitingForDrop &&
                 connectDropTarget &&
                 connectDropTarget(
                 <div className={`${c}-inner waiting`}>
                     <Row>
-                        <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts here for</Col>
+                        <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts for</Col>
                         <Col sm={6} className={`${c}-all-data ${hovered == HoverDropType.All ? 'hovered' : ''}`} 
                             onDragOver={this.toggleUseAllData.bind(null, HoverDropType.All)}>
                             <div>
@@ -128,14 +125,33 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                         <Col sm={6} className={`${c}-specific-data ${hovered == HoverDropType.Specific ? 'hovered' : ''}`} 
                             onDragOver={this.toggleUseAllData.bind(null, HoverDropType.Specific)}>
                             <div>
-                                Only Specific Dates or Values
+                                Specific Dates or Values
                             </div>
                         </Col>
                     </Row>
                 </div>)}
 
                 {/* Concept dropped */}
-                {mode === OverlayMode.Selected && panel &&
+                {/* Modal 
+                <Modal isOpen={mode === TimelinesOverlayMode.ConfiguringConcept && !!panel} className={`${c}-panel-selection-modal`}>
+                    <ModalBody>
+                        <div className={`${c}-panel-selection-container`}>
+                            <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers}/>
+                            <div className={`${c}-panel-selection-explanation`}>
+                                <span>Specify any date, numeric, or other filters, then click</span>
+                                <span className={`${c}-panel-selection-emphasis`}>Add to Timeline</span>
+                                <span>below</span>
+                            </div>
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button className='leaf-button leaf-button-secondary' onClick={this.handlePanelCancelClick}>Cancel</Button>
+                        <Button className='leaf-button leaf-button-primary' onClick={this.handlePanelGetDataClick}>Add to Timeline</Button>
+                    </ModalFooter>
+                </Modal>
+                */}
+
+                {mode === TimelinesOverlayMode.ConfiguringConcept && panel &&
                 <div className={`${c}-inner selecting`}>
                     <div className={`${c}-panel-selection-container`}>
                         <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers}/>
@@ -152,7 +168,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 </div>}
 
                 {/* Concept requested */}
-                {loadingConcept && 
+                {mode === TimelinesOverlayMode.RequestingData &&
                 <div className={`${c}-inner update`}>
                     <div className={`${c}-loading`}>
                         <Row>
@@ -163,37 +179,46 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                         </Row>
                     </div>
                 </div>}
+
+                <div className={`${c}-close`} onClick={this.handleCloseClick}>
+                    {closeX}
+                </div>
             </div>
         );
     }
 
+    private handleCloseClick = () => {
+        const { handleShowConceptsChange } = this.props;
+        handleShowConceptsChange();
+    }
+
     private handlePanelCancelClick = () => {
-        const { handleConfiguringConceptChange } = this.props;
-        handleConfiguringConceptChange(false);
-        this.setState({ panel: undefined, mode: OverlayMode.Waiting});
+        const { handleOverlayModeChange } = this.props;
+        handleOverlayModeChange(TimelinesOverlayMode.WaitingForDrop);
+        this.setState({ panel: undefined });
     }
 
     private handlePanelGetDataClick = () => {
-        const { dispatch, handleConfiguringConceptChange } = this.props;
+        const { dispatch, handleOverlayModeChange, } = this.props;
         const { panel } = this.state;
         if (panel) {  
             dispatch(getConceptDataset(panel));
-            this.setState({ panel: undefined, mode: OverlayMode.Waiting });
-            handleConfiguringConceptChange(false);
+            handleOverlayModeChange(TimelinesOverlayMode.RequestingData);
         }
     }
 
     private handleConceptDrop = (concept: Concept) => {
-        const { dispatch, handleConfiguringConceptChange } = this.props;
+        const { dispatch, handleOverlayModeChange } = this.props;
         const { hovered } = this.state;
         const panel = this.createPanel(concept);
 
         if (hovered == HoverDropType.All) {
-            this.setState({ mode: OverlayMode.Waiting });
             dispatch(getConceptDataset(panel));
+            handleOverlayModeChange(TimelinesOverlayMode.RequestingData);
         } else {
-            handleConfiguringConceptChange(true);
-            this.setState({ panel, mode: OverlayMode.Selected });
+            this.setState({ panel }, () =>
+                handleOverlayModeChange(TimelinesOverlayMode.ConfiguringConcept)
+            );
         }
     }
 
@@ -214,17 +239,17 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
      */
     private packageHandlers = () => {
         return {
-            handlePanelInclusion: (panelIndex: number, include: boolean) => null,
-            handleSubPanelInclusion: (panelIndex: number, subpanelIndex: number, include: boolean) => null,
+            handlePanelInclusion: (panelIndex: number, include: boolean) => null as any,
+            handleSubPanelInclusion: (panelIndex: number, subpanelIndex: number, include: boolean) => null as any,
             handlePanelDateFilter: this.handlePanelDateFilter,
-            handleSubPanelCount: (panelIndex: number, subpanelIndex: number, minCount: number) => null,
+            handleSubPanelCount: (panelIndex: number, subpanelIndex: number, minCount: number) => null as any,
             handleDeselectSpecialization: this.handleDeselectSpecialization,
             handleSelectSpecialization: this.handleSelectSpecialization,
-            handleAddPanelItem: (concept: Concept, subPanel: SubPanel) => null,
+            handleAddPanelItem: (concept: Concept, subPanel: SubPanel) => null as any,
             handlePanelItemNumericFilter: this.handlePanelItemNumericFilter,
-            handleHidePanelItem: (panelItem: PanelItem) => null,
-            handleRemovePanelItem: (panelItem: PanelItem) => null,
-            handleSubPanelJoinSequence: (subPanel: SubPanel, joinSequence: SubPanelJoinSequence) => null
+            handleHidePanelItem: (panelItem: PanelItem) => null as any,
+            handleRemovePanelItem: (panelItem: PanelItem) => null as any,
+            handleSubPanelJoinSequence: (subPanel: SubPanel, joinSequence: SubPanelJoinSequence) => null as any
         };
     }
 

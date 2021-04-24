@@ -116,7 +116,7 @@ export default class CohortAggregatorWebWorker {
                     const currBucket = curr.ageByGenderData.buckets[k];
 
                     // For all gender identifications, sum
-                    Object.keys(prevBucket).forEach((gk: any) => {
+                    Object.keys(prevBucket).forEach((gk: string) => {
                         prevBucket[gk] += currBucket[gk];
                     })
                 });
@@ -150,8 +150,8 @@ export default class CohortAggregatorWebWorker {
 
                 // Religion
                 Object.keys(curr.religionData).forEach((k: string) => {
-                    const currBucket = curr.religionData[k];
-                    let prevBucket = prev.religionData[k];
+                    const currBucket = curr.religionData[k] as any;
+                    let prevBucket = prev.religionData[k] as any;
 
                     if (!prevBucket) {
                         prevBucket = Object.assign({}, currBucket);
@@ -167,9 +167,9 @@ export default class CohortAggregatorWebWorker {
                 });
 
                 // NIH Race, Ethnicity, Gender
-                Object.keys(curr.nihRaceEthnicityData).forEach((k: string) => {
-                    const currBucket: NihRaceEthnicityBucket = curr.nihRaceEthnicityData[k];
-                    let prevBucket: NihRaceEthnicityBucket = prev.nihRaceEthnicityData[k];
+                Object.keys(curr.nihRaceEthnicityData).forEach((k: any) => {
+                    const currBucket = curr.nihRaceEthnicityData[k] as any;
+                    let prevBucket = prev.nihRaceEthnicityData[k as any] as any;
 
                     if (!prevBucket) {
                         prevBucket = Object.assign({}, currBucket);

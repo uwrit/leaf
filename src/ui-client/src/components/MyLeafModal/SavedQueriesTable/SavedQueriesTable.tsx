@@ -90,7 +90,7 @@ export default class SavedQueriesTable extends React.PureComponent<Props> {
         const confirm: ConfirmationModalState = {
             body: `Are you sure you want to delete the query "${query.name}"?`,
             header: 'Delete Query',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => dispatch(deleteSavedQueryAndCohort(query)),
             show: true,
             noButtonText: 'No',

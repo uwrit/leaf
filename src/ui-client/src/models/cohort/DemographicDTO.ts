@@ -37,6 +37,7 @@ export interface AgeByGenderData {
 }
 
 export interface AgeByGenderBuckets {
+    [key: string]: AgeByGenderBucket;
     '<1': AgeByGenderBucket;
     '1-9': AgeByGenderBucket;
     '10-17': AgeByGenderBucket;
@@ -51,12 +52,14 @@ export interface AgeByGenderBuckets {
 }
 
 export interface AgeByGenderBucket {
+    [key: string]: number;
     females: number;
     males: number;
     others: number;
 }
 
 export interface NihRaceEthnicityBuckets {
+    [key: string]: EthnicBackgroundGenderMap;
     ethnicBackgrounds: EthnicBackgroundGenderMap;
 }
 

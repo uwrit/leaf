@@ -25,6 +25,12 @@ import TimelinesChartTitle from '../../components/Timelines/TimelinesChartTitle'
 import CheckboxSlider from '../../components/Other/CheckboxSlider/CheckboxSlider';
 import './Timelines.css';
 
+export enum TimelinesOverlayMode {
+    WaitingForDrop = 1,
+    ConfiguringConcept = 2,
+    RequestingData = 3
+}
+
 interface OwnProps { }
 interface StateProps {
     auth: AuthorizationState;
@@ -36,7 +42,7 @@ interface DispatchProps {
 }
 type Props = StateProps & OwnProps & DispatchProps;
 interface State {
-    configuringConcept: boolean;
+    overlayMode: TimelinesOverlayMode,
     showConcepts: boolean;
     showPanelSelector: boolean;
 }
@@ -47,16 +53,26 @@ class Timelines extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            configuringConcept: false,
+            overlayMode: TimelinesOverlayMode.WaitingForDrop,
             showConcepts: false,
             showPanelSelector: false
+        }
+    }
+
+    public componentDidUpdate(prevProps: Props): any {
+        const { overlayMode } = this.state;
+        const { timelines } = this.props;
+
+        if (overlayMode === TimelinesOverlayMode.RequestingData &&
+            timelines.state !== CohortStateType.REQUESTING) {
+            this.setState({ overlayMode: TimelinesOverlayMode.WaitingForDrop });
         }
     }
 
     public render() {
         const c = this.className;
         const { dispatch, auth, patientCount, timelines } = this.props;
-        const { configuringConcept, showPanelSelector, showConcepts } = this.state;
+        const { overlayMode, showPanelSelector, showConcepts } = this.state;
         const hasConcepts =  timelines.configuration.panels.size > 0;
         const config = timelines.configuration;
 
@@ -88,7 +104,7 @@ class Timelines extends React.Component<Props, State> {
                     <Row>
 
                         {/* Control panel */}
-                        <div className={`${c}-control-panel-container`}>
+                        <Col md={4} className={`${c}-control-panel-container`}>
                             <div className={`${c}-control-panel`}>
 
                                 {/* Index event */}
@@ -148,16 +164,17 @@ class Timelines extends React.Component<Props, State> {
                                     }
                                 />
                             </div>
-                        </div>
+                        </Col>
 
                         {/* Chart */}
-                        <div className={`${c}-chart`}>
+                        <Col md={8} className={`${c}-chart`}>
 
                             {/* Overlay */}
                             {showConcepts && 
                             <TimelinesConceptDragOverlay 
-                                configuringConcept={configuringConcept} handleConfiguringConceptChange={this.setConfiguringConcept} dispatch={dispatch} 
-                                timelines={timelines} toggleOverlay={this.toggleShowConcepts}
+                                handleOverlayModeChange={this.handleOverlayModeChange}
+                                handleShowConceptsChange={this.toggleShowConcepts}
+                                dispatch={dispatch} mode={overlayMode} timelines={timelines}
                             />}
 
                             {/* Charts */}
@@ -172,13 +189,16 @@ class Timelines extends React.Component<Props, State> {
                                 <AggregateTimelineChart auth={auth} dispatch={dispatch} patientCount={patientCount} timelines={timelines} />}
 
                             </div>}
-
-                        </div>
+                        </Col>
 
                     </Row>
                 </Container>
             </div>
         );
+    }
+
+    private handleOverlayModeChange = (mode: TimelinesOverlayMode) => {
+        this.setState({ overlayMode: mode });
     }
 
     private handleFirstEventOnlyClick = () => {
@@ -188,31 +208,17 @@ class Timelines extends React.Component<Props, State> {
         dispatch(getLatestTimelinesDataFromConfig(newConfig));
     }
 
-    private setConfiguringConcept = (configuringConcept: boolean) => {
-        const { timelines } = this.props;
+    private toggleShowConcepts = () => {
+        const { overlayMode } = this.state;
+        const showConcepts = !this.state.showConcepts;
 
-        if (!configuringConcept) {
-            const showConcepts = timelines.state === CohortStateType.REQUESTING;
-            this.setState({ configuringConcept, showConcepts });
-        } else {
-            this.setState({ configuringConcept });
+        if (!showConcepts && [TimelinesOverlayMode.ConfiguringConcept, TimelinesOverlayMode.RequestingData].includes(overlayMode)) {
+            return;
         }
-    }
-
-    private toggleShowConcepts = (show?: boolean) => {
-        const { configuringConcept } = this.state;
-        const showConcepts = typeof(show) === 'undefined' ? !this.state.showConcepts : show;
-
-        if (!show) {
-            const { timelines } = this.props;
-            if (configuringConcept || timelines.state === CohortStateType.REQUESTING) {
-                return;
-            }
-        }
-
         this.setState({ 
             showConcepts: showConcepts,
-            showPanelSelector: false 
+            showPanelSelector: false,
+            overlayMode: TimelinesOverlayMode.WaitingForDrop
         });
     };
 

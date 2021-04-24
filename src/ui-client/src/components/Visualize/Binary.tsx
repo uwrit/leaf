@@ -30,7 +30,8 @@ export class Binary extends React.PureComponent<Props> {
                 const val = d.left;
                 return {
                     ...val,
-                    color: config.colors[d.category].left,
+                    // @ts-ignore
+                    color: config.colors[d.category].left, 
                     dummyValue: 0,
                     value: -val.value
                 };
@@ -40,6 +41,7 @@ export class Binary extends React.PureComponent<Props> {
                 const val = d.right;
                 return {
                     ...val,
+                    // @ts-ignore
                     color: config.colors[d.category].right,
                     dummyValue: 0
                 };

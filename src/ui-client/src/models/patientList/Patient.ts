@@ -32,6 +32,7 @@ export interface PatientListRow {
 }
 
 export interface PatientListRowDTO {
+    [key: string]: string;
     encounterId?: EncounterId;
     personId: string;
 }

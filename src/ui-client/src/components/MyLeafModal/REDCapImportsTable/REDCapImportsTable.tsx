@@ -81,7 +81,7 @@ export default class REDCapImportsTable extends React.PureComponent<Props> {
         const confirm: ConfirmationModalState = {
             body: `Are you sure you want to delete the REDCap imported project "${struct.configuration.projectInfo.project_title}"? This will not affect your real data in REDCap.`,
             header: 'Delete REDCap Import',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => dispatch(deleteREDCapImport(im)),
             show: true,
             noButtonText: 'No',

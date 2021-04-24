@@ -103,7 +103,7 @@ export class GlobalPanelFilterRow extends React.PureComponent<Props> {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete the Global Panel Filter (id "${globalPanelFilter.id}")? This can't be undone.`,
                 header: 'Delete Global Panel Filter',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => dispatch(deleteAdminGlobalPanelFilter(globalPanelFilter)),
                 show: true,
                 noButtonText: `No`,

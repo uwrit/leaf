@@ -64,7 +64,7 @@ class CohortCountBox extends React.PureComponent<Props, State> {
 
     public componentDidUpdate () { return; }
 
-    public getSnapshotBeforeUpdate (prevProps: Props) {
+    public getSnapshotBeforeUpdate (prevProps: Props): any {
         const prevState = prevProps.cohort.count.state;
         const currState = this.props.cohort.count.state; 
 

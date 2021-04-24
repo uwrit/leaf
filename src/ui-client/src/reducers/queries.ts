@@ -34,7 +34,7 @@ export const defaultQueriesState = (): SavedQueriesState => {
         currentChangeId: '',
         lastSavedChangeId: '',
         saved: new Map<string, SavedQueryRef>(),
-        runAfterSave: () => null
+        runAfterSave: () => null as any
     };
 };
 

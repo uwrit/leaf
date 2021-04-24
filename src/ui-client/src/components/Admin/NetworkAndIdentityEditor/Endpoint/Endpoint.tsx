@@ -160,7 +160,7 @@ export class Endpoint extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete the endpoint "${endpoint.name}" (id "${endpoint.id}")? This can't be undone.`,
                 header: 'Delete Endpoint',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => dispatch(deleteNetworkEndpoint(endpoint)),
                 show: true,
                 noButtonText: `No`,

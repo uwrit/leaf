@@ -76,7 +76,7 @@ class Attestation extends React.PureComponent<Props, State> {
         }
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { config, isSubmittingAttestation, userContext, hasAttested } = this.props;
         if (hasAttested || isSubmittingAttestation) { return null; }
         if (userContext && config && !config.attestation.enabled) {

@@ -159,7 +159,7 @@ export class SqlSetEditor extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `One or more fields in the SQL Set or Dropdowns are missing necessary data. Are you sure you want to save?`,
                 header: 'Missing SQL Set data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     dispatch(processApiUpdateQueue());
                     this.setState({ forceValidation: false });

@@ -102,6 +102,33 @@
     height: 400px;
 }
 
+.timelines-concept-drag-overlay-close {
+    background-color: rgba(150,150,150,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: -20px;
+    width: 70px;
+}
+
+.timelines-concept-drag-overlay-close svg {
+    margin-bottom: -4px;
+}
+
+.timelines-concept-drag-overlay-close svg path {
+    fill: rgb(102, 102, 102);
+}
+
+.timelines-concept-drag-overlay-close:hover path {
+    fill: rgb(252, 74, 74);
+}
+
+.timelines-concept-drag-overlay-panel-selection-modal .modal-content {
+    margin-left: 75%;
+    margin-top: 25%;
+}
+
 .timelines-concept-drag-overlay-panel-selection-container {
     margin-top: 20px;
 }

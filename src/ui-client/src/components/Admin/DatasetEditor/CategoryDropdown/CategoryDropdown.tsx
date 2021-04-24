@@ -203,7 +203,7 @@ export class CategoryDropdown extends React.PureComponent<Props,State> {
             body: `Are you sure you want to delete the Dataset Query Category, "${cat.category}" (id: ${cat.id})? ` +
                   `This will take effect immediately and can't be undone.`,
             header: 'Delete Dataset Query Category',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => dispatch(deleteAdminDatasetQueryCategory(cat)),
             show: true,
             noButtonText: `No`,

@@ -41,7 +41,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
         }
     }
 
-    public getSnapshotBeforeUpdate(prevProps: Props) {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         if (this.props.set.specializationGroups.size === 0) {
             return false;
         }
@@ -237,7 +237,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete the SQL Set (id "${set.id}")? This can't be undone.`,
                 header: 'Delete Concept SQL Set',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => dispatch(deleteAdminConceptSqlSet(set)),
                 show: true,
                 noButtonText: `No`,

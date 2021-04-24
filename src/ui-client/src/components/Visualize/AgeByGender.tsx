@@ -28,8 +28,8 @@ export class AgeByGender extends React.PureComponent<Props> {
         const w = width > this.maxWidth ? this.maxWidth : width;
         const stackHeight = height / 2;
         let max = 0;
-        const data: AgeByGenderBucket[] = Object.keys(this.props.data.buckets)
-            .map((d: string) => {
+        const data: any[] = Object.keys(this.props.data.buckets)
+            .map((d) => {
                 const bucket = this.props.data.buckets[d];
                 if (bucket.females > max) { max = bucket.females; }
                 if (bucket.males > max) { max = bucket.males; }

@@ -117,7 +117,7 @@ export default class TimelinesDateRangeSelector extends React.Component<Props, S
         switch (mode) {
             case DateDisplayMode.BEFORE: return 'Before Index Event';
             case DateDisplayMode.AFTER: return 'After Index Event';
-            case DateDisplayMode.BEFORE_AND_AFTER: return 'Before+After Index Event';
+            case DateDisplayMode.BEFORE_AND_AFTER: return 'Before / After Index Event';
         }
     }
 

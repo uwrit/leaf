@@ -35,7 +35,7 @@ interface BaseConceptProps {
  * transform a corresponding user Concept with
  * the changes if applicable.
  */
-export const updateUserConceptFromAdminChange = (userConcept: UserConcept, propName: string, val: any, sqlSet?: ConceptSqlSet): UserConcept => {
+export const updateUserConceptFromAdminChange = (userConcept: any, propName: string, val: any, sqlSet?: ConceptSqlSet): UserConcept => {
     const neverAdd = new Set(['specializationGroups']);
     const alwaysAdd = new Set([ 
         'uiDisplaySubtext', 'uiDisplayPatientCount', 'uiNumericDefaultText', 'uiDisplayTooltip', 

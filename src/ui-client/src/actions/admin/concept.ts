@@ -104,7 +104,7 @@ export const handleReparentDrop = (userConcept: UserConcept, parentId: string) =
                 body: `Are you sure you want to move "${adminConcept.uiDisplayName}" under "${newParent.uiDisplayName}"? `+
                       `This will take effect immediately and be visible to users`,
                 header: 'Re-parent Concept',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => {
                     dispatch(saveAdminConcept(adminConcept, userConcept));
                     dispatch(resetAdminConceptCache());
