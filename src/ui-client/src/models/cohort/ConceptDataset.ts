@@ -33,5 +33,5 @@ export interface ConceptDatasetRow {
     personId: PatientId;
     encounterId?: EncounterId;
     numberField?: number;
-    dateField?: Date;
+    dateField: Date;
 }

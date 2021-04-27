@@ -5,8 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 import { CohortTimelinesAction } from "../../actions/cohort/timelines";
-import { ConceptId } from "../../models/concept/Concept";
-import { PanelItem } from "../../models/panel/PanelItem";
 import { CohortState, CohortStateType, TimelinesNetworkState, TimelinesState } from "../../models/state/CohortState";
 import { DateDisplayMode, DateIncrementType, TimelinesDisplayMode } from "../../models/timelines/Configuration";
 
@@ -26,7 +24,7 @@ export const defaultTimelinesState = (): TimelinesState => {
                 incrementType: DateIncrementType.MONTH,
                 mode: DateDisplayMode.BEFORE_AND_AFTER
             },
-            firstEventOnly: true,
+            firstEventOnly: false,
             mode: TimelinesDisplayMode.AGGREGATE,
             panels: new Map()
         },

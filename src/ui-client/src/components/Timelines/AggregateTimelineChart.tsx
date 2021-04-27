@@ -6,9 +6,12 @@
  */ 
 
 import React from 'react';
-import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid, Area, AreaChart } from 'recharts';
+import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
+import { Concept } from '../../models/concept/Concept';
+import { NumericFilterType } from '../../models/panel/NumericFilter';
 import { Panel } from '../../models/panel/Panel';
+import { PanelItem } from '../../models/panel/PanelItem';
 import { AuthorizationState } from '../../models/state/AppState';
 import { TimelinesState } from '../../models/state/CohortState';
 import { DateIncrementType } from '../../models/timelines/Configuration';
@@ -90,14 +93,13 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                             {/* X-axis (lower-most chart only) */}
                             {i === lastConcept &&
-                            <XAxis type="category" dataKey="timepointId" tick={true} interval={0} axisLine={false}/>}
+                            <XAxis type="category" dataKey="timepointId" interval={0} axisLine={false}
+                                tick={<CustomizedXAxisTick/>} />}
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
-                                tick={<CustomizedAxisTick panel={d.panel} clickHandler={this.handleLabelClick}/>}
+                                tick={<CustomizedYAxisTick panel={d.panel} clickHandler={this.handleLabelClick}/>}
                             />
-
-                            {/* <Area type="linear" dataKey="displayValues"/> */}
 
                             {/* Z-axis (bubble size) */}
                             <ZAxis type="number" dataKey="displayValueX" range={[0,1000]} />
@@ -163,7 +165,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 /**
  * Left-side Y-Axis labels
  */
-interface TickProps {
+interface YTickProps {
     clickHandler: (panel: Panel) => void;
     panel: Panel;
     x?: any;
@@ -176,15 +178,12 @@ const closeX = (
         <path d='M13.414 12l5.793-5.793c.39-.39.39-1.023 0-1.414s-1.023-.39-1.414 0L12 10.586 6.207 4.793c-.39-.39-1.023-.39-1.414 0s-.39 1.023 0 1.414L10.586 12l-5.793 5.793c-.39.39-.39 1.023 0 1.414.195.195.45.293.707.293s.512-.098.707-.293L12 13.414l5.793 5.793c.195.195.45.293.707.293s.512-.098.707-.293c.39-.39.39-1.023 0-1.414L13.414 12z'></path>
     </svg>
 );
-class CustomizedAxisTick extends React.PureComponent<TickProps> {
+class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
     public render () {
         const c = 'timelines-aggregate-yaxis';
         const { x, y, payload, panel, clickHandler } = this.props;
         if (payload.value !== 1) { return null; }
-        const concept = panel.subPanels[0].panelItems[0].concept;
-        const text = concept.uiDisplayName.split(' ').length > 1 
-            ? concept.uiDisplayName
-            : concept.uiDisplayText;
+        const pi = panel.subPanels[0].panelItems[0];
 
         return (
             <foreignObject className={c} x={x+1} y={y-13}>
@@ -193,8 +192,77 @@ class CustomizedAxisTick extends React.PureComponent<TickProps> {
                         {closeX}
                     </div>
                     <div className={`${c}-label`} >
-                        {text}
+                        {this.getText(pi, panel)}
                     </div>
+                </div>
+            </foreignObject>
+        );
+    }
+
+    private getText = (pi: PanelItem, panel: Panel): string => {
+        const concept = pi.concept;
+        let coreText = pi.concept.uiDisplayText;
+        let addText = '';
+
+        if (pi.numericFilter.filterType !== NumericFilterType.None) {
+            const f = pi.numericFilter.filter;
+            switch (pi.numericFilter.filterType) {
+                case NumericFilterType.GreaterThan:          addText = `> ${f[0]}`; break;
+                case NumericFilterType.GreaterThanOrEqualTo: addText = `>= ${f[0]}`; break;
+                case NumericFilterType.LessThan:             addText = `< ${f[0]}`; break;
+                case NumericFilterType.LessThanOrEqualTo:    addText = `<= ${f[0]}`; break;
+                case NumericFilterType.EqualTo:              addText = `= ${f[0]}`; break;
+                case NumericFilterType.GreaterThanOrEqualTo: addText = `>=${f[0]}`; break;
+                case NumericFilterType.Between:              addText = `between ${f[0]} and ${f[1]}`; break;
+            }
+            if (pi.concept.uiDisplayUnits) {
+                addText += ` ${pi.concept.uiDisplayUnits}`
+            }
+        }
+        if (concept.isSpecializable && concept.specializationGroups) {
+            const specializations = pi.specializations;
+            for (const sg of concept.specializationGroups) {
+                const selected = specializations.find((s) => s.specializationGroupId === sg.id);
+                if (selected) {
+                    addText += ` ${selected.uiDisplayText}`;
+                }
+            }
+        }
+        if (panel.dateFilter.display && panel.dateFilter.display !== 'Anytime') {
+            addText += ` (${panel.dateFilter.display.replace('In ', '')})`;
+        }
+
+        if (addText.length) {
+            if (coreText.length > 35) {
+                coreText = `${coreText.slice(0, 35)} ...`
+            }
+        } else {
+            if (coreText.length > 45) {
+                coreText = `${coreText.slice(0, 45)} ...`
+            }
+        }
+
+        return `${coreText} ${addText}`
+    } 
+};
+
+/**
+ * Bottom X-Axis labels
+ */
+ interface XTickProps {
+    x?: any;
+    y?: any;
+    payload?: any;
+}
+class CustomizedXAxisTick extends React.PureComponent<XTickProps> {
+    public render () {
+        const c = 'timelines-aggregate-xaxis';
+        const { x, y, payload } = this.props;
+
+        return (
+            <foreignObject className={c} x={x-25} y={y}>
+                <div>
+                    {payload.value}
                 </div>
             </foreignObject>
         );

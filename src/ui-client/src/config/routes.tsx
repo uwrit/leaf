@@ -23,6 +23,7 @@ export interface RouteConfig {
     display: string;
     icon: any;
     index: Routes;
+    isBeta?: boolean;
     path: string;
     render: any;
     subRoutes?: SubRouteConfig[];
@@ -69,6 +70,7 @@ const timelines = (): RouteConfig => {
         display: 'Timelines',
         icon: <FiSliders />,
         index: Routes.Timelines,
+        isBeta: true,
         path: '/timelines',
         render: () => <Timelines />
     };

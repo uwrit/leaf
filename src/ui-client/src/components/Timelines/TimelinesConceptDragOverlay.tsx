@@ -131,26 +131,6 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                     </Row>
                 </div>)}
 
-                {/* Concept dropped */}
-                {/* Modal 
-                <Modal isOpen={mode === TimelinesOverlayMode.ConfiguringConcept && !!panel} className={`${c}-panel-selection-modal`}>
-                    <ModalBody>
-                        <div className={`${c}-panel-selection-container`}>
-                            <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers}/>
-                            <div className={`${c}-panel-selection-explanation`}>
-                                <span>Specify any date, numeric, or other filters, then click</span>
-                                <span className={`${c}-panel-selection-emphasis`}>Add to Timeline</span>
-                                <span>below</span>
-                            </div>
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button className='leaf-button leaf-button-secondary' onClick={this.handlePanelCancelClick}>Cancel</Button>
-                        <Button className='leaf-button leaf-button-primary' onClick={this.handlePanelGetDataClick}>Add to Timeline</Button>
-                    </ModalFooter>
-                </Modal>
-                */}
-
                 {mode === TimelinesOverlayMode.ConfiguringConcept && panel &&
                 <div className={`${c}-inner selecting`}>
                     <div className={`${c}-panel-selection-container`}>
@@ -180,9 +160,11 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                     </div>
                 </div>}
 
+                {mode !== TimelinesOverlayMode.RequestingData &&
                 <div className={`${c}-close`} onClick={this.handleCloseClick}>
                     {closeX}
                 </div>
+                }
             </div>
         );
     }

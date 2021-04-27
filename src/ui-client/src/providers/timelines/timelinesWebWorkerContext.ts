@@ -7,6 +7,7 @@
 
 export const workerContext = `
 "use strict";
+console.log('yo!')
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
         for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -68,7 +69,7 @@ var queryAggregate = function (payload) {
 /**
  * Aggregate counts relative to index date
  */
-var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer) {
+ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer) {
     var output = [];
     var conceptData = conceptDatasetMap.get(concept.id);
     if (!conceptData) {
@@ -81,53 +82,50 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
     var _loop_1 = function (bi) {
         // If placeholder for index date
         var bin = bins[bi];
-        if (bin === null) {
-            output.push(null);
-            return "continue";
-        }
+        var isIndex = bin.isIndex;
+        var underMaxNum = typeof (bin.minNum) === 'undefined';
+        var overMinNum = typeof (bin.maxNum) === 'undefined';
         var binCount = 0;
-        var _loop_2 = function (i) {
+        var searchFunc = function (p, idxDate) { return null; };
+        if (isIndex)
+            searchFunc = function (p, idxDate) { return p.rows.find(function (r) { return r.dateField.getTime() === idxDate.getTime(); }); };
+        else if (underMaxNum)
+            searchFunc = function (p, idxDate) { return p.rows.find(function (r) { return dateDiffer(r.dateField, idxDate) < bin.maxNum; }); };
+        else if (overMinNum)
+            searchFunc = function (p, idxDate) { return p.rows.find(function (r) { return dateDiffer(r.dateField, idxDate) > bin.minNum; }); };
+        else
+            searchFunc = function (p, idxDate) { return p.rows.find(function (r) {
+                if (!r.dateField) {
+                    return false;
+                }
+                var diff = dateDiffer(r.dateField, idxDate);
+                if (diff >= bin.minNum && diff < bin.maxNum) {
+                    return true;
+                }
+                return false;
+            }); };
+        // For each patient
+        for (var i = 0; i < pats.length; i++) {
             var p = pats[i];
             var idxp = indexDataset.patients.get(p.compoundId);
             if (!idxp || !idxp.initialDate) {
-                return "continue";
+                continue;
             }
-            var indexDate_1 = idxp.initialDate;
-            var d = void 0;
-            if (typeof (bin.minNum) === 'undefined') {
-                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate_1) < bin.maxNum; });
-            }
-            else if (typeof (bin.maxNum) === 'undefined') {
-                d = p.rows.find(function (r) { return r.dateField && dateDiffer(r.dateField, indexDate_1) > bin.minNum; });
-            }
-            else {
-                d = p.rows.find(function (r) {
-                    if (!r.dateField) {
-                        return false;
-                    }
-                    var diff = dateDiffer(r.dateField, indexDate_1);
-                    if (diff >= bin.minNum && diff < bin.maxNum) {
-                        return true;
-                    }
-                    return false;
-                });
-            }
-            if (d) {
+            var indexDate = idxp.initialDate;
+            var data = searchFunc(p, indexDate);
+            if (data) {
                 binCount += 1;
                 afterMatchHandler(i);
             }
-        };
-        // For each patient
-        for (var i = 0; i < pats.length; i++) {
-            _loop_2(i);
         }
         var values = { percent: (binCount / totalPats), total: binCount };
         var dataRow = {
             conceptId: concept.id,
+            isIndex: bin.isIndex,
             timepointId: bin.label,
             displayValueX: values.total,
             displayValueY: 1,
-            displayValues: [ -values.total, values.total ],
+            displayValues: [-values.total, values.total],
             values: values
         };
         output.push(dataRow);
@@ -137,15 +135,6 @@ var getAggregateCounts = function (totalPats, config, concept, bins, dateDiffer)
         _loop_1(bi);
     }
     ;
-    // Add index date bin
-    var indexDate = {
-        conceptId: concept.id, timepointId: 'Index Event',
-        displayValueX: 0, displayValueY: 1, displayValues: [0,0],
-        values: { percent: 0, total: 0 }
-    };
-    // Swap null placeholder out with IndexDate
-    var placeholder = output.findIndex(function (dr) { return dr === null; });
-    output[placeholder] = indexDate;
     return output;
 };
 /**
@@ -180,7 +169,6 @@ var getDateDiffFunc = function (config) {
  * Get Timebins
  */
 var getTimeBins = function (config) {
-    var maxBins = 10;
     var bins = [];
     var incr = config.dateIncrement.increment;
     var startBin;
@@ -188,6 +176,7 @@ var getTimeBins = function (config) {
     var lowerBound = 0;
     var upperBound = 0;
     var currIdx = incr;
+    var maxBins = 10;
     // Bail if increment invalid
     if (config.dateIncrement.increment <= 0 || isNaN(config.dateIncrement.increment)) {
         return bins;
@@ -206,7 +195,7 @@ var getTimeBins = function (config) {
         }
         bins.unshift(startBin);
         // Add Index data with null placeholder
-        bins.push(null);
+        bins.push({ isIndex: true, label: 'Index' });
         // After
         currIdx = incr;
         lowerBound = 0;
@@ -294,7 +283,10 @@ var addConceptDataset = function (payload) {
         var convRows = [];
         for (var k = 0; k < rows.length; k++) {
             var row = rows[k];
-            var convRow = __assign({}, row, { dateField: row.dateField ? new Date(row.dateField) : undefined });
+            if (!row.dateField) {
+                continue;
+            }
+            var convRow = __assign({}, row, { dateField: new Date(row.dateField) });
             convRows.push(convRow);
         }
         var pat = { compoundId: compoundId, id: p, responderId: responderId, rows: convRows };

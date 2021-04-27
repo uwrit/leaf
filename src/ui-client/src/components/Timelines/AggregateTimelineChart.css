@@ -134,3 +134,9 @@
 .timelines-aggregate-yaxis-remove svg:hover path {
     fill: rgb(252, 74, 74);
 }
+
+.timelines-aggregate-xaxis {
+    height: 70px;
+    text-align: center;
+    width: 50px;
+}

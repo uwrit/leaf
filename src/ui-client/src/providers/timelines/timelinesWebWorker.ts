@@ -12,7 +12,7 @@ import { Panel } from '../../models/panel/Panel';
 import { PatientId } from '../../models/patientList/Patient';
 import { DateDisplayMode, DateIncrementType, TimelinesConfiguration, TimelinesDisplayMode } from '../../models/timelines/Configuration';
 import { TimelinesAggregateDataRow, TimelinesAggregateDataset, TimelinesAggregateTimeBin } from '../../models/timelines/Data';
-import { IndexPatient } from '../../models/timelines/Patient';
+import { IndexPatient, Patient } from '../../models/timelines/Patient';
 import { ConceptDatasetStore, IndexDatasetStore } from '../../models/timelines/Patient';
 import { workerContext } from './timelinesWebWorkerContext';
 
@@ -213,11 +213,25 @@ export default class TimelinesWebWorker {
 
                 // If placeholder for index date
                 const bin = bins[bi];
-                if (bin === null) {
-                    output.push(null as any);
-                    continue;
-                }
+                const isIndex = bin.isIndex;
+                const underMaxNum = typeof(bin.minNum) === 'undefined';
+                const overMinNum = typeof(bin.maxNum) === 'undefined';
                 let binCount = 0;
+                let searchFunc = (p: Patient, idxDate: Date) => null as any;
+
+                if (isIndex)          searchFunc = (p: Patient, idxDate: Date) => p.rows.find((r) => r.dateField.getTime() === idxDate.getTime());
+                else if (underMaxNum) searchFunc = (p: Patient, idxDate: Date) => p.rows.find((r) => dateDiffer(r.dateField, idxDate) < bin.maxNum!);
+                else if (overMinNum)  searchFunc = (p: Patient, idxDate: Date) => p.rows.find((r) => dateDiffer(r.dateField, idxDate) > bin.minNum!);
+                else {                  
+                    searchFunc = (p: Patient, idxDate: Date) => p.rows.find((r) => {
+                        if (!r.dateField) { return false; }
+                        const diff = dateDiffer(r.dateField, idxDate);
+                        if (diff >= bin.minNum! && diff < bin.maxNum!) {
+                            return true;
+                        }
+                        return false;
+                    });
+                }
 
                 // For each patient
                 for (let i = 0; i < pats.length; i++) {
@@ -226,23 +240,8 @@ export default class TimelinesWebWorker {
                     if (!idxp || !idxp.initialDate) { continue; }
 
                     const indexDate = idxp.initialDate;
-                    let d;
-
-                    if (typeof(bin.minNum) === 'undefined') {
-                        d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) < bin.maxNum!);
-                    } else if (typeof(bin.maxNum) === 'undefined') {
-                        d = p.rows.find((r) => r.dateField && dateDiffer(r.dateField, indexDate) > bin.minNum!);
-                    } else {
-                        d = p.rows.find((r) => {
-                            if (!r.dateField) { return false; }
-                            const diff = dateDiffer(r.dateField, indexDate);
-                            if (diff >= bin.minNum! && diff < bin.maxNum!) {
-                                return true;
-                            }
-                            return false;
-                        });
-                    }
-                    if (d) {
+                    const data = searchFunc(p, indexDate);
+                    if (data) {
                         binCount += 1;
                         afterMatchHandler(i);
                     }
@@ -250,6 +249,7 @@ export default class TimelinesWebWorker {
                 const values = { percent: (binCount / totalPats), total: binCount };
                 const dataRow: TimelinesAggregateDataRow = {
                     conceptId: concept.id,
+                    isIndex: bin.isIndex,
                     timepointId: bin.label,
                     displayValueX: values.total,
                     displayValueY: 1,
@@ -258,17 +258,6 @@ export default class TimelinesWebWorker {
                 };
                 output.push(dataRow);
             };
-
-            // Add index date bin
-            const indexDate = {
-                conceptId: concept.id, timepointId: 'Index Event',
-                displayValueX: 0, displayValueY: 1, displayValues: [0,0],
-                values: { percent: 0, total: 0 }
-            };
-            
-            // Swap null placeholder out with IndexDate
-            const placeholder = output.findIndex((dr) => dr === null);
-            output[placeholder] = indexDate;
 
             return output;
         };
@@ -326,7 +315,7 @@ export default class TimelinesWebWorker {
                 bins.unshift(startBin);
 
                 // Add Index data with null placeholder
-                bins.push(null as any);
+                bins.push({ isIndex: true, label: 'Index' });
 
                 // After
                 currIdx = incr;
@@ -426,9 +415,12 @@ export default class TimelinesWebWorker {
                 const convRows: ConceptDatasetRow[] = [];
                 for (let k = 0; k < rows.length; k++) {
                     const row = rows[k];
+                    if (!row.dateField) {
+                        continue;
+                    }
                     const convRow: ConceptDatasetRow = { 
                         ...row, 
-                        dateField: row.dateField ? new Date(row.dateField) : undefined
+                        dateField: new Date(row.dateField)
                     };
                     convRows.push(convRow);
                 }

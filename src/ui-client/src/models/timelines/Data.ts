@@ -21,6 +21,7 @@ export interface TimelinesAggregateConcept {
 
 export interface TimelinesAggregateDataRow {
     conceptId: ConceptId;
+    isIndex?: boolean;
     timepointId: TimePointId;
     displayValueX: number;
     displayValueY: number;
@@ -34,6 +35,7 @@ export interface TimelinesAggregateDataRowValue {
 }
 
 export interface TimelinesAggregateTimeBin {
+    isIndex?: boolean;
     label: string;
     minNum?: number;
     maxNum?: number;
