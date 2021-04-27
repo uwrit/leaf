@@ -390,6 +390,13 @@ BEGIN
 		  ,LEFT(UiDisplayName,400)
 	FROM app.Concept C
 	WHERE EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
+    UNION ALL
+	SELECT Id
+		  ,rootID
+		  ,LEFT(UiDisplaySubtext,400)
+	FROM app.Concept C
+	WHERE UiDisplaySubtext IS NOT NULL 
+		  AND EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
 	/**
 	 * Remove puncuation and non-alphabetic characters.
