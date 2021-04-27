@@ -204,9 +204,10 @@ export default class TimelinesWebWorker {
             if (!conceptData) { return output; }
 
             const pats = [ ...conceptData.patients.values() ];
+            const prevFound = new Set();
             const afterMatchHandler = config.firstEventOnly
-                ? (i: number) => { pats.splice(i, 1) }
-                : (i: number) => null as any;
+                ? (id: string) => { prevFound.add(id); }
+                : (id: string) => null as any;
 
             // For each bin
             for (let bi = 0; bi < bins.length; bi++) {
@@ -237,13 +238,13 @@ export default class TimelinesWebWorker {
                 for (let i = 0; i < pats.length; i++) {
                     const p = pats[i];
                     const idxp = indexDataset.patients.get(p.compoundId);
-                    if (!idxp || !idxp.initialDate) { continue; }
+                    if (!idxp || !idxp.initialDate || (config.firstEventOnly && prevFound.has(p.compoundId))) { continue; }
 
                     const indexDate = idxp.initialDate;
                     const data = searchFunc(p, indexDate);
                     if (data) {
                         binCount += 1;
-                        afterMatchHandler(i);
+                        afterMatchHandler(p.compoundId);
                     }
                 }
                 const values = { percent: (binCount / totalPats), total: binCount };
