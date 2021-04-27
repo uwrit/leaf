@@ -76,10 +76,14 @@ var queryAggregate = function (payload) {
         return output;
     }
     var pats = [ ...conceptData.patients.values() ];
-    const prevFound = new Set();
-    var afterMatchHandler = config.firstEventOnly
-        ? id => { prevFound.add(id); }
-        : id => null;
+    var prevFound = new Set();
+    let afterMatchHandler = id => null;
+    let isValid = idxp => idxp && !!idxp.initialDate;
+
+    if (config.firstEventOnly) {
+        afterMatchHandler = id => { prevFound.add(id); }
+        isValid = idxp => idxp && idxp.initialDate && !prevFound.has(idxp.compoundId);
+    }
     var _loop_1 = function (bi) {
         // If placeholder for index date
         var bin = bins[bi];
@@ -109,7 +113,7 @@ var queryAggregate = function (payload) {
         for (var i = 0; i < pats.length; i++) {
             var p = pats[i];
             var idxp = indexDataset.patients.get(p.compoundId);
-            if (!idxp || !idxp.initialDate || (config.firstEventOnly && prevFound.has(p.compoundId))) {
+            if (!isValid(idxp)) {
                 continue;
             }
             var indexDate = idxp.initialDate;

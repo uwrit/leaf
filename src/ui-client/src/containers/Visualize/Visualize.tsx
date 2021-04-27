@@ -29,17 +29,56 @@ interface State {
     width: number;
 }
 
+interface ErrorBoundaryState {
+    errored: boolean;
+}
+
+class VisualizeErrorBoundary extends React.Component<Props, ErrorBoundaryState> {
+    constructor(props: Props) {
+        super(props);
+        this.state = { 
+            errored: false
+        };
+    }
+
+    public static getDerivedStateFromError(error: any) {
+        return { errored: true };
+    }
+    
+    public componentDidCatch(error: any, errorInfo: any) {    
+        console.log(error, errorInfo);
+    }
+
+    public render() {
+        if (this.state.errored) {
+            return (
+                <div className={`visualize-error`}>
+                    <p>
+                        Whoops! An error occurred while creating patient visualizations. We are sorry for the inconvenience. 
+                        Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
+            );
+        }
+
+        return <Visualize {...this.props} />;
+    }
+}
+
 class Visualize extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+        this.state = { 
+            width: 1000
+        };
+    }
+
     public updateDimensions = () => {
         const dimensions = computeDimensions();
         this.setState({ width: dimensions.contentWidth });
     }
 
     public componentWillMount() {
-        this.updateDimensions();
-    }
-
-    public componentDidMount() {
         window.addEventListener('resize', this.updateDimensions);
     }
 
@@ -131,4 +170,4 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
 const mapDispatchToProps = {};
 
 export default connect<StateProps, DispatchProps, OwnProps, AppState>
-    (mapStateToProps, mapDispatchToProps)(Visualize)
+    (mapStateToProps, mapDispatchToProps)(VisualizeErrorBoundary)

@@ -205,9 +205,13 @@ export default class TimelinesWebWorker {
 
             const pats = [ ...conceptData.patients.values() ];
             const prevFound = new Set();
-            const afterMatchHandler = config.firstEventOnly
-                ? (id: string) => { prevFound.add(id); }
-                : (id: string) => null as any;
+            let afterMatchHandler = (id: string) => null as any;
+            let isValid = (idxp: IndexPatient): boolean => idxp && !!idxp.initialDate;
+
+            if (config.firstEventOnly) {
+                afterMatchHandler = (id: string) => { prevFound.add(id); }
+                isValid = (idxp: IndexPatient) => idxp && idxp.initialDate && !prevFound.has(idxp.compoundId);
+            }
 
             // For each bin
             for (let bi = 0; bi < bins.length; bi++) {
@@ -238,7 +242,7 @@ export default class TimelinesWebWorker {
                 for (let i = 0; i < pats.length; i++) {
                     const p = pats[i];
                     const idxp = indexDataset.patients.get(p.compoundId);
-                    if (!idxp || !idxp.initialDate || (config.firstEventOnly && prevFound.has(p.compoundId))) { continue; }
+                    if (!isValid(idxp)) { continue; }
 
                     const indexDate = idxp.initialDate;
                     const data = searchFunc(p, indexDate);
