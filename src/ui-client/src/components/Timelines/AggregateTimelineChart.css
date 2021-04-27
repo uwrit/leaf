@@ -76,7 +76,6 @@
 }
 
 .timelines-aggregate-yaxis {
-    height: 70px;
     width: 150px;
 }
 
@@ -87,6 +86,7 @@
     height: 100%;
     padding: 4px;
     position: relative;
+    width: 145px;
 }
 
 .timelines-aggregate-yaxis-container:hover { 
@@ -94,8 +94,12 @@
 }
 
 .timelines-aggregate-yaxis-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
+    font-size: 0.9rem;
+    margin: auto;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
 }
 
 .timelines-aggregate-yaxis-remove {
@@ -108,10 +112,11 @@
     top: 50%;
     transform: translate(-50%, -50%);
     width: 38px;
+    z-index: 101;
 }
 
 .timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove {
-    background-color: rgba(40, 28, 27, 0.4);
+    background-color: rgb(102, 102, 102);
 }
 
 .timelines-aggregate-yaxis-remove svg {
@@ -127,11 +132,7 @@
     fill: transparent;
 }
 
-.timelines-aggregate-yaxis-container:hover path {
-    fill: white;
-}
-
-.timelines-aggregate-yaxis-remove svg:hover path {
+.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove svg path {
     fill: rgb(252, 74, 74);
 }
 

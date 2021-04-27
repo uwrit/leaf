@@ -84,6 +84,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                 {data.map((d,i) => {
                     const concept = d.panel.subPanels[0].panelItems[0].concept;
+                    const isLast = i === lastConcept;
 
                     return (
                         <ScatterChart key={concept.id} width={chartWidth} height={swimlaneHeight} margin={margins} data={d.data} >
@@ -92,13 +93,13 @@ export default class AggregateTimelineChart extends React.Component<Props, State
                             <CartesianGrid fill={'rgb(245,245,245)'} />
 
                             {/* X-axis (lower-most chart only) */}
-                            {i === lastConcept &&
+                            {isLast &&
                             <XAxis type="category" dataKey="timepointId" interval={0} axisLine={false}
                                 tick={<CustomizedXAxisTick/>} />}
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
-                                tick={<CustomizedYAxisTick panel={d.panel} clickHandler={this.handleLabelClick}/>}
+                                tick={<CustomizedYAxisTick height={isLast ? swimlaneHeight - 28 : swimlaneHeight} panel={d.panel} clickHandler={this.handleLabelClick}/>}
                             />
 
                             {/* Z-axis (bubble size) */}
@@ -167,6 +168,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
  */
 interface YTickProps {
     clickHandler: (panel: Panel) => void;
+    height: number;
     panel: Panel;
     x?: any;
     y?: any;
@@ -181,12 +183,12 @@ const closeX = (
 class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
     public render () {
         const c = 'timelines-aggregate-yaxis';
-        const { x, y, payload, panel, clickHandler } = this.props;
+        const { x, y, payload, panel, clickHandler, height } = this.props;
         if (payload.value !== 1) { return null; }
         const pi = panel.subPanels[0].panelItems[0];
 
         return (
-            <foreignObject className={c} x={x+1} y={y-13}>
+            <foreignObject className={c} x={x+1} y={0} height={height}>
                 <div className={`${c}-container`} onClick={clickHandler.bind(null, panel)}>
                     <div className={`${c}-remove`}>
                         {closeX}
@@ -232,14 +234,9 @@ class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
             addText += ` (${panel.dateFilter.display.replace('In ', '')})`;
         }
 
-        if (addText.length) {
-            if (coreText.length > 35) {
-                coreText = `${coreText.slice(0, 35)} ...`
-            }
-        } else {
-            if (coreText.length > 45) {
-                coreText = `${coreText.slice(0, 45)} ...`
-            }
+        const shortenVal = addText.length ? 50 : 60;
+        if (coreText.length > shortenVal) {
+            coreText = `${coreText.slice(0, shortenVal)} ...`
         }
 
         return `${coreText} ${addText}`
