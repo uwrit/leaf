@@ -63,7 +63,6 @@ export const getConceptDataset = (panel: Panel) => {
             } 
         });
         dispatch(setTimelinesConceptDatasetExtractStarted(panel));
-        timelines.configuration.panels.set(concept.id, panel);
 
         // Wrap entire query action in Promise.all
         Promise.all(
@@ -102,9 +101,11 @@ export const getConceptDataset = (panel: Panel) => {
             dispatch(setTimelinesConceptDatasetExtractFinished(panel));
 
             if (atLeastOneSucceeded && timelines.indexConceptState) {
-                const timeline = await getChartData(timelines.configuration) as TimelinesAggregateDataset;
-                console.log(timeline);
-                dispatch(setTimelinesConfiguration(timelines.configuration));
+                const newConfig = Object.assign({}, timelines.configuration);
+                newConfig.panels = new Map(newConfig.panels);
+                newConfig.panels.set(concept.id, panel);
+                const timeline = await getChartData(newConfig) as TimelinesAggregateDataset;
+                dispatch(setTimelinesConfiguration(newConfig));
                 dispatch(setTimelinesAggregateDataset(timeline));
 
             } else if (!atLeastOneSucceeded) {

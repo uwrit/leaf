@@ -103,7 +103,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
     public render() {
         const c = this.className;
         const { hovered, panel } = this.state;
-        const { connectDropTarget, canDrop, isOver, mode, timelines } = this.props;
+        const { connectDropTarget, canDrop, isOver, mode } = this.props;
         const panelHandlers = this.packageHandlers();
 
         return (
