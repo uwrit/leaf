@@ -3,7 +3,7 @@
 SA_PASSWORD=Th3PA55--8zz       # DB password
 DB_SERVER=host.docker.internal # Use 'host.docker.internal' if mac, else '127.0.0.1' if linux 
                                # see: (https://stackoverflow.com/questions/24319662/from-inside-of-a-docker-container-how-do-i-connect-to-the-localhost-of-the-mach)
-LEAF_ROOT=$(PWD)                            
+LEAF_ROOT=$PWD                      
 
 # Check ENV variables
 if [ -z ${LEAFDB_SA_PW+x}    ]; then echo "LEAFDB_SA_PW is unset!"    exit; fi
