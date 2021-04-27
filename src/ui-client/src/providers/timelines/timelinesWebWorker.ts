@@ -349,7 +349,7 @@ export default class TimelinesWebWorker {
                     currIdx += incr;
                 }
                 bins.unshift(startBin);
-                bins.unshift(null as any);
+                bins.unshift({ isIndex: true, label: 'Index' });
                 bins.push(lastBin);
             }
 
@@ -365,7 +365,7 @@ export default class TimelinesWebWorker {
                     currIdx -= incr;
                 }
                 bins.unshift(startBin);
-                bins.push(null as any);
+                bins.push({ isIndex: true, label: 'Index' });
             }
             
             return bins;

@@ -224,7 +224,7 @@ var getTimeBins = function (config) {
             currIdx += incr;
         }
         bins.unshift(startBin);
-        bins.unshift(null);
+        bins.unshift({ isIndex: true, label: 'Index' });
         bins.push(lastBin);
     }
     // Before
@@ -238,7 +238,7 @@ var getTimeBins = function (config) {
             currIdx -= incr;
         }
         bins.unshift(startBin);
-        bins.push(null);
+        bins.push({ isIndex: true, label: 'Index' });
     }
     return bins;
 };
