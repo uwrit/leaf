@@ -59,6 +59,9 @@ body {
     #sidebar {
         width: 45px;
     }
+    .sidebar-tab .sidebar-beta {
+        display: none
+    }
     .sidebar-text,
     .header-options-text {
         display: none;

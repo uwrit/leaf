@@ -9,6 +9,10 @@ import { CancelTokenSource } from 'axios';
 import { PatientListConfiguration } from '../patientList/Configuration';
 import { PatientListRow } from '../patientList/Patient';
 import { DemographicStatistics } from '../cohort/DemographicDTO';
+import { TimelinesConfiguration } from '../timelines/Configuration';
+import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
+import { PanelItem } from '../panel/PanelItem';
+import { Concept, ConceptId } from '../concept/Concept';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -18,25 +22,33 @@ export enum CohortStateType {
     NOT_IMPLEMENTED = 5
 }
 
-// Top-level aggregate state
+/** 
+ * Top-level aggregate state
+ */ 
 export interface CohortState {
     cancel?: CancelTokenSource;
     count: PatientCountState;
     networkCohorts: CohortMap;
     patientList: PatientListState;
+    timelines: TimelinesState;
     visualization: VisualizationState;
 }
 export type CohortMap = Map<number, NetworkCohortState>;
 
-// Responder-level state
+/** 
+ * Responder-level state
+ */ 
 export interface NetworkCohortState {
     count: PatientCountState;
     id: number;
+    timelines: TimelinesNetworkState;
     patientList: PatientListNetworkState;
     visualization: VisualizationState;
 }
 
-// State prop types
+/** 
+ * State prop types
+ */
 export interface PatientCountState {
     duration?: number;
     plusMinus: number;
@@ -59,9 +71,27 @@ export interface PatientListState extends BasePatientListState {
 }
 
 export interface PatientListNetworkState extends BasePatientListState {
-    state: CohortStateType;
     multiRowCount: number;
     singletonRowCount: number;
+}
+
+export interface BaseTimelinesState {
+    
+}
+
+export interface TimelinesState extends BaseTimelinesState {
+    aggregateData: TimelinesAggregateDataset;
+    configuration: TimelinesConfiguration;
+    indexConceptState: CohortStateType;
+    patientData: TimelinesPatientDataRow[];
+    state: CohortStateType;
+}
+
+export interface TimelinesNetworkState {
+    indexConceptState: CohortStateType;
+
+    // Network respondent needs to track state per concept (failed, succeeded, etc.)
+    cohortStateByConcept: Map<ConceptId, CohortStateType>;
 }
 
 export interface VisualizationState {

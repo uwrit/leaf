@@ -115,7 +115,7 @@ export default class UserQueriesTable extends React.PureComponent<Props> {
         const confirm: ConfirmationModalState = {
             body: `Are you sure you want to delete the user ${query.ownerShort}'s query "${query.name}"?`,
             header: 'Delete User Query',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => dispatch(deleteSavedQueryAndCohort(query)),
             show: true,
             noButtonText: 'No',

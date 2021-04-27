@@ -115,21 +115,15 @@ namespace Model.Compiler
 
         private LeafType GetLeafType()
         {
-            switch (Type)
+            return Type switch
             {
-                case "String":
-                    return LeafType.String;
-                case "Bool":
-                    return LeafType.Bool;
-                case "DateTime":
-                    return LeafType.DateTime;
-                case "Guid":
-                    return LeafType.Guid;
-                case "Numeric":
-                    return LeafType.Numeric;
-                default:
-                    return LeafType.String;
-            }
+                "String"   => LeafType.String,
+                "Bool"     => LeafType.Bool,
+                "DateTime" => LeafType.DateTime,
+                "Guid"     => LeafType.Guid,
+                "Numeric"  => LeafType.Numeric,
+                _          => LeafType.String,
+            };
         }
     }
 

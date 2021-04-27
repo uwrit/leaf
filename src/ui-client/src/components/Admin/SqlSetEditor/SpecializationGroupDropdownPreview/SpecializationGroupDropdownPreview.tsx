@@ -127,7 +127,7 @@ export class SpecializationGroupDropdownPreview extends React.PureComponent<Prop
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete this dropdown (id "${specializationGroup.id}")? This can't be undone.`,
                 header: 'Delete Specialization Dropdown',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => dispatch(deleteAdminConceptSpecializationGroup(specializationGroup)),
                 show: true,
                 noButtonText: `No`,

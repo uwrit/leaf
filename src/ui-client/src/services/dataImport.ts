@@ -41,7 +41,7 @@ export const calculateREDCapFieldCount = async (concept: REDCapConcept): Promise
 export const clearRecords = async () => {
     return new Promise( async (resolve, reject) => {
         await worker.clearRecords();
-        resolve();
+        resolve(null);
     });
 };
 
@@ -51,7 +51,7 @@ export const clearRecords = async () => {
 export const clearUnmappedRecords = async (unmapped: Set<string>) => {
     return new Promise( async (resolve, reject) => {
         await worker.clearUnmapped(unmapped);
-        resolve();
+        resolve(null);
     });
 };
 

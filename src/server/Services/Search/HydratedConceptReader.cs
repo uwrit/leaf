@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using Model.Compiler;
-using Model.Search;
 
 namespace Services.Search
 {

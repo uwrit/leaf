@@ -73,10 +73,10 @@ export interface DynamicDatasetQuerySchemaField extends BaseDynamicDatasetQueryS
 }
 
 export const fromDTO = (dto: AdminDatasetQueryDTO): AdminDatasetQuery => {
-    const ds: AdminDatasetQuery = {
+    const ds = {
         ...dto,
         schema: dto.schema 
-            ? { fields: dto.schema.fields.map(f => ({ ...f, type: PatientListColumnType[f.type], present: true })) }
+            ? { fields: dto.schema.fields.map(f => ({ ...f, type: PatientListColumnType[f.type as any], present: true })) } as any
             : { fields: [] }
     };
     return ds;

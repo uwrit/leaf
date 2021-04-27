@@ -34,5 +34,5 @@ export class PanelFilterPreview extends React.PureComponent<Props> {
         );
     }
 
-    private dummyDispatch = () => null;
+    private dummyDispatch = () => null as any;
 };

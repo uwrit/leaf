@@ -153,7 +153,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `One or more fields in the Panel Filters are missing necessary data. Are you sure you want to save?`,
                 header: 'Missing Panel Filter data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     dispatch(processApiUpdateQueue());
                     this.setState({ forceValidation: false });

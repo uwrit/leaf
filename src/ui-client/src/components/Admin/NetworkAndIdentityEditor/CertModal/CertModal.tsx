@@ -65,7 +65,7 @@ export default class CertModal extends React.PureComponent<Props> {
         );
     }
 
-    private dummyHandler = () => null;
+    private dummyHandler = () => null as any;
 
     private onClickNo = () => {
         const { dispatch } = this.props;

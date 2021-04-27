@@ -18,20 +18,20 @@ interface Props {
 
 export class PanelPreview extends React.PureComponent<Props> {
     private className = 'concept-editor-preview';
+
     public render() {
         const { panel } = this.props;
         const c = this.className;
+
         return (
             createPortal(
                 <div className={`${c}-panel-container concept-editor-preview`}>
                     <div className={`${c}-panel-container-inner`}>
-                        <Panel dispatch={this.dummyDispatch} panel={panel} isFirst={true} queryState={CohortStateType.LOADED} />
+                        <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} />
                     </div>
                 </div>,
                 document.body
             )
         );
     }
-
-    private dummyDispatch = () => null;
 };

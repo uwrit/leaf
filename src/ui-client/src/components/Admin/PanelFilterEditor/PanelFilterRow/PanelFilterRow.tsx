@@ -152,7 +152,7 @@ class PanelFilterRow extends React.PureComponent<Props> {
             const confirm: ConfirmationModalState = {
                 body: `Are you sure you want to delete the Panel Filter (id "${panelFilter.id}")? This can't be undone.`,
                 header: 'Delete Panel Filter',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => dispatch(deleteAdminPanelFilter(panelFilter)),
                 show: true,
                 noButtonText: `No`,

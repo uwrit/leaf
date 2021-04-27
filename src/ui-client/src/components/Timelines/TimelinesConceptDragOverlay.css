@@ -1,0 +1,176 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.timelines-concept-drag-overlay {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    z-index: 105;
+}
+
+.timelines-concept-drag-overlay-inner {
+    background-color: rgb(250, 250, 250);
+    border: 2px solid transparent;
+    border-radius: 8px;
+    color: black;
+    display: relative;
+    height: 300px;
+    margin: 0;
+    position: absolute;
+    top: 30%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    vertical-align: middle;
+}
+
+.timelines-concept-drag-overlay-inner svg {
+    margin-right: 0;
+}
+
+.timelines-concept-drag-overlay-inner.waiting {
+    padding: 0 20px 30px !important;
+}
+
+.timelines-concept-drag-overlay-title-text {
+    font-size: 2.0rem;
+    font-weight: 300;
+    text-align: center;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .row {
+    height: 100%;
+    font-weight: 100;
+    padding: 0 10px;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .col-sm-6 {
+    height: 85%;
+    margin-top: 14px;
+}
+
+.timelines-concept-drag-overlay-all-data {
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+}
+
+.timelines-concept-drag-overlay-specific-data {
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.timelines-concept-drag-overlay-inner.waiting .col-sm-6 > div {
+    font-size: 2rem;
+    margin-bottom: 0;
+    position: absolute;
+    text-align: center;
+    top: 20%;
+    width: 90%;
+}
+
+.timelines-concept-drag-overlay-all-data {
+    border-right: 1px solid rgb(200,200,200);
+}
+
+.timelines-concept-drag-overlay-loading {
+    font-size: 2.5rem;
+    font-weight: 100;
+    margin: 0;
+    position: absolute;
+    left: 50%;
+    margin-right: -50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 450px;
+}
+
+.timelines-concept-drag-overlay-loading .col-md-8 > div {
+    top: 25%;
+    position: absolute;
+}
+
+.timelines-concept-drag-overlay.can-drop .timelines-concept-drag-overlay-inner .col-sm-6.hovered {
+    background-color: rgba(175, 231, 252, 0.5);
+}
+
+/* Configuring concept */
+.timelines-concept-drag-overlay-inner.selecting {
+    height: 400px;
+}
+
+.timelines-concept-drag-overlay-close {
+    background-color: rgba(150,150,150,0.2);
+    border-radius: 50%;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+    top: -20px;
+    width: 70px;
+}
+
+.timelines-concept-drag-overlay-close svg {
+    margin-bottom: -4px;
+}
+
+.timelines-concept-drag-overlay-close svg path {
+    fill: rgb(102, 102, 102);
+}
+
+.timelines-concept-drag-overlay-close:hover path {
+    fill: rgb(252, 74, 74);
+}
+
+.timelines-concept-drag-overlay-panel-selection-modal .modal-content {
+    margin-left: 75%;
+    margin-top: 25%;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container {
+    margin-top: 20px;
+}
+
+.timelines-concept-drag-overlay-panel-selection-explanation {
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 300;
+    height: 80px;
+    margin: 10px 0;
+    padding: 0 20%;
+}
+
+.timelines-concept-drag-overlay-panel-selection-explanation span {
+    text-align: center;
+}
+
+.timelines-concept-drag-overlay-panel-selection-emphasis {
+    color: rgb(28, 168, 221);
+    font-weight: 500;
+    margin: 0 4px;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container .panel-column {
+    flex: 0 0 100% !important;
+    margin: 0 auto !important;
+    max-width: 400px !important;
+    padding: 0 50px !important;
+}
+
+.timelines-concept-drag-overlay-panel-selection-container .subpanel-body {
+    min-height: 150px !important;
+}
+
+.timelines-concept-drag-overlay-panel-selection-footer {
+    border-top: 1px solid rgb(233, 236, 239);
+    bottom: 0;
+    padding: 10px;
+    position: fixed; 
+    width: 100%;
+}
+
+.timelines-concept-drag-overlay-panel-selection-footer .leaf-button-primary {
+    float: right;
+}

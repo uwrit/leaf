@@ -1,0 +1,26 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .timelines-date-range-selector-number.input[type=number]::-webkit-inner-spin-button,
+ .timelines-date-range-selector-number.input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
+}
+
+.ztimelines-date-range-selector-mode {
+    width: 188px;
+}
+
+.ztimelines-date-range-selector-number {
+    width: 33px;
+}
+
+.ztimelines-date-range-selector-type {
+    width: 73px;
+}

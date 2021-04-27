@@ -46,6 +46,13 @@ namespace API.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("shape/concept")]
+        public ActionResult<ShapedDatasetContract> Concept()
+        {
+            return Ok(new DatasetContractDTO(ConceptDatasetContract.Contract));
+        }
+
+        [AllowAnonymous]
         [HttpGet("shape/observation")]
         public ActionResult<ShapedDatasetContract> Observation()
         {

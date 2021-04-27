@@ -1,0 +1,143 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.timelines-aggregate {
+    font-family: Roboto;
+    z-index: 99;
+}
+
+.timelines-aggregate .recharts-cartesian-grid {
+    background-color: rgb(244, 231, 255);
+}
+
+.timelines-aggregate .recharts-cartesian-grid line {
+    stroke: white;
+    stroke-width: 2;
+}
+
+.timelines-aggregate .recharts-cartesian-axis-tick-value {
+    fill: black;
+}
+
+.timelines-aggregate .recharts-xAxis tspan {
+    color: black;
+    text-shadow: none;
+}
+
+.timelines-aggregate-xAxis-label-container {
+    left: 40.5%;
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-top: 10px;
+    position: absolute;
+    width: 100%;
+}
+
+.timelines-aggregate-dot {
+    fill: rgb(154, 93, 223);
+    opacity: 0.6;
+    stroke: rgb(130, 51, 219);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+}
+
+.timelines-aggregate-dot:hover {
+    fill: rgb(137, 76, 207);
+    opacity: 0.9;
+    stroke: rgb(110, 26, 206);
+}
+
+.timelines-aggregate-tooltip {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 4px 16px 0px;
+    padding: 0 10px;
+}
+
+.timelines-aggregate-tooltip-count {
+    font-size: 3rem;
+}
+
+.timelines-aggregate-tooltip-denom {
+    font-size: 1.2rem;
+}
+
+.timelines-aggregate-tooltip-percent {
+    color: green;
+}
+
+.timelines-aggregate-tooltip-subtext {
+    color: rgb(150,150,150);
+}
+
+.timelines-aggregate-yaxis {
+    width: 150px;
+}
+
+.timelines-aggregate-yaxis-container { 
+    background-color: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    height: 100%;
+    padding: 4px;
+    position: relative;
+    width: 145px;
+}
+
+.timelines-aggregate-yaxis-container:hover { 
+    background-color: rgba(0,0,0,0.2);
+}
+
+.timelines-aggregate-yaxis-label {
+    font-size: 0.9rem;
+    margin: auto;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.timelines-aggregate-yaxis-remove {
+    background-color: transparent;
+    border-radius: 50%;
+    height: 38px;
+    left: 50%;
+    margin: auto;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 38px;
+    z-index: 101;
+}
+
+.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove {
+    background-color: rgb(102, 102, 102);
+}
+
+.timelines-aggregate-yaxis-remove svg {
+    height: 35px;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    width: 35px;
+    top: 50%;
+}
+
+.timelines-aggregate-yaxis-remove svg path {
+    fill: transparent;
+}
+
+.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove svg path {
+    fill: rgb(252, 74, 74);
+}
+
+.timelines-aggregate-xaxis {
+    height: 70px;
+    text-align: center;
+    width: 50px;
+}

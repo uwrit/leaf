@@ -54,21 +54,20 @@ export const panelItemToDto = (panelItem: PanelItem): PanelItemDTO => {
 const panelItemNumericFilterToDto = (numFilter: NumericFilter): NumericFilterDTO => {
     const [ val1, val2 ] = numFilter.filter;
 
-    /*
+    /**
      * If invalid, return type 'None'.
      */
     if (
         numFilter.filterType === NumericFilterType.None ||
         val1 === null ||
-       (numFilter.filterType === NumericFilterType.Between && val2 === null)) 
-    { 
+       (numFilter.filterType === NumericFilterType.Between && val2 === null)) { 
         return {
             filterType: NumericFilterType.None,
             filter: []
         };
     }
 
-    /*
+    /**
      * If between, return both values.
      */
     if (numFilter.filterType === NumericFilterType.Between) {
@@ -81,7 +80,7 @@ const panelItemNumericFilterToDto = (numFilter: NumericFilter): NumericFilterDTO
         };
     } 
 
-    /*
+    /**
      * Else return just the first value.
      */
     return {

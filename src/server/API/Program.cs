@@ -37,6 +37,7 @@ namespace API
                     formatter: new JsonFormatter(),
                     pathFormat: Path.Combine(Environment.GetEnvironmentVariable(Config.Logging.Directory), Config.Logging.FileTemplate),
                     restrictedToMinimumLevel: LogEventLevel.Information,
+                    retainedFileCountLimit: null,
                     flushToDiskInterval: TimeSpan.FromSeconds(1))
                 .CreateLogger();
 

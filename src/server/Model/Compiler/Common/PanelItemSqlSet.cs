@@ -47,6 +47,7 @@ namespace Model.Compiler.Common
         internal Column EncounterId;
         internal EventIdColumn EventId;
         internal AutoAliasedColumn Date;
+        internal AutoAliasedColumn Number;
 
         new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
@@ -177,29 +178,29 @@ namespace Model.Compiler.Common
         {
             if (panelitem.UseNumericFilter)
             {
-                var col = new AutoAliasedColumn(concept.SqlFieldNumeric, compilerOptions.Alias, this);
+                Number = new AutoAliasedColumn(concept.SqlFieldNumeric, compilerOptions.Alias, this);
                 var val1 = panelitem.NumericFilter.Filter[0];
 
                 switch (panelitem.NumericFilter.FilterType)
                 {
                     case NumericFilterType.GreaterThan:
-                        where.Add(col > val1);
+                        where.Add(Number > val1);
                         return;
                     case NumericFilterType.GreaterThanOrEqualTo:
-                        where.Add(col >= val1);
+                        where.Add(Number >= val1);
                         return;
                     case NumericFilterType.LessThan:
-                        where.Add(col < val1);
+                        where.Add(Number < val1);
                         return;
                     case NumericFilterType.LessThanOrEqualTo:
-                        where.Add(col <= val1);
+                        where.Add(Number <= val1);
                         return;
                     case NumericFilterType.EqualTo:
-                        where.Add(col == val1);
+                        where.Add(Number == val1);
                         return;
                     case NumericFilterType.Between:
                         var val2 = panelitem.NumericFilter.Filter[1];
-                        where.Add(col == val1 & val2);
+                        where.Add(Number == val1 & val2);
                         return;
                     default:
                         return;

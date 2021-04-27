@@ -10,17 +10,18 @@ import { Panel as PanelModel } from '../../../models/panel/Panel';
 import CountDropdown from './CountDropdown';
 import InclusionDropdown from './InclusionDropdown';
 import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown'
+import { PanelHandlers } from './PanelGroup';
 import SameSequenceDropdown from './SameSequenceDropdown';
 
 interface Props {
-    dispatch: any;
+    handlers: PanelHandlers;
     index: number;
     panel: PanelModel;
 }
 
 export default class SubPanelHeader extends React.PureComponent<Props> {
     public render(): any {
-        const { panel, index, dispatch } = this.props;
+        const { panel, index, handlers } = this.props;
         const subpanel = panel.subPanels[index];
         const classes = [ 'subpanel-header' ];
         let content: any; 
@@ -32,24 +33,23 @@ export default class SubPanelHeader extends React.PureComponent<Props> {
         if (subpanel.panelItems.length === 0) {
             content = <div className="subpanel-header-preview">In the Same Encounter</div>;
             classes.push('no-data');
-        }
-        else {
+        } else {
             content = 
                 <div>
                     <InclusionDropdown 
-                        dispatch={dispatch}
+                        handlers={handlers}
                         inclusionDropdownType={INCLUSION_DROPDOWN_TYPE.SUBPANEL}
                         index={index}
                         isFirst={false} 
                         panel={panel} 
                     />
                     <SameSequenceDropdown
-                        dispatch={dispatch}
+                        handlers={handlers}
                         index={index}
                         subPanel={subpanel}
                     /> 
                     <CountDropdown 
-                        dispatch={dispatch}
+                        handlers={handlers}
                         index={index}
                         panel={panel}
                     /> 

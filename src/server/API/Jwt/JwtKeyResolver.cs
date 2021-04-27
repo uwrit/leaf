@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
@@ -50,8 +51,12 @@ namespace API.Jwt
             {
                 return new SecurityKey[] { new X509SecurityKey(new X509Certificate2(jwtOpts.Certificate)) };
             }
-
+            log.LogInformation("Token", token);
+            log.LogInformation("Security token", securityToken.Issuer);
+            log.LogInformation("Kid", kid);
+            log.LogInformation("Interrogators", cache.Interrogators().Select(i => $"{i.Name}, {i.Issuer}, {i.KeyId}"));
             var ne = cache.GetInterrogatorOrDefault(securityToken.Issuer);
+            log.LogInformation("Interrogator", ne);
             if (ne.KeyId == kid)
             {
                 return new SecurityKey[] { new X509SecurityKey(new X509Certificate2(ne.Certificate)) };

@@ -40,6 +40,7 @@ namespace API.DTO.Config
     {
         public MapOptionsDTO Map = new MapOptionsDTO();
         public VisualizeOptionsDTO Visualize = new VisualizeOptionsDTO();
+        public TimelinesOptionsDTO Timelines = new TimelinesOptionsDTO();
         public PatientListOptionsDTO PatientList = new PatientListOptionsDTO();
         public HelpOptionsDTO Help = new HelpOptionsDTO();
 
@@ -52,6 +53,10 @@ namespace API.DTO.Config
         {
             public bool Enabled { get; set; }
             public bool ShowFederated { get; set; }
+        }
+        public class TimelinesOptionsDTO
+        {
+            public bool Enabled { get; set; }
         }
         public class PatientListOptionsDTO
         {

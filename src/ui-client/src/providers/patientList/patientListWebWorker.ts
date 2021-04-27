@@ -168,7 +168,7 @@ export default class PatientListWebWorker {
     }
 
     private workerContext = () => {
-        let patientMap = new Map<string, Patient>();
+        let patientMap = new Map<PatientId, Patient>();
         let singletonDatasets = new Map<PatientListDatasetId, PatientListDatasetDefinition>();
         let multirowDatasets = new Map<PatientListDatasetId, PatientListDatasetDefinition>();
         let defaultPatientOrder: PatientId[] = [];
@@ -277,7 +277,7 @@ export default class PatientListWebWorker {
             // For each row
             for (let i = 0; i < uniquePatients.length; i++) {
                 const p = uniquePatients![i];
-                const row = data[p][0];
+                const row = data[p][0] as any;
                 const compoundId = `${responderId}_${p}`;
                 const pat = patientMap.get(compoundId);
                 if (!pat) { continue; }
@@ -324,7 +324,7 @@ export default class PatientListWebWorker {
 
                 // Convert strings to dates
                 for (let j = 0; j < rows.length; j++) {
-                    const row = rows[j];
+                    const row = rows[j] as any;
                     for (let k = 0; k < dateFields.length; k++) {
                         const f = dateFields[k].id;
                         const v = row[f];
@@ -577,7 +577,7 @@ export default class PatientListWebWorker {
          * Define a derivedNumericColumns template for
          * storing summarized stats from numeric datasets.
          */
-        const getDerivedNumericColumnsTemplate = () => {
+        const getDerivedNumericColumnsTemplate = (): any => {
             return {
                 trend: { id: 'Trend', isDisplayed: true, type: typeSparkline },
                 count: { id: 'Count', isDisplayed: true, type: typeNum },
@@ -678,7 +678,7 @@ export default class PatientListWebWorker {
                 // Make sure we have data to work with
                 if (!data) { continue; }
 
-                const vals: XY[] = data.map((d: PatientListRowDTO) => ({ x: d[def.dateValueColumn!], y: d[def.numericValueColumn!] }))
+                const vals: XY[] = data.map((d: PatientListRowDTO) => ({ x: d[def.dateValueColumn!], y: d[def.numericValueColumn!] })) as any;
                 const numVals: XY[] = vals.filter((d: XY) => +d.y).sort((a: XY, b: XY) => a.y - b.y);
 
                 // Compute earliest and latest
@@ -722,7 +722,7 @@ export default class PatientListWebWorker {
          * a given non-numeric dataset definition.
          */
         const getNonNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
-            const cols = getDerivedNonNumericColumnsTemplate();
+            const cols = getDerivedNonNumericColumnsTemplate() as any;
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
                 col.index = i;
@@ -777,7 +777,7 @@ export default class PatientListWebWorker {
                 // Make sure we have data to work with
                 if (!data) { continue; }
 
-                const vals: XY[] = data.map((d: PatientListRowDTO) => ({ x: d[def.dateValueColumn!], y: d[def.stringValueColumn!] }));
+                const vals: XY[] = data.map((d: PatientListRowDTO) => ({ x: d[def.dateValueColumn!], y: d[def.stringValueColumn!] })) as any;
 
                 // Compute earliest and latest
                 const firstDate = vals[0].x;
@@ -861,7 +861,7 @@ export default class PatientListWebWorker {
                     let rowCount = 0;
                     if (ds) {
                         for (let i = 0; i < ds.length; i++) {
-                            const row: any[] = [];
+                            const row = [] as any;
                             const vals: any = ds[i];
                             for (let j = 0; j < mdsCols.length; j++) {
                                 const d = vals[mdsCols[j].id];

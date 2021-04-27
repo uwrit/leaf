@@ -10,7 +10,7 @@ import { MultirowDataByDatasetKey, SingletonDataByDatasetKey } from './Dataset';
 export type PatientId = string;
 export type EncounterId = string;
 
-// This is the model stored in the web worker backend
+// Model stored in the web worker backend
 export interface Patient {
     compoundId: PatientId;
     detailRowCount: number;
@@ -32,6 +32,7 @@ export interface PatientListRow {
 }
 
 export interface PatientListRowDTO {
+    [key: string]: string;
     encounterId?: EncounterId;
     personId: string;
 }

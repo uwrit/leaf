@@ -54,7 +54,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
         }
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(): any {
         const { setMrnFieldValid, redCap } = this.props;
         const { mrnField } = redCap;
 

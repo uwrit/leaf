@@ -45,6 +45,30 @@ namespace Model.Compiler
             };
         }
 
+        /// <summary>
+        /// Validate the specified context. Throws if there are unrecoverable errors.
+        /// </summary>
+        /// <returns>The validated Panel.</returns>
+        /// <param name="ctx">Context.</param>
+        /// <exception cref="LeafCompilerException"/>
+        public PanelDatasetCompilerContext ValidateConceptPanel(PanelValidationContext ctx, QueryRef queryRef)
+        {
+            if (!ctx.PreflightPassed)
+            {
+                throw new LeafCompilerException("PreflightCheck failed, nothing to validate.");
+            }
+            ValidateItems(ctx);
+            var panels = ValidatePanels(ctx);
+            return new PanelDatasetCompilerContext
+            {
+                Panel = panels.First(),
+                QueryContext = new QueryContext
+                {
+                    QueryId = (Guid)queryRef.Id
+                }
+            };
+        }
+
         IReadOnlyCollection<Panel> ValidatePanels(PanelValidationContext ctx)
         {
             var validated = new List<Panel>();
@@ -131,7 +155,7 @@ namespace Model.Compiler
                                specialization = d,
                                matches = panelItem.Concept.SpecializationGroups
                                                   .SelectMany(s => s.Specializations)
-                                                  .Where(s => s.Id == d.Id || d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId)
+                                                  .Where(s => s.Id == d.Id || (d.UniversalId != null && s.UniversalId.ToString() == d.UniversalId))
                            };
                        });
 

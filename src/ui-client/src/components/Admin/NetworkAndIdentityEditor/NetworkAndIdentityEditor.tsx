@@ -148,7 +148,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `One or more Identity fields or networked Leaf instances are missing necessary data. Are you sure you want to save?`,
                 header: 'Missing Identity or Network data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     dispatch(processApiUpdateQueue());
                     this.setState({ forceValidation: false });

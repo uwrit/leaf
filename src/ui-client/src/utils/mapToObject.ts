@@ -37,8 +37,8 @@ const demap = (map: Map<any, any>) => {
     return output;
 };
 
-export const mapToObject = (input: any, targetShape: Object) => {
-    const output = {};
+export const mapToObject = (input: any, targetShape: any) => {
+    const output = {} as any;
     const keys = Object.keys(input);
     for (const key of keys) {
         const target = targetShape[key]

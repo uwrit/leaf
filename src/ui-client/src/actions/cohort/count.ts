@@ -24,6 +24,7 @@ import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
 import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
 import { allowAllDatasets } from '../../services/datasetSearchApi';
+import { clearAllTimelinesData } from '../../services/timelinesApi';
 import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
@@ -70,8 +71,9 @@ export const getCounts = () => {
         });
         dispatch(setCohortCountStarted(state.responders, cancelSource));
 
-        // Clear patient list
+        // Clear patient list & timeline data
         await clearPreviousPatientList();
+        await clearAllTimelinesData();
 
         // Wrap entire query action in Promise.all
         Promise.all(
@@ -109,7 +111,7 @@ export const getCounts = () => {
                                 dispatch(errorNetworkCohortCount(nr.id, error.response));
                             }
                         })
-                        .then(() => resolve());
+                        .then(() => resolve(null));
                 })
             })                
         ).then( async () => {
@@ -177,7 +179,7 @@ const getDemographics = () => {
                             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
                             dispatch(errorNetworkCohortDemographics(nr.id, error.response));
                         })
-                        .then(() => resolve());
+                        .then(() => resolve(null));
                 })
             })                
         ).then(() => {

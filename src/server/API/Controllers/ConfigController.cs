@@ -77,6 +77,10 @@ namespace API.Controllers
                         Enabled = clientOptions.Visualize.Enabled,
                         ShowFederated = clientOptions.Visualize.ShowFederated
                     },
+                    Timelines = new ClientOptionsDTO.TimelinesOptionsDTO
+                    {
+                        Enabled = clientOptions.Timelines.Enabled
+                    },
                     PatientList = new ClientOptionsDTO.PatientListOptionsDTO
                     {
                         Enabled = clientOptions.PatientList.Enabled

@@ -252,7 +252,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `One or more fields are missing necessary data. Are you sure you want to save this Concept?`,
                 header: 'Missing Concept data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     dispatch(saveAdminConcept(currentAdminConcept!, currentUserConcept!));
                     this.setState({ forceValidation: false });
@@ -315,7 +315,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
                           `operation will fail if any are found. Are you sure you want to continue? This will take effect immediately and can't be undone.`
                         : `Are you sure you want to delete the Concept, "${currentAdminConcept!.uiDisplayName}"? This will take effect immediately and can't be undone.`,
                     header: 'Delete Concept',
-                    onClickNo: () => null,
+                    onClickNo: () => null as any,
                     onClickYes: () => { dispatch(deleteAdminConceptFromServer(currentAdminConcept!, currentUserConcept!)) },
                     show: true,
                     noButtonText: `No`,

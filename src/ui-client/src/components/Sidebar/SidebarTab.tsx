@@ -16,6 +16,7 @@ interface Props {
     currentAdminPane: AdminPanelPane;
     dispatch: any;
     isActive: boolean;
+    isBeta?: boolean;
     clickHandler: (i: number) => void;
     selectable: boolean;
 }
@@ -33,7 +34,7 @@ export class SidebarTab extends React.PureComponent<Props, State> {
     }
     
     public render () {
-        const { selectable, isActive, config, clickHandler, dispatch, currentAdminPane } = this.props;
+        const { selectable, isActive, isBeta, config, clickHandler, dispatch, currentAdminPane } = this.props;
         const c = 'sidebar';
         const id = `${c}-tab_${config.index}`;
         const classes = [ `${c}-tab` ];
@@ -58,6 +59,9 @@ export class SidebarTab extends React.PureComponent<Props, State> {
                         toggle={this.toggleTooltip}>
                         {config.display}
                     </Tooltip>
+                    }
+                    {isBeta &&
+                    <div className={`${c}-beta`}>BETA</div>
                     }
                 </li>
                 <div className={`${c}-tab-divider`} />

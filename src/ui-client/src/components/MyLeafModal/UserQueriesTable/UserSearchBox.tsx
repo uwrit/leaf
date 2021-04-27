@@ -39,10 +39,10 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
         }
     }
 
-    public getSnapshotBeforeUpdate(nextProps: Props) {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { userQueryState } = this.props;
 
-        if (nextProps.userQueryState.users.length !== userQueryState.users.length) {
+        if (prevProps.userQueryState.users.length !== userQueryState.users.length) {
             this.setState({ selectedUserIndex: -1 });
         }
         return null;
@@ -205,7 +205,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
             clearTimeout(debounceTimer);
         }
 
-        if (term.length >= (this.minSearchCharLength && !(term.startsWith(this.prevSearchTerm))) || Math.abs(term.length - this.prevSearchTerm.length) <= 2) {
+        if ((term.length >= this.minSearchCharLength && !(term.startsWith(this.prevSearchTerm))) || Math.abs(term.length - this.prevSearchTerm.length) <= 2) {
             this.prevSearchTerm = term;
             this.setState({
                 showUsersDropdown: true,

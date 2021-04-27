@@ -397,6 +397,31 @@ namespace Model.Cohort
         }
     }
 
+    public sealed class ConceptMarshalPlan : MarshalPlan
+    {
+        public SchemaField EncounterId { get; set; }
+        public SchemaField DateField { get; set; }
+        public SchemaField NumberField { get; set; }
+
+        public ConceptMarshalPlan(DatasetResultSchema schema) : base(schema)
+        {
+            if (schema.TryGet(ConceptColumns.EncounterId, out var encounterId))
+            {
+                EncounterId = encounterId;
+            }
+
+            if (schema.TryGet(ConceptColumns.DateField, out var dateField))
+            {
+                DateField = dateField;
+            }
+
+            if (schema.TryGet(ConceptColumns.NumberField, out var numberField))
+            {
+                NumberField = numberField;
+            }
+        }
+    }
+
     public sealed class ObservationMarshalPlan : MarshalPlan
     {
         public SchemaField Category { get; set; }

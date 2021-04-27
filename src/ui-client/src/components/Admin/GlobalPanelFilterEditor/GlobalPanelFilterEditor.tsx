@@ -126,7 +126,7 @@ export class GlobalPanelFilterEditor extends React.PureComponent<Props,State> {
             const confirm: ConfirmationModalState = {
                 body: `One or more fields in the Global Panel Filters are missing necessary data. Are you sure you want to save?`,
                 header: 'Missing Global Panel Filter data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     dispatch(processApiUpdateQueue());
                     this.setState({ forceValidation: false });

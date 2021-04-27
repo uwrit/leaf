@@ -371,7 +371,7 @@ export default class REDCapImportWebWorker {
 
         const deriveImportRecords = (config: REDCapImportConfiguration) => {
             const seen: Map<string, number> = new Map();
-            const mrnMap: Map<string, string> = new Map(config.mrns.map(m => [ m[config.recordField], m[config.mrnField] ]));
+            const mrnMap: Map<string, string> = new Map(config.mrns.map((m: any) => [ m[config.recordField], m[config.mrnField] ]));
 
             for (let i = 0; i < config!.records.length; i++) {
                 const raw = config!.records[i] as REDCapEavRecord;

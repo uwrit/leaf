@@ -88,7 +88,7 @@ export const importMetadataFromREDCap = () => {
                 const confirm: ConfirmationModalState = {
                     body: `It looks like this project, "${config.projectInfo.project_title}", has already been imported into Leaf. Do you want to delete it now and import again?`,
                     header: 'Delete Previous REDCap Import',
-                    onClickNo: () => null,
+                    onClickNo: () => null as any,
                     onClickYes: async () => {
                         dispatch(setNoClickModalState({ message: 'Deleting previous', state: NotificationStates.Working }));
                         await deleteMetadata(state, prev);
@@ -220,7 +220,7 @@ const importFormRecordsFromREDCap = async (dispatch: any, conn: REDCapHttpConnec
              * Import current batch.
              */
             const endIdx = startIdx + batchSize;
-            const batch = config.mrns.slice(startIdx, endIdx).map(m => m[config.recordField]);
+            const batch = config.mrns.slice(startIdx, endIdx).map((m: any) => m[config.recordField]);
             const newRecs = await conn.getRecords({ ...request, records: batch }) as REDCapEavRecord[];
             const display = `(${endIdx.toLocaleString()} of ${totalRecords.toLocaleString()})`;
             config.records = config.records.concat(newRecs);

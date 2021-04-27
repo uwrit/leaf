@@ -11,7 +11,7 @@ namespace Model.Tagging
     {
         const string resourceSegment = ResourceType.Query;
 
-        QueryUrn(string urn) : base(urn)
+        public QueryUrn(string urn) : base(urn)
         {
 
         }
@@ -54,7 +54,7 @@ namespace Model.Tagging
         public static QueryUrn Create(Guid guid)
         {
             var now = DateTime.UtcNow.Ticks.ToString();
-            return From($"urn:leaf:query:{guid.ToString()}:{now}");
+            return From($"urn:leaf:query:{guid}:{now}");
         }
     }
 }

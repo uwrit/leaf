@@ -13,13 +13,12 @@ import { AppState } from '../../../models/state/AppState';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import Panel from '../../FindPatients/Panels/Panel';
 import { CohortStateType } from '../../../models/state/CohortState';
-import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { FiSlash } from 'react-icons/fi';
-import './EncounterPanelSelector.css';
+import './PanelSelectorModal.css';
 
 interface OwnProps {
-    dataset?: PatientListDatasetQuery;
-    handleByEncounterSelect: (panelIndex?: number) => void;
+    headerText: string;
+    handleByPanelSelect: (panelIndex?: number) => void;
     toggle: () => void;
 }
 interface StateProps {
@@ -41,8 +40,8 @@ interface State {
     shown: boolean;
 }
 
-class EncounterPanelSelector extends React.PureComponent<Props, State> {
-    private className = 'encounter-panel-selector';
+class PanelSelectorModal extends React.PureComponent<Props, State> {
+    private className = 'panel-selector';
     private mouseOut = true;
 
     public constructor(props: Props) {
@@ -58,13 +57,9 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
     }
     
     public render() {
-        const { panels, dataset, toggle } = this.props;
+        const { panels, headerText, toggle } = this.props;
         const c = this.className;
         const modalClasses = [ `${c}-modal`, (this.state.shown ? 'shown' : '') ];
-
-        if (!dataset) { return null; }
-
-        const name = dataset.category ? `${dataset.category} ${dataset.name}` : dataset.name;
 
         return (
             createPortal(
@@ -75,7 +70,7 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
                     ref={this.triggerClick}>
                     <div className={`${c}-container`}>
                         <span className={`${c}-close`} onClick={toggle}>✖</span>
-                        <div className={`${c}-header`}>Which Encounters do you want {name} data from?</div>
+                        <div className={`${c}-header`}>{headerText}</div>
                         <Row>
                             {panels.map((p,i) => {
                                 const tp = this.getPanelType(p);
@@ -86,7 +81,6 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
                                         <div className={`${c}-panel-overlay`} onClick={this.handlePanelSelect.bind(null, p, i)}>
                                             <Panel 
                                                 isFirst={i===0}
-                                                dispatch={this.noOp}
                                                 panel={p}
                                                 queryState={CohortStateType.LOADED}
                                             />
@@ -102,14 +96,12 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
     }
 
     private handlePanelSelect = (panel: PanelModel, panelIndex: number) => {
-        const { handleByEncounterSelect } = this.props;
+        const { handleByPanelSelect } = this.props;
 
         if (this.getPanelType(panel) === PanelType.Valid) {
-            handleByEncounterSelect(panelIndex);
+            handleByPanelSelect(panelIndex);
         }
     }
-
-    private noOp = () => () => null;
 
     private getPanelExclusionText = (tp: PanelType) => {
         if (tp === PanelType.Valid) { return null; }
@@ -129,7 +121,7 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
     }
 
     private getPanelType = (panel: PanelModel): PanelType => {
-        const noEncs = !panel.subPanels.find(sp => sp.panelItems.find(pi => pi.concept.isEncounterBased));
+        const noEncs = !panel.subPanels.find(sp => sp.panelItems.find(pi => pi.concept.isEncounterBased) as any);
         const excluded = !panel.includePanel;
         const empty = !panel.subPanels.find(sp => sp.panelItems.length > 0);
 
@@ -144,9 +136,9 @@ class EncounterPanelSelector extends React.PureComponent<Props, State> {
     private handleMouseLeave = () => this.mouseOut = true;
 
     private handleBlur = (e: React.SyntheticEvent<Element>) => {
-        const { handleByEncounterSelect, toggle } = this.props;
+        const { handleByPanelSelect, toggle } = this.props;
         if (this.mouseOut) { 
-            handleByEncounterSelect()
+            handleByPanelSelect()
             toggle(); 
         }
     }
@@ -174,4 +166,4 @@ const mapDispatchToProps = (dispatch: any, ownProps: OwnProps) : DispatchProps =
 }
 
 export default connect<StateProps, DispatchProps, OwnProps, AppState>
-    (mapStateToProps, mapDispatchToProps)(EncounterPanelSelector)
+    (mapStateToProps, mapDispatchToProps)(PanelSelectorModal)

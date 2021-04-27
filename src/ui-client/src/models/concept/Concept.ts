@@ -8,8 +8,10 @@
 import { ConceptMap } from '../state/AppState';
 import { PanelFilter } from '../panel/PanelFilter';
 
+export type ConceptId = string;
+
 export interface BaseConcept {
-    id: string;
+    id: ConceptId;
     universalId?: string;
 }
 

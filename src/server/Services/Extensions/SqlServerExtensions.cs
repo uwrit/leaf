@@ -15,6 +15,11 @@ namespace Services.Extensions
 {
     public static class SqlServerExtensions
     {
+        public static SqlParameter[] SqlParameters(this ConceptDatasetExecutionContext ctx)
+        {
+            return ctx.Parameters.SqlParameters();
+        }
+
         public static SqlParameter[] SqlParameters(this ShapedDatasetExecutionContext ctx)
         {
             return ctx.Parameters.SqlParameters();

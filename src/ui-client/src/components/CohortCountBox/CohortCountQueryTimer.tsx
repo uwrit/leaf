@@ -31,7 +31,7 @@ export class CohortCountQueryTimer extends React.PureComponent<Props, State> {
         this.setState({ elapsed: this.state.elapsed + increment });
     }
 
-    public getSnapshotBeforeUpdate (prevProps: Props) {
+    public getSnapshotBeforeUpdate (prevProps: Props): any {
         const prevState = prevProps.countState;
         const currState = this.props.countState; 
 

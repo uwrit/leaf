@@ -125,7 +125,7 @@ namespace Model.Compiler.SqlServer
                 case Shape.MedicationAdministration:
                     return new MedicationAdministrationDateFilterProvider();
                 default:
-                    throw new ArgumentException($"{compilerContext.Shape.ToString()} switch branch not implemented");
+                    throw new ArgumentException($"{compilerContext.Shape} switch branch not implemented");
             }
         }
 

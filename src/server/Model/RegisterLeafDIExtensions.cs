@@ -39,6 +39,10 @@ namespace Model
             services.AddTransient<DatasetQueryProvider>();
             services.AddTransient<DataImporter>();
             services.AddTransient<NotificationManager>();
+            services.AddTransient<ConceptDatasetProvider>();
+            services.AddTransient<ConceptDatasetCompilerValidationContextProvider>();
+            services.AddTransient<PanelDatasetProvider>();
+            services.AddTransient<PanelDatasetCompilerValidationContextProvider>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();

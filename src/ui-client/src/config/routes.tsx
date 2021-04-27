@@ -6,7 +6,7 @@
  */ 
 
 import React, { Suspense } from 'react'
-import { FiBarChart2, FiMap, FiSearch } from 'react-icons/fi';
+import { FiBarChart2, FiMap, FiSearch, FiSliders } from 'react-icons/fi';
 import { MdPerson } from 'react-icons/md'
 import { FindPatients } from '../components/FindPatients/FindPatients';
 import LeafMap from '../containers/Map/LeafMap';
@@ -17,11 +17,13 @@ import { UserContext, AppConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import { AdminPanelPane } from '../models/state/AdminState';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../actions/admin/admin';
+import Timelines from '../containers/Timelines/Timelines';
 
 export interface RouteConfig {
     display: string;
     icon: any;
     index: Routes;
+    isBeta?: boolean;
     path: string;
     render: any;
     subRoutes?: SubRouteConfig[];
@@ -61,6 +63,16 @@ const visualize = (): RouteConfig => {
         index: Routes.Visualize,
         path: '/visualize', 
         render: () => <Visualize />
+    };
+};
+const timelines = (): RouteConfig => {
+    return {
+        display: 'Timelines',
+        icon: <FiSliders />,
+        index: Routes.Timelines,
+        isBeta: true,
+        path: '/timelines',
+        render: () => <Timelines />
     };
 };
 const patientList = (): RouteConfig => { 
@@ -116,6 +128,7 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
 
     if (client.map.enabled)         { routes.push(map(client.map.tileURI)); }
     if (client.visualize.enabled)   { routes.push(visualize()); }
+    if (client.timelines.enabled)   { routes.push(timelines()); }
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
 

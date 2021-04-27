@@ -80,6 +80,20 @@ namespace Model.Compiler
 
         /// <summary>
         /// Converts stub AST query definition into local, fully hydrated AST.
+        /// The returned AST is unvalidated, and has a UniversalId property set if the incoming query has one.
+        /// </summary>
+        /// <returns>The panels async.</returns>
+        /// <param name="query">Stub AST query definition.</param>
+        /// <param name="token">Cancellation token.</param>
+        public async Task<PanelValidationContext> GetPanelsAsync(IConceptDatasetPanel query, CancellationToken token)
+        {
+            token.ThrowIfCancellationRequested();
+            var validationContext = await GetPanelsAsync(query);
+            return validationContext;
+        }
+
+        /// <summary>
+        /// Converts stub AST query definition into local, fully hydrated AST.
         /// The returned AST is unvalidated.
         /// </summary>
         /// <returns>The panels async.</returns>
@@ -102,6 +116,13 @@ namespace Model.Compiler
             return new PanelValidationContext(query, resources, merged);
         }
 
+        /// <summary>
+        /// Crosswalks panel items to associated import dataset reference ids.
+        /// The returned AST is unvalidated.
+        /// </summary>
+        /// <returns>The panels.</returns>
+        /// <param name="panels">PanelDTOs.</param>
+        /// <param name="importRefs">Import panel items referenced in panels.</param>
         public IEnumerable<IPanelDTO> CrosswalkImportIds(IEnumerable<IPanelDTO> panels, IEnumerable<ImportRef> importRefs)
         {
             var mapped = panels.Select(p => p).ToList();

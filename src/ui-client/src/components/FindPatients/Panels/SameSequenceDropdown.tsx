@@ -7,15 +7,15 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
-import { setSubPanelJoinSequence } from '../../../actions/panels';
 import { DateIncrementType } from '../../../models/panel/Date';
 import { SubPanel as SubPanelModel, SequenceType, SubPanelJoinSequence } from '../../../models/panel/SubPanel';
+import { PanelHandlers } from './PanelGroup';
 import SameSequenceDropdownIncrement from './SameSequenceDropdownIncrement';
 
 interface Props {
-    dispatch: any
-    index: number,
-    subPanel: SubPanelModel,
+    handlers: PanelHandlers;
+    index: number;
+    subPanel: SubPanelModel;
 }
 
 interface State {
@@ -132,8 +132,8 @@ export default class SameSequenceDropdown extends React.PureComponent<Props, Sta
      * Updates Redux store with current data.
      */
     private updateStoreWithJoinSequence = (joinSequence: SubPanelJoinSequence) => {
-        const { dispatch, subPanel, index } = this.props;
-        dispatch(setSubPanelJoinSequence(subPanel.panelIndex, index, { ...subPanel.joinSequence, ...joinSequence }));
+        const { handlers, subPanel } = this.props;
+        handlers.handleSubPanelJoinSequence(subPanel, joinSequence);
     }
 
     /*

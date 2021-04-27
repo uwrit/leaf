@@ -27,6 +27,10 @@ namespace Services.Search
         readonly IUserContext user;
         readonly ILogger<DatasetCompilerContextProvider> log;
         readonly AppDbOptions opts;
+        readonly JsonSerializerSettings jsonSettings = new JsonSerializerSettings
+        {
+            TypeNameHandling = TypeNameHandling.Auto
+        };
 
         public DatasetCompilerContextProvider(
             IUserContext userContext,
@@ -86,10 +90,7 @@ namespace Services.Search
             {
                 return null;
             }
-            var panels = JsonConvert.DeserializeObject<IEnumerable<Panel>>(def, new JsonSerializerSettings
-            {
-                TypeNameHandling = TypeNameHandling.Auto
-            });
+            var panels = JsonConvert.DeserializeObject<IEnumerable<Panel>>(def, jsonSettings);
             if (panels.Count() >= idx+1)
             {
                 return panels.ElementAt(idx.Value);
@@ -124,6 +125,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetId and QueryUId");
             var datasetid = request.DatasetRef.Id.Value;
             var queryuid = request.QueryRef.UniversalId.ToString();
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -131,7 +133,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetIdQueryUId,
-                    new { datasetid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetid, queryuid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -145,6 +147,7 @@ namespace Services.Search
             log.LogInformation("Getting DatasetQueryCompilerContext by DatasetUId and QueryId");
             var datasetuid = request.DatasetRef.UniversalId.ToString();
             var queryid = request.QueryRef.Id.Value;
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -152,7 +155,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryId,
-                    new { datasetuid, queryid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetuid, queryid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -163,9 +166,10 @@ namespace Services.Search
 
         async Task<DatasetCompilerContext> ByDatasetUIdQueryUId(DatasetExecutionRequest request)
         {
-            log.LogInformation("Getting DatasetQueryCompilerContext bty DatasetUId and QueryUId");
+            log.LogInformation("Getting DatasetQueryCompilerContext by DatasetUId and QueryUId");
             var datasetuid = request.DatasetRef.UniversalId.ToString();
             var queryuid = request.QueryRef.UniversalId.ToString();
+            var joinpanel = request.PanelIndex.HasValue;
 
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -173,7 +177,7 @@ namespace Services.Search
 
                 var grid = await cn.QueryMultipleAsync(
                     ContextQuery.byDatasetUIdQueryUId,
-                    new { datasetuid, queryuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
+                    new { datasetuid, queryuid, joinpanel, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );

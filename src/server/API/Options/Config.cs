@@ -50,11 +50,5 @@ namespace API.Options
                 throw new LeafConfigurationException($"{Authorization.ActiveDirectory}:{nameof(opts.RolesMapping)} is required");
             }
         }
-
-        public static class Logging
-        {
-            public const string Directory = "SERILOG_DIR";
-            public const string FileTemplate = "leaf-api-{Date}.log";
-        }
     }
 }

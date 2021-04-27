@@ -16,6 +16,8 @@ namespace Model.Compiler
         {
             switch (shape)
             {
+                case Shape.Concept:
+                    return new ConceptDatasetResultSchema(fields);
                 case Shape.Dynamic:
                     return new DynamicDatasetResultSchema(fields);
                 case Shape.Observation:
@@ -37,7 +39,7 @@ namespace Model.Compiler
                 case Shape.MedicationAdministration:
                     return new MedicationAdministrationResultSchema(fields);
                 default:
-                    throw new ArgumentException($"{shape.ToString()} switch branch not implemented");
+                    throw new ArgumentException($"{shape} switch branch not implemented");
             }
         }
 
@@ -69,6 +71,15 @@ namespace Model.Compiler
         public DynamicDatasetResultSchema(ICollection<SchemaField> fields)
         {
             Shape = Shape.Dynamic;
+            Fields = fields;
+        }
+    }
+
+    public sealed class ConceptDatasetResultSchema : DatasetResultSchema
+    {
+        public ConceptDatasetResultSchema(ICollection<SchemaField> fields)
+        {
+            Shape = Shape.Concept;
             Fields = fields;
         }
     }

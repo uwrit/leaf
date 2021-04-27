@@ -15,7 +15,7 @@ import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Dat
 import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patientList/Dataset';
 import moment from 'moment'
 
-/*
+/**
  * Fetch patient counts based on current panel setup.
  */
 export function fetchCount(state: AppState, nr: NetworkIdentity, panelFilters: PanelFilter[], panels: PanelDTO[], queryId: string, cancelToken: CancelTokenSource) {
@@ -30,17 +30,59 @@ export function fetchCount(state: AppState, nr: NetworkIdentity, panelFilters: P
     return request;
 };
 
-/*
+/**
  * Fetch demographics (shared by patient list and visuzalization)
  * based on already run patient counts.
  */
-export function fetchDemographics(state: AppState, nr: NetworkIdentity, queryId: string, cancelToken: CancelTokenSource) {
+export const fetchDemographics = (
+    state: AppState, 
+    nr: NetworkIdentity, 
+    queryId: string, 
+    cancelToken: CancelTokenSource)=> {
+
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.get(`${nr.address}/api/cohort/${queryId}/demographics`);
 };
 
-/*
+/**
+ * Fetch a concept dataset.
+ */
+export const fetchConceptDataset = (
+    state: AppState, 
+    nr: NetworkIdentity, 
+    queryId: string, 
+    panel: PanelDTO) => {
+
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const params: any = { 'panelitem': JSON.stringify(panel.subPanels[0].panelItems[0]) };
+    const dates = panel.dateFilter;
+
+    if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
+        params.early = deriveDateTicks(dates.start);
+        params.late = deriveDateTicks(dates.end);
+    }
+
+    return http.get(`${nr.address}/api/cohort/${queryId}/conceptdataset`, { params } );
+};
+
+/**
+ * Fetch a panel dataset.
+ */
+export const fetchPanelDataset = (
+    state: AppState, 
+    nr: NetworkIdentity, 
+    queryId: string,
+    panelIdx: number) => {
+
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const params: any = { panelIdx };
+    return http.get(`${nr.address}/api/cohort/${queryId}/paneldataset`, { params } );
+};
+
+/**
  * Fetch a dataset, which may or may not have date boundaries.
  */
 export const fetchDataset = async (
@@ -77,7 +119,7 @@ export const fetchAvailableDatasets = async (state: AppState): Promise<PatientLi
     return ds;
 };
 
-/*
+/**
  * Private method for getting UNIX ticks based on a given
  * DateFilter. Used when requesting datasets.
  */

@@ -1,0 +1,117 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.timelines-container {
+    background-color: white;
+    padding: 2px 10px;
+    transition: background-color 0.5s;
+}
+
+.timelines-container.show-concepts {
+    background-color: rgba(0,0,0,0.5);
+    padding: 0 10px;
+}
+
+.timelines-main {
+    margin-top: 30px;
+}
+
+.timelines-chart {
+    border-radius: 8px;
+    display: inline-block;
+    flex: 1;
+    height: calc(82vh);
+    position: relative;
+}
+
+.timelines-control-panel {
+    border: 1px solid rgb(230,230,230);
+    border-radius: 8px;
+    background-color: rgb(238,238,238);
+    display: inline-block;
+    margin-right: 10px;
+    padding: 0 20px;
+}
+
+.timelines-no-concepts {
+    background-color: rgba(28, 170, 221, 0.05);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: black;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+}
+
+.timelines-no-concepts p {
+    font-size: 1.4rem;
+    font-weight: 100;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+.timelines-index-control-panel {
+    text-align: center;
+}
+
+.timelines-control-panel-step .clickable {
+    color: rgb(28, 168, 221);
+    cursor: pointer;
+}
+
+.timelines-control-panel-step .clickable:hover {
+    text-decoration: underline;
+}
+
+.timelines-index-control-panel-loaded {
+    height: 20px;
+}
+
+.timelines-index-control-panel-loaded svg {
+    font-size: 2rem;
+    margin: -4px 8px 0 0;
+}
+
+.timelines-index-control-panel-loaded svg circle {
+    stroke-width: 2px !important;
+}
+
+.timelines-index-control-panel-loaded svg path,
+.timelines-index-control-panel-loaded svg polyline {
+    stroke: rgb(7, 192, 69);
+}
+
+.timelines-index-control-panel-loaded span {
+    vertical-align: top;
+}
+
+.timelines-control-panel-step .input-group-append > button {
+    background-color: rgb(245, 245, 245) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: rgb(28, 168, 221) !important;
+    padding: 4px !important;
+}
+
+.timelines-control-panel-step .input-group-append > button:hover {
+    background-color: rgb(230, 230, 230) !important;
+}
+
+.timelines-date-range-selector-number {
+    appearance: none;
+    margin: 0;
+    text-align: center;
+}
+
+.timelines-control-panel-step-subcomponent,
+.timelines-control-panel-step .input-group-append button {
+    font-size: 1.1rem !important;
+}

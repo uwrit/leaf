@@ -309,7 +309,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                     <p key={2}>Are you sure you want to try to save this Dataset? The save or query execution process may fail due to missing data.</p>
                 ],
                 header: 'Missing Dataset data',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
                         dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
@@ -336,7 +336,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                        Leaf will throw an error in the Patient List.</p>
                 ],
                 header: 'Potential missing columns',
-                onClickNo: () => null,
+                onClickNo: () => null as any,
                 onClickYes: () => { 
                     if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
                         dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
@@ -434,7 +434,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
      * user hits enter. This function is used in the Patient List
      * but serves no use in the Admin Panel.
      */
-    private handleDatasetRequest = () => null;
+    private handleDatasetRequest = () => null as any;
 
     /*
      * Handle 'delete' button clicks.
@@ -447,7 +447,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             body: `Are you sure you want to delete the Dataset, "${currentDataset!.name}" (id: ${currentDataset!.id})? ` +
                   `This will take effect immediately and can't be undone.`,
             header: 'Delete Dataset',
-            onClickNo: () => null,
+            onClickNo: () => null as any,
             onClickYes: () => { 
                 dispatch(deleteAdminDataset(currentDataset!)); 
             },

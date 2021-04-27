@@ -29,7 +29,7 @@ export default class ImportProgressCounts extends React.Component<Props> {
         }
     }
 
-    public getSnapshotBeforeUpdate() {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { rows, patients } = this.props.data.redCap;
         return [ rows, patients ];
     }

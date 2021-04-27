@@ -49,7 +49,7 @@ export default class DatasetContainer extends React.PureComponent<Props> {
         }
     }
 
-    public getSnapshotBeforeUpdate(prevProps: Props) {
+    public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { datasets, handleDatasetSelect, autoSelectOnSearch } = this.props;
         const { displayOrder } = datasets;
 

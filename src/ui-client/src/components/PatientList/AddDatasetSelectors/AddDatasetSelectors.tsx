@@ -13,7 +13,7 @@ import { PatientListConfiguration } from '../../../models/patientList/Configurat
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
 import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
-import EncounterPanelSelector from './EncounterPanelSelector';
+import PanelSelectorModal from '../../Modals/PanelSelectorModal/PanelSelectorModal';
 
 interface Props {
     className?: string;
@@ -94,10 +94,10 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
                         Add Dataset
                     </Button>
                 </div>
-                {showEncounterPanelModal && 
-                <EncounterPanelSelector 
-                    dataset={selected} 
-                    handleByEncounterSelect={this.handleEncounterPanelSelect}
+                {showEncounterPanelModal && selected &&
+                <PanelSelectorModal
+                    headerText={`Which Encounters would you like ${selected.name} data from?`} 
+                    handleByPanelSelect={this.handleEncounterPanelSelect}
                     toggle={this.hideEncounterPanelModal}
                 />
                 }

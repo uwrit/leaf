@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
-import { addPanelItem } from '../../../actions/panels';
 import { Concept } from '../../../models/concept/Concept';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
@@ -17,6 +16,7 @@ import PanelItemOr from './PanelItemOr';
 import SubPanelDashBorder from './SubPanelDashBorder';
 import SubPanelHeader from './SubPanelHeader';
 import { CohortStateType } from '../../../models/state/CohortState';
+import { PanelHandlers } from './PanelGroup';
 
 interface DndProps {
     canDrop?: boolean;
@@ -25,10 +25,10 @@ interface DndProps {
 }
 
 interface OwnProps {
+    handlers: PanelHandlers;
     panel: PanelModel;
     subPanel: SubPanelModel;
     index: number;
-    dispatch: any;
     queryState: CohortStateType;
 }
 
@@ -36,9 +36,9 @@ type Props = DndProps & OwnProps
 
 const panelTarget = {
     drop(props: Props, monitor: DropTargetMonitor) {
-        const { dispatch, subPanel } = props;
+        const { handlers, subPanel } = props;
         const concept: Concept = monitor.getItem();
-        dispatch(addPanelItem(concept, subPanel.panelIndex, subPanel.index));
+        handlers.handleAddPanelItem(concept, subPanel);
     },
     canDrop (props: Props, monitor: DropTargetMonitor) {
         return props.queryState !== CohortStateType.REQUESTING;
@@ -53,7 +53,7 @@ const collect = (connect: DropTargetConnector, monitor: DropTargetMonitor) => ({
 
 class SubPanel extends React.Component<Props> {
     public render() {
-        const { connectDropTarget, dispatch, isOver, canDrop, subPanel, index, panel, queryState } = this.props;
+        const { connectDropTarget, handlers, isOver, canDrop, subPanel, index, panel, queryState } = this.props;
         const totalPanelItems = subPanel.panelItems.length;
         const wrapperClasses = 'subpanel-wrapper ' + (totalPanelItems > 0 ? 'has-data' : '');
         const classes = [ 'subpanel' ];
@@ -62,14 +62,14 @@ class SubPanel extends React.Component<Props> {
 
         // Set classes
         if (totalPanelItems === 0) { classes.push('no-data'); }
-        if (isOver && canDrop)    { classes.push('can-drop'); }
+        if (isOver && canDrop)     { classes.push('can-drop'); }
         if (canDrop)               { classes.push('show-dash-border'); }
         if (subPanel.index === 0)  { classes.push('subpanel-first'); }
 
         // Set PanelItems and -or- objects
         for (let i = 0; i < totalPanelItems; i++) {
             panelItem = subPanel.panelItems[i];
-            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} dispatch={dispatch} subPanel={subPanel} queryState={queryState} />);
+            items.push(<PanelItem key={panelItem.id} panelItem={panelItem} handlers={handlers} subPanel={subPanel} queryState={queryState} />);
 
             // Add -or- if necessary
             if (subPanel.panelItems[i+1] &&         // Followed by another panelItem
@@ -84,18 +84,22 @@ class SubPanel extends React.Component<Props> {
             connectDropTarget &&
             connectDropTarget(
                 <div className={wrapperClasses}>
+
                     {/* Header - only set if subpanel is not the first */}
                     {index !== 0 &&
-                    <SubPanelHeader dispatch={dispatch} index={index} panel={panel} 
-                    />}
+                    <SubPanelHeader handlers={handlers} index={index} panel={panel} />}
+
                     <div className={classes.join(' ')}>
+
                         {/* Dashed borders that move when user is dragging a concept */}
                         <SubPanelDashBorder />
                         {/* Main subpanel body with panel items */}
                         <div className="subpanel-body">
                             {items}
                         </div>
+
                     </div>
+
                 </div>
             )
         );

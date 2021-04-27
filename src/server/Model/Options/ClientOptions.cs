@@ -11,6 +11,7 @@ namespace Model.Options
     {
         public MapOptions Map = new MapOptions();
         public VisualizeOptions Visualize = new VisualizeOptions();
+        public TimelinesOptions Timelines = new TimelinesOptions();
         public PatientListOptions PatientList = new PatientListOptions();
         public HelpOptions Help = new HelpOptions();
 
@@ -23,6 +24,10 @@ namespace Model.Options
         {
             public bool Enabled { get; set; }
             public bool ShowFederated { get; set; }
+        }
+        public class TimelinesOptions
+        {
+            public bool Enabled { get; set; }
         }
         public class PatientListOptions
         {

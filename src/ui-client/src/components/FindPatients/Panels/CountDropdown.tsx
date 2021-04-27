@@ -7,13 +7,13 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { setSubPanelCount } from '../../../actions/panels';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
+import { PanelHandlers } from './PanelGroup';
 
 interface Props {
-    dispatch: any
-    index: number,
-    panel: PanelModel,
+    handlers: PanelHandlers;
+    index: number;
+    panel: PanelModel;
 }
 
 interface State {
@@ -49,12 +49,11 @@ export default class CountDropdown extends React.Component<Props, State> {
     }
 
     public selectItem = (item: any) => {
-        const { dispatch, index, panel } = this.props;
+        const { handlers, index, panel } = this.props;
         const text: string = item.target.innerText;
         const val: number = +text.replace('At Least ','').replace('x','').trim();
 
-        // Update state
-        dispatch(setSubPanelCount(panel.index, index, val));
+        handlers.handleSubPanelCount(panel.index, index, val);
     }
 
     public render() {

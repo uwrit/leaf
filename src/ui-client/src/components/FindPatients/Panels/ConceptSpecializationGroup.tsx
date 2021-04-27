@@ -7,16 +7,16 @@
 
 import React from 'react';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
-import { deselectSpecialization, selectSpecialization } from '../../../actions/panels';
 import { ConceptSpecialization, ConceptSpecializationGroup as ConceptSpecializationGroupModel } from '../../../models/concept/Concept';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
+import { PanelHandlers } from './PanelGroup';
 
 interface State {
     dropdownOpen: boolean;
 }
 
 interface Props {
-    dispatch: any;
+    handlers: PanelHandlers;
     panelItem: PanelItemModel;
     selected: ConceptSpecialization[];
     specializationGroup: ConceptSpecializationGroupModel;
@@ -68,13 +68,13 @@ export default class ConceptSpecializationGroup extends React.PureComponent<Prop
     }
 
     private handleDefaultClick = () => {
-        const { specializationGroup, panelItem } = this.props;
-        this.props.dispatch(deselectSpecialization(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index, specializationGroup));
+        const { specializationGroup, panelItem, handlers } = this.props;
+        handlers.handleDeselectSpecialization(panelItem, specializationGroup);
     }
 
     private handleSpecializationClick = (conceptSpecialization: ConceptSpecialization) => {
-        const { panelItem } = this.props;
-        this.props.dispatch(selectSpecialization(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index, conceptSpecialization));
+        const { panelItem, handlers } = this.props;
+        handlers.handleSelectSpecialization(panelItem, conceptSpecialization);
     }
 }
 

@@ -12,9 +12,10 @@ import CustomDateRangePicker from './CustomDateRangePicker';
 import DateDropdown from './DateDropdown';
 import InclusionDropdown from './InclusionDropdown';
 import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown';
+import { PanelHandlers } from './PanelGroup';
 
 interface Props {
-    dispatch: any;
+    handlers: PanelHandlers;
     isFirst: boolean;
     panel: PanelModel;
 }
@@ -33,33 +34,33 @@ export default class PanelHeader extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const { dispatch, isFirst, panel } = this.props;
-        const { DOMRect } = this.state;
+        const { handlers, isFirst, panel } = this.props;
+        const { DOMRect, showCustomDateRangeBox } = this.state;
 
         return (
             <div className="panel-header" id={`panel-header-${panel.index}`}>
                 <InclusionDropdown 
-                    dispatch={dispatch}
+                    handlers={handlers}
                     inclusionDropdownType={INCLUSION_DROPDOWN_TYPE.PANEL}
                     index={0}
                     isFirst={isFirst} 
                     panel={panel}
                 />
                 <DateDropdown
-                    dispatch={dispatch}
+                    handlers={handlers}
                     handleCustomDateClick={this.handleCustomDateSelectionClick}
                     panel={panel}
                 />
-                {this.state.showCustomDateRangeBox &&
+                {showCustomDateRangeBox &&
                 <CustomDateRangePicker 
-                    dispatch={dispatch}
+                    handlers={handlers}
                     panel={panel}
                     parentDomRect={DOMRect!}
                     toggleCustomDateRangeBox={this.toggleCustomDateRangeBox}
                 />
                 }
                 <CountDropdown 
-                    dispatch={dispatch}
+                    handlers={handlers}
                     index={0}
                     panel={panel}
                 /> 

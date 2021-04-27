@@ -1,0 +1,83 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.timelines-control-panel-step {
+    background-color: white;
+    border: 1px solid rgb(230,230,230);
+    border-radius: 8px;
+    margin: 10px 0;
+    padding: 4px;
+}
+
+.timelines-control-panel-step.disabled {
+    background-color: rgba(0,0,0,0.2);
+    color: rgb(100,100,100);
+    opacity: 0.5;
+}
+
+.timelines-control-panel-step.clickable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.timelines-control-panel-step.clickable:hover {
+    background-color: rgb(224, 244, 253);
+    border-color: rgb(164, 222, 248);
+}
+
+.timelines-control-panel-step-number,
+.timelines-control-panel-step-text {
+    display: inline-block;
+}
+
+.timelines-control-panel-step-number {
+    background-image: linear-gradient(90deg, rgb(5, 150, 202), rgb(28, 168, 221));
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 500;
+    text-align: center;
+    width: 24px;
+}
+
+.timelines-control-panel-step-text {
+    margin-left: 10px;
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+.timelines-control-panel-step.disabled .timelines-control-panel-step-number {
+    background-image: none;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.timelines-control-panel-step-subtext {
+    color: rgb(63, 62, 62);
+    font-size: 0.9rem;
+    padding: 8px;
+}
+
+.timelines-control-panel-step-subcomponent {
+    background: rgb(245,245,245);
+    border: 1px solid rgb(235,235,235);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+}
+
+.timelines-additional-options-text {
+    color: rgb(28, 168, 221);
+    font-size: 1.1rem;
+}
+
+.timelines-additional-options.row .checkbox-slider-container label {
+    float: right;
+}
+
+.timelines-control-panel-step .checkbox-slider-container label {
+    border: 1px solid rgb(220,220,220);
+}
