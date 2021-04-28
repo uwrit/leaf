@@ -206,19 +206,23 @@ class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
         let coreText = pi.concept.uiDisplayText;
         let addText = '';
 
-        if (pi.numericFilter.filterType !== NumericFilterType.None) {
-            const f = pi.numericFilter.filter;
-            switch (pi.numericFilter.filterType) {
-                case NumericFilterType.GreaterThan:          addText = `> ${f[0]}`; break;
-                case NumericFilterType.GreaterThanOrEqualTo: addText = `>= ${f[0]}`; break;
-                case NumericFilterType.LessThan:             addText = `< ${f[0]}`; break;
-                case NumericFilterType.LessThanOrEqualTo:    addText = `<= ${f[0]}`; break;
-                case NumericFilterType.EqualTo:              addText = `= ${f[0]}`; break;
-                case NumericFilterType.GreaterThanOrEqualTo: addText = `>=${f[0]}`; break;
-                case NumericFilterType.Between:              addText = `between ${f[0]} and ${f[1]}`; break;
-            }
-            if (pi.concept.uiDisplayUnits) {
-                addText += ` ${pi.concept.uiDisplayUnits}`
+        if (concept.isNumeric) {
+            if (pi.numericFilter.filterType !== NumericFilterType.None) {
+                const f = pi.numericFilter.filter;
+                switch (pi.numericFilter.filterType) {
+                    case NumericFilterType.GreaterThan:          addText = `> ${f[0]}`; break;
+                    case NumericFilterType.GreaterThanOrEqualTo: addText = `>= ${f[0]}`; break;
+                    case NumericFilterType.LessThan:             addText = `< ${f[0]}`; break;
+                    case NumericFilterType.LessThanOrEqualTo:    addText = `<= ${f[0]}`; break;
+                    case NumericFilterType.EqualTo:              addText = `= ${f[0]}`; break;
+                    case NumericFilterType.GreaterThanOrEqualTo: addText = `>=${f[0]}`; break;
+                    case NumericFilterType.Between:              addText = `between ${f[0]} and ${f[1]}`; break;
+                }
+                if (concept.uiDisplayUnits) {
+                    addText += ` ${pi.concept.uiDisplayUnits}`
+                }
+            } else if (concept.uiNumericDefaultText) {
+                addText += ` ${concept.uiNumericDefaultText}`
             }
         }
         if (concept.isSpecializable && concept.specializationGroups) {
@@ -234,7 +238,7 @@ class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
             addText += ` (${panel.dateFilter.display.replace('In ', '')})`;
         }
 
-        const shortenVal = addText.length ? 50 : 60;
+        const shortenVal = addText.length ? 70 : 80;
         if (coreText.length > shortenVal) {
             coreText = `${coreText.slice(0, shortenVal)} ...`
         }

@@ -41,7 +41,7 @@ namespace Model.Compiler.Common
             cols.Add(encounterId);
             cols.Add(dateField);
 
-            if (PanelItem != null && PanelItem.Concept.IsNumeric)
+            if (PanelItem != null && PanelItem.UseNumericFilter)
             {
                 var numericField = new ExpressedColumn(Number, ConceptColumns.NumberField);
                 cols.Add(numericField);
