@@ -20,6 +20,7 @@ export const objectToMapRecursive = (input: any) => {
                 break;
             case "Object":
                 ob[key] = objectToMapRecursive(val)
+                break;
             default:
                 break;
         } 

@@ -30,10 +30,11 @@ export enum AdminPanelLoadState {
 export enum AdminPanelPane {
     CONCEPTS = 1,
     SQL_SETS = 2,
-    PANEL_FILTERS = 3,
-    GLOBAL_PANEL_FILTERS = 4,
-    DATASETS = 5,
-    NETWORK = 6
+    CUSTOM_VISUALIZE = 3,
+    PANEL_FILTERS = 4,
+    GLOBAL_PANEL_FILTERS = 5,
+    DATASETS = 6,
+    NETWORK = 7
 }
 
 export interface AdminConceptState {

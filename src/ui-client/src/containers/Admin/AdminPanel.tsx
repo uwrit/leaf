@@ -15,6 +15,7 @@ import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdent
 import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 import { GlobalPanelFilterEditor } from '../../components/Admin/GlobalPanelFilterEditor/GlobalPanelFilterEditor';
+import { CustomVisualizationEditor } from '../../components/Admin/CustomVisualizationEditor/CustomVisualizationEditor';
 import './AdminPanel.css';
 
 interface StateProps { 
@@ -51,16 +52,18 @@ class AdminPanel extends React.PureComponent<Props> {
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
                 return <ConceptEditor data={admin!} dispatch={dispatch} />;
+            case AdminPanelPane.SQL_SETS:
+                return <SqlSetEditor data={admin!} dispatch={dispatch} />;
+            case AdminPanelPane.CUSTOM_VISUALIZE:
+                return <CustomVisualizationEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.PANEL_FILTERS:
                 return <PanelFilterEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.GLOBAL_PANEL_FILTERS:
                 return <GlobalPanelFilterEditor data={admin!} dispatch={dispatch} />;
-            case AdminPanelPane.SQL_SETS:
-                return <SqlSetEditor data={admin!} dispatch={dispatch} />
             case AdminPanelPane.DATASETS:
                 return <DatasetEditor data={admin!} dispatch={dispatch} datasets={datasets}/>;
             case AdminPanelPane.NETWORK:
-                return <NetworkAndIdentityEditor data={admin!} dispatch={dispatch} />
+                return <NetworkAndIdentityEditor data={admin!} dispatch={dispatch} />;
             default: 
                 return null;
         }
