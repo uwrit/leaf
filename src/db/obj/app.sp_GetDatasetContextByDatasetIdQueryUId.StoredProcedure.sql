@@ -1,4 +1,4 @@
--- Copyright (c) 2020, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2021, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -19,6 +19,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextByDatasetIdQueryUId]
     @datasetid UNIQUEIDENTIFIER,
     @queryuid app.UniversalId,
+    @joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -32,13 +33,7 @@ BEGIN
     FROM app.Query
     WHERE app.Query.UniversalId = @queryuid;
 
-    EXEC app.sp_GetDatasetContextById @datasetid, @qid, @user, @groups, @admin = @admin;
+    EXEC app.sp_GetDatasetContextById @datasetid, @qid, @user, @joinpanel, @groups, @admin = @admin;
 END
-
-
-
-
-
-
 
 GO

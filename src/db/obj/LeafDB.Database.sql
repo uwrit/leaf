@@ -1,4 +1,4 @@
--- Copyright (c) 2020, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2021, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,9 +9,9 @@ GO
 CREATE DATABASE [LeafDB]
  CONTAINMENT = NONE
  ON  PRIMARY 
-( NAME = N'LeafDB_new', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\LeafDB_new.mdf' , SIZE = 663552KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+( NAME = N'LeafDB', FILENAME = N'/var/opt/mssql/data/LeafDB.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'LeafDB_new_log', FILENAME = N'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\LeafDB_new_log.ldf' , SIZE = 532480KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 204800KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
 GO
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 begin
@@ -46,7 +46,7 @@ ALTER DATABASE [LeafDB] SET QUOTED_IDENTIFIER OFF
 GO
 ALTER DATABASE [LeafDB] SET RECURSIVE_TRIGGERS OFF 
 GO
-ALTER DATABASE [LeafDB] SET  DISABLE_BROKER 
+ALTER DATABASE [LeafDB] SET  ENABLE_BROKER 
 GO
 ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
 GO
@@ -62,7 +62,7 @@ ALTER DATABASE [LeafDB] SET READ_COMMITTED_SNAPSHOT OFF
 GO
 ALTER DATABASE [LeafDB] SET HONOR_BROKER_PRIORITY OFF 
 GO
-ALTER DATABASE [LeafDB] SET RECOVERY SIMPLE 
+ALTER DATABASE [LeafDB] SET RECOVERY FULL 
 GO
 ALTER DATABASE [LeafDB] SET  MULTI_USER 
 GO

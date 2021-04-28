@@ -1,12 +1,82 @@
--- Copyright (c) 2020, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2021, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-USE [master]
+﻿USE [master]
 GO
 /****** Object:  Database [LeafDB]    Script Date: ******/
 CREATE DATABASE [LeafDB]
+ CONTAINMENT = NONE
+ ON  PRIMARY 
+( NAME = N'LeafDB', FILENAME = N'/var/opt/mssql/data/LeafDB.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+ LOG ON 
+( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 204800KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+GO
+IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
+begin
+EXEC [LeafDB].[dbo].[sp_fulltext_database] @action = 'enable'
+end
+GO
+ALTER DATABASE [LeafDB] SET ANSI_NULL_DEFAULT OFF 
+GO
+ALTER DATABASE [LeafDB] SET ANSI_NULLS OFF 
+GO
+ALTER DATABASE [LeafDB] SET ANSI_PADDING OFF 
+GO
+ALTER DATABASE [LeafDB] SET ANSI_WARNINGS OFF 
+GO
+ALTER DATABASE [LeafDB] SET ARITHABORT OFF 
+GO
+ALTER DATABASE [LeafDB] SET AUTO_CLOSE OFF 
+GO
+ALTER DATABASE [LeafDB] SET AUTO_SHRINK OFF 
+GO
+ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS ON 
+GO
+ALTER DATABASE [LeafDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+GO
+ALTER DATABASE [LeafDB] SET CURSOR_DEFAULT  GLOBAL 
+GO
+ALTER DATABASE [LeafDB] SET CONCAT_NULL_YIELDS_NULL OFF 
+GO
+ALTER DATABASE [LeafDB] SET NUMERIC_ROUNDABORT OFF 
+GO
+ALTER DATABASE [LeafDB] SET QUOTED_IDENTIFIER OFF 
+GO
+ALTER DATABASE [LeafDB] SET RECURSIVE_TRIGGERS OFF 
+GO
+ALTER DATABASE [LeafDB] SET  ENABLE_BROKER 
+GO
+ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+GO
+ALTER DATABASE [LeafDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+GO
+ALTER DATABASE [LeafDB] SET TRUSTWORTHY OFF 
+GO
+ALTER DATABASE [LeafDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+GO
+ALTER DATABASE [LeafDB] SET PARAMETERIZATION SIMPLE 
+GO
+ALTER DATABASE [LeafDB] SET READ_COMMITTED_SNAPSHOT OFF 
+GO
+ALTER DATABASE [LeafDB] SET HONOR_BROKER_PRIORITY OFF 
+GO
+ALTER DATABASE [LeafDB] SET RECOVERY FULL 
+GO
+ALTER DATABASE [LeafDB] SET  MULTI_USER 
+GO
+ALTER DATABASE [LeafDB] SET PAGE_VERIFY CHECKSUM  
+GO
+ALTER DATABASE [LeafDB] SET DB_CHAINING OFF 
+GO
+ALTER DATABASE [LeafDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+GO
+ALTER DATABASE [LeafDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+GO
+ALTER DATABASE [LeafDB] SET DELAYED_DURABILITY = DISABLED 
+GO
+EXEC sys.sp_db_vardecimal_storage_format N'LeafDB', N'ON'
 GO
 USE [LeafDB]
 GO
@@ -5137,6 +5207,163 @@ END
 
 
 GO
+/****** Object:  StoredProcedure [app].[sp_GetConceptByUId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2020/12/28
+-- Description: Retrieves Concept requested by UniversalId, filtered by constraint.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetConceptByUId]
+    @uid NVARCHAR(200),
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @ids app.ResourceIdTable;
+    INSERT INTO @ids
+    SELECT Id
+    FROM app.Concept c
+    WHERE c.UniversalId = @uid
+    
+    DECLARE @allowed app.ResourceIdTable;
+    INSERT INTO @allowed
+    EXEC app.sp_FilterConceptsByConstraint @user, @groups, @ids, @admin = @admin;
+
+    EXEC app.sp_HydrateConceptsByIds @allowed;
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetConceptDatasetContextByQueryIdConceptId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [app].[sp_GetConceptDatasetContextByQueryIdConceptId]
+    @queryid UNIQUEIDENTIFIER,
+    @conceptid UNIQUEIDENTIFIER,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- queryconstraint ok?
+    IF (auth.fn_UserIsAuthorizedForQueryById(@user, @groups, @queryid, @admin) = 0)
+    BEGIN;
+        DECLARE @query403 nvarchar(400) = @user + N' is not authorized to execute query ' + app.fn_StringifyGuid(@queryid);
+        THROW 70403, @query403, 1;
+    END;
+
+    SELECT
+        QueryId = Id,
+        Pepper
+    FROM app.Query
+    WHERE Id = @queryid;
+
+    -- concept
+    EXEC app.sp_GetConceptById @conceptid, @user, @groups, @admin
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetConceptDatasetContextByQueryIdConceptUId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [app].[sp_GetConceptDatasetContextByQueryIdConceptUId]
+    @queryid UNIQUEIDENTIFIER,
+    @conceptuid UNIQUEIDENTIFIER,
+    @user auth.[User] = NULL,
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert conceptuid to conceptid
+    DECLARE @conceptid UNIQUEIDENTIFIER
+    SELECT TOP 1 @conceptid = Id
+    FROM app.Concept AS C
+    WHERE C.UniversalId = @conceptuid
+
+    EXEC app.sp_GetConceptDatasetContextByQueryIdConceptId @queryid, @conceptid, @user, @groups, @admin
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetConceptDatasetContextByQueryUIdConceptId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2020/12/28
+-- Description: Retrieves the Query by UId and Concept by Id.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetConceptDatasetContextByQueryUIdConceptId]
+    @queryuid UNIQUEIDENTIFIER,
+    @conceptid [uniqueidentifier],
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert queryuid to queryid
+    DECLARE @qid UNIQUEIDENTIFIER;
+    SELECT TOP 1 @qid = Id
+    FROM app.Query AS Q
+    WHERE Q.UniversalId = @queryuid;
+
+    EXEC app.sp_GetConceptDatasetContextByQueryIdConceptId @qid, @conceptid, @user, @groups, @admin
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetConceptDatasetContextByQueryUIdConceptUId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2020/12/28
+-- Description: Retrieves the Query by UId and Concept by UId.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetConceptDatasetContextByQueryUIdConceptUId]
+    @queryuid UNIQUEIDENTIFIER,
+    @uid [uniqueidentifier],
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert queryuid to queryid
+    DECLARE @qid UNIQUEIDENTIFIER;
+    SELECT TOP 1 @qid = Id
+    FROM app.Query AS Q
+    WHERE Q.UniversalId = @queryuid;
+
+    -- convert conceptuid to conceptid
+    DECLARE @conceptid UNIQUEIDENTIFIER
+    SELECT TOP 1 @conceptid = Id
+    FROM app.Concept AS C
+    WHERE C.UniversalId = @uid
+
+    EXEC app.sp_GetConceptDatasetContextByQueryIdConceptId @qid, @conceptid, @user, @groups, @admin
+END
+
+GO
 /****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -5434,6 +5661,62 @@ END
 
 
 GO
+/****** Object:  StoredProcedure [app].[sp_GetContextById]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [app].[sp_GetContextById]
+    @queryid UNIQUEIDENTIFIER,
+    @user auth.[User] = NULL,
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- queryconstraint ok?
+    IF (auth.fn_UserIsAuthorizedForQueryById(@user, @groups, @queryid, @admin) = 0)
+    BEGIN;
+        DECLARE @query403 nvarchar(400) = @user + N' is not authorized to execute query ' + app.fn_StringifyGuid(@queryid);
+        THROW 70403, @query403, 1;
+    END;
+
+    SELECT
+        QueryId = Id,
+        Pepper,
+        Definition
+    FROM app.Query
+    WHERE Id = @queryid;
+
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetContextByUId]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE PROCEDURE [app].[sp_GetContextByUId]
+    @queryuid UNIQUEIDENTIFIER,
+    @user auth.[User] = NULL,
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- convert queryuid to queryid
+    DECLARE @qid UNIQUEIDENTIFIER;
+    SELECT TOP 1 @qid = Id
+    FROM app.Query AS Q
+    WHERE Q.UniversalId = @queryuid;
+
+    EXEC [app].[sp_GetContextById] @qid, @user, @groups, @admin
+
+END
+
+GO
 /****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetIdQueryUId]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -5448,6 +5731,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextByDatasetIdQueryUId]
     @datasetid UNIQUEIDENTIFIER,
     @queryuid app.UniversalId,
+    @joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -5461,14 +5745,8 @@ BEGIN
     FROM app.Query
     WHERE app.Query.UniversalId = @queryuid;
 
-    EXEC app.sp_GetDatasetContextById @datasetid, @qid, @user, @groups, @admin = @admin;
+    EXEC app.sp_GetDatasetContextById @datasetid, @qid, @user, @joinpanel, @groups, @admin = @admin;
 END
-
-
-
-
-
-
 
 GO
 /****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryId]    Script Date: ******/
@@ -5485,6 +5763,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextByDatasetUIdQueryId]
     @datasetuid app.UniversalId,
     @queryid UNIQUEIDENTIFIER,
+    @joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -5499,14 +5778,8 @@ BEGIN
     WHERE app.DatasetQuery.UniversalId = @datasetuid;
 
     -- do the normal thing
-    EXEC app.sp_GetDatasetContextById @did, @queryid, @user, @groups, @admin = @admin;
+    EXEC app.sp_GetDatasetContextById @did, @queryid, @joinpanel, @user, @groups, @admin = @admin;
 END
-
-
-
-
-
-
 
 GO
 /****** Object:  StoredProcedure [app].[sp_GetDatasetContextByDatasetUIdQueryUId]    Script Date: ******/
@@ -5523,6 +5796,7 @@ GO
 CREATE PROCEDURE [app].[sp_GetDatasetContextByDatasetUIdQueryUId]
     @datasetuid app.UniversalId,
     @queryuid app.UniversalId,
+    @joinpanel BIT,
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
     @admin bit = 0
@@ -5543,14 +5817,8 @@ BEGIN
     WHERE app.DatasetQuery.UniversalId = @queryuid;
 
     -- do the normal thing
-    EXEC app.sp_GetDatasetContextById @did, @qid, @user, @groups, @admin = @admin;
+    EXEC app.sp_GetDatasetContextById @did, @qid, @joinpanel, @user, @groups, @admin = @admin;
 END
-
-
-
-
-
-
 
 GO
 /****** Object:  StoredProcedure [app].[sp_GetDatasetContextById]    Script Date: ******/
@@ -7902,15 +8170,6 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
-
--- =======================================
--- Author:      Nic Dobbins
--- Create date: 2019/3/23
--- Description: Updates search index tables by diff'ing
---				rather than full truncate/insert, and updates
---              the ConceptTokenizedIndex table.
--- =======================================
 CREATE PROCEDURE [app].[sp_UpdateSearchIndexTables]
 AS
 BEGIN
@@ -7974,13 +8233,20 @@ BEGIN
 		  ,LEFT(UiDisplayName,400)
 	FROM app.Concept C
 	WHERE EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
+    UNION ALL
+	SELECT Id
+		  ,rootID
+		  ,LEFT(UiDisplaySubtext,400)
+	FROM app.Concept C
+	WHERE UiDisplaySubtext IS NOT NULL 
+		  AND EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
 	/**
 	 * Remove puncuation and non-alphabetic characters.
 	 */
 	UPDATE #concepts
-	SET uiDisplayName = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
-						uiDisplayName,',',' '),':',' '),';',' '),'''',' '),'"',' '),']',' '),'[',' '),'(',' '),')',' '),'?',' '),'/',' '),'\',' '),'-',' ')
+	SET uiDisplayName = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+						uiDisplayName,',',' '),':',' '),';',' '),'"',' '),']',' '),'[',' '),'(',' '),')',' '),'?',' '),'/',' '),'\',' '),'-',' ')
 
 	/**
 	 * Loop through each word in the uiDisplayName and separate each into its own row.
@@ -8155,6 +8421,7 @@ BEGIN
 	DROP TABLE #jsonTokens
 
 END
+
 
 
 

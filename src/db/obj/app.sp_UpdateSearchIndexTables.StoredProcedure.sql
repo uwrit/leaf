@@ -1,4 +1,4 @@
--- Copyright (c) 2020, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2021, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -10,15 +10,6 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
-
-
--- =======================================
--- Author:      Nic Dobbins
--- Create date: 2019/3/23
--- Description: Updates search index tables by diff'ing
---				rather than full truncate/insert, and updates
---              the ConceptTokenizedIndex table.
--- =======================================
 CREATE PROCEDURE [app].[sp_UpdateSearchIndexTables]
 AS
 BEGIN
@@ -82,13 +73,20 @@ BEGIN
 		  ,LEFT(UiDisplayName,400)
 	FROM app.Concept C
 	WHERE EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
+    UNION ALL
+	SELECT Id
+		  ,rootID
+		  ,LEFT(UiDisplaySubtext,400)
+	FROM app.Concept C
+	WHERE UiDisplaySubtext IS NOT NULL 
+		  AND EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
 	/**
 	 * Remove puncuation and non-alphabetic characters.
 	 */
 	UPDATE #concepts
-	SET uiDisplayName = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
-						uiDisplayName,',',' '),':',' '),';',' '),'''',' '),'"',' '),']',' '),'[',' '),'(',' '),')',' '),'?',' '),'/',' '),'\',' '),'-',' ')
+	SET uiDisplayName = REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
+						uiDisplayName,',',' '),':',' '),';',' '),'"',' '),']',' '),'[',' '),'(',' '),')',' '),'?',' '),'/',' '),'\',' '),'-',' ')
 
 	/**
 	 * Loop through each word in the uiDisplayName and separate each into its own row.
@@ -263,6 +261,7 @@ BEGIN
 	DROP TABLE #jsonTokens
 
 END
+
 
 
 
