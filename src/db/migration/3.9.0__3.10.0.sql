@@ -167,23 +167,23 @@ BEGIN
         SELECT
             VP.Id
         FROM app.VisualizationPage AS VP
-        WHERE EXISTS (
-            SELECT 1
-            FROM auth.VisualizationPageConstraint AS VPC
-            WHERE VPC.VisualizationPageId = VP.Id
-                  AND ConstraintId = 1
-                  AND ConstraintValue = @user
-            UNION ALL
-            SELECT 1
-            FROM auth.VisualizationPageConstraint AS VPC
-            WHERE VPC.VisualizationPageId = VP.Id
-                  AND ConstraintId = 2
-                  AND ConstraintValue IN (SELECT [Group] FROM @groups)
-        )
-        OR NOT EXISTS (
-            SELECT 1
-            FROM auth.VisualizationPageConstraint AS VPC
-            WHERE VPC.VisualizationPageId = VP.Id
+        WHERE NOT EXISTS (
+                SELECT 1
+                FROM auth.VisualizationPageConstraint AS VPC
+                WHERE VPC.VisualizationPageId = VP.Id
+            )
+            OR EXISTS (
+                SELECT 1
+                FROM auth.VisualizationPageConstraint AS VPC
+                WHERE VPC.VisualizationPageId = VP.Id
+                      AND ConstraintId = 1
+                      AND ConstraintValue = @user
+                UNION ALL
+                SELECT 1
+                FROM auth.VisualizationPageConstraint AS VPC
+                WHERE VPC.VisualizationPageId = VP.Id
+                      AND ConstraintId = 2
+                      AND ConstraintValue IN (SELECT [Group] FROM @groups)
         );
     END;
 
@@ -224,8 +224,12 @@ BEGIN
              INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
                 ON DQ.Id = VCDQ.DatasetQueryId
         WHERE EXISTS (SELECT 1 FROM #VC AS VC WHERE VC.Id = VCDQ.VisualizationComponentId)
-              AND (
-              EXISTS (
+              AND NOT EXISTS (
+                SELECT 1
+                FROM auth.DatasetQueryConstraint AS DQC
+                WHERE DQC.DatasetQueryId = dq.Id
+              ) 
+              OR EXISTS (
                 SELECT 1
                 FROM auth.DatasetQueryConstraint AS DQC
                 WHERE DQC.DatasetQueryId = DQ.Id 
@@ -237,13 +241,7 @@ BEGIN
                 WHERE DQC.DatasetQueryId = DQ.Id
                       AND DQC.ConstraintId = 2
                       AND DQC.ConstraintValue IN (SELECT [Group] FROM @groups)
-                     )   
-              OR NOT EXISTS (
-                SELECT 1
-                FROM auth.DatasetQueryConstraint AS DQC
-                WHERE DQC.DatasetQueryId = dq.Id
-                            )
-            );
+              );
         
     END;
 
