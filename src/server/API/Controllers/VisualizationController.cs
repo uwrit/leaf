@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using API.DTO.Compiler;
+using API.DTO.Visualization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -29,12 +29,12 @@ namespace API.Controllers
         [Authorize(Policy = Access.Institutional)]
         [Authorize(Policy = TokenType.Access)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<DatasetQueryDTO>>> Get([FromServices] DatasetQueryProvider provider)
+        public async Task<ActionResult<IEnumerable<VisualizationPageDTO>>> Get([FromServices] VisualizationPageProvider provider)
         {
             try
             {
-                var queries = await provider.GetQueriesAsync();
-                var dtos = queries.Select(q => new DatasetQueryDTO(q));
+                var visualizationPages = await provider.GetVisualizationPagesAsync();
+                var dtos = visualizationPages.Select(vp => new VisualizationPageDTO(vp));
                 return Ok(dtos);
             }
             catch (Exception e)

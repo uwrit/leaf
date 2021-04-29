@@ -1,0 +1,52 @@
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
+// Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using Model.Visualization;
+
+namespace API.DTO.Visualization
+{
+    public class VisualizationPageDTO
+    {
+        public Guid? Id { get; set; }
+        public string PageName { get; set; }
+        public string PageDescription { get; set; }
+        public IEnumerable<VisualizationComponentDTO> Components { get; set; }
+        public int OrderId { get; set; }
+
+        public VisualizationPageDTO(IVisualizationPage page)
+        {
+            Id = page.Id;
+            PageName = page.PageName;
+            PageDescription = page.PageDescription;
+            Components = page.Components.Select(c => new VisualizationComponentDTO(c));
+            OrderId = page.OrderId;
+        }
+    }
+
+    public class VisualizationComponentDTO
+    {
+        public Guid? Id { get; set; }
+        public string Header { get; set; }
+        public string SubHeader { get; set; }
+        public string JsonSpec { get; set; }
+        public IEnumerable<Guid> DatasetQueryIds { get; set; }
+        public bool IsFullWidth { get; set; }
+        public int OrderId { get; set; }
+
+        public VisualizationComponentDTO(IVisualizationComponent vc)
+        {
+            Id = vc.Id;
+            Header = vc.Header;
+            SubHeader = vc.SubHeader;
+            JsonSpec = vc.JsonSpec;
+            DatasetQueryIds = vc.DatasetQueryIds;
+            IsFullWidth = vc.IsFullWidth;
+            OrderId = vc.OrderId;
+        }
+    }
+}

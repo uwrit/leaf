@@ -63,6 +63,9 @@ CREATE TABLE [app].[VisualizationComponent](
 ) ON [PRIMARY] 
 GO
 
+ALTER TABLE [app].[VisualizationComponent] ADD  CONSTRAINT [DF_VisualizationComponent_Id]  DEFAULT (newsequentialid()) FOR [Id]
+GO
+
 /**
  * [app].[Visualization]
  */
@@ -86,6 +89,8 @@ CREATE TABLE [app].[VisualizationPage](
 ) ON [PRIMARY]
 GO
 
+ALTER TABLE [app].[VisualizationPage] ADD  CONSTRAINT [DF_VisualizationPage_Id]  DEFAULT (newsequentialid()) FOR [Id]
+GO
 ALTER TABLE [app].[VisualizationPage] ADD  CONSTRAINT [DF_VisualizationPage_Created]  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [app].[VisualizationPage] ADD  CONSTRAINT [DF_VisualizationPage_Updated]  DEFAULT (getdate()) FOR [Updated]
@@ -277,6 +282,16 @@ BEGIN
       , VC.IsFullWidth
       , VC.OrderId
     FROM #VC AS VC
+    WHERE EXISTS (SELECT 1 FROM @ids AS I WHERE VC.VisualizationPageId = I.Id)
+
+    -- produce dependent dataset IDs
+    SELECT
+        VC.VisualizationPageId
+      , VCDQ.VisualizationComponentId
+      , VCDQ.DatasetQueryId
+    FROM #VC AS VC
+         INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
+            ON VC.Id = VCDQ.VisualizationComponentId
     WHERE EXISTS (SELECT 1 FROM @ids AS I WHERE VC.VisualizationPageId = I.Id)
 
 END

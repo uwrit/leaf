@@ -102,6 +102,7 @@ namespace API.Options
             services.AddTransient<DatasetCompilerValidationContextProvider.ICompilerContextProvider, DatasetCompilerContextProvider>();
             services.AddTransient<IDatasetQueryFetcher, DatasetQueryFetcher>();
             services.AddTransient<DatasetProvider.IDatasetExecutor, DatasetExecutor>();
+            services.AddTransient<IVisualizationPageFetcher, VisualizationPageFetcher>();
             services.AddTransient<IQueryService, QueryService>();
             services.AddTransient<DataImporter.IImportService, ImportService>();
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
