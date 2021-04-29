@@ -8,7 +8,6 @@
 import React from 'react';
 import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
-import { Concept } from '../../models/concept/Concept';
 import { NumericFilterType } from '../../models/panel/NumericFilter';
 import { Panel } from '../../models/panel/Panel';
 import { PanelItem } from '../../models/panel/PanelItem';
@@ -215,7 +214,6 @@ class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
                     case NumericFilterType.LessThan:             addText = `< ${f[0]}`; break;
                     case NumericFilterType.LessThanOrEqualTo:    addText = `<= ${f[0]}`; break;
                     case NumericFilterType.EqualTo:              addText = `= ${f[0]}`; break;
-                    case NumericFilterType.GreaterThanOrEqualTo: addText = `>=${f[0]}`; break;
                     case NumericFilterType.Between:              addText = `between ${f[0]} and ${f[1]}`; break;
                 }
                 if (concept.uiDisplayUnits) {

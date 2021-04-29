@@ -31,8 +31,8 @@ export class CustomVisualizationEditor extends React.PureComponent<Props,State> 
         const c = this.className;
 
         const spec = {
-            width: 400,
-            height: 200,
+            width: 800,
+            height: 400,
             "data": {
                 "name": "values"
             },
