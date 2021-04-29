@@ -6,6 +6,64 @@ SET [Version] = '3.10.0'
 GO
 
 /**
+ * [rela].[VisualizationComponentDatasetQuery]
+ */
+IF OBJECT_ID('rela.VisualizationComponentDatasetQuery') IS NOT NULL
+	DROP TABLE [rela].[VisualizationComponentDatasetQuery];
+GO
+
+CREATE TABLE [rela].[VisualizationComponentDatasetQuery](
+	[VisualizationComponentId] [uniqueidentifier] NOT NULL,
+    [DatasetQueryId] [uniqueidentifier] NOT NULL
+ CONSTRAINT [PK__VisualizationComponentDatasetQuery] PRIMARY KEY CLUSTERED 
+(
+	[VisualizationComponentId] ASC,
+    [DatasetQueryId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] 
+GO
+
+/**
+ * [auth].[VisualizationPageConstraint]
+ */
+IF OBJECT_ID('auth.VisualizationPageConstraint') IS NOT NULL
+	DROP TABLE [auth].[VisualizationPageConstraint];
+GO
+
+CREATE TABLE [auth].[VisualizationPageConstraint](
+	[VisualizationPageId] [uniqueidentifier] NOT NULL,
+	[ConstraintId] [int] NOT NULL,
+	[ConstraintValue] [nvarchar](1000) NOT NULL
+CONSTRAINT [PK__VisualizationComponentDatasetQuery] PRIMARY KEY CLUSTERED 
+(
+	[VisualizationPageId] ASC,
+    [ConstraintId] ASC,
+    [ConstraintValue] ASC
+) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+
+/**
+ * [app].[VisualizationComponent]
+ */
+IF OBJECT_ID('app.VisualizationComponent') IS NOT NULL
+	DROP TABLE [app].[VisualizationComponent];
+GO
+
+CREATE TABLE [app].[VisualizationComponent](
+	[Id] [uniqueidentifier] NOT NULL,
+    [VisualizationPageId] [uniqueidentifier] NOT NULL,
+    [JsonSpec] [nvarchar](max) NOT NULL,
+    [IsFullWidth] BIT NOT NULL,
+    [OrderId] [int] NOT NULL
+ CONSTRAINT [PK__VisualizationComponent] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] 
+GO
+
+/**
  * [app].[Visualization]
  */
 IF OBJECT_ID('app.VisualizationPage') IS NOT NULL
@@ -34,48 +92,13 @@ ALTER TABLE [app].[VisualizationPage] ADD  CONSTRAINT [DF_VisualizationPage_Upda
 GO
 
 /**
- * [app].[VisualizationComponent]
+ * FKs
  */
-IF OBJECT_ID('app.VisualizationComponent') IS NOT NULL
-	DROP TABLE [app].[VisualizationComponent];
-GO
-
-CREATE TABLE [app].[VisualizationComponent](
-	[Id] [uniqueidentifier] NOT NULL,
-    [VisualizationPageId] [uniqueidentifier] NOT NULL,
-    [JsonSpec] [nvarchar](max) NOT NULL,
-    [IsFullWidth] BIT NOT NULL,
-    [OrderId] [int] NOT NULL
- CONSTRAINT [PK__VisualizationComponent] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] 
-GO
-
 ALTER TABLE [app].[VisualizationComponent]  WITH CHECK ADD CONSTRAINT [FK_VisualizationComponent_VisualizationPageId] FOREIGN KEY([VisualizationPageId])
 REFERENCES [app].[VisualizationPage] ([Id])
 GO
 
 ALTER TABLE [app].[VisualizationComponent] CHECK CONSTRAINT [FK_VisualizationComponent_VisualizationPageId]
-GO
-
-/**
- * [rela].[VisualizationComponentDatasetQuery]
- */
-IF OBJECT_ID('rela.VisualizationComponentDatasetQuery') IS NOT NULL
-	DROP TABLE [rela].[VisualizationComponentDatasetQuery];
-GO
-
-CREATE TABLE [rela].[VisualizationComponentDatasetQuery](
-	[VisualizationComponentId] [uniqueidentifier] NOT NULL,
-    [DatasetQueryId] [uniqueidentifier] NOT NULL
- CONSTRAINT [PK__VisualizationComponentDatasetQuery] PRIMARY KEY CLUSTERED 
-(
-	[VisualizationComponentId] ASC,
-    [DatasetQueryId] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] 
 GO
 
 ALTER TABLE [rela].[VisualizationComponentDatasetQuery]  WITH CHECK ADD CONSTRAINT [FK_PK__VisualizationComponentDatasetQuery_VisualizationComponentId] FOREIGN KEY([VisualizationComponentId])
@@ -92,34 +115,17 @@ GO
 ALTER TABLE [rela].[VisualizationComponentDatasetQuery] CHECK CONSTRAINT [FK_PK__VisualizationComponentDatasetQuery_DatasetQueryId]
 GO
 
-/**
- * [auth].[VisualizationPageConstraint]
- */
-IF OBJECT_ID('auth.VisualizationPageConstraint') IS NOT NULL
-	DROP TABLE [auth].[VisualizationPageConstraint];
-GO
-
-CREATE TABLE [auth].[VisualizationPageConstraint](
-	[VisualizationPageId] [uniqueidentifier] NOT NULL,
-	[ConstraintId] [int] NOT NULL,
-	[ConstraintValue] [nvarchar](1000) NOT NULL
-CONSTRAINT [PK__VisualizationComponentDatasetQuery] PRIMARY KEY CLUSTERED 
-(
-	[VisualizationPageId] ASC,
-    [ConstraintId] ASC,
-    [ConstraintValue] ASC
-) WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-
 ALTER TABLE [auth].[VisualizationPageConstraint]  WITH CHECK ADD  CONSTRAINT [FK_VisualizationPageConstraint_ConstraintId] FOREIGN KEY([ConstraintId])
 REFERENCES [auth].[Constraint] ([Id])
 GO
+
 ALTER TABLE [auth].[VisualizationPageConstraint] CHECK CONSTRAINT [FK_VisualizationPageConstraint_ConstraintId]
 GO
+
 ALTER TABLE [auth].[VisualizationPageConstraint]  WITH CHECK ADD  CONSTRAINT [FK_VisualizationPageConstraint_VisualizationPageId] FOREIGN KEY([VisualizationPageId])
 REFERENCES [app].[VisualizationPage] ([Id])
 GO
+
 ALTER TABLE [auth].[VisualizationPageConstraint] CHECK CONSTRAINT [FK_VisualizationPageConstraint_VisualizationPageId]
 GO
 
@@ -279,8 +285,16 @@ END
 GO
 
 /**
- * [app].[VisualizationComponentTable]
+ * [adm].[sp_CreateVisualizationPage], [adm].[sp_UpdateVisualizationPage] & [app].[VisualizationComponentTable]
  */
+IF OBJECT_ID('adm.sp_CreateVisualizationPage', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_CreateVisualizationPage]
+GO
+
+IF OBJECT_ID('adm.sp_UpdateVisualizationPage', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_UpdateVisualizationPage]
+GO
+
 IF TYPE_ID('[app].[VisualizationComponentTable]') IS NOT NULL
 	DROP TYPE [app].[VisualizationComponentTable];
 GO
@@ -292,10 +306,6 @@ CREATE TYPE [app].[VisualizationComponentTable] AS TABLE (
 )
 GO
 
-
-IF OBJECT_ID('adm.sp_CreateVisualizationPage', 'P') IS NOT NULL
-    DROP PROCEDURE [adm].[sp_CreateVisualizationPage]
-GO
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2021-04-28
@@ -335,6 +345,7 @@ BEGIN
             inserted.Header,
             inserted.SubHeader,
             inserted.OrderId,
+            inserted.Created,
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
@@ -375,9 +386,6 @@ BEGIN
 END
 GO
 
-IF OBJECT_ID('adm.sp_UpdateVisualizationPage', 'P') IS NOT NULL
-    DROP PROCEDURE [adm].[sp_UpdateVisualizationPage]
-GO
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2021-04-28
@@ -450,7 +458,6 @@ BEGIN
 
 END
 GO
-
 
 IF OBJECT_ID('adm.sp_DeleteVisualizationPage', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_DeleteVisualizationPage]
