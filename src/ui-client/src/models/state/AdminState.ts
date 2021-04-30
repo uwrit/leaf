@@ -30,7 +30,7 @@ export enum AdminPanelLoadState {
 export enum AdminPanelPane {
     CONCEPTS = 1,
     SQL_SETS = 2,
-    CUSTOM_VISUALIZE = 3,
+    VISUALIZATIONS = 3,
     PANEL_FILTERS = 4,
     GLOBAL_PANEL_FILTERS = 5,
     DATASETS = 6,

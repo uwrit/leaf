@@ -9,7 +9,7 @@ import React from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { VegaLite } from 'react-vega'
-import './CustomVisualizationEditor.css';
+import './VisualizationEditor.css';
 
 interface Props { 
     data: AdminState;
@@ -19,8 +19,8 @@ interface Props {
 interface State {
 }
 
-export class CustomVisualizationEditor extends React.PureComponent<Props,State> {
-    private className = 'custom-visualization-editor';
+export class VisualizationEditor extends React.PureComponent<Props,State> {
+    private className = 'visualization-editor';
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -38,46 +38,48 @@ export class CustomVisualizationEditor extends React.PureComponent<Props,State> 
             },
             "params": [
                 {
-                "name": "highlight",
-                "select": {"type": "point", "on": "mouseover"}
+                    "name": "highlight",
+                    "select": { "type": "point", "on": "mouseover" }
                 },
-                {"name": "select", "select": "point"},
-                { "name": "cornerRadius", "value": 0,
-                  "bind": {"input": "range", "min": 0, "max": 50, "step": 1} }
+                { "name": "select", "select": "point" },
+                {
+                    "name": "cornerRadius", "value": 0,
+                    "bind": { "input": "range", "min": 0, "max": 50, "step": 1 }
+                }
             ],
             "mark": {
                 "type": "bar",
                 "fill": "#4C78A8",
                 "stroke": "black",
                 "cursor": "pointer",
-                "cornerRadius": {"expr": "cornerRadius"}
+                "cornerRadius": { "expr": "cornerRadius" }
             },
             "encoding": {
-                "x": {"field": "a", "type": "ordinal"},
-                "y": {"field": "b", "type": "quantitative"},
+                "x": { "field": "a", "type": "ordinal" },
+                "y": { "field": "b", "type": "quantitative" },
                 "fillOpacity": {
-                "condition": {"param": "select", "value": 1},
-                "value": 0.3
+                    "condition": { "param": "select", "value": 1 },
+                    "value": 0.3
                 },
                 "strokeWidth": {
-                "condition": [
-                    {
-                    "param": "select",
-                    "empty": false,
-                    "value": 2
-                    },
-                    {
-                    "param": "highlight",
-                    "empty": false,
-                    "value": 1
-                    }
-                ],
-                "value": 0
+                    "condition": [
+                        {
+                            "param": "select",
+                            "empty": false,
+                            "value": 2
+                        },
+                        {
+                            "param": "highlight",
+                            "empty": false,
+                            "value": 1
+                        }
+                    ],
+                    "value": 0
                 }
             },
             "config": {
                 "scale": {
-                "bandPaddingInner": 0.2
+                    "bandPaddingInner": 0.2
                 }
             }
         } as any;
