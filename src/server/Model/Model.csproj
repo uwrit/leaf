@@ -18,6 +18,7 @@
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
     <Folder Include="Visualization\" />
+    <Folder Include="Admin\Visualization\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.1.0" />

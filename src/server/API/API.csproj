@@ -26,6 +26,7 @@
     <Folder Include="DTO\Config\" />
     <Folder Include="DTO\Notification\" />
     <Folder Include="DTO\Visualization\" />
+    <Folder Include="DTO\Admin\Visualization\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.0">

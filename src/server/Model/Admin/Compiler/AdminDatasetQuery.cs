@@ -34,7 +34,5 @@ namespace Model.Admin.Compiler
         public string CreatedBy { get; set; }
         public DateTime Updated { get; set; }
         public string UpdatedBy { get; set; }
-
-        
     }
 }

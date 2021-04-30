@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Model.Authorization;
 using Microsoft.Extensions.Logging;
-using Model.Admin.Compiler;
-using API.DTO.Admin.Compiler;
+using API.DTO.Admin.Visualization;
+using Model.Admin.Visualization;
 using Model.Error;
 
 namespace API.Controllers.Admin
@@ -22,52 +22,18 @@ namespace API.Controllers.Admin
     public class AdminVisualizationController : Controller
     {
         readonly ILogger<AdminVisualizationController> log;
-        readonly AdminDatasetQueryManager manager;
+        readonly AdminVisualizationPageManager manager;
 
         public AdminVisualizationController(
-            AdminDatasetQueryManager manager,
+            AdminVisualizationPageManager manager,
             ILogger<AdminVisualizationController> log)
         {
             this.manager = manager;
             this.log = log;
         }
 
-        [HttpPut("{id}")]
-        public async Task<ActionResult<AdminDatasetQueryDTO>> UpdateAsync(Guid id, [FromBody] AdminDatasetQueryDTO dto)
-        {
-            try
-            {
-                if (dto != null)
-                {
-                    dto.Id = id;
-                }
-                var query = dto.AdminDatasetQuery();
-                var updated = await manager.UpdateDatasetQueryAsync(query);
-                return Ok(updated.AdminDatasetQueryDTO());
-            }
-            catch (FormatException fe)
-            {
-                log.LogError("Malformed DatasetQueryUrn UniversalId. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (ArgumentException ae)
-            {
-                log.LogError("Invalid update DatasetQuery model. Model:{@Model} Error:{Error}", dto, ae.Message);
-                return BadRequest();
-            }
-            catch (LeafRPCException le)
-            {
-                return StatusCode(le.StatusCode);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed to update DatasetQuery. Model:{@Model} Error:{Error}", dto, ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         [HttpPost]
-        public async Task<ActionResult<AdminDatasetQueryDTO>> CreateAsync([FromBody] AdminDatasetQueryDTO dto)
+        public async Task<ActionResult<AdminVisualizationPageDTO>> CreateAsync([FromBody] AdminVisualizationPageDTO dto)
         {
             try
             {
@@ -76,19 +42,9 @@ namespace API.Controllers.Admin
                     return BadRequest();
                 }
 
-                var query = dto.AdminDatasetQuery();
-                var created = await manager.CreateDatasetQueryAsync(query);
-                return Ok(created.AdminDatasetQueryDTO());
-            }
-            catch (FormatException fe)
-            {
-                log.LogError("Malformed DatasetQueryUrn UniversalId. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (ArgumentException ae)
-            {
-                log.LogError("Invalid create DatasetQuery model. Model:{@Model} Error:{Error}", dto, ae.Message);
-                return BadRequest();
+                var query = dto.AdminVisualizationPage();
+                var created = await manager.CreateVisualizationPageAsync(query);
+                return Ok(created.AdminVisualizationPageDTO());
             }
             catch (LeafRPCException le)
             {
@@ -96,7 +52,31 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to create DatasetQuery. Model:{@Model} Error:{Error}", dto, ex.ToString());
+                log.LogError("Failed to create VisualizationPage. Model:{@Model} Error:{Error}", dto, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<AdminVisualizationPageDTO>> UpdateAsync(Guid id, [FromBody] AdminVisualizationPageDTO dto)
+        {
+            try
+            {
+                if (dto != null)
+                {
+                    dto.Id = id;
+                }
+                var query = dto.AdminVisualizationPage();
+                var updated = await manager.UpdateDatasetQueryAsync(query);
+                return Ok(updated.AdminVisualizationPageDTO());
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to update VisualizationPage. Model:{@Model} Error:{Error}", dto, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
@@ -106,7 +86,7 @@ namespace API.Controllers.Admin
         {
             try
             {
-                var deleted = await manager.DeleteDatasetQueryAsync(id);
+                var deleted = await manager.DeleteVisualizationPageAsync(id);
                 if (!deleted.HasValue)
                 {
                     return NotFound();
@@ -115,7 +95,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to delete DatasetQuery. Id:{Id} Error:{Error}", id, ex.ToString());
+                log.LogError("Failed to delete VisualizationPage. Id:{Id} Error:{Error}", id, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

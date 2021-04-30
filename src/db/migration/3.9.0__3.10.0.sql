@@ -53,6 +53,8 @@ GO
 CREATE TABLE [app].[VisualizationComponent](
 	[Id] [uniqueidentifier] NOT NULL,
     [VisualizationPageId] [uniqueidentifier] NOT NULL,
+    [Header] [nvarchar](100) NOT NULL,
+    [SubHeader] [nvarchar](1000) NULL,
     [JsonSpec] [nvarchar](max) NOT NULL,
     [IsFullWidth] BIT NOT NULL,
     [OrderId] [int] NOT NULL
@@ -75,8 +77,8 @@ GO
 
 CREATE TABLE [app].[VisualizationPage](
 	[Id] [uniqueidentifier] NOT NULL,
-    [Header] [nvarchar](50) NOT NULL,
-    [SubHeader] [nvarchar](1000) NULL,
+    [PageName] [nvarchar](100) NOT NULL,
+    [PageDescription] nvarchar(1000) NOT NULL,
     [OrderId] [int] NOT NULL,
     [Created] [datetime] NOT NULL,
 	[CreatedBy] [nvarchar](1000) NOT NULL,
@@ -196,6 +198,8 @@ BEGIN
     SELECT
         VC.Id
       , VC.VisualizationPageId
+      , VC.Header
+      , VC.SubHeader
       , VC.JsonSpec
       , VC.IsFullWidth
       , VC.OrderId
@@ -268,8 +272,8 @@ BEGIN
     -- produce the hydrated visualization pages
     SELECT
         VP.Id
-      , VP.Header
-      , VP.SubHeader
+      , VP.PageName
+      , VP.PageDescription
       , VP.OrderId
     FROM app.VisualizationPage AS VP
     WHERE EXISTS (SELECT 1 FROM @ids AS I WHERE VP.Id = I.Id)
@@ -278,6 +282,8 @@ BEGIN
     SELECT
         VC.Id
       , VC.VisualizationPageId
+      , VC.Header
+      , VC.SubHeader
       , VC.JsonSpec
       , VC.IsFullWidth
       , VC.OrderId
@@ -304,6 +310,10 @@ IF OBJECT_ID('adm.sp_CreateVisualizationPage', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_CreateVisualizationPage]
 GO
 
+IF OBJECT_ID('adm.sp_CreateVisualizationComponent', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_CreateVisualizationComponent]
+GO
+
 IF OBJECT_ID('adm.sp_UpdateVisualizationPage', 'P') IS NOT NULL
     DROP PROCEDURE [adm].[sp_UpdateVisualizationPage]
 GO
@@ -312,7 +322,8 @@ IF TYPE_ID('[app].[VisualizationComponentTable]') IS NOT NULL
 	DROP TYPE [app].[VisualizationComponentTable];
 GO
 CREATE TYPE [app].[VisualizationComponentTable] AS TABLE (
-	[VisualizationPageId] [uniqueidentifier] NOT NULL,
+    [Header] [nvarchar](100) NOT NULL,
+    [SubHeader] [nvarchar](1000) NOT NULL,
     [JsonSpec] [nvarchar](max) NOT NULL,
     [IsFullWidth] BIT NOT NULL,
     [OrderId] [int] NOT NULL
@@ -325,25 +336,24 @@ GO
 -- Description: Create a Visualization Page
 -- =======================================
 CREATE PROCEDURE [adm].[sp_CreateVisualizationPage]
-    @header nvarchar(50),
-    @subheader nvarchar(1000),
+    @name nvarchar(100),
+    @description nvarchar(1000),
     @orderid int,
-    @components app.VisualizationComponentTable READONLY,
     @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
 BEGIN
     SET NOCOUNT ON
     
-    IF (app.fn_NullOrWhitespace(@header) = 1)
-        THROW 70400, N'VisualizationPage.Header is required.', 1;
+    IF (app.fn_NullOrWhitespace(@name) = 1)
+        THROW 70400, N'VisualizationPage.Name is required.', 1;
     
     BEGIN TRAN;
     BEGIN TRY
 
         DECLARE @ins TABLE (
             Id uniqueidentifier,
-            Header nvarchar(50) NOT NULL,
+            Header nvarchar(100) NOT NULL,
             SubHeader nvarchar(1000) NULL,
             OrderId int NOT NULL,
             Created datetime NOT NULL,
@@ -352,18 +362,10 @@ BEGIN
             UpdatedBy nvarchar(1000) NOT NULL
         );
 
-        INSERT INTO app.VisualizationPage (Header, SubHeader, OrderId, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT
-            inserted.Id,
-            inserted.Header,
-            inserted.SubHeader,
-            inserted.OrderId,
-            inserted.Created,
-            inserted.CreatedBy,
-            inserted.Updated,
-            inserted.UpdatedBy
+        INSERT INTO app.VisualizationPage (PageName, PageDescription, OrderId, Created, CreatedBy, Updated, UpdatedBy)
+        OUTPUT inserted.Id, inserted.PageName, inserted.PageDescription, inserted.OrderId, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy
         INTO @ins
-        VALUES (@header, @subheader, @orderid, GETDATE(), @user, GETDATE(), @user);
+        VALUES (@name, @description, @orderid, GETDATE(), @user, GETDATE(), @user);
 
         DECLARE @id UNIQUEIDENTIFIER;
         SELECT TOP 1 @id = Id from @ins;
@@ -378,11 +380,6 @@ BEGIN
             Updated,
             UpdatedBy
         FROM @ins;
-
-        INSERT INTO app.VisualizationComponent (VisualizationPageId, JsonSpec, IsFullWidth, OrderId)
-        OUTPUT inserted.VisualizationPageId, inserted.JsonSpec, inserted.IsFullWidth, inserted.OrderId
-        SELECT @id, JsonSpec, IsFullWidth, OrderId
-        FROM @components;
 
         INSERT INTO auth.VisualizationPageConstraint (VisualizationPageId, ConstraintId, ConstraintValue)
         OUTPUT inserted.VisualizationPageId, inserted.ConstraintId, inserted.ConstraintValue
@@ -402,14 +399,71 @@ GO
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2021-04-28
--- Description: Update a Visualization Page
+-- Description: Create a Visualization Component
+-- =======================================
+CREATE PROCEDURE [adm].[sp_CreateVisualizationComponent]
+    @visualizationpageid uniqueidentifier,
+    @header nvarchar(100),
+    @subheader nvarchar(1000),
+    @jsonSpec nvarchar(MAX),
+    @isFullWidth bit,
+    @orderId int,
+    @datasetids app.ResourceIdTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    IF (app.fn_NullOrWhitespace(@header) = 1)
+        THROW 70400, N'VisualizationComponent.Header is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        DECLARE @comps TABLE (
+            VisualizationPageId uniqueidentifier NOT NULL, 
+            Id uniqueidentifier NOT NULL,
+            Header NVARCHAR(100) NOT NULL, 
+            SubHeader NVARCHAR(1000) NULL,
+            JsonSpec NVARCHAR(MAX) NOT NULL, 
+            IsFullWidth BIT NOT NULL,
+            OrderId INT NOT NULL
+        )
+
+        INSERT INTO app.VisualizationComponent (VisualizationPageId, Header, SubHeader, JsonSpec, IsFullWidth, OrderId)
+        OUTPUT inserted.VisualizationPageId, inserted.Id, inserted.Header, inserted.SubHeader, inserted.JsonSpec, inserted.IsFullWidth, inserted.OrderId
+        INTO @comps
+        SELECT @visualizationpageid, @header, @subheader, @jsonSpec, @isFullWidth, @orderId
+
+        DECLARE @componentid UNIQUEIDENTIFIER;
+        SELECT TOP 1 @componentid = Id from @comps;
+
+        INSERT INTO rela.VisualizationComponentDatasetQuery (VisualizationComponentId, DatasetQueryId)
+        OUTPUT inserted.VisualizationComponentId, inserted.DatasetQueryId
+        SELECT @componentid, Id
+        FROM @datasetids
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021-04-28
+-- Description: Update a Visualization Page and 
+--              delete any previous components
 -- =======================================
 CREATE PROCEDURE adm.sp_UpdateVisualizationPage
     @id uniqueidentifier,
-    @header nvarchar(50),
-    @subheader nvarchar(1000),
+    @name nvarchar(100),
+    @description nvarchar(1000),
     @orderid int,
-    @components app.VisualizationComponentTable READONLY,
     @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
 AS
@@ -419,8 +473,8 @@ BEGIN
     IF (@id IS NULL)
         THROW 70400, N'VisualizationPage.Id is required.', 1;
 
-    IF (app.fn_NullOrWhitespace(@header) = 1)
-        THROW 70400, N'VisualizationPage.Header is required.', 1;
+    IF (app.fn_NullOrWhitespace(@name) = 1)
+        THROW 70400, N'VisualizationPage.Name is required.', 1;
     
     BEGIN TRAN;
     BEGIN TRY
@@ -430,15 +484,15 @@ BEGIN
 
         UPDATE app.VisualizationPage
         SET
-            Header = @header,
-            SubHeader = @subheader,
+            PageName = @name,
+            PageDescription = @description,
             OrderId = @orderid,
             Updated = GETDATE(),
             UpdatedBy = @user
         OUTPUT
             inserted.Id,
-            inserted.Header,
-            inserted.SubHeader,
+            inserted.PageName,
+            inserted.PageDescription,
             inserted.OrderId,
             inserted.Created,
             inserted.CreatedBy,
@@ -446,15 +500,16 @@ BEGIN
             inserted.UpdatedBy
         WHERE Id = @id;
 
-        DELETE FROM app.VisualizationComponent
-        WHERE VisualizationPageId = @id;
-
-        INSERT INTO app.VisualizationComponent (VisualizationPageId, JsonSpec, IsFullWidth, OrderId)
-        OUTPUT inserted.VisualizationPageId, inserted.JsonSpec, inserted.IsFullWidth, inserted.OrderId
-        SELECT @id, JsonSpec, IsFullWidth, OrderId
-        FROM @components;
+        DELETE rela.VisualizationComponentDatasetQuery
+        FROM rela.VisualizationComponentDatasetQuery AS VCDQ
+             INNER JOIN app.VisualizationComponent AS VC
+                ON VCDQ.VisualizationComponentId = VC.Id
+        WHERE VC.VisualizationPageId = @id
 
         DELETE FROM auth.VisualizationPageConstraint
+        WHERE VisualizationPageId = @id;
+
+        DELETE FROM app.VisualizationComponent
         WHERE VisualizationPageId = @id;
 
         INSERT INTO auth.VisualizationPageConstraint (VisualizationPageId, ConstraintId, ConstraintValue)
