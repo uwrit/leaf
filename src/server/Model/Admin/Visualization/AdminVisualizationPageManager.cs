@@ -10,6 +10,7 @@ using System.Data.Common;
 using Model.Validation;
 using Model.Error;
 using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 
 namespace Model.Admin.Visualization
 {
@@ -17,6 +18,7 @@ namespace Model.Admin.Visualization
     {
         public interface IAdminVisualizationPageService
         {
+            Task<IEnumerable<AdminVisualizationPage>> GetVisualizationPagesAsync();
             Task<AdminVisualizationPage> CreateVisualizationPageAsync(AdminVisualizationPage query);
             Task<AdminVisualizationPage> UpdateVisualizationPageAsync(AdminVisualizationPage query);
             Task<Guid?> DeleteVisualizationPageAsync(Guid id);
@@ -31,6 +33,22 @@ namespace Model.Admin.Visualization
         {
             svc = service;
             this.log = log;
+        }
+
+        public async Task<IEnumerable<AdminVisualizationPage>> GetVisualizationPagesAsync()
+        {
+            try
+            {
+                var pages = await svc.GetVisualizationPagesAsync();
+                log.LogInformation("Fetched VisualizationPages");
+                return pages;
+            }
+            catch (DbException db)
+            {
+                log.LogError("Failed to create VisualizationPage. VisualizationPage:{@VisualizationPage} Code:{Code} Error:{Error}", page, db.ErrorCode, db.Message);
+                db.MapThrow();
+                throw;
+            }
         }
 
         public async Task<AdminVisualizationPage> CreateVisualizationPageAsync(AdminVisualizationPage page)

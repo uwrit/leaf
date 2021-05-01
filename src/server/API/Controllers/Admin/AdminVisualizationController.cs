@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using API.DTO.Admin.Visualization;
 using Model.Admin.Visualization;
 using Model.Error;
+using System.Collections.Generic;
 
 namespace API.Controllers.Admin
 {
@@ -32,6 +34,21 @@ namespace API.Controllers.Admin
             this.log = log;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AdminVisualizationPageDTO>>> GetAsync()
+        {
+            try
+            {
+                var pages = await manager.GetVisualizationPagesAsync();
+                return Ok(pages.Select(p => p.AdminVisualizationPageDTO()));
+            }
+            catch (Exception e)
+            {
+                log.LogError("Failed to get Visualization Pages. Error:{Error}", e.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpPost]
         public async Task<ActionResult<AdminVisualizationPageDTO>> CreateAsync([FromBody] AdminVisualizationPageDTO dto)
         {
@@ -42,8 +59,8 @@ namespace API.Controllers.Admin
                     return BadRequest();
                 }
 
-                var query = dto.AdminVisualizationPage();
-                var created = await manager.CreateVisualizationPageAsync(query);
+                var page = dto.AdminVisualizationPage();
+                var created = await manager.CreateVisualizationPageAsync(page);
                 return Ok(created.AdminVisualizationPageDTO());
             }
             catch (LeafRPCException le)

@@ -29,6 +29,21 @@ namespace Services.Admin.Compiler
             this.user = userContext;
         }
 
+        public async Task<IEnumerable<AdminVisualizationPage>> GetVisualizationPagesAsync()
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var grid = await cn.QueryMultipleAsync(
+                    Sql.GetPages,
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout);
+
+                return DbReader.ReadPages(grid);
+            }
+        }
+
         public async Task<AdminVisualizationPage> CreateVisualizationPageAsync(AdminVisualizationPage page)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
@@ -149,6 +164,7 @@ namespace Services.Admin.Compiler
 
         static class Sql
         {
+            public const string GetPages = "adm.sp_GetVisualizationPages";
             public const string CreatePage = "adm.sp_CreateVisualizationPage";
             public const string CreateComponent = "adm.sp_CreateVisualizationComponent";
             public const string UpdatePage = "adm.sp_UpdateVisualizationPage";
@@ -204,6 +220,46 @@ namespace Services.Admin.Compiler
 
         static class DbReader
         {
+            public static IEnumerable<AdminVisualizationPage> ReadPages(SqlMapper.GridReader grid)
+            {
+                var pageRecs = grid.Read<AdminVisualizationPageRecord>();
+                var compRecs = grid.Read<AdminVisualizationComponentRecord>();
+                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetIdRecord>();
+                var consRecs = grid.Read<AdminVisualizationPageConstraintRecord>();
+
+                var comps = compRecs.GroupJoin(dsidRecs,
+                    comp => comp.Id,
+                    dsid => dsid.VisualizationComponentId,
+                    (comp, dsid) => new
+                    {
+                        comp.VisualizationPageId,
+                        Component = comp,
+                        DatasetQueryIds = dsid.Select(ds => ds.DatasetQueryId)
+                    });
+
+                var pages = pageRecs.GroupJoin(comps,
+                    page => page.Id,
+                    comp => comp.VisualizationPageId,
+                    (page, compsJoin) => new AdminVisualizationPage
+                    {
+                        PageName = page.PageName,
+                        PageDescription = page.PageDescription,
+                        OrderId = page.OrderId,
+                        Constraints = consRecs.Where(con => con.VisualizationPageId == page.Id).Select(con => con.Constraint()),
+                        Components = compsJoin.Select(comp => new AdminVisualizationComponent
+                        {
+                            Header = comp.Component.Header,
+                            SubHeader = comp.Component.SubHeader,
+                            JsonSpec = comp.Component.JsonSpec,
+                            DatasetQueryIds = comp.DatasetQueryIds,
+                            IsFullWidth = comp.Component.IsFullWidth,
+                            OrderId = comp.Component.OrderId
+                        })
+                    });
+
+                return pages;
+            }
+
             public static AdminVisualizationPage ReadPage(SqlMapper.GridReader grid)
             {
                 var pageRec = grid.Read<AdminVisualizationPageRecord>().FirstOrDefault();

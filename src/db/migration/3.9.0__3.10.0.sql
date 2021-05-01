@@ -330,6 +330,62 @@ CREATE TYPE [app].[VisualizationComponentTable] AS TABLE (
 )
 GO
 
+/*
+ * [adm].[sp_GetVisualizationPages]
+ */
+IF OBJECT_ID('adm.sp_GetVisualizationPages', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_GetVisualizationPages];
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/04/30
+-- Description: Retrieves all VisualizationPage records for an admin
+-- =======================================
+CREATE PROCEDURE [adm].[sp_GetVisualizationPages]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Get visualization pages
+    SELECT
+        VP.Id
+      , VP.PageName
+      , VP.PageDescription
+      , VP.OrderId
+      , VP.Created
+      , VP.CreatedBy
+      , VP.Updated
+      , VP.UpdatedBy
+    FROM app.VisualizationPage AS VP
+
+    -- Get components for each visualization page
+    SELECT
+        VC.Id
+      , VC.VisualizationPageId
+      , VC.Header
+      , VC.SubHeader
+      , VC.JsonSpec
+      , VC.IsFullWidth
+      , VC.OrderId
+    FROM app.VisualizationComponent AS VC
+
+    -- Get visualization component dataset Ids
+    SELECT
+        VCDQ.VisualizationComponentId
+      , VCDQ.DatasetQueryId
+    FROM rela.VisualizationComponentDatasetQuery AS VCDQ
+
+    -- Get constraints
+    SELECT
+        VPC.ConstraintId
+      , VPC.ConstraintValue
+      , VPC.VisualizationPageId
+    FROM auth.VisualizationPageConstraint AS VPC
+
+END
+GO
+
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2021-04-28
