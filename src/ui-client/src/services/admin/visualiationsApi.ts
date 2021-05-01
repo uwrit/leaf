@@ -5,89 +5,51 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+import { AdminVisualizationPage } from '../../models/admin/Visualization';
 import { AppState } from '../../models/state/AppState';
 import { HttpFactory } from './../HttpFactory';
 
 /*
- * Gets a Dataset.
+ * Get all Visualization Pages
  */ 
-export const getAdminDataset = async (state: AppState, id: string): Promise<AdminDatasetQuery> => {
+export const getAdminVisualizationPages = async (state: AppState): Promise<AdminVisualizationPage[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get(`api/admin/dataset/${id}`);
-    const ds = resp.data as AdminDatasetQueryDTO;
-    return fromDTO(ds);
+    const resp = await http.get('api/admin/visualization');
+    const pages = resp.data as AdminVisualizationPage[];
+    return pages;
 };
 
 /*
- * Updates an existing Dataset.
+ * Create a new Visualization Page
  */ 
-export const updateDataset = async (state: AppState, dataset: AdminDatasetQuery): Promise<AdminDatasetQuery> => {
+export const createAdminVisualiationPage = async (state: AppState, page: AdminVisualizationPage): Promise<AdminVisualizationPage> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/dataset/${dataset.id}`, toDTO(dataset));
-    const ds = resp.data as AdminDatasetQueryDTO;
-    return fromDTO(ds);
-};
-
-/*
- * Creates a new Dataset.
- */ 
-export const createDataset = async (state: AppState, dataset: AdminDatasetQuery): Promise<AdminDatasetQuery> => {
-    const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.post(`api/admin/dataset`, {
-        ...toDTO(dataset),
+    const resp = await http.post('api/admin/visualization', {
+        page,
         id: null
     });
-    const ds = resp.data as AdminDatasetQueryDTO;
-    return fromDTO(ds);
+    const created = resp.data as AdminVisualizationPage;
+    return created;
 };
 
 /*
- * Deletes an existing Dataset
+ * Update an existing Visualization Page
  */ 
-export const deleteDataset = async (state: AppState, dataset: AdminDatasetQuery) => {
+export const updateAdminVisualiationPage = async (state: AppState, page: AdminVisualizationPage): Promise<AdminVisualizationPage> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    await http.delete(`api/admin/dataset/${dataset.id}`);
+    const resp = await http.put(`api/admin/visualization/${page.id}`, { page });
+    const updated = resp.data as AdminVisualizationPage;
+    return updated;
 };
 
 /*
- * Gets the Demographics Dataset.
+ * Delete a Visualization Page
  */ 
-export const getAdminDemographicsDataset = async (state: AppState): Promise<AdminDatasetQuery> => {
+export const deleteAdminVisualizationPage = async (state: AppState, page: AdminVisualizationPage) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get(`api/admin/demographics`);
-    const ds = resp.data as AdminDemographicQuery;
-    const converted: AdminDatasetQuery = {
-        id: 'demographics',
-        constraints: [],
-        isEncounterBased: false,
-        name: 'Basic Demographics',
-        shape: PatientListDatasetShape.Demographics,
-        sqlStatement: ds.sqlStatement ? ds.sqlStatement : 'SELECT FROM dbo.table',
-        tags: [],
-        unsaved: new Date(ds.lastChanged).getFullYear() === 0
-    };
-    return converted;
-};
-
-/*
- * Updates or Inserts existing Demographics Dataset.
- */ 
-export const upsertDemographicsDataset = async (state: AppState, dataset: AdminDatasetQuery): Promise<AdminDatasetQuery> => {
-    const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/demographics`, {
-        sqlStatement: dataset.sqlStatement
-    });
-    const ds = resp.data as AdminDemographicQuery;
-    const converted: AdminDatasetQuery = {
-        ...dataset,
-        ...ds,
-        unsaved: false
-    };
-    return converted;
+    await http.delete(`api/admin/visualization/${page.id}`);
 };

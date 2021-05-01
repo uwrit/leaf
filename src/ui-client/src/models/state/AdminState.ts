@@ -17,6 +17,7 @@ import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
+import { AdminVisualizationComponent, AdminVisualizationPage } from '../admin/Visualization';
 
 
 export enum AdminPanelLoadState {
@@ -45,6 +46,13 @@ export interface AdminConceptState {
     examplePanel: Panel;
     exampleSql: string;
     state: AdminPanelLoadState;
+}
+
+export interface AdminVisualizationState {
+    changed: boolean;
+    visualizationPages: Map<string, AdminVisualizationPage>;
+    currentVisualizationPage?: AdminVisualizationPage;
+    currentVisualizationComponent?: AdminVisualizationComponent;
 }
 
 export interface AdminConceptEventState {
@@ -122,5 +130,6 @@ export default interface AdminState {
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
     state: AdminPanelLoadState;
+    visualizations: AdminVisualizationState;
     userQueries: AdminUserQueryState;
 }

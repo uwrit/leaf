@@ -22,6 +22,7 @@ export interface AdminVisualizationPageDTO {
 
 export interface AdminVisualizationPage extends AdminVisualizationPageDTO {
     components: AdminVisualizationComponent[];
+    unsaved?: boolean;
 }
 
 export interface AdminVisualizationComponentDTO {

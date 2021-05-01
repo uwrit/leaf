@@ -10,9 +10,9 @@ import { VisualizationPageDTO } from '../models/visualization/Visualization';
 import { HttpFactory } from './HttpFactory';
 
 /**
- * Add a Concept Dataset
+ * Get all Visualization Pages available to user
  */
-export const getVisualizations = (state: AppState): Promise<VisualizationPageDTO> => {
+export const getVisualizationPages = (state: AppState): Promise<VisualizationPageDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     return http.get("/api/visualization") as Promise<VisualizationPageDTO>;
