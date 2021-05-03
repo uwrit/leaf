@@ -14,6 +14,7 @@ using Model.Admin.Compiler;
 using Model.Admin.Network;
 using Model.Admin.Query;
 using Model.Admin.User;
+using Model.Admin.Visualization;
 
 namespace Model
 {
@@ -57,6 +58,7 @@ namespace Model
             services.AddTransient<AdminGlobalPanelFilterManager>();
             services.AddTransient<AdminQueryManager>();
             services.AddTransient<AdminUserManager>();
+            services.AddTransient<AdminVisualizationPageManager>();
 
             return services;
         }

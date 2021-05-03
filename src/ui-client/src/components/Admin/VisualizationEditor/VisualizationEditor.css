@@ -5,6 +5,33 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.visualization-editor {
-    
+ .visualization-editor {
+    background-color: white;
+    padding: 0 0 75px 0;
+ }
+
+/* Header */
+.visualization-editor-toprow {
+    background-color: rgb(250, 250, 250);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 84px;
+    margin-bottom: 4px;
+    padding: 20px;
+    z-index: 101;
+}
+
+.visualization-editor-toprow .leaf-button {
+    margin-right: 20px !important;
+}
+
+.visualization-editor-toprow .leaf-button-secondary {
+    background-color: white;
+}
+
+/* Inner */
+.visualization-editor-inner {
+    height: calc(100vh - 55px - 84px);
+    overflow-x: hidden;
+    padding: 0 20% !important;
+    z-index: 100;
 }

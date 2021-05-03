@@ -45,7 +45,7 @@ namespace Model.Admin.Visualization
             }
             catch (DbException db)
             {
-                log.LogError("Failed to create VisualizationPage. VisualizationPage:{@VisualizationPage} Code:{Code} Error:{Error}", page, db.ErrorCode, db.Message);
+                log.LogError("Failed to create VisualizationPage. VisualizationPage:{@VisualizationPage} Code:{Code} Error:{Error}", db.ErrorCode, db.Message);
                 db.MapThrow();
                 throw;
             }

@@ -8,8 +8,7 @@
 import { AppState } from "../../models/state/AppState";
 import { setNoClickModalState, showInfoModal, setSideNotificationState } from "../generalUi";
 import { NotificationStates, InformationModalState } from "../../models/state/GeneralUiState";
-import { 
-    getAdminVisualizationPages, 
+import {
     createAdminVisualiationPage, 
     updateAdminVisualiationPage, 
     deleteAdminVisualizationPage
@@ -17,13 +16,14 @@ import {
 import { AdminVisualizationPage } from "../../models/admin/Visualization";
 
 export const SET_ADMIN_VISUALIZATIONS = 'SET_ADMIN_VISUALIZATIONS';
-export const SET_ADMIN_UNEDITED_VISUALIZATION = 'SET_ADMIN_UNEDITED_VISUALIZATION';
+export const SET_ADMIN_VISUALIZATION = 'SET_ADMIN_VISUALIZATION';
 export const UNDO_ADMIN_VISUALIZATION_CHANGE = 'UNDO_ADMIN_VISUALIZATION_CHANGE';
 export const REMOVE_ADMIN_VISUALIZATION = 'REMOVE_ADMIN_VISUALIZATION';
 
 export interface AdminVisualizationAction {
     changed?: boolean;
     page?: AdminVisualizationPage;
+    pages?: AdminVisualizationPage[];
     type: string;
 }
 
@@ -43,7 +43,7 @@ export const saveAdminVisualizationPage = (page: AdminVisualizationPage) => {
                 : await updateAdminVisualiationPage(state, page);
 
             dispatch(removeAdminVisualizationPage(page));
-            dispatch(setAdminVisualizationPage(page, false));
+            dispatch(setAdminVisualizationPage(newPage, false));
         } catch (err) {
             console.log(err);
             const info: InformationModalState = {
@@ -55,7 +55,7 @@ export const saveAdminVisualizationPage = (page: AdminVisualizationPage) => {
         } finally {
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         }
-    }
+    };
 };
 
 /*
@@ -88,27 +88,24 @@ export const deleteAdminVisualization = (page: AdminVisualizationPage) => {
 };
 
 // Synchronous
-export const setAdminVisualizationPage = (ev: AdminVisualizationPage, changed: boolean): AdminVisualizationAction => {
+export const setAdminVisualizationPage = (page: AdminVisualizationPage, changed: boolean): AdminVisualizationAction => {
     return {
         changed,
+        page,
+        type: SET_ADMIN_VISUALIZATION
+    };
+};
+
+export const setAdminVisualizationPages = (pages: AdminVisualizationPage[]): AdminVisualizationAction => {
+    return {
+        pages,
         type: SET_ADMIN_VISUALIZATIONS
     };
 };
 
-export const setAdminVisualizationPages = (evs: AdminVisualizationPage[]): AdminVisualizationAction => {
+export const removeAdminVisualizationPage = (page: AdminVisualizationPage): AdminVisualizationAction => {
     return {
-        type: SET_ADMIN_VISUALIZATIONS
-    };
-};
-
-export const setAdminUneditedVisualizationPage = (ev: AdminVisualizationPage): AdminVisualizationAction => {
-    return {
-        type: SET_ADMIN_UNEDITED_VISUALIZATION
-    };
-};
-
-export const removeAdminVisualizationPage = (ev: AdminVisualizationPage): AdminVisualizationAction => {
-    return {
+        page,
         type: REMOVE_ADMIN_VISUALIZATION
     };
 };

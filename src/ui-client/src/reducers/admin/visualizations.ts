@@ -10,48 +10,55 @@ import { AdminVisualizationAction } from "../../actions/admin/visualizations";
 
 
 export const setAdminVisualizationPages = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    for (const ev of action.evs!) {
-        state.conceptEvents.events.set(ev.id, Object.assign({}, ev));
+    const pages = new Map(state.visualizations.pages);
+    for (const page of action.pages) {
+        pages.set(page.id, Object.assign({}, page));
     }
     return Object.assign({}, state, { 
-        conceptEvents: {
-            ...state.conceptEvents,
-            changed: action.changed,
-            events: new Map(state.conceptEvents.events)
+        visualizations: {
+            ...state.visualizations,
+            pages
         }
     });
 };
 
-export const setAdminUneditedVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+export const setAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    let uneditedPage = state.visualizations.uneditedPage;
+    if (action.changed && !state.visualizations.changed) {
+        uneditedPage = state.visualizations.pages.get(action.page!.id);
+    }
+    state.visualizations.pages.set(action.page!.id, Object.assign({}, action.page));
+
     return Object.assign({}, state, { 
-        conceptEvents: {
-            ...state.conceptEvents,
-            uneditedEvent: Object.assign({}, action.ev, { changed: false })
+        visualizations: {
+            ...state.visualizations,
+            uneditedPage,
+            changed: action.changed
         }
     });
 };
 
 export const removeAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    state.conceptEvents.events.delete(action.ev!.id);
+    state.visualizations.pages.delete(action.page!.id);
     return Object.assign({}, state, { 
-        conceptEvents: { 
-            events: new Map(state.conceptEvents.events)
+        visualizations: { 
+            ...state.visualizations,
         }
     });
 };
 
 export const undoAdminVisualizationPageChange = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    const unedited = state.conceptEvents.uneditedEvent!;
+    const uneditedPage = state.visualizations.uneditedPage;
 
-    if (unedited.id) {
-        state.conceptEvents.events.set(unedited.id, Object.assign({}, unedited));
+    if (uneditedPage && uneditedPage.id) {
+        state.visualizations.pages.set(uneditedPage.id, Object.assign({}, uneditedPage));
     }
 
     return Object.assign({}, state, { 
-        conceptEvents: { 
-            changed: false,
-            events: new Map(state.conceptEvents.events),
-            uneditedEvent: undefined
+        visualizations: {
+            ...state.visualizations,
+            uneditedPage: undefined,
+            changed: false
         }
     });
 };

@@ -17,7 +17,8 @@ import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
-import { AdminVisualizationComponent, AdminVisualizationPage } from '../admin/Visualization';
+import { CohortStateType } from '../state/CohortState';
+import { AdminVisualizationPage } from '../admin/Visualization';
 
 
 export enum AdminPanelLoadState {
@@ -50,9 +51,16 @@ export interface AdminConceptState {
 
 export interface AdminVisualizationState {
     changed: boolean;
-    visualizationPages: Map<string, AdminVisualizationPage>;
-    currentVisualizationPage?: AdminVisualizationPage;
-    currentVisualizationComponent?: AdminVisualizationComponent;
+    currentPage?: AdminVisualizationPage;
+    datasets: Map<string, AdminVisualizationDatasetState>;
+    pages: Map<string, AdminVisualizationPage>;
+    selectedId?: string;
+    uneditedPage?: AdminVisualizationPage;
+}
+
+export interface AdminVisualizationDatasetState {
+    state: CohortStateType;
+    data: any[];
 }
 
 export interface AdminConceptEventState {

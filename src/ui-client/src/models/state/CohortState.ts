@@ -11,8 +11,7 @@ import { PatientListRow } from '../patientList/Patient';
 import { DemographicStatistics } from '../cohort/DemographicDTO';
 import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
-import { PanelItem } from '../panel/PanelItem';
-import { Concept, ConceptId } from '../concept/Concept';
+import { ConceptId } from '../concept/Concept';
 
 export enum CohortStateType {
     REQUESTING = 1,

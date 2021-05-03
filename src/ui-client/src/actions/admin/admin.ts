@@ -17,6 +17,8 @@ import { getPanelFilters } from "../../services/admin/panelFilterApi";
 import { getGlobalPanelFilters } from "../../services/admin/globalPanelFilterApi";
 import { setAdminPanelFilters } from "./panelFilter";
 import { setAdminGlobalPanelFilters } from "./globalPanelFilter";
+import { getAdminVisualizationPages } from "../../services/admin/visualiationsApi";
+import { setAdminVisualizationPages } from "./visualizations";
 
 export const SET_ADMIN_PANEL_PANE = 'SET_ADMIN_PANEL_PANE';
 export const SET_ADMIN_PANEL_LOAD_STATE = 'SET_ADMIN_PANEL_LOAD_STATE';
@@ -38,43 +40,49 @@ export const loadAdminPanelDataIfNeeded = () => {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
-                /*
-                 * Load Leaf instance configuration.
+                /**
+                 * Load Leaf instance configuration
                  */
                 dispatch(getAdminSqlConfiguration());
 
-                /*
-                 * Load Concept-related data.
+                /**
+                 * Load Concept-related data
                  */ 
                 const sqlSets = await getSqlSets(state);
                 const conceptEvents = await getConceptEvents(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminConceptEvents(conceptEvents));
 
-                /*
-                 * Load panel filter-related data.
+                /**
+                 * Load panel filter-related data
                  */
                 const panelFilters = await getPanelFilters(state);
                 const globalPanelFilters = await getGlobalPanelFilters(state);
                 dispatch(setAdminPanelFilters(panelFilters));
                 dispatch(setAdminGlobalPanelFilters(globalPanelFilters));
 
-                /*
-                 * Load datasets data.
+                /**
+                 * Load datasets data
                  */
                 const demographics = await getAdminDemographicsDataset(state);
                 const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminDemographicsDataset(demographics, false));
                 dispatch(setAdminDatasetQueryCategories(datasetQueryCategories));
 
-                /*
-                 * Load network & identity data.
+                /**
+                 * Load visualization data
+                 */
+                 const visualizationPages = await getAdminVisualizationPages(state);
+                 dispatch(setAdminVisualizationPages(visualizationPages));
+
+                /**
+                 * Load network & identity data
                  */
                 const endpoints = await getNetworkEndpoints(state);
                 dispatch(setAdminNetworkEndpoints(endpoints));
 
-                /*
-                 * Finish.
+                /**
+                 * Finish
                  */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));

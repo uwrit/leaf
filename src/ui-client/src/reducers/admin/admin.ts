@@ -96,6 +96,12 @@ import {
     SET_ADMIN_QUERY_USERS,
     SET_ADMIN_QUERY_USER_SEARCH_TERM
 } from "../../actions/admin/userQuery";
+import {
+    SET_ADMIN_VISUALIZATIONS,
+    SET_ADMIN_VISUALIZATION,
+    REMOVE_ADMIN_VISUALIZATION,
+    UNDO_ADMIN_VISUALIZATION_CHANGE
+} from "../../actions/admin/visualizations";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -109,6 +115,7 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
+import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, undoAdminVisualizationPageChange } from "./visualizations";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -176,6 +183,11 @@ export const defaultAdminState = (): AdminState => {
             uneditedSets: new Map()
         },
         state: AdminPanelLoadState.NOT_LOADED,
+        visualizations: {
+            changed: false,
+            datasets: new Map(),
+            pages: new Map()
+        },
         userQueries: {
             fetchingQueries: false,
             fetchingUsers: false,
@@ -312,6 +324,16 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return undoAdminDatasetQueryCategoryChange(state, action);
         case REMOVE_ADMIN_DATASET_QUERY_CATEGORY:
             return removeAdminDatasetQueryCategory(state, action);
+
+        // Visualizations
+        case SET_ADMIN_VISUALIZATIONS:
+            return setAdminVisualizationPages(state, action);
+        case SET_ADMIN_VISUALIZATION:
+            return setAdminVisualizationPage(state, action);
+        case UNDO_ADMIN_VISUALIZATION_CHANGE:
+            return undoAdminVisualizationPageChange(state, action);
+        case REMOVE_ADMIN_VISUALIZATION:
+            return removeAdminVisualizationPage(state, action);
 
         // Network Identity & Endpoints
         case SET_ADMIN_NETWORK_IDENTITY:

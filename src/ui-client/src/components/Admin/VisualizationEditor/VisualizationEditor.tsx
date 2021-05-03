@@ -6,9 +6,10 @@
  */ 
 
 import React from 'react';
-import { Container, Row, Col } from 'reactstrap';
+import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { VegaLite } from 'react-vega'
+import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -28,6 +29,39 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     }
 
     public render() {
+        const c = this.className;
+        const { data } = this.props;
+
+        return (
+            <Container fluid={true} className={`${c} admin-panel-editor`}>
+                {/* Header */}
+                <div className={`${c}-toprow`}>
+                    <Button className='leaf-button leaf-button-addnew'>
+                        + Create New Visualization
+                    </Button>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!data.visualizations.changed}>
+                        Undo Changes
+                    </Button>
+                    <Button className='leaf-button leaf-button-primary' disabled={!data.visualizations.changed}>
+                        Save
+                    </Button>
+
+                    {/* Explanation */}
+                    <WhatsThis
+                        question={'What is a Leaf Visualization?'}
+                        body={`Visualizations`}
+                    />
+                </div>
+
+                {/* Editor */}
+                <div className={`${c}-inner`}>
+                    
+                </div>
+
+            </Container>);
+    }
+    
+    public demorender() {
         const c = this.className;
 
         const spec = {
