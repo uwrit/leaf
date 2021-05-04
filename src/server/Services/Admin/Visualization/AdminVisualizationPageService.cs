@@ -194,11 +194,12 @@ namespace Services.Admin.Compiler
             public int OrderId { get; set; }
         }
 
-        class AdminVisualizationComponentDatasetIdRecord
+        class AdminVisualizationComponentDatasetRefRecord
         {
             public Guid VisualizationPageId { get; set; }
             public Guid VisualizationComponentId { get; set; }
             public Guid DatasetQueryId { get; set; }
+            public string DatasetName { get; set; }
         }
 
         class AdminVisualizationPageConstraintRecord
@@ -224,7 +225,7 @@ namespace Services.Admin.Compiler
             {
                 var pageRecs = grid.Read<AdminVisualizationPageRecord>();
                 var compRecs = grid.Read<AdminVisualizationComponentRecord>();
-                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetIdRecord>();
+                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetRefRecord>();
                 var consRecs = grid.Read<AdminVisualizationPageConstraintRecord>();
 
                 var comps = compRecs.GroupJoin(dsidRecs,
@@ -242,6 +243,7 @@ namespace Services.Admin.Compiler
                     comp => comp.VisualizationPageId,
                     (page, compsJoin) => new AdminVisualizationPage
                     {
+                        Id = (Guid)page.Id,
                         PageName = page.PageName,
                         PageDescription = page.PageDescription,
                         OrderId = page.OrderId,
@@ -288,7 +290,7 @@ namespace Services.Admin.Compiler
                     Header = compRec.Header,
                     SubHeader = compRec.SubHeader,
                     JsonSpec = compRec.JsonSpec,
-                    DatasetQueryIds = dsidRecs.Select(id => id.DatasetQueryId),
+                    DatasetQueryRefs = dsidRecs.Select(id => id.DatasetQueryId),
                     IsFullWidth = compRec.IsFullWidth,
                     OrderId = compRec.OrderId
                 };

@@ -47,6 +47,15 @@ export const removeAdminVisualizationPage = (state: AdminState, action: AdminVis
     });
 };
 
+export const setCurrentAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    return Object.assign({}, state, { 
+        visualizations: { 
+            ...state.visualizations,
+            currentPage: action.page
+        }
+    });
+};
+
 export const undoAdminVisualizationPageChange = (state: AdminState, action: AdminVisualizationAction): AdminState => {
     const uneditedPage = state.visualizations.uneditedPage;
 

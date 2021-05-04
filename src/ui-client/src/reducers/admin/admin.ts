@@ -100,7 +100,8 @@ import {
     SET_ADMIN_VISUALIZATIONS,
     SET_ADMIN_VISUALIZATION,
     REMOVE_ADMIN_VISUALIZATION,
-    UNDO_ADMIN_VISUALIZATION_CHANGE
+    UNDO_ADMIN_VISUALIZATION_CHANGE,
+    SET_ADMIN_VISUALIZATION_CURRENT
 } from "../../actions/admin/visualizations";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
@@ -115,7 +116,7 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, undoAdminVisualizationPageChange } from "./visualizations";
+import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualizations";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -334,6 +335,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return undoAdminVisualizationPageChange(state, action);
         case REMOVE_ADMIN_VISUALIZATION:
             return removeAdminVisualizationPage(state, action);
+        case SET_ADMIN_VISUALIZATION_CURRENT:
+            return setCurrentAdminVisualizationPage(state, action);
 
         // Network Identity & Endpoints
         case SET_ADMIN_NETWORK_IDENTITY:

@@ -10,6 +10,9 @@ import { Container, Row, Col, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { VegaLite } from 'react-vega'
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
+import VisualizationPageSidebar from './VisualizationPageSidebar/VisualizationPageSidebar';
+import { AdminVisualizationComponent } from '../../../models/admin/Visualization';
+import VisualizationSpecEditor from './VisualizationSpecEditor/VisualizationSpecEditor';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -18,6 +21,7 @@ interface Props {
 }
 
 interface State {
+    selectedComponent?: AdminVisualizationComponent;
 }
 
 export class VisualizationEditor extends React.PureComponent<Props,State> {
@@ -30,19 +34,32 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const c = this.className;
-        const { data } = this.props;
+        const { data, dispatch } = this.props;
+        const { selectedComponent } = this.state;
+        const { visualizations } = data;
+        const { currentPage, changed } = visualizations;
+        let spec = null;
+
+        if (currentPage && selectedComponent) {
+            spec = {
+                data: [
+                    selectedComponent.datasetQueryIds.map(dsid => ({ name: dsid }))
+                ]
+            }
+        }
 
         return (
             <Container fluid={true} className={`${c} admin-panel-editor`}>
+
                 {/* Header */}
                 <div className={`${c}-toprow`}>
                     <Button className='leaf-button leaf-button-addnew'>
                         + Create New Visualization
                     </Button>
-                    <Button className='leaf-button leaf-button-secondary' disabled={!data.visualizations.changed}>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!changed}>
                         Undo Changes
                     </Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={!data.visualizations.changed}>
+                    <Button className='leaf-button leaf-button-primary' disabled={!changed}>
                         Save
                     </Button>
 
@@ -53,10 +70,23 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     />
                 </div>
 
-                {/* Editor */}
-                <div className={`${c}-inner`}>
-                    
-                </div>
+                <Row>
+
+                    {/* Sidebar */}
+                    <Col md={2}>
+                        <VisualizationPageSidebar data={visualizations} dispatch={dispatch} />
+                    </Col>
+
+                    {/* Editor */}
+                    <Col md={10}>
+
+                        {currentPage && selectedComponent &&
+                        <VisualizationSpecEditor currentPage={currentPage} currentComponent={selectedComponent} dispatch={dispatch} />
+                        }
+                        
+                    </Col>
+
+                </Row>
 
             </Container>);
     }

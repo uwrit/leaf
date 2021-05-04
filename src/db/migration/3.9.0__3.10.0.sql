@@ -69,6 +69,29 @@ ALTER TABLE [app].[VisualizationComponent] ADD  CONSTRAINT [DF_VisualizationComp
 GO
 
 /**
+ * [app].[VisualizationComponent]
+ */
+IF OBJECT_ID('app.VisualizationCategory') IS NOT NULL
+	DROP TABLE [app].[VisualizationCategory];
+GO
+
+CREATE TABLE [app].[VisualizationCategory](
+	[Id] [uniqueidentifier] NOT NULL,
+    [Name] [nvarchar](100) NOT NULL,
+    [Header] [nvarchar](100) NOT NULL,
+    [SubHeader] [nvarchar](1000) NULL,
+    [JsonSpec] [nvarchar](max) NOT NULL
+ CONSTRAINT [PK__VisualizationCategory] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] 
+GO
+
+ALTER TABLE [app].[VisualizationCategory] ADD  CONSTRAINT [DF_VisualizationCategory_Id]  DEFAULT (newsequentialid()) FOR [Id]
+GO
+
+/**
  * [app].[Visualization]
  */
 IF OBJECT_ID('app.VisualizationPage') IS NOT NULL
@@ -79,6 +102,7 @@ CREATE TABLE [app].[VisualizationPage](
 	[Id] [uniqueidentifier] NOT NULL,
     [PageName] [nvarchar](100) NOT NULL,
     [PageDescription] nvarchar(1000) NOT NULL,
+    [CategoryId] uniqueidentifier NULL,
     [OrderId] [int] NOT NULL,
     [Created] [datetime] NOT NULL,
 	[CreatedBy] [nvarchar](1000) NOT NULL,
@@ -106,6 +130,13 @@ REFERENCES [app].[VisualizationPage] ([Id])
 GO
 
 ALTER TABLE [app].[VisualizationComponent] CHECK CONSTRAINT [FK_VisualizationComponent_VisualizationPageId]
+GO
+
+ALTER TABLE [app].[VisualizationPage]  WITH CHECK ADD CONSTRAINT [FK_VisualizationPage_CategoryId] FOREIGN KEY([CategoryId])
+REFERENCES [app].[VisualizationCategory] ([Id])
+GO
+
+ALTER TABLE [app].[VisualizationPage] CHECK CONSTRAINT [FK_VisualizationPage_CategoryId]
 GO
 
 ALTER TABLE [rela].[VisualizationComponentDatasetQuery]  WITH CHECK ADD CONSTRAINT [FK_PK__VisualizationComponentDatasetQuery_VisualizationComponentId] FOREIGN KEY([VisualizationComponentId])
@@ -275,7 +306,10 @@ BEGIN
       , VP.PageName
       , VP.PageDescription
       , VP.OrderId
+      , Category = VCAT.Name
     FROM app.VisualizationPage AS VP
+         LEFT JOIN app.VisualizationCategory AS VCAT
+            ON VP.CategoryId = VCAT.Id
     WHERE EXISTS (SELECT 1 FROM @ids AS I WHERE VP.Id = I.Id)
 
     -- produce visualization components
@@ -295,9 +329,13 @@ BEGIN
         VC.VisualizationPageId
       , VCDQ.VisualizationComponentId
       , VCDQ.DatasetQueryId
+      , DQ.UniversalId
+      , DatasetName = DQ.[Name]
     FROM #VC AS VC
          INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
             ON VC.Id = VCDQ.VisualizationComponentId
+         INNER JOIN app.DatasetQuery AS DQ
+            ON VCDQ.DatasetQueryId = DQ.Id
     WHERE EXISTS (SELECT 1 FROM @ids AS I WHERE VC.VisualizationPageId = I.Id)
 
 END
@@ -352,6 +390,7 @@ BEGIN
         VP.Id
       , VP.PageName
       , VP.PageDescription
+      , VP.CategoryId
       , VP.OrderId
       , VP.Created
       , VP.CreatedBy
@@ -374,7 +413,11 @@ BEGIN
     SELECT
         VCDQ.VisualizationComponentId
       , VCDQ.DatasetQueryId
+      , DQ.UniversalId
+      , DatasetName = DQ.[Name]
     FROM rela.VisualizationComponentDatasetQuery AS VCDQ
+         INNER JOIN app.DatasetQuery AS DQ
+            ON VCDQ.DatasetQueryId = DQ.Id
 
     -- Get constraints
     SELECT
@@ -394,6 +437,7 @@ GO
 CREATE PROCEDURE [adm].[sp_CreateVisualizationPage]
     @name nvarchar(100),
     @description nvarchar(1000),
+    @categoryid uniqueidentifier,
     @orderid int,
     @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
@@ -409,8 +453,9 @@ BEGIN
 
         DECLARE @ins TABLE (
             Id uniqueidentifier,
-            Header nvarchar(100) NOT NULL,
-            SubHeader nvarchar(1000) NULL,
+            PageName nvarchar(100) NOT NULL,
+            PageDescription nvarchar(1000) NULL,
+            CategoryId uniqueidentifier NULL,
             OrderId int NOT NULL,
             Created datetime NOT NULL,
             CreatedBy nvarchar(1000) NOT NULL,
@@ -418,18 +463,19 @@ BEGIN
             UpdatedBy nvarchar(1000) NOT NULL
         );
 
-        INSERT INTO app.VisualizationPage (PageName, PageDescription, OrderId, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT inserted.Id, inserted.PageName, inserted.PageDescription, inserted.OrderId, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy
+        INSERT INTO app.VisualizationPage (PageName, PageDescription, CategoryId, OrderId, Created, CreatedBy, Updated, UpdatedBy)
+        OUTPUT inserted.Id, inserted.PageName, inserted.PageDescription, inserted.CategoryId, inserted.OrderId, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy
         INTO @ins
-        VALUES (@name, @description, @orderid, GETDATE(), @user, GETDATE(), @user);
+        VALUES (@name, @description, @categoryid, @orderid, GETDATE(), @user, GETDATE(), @user);
 
         DECLARE @id UNIQUEIDENTIFIER;
         SELECT TOP 1 @id = Id from @ins;
 
         SELECT
             Id,
-            Header,
-            SubHeader,
+            PageName,
+            PageDescription,
+            CategoryId,
             OrderId,
             Created,
             CreatedBy,
@@ -486,6 +532,11 @@ BEGIN
             OrderId INT NOT NULL
         )
 
+        DECLARE @dqs TABLE (
+            VisualizationComponentId uniqueidentifier NOT NULL,
+            DatasetQueryId uniqueidentifier NOT NULL
+        )
+
         INSERT INTO app.VisualizationComponent (VisualizationPageId, Header, SubHeader, JsonSpec, IsFullWidth, OrderId)
         OUTPUT inserted.VisualizationPageId, inserted.Id, inserted.Header, inserted.SubHeader, inserted.JsonSpec, inserted.IsFullWidth, inserted.OrderId
         INTO @comps
@@ -496,8 +547,28 @@ BEGIN
 
         INSERT INTO rela.VisualizationComponentDatasetQuery (VisualizationComponentId, DatasetQueryId)
         OUTPUT inserted.VisualizationComponentId, inserted.DatasetQueryId
+        INTO @dqs
         SELECT @componentid, Id
         FROM @datasetids
+
+        SELECT
+            VC.Id
+          , VC.VisualizationPageId
+          , VC.Header
+          , VC.SubHeader
+          , VC.JsonSpec
+          , VC.IsFullWidth
+          , VC.OrderId
+        FROM @comps AS VC
+
+        SELECT
+            DQS.VisualizationComponentId
+          , DQS.DatasetQueryId
+          , DQ.UniversalId
+          , DatasetName = DQ.[Name]
+        FROM @dqs AS DQS
+             INNER JOIN app.DatasetQuery AS DQ
+                ON DQS.DatasetQueryId = DQ.Id
 
         COMMIT;
     END TRY
@@ -519,6 +590,7 @@ CREATE PROCEDURE adm.sp_UpdateVisualizationPage
     @id uniqueidentifier,
     @name nvarchar(100),
     @description nvarchar(1000),
+    @categoryid uniqueidentifier,
     @orderid int,
     @constraints auth.ResourceConstraintTable READONLY,
     @user auth.[User]
@@ -542,6 +614,7 @@ BEGIN
         SET
             PageName = @name,
             PageDescription = @description,
+            CategoryId = @categoryid,
             OrderId = @orderid,
             Updated = GETDATE(),
             UpdatedBy = @user
@@ -549,6 +622,7 @@ BEGIN
             inserted.Id,
             inserted.PageName,
             inserted.PageDescription,
+            inserted.CategoryId,
             inserted.OrderId,
             inserted.Created,
             inserted.CreatedBy,

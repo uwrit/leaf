@@ -19,6 +19,9 @@ export interface CohortVisualizationAction {
     type: string;
 }
 
+// Asynchonous
+// export const getVisualizationData = ()
+
 // Synchronous
 export const setNetworkVisualizationData = (id: number, vizResults: DemographicStatistics): CohortVisualizationAction => {
     return {

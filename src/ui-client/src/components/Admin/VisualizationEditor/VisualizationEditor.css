@@ -35,3 +35,25 @@
     padding: 0 20% !important;
     z-index: 100;
 }
+
+/* Sidebar */
+.visualization-page-sidebar {
+    padding: 10px 0 0 0;
+}
+
+.visualization-page-sidebar-inner {
+    list-style-type: none;
+}
+
+.visualization-page-sidebar-item {
+    cursor: pointer;
+}
+
+.visualization-page-sidebar-item:hover,
+.visualization-page-sidebar-item.selected {
+    color: rgb(28,168,221);
+}
+
+.visualization-page-sidebar-item:hover {
+    text-decoration: underline;
+}

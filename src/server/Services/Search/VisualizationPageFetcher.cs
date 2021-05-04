@@ -63,6 +63,7 @@ namespace Services.Search
                     comp => comp.VisualizationPageId,
                     (page, compsJoin) => new VisualizationPage
                     {
+                        Id = page.Id,
                         PageName = page.PageName,
                         PageDescription = page.PageDescription,
                         OrderId = page.OrderId,

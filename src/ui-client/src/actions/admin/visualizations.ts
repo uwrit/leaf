@@ -19,6 +19,7 @@ export const SET_ADMIN_VISUALIZATIONS = 'SET_ADMIN_VISUALIZATIONS';
 export const SET_ADMIN_VISUALIZATION = 'SET_ADMIN_VISUALIZATION';
 export const UNDO_ADMIN_VISUALIZATION_CHANGE = 'UNDO_ADMIN_VISUALIZATION_CHANGE';
 export const REMOVE_ADMIN_VISUALIZATION = 'REMOVE_ADMIN_VISUALIZATION';
+export const SET_ADMIN_VISUALIZATION_CURRENT = 'SET_ADMIN_VISUALIZATION_CURRENT';
 
 export interface AdminVisualizationAction {
     changed?: boolean;
@@ -113,5 +114,12 @@ export const removeAdminVisualizationPage = (page: AdminVisualizationPage): Admi
 export const undoAdminVisualizationPageChange = (): AdminVisualizationAction => {
     return {
         type: UNDO_ADMIN_VISUALIZATION_CHANGE
+    };
+};
+
+export const setAdminCurrentVisualizationPage = (page: AdminVisualizationPage): AdminVisualizationAction => {
+    return {
+        page,
+        type: SET_ADMIN_VISUALIZATION_CURRENT
     };
 };
