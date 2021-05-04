@@ -17,8 +17,10 @@ import { getPanelFilters } from "../../services/admin/panelFilterApi";
 import { getGlobalPanelFilters } from "../../services/admin/globalPanelFilterApi";
 import { setAdminPanelFilters } from "./panelFilter";
 import { setAdminGlobalPanelFilters } from "./globalPanelFilter";
-import { getAdminVisualizationPages } from "../../services/admin/visualiationsApi";
-import { setAdminVisualizationPages } from "./visualizations";
+import { getAdminVisualizationPages } from "../../services/admin/visualiationApi";
+import { setAdminVisualizationPages } from "./visualization";
+import { getVisualizationCategories } from "../../services/admin/visualizationCategoryApi";
+import { setAdminVisualizationCategories } from "./visualizationCategory";
 
 export const SET_ADMIN_PANEL_PANE = 'SET_ADMIN_PANEL_PANE';
 export const SET_ADMIN_PANEL_LOAD_STATE = 'SET_ADMIN_PANEL_LOAD_STATE';
@@ -74,6 +76,12 @@ export const loadAdminPanelDataIfNeeded = () => {
                  */
                  const visualizationPages = await getAdminVisualizationPages(state);
                  dispatch(setAdminVisualizationPages(visualizationPages));
+
+                /**
+                 * Load visualization category data
+                 */
+                 const visualizationCategories = await getVisualizationCategories(state);
+                 dispatch(setAdminVisualizationCategories(visualizationCategories));
 
                 /**
                  * Load network & identity data

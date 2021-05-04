@@ -187,19 +187,19 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<Guid?> DeleteDatasetQueryAsync(Guid id)
+        public async Task<DatasetQueryDeleteResult> DeleteDatasetQueryAsync(Guid id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var deleted = await cn.QueryFirstOrDefaultAsync<Guid?>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.Delete,
                     new { id },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                return deleted;
+                return new DatasetQueryDeleteResult { VisualizationComponentDependents = grid.Read<VisualizationComponentDependant>() };
             }
         }
 

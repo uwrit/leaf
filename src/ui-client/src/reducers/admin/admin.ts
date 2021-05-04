@@ -102,7 +102,7 @@ import {
     REMOVE_ADMIN_VISUALIZATION,
     UNDO_ADMIN_VISUALIZATION_CHANGE,
     SET_ADMIN_VISUALIZATION_CURRENT
-} from "../../actions/admin/visualizations";
+} from "../../actions/admin/visualization";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -116,7 +116,9 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualizations";
+import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualization";
+import { REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY, SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY, SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES, UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE } from "../../actions/admin/visualizationCategory";
+import { removeAdminVisualizationCategory, setAdminUneditedVisualizationCategory, setAdminVisualizationCategories, undoAdminVisualizationCategoryChange } from "./visualizationCategory";
 
 
 export const defaultAdminState = (): AdminState => {
@@ -188,6 +190,10 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             datasets: new Map(),
             pages: new Map()
+        },
+        visualizationCategories: {
+            changed: false,
+            categories: new Map(),
         },
         userQueries: {
             fetchingQueries: false,
@@ -337,6 +343,16 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminVisualizationPage(state, action);
         case SET_ADMIN_VISUALIZATION_CURRENT:
             return setCurrentAdminVisualizationPage(state, action);
+
+        // Visualization Categories
+        case SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES:
+            return setAdminVisualizationCategories(state, action);
+        case SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY:
+            return setAdminUneditedVisualizationCategory(state, action);
+        case UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE:
+            return undoAdminVisualizationCategoryChange(state, action);
+        case REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY:
+            return removeAdminVisualizationCategory(state, action);
 
         // Network Identity & Endpoints
         case SET_ADMIN_NETWORK_IDENTITY:

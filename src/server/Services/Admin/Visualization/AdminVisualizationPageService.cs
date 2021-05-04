@@ -80,7 +80,7 @@ namespace Services.Admin.Compiler
                             jsonSpec = comp.JsonSpec,
                             isFullWidth = comp.IsFullWidth,
                             orderId = comp.OrderId,
-                            datasets = ResourceIdTable.From(comp.DatasetQueryIds),
+                            datasets = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
                             user = user.UUID
 
                         },
@@ -131,7 +131,7 @@ namespace Services.Admin.Compiler
                             jsonSpec = comp.JsonSpec,
                             isFullWidth = comp.IsFullWidth,
                             orderId = comp.OrderId,
-                            datasets = ResourceIdTable.From(comp.DatasetQueryIds),
+                            datasets = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
                             user = user.UUID
 
                         },
@@ -194,12 +194,12 @@ namespace Services.Admin.Compiler
             public int OrderId { get; set; }
         }
 
-        class AdminVisualizationComponentDatasetRefRecord
+        class AdminVisualizationComponentDatasetQueryRefRecord
         {
-            public Guid VisualizationPageId { get; set; }
             public Guid VisualizationComponentId { get; set; }
             public Guid DatasetQueryId { get; set; }
-            public string DatasetName { get; set; }
+            public string DatasetQueryUniversalId { get; set; }
+            public string DatasetQueryName { get; set; }
         }
 
         class AdminVisualizationPageConstraintRecord
@@ -225,7 +225,7 @@ namespace Services.Admin.Compiler
             {
                 var pageRecs = grid.Read<AdminVisualizationPageRecord>();
                 var compRecs = grid.Read<AdminVisualizationComponentRecord>();
-                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetRefRecord>();
+                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetQueryRefRecord>();
                 var consRecs = grid.Read<AdminVisualizationPageConstraintRecord>();
 
                 var comps = compRecs.GroupJoin(dsidRecs,
@@ -235,7 +235,7 @@ namespace Services.Admin.Compiler
                     {
                         comp.VisualizationPageId,
                         Component = comp,
-                        DatasetQueryIds = dsid.Select(ds => ds.DatasetQueryId)
+                        DatasetQueryRefs = dsid
                     });
 
                 var pages = pageRecs.GroupJoin(comps,
@@ -253,7 +253,12 @@ namespace Services.Admin.Compiler
                             Header = comp.Component.Header,
                             SubHeader = comp.Component.SubHeader,
                             JsonSpec = comp.Component.JsonSpec,
-                            DatasetQueryIds = comp.DatasetQueryIds,
+                            DatasetQueryRefs = comp.DatasetQueryRefs.Select(r => new AdminVisualizationDatasetQueryRef
+                            {
+                                Id = r.DatasetQueryId,
+                                UniversalId = r.DatasetQueryUniversalId,
+                                Name = r.DatasetQueryName
+                            }),
                             IsFullWidth = comp.Component.IsFullWidth,
                             OrderId = comp.Component.OrderId
                         })
@@ -281,7 +286,7 @@ namespace Services.Admin.Compiler
             public static AdminVisualizationComponent ReadComponent(SqlMapper.GridReader grid)
             {
                 var compRec = grid.Read<AdminVisualizationComponentRecord>().FirstOrDefault();
-                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetIdRecord>();
+                var dsidRecs = grid.Read<AdminVisualizationComponentDatasetQueryRefRecord>();
 
                 if (compRec == null) return null;
 
@@ -290,7 +295,12 @@ namespace Services.Admin.Compiler
                     Header = compRec.Header,
                     SubHeader = compRec.SubHeader,
                     JsonSpec = compRec.JsonSpec,
-                    DatasetQueryRefs = dsidRecs.Select(id => id.DatasetQueryId),
+                    DatasetQueryRefs = dsidRecs.Select(r => new AdminVisualizationDatasetQueryRef
+                    {
+                        Id = r.DatasetQueryId,
+                        UniversalId = r.DatasetQueryUniversalId,
+                        Name = r.DatasetQueryName
+                    }),
                     IsFullWidth = compRec.IsFullWidth,
                     OrderId = compRec.OrderId
                 };

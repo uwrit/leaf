@@ -131,6 +131,7 @@ namespace API.Options
             services.AddTransient<AdminNetworkEndpointManager.IAdminNetworkUpdater, AdminNetworkEndpointUpdater>();
             services.AddTransient<AdminDatasetQueryManager.IAdminDatasetQueryService, AdminDatasetQueryService>();
             services.AddTransient<AdminVisualizationPageManager.IAdminVisualizationPageService, AdminVisualizationPageService>();
+            services.AddTransient<AdminVisualizationCategoryManager.IAdminVisualizationCategoryService, AdminVisualizationCategoryService>();
             services.AddTransient<AdminDatasetCategoryManager.IAdminDatasetCategoryService, AdminDatasetCategoryService>();
             services.AddTransient<AdminDemographicsManager.IAdminDemographicQueryService, AdminDemographicQueryService>();
             services.AddTransient<AdminPanelFilterManager.IAdminPanelFilterService, AdminPanelFilterService>();

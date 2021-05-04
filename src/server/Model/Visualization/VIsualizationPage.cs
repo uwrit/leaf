@@ -13,6 +13,7 @@ namespace Model.Visualization
         Guid? Id { get; set; }
         string PageName { get; set; }
         string PageDescription { get; set; }
+        string Category { get; set; }
         public IEnumerable<IVisualizationComponent> Components { get; set; }
         int OrderId { get; set; }
     }
@@ -33,6 +34,7 @@ namespace Model.Visualization
         public Guid? Id { get; set; }
         public string PageName { get; set; }
         public string PageDescription { get; set; }
+        public string Category { get; set; }
         public IEnumerable<IVisualizationComponent> Components { get; set; }
         public int OrderId { get; set; }
 

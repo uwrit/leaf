@@ -19,8 +19,8 @@ namespace Model.Admin.Visualization
         public interface IAdminVisualizationPageService
         {
             Task<IEnumerable<AdminVisualizationPage>> GetVisualizationPagesAsync();
-            Task<AdminVisualizationPage> CreateVisualizationPageAsync(AdminVisualizationPage query);
-            Task<AdminVisualizationPage> UpdateVisualizationPageAsync(AdminVisualizationPage query);
+            Task<AdminVisualizationPage> CreateVisualizationPageAsync(AdminVisualizationPage page);
+            Task<AdminVisualizationPage> UpdateVisualizationPageAsync(AdminVisualizationPage page);
             Task<Guid?> DeleteVisualizationPageAsync(Guid id);
         }
 

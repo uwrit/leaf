@@ -7,7 +7,7 @@
 
 import { AdminVisualizationPage } from '../../models/admin/Visualization';
 import { AppState } from '../../models/state/AppState';
-import { HttpFactory } from './../HttpFactory';
+import { HttpFactory } from '../HttpFactory';
 
 /*
  * Get all Visualization Pages

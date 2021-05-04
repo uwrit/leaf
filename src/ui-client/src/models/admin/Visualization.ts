@@ -11,6 +11,7 @@ export interface AdminVisualizationPageDTO {
     id: string;
     pageName: string;
     pageDescription: string;
+    categoryId?: string;
     orderId: number;
     components: AdminVisualizationComponentDTO[];
     constraints: Constraint[];
@@ -36,3 +37,12 @@ export interface AdminVisualizationComponentDTO {
 }
 
 export interface AdminVisualizationComponent extends AdminVisualizationComponentDTO {}
+
+export interface AdminVisualizationCategoryDTO {
+    id: string;
+    category: string;
+} 
+
+export interface AdminVisualizationCategory extends AdminVisualizationCategoryDTO {
+    unsaved?: boolean;
+}

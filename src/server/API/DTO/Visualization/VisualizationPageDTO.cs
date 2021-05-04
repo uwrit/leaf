@@ -15,6 +15,7 @@ namespace API.DTO.Visualization
         public Guid? Id { get; set; }
         public string PageName { get; set; }
         public string PageDescription { get; set; }
+        public string Category { get; set; }
         public IEnumerable<VisualizationComponentDTO> Components { get; set; }
         public int OrderId { get; set; }
 
@@ -23,6 +24,7 @@ namespace API.DTO.Visualization
             Id = page.Id;
             PageName = page.PageName;
             PageDescription = page.PageDescription;
+            Category = page.Category;
             Components = page.Components.Select(c => new VisualizationComponentDTO(c));
             OrderId = page.OrderId;
         }

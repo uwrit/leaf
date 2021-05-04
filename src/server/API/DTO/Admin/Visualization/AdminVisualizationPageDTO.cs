@@ -17,6 +17,7 @@ namespace API.DTO.Admin.Visualization
         public Guid Id { get; set; }
         public string PageName { get; set; }
         public string PageDescription { get; set; }
+        public Guid? CategoryId { get; set; }
         public int OrderId { get; set; }
         public IEnumerable<AdminVisualizationComponentDTO> Components { get; set; }
         public IEnumerable<Constraint> Constraints { get; set; }
@@ -33,9 +34,16 @@ namespace API.DTO.Admin.Visualization
         public string Header { get; set; }
         public string SubHeader { get; set; }
         public string JsonSpec { get; set; }
-        public IEnumerable<Guid> DatasetQueryIds { get; set; }
+        public IEnumerable<AdminVisualizationDatasetQueryRefDTO> DatasetQueryRefs { get; set; }
         public bool IsFullWidth { get; set; }
         public int OrderId { get; set; }
+    }
+
+    public class AdminVisualizationDatasetQueryRefDTO
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string UniversalId { get; set; }
     }
 }
 
@@ -86,7 +94,7 @@ public static class AdminVisualizationPageDTOExt
             Header = vc.Header,
             SubHeader = vc.SubHeader,
             JsonSpec = vc.JsonSpec,
-            DatasetQueryIds = vc.DatasetQueryIds,
+            DatasetQueryRefs = vc.DatasetQueryRefs.Select(r => r.AdminVisualizationDatasetQueryRefDTO()),
             IsFullWidth = vc.IsFullWidth,
             OrderId = vc.OrderId
         };
@@ -101,9 +109,31 @@ public static class AdminVisualizationPageDTOExt
             Header = dto.Header,
             SubHeader = dto.SubHeader,
             JsonSpec = dto.JsonSpec,
-            DatasetQueryIds = dto.DatasetQueryIds,
+            DatasetQueryRefs = dto.DatasetQueryRefs.Select(r => r.AdminVisualizationDatasetQueryRef()),
             IsFullWidth = dto.IsFullWidth,
             OrderId = dto.OrderId
+        };
+    }
+
+    public static AdminVisualizationDatasetQueryRef AdminVisualizationDatasetQueryRef(this AdminVisualizationDatasetQueryRefDTO dto)
+    {
+        if (dto == null) return null;
+        return new AdminVisualizationDatasetQueryRef
+        {
+            Id = dto.Id,
+            UniversalId = dto.UniversalId,
+            Name = dto.Name
+        };
+    }
+
+    public static AdminVisualizationDatasetQueryRefDTO AdminVisualizationDatasetQueryRefDTO(this AdminVisualizationDatasetQueryRef cat)
+    {
+        if (cat == null) return null;
+        return new AdminVisualizationDatasetQueryRefDTO
+        {
+            Id = cat.Id,
+            UniversalId = cat.UniversalId,
+            Name = cat.Name
         };
     }
 }

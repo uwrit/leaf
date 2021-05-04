@@ -126,14 +126,14 @@ namespace API.Controllers.Admin
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteAsync(Guid id)
+        public async Task<ActionResult<DatasetQueryDeleteResult>> DeleteAsync(Guid id)
         {
             try
             {
-                var deleted = await manager.DeleteDatasetQueryAsync(id);
-                if (!deleted.HasValue)
+                var result = await manager.DeleteDatasetQueryAsync(id);
+                if (!result.Ok)
                 {
-                    return NotFound();
+                    return Conflict(DatasetQueryDeleteResponse.From(result));
                 }
                 return Ok();
             }

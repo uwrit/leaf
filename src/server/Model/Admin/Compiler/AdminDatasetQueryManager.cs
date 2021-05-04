@@ -21,7 +21,7 @@ namespace Model.Admin.Compiler
             Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id);
             Task<AdminDatasetQuery> UpdateDatasetQueryAsync(AdminDatasetQuery query);
             Task<AdminDatasetQuery> CreateDatasetQueryAsync(AdminDatasetQuery query);
-            Task<Guid?> DeleteDatasetQueryAsync(Guid id);
+            Task<DatasetQueryDeleteResult> DeleteDatasetQueryAsync(Guid id);
         }
 
         readonly IAdminDatasetQueryService svc;
@@ -77,20 +77,20 @@ namespace Model.Admin.Compiler
             }
         }
 
-        public async Task<Guid?> DeleteDatasetQueryAsync(Guid id)
+        public async Task<DatasetQueryDeleteResult> DeleteDatasetQueryAsync(Guid id)
         {
             Ensure.NotDefault(id, nameof(id));
 
-            var deleted = await svc.DeleteDatasetQueryAsync(id);
-            if (deleted.HasValue)
+            var result = await svc.DeleteDatasetQueryAsync(id);
+            if (result.Ok)
             {
                 log.LogInformation("Deleted DatasetQuery. Id:{Id}", id);
             }
             else
             {
-                log.LogInformation("DatasetQuery not found. Id:{Id}", id);
+                log.LogInformation("Could not delete DatasetQuery due to conflicts. Id:{Id}", id);
             }
-            return deleted;
+            return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

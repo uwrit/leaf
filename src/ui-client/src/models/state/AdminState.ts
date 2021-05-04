@@ -18,7 +18,7 @@ import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
 import { CohortStateType } from '../state/CohortState';
-import { AdminVisualizationPage } from '../admin/Visualization';
+import { AdminVisualizationCategory, AdminVisualizationPage } from '../admin/Visualization';
 
 
 export enum AdminPanelLoadState {
@@ -56,6 +56,12 @@ export interface AdminVisualizationState {
     pages: Map<string, AdminVisualizationPage>;
     selectedId?: string;
     uneditedPage?: AdminVisualizationPage;
+}
+
+export interface AdminVisualizationCategoryState {
+    changed: boolean;
+    categories: Map<string, AdminVisualizationCategory>;
+    uneditedCategory?: AdminVisualizationCategory;
 }
 
 export interface AdminVisualizationDatasetState {
@@ -139,5 +145,6 @@ export default interface AdminState {
     sqlSets: AdminPanelSqlSetState;
     state: AdminPanelLoadState;
     visualizations: AdminVisualizationState;
+    visualizationCategories: AdminVisualizationCategoryState;
     userQueries: AdminUserQueryState;
 }

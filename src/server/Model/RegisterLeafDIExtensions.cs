@@ -59,6 +59,7 @@ namespace Model
             services.AddTransient<AdminQueryManager>();
             services.AddTransient<AdminUserManager>();
             services.AddTransient<AdminVisualizationPageManager>();
+            services.AddTransient<AdminVisualizationCategoryManager>();
 
             return services;
         }
