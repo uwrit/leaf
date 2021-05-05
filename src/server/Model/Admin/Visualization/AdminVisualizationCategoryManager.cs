@@ -39,9 +39,9 @@ namespace Model.Admin.Visualization
         {
             try
             {
-                var Categorys = await svc.GetVisualizationCategoriesAsync();
+                var categories = await svc.GetVisualizationCategoriesAsync();
                 log.LogInformation("Fetched VisualizationCategories");
-                return Categorys;
+                return categories;
             }
             catch (DbException db)
             {

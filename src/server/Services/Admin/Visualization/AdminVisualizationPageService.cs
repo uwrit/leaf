@@ -261,7 +261,11 @@ namespace Services.Admin.Compiler
                             }),
                             IsFullWidth = comp.Component.IsFullWidth,
                             OrderId = comp.Component.OrderId
-                        })
+                        }),
+                        Created = page.Created,
+                        CreatedBy = page.CreatedBy,
+                        Updated = page.Updated,
+                        UpdatedBy = page.UpdatedBy
                     });
 
                 return pages;

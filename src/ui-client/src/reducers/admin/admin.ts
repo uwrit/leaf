@@ -103,6 +103,12 @@ import {
     UNDO_ADMIN_VISUALIZATION_CHANGE,
     SET_ADMIN_VISUALIZATION_CURRENT
 } from "../../actions/admin/visualization";
+import { 
+    REMOVE_ADMIN_VISUALIZATION_CATEGORY, 
+    SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY, 
+    SET_ADMIN_VISUALIZATION_CATEGORIES, 
+    UNDO_ADMIN_VISUALIZATION_CATEGORY_CHANGE 
+} from "../../actions/admin/visualizationCategory";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -117,7 +123,6 @@ import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChang
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualization";
-import { REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY, SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY, SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES, UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE } from "../../actions/admin/visualizationCategory";
 import { removeAdminVisualizationCategory, setAdminUneditedVisualizationCategory, setAdminVisualizationCategories, undoAdminVisualizationCategoryChange } from "./visualizationCategory";
 
 
@@ -345,13 +350,13 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setCurrentAdminVisualizationPage(state, action);
 
         // Visualization Categories
-        case SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES:
+        case SET_ADMIN_VISUALIZATION_CATEGORIES:
             return setAdminVisualizationCategories(state, action);
-        case SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY:
+        case SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY:
             return setAdminUneditedVisualizationCategory(state, action);
-        case UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE:
+        case UNDO_ADMIN_VISUALIZATION_CATEGORY_CHANGE:
             return undoAdminVisualizationCategoryChange(state, action);
-        case REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY:
+        case REMOVE_ADMIN_VISUALIZATION_CATEGORY:
             return removeAdminVisualizationCategory(state, action);
 
         // Network Identity & Endpoints

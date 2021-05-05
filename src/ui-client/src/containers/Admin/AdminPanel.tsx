@@ -16,10 +16,12 @@ import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 import { GlobalPanelFilterEditor } from '../../components/Admin/GlobalPanelFilterEditor/GlobalPanelFilterEditor';
 import { VisualizationEditor } from '../../components/Admin/VisualizationEditor/VisualizationEditor';
+import { CohortState } from '../../models/state/CohortState';
 import './AdminPanel.css';
 
 interface StateProps { 
     admin?: AdminState;
+    cohort: CohortState;
     datasets: DatasetsState;
 }
 interface DispatchProps {
@@ -47,7 +49,7 @@ class AdminPanel extends React.PureComponent<Props> {
     }
 
     private getContent = () => {
-        const { admin, dispatch, datasets } = this.props;
+        const { admin, cohort, dispatch, datasets } = this.props;
 
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
@@ -55,7 +57,7 @@ class AdminPanel extends React.PureComponent<Props> {
             case AdminPanelPane.SQL_SETS:
                 return <SqlSetEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.VISUALIZATIONS:
-                return <VisualizationEditor data={admin!} dispatch={dispatch} />;
+                return <VisualizationEditor data={admin!} dispatch={dispatch} cohort={cohort} />;
             case AdminPanelPane.PANEL_FILTERS:
                 return <PanelFilterEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.GLOBAL_PANEL_FILTERS:
@@ -73,6 +75,7 @@ class AdminPanel extends React.PureComponent<Props> {
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         admin: state.admin,
+        cohort: state.cohort,
         datasets: state.datasets
     };
 }

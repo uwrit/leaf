@@ -11,10 +11,10 @@ import { NotificationStates, InformationModalState } from "../../models/state/Ge
 import { createVisualizationCategory, updateVisualizationCategory, deleteVisualizationCategory } from "../../services/admin/visualizationCategoryApi";
 import { AdminVisualizationCategory } from "../../models/admin/Visualization";
 
-export const SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES = 'SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES';
-export const SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY = 'SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY';
-export const UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE = 'UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE';
-export const REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY = 'REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY';
+export const SET_ADMIN_VISUALIZATION_CATEGORIES = 'SET_ADMIN_VISUALIZATION_CATEGORIES';
+export const SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY = 'SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY';
+export const UNDO_ADMIN_VISUALIZATION_CATEGORY_CHANGE = 'UNDO_ADMIN_VISUALIZATION_CATEGORY_CHANGE';
+export const REMOVE_ADMIN_VISUALIZATION_CATEGORY = 'REMOVE_ADMIN_VISUALIZATION_CATEGORY';
 
 export interface AdminVisualizationCategoryAction {
     changed?: boolean;
@@ -87,33 +87,33 @@ export const setAdminVisualizationCategory = (cat: AdminVisualizationCategory, c
     return {
         cats: [ cat ],
         changed,
-        type: SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES
+        type: SET_ADMIN_VISUALIZATION_CATEGORIES
     };
 };
 
 export const setAdminVisualizationCategories = (cats: AdminVisualizationCategory[]): AdminVisualizationCategoryAction => {
     return {
         cats,
-        type: SET_ADMIN_VISUALIZATION_CATEGORY_CATEGORIES
+        type: SET_ADMIN_VISUALIZATION_CATEGORIES
     };
 };
 
 export const setAdminUneditedVisualizationCategory = (cat: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
     return {
         cat,
-        type: SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY_CATEGORY
+        type: SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY
     };
 };
 
 export const removeAdminVisualizationCategory = (cat: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
     return {
         cat,
-        type: REMOVE_ADMIN_VISUALIZATION_CATEGORY_CATEGORY
+        type: REMOVE_ADMIN_VISUALIZATION_CATEGORY
     };
 };
 
 export const undoAdminVisualizationCategoryChange = (): AdminVisualizationCategoryAction => {
     return {
-        type: UNDO_ADMIN_VISUALIZATION_CATEGORY_CATEGORY_CHANGE
+        type: UNDO_ADMIN_VISUALIZATION_CATEGORY_CHANGE
     };
 };

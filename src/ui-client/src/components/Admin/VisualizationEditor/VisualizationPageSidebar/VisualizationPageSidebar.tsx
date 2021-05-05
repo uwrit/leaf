@@ -6,15 +6,12 @@
  */ 
 
 import React from 'react';
-import { setAdminCurrentVisualizationPage } from '../../../../actions/admin/visualizations';
-import { showInfoModal } from '../../../../actions/generalUi';
-import { AdminVisualizationPage } from '../../../../models/admin/Visualization';
-import { AdminVisualizationState } from '../../../../models/state/AdminState';
-import { InformationModalState } from '../../../../models/state/GeneralUiState';
+import { VisualizationPage } from '../../../../models/visualization/Visualization';
 
 interface Props { 
-    data: AdminVisualizationState;
-    dispatch: any;
+    clickHandler: (page: VisualizationPage) => any;
+    pages: Map<string, VisualizationPage>;
+    selectedId?: string;
 }
 
 export default class VisualizationPageSidebar extends React.PureComponent<Props> {
@@ -22,20 +19,22 @@ export default class VisualizationPageSidebar extends React.PureComponent<Props>
 
     public render() {
         const c = this.className;
-        const { data } = this.props;
+        const { clickHandler, pages, selectedId } = this.props;
         const barClass = `${c}-item`;
 
         return (
             <div className={c}>
                 <ul className={`${c}-inner`}>
-                {[ ...data.pages.values() ].map(page => {
+                    
+                {[ ...pages.values() ].map(page => {
+
                     const classes = [ barClass ];
-                    if (data.selectedId && page.id === data.selectedId) {
+                    if (selectedId && page.id === selectedId) {
                         classes.push('selected');
                     }
 
                     return (
-                        <li className={classes.join(' ')} key={page.id} onClick={this.handleClick.bind(null, page)}>
+                        <li className={classes.join(' ')} key={page.id} onClick={clickHandler.bind(null, page)}>
                             {page.pageName}
                         </li>
                     );
@@ -43,20 +42,5 @@ export default class VisualizationPageSidebar extends React.PureComponent<Props>
                 </ul>
             </div>
         );
-    }
-
-    private handleClick = (page: AdminVisualizationPage) => {
-        const { data, dispatch } = this.props;
-
-        if (data.changed) {
-            const info: InformationModalState = {
-                body: "Please Save or Undo your changes",
-                header: "Save or Undo Changes",
-                show: true
-            };
-            dispatch(showInfoModal(info));
-        }
-
-        dispatch(setAdminCurrentVisualizationPage(page));
     }
 }

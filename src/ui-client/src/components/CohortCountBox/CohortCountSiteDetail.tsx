@@ -10,8 +10,8 @@ import { PatientCountState, CohortStateType } from '../../models/state/CohortSta
 import { NetworkIdentity } from '../../models/NetworkResponder';
 import CohortSql from './CohortSql';
 import LoaderIcon from '../Other/LoaderIcon/LoaderIcon';
-import 'brace/mode/sqlserver';
-import 'brace/theme/sqlserver';
+import 'ace-builds/src-noconflict/mode-sqlserver';
+import 'ace-builds/src-noconflict/theme-sqlserver';
 
 export interface SiteCountDetail {
     countResults: PatientCountState;

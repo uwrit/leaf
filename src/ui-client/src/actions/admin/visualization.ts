@@ -12,7 +12,7 @@ import {
     createAdminVisualiationPage, 
     updateAdminVisualiationPage, 
     deleteAdminVisualizationPage
-} from "../../services/admin/visualiationsApi";
+} from "../../services/admin/visualiationApi";
 import { AdminVisualizationPage } from "../../models/admin/Visualization";
 
 export const SET_ADMIN_VISUALIZATIONS = 'SET_ADMIN_VISUALIZATIONS';

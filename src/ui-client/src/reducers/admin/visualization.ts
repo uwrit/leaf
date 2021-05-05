@@ -6,7 +6,7 @@
  */ 
 
 import AdminState from "../../models/state/AdminState";
-import { AdminVisualizationAction } from "../../actions/admin/visualizations";
+import { AdminVisualizationAction } from "../../actions/admin/visualization";
 
 
 export const setAdminVisualizationPages = (state: AdminState, action: AdminVisualizationAction): AdminState => {

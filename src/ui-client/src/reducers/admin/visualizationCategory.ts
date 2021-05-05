@@ -13,7 +13,7 @@ export const setAdminVisualizationCategories = (state: AdminState, action: Admin
         state.visualizationCategories.categories.set(cat.id, Object.assign({}, cat));
     }
     return Object.assign({}, state, { 
-        VisualizationCategories: {
+        visualizationCategories: {
             ...state.visualizationCategories,
             changed: action.changed,
             categories: new Map(state.visualizationCategories.categories)
@@ -23,7 +23,7 @@ export const setAdminVisualizationCategories = (state: AdminState, action: Admin
 
 export const setAdminUneditedVisualizationCategory = (state: AdminState, action: AdminVisualizationCategoryAction): AdminState => {
     return Object.assign({}, state, { 
-        VisualizationCategories: {
+        visualizationCategories: {
             ...state.visualizationCategories,
             uneditedCategory: Object.assign({}, action.cat, { changed: false })
         }
@@ -33,7 +33,7 @@ export const setAdminUneditedVisualizationCategory = (state: AdminState, action:
 export const removeAdminVisualizationCategory = (state: AdminState, action: AdminVisualizationCategoryAction): AdminState => {
     state.visualizationCategories.categories.delete(action.cat!.id);
     return Object.assign({}, state, { 
-        VisualizationCategories: { 
+        visualizationCategories: { 
             categories: new Map(state.visualizationCategories.categories)
         }
     });
@@ -47,7 +47,7 @@ export const undoAdminVisualizationCategoryChange = (state: AdminState, action: 
     }
 
     return Object.assign({}, state, { 
-        VisualizationCategories: { 
+        visualizationCategories: { 
             changed: false,
             categories: new Map(state.visualizationCategories.categories),
             uneditedCategory: undefined

@@ -13,9 +13,16 @@ import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import VisualizationPageSidebar from './VisualizationPageSidebar/VisualizationPageSidebar';
 import { AdminVisualizationComponent } from '../../../models/admin/Visualization';
 import VisualizationSpecEditor from './VisualizationSpecEditor/VisualizationSpecEditor';
+import { CohortState } from '../../../models/state/CohortState';
+import { VisualizationPage } from '../../../models/visualization/Visualization';
+import { InformationModalState } from '../../../models/state/GeneralUiState';
+import { showInfoModal } from '../../../actions/generalUi';
+import { setAdminCurrentVisualizationPage } from '../../../actions/admin/visualization';
 import './VisualizationEditor.css';
+import VisualizationPreview from './VisualizationPage/VisualizationPage';
 
 interface Props { 
+    cohort: CohortState;
     data: AdminState;
     dispatch: any;
 }
@@ -34,11 +41,11 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const c = this.className;
-        const { data, dispatch } = this.props;
+        const { cohort, data, dispatch } = this.props;
         const { selectedComponent } = this.state;
         const { visualizations } = data;
         const { currentPage, changed } = visualizations;
-        let spec = null;
+        let spec: any = null;
 
         if (currentPage && selectedComponent) {
             spec = {
@@ -74,21 +81,44 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                     {/* Sidebar */}
                     <Col md={2}>
-                        <VisualizationPageSidebar data={visualizations} dispatch={dispatch} />
+                        <VisualizationPageSidebar pages={visualizations.pages} clickHandler={this.sidebarClickHandler} />
+                    </Col>
+
+                    {/* Preview */}
+                    <Col md={10}>
+                        <VisualizationPreview data={data.visualizations} dispatch={dispatch} spec={spec}/>
                     </Col>
 
                     {/* Editor */}
                     <Col md={10}>
 
-                        {currentPage && selectedComponent &&
-                        <VisualizationSpecEditor currentPage={currentPage} currentComponent={selectedComponent} dispatch={dispatch} />
-                        }
+                        <VisualizationSpecEditor 
+                            currentPage={currentPage} 
+                            currentComponent={selectedComponent} 
+                            dispatch={dispatch} 
+                        />
                         
                     </Col>
 
                 </Row>
 
             </Container>);
+    }
+
+    private sidebarClickHandler = (page: VisualizationPage) => {
+        const { data, dispatch } = this.props;
+
+        if (data.visualizations.changed) {
+            const info: InformationModalState = {
+                body: "Please Save or Undo your changes",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        }
+
+        const adminPage = data.visualizations.pages.get(page.id);
+        dispatch(setAdminCurrentVisualizationPage(adminPage));
     }
     
     public demorender() {

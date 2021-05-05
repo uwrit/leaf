@@ -7,8 +7,8 @@
 
 import React from 'react';
 import AceEditor from 'react-ace'; 
-import 'brace/mode/sqlserver';
-import 'brace/theme/sqlserver';
+import 'ace-builds/src-noconflict/mode-sqlserver';
+import 'ace-builds/src-noconflict/theme-sqlserver';
 
 interface Props {
     changeHandler?: (value:string, evt: any) => void;

@@ -5,10 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .visualization-editor {
+.visualization-editor {
     background-color: white;
+    height: calc(100vh - 55px);
     padding: 0 0 75px 0;
- }
+    position: relative;
+}
 
 /* Header */
 .visualization-editor-toprow {

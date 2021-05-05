@@ -8,7 +8,8 @@
 import React from 'react';
 import { AdminVisualizationComponent, AdminVisualizationPage } from '../../../../models/admin/Visualization';
 import AceEditor from 'react-ace'; 
-import 'brace/mode/json';
+import 'ace-builds/src-noconflict/mode-json';
+import './VisualizationSpecEditor.css';
 
 interface Props { 
     currentPage?: AdminVisualizationPage;
@@ -23,7 +24,13 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         const c = this.className;
         const { currentPage, currentComponent } = this.props;
 
-        if (!currentPage || !currentComponent) return null;
+        if (!currentComponent) {
+            return (
+                <div className={c}>
+                    <div className={`${c}-unselected`}>Select a Visualization Component to edit</div>
+                </div>
+            )
+        }
 
         return (
             <div className={c}>
