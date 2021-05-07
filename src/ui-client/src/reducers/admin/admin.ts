@@ -5,7 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+import { adminHelp } from "./help";
 import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
+import { AdminHelpPane } from "../../models/state/AdminHelpState";
 import {
     SET_ADMIN_PANEL_PANE,
     SET_ADMIN_PANEL_LOAD_STATE,
@@ -110,7 +112,6 @@ import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChang
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 
-
 export const defaultAdminState = (): AdminState => {
     return {
         activePane: AdminPanelPane.CONCEPTS,
@@ -156,6 +157,17 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             data: new Map()
         },
+        help: {
+            activePane: AdminHelpPane.CONTENT,
+            helpContent: {
+                changed: false,
+                // state: AdminHelpLoadState.NOT_LOADED
+            },
+            helpPage: {
+                changed: false,
+                // state: AdminHelpLoadState.NOT_LOADED
+            }
+        },
         networkAndIdentity: {
             changed: false,
             endpoints: new Map(),
@@ -200,7 +212,7 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
 
 type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
-export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
+const adminPanel = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
 
         // UI
@@ -344,3 +356,5 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return state;
     }
 };
+
+export const admin = adminPanel || adminHelp;

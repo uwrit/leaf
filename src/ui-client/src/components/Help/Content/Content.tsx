@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { resetHelpPageContent } from '../../../actions/helpPage';
 import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
@@ -39,7 +40,9 @@ export class Content extends React.Component<Props> {
 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
-                        <b>{currentPage.title}</b>
+                        {/* <b>{currentPage.title}</b> */}
+                        <ReactMarkdown children={currentPage.title} />
+                        
                     </div>
 
                     {content.map(content => this.getContent(content))}
@@ -60,20 +63,25 @@ export class Content extends React.Component<Props> {
         if (content.textContent != null) {
             return (
                 <div className={`${c}-text`}>
-                    <TextareaAutosize
+                    {/* <TextareaAutosize
                         readOnly={true}
                         spellCheck={false}
                         value={content.textContent}>
-                    </TextareaAutosize>
+                    </TextareaAutosize> */}
+                    <ReactMarkdown children={content.textContent} />
                 </div>
             );
         } else if (content.imageContent != null) {
             return (
                 <div className={`${c}-image`}>
-                    <img
+                    {/* <img
                         // src={`data:image/jpeg;base64,${content.imageContent}`}
                         src={`data:image;base64,${content.imageContent}`}
                         alt={altText}
+                    /> */}
+                    {/* TODO: page loads slower compared to using the img tag. */}
+                    <ReactMarkdown
+                        children={`![${altText}](data:image;base64,${content.imageContent})`}
                     />
                 </div>
             );

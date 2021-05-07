@@ -12,6 +12,7 @@ import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
+import AdminHelpState from './AdminHelpState';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
@@ -117,6 +118,7 @@ export default interface AdminState {
     datasets: AdminDatasetState;
     datasetQueryCategories: AdminDatasetQueryCategoryState;
     globalPanelFilters: AdminGlobalPanelFilterState;
+    help: AdminHelpState;
     networkAndIdentity: AdminNetworkAndIdentityState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;

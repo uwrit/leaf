@@ -95,6 +95,7 @@ export const loadAdminPanelDataIfNeeded = () => {
  * Handle switching between Admin Panel views. Prevents
  * view pane changes if admin has unsaved changes.
  */
+
 export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelPane) => {
     return async (dispatch: any, getState: () => AppState) => {
         const admin = getState().admin!;

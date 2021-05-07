@@ -49,7 +49,7 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                 const categories = await fetchHelpPageCategories(getState());
                 const pages = await fetchHelpPages(getState());
 
-                dispatch(SetHelpPagesAndCategories(categories, pages));
+                dispatch(setHelpPagesAndCategories(categories, pages));
 
                 /*
                  * Finish.
@@ -79,6 +79,7 @@ export const fetchSingleHelpPageContent = (page: HelpPage) => {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
+                dispatch(setCurrentHelpPage(page));
                 /*
                  * Fetch help page content.
                  */
@@ -86,7 +87,7 @@ export const fetchSingleHelpPageContent = (page: HelpPage) => {
                 dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
                 
                 // Set user selected help page as current selected page.
-                dispatch(SetCurrentHelpPage(page));
+                // dispatch(SetCurrentHelpPage(page));
                 /*
                  * Finish.
                  */
@@ -104,6 +105,9 @@ export const fetchSingleHelpPageContent = (page: HelpPage) => {
     };
 };
 
+/*
+ * Function called to reset content that's loaded already or clearing content to load another.
+ */
 export const resetHelpPageContent = () => {
     return (dispatch: any) => {
         try {
@@ -116,7 +120,7 @@ export const resetHelpPageContent = () => {
 };
 
 // Synchronous actions
-export const SetHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpPageAction => {
+export const setHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpPageAction => {
     return {
         categories,
         pages,
@@ -124,7 +128,7 @@ export const SetHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pag
     };
 };
 
-export const SetCurrentHelpPage = (currentSelectedPage: HelpPage): HelpPageAction => {
+export const setCurrentHelpPage = (currentSelectedPage: HelpPage): HelpPageAction => {
     return {
         currentSelectedPage,
         type: SET_CURRENT_HELP_PAGE

@@ -47,7 +47,7 @@ const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]):
     return mappedCategories;
 };
 
-const SetHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+const setHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     const mappedCategories = mapCategories(action.categories!, action.pages!);
 
     return Object.assign({}, state, {
@@ -55,7 +55,7 @@ const SetHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction)
     });
 };
 
-const SetCurrentHelpPage = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+const setCurrentHelpPage = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     return Object.assign({}, state, {
         currentSelectedPage: action.currentSelectedPage
     });
@@ -72,7 +72,7 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
         content: {
             ...state.content,
             content: (action.state === HelpPageLoadState.LOADED) ? action.content : undefined,
-            state: action.state
+            state: action.state,
         }
     });
 };
@@ -82,9 +82,9 @@ type HelpAction = HelpPageAction | HelpPageContentAction;
 export const help = (state: HelpPageState = defaultHelpPagesState(), action: HelpAction): HelpPageState => {
     switch (action.type) {
         case SET_HELP_PAGES_AND_CATEGORIES:
-            return SetHelpPagesAndCategories(state, action);
+            return setHelpPagesAndCategories(state, action);
         case SET_CURRENT_HELP_PAGE:
-            return SetCurrentHelpPage(state, action);
+            return setCurrentHelpPage(state, action);
         case SET_HELP_PAGE_LOAD_STATE:
             return setHelpPageLoadState(state, action);
         case SET_HELP_PAGE_CONTENT:

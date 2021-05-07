@@ -15,12 +15,14 @@ import { UserContext } from '../../models/Auth';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { AdminHelp } from '../Admin/AdminHelp';
 import './Help.css';
+import AdminHelpState from '../../models/state/AdminHelpState';
 
 interface OwnProps { }
 
 interface StateProps {
     helpPages: HelpPageState;
     user: UserContext;
+    adminHelp: AdminHelpState;
 }
 
 interface DispatchProps {
@@ -42,9 +44,11 @@ export class Help extends React.PureComponent<Props, State> {
             if (user.isAdmin) {
                 return (
                     <AdminHelp
+                        categories={helpPages.categories}
                         content={helpPages.content.content}
                         currentPage={helpPages.currentSelectedPage}
                         dispatch={dispatch}
+                        adminHelpContent={this.props.adminHelp.helpContent.content!}
                     />
                 );
             };
@@ -80,7 +84,8 @@ export class Help extends React.PureComponent<Props, State> {
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         helpPages: state.help,
-        user: state.auth.userContext!
+        user: state.auth.userContext!,
+        adminHelp: state.admin!.help
     };
 };
 

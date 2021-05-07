@@ -7,20 +7,22 @@
 
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Col, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
 import TextareaAutosize from 'react-textarea-autosize';
 import './ContentEditor.css';
+import { TextArea } from '../Section/TextArea';
 
 interface Props {
     content: HelpPageContent;
-    currentPage: HelpPage;
-    dispatch: any;
+
+    // dispatch: any; Maybe need it or maybe not
+    buttonDisableHandler: (disabled: boolean) => void;
 }
 
 interface State {
     selected: boolean;
-    newContent: string;
+    cont: string;
 }
 
 export class ContentEditor extends React.Component<Props, State> {
@@ -30,91 +32,75 @@ export class ContentEditor extends React.Component<Props, State> {
         super(props)
         this.state = {
             selected: false,
-            newContent: this.props.content.textContent
+            cont: this.props.content.textContent
         }
     }
 
     public render() {
         const c = this.className;
-        const { content, currentPage, dispatch } = this.props;
-        const { newContent, selected } = this.state;
+        // const { content, currentPage, dispatch } = this.props;
+        const { cont, selected } = this.state;
         const markdownClass = selected ? 'markdown-slide-left' : 'markdown';
         const col1Size = selected ? 6 : 12;
         const col2Size = selected ? 6 : 0;
 
-        // if (selected) {
-        //     return (
-        //         <div>
-        //             <Row>
-        //             {/* <Col className={`${c}-left`}>
-        //                 <ReactMarkdown  className={`${c}-markdown`} children={newContent} />
-        //             </Col> */}
-
-        //             <Col>
-        //                 <TextareaAutosize
-        //                     className={`${c}-edit-row`}
-        //                     onChange={this.handleChange}>
-        //                     {newContent}
-        //                 </TextareaAutosize>
-        //             </Col>
-        //             </Row>
-        //             <button onClick={this.handleSaveClick}>
-        //                 SAVE
-        //             </button>
-        //         </div>
-        //     );
-        // };
-
         return (
             <div className={c}>
-
                 <Row>
 
                     <Col xs={col1Size}>
                         <div className={`${c}-${markdownClass}`} onClick={this.handleClick}>
-                            <ReactMarkdown children={newContent} />
+                            <ReactMarkdown children={cont} />
                         </div>
                     </Col>
 
                     <Col xs={col2Size}>
                         {selected &&
                             <div className={`${c}-text-edit`}>
-                                <TextareaAutosize
-                                    // className={`${c}-edit-row`}
-                                    onChange={this.handleChange}>
-                                        {newContent}
-                                </TextareaAutosize>
+                                <TextareaAutosize onChange={this.handleChange} value={cont} />
 
-                                {/* <button onClick={this.handleSaveClick}>
-                                    SAVE
-                                </button> */}
+                                <Button onClick={this.handleUndo}>UNDO</Button>
+                                {/* NIC: why does the changeHandler function work still? function is missing param */}
+                                {/* <TextArea
+                                    className={`${c}-edit-row`}
+                                    changeHandler={this.changeHandler}
+                                    value={newContent}
+                                    propName={content.id.toString()}
+                                /> */}
+
                             </div>
                         }
                     </Col>
 
                 </Row>
-                
             </div>
         );
     };
 
-    private handleSaveClick = () => {
-        const selected = this.state.selected;
+    private handleUndo = () => {
         this.setState({
-            selected: !selected
+            cont: this.props.content.textContent
         })
     };
 
     private handleClick = () => {
-        const selected = this.state.selected;
+        // const selected = this.state.selected;
         this.setState({
-            selected: !selected
+            // selected: !selected
+            selected: true
+        });
+        this.props.buttonDisableHandler(true);
+    };
+
+    private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        this.setState({
+            cont: e.currentTarget.value,
         })
     };
 
-    private handleChange = (e: React.FormEvent<HTMLInputElement>) => {
+    private changeHandler = (val: any) => {
         this.setState({
-            newContent: e.currentTarget.value
+            cont: val
         })
     };
 }

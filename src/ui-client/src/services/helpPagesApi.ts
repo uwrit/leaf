@@ -12,12 +12,10 @@ import { HttpFactory } from './HttpFactory';
 /*
  * Private general function for making requests.
  */
-const makeRequest = async (state: AppState, requestString: string, requestParams?: object) => {
+const makeRequest = async (state: AppState, requestString: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const request = requestParams
-        ? http.get(requestString, requestParams)
-        : http.get(requestString)
+    const request = http.get(requestString)
     return request;
 };
 
