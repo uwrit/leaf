@@ -8,6 +8,7 @@
 import { CohortMap } from '../models/state/CohortState';
 import { NetworkResponderMap } from '../models/NetworkResponder';
 import CohortAggregatorWebWorker from '../providers/cohortAggregator/cohortAggregatorWebWorker';
+import { PatientListDatasetDTO } from '../models/patientList/Dataset';
 
 const aggregator = new CohortAggregatorWebWorker();
 
@@ -15,5 +16,12 @@ export const aggregateStatistics = (cohorts: CohortMap, responders: NetworkRespo
     return new Promise( async (resolve, reject) => {
         const agg = await aggregator.aggregateStatistics(cohorts, responders);
         resolve(agg);
+    });
+};
+
+export const combineDatasets = (data: Map<string, PatientListDatasetDTO[]>): Promise<Map<string, any[]>> => {
+    return new Promise( async (resolve, reject) => {
+        const combined = await combineDatasets(data);
+        resolve(combined);
     });
 };

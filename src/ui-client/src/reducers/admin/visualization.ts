@@ -38,6 +38,56 @@ export const setAdminVisualizationPage = (state: AdminState, action: AdminVisual
     });
 };
 
+export const setAdminVisualizationDatasetQueryState = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    const datasets = new Map(state.visualizations.datasets);
+    const newds = datasets.has(action.datasetQueryRef.id)
+        ? datasets.get(action.datasetQueryRef.id)
+        : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+    newds.state = action.dsState;
+    datasets.set(newds.id, newds);
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualizations,
+            datasets
+        }
+    });
+};
+
+export const setAdminVisualizationDatasetQueryNetworkState = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    const datasets = new Map(state.visualizations.datasets);
+    const newds = datasets.has(action.datasetQueryRef.id)
+        ? datasets.get(action.datasetQueryRef.id)
+        : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+    newds.networkState.set(action.networkIdentity.id, action.dsState);
+    datasets.set(newds.id, newds);
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualizations,
+            datasets
+        }
+    });
+};
+
+export const setAdminVisualizationDatasetState = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    const datasets = new Map(state.visualizations.datasets);
+    action.datasets.forEach((rows, dsid) => {
+        const ds = datasets.has(dsid)
+            ? datasets.get(dsid)
+            : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+        ds.data = rows;
+        datasets.set(dsid, datasets.get(dsid));
+    });
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualizations,
+            datasets
+        }
+    });
+};
+
 export const removeAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
     state.visualizations.pages.delete(action.page!.id);
     return Object.assign({}, state, { 

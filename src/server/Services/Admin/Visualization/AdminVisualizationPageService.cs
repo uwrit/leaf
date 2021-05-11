@@ -200,6 +200,7 @@ namespace Services.Admin.Compiler
             public Guid DatasetQueryId { get; set; }
             public string DatasetQueryUniversalId { get; set; }
             public string DatasetQueryName { get; set; }
+            public Model.Compiler.Shape DatasetQueryShape { get; set; }
         }
 
         class AdminVisualizationPageConstraintRecord
@@ -257,7 +258,9 @@ namespace Services.Admin.Compiler
                             {
                                 Id = r.DatasetQueryId,
                                 UniversalId = r.DatasetQueryUniversalId,
-                                Name = r.DatasetQueryName
+                                Name = r.DatasetQueryName,
+                                Shape = r.DatasetQueryShape
+                                
                             }),
                             IsFullWidth = comp.Component.IsFullWidth,
                             OrderId = comp.Component.OrderId

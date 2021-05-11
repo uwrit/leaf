@@ -13,13 +13,13 @@ import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import VisualizationPageSidebar from './VisualizationPageSidebar/VisualizationPageSidebar';
 import { AdminVisualizationComponent } from '../../../models/admin/Visualization';
 import VisualizationSpecEditor from './VisualizationSpecEditor/VisualizationSpecEditor';
-import { CohortState } from '../../../models/state/CohortState';
-import { VisualizationPage } from '../../../models/visualization/Visualization';
+import { CohortState, CohortStateType } from '../../../models/state/CohortState';
+import { VisualizationComponent, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
 import { setAdminCurrentVisualizationPage } from '../../../actions/admin/visualization';
+import VisualizationPage from './VisualizationPage/VisualizationPage';
 import './VisualizationEditor.css';
-import VisualizationPreview from './VisualizationPage/VisualizationPage';
 
 interface Props { 
     cohort: CohortState;
@@ -44,14 +44,29 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         const { cohort, data, dispatch } = this.props;
         const { selectedComponent } = this.state;
         const { visualizations } = data;
-        const { currentPage, changed } = visualizations;
+        const { currentPage, changed, datasets } = visualizations;
+        const cohortReady = cohort.count.state === CohortStateType.NOT_LOADED;
         let spec: any = null;
+        let datasetsLoaded = true;
+
 
         if (currentPage && selectedComponent) {
             spec = {
                 data: [
                     selectedComponent.datasetQueryIds.map(dsid => ({ name: dsid }))
                 ]
+            }
+        }
+
+        if (currentPage) {
+            for (const comp of currentPage.components) {
+                for (const dsid of comp.datasetQueryIds) {
+                    const status = datasets.get(dsid);
+                    if (!status || status.state !== CohortStateType.LOADED) {
+                        datasetsLoaded = false;
+                        break;
+                    }
+                }
             }
         }
 
@@ -86,7 +101,31 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                     {/* Preview */}
                     <Col md={10}>
-                        <VisualizationPreview data={data.visualizations} dispatch={dispatch} spec={spec}/>
+                        {/* Viz Page */}
+                        {data.visualizations.currentPage && datasetsLoaded &&
+                        <VisualizationPage componentClickHandler={this.handlePageComponentClick} dispatch={dispatch} page={currentPage} />
+                        }
+
+                        {/* 'Select a Page' fallback */}
+                        {!data.visualizations.currentPage && cohortReady &&
+                        <div className={`${c}-no-page-selected`}>
+                            <p>
+                                <span>Select a Visualization Page from the left or </span>
+                                <span className='link-span'>create one</span>
+                            </p>
+                        </div>
+                        }
+
+                        {/* Dependent datasets not yet loaded and no cohort */}
+                        {!datasetsLoaded && !cohortReady &&
+                        <div className={`${c}-no-cohort`}>
+                            <p>
+                                Leaf can't show visualizations because you haven't loaded a cohort. To test or create visualizations,
+                                load a cohort on the Find Patients screen, then return here. Leaf will then be able to generate data you
+                                can create visualizations with
+                            </p>
+                        </div>
+                        }
                     </Col>
 
                     {/* Editor */}
@@ -105,7 +144,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
             </Container>);
     }
 
-    private sidebarClickHandler = (page: VisualizationPage) => {
+    private sidebarClickHandler = (page: VisualizationPageModel) => {
         const { data, dispatch } = this.props;
 
         if (data.visualizations.changed) {
@@ -119,6 +158,10 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
         const adminPage = data.visualizations.pages.get(page.id);
         dispatch(setAdminCurrentVisualizationPage(adminPage));
+    }
+
+    private handlePageComponentClick = (comp: VisualizationComponent) => {
+
     }
     
     public demorender() {

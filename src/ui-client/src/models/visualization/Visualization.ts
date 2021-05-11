@@ -3,7 +3,8 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
+import { PatientListDatasetShape } from "../patientList/Dataset";
 
 export interface VisualizationPageDTO {
     id: string;
@@ -22,9 +23,20 @@ export interface VisualizationComponentDTO {
     header: string;
     subHeader: string;
     jsonSpec: string;
-    datasetQueryIds: string[];
+    datasetQueryIds: VisualizationDatasetQueryRefDTO[];
     isFullWidth: boolean;
     orderId: number;
 }
 
-export interface VisualizationComponent extends VisualizationComponentDTO {}
+export interface VisualizationComponent extends VisualizationComponentDTO {
+    datasetQueryIds: VisualizationDatasetQueryRef[];
+}
+
+export interface VisualizationDatasetQueryRefDTO {
+    id: string;
+    universalId?: string;
+    name: string;
+    shape: PatientListDatasetShape;
+}
+
+export interface VisualizationDatasetQueryRef extends VisualizationDatasetQueryRefDTO {}

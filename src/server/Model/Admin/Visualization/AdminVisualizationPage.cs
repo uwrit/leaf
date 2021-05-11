@@ -39,8 +39,9 @@ namespace Model.Admin.Visualization
     public class AdminVisualizationDatasetQueryRef
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
         public string UniversalId { get; set; }
+        public string Name { get; set; }
+        public Model.Compiler.Shape Shape { get; set; }
     }
 }
 

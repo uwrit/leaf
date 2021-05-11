@@ -9,12 +9,14 @@ import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import { Col, Row } from 'reactstrap';
 import { AdminVisualizationState } from '../../../../models/state/AdminState';
+import { VisualizationPage as VisualizationPageModel, VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
 import { VisualizationComponent } from './VisualizationComponent';
+import './VisualizationPage.css';
 
 interface Props { 
-    data: AdminVisualizationState;
+    componentClickHandler: (comp: VisualizationComponentModel) => any;
+    page: VisualizationPageModel;
     dispatch: any;
-    spec: VisualizationSpec;
 }
 
 export default class VisualizationPage extends React.PureComponent<Props> {
@@ -22,22 +24,17 @@ export default class VisualizationPage extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { data, dispatch, spec } = this.props;
-        const { changed, datasets, currentPage } = data;
+        const { page, dispatch, componentClickHandler } = this.props;
 
-        if (!currentPage) return null;
 
-        const d = { "values": [
-            {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
-            {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
-            {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
-            ]
-        }
-        
         return (
-            <div className={c}>
-                {currentPage.components.map(comp => <VisualizationComponent data={comp} />)}
-            </div>
-        );
+            <div>
+                {page.components.map(comp => {
+                    return (
+                        <VisualizationComponent clickHandler={componentClickHandler} data={comp} />
+                    )})
+                }
+            </div>);
+        
     }
 }

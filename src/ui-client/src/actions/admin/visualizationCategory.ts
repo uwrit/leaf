@@ -18,8 +18,8 @@ export const REMOVE_ADMIN_VISUALIZATION_CATEGORY = 'REMOVE_ADMIN_VISUALIZATION_C
 
 export interface AdminVisualizationCategoryAction {
     changed?: boolean;
-    cat?: AdminVisualizationCategory;
-    cats?: AdminVisualizationCategory[];
+    category?: AdminVisualizationCategory;
+    categories?: AdminVisualizationCategory[];
     type: string;
 }
 
@@ -83,31 +83,31 @@ export const deleteAdminVisualizationCategory = (cat: AdminVisualizationCategory
 };
 
 // Synchronous
-export const setAdminVisualizationCategory = (cat: AdminVisualizationCategory, changed: boolean): AdminVisualizationCategoryAction => {
+export const setAdminVisualizationCategory = (category: AdminVisualizationCategory, changed: boolean): AdminVisualizationCategoryAction => {
     return {
-        cats: [ cat ],
+        categories: [ category ],
         changed,
         type: SET_ADMIN_VISUALIZATION_CATEGORIES
     };
 };
 
-export const setAdminVisualizationCategories = (cats: AdminVisualizationCategory[]): AdminVisualizationCategoryAction => {
+export const setAdminVisualizationCategories = (categories: AdminVisualizationCategory[]): AdminVisualizationCategoryAction => {
     return {
-        cats,
+        categories,
         type: SET_ADMIN_VISUALIZATION_CATEGORIES
     };
 };
 
-export const setAdminUneditedVisualizationCategory = (cat: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
+export const setAdminUneditedVisualizationCategory = (category: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
     return {
-        cat,
+        category,
         type: SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY
     };
 };
 
-export const removeAdminVisualizationCategory = (cat: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
+export const removeAdminVisualizationCategory = (category: AdminVisualizationCategory): AdminVisualizationCategoryAction => {
     return {
-        cat,
+        category,
         type: REMOVE_ADMIN_VISUALIZATION_CATEGORY
     };
 };

@@ -10,9 +10,31 @@ var handleWorkMessage = function (payload) {
     switch (payload.message) {
         case AGGREGATE_STATISTICS:
             return aggregateStatistics(payload);
+        case COMBINE_DATASETS:
+            return combineVisualizationDatasets(payload);
         default:
             return null;
     }
+};
+var combineVisualizationDatasets = function (payload) {
+    var visualizationData = payload.visualizationData, requestId = payload.requestId;
+    var combined = new Map();
+    visualizationData.forEach(function (dsarr, dsid) {
+        var union = [];
+        for (var _i = 0, dsarr_1 = dsarr; _i < dsarr_1.length; _i++) {
+            var ds = dsarr_1[_i];
+            var uniquePatients = Object.keys(ds.results);
+            for (var i = 0; i < uniquePatients.length; i++) {
+                var p = uniquePatients[i];
+                var rows = ds.results[p];
+                for (var _a = 0, rows_1 = rows; _a < rows_1.length; _a++) {
+                    union.push(rows_1[_a]);
+                }
+            }
+        }
+        combined.set(dsid, union);
+    });
+    return { requestId: requestId, result: combined };
 };
 var aggregateStatistics = function (payload) {
     var cohorts = payload.cohorts, responders = payload.responders, requestId = payload.requestId;

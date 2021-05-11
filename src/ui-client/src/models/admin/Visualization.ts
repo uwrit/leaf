@@ -5,6 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+import { PatientListDatasetShape } from "../patientList/Dataset";
 import { Constraint } from "./Concept";
 
 export interface AdminVisualizationPageDTO {
@@ -31,12 +32,23 @@ export interface AdminVisualizationComponentDTO {
     header: string;
     subHeader: string;
     jsonSpec: string;
-    datasetQueryIds: string[];
+    datasetQueryRefs: AdminVisualizationDatasetQueryRefDTO[];
     isFullWidth: boolean;
     orderId: number;
 }
 
-export interface AdminVisualizationComponent extends AdminVisualizationComponentDTO {}
+export interface AdminVisualizationComponent extends AdminVisualizationComponentDTO {
+    datasetQueryRefs: AdminVisualizationDatasetQueryRef[];
+}
+
+export interface AdminVisualizationDatasetQueryRef {
+    id: string;
+    universalId?: string;
+    name: string;
+    shape: PatientListDatasetShape;
+}
+
+export interface AdminVisualizationDatasetQueryRefDTO extends AdminVisualizationDatasetQueryRef {}
 
 export interface AdminVisualizationCategoryDTO {
     id: string;

@@ -36,7 +36,7 @@ namespace API.DTO.Visualization
         public string Header { get; set; }
         public string SubHeader { get; set; }
         public string JsonSpec { get; set; }
-        public IEnumerable<Guid> DatasetQueryIds { get; set; }
+        public IEnumerable<VisualizationDatasetQueryRefDTO> DatasetQueryRefs { get; set; }
         public bool IsFullWidth { get; set; }
         public int OrderId { get; set; }
 
@@ -46,9 +46,25 @@ namespace API.DTO.Visualization
             Header = vc.Header;
             SubHeader = vc.SubHeader;
             JsonSpec = vc.JsonSpec;
-            DatasetQueryIds = vc.DatasetQueryIds;
+            DatasetQueryRefs = vc.DatasetQueryRefs.Select(dsref => new VisualizationDatasetQueryRefDTO(dsref));
             IsFullWidth = vc.IsFullWidth;
             OrderId = vc.OrderId;
+        }
+    }
+
+    public class VisualizationDatasetQueryRefDTO
+    {
+        public Guid? Id { get; set; }
+        public string UniversalId { get; set; }
+        public string Name { get; set; }
+        public Model.Compiler.Shape Shape { get; set; }
+
+        public VisualizationDatasetQueryRefDTO(IVisualizationDatasetQueryRef dsref)
+        {
+            Id = dsref.Id;
+            UniversalId = dsref.UniversalId;
+            Name = dsref.Name;
+            Shape = dsref.Shape;
         }
     }
 }

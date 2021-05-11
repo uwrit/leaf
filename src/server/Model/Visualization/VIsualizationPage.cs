@@ -24,9 +24,17 @@ namespace Model.Visualization
         string Header { get; set; }
         string SubHeader { get; set; }
         string JsonSpec { get; set; }
-        IEnumerable<Guid> DatasetQueryIds { get; set; }
+        IEnumerable<VisualizationDatasetQueryRef> DatasetQueryRefs { get; set; }
         bool IsFullWidth { get; set; }
         int OrderId { get; set; }
+    }
+
+    public interface IVisualizationDatasetQueryRef
+    {
+        Guid? Id { get; set; }
+        string UniversalId { get; set; }
+        string Name { get; set; }
+        Model.Compiler.Shape Shape { get; set; }
     }
 
     public class VisualizationPage : IVisualizationPage
@@ -37,11 +45,6 @@ namespace Model.Visualization
         public string Category { get; set; }
         public IEnumerable<IVisualizationComponent> Components { get; set; }
         public int OrderId { get; set; }
-
-        public VisualizationPage()
-        {
-            Components = new List<VisualizationComponent>();
-        }
     }
 
     public class VisualizationComponent : IVisualizationComponent
@@ -50,14 +53,17 @@ namespace Model.Visualization
         public string Header { get; set; }
         public string SubHeader { get; set; }
         public string JsonSpec { get; set; }
-        public IEnumerable<Guid> DatasetQueryIds { get; set; }
+        public IEnumerable<VisualizationDatasetQueryRef> DatasetQueryRefs { get; set; }
         public bool IsFullWidth { get; set; }
         public int OrderId { get; set; }
+    }
 
-        public VisualizationComponent()
-        {
-            DatasetQueryIds = new List<Guid>();
-        }
+    public class VisualizationDatasetQueryRef : IVisualizationDatasetQueryRef
+    {
+        public Guid? Id { get; set; }
+        public string UniversalId { get; set; }
+        public string Name { get; set; }
+        public Model.Compiler.Shape Shape { get; set; }
     }
 }
 

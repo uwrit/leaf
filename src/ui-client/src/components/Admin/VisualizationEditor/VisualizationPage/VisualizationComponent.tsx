@@ -9,8 +9,11 @@ import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import { Col, Row } from 'reactstrap';
 import { AdminVisualizationComponent } from '../../../../models/admin/Visualization';
+import { VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
+import { SectionHeader } from '../../../Other/SectionHeader/SectionHeader';
 
 interface Props { 
+    clickHandler: (comp: VisualizationComponentModel) => any;
     data: AdminVisualizationComponent;
 }
 
@@ -27,6 +30,7 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
     }
 
     public static getDerivedStateFromError(error: any) {
+        console.log(error);
         return { errored: true };
     }
     
@@ -57,6 +61,60 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         const c = this.className;
         const { data } = this.props;
 
+        const spec = {
+            width: 800,
+            height: 400,
+            "data": {
+                "name": "values"
+            },
+            "params": [
+                {
+                    "name": "highlight",
+                    "select": { "type": "point", "on": "mouseover" }
+                },
+                { "name": "select", "select": "point" },
+                {
+                    "name": "cornerRadius", "value": 0,
+                    "bind": { "input": "range", "min": 0, "max": 50, "step": 1 }
+                }
+            ],
+            "mark": {
+                "type": "bar",
+                "fill": "#4C78A8",
+                "stroke": "black",
+                "cursor": "pointer",
+                "cornerRadius": { "expr": "cornerRadius" }
+            },
+            "encoding": {
+                "x": { "field": "a", "type": "ordinal" },
+                "y": { "field": "b", "type": "quantitative" },
+                "fillOpacity": {
+                    "condition": { "param": "select", "value": 1 },
+                    "value": 0.3
+                },
+                "strokeWidth": {
+                    "condition": [
+                        {
+                            "param": "select",
+                            "empty": false,
+                            "value": 2
+                        },
+                        {
+                            "param": "highlight",
+                            "empty": false,
+                            "value": 1
+                        }
+                    ],
+                    "value": 0
+                }
+            },
+            "config": {
+                "scale": {
+                    "bandPaddingInner": 0.2
+                }
+            }
+        } as any;
+
         const d = { "values": [
             {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
             {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
@@ -68,8 +126,9 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
             <div className={c}>
                 <Row>
                     <Col md={data.isFullWidth ? 12 : 6}>
+                        <SectionHeader headerText={data.header} />
                         <div className={c}>
-                            <VegaLite spec={data.jsonSpec as VisualizationSpec} data={d}/>
+                            <VegaLite spec={spec as VisualizationSpec} data={d}/>
                         </div>
                     </Col>
                 </Row>

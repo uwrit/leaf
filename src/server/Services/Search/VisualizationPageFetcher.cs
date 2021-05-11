@@ -46,7 +46,7 @@ namespace Services.Search
 
                 var pageRecs = grid.Read<VisualizationPageRecord>();
                 var compRecs = grid.Read<VisualizationComponentRecord>();
-                var dsidRecs = grid.Read<VisualizationComponentDatasetIdRecord>();
+                var dsidRecs = grid.Read<VisualizationComponentDatasetRefRecord>();
 
                 var comps = compRecs.GroupJoin(dsidRecs,
                     comp => comp.Id,
@@ -55,7 +55,7 @@ namespace Services.Search
                     {
                         comp.VisualizationPageId,
                         Component = comp,
-                        DatasetQueryIds = dsid.Select(ds => ds.DatasetQueryId)
+                        DatasetQueryRefs = dsid
                     });
 
                 var pages = pageRecs.GroupJoin(comps,
@@ -72,7 +72,13 @@ namespace Services.Search
                             Header = comp.Component.Header,
                             SubHeader = comp.Component.SubHeader,
                             JsonSpec = comp.Component.JsonSpec,
-                            DatasetQueryIds = comp.DatasetQueryIds,
+                            DatasetQueryRefs =  comp.DatasetQueryRefs.Select(dsref => new VisualizationDatasetQueryRef
+                            {
+                                Id = dsref.DatasetQueryId,
+                                UniversalId = dsref.DatasetQueryUniversalId,
+                                Name = dsref.DatasetQueryName,
+                                Shape = dsref.DatasetQueryShape
+                            }),
                             IsFullWidth = comp.Component.IsFullWidth,
                             OrderId = comp.Component.OrderId
                         })

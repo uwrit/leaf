@@ -26,11 +26,14 @@ namespace Services.Search
         public int OrderId { get; set; }
     }
 
-    class VisualizationComponentDatasetIdRecord
+    class VisualizationComponentDatasetRefRecord
     {
         public Guid VisualizationPageId { get; set; }
         public Guid VisualizationComponentId { get; set; }
         public Guid DatasetQueryId { get; set; }
+        public string DatasetQueryUniversalId { get; set; }
+        public string DatasetQueryName { get; set; }
+        public Model.Compiler.Shape DatasetQueryShape { get; set; } 
     }
 }
     

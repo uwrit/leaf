@@ -62,7 +62,8 @@ import {
     SET_ADMIN_DATASET_QUERY_CATEGORIES, 
     SET_ADMIN_UNEDITED_DATASET_QUERY_CATEGORY, 
     UNDO_ADMIN_DATASET_QUERY_CATEGORY_CHANGE, 
-    REMOVE_ADMIN_DATASET_QUERY_CATEGORY 
+    REMOVE_ADMIN_DATASET_QUERY_CATEGORY, 
+    AdminDatasetQueryCategoryAction
 } from "../../actions/admin/datasetQueryCategory";
 import { 
     SET_ADMIN_NETWORK_IDENTITY, 
@@ -101,9 +102,14 @@ import {
     SET_ADMIN_VISUALIZATION,
     REMOVE_ADMIN_VISUALIZATION,
     UNDO_ADMIN_VISUALIZATION_CHANGE,
-    SET_ADMIN_VISUALIZATION_CURRENT
+    SET_ADMIN_VISUALIZATION_CURRENT,
+    SET_ADMIN_VISUALIZATION_DATASET_QUERY_STATE,
+    SET_ADMIN_VISUALIZATION_DATASET_QUERY_NETWORK_STATE,
+    SET_ADMIN_VISUALIZATION_DATASETS,
+    AdminVisualizationAction,
 } from "../../actions/admin/visualization";
 import { 
+    AdminVisualizationCategoryAction,
     REMOVE_ADMIN_VISUALIZATION_CATEGORY, 
     SET_ADMIN_UNEDITED_VISUALIZATION_CATEGORY, 
     SET_ADMIN_VISUALIZATION_CATEGORIES, 
@@ -122,7 +128,7 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-import { removeAdminVisualizationPage, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualization";
+import { removeAdminVisualizationPage, setAdminVisualizationDatasetQueryNetworkState, setAdminVisualizationDatasetQueryState, setAdminVisualizationDatasetState, setAdminVisualizationPage, setAdminVisualizationPages, setCurrentAdminVisualizationPage, undoAdminVisualizationPageChange } from "./visualization";
 import { removeAdminVisualizationCategory, setAdminUneditedVisualizationCategory, setAdminVisualizationCategories, undoAdminVisualizationCategoryChange } from "./visualizationCategory";
 
 
@@ -222,7 +228,8 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
     });
 }; 
 
-type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
+type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminDatasetQueryCategoryAction |
+                   AdminSpecializationGroupAction | AdminSpecializationAction | AdminVisualizationAction | AdminVisualizationCategoryAction;
 
 export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
@@ -348,6 +355,12 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return removeAdminVisualizationPage(state, action);
         case SET_ADMIN_VISUALIZATION_CURRENT:
             return setCurrentAdminVisualizationPage(state, action);
+        case SET_ADMIN_VISUALIZATION_DATASET_QUERY_STATE:
+            return setAdminVisualizationDatasetQueryState(state, action);
+        case SET_ADMIN_VISUALIZATION_DATASET_QUERY_NETWORK_STATE:
+            return setAdminVisualizationDatasetQueryNetworkState(state, action);
+        case SET_ADMIN_VISUALIZATION_DATASETS:
+            return setAdminVisualizationDatasetState(state, action);
 
         // Visualization Categories
         case SET_ADMIN_VISUALIZATION_CATEGORIES:

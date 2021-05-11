@@ -20,7 +20,7 @@ namespace API.Controllers.Admin
 {
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
-    [Route("api/admin/visualizationcategory")]
+    [Route("api/admin/datasetcategory")]
     public class AdminDatasetCategoryController : Controller
     {
         readonly ILogger<AdminDatasetCategoryController> log;

@@ -65,7 +65,9 @@ export interface AdminVisualizationCategoryState {
 }
 
 export interface AdminVisualizationDatasetState {
+    id: string;
     state: CohortStateType;
+    networkState: Map<string, CohortStateType>;
     data: any[];
 }
 

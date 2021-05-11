@@ -9,7 +9,7 @@ import AdminState from "../../models/state/AdminState";
 import { AdminVisualizationCategoryAction } from "../../actions/admin/visualizationCategory";
 
 export const setAdminVisualizationCategories = (state: AdminState, action: AdminVisualizationCategoryAction): AdminState => {
-    for (const cat of action.cats!) {
+    for (const cat of action.categories!) {
         state.visualizationCategories.categories.set(cat.id, Object.assign({}, cat));
     }
     return Object.assign({}, state, { 
@@ -25,13 +25,13 @@ export const setAdminUneditedVisualizationCategory = (state: AdminState, action:
     return Object.assign({}, state, { 
         visualizationCategories: {
             ...state.visualizationCategories,
-            uneditedCategory: Object.assign({}, action.cat, { changed: false })
+            uneditedCategory: Object.assign({}, action.category, { changed: false })
         }
     });
 };
 
 export const removeAdminVisualizationCategory = (state: AdminState, action: AdminVisualizationCategoryAction): AdminState => {
-    state.visualizationCategories.categories.delete(action.cat!.id);
+    state.visualizationCategories.categories.delete(action.category!.id);
     return Object.assign({}, state, { 
         visualizationCategories: { 
             categories: new Map(state.visualizationCategories.categories)

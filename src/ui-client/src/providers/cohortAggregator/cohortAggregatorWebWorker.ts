@@ -7,16 +7,20 @@
 
 import { generate as generateId } from 'shortid';
 import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
-import { BinarySplitPair, DemographicStatistics, NihRaceEthnicityBucket } from '../../models/cohort/DemographicDTO';
+import { BinarySplitPair, DemographicStatistics } from '../../models/cohort/DemographicDTO';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
+import { PatientListDatasetDTO } from '../../models/patientList/Dataset';
+import { PatientId } from '../../models/patientList/Patient';
 
 const AGGREGATE_STATISTICS = 'AGGREGATE_STATISTICS';
+const COMBINE_DATASETS = 'COMBINE_DATASETS';
 
 interface InboundMessagePartialPayload {
     cohorts?: CohortMap;
     message: string;
     responders?: NetworkResponderMap;
+    visualizationData?: Map<string, PatientListDatasetDTO[]>;
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -44,7 +48,7 @@ export default class CohortAggregatorWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ AGGREGATE_STATISTICS ])}
+            ${this.addMessageTypesToContext([ AGGREGATE_STATISTICS, COMBINE_DATASETS ])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -58,6 +62,10 @@ export default class CohortAggregatorWebWorker {
 
     public aggregateStatistics = (cohorts: CohortMap, responders: NetworkResponderMap) => {
         return this.postMessage({ message: AGGREGATE_STATISTICS, cohorts, responders });
+    }
+
+    public combineDatasets = (visualizationData: Map<string, PatientListDatasetDTO[]>) => {
+        return this.postMessage({ message: COMBINE_DATASETS, visualizationData });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -94,9 +102,33 @@ export default class CohortAggregatorWebWorker {
             switch (payload.message) {
                 case AGGREGATE_STATISTICS:
                     return aggregateStatistics(payload);
+                case COMBINE_DATASETS:
+                    return combineVisualizationDatasets(payload);
                 default:
                     return null;
             }
+        };
+
+        const combineVisualizationDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { visualizationData, requestId } = payload;
+            const combined: Map<string, any[]> = new Map();
+            
+            visualizationData.forEach((dsarr, dsid) => {
+                const union: any[] = [];
+                for (const ds of dsarr) {
+                    const uniquePatients: PatientId[] = Object.keys(ds.results);
+                    for (let i = 0; i < uniquePatients.length; i++) {
+                        const p = uniquePatients![i];
+                        const rows = ds.results[p];
+                        for (const row of rows) {
+                            union.push(row);   
+                        }
+                    }
+                }
+                combined.set(dsid, union);
+            });
+
+            return { requestId, result: combined };
         };
 
         const aggregateStatistics = (payload: InboundMessagePayload): OutboundMessagePayload => {

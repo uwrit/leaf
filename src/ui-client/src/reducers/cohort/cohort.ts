@@ -54,8 +54,14 @@ import {
     TIMELINES_INDEX_SET_PANEL_ID,
     TIMELINES_REMOVE_CONCEPT_DATASET
 } from '../../actions/cohort/timelines';
-import { DISABLE_RESPONDER, ENABLE_RESPONDER } from '../../actions/networkResponders';
-import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../../actions/panelFilter';
+import { 
+    DISABLE_RESPONDER, 
+    ENABLE_RESPONDER 
+} from '../../actions/networkResponders';
+import { 
+    SET_PANEL_FILTERS, 
+    TOGGLE_PANEL_FILTER 
+} from '../../actions/panelFilter';
 import { 
     ADD_PANEL_ITEM, 
     REMOVE_PANEL_ITEM,
@@ -85,7 +91,10 @@ import {
     setPatientListDatasetRequested,
     setNetworkPatientListDatasetNotImplemented
 } from './patientList';
-import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkCohortVisualization } from './visualize';
+import { 
+    defaultVisualizationState, 
+    setAggregateCohortVisualization, 
+    setNetworkCohortVisualization } from './visualize';
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
