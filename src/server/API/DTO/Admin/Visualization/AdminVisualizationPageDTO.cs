@@ -44,6 +44,7 @@ namespace API.DTO.Admin.Visualization
         public Guid Id { get; set; }
         public string Name { get; set; }
         public string UniversalId { get; set; }
+        public Model.Compiler.Shape Shape { get; set; } 
     }
 }
 
@@ -122,18 +123,20 @@ public static class AdminVisualizationPageDTOExt
         {
             Id = dto.Id,
             UniversalId = dto.UniversalId,
-            Name = dto.Name
+            Name = dto.Name,
+            Shape = dto.Shape
         };
     }
 
-    public static AdminVisualizationDatasetQueryRefDTO AdminVisualizationDatasetQueryRefDTO(this AdminVisualizationDatasetQueryRef cat)
+    public static AdminVisualizationDatasetQueryRefDTO AdminVisualizationDatasetQueryRefDTO(this AdminVisualizationDatasetQueryRef dsref)
     {
-        if (cat == null) return null;
+        if (dsref == null) return null;
         return new AdminVisualizationDatasetQueryRefDTO
         {
-            Id = cat.Id,
-            UniversalId = cat.UniversalId,
-            Name = cat.Name
+            Id = dsref.Id,
+            UniversalId = dsref.UniversalId,
+            Name = dsref.Name,
+            Shape = dsref.Shape
         };
     }
 }

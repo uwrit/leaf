@@ -12,9 +12,14 @@ import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
 import { PatientListDatasetDTO } from '../../models/patientList/Dataset';
 import { PatientId } from '../../models/patientList/Patient';
+import { PatientListColumnType } from '../../models/patientList/Column';
 
 const AGGREGATE_STATISTICS = 'AGGREGATE_STATISTICS';
 const COMBINE_DATASETS = 'COMBINE_DATASETS';
+
+const typeString = PatientListColumnType.String;
+const typeNum = PatientListColumnType.Numeric;
+const typeDate = PatientListColumnType.DateTime;
 
 interface InboundMessagePartialPayload {
     cohorts?: CohortMap;
@@ -49,6 +54,9 @@ export default class CohortAggregatorWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([ AGGREGATE_STATISTICS, COMBINE_DATASETS ])}
+            var typeString = ${PatientListColumnType.String};
+            var typeNum = ${PatientListColumnType.Numeric};
+            var typeDate = ${PatientListColumnType.DateTime};
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -115,13 +123,20 @@ export default class CohortAggregatorWebWorker {
             
             visualizationData.forEach((dsarr, dsid) => {
                 const union: any[] = [];
+                const dateFields = dsarr[0].schema.fields.filter((f) => f.type === typeDate);
                 for (const ds of dsarr) {
                     const uniquePatients: PatientId[] = Object.keys(ds.results);
                     for (let i = 0; i < uniquePatients.length; i++) {
                         const p = uniquePatients![i];
                         const rows = ds.results[p];
                         for (const row of rows) {
-                            union.push(row);   
+                            const d = row as any;
+                            for (const datefield of dateFields) {
+                                if (d[datefield.name]) {
+                                    d[datefield.name] = new Date(d[datefield.name]);
+                                }
+                            }
+                            union.push(d);   
                         }
                     }
                 }

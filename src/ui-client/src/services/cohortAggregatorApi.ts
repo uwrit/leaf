@@ -19,9 +19,9 @@ export const aggregateStatistics = (cohorts: CohortMap, responders: NetworkRespo
     });
 };
 
-export const combineDatasets = (data: Map<string, PatientListDatasetDTO[]>): Promise<Map<string, any[]>> => {
+export const combineDatasets = async (data: Map<string, PatientListDatasetDTO[]>) => {
     return new Promise( async (resolve, reject) => {
-        const combined = await combineDatasets(data);
+        const combined = await aggregator.combineDatasets(data);
         resolve(combined);
     });
 };

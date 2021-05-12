@@ -10,6 +10,7 @@ export interface VisualizationPageDTO {
     id: string;
     pageName: string;
     pageDescription: string;
+    category?: string;
     orderId: number;
     components: VisualizationComponentDTO[];
 }
@@ -23,13 +24,13 @@ export interface VisualizationComponentDTO {
     header: string;
     subHeader: string;
     jsonSpec: string;
-    datasetQueryIds: VisualizationDatasetQueryRefDTO[];
+    datasetQueryRefs: VisualizationDatasetQueryRefDTO[];
     isFullWidth: boolean;
     orderId: number;
 }
 
 export interface VisualizationComponent extends VisualizationComponentDTO {
-    datasetQueryIds: VisualizationDatasetQueryRef[];
+    datasetQueryRefs: VisualizationDatasetQueryRef[];
 }
 
 export interface VisualizationDatasetQueryRefDTO {

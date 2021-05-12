@@ -17,7 +17,7 @@ import { CohortState, CohortStateType } from '../../../models/state/CohortState'
 import { VisualizationComponent, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
-import { setAdminCurrentVisualizationPage } from '../../../actions/admin/visualization';
+import { setAdminCurrentVisualizationPageWithDatasetCheck } from '../../../actions/admin/visualization';
 import VisualizationPage from './VisualizationPage/VisualizationPage';
 import './VisualizationEditor.css';
 
@@ -45,7 +45,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         const { selectedComponent } = this.state;
         const { visualizations } = data;
         const { currentPage, changed, datasets } = visualizations;
-        const cohortReady = cohort.count.state === CohortStateType.NOT_LOADED;
+        const cohortReady = cohort.count.state === CohortStateType.LOADED;
         let spec: any = null;
         let datasetsLoaded = true;
 
@@ -53,15 +53,15 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         if (currentPage && selectedComponent) {
             spec = {
                 data: [
-                    selectedComponent.datasetQueryIds.map(dsid => ({ name: dsid }))
+                    selectedComponent.datasetQueryRefs.map(dsid => ({ name: dsid }))
                 ]
             }
         }
 
         if (currentPage) {
             for (const comp of currentPage.components) {
-                for (const dsid of comp.datasetQueryIds) {
-                    const status = datasets.get(dsid);
+                for (const dsref of comp.datasetQueryRefs) {
+                    const status = datasets.get(dsref.id);
                     if (!status || status.state !== CohortStateType.LOADED) {
                         datasetsLoaded = false;
                         break;
@@ -103,11 +103,16 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     <Col md={10}>
                         {/* Viz Page */}
                         {data.visualizations.currentPage && datasetsLoaded &&
-                        <VisualizationPage componentClickHandler={this.handlePageComponentClick} dispatch={dispatch} page={currentPage} />
+                        <VisualizationPage 
+                            adminMode={true}
+                            componentClickHandler={this.handlePageComponentClick} 
+                            dispatch={dispatch} 
+                            page={currentPage} 
+                        />
                         }
 
                         {/* 'Select a Page' fallback */}
-                        {!data.visualizations.currentPage && cohortReady &&
+                        {!data.visualizations.currentPage &&
                         <div className={`${c}-no-page-selected`}>
                             <p>
                                 <span>Select a Visualization Page from the left or </span>
@@ -157,11 +162,12 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         }
 
         const adminPage = data.visualizations.pages.get(page.id);
-        dispatch(setAdminCurrentVisualizationPage(adminPage));
+        this.setState({ selectedComponent: undefined });
+        dispatch(setAdminCurrentVisualizationPageWithDatasetCheck(adminPage));
     }
 
-    private handlePageComponentClick = (comp: VisualizationComponent) => {
-
+    private handlePageComponentClick = (selectedComponent: VisualizationComponent) => {
+        this.setState({ selectedComponent });
     }
     
     public demorender() {

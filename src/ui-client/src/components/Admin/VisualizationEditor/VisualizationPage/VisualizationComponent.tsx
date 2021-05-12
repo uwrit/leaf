@@ -8,13 +8,14 @@
 import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import { Col, Row } from 'reactstrap';
-import { AdminVisualizationComponent } from '../../../../models/admin/Visualization';
 import { VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
 import { SectionHeader } from '../../../Other/SectionHeader/SectionHeader';
 
-interface Props { 
+interface Props {
+    adminMode?: boolean;
     clickHandler: (comp: VisualizationComponentModel) => any;
-    data: AdminVisualizationComponent;
+    data: VisualizationComponentModel;
+    isSelected?: boolean;
 }
 
 interface ErrorBoundaryState {
@@ -22,6 +23,7 @@ interface ErrorBoundaryState {
 }
 
 export class VisualizationComponent extends React.Component<Props, ErrorBoundaryState> {
+    private classname = 'visualize-component-container';
     constructor(props: Props) {
         super(props);
         this.state = { 
@@ -39,18 +41,27 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
     }
 
     public render() {
-        if (this.state.errored) {
-            return (
-                <div className={`visualize-error`}>
+        const { adminMode, isSelected, clickHandler, data } = this.props;
+        const c = this.classname;
+        const classes = [ c, isSelected ? 'selected' : '', adminMode ? 'clickable' : '' ].join(' ');
+        const err = this.state.errored;
+
+        return (
+            <div className={classes} onClick={clickHandler.bind(null, data)}>
+                {!err &&
+                <VisualizationComponentInternal {...this.props} />
+                }
+
+                {err && 
+                 <div className={`${c}-error`}>
                     <p>
                         Whoops! An error occurred while creating patient visualizations. We are sorry for the inconvenience. 
                         Please contact your Leaf administrator if this error continues.
                     </p>
                 </div>
-            );
-        }
-
-        return <VisualizationComponentInternal {...this.props} />;
+                }
+            </div>
+        );
     }
 }
 

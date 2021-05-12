@@ -340,8 +340,9 @@ BEGIN
         VC.VisualizationPageId
       , VCDQ.VisualizationComponentId
       , VCDQ.DatasetQueryId
-      , DQ.UniversalId
+      , DatasetQueryUniversalId = DQ.UniversalId
       , DatasetName = DQ.[Name]
+      , DatasetShape = DQ.Shape
     FROM #VC AS VC
          INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
             ON VC.Id = VCDQ.VisualizationComponentId
@@ -424,8 +425,9 @@ BEGIN
     SELECT
         VCDQ.VisualizationComponentId
       , VCDQ.DatasetQueryId
-      , DQ.UniversalId
-      , DatasetName = DQ.[Name]
+      , DatasetQueryUniversalId = DQ.UniversalId
+      , DatasetQueryName = DQ.[Name]
+      , DatasetQueryShape=  DQ.Shape
     FROM rela.VisualizationComponentDatasetQuery AS VCDQ
          INNER JOIN app.DatasetQuery AS DQ
             ON VCDQ.DatasetQueryId = DQ.Id
@@ -577,6 +579,7 @@ BEGIN
           , DQS.DatasetQueryId
           , DatasetQueryUniversalId = DQ.UniversalId
           , DatasetQueryName = DQ.[Name]
+          , DatasetQueryShape = DQ.Shape
         FROM @dqs AS DQS
              INNER JOIN app.DatasetQuery AS DQ
                 ON DQS.DatasetQueryId = DQ.Id
@@ -720,6 +723,10 @@ BEGIN
     SELECT
         VCAT.Id
       , VCAT.Category
+      , VCAT.Created
+      , VCAT.CreatedBy
+      , VCAT.Updated
+      , VCAT.UpdatedBy
     FROM app.VisualizationCategory AS VCAT
 
 END

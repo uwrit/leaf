@@ -5,10 +5,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .visualization-spec-editor {
-    background-color: gray;
+.visualization-spec-editor-container {
+    background-color: rgb(240,240,240);
     bottom: 0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 -4px 10px 0px;
     height: 300px;
+    overflow-y: auto;
     position: fixed;
     width: 100%;
+}
+
+.visualization-spec-editor {
+    
 }

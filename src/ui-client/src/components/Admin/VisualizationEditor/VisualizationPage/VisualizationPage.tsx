@@ -8,12 +8,13 @@
 import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
 import { Col, Row } from 'reactstrap';
-import { AdminVisualizationState } from '../../../../models/state/AdminState';
 import { VisualizationPage as VisualizationPageModel, VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
 import { VisualizationComponent } from './VisualizationComponent';
 import './VisualizationPage.css';
 
-interface Props { 
+interface Props {
+    adminMode?: boolean;
+    currentComponent?: VisualizationComponentModel;
     componentClickHandler: (comp: VisualizationComponentModel) => any;
     page: VisualizationPageModel;
     dispatch: any;
@@ -24,14 +25,20 @@ export default class VisualizationPage extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { page, dispatch, componentClickHandler } = this.props;
+        const { page, adminMode, currentComponent, componentClickHandler } = this.props;
 
 
         return (
-            <div>
+            <div className={c}>
                 {page.components.map(comp => {
                     return (
-                        <VisualizationComponent clickHandler={componentClickHandler} data={comp} />
+                        <VisualizationComponent 
+                            key={comp.id} 
+                            adminMode={adminMode}
+                            clickHandler={componentClickHandler} 
+                            data={comp}
+                            isSelected={adminMode && currentComponent && currentComponent === comp}
+                        />
                     )})
                 }
             </div>);

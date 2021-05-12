@@ -5,15 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetShape } from "../patientList/Dataset";
+import { VisualizationComponentDTO, VisualizationDatasetQueryRefDTO, VisualizationPageDTO } from "../visualization/Visualization";
 import { Constraint } from "./Concept";
 
-export interface AdminVisualizationPageDTO {
-    id: string;
-    pageName: string;
-    pageDescription: string;
+export interface AdminVisualizationPageDTO extends VisualizationPageDTO {
     categoryId?: string;
-    orderId: number;
     components: AdminVisualizationComponentDTO[];
     constraints: Constraint[];
     created: Date;
@@ -27,28 +23,17 @@ export interface AdminVisualizationPage extends AdminVisualizationPageDTO {
     unsaved?: boolean;
 }
 
-export interface AdminVisualizationComponentDTO {
-    id: string;
-    header: string;
-    subHeader: string;
-    jsonSpec: string;
+export interface AdminVisualizationComponentDTO extends VisualizationComponentDTO {
     datasetQueryRefs: AdminVisualizationDatasetQueryRefDTO[];
-    isFullWidth: boolean;
-    orderId: number;
 }
 
 export interface AdminVisualizationComponent extends AdminVisualizationComponentDTO {
     datasetQueryRefs: AdminVisualizationDatasetQueryRef[];
 }
 
-export interface AdminVisualizationDatasetQueryRef {
-    id: string;
-    universalId?: string;
-    name: string;
-    shape: PatientListDatasetShape;
-}
+export interface AdminVisualizationDatasetQueryRefDTO extends VisualizationDatasetQueryRefDTO {}
 
-export interface AdminVisualizationDatasetQueryRefDTO extends AdminVisualizationDatasetQueryRef {}
+export interface AdminVisualizationDatasetQueryRef extends AdminVisualizationDatasetQueryRefDTO {}
 
 export interface AdminVisualizationCategoryDTO {
     id: string;

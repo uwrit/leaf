@@ -10,6 +10,8 @@ import { AdminVisualizationComponent, AdminVisualizationPage } from '../../../..
 import AceEditor from 'react-ace'; 
 import 'ace-builds/src-noconflict/mode-json';
 import './VisualizationSpecEditor.css';
+import { setAdminCurrentVisualizationPage } from '../../../../actions/admin/visualization';
+import { Col, Row } from 'reactstrap';
 
 interface Props { 
     currentPage?: AdminVisualizationPage;
@@ -22,7 +24,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
     public render() {
         const c = this.className;
-        const { currentPage, currentComponent } = this.props;
+        const { currentComponent } = this.props;
 
         if (!currentComponent) {
             return (
@@ -33,24 +35,51 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         }
 
         return (
-            <div className={c}>
-                <AceEditor
-                    className={c}
-                    editorProps={{ $blockScrolling: Infinity }}
-                    highlightActiveLine={false}
-                    height={`${500}px`}
-                    width={`${500}px`}
-                    mode="json"
-                    showPrintMargin={false}
-                    value={currentComponent.jsonSpec}
-                    setOptions={{
-                        fontSize: 12,
-                        showGutter: false,
-                        showLineNumbers: false,
-                        tabSize: 2,
-                    }}
-                />
+            <div className={`${c}-container`}>
+
+                <Row>
+                    <Col md={6}>
+
+                    </Col>
+
+                    <Col md={6}>
+
+                        {/* JSON Spec Editor */}
+                        <AceEditor
+                        className={c}
+                        style={{ backgroundColor: 'white' }}
+                        editorProps={{ $blockScrolling: Infinity }}
+                        highlightActiveLine={true}
+                        onChange={this.handleInputChange}
+                        height={`${500}px`}
+                        width={`${800}px`}
+                        mode="json"
+                        showPrintMargin={false}
+                        value={currentComponent.jsonSpec}
+                        setOptions={{
+                            fontSize: 12,
+                            showGutter: false,
+                            showLineNumbers: false,
+                            tabSize: 2,
+                        }}
+                    />
+                    </Col>
+                </Row>
+
             </div>
         );
+    }
+
+    private handleInputChange = (value: string, evt: any) => {
+        const { currentPage, currentComponent, dispatch } = this.props;
+        const page = Object.assign({}, currentPage);
+        const comp = Object.assign({}, currentComponent, {
+            jsonSpec: value
+        });
+        const idx = page.components.findIndex(c => c.id === comp.id);
+        if (idx > -1) {
+            page.components[idx] = comp;
+            dispatch(setAdminCurrentVisualizationPage(page));
+        }
     }
 }

@@ -11,7 +11,7 @@ import 'ace-builds/src-noconflict/mode-sqlserver';
 import 'ace-builds/src-noconflict/theme-sqlserver';
 
 interface Props {
-    changeHandler?: (value:string, evt: any) => void;
+    changeHandler?: (value: string, evt: any) => void;
     height: number;
     fontSize?: string | number;
     readonly: boolean;

@@ -5,6 +5,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .visualization-page {
-     overflow-y: auto;
- }
+.visualization-page {
+    overflow-y: auto;
+}
+
+.visualization-component-container {
+    
+}
+
+.visualization-component-container.clickable .visualization-component {
+    cursor: pointer;
+}
+
+.visualization-component-container.clickable:hover .visualization-component {
+    background-color: rgba(142, 255, 49, 0.3);
+}
+
+.visualization-component {
+    
+}

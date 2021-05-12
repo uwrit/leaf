@@ -42,6 +42,16 @@ export interface AdminVisualizationAction {
 }
 
 // Asynchronous
+export const setAdminCurrentVisualizationPageWithDatasetCheck = (page: AdminVisualizationPage) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        if (getState().cohort.count.state === CohortStateType.LOADED) {
+            dispatch(loadDependentDatasets(page));
+        }
+        dispatch(setAdminCurrentVisualizationPage(page));
+    };
+};
+
+
 export const loadDependentDatasets = (page: VisualizationPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
@@ -57,7 +67,7 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
          * Get dependent datasets not yet loaded
          */
         for (const comp of page.components) {
-            for (const dsref of comp.datasetQueryIds) {
+            for (const dsref of comp.datasetQueryRefs) {
                 if (!viz.datasets.has(dsref.id) || viz.datasets.get(dsref.id).state !== CohortStateType.LOADED) {
                     deps.add(dsref);
                 }
@@ -84,38 +94,47 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
 
             // Foreach dataset
             Promise.all([ ...deps.values() ].map(dsref => {
-                dispatch(setAdminVisualizationDatasetQueryState(dsref, CohortStateType.REQUESTING));
-                results.set(dsref.id, []);
+                return new Promise( async (resolveDataset, rejectDataset) => {
+                    dispatch(setAdminVisualizationDatasetQueryState(dsref, CohortStateType.REQUESTING));
+                    results.set(dsref.id, []);
 
-                // Foreach responder
-                responders.map((nr, i) => { 
-                    return new Promise( async (resolve, reject) => {
-                        try {
+                    // Foreach responder
+                    Promise.all(responders.map((nr, i) => { 
+                        return new Promise( async (resolve, reject) => {
                             if (nr.isHomeNode || dsref.universalId) {
                                 const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-                                const ds = await fetchVisualizationDataset(state, nr, queryId, dsref);
-                                results.set(dsref.id, results.get(dsref.id).concat(ds));
-                                dispatch(setAdminVisualizationDatasetQueryNetworkState(dsref, CohortStateType.LOADED, nr));
+                                fetchVisualizationDataset(state, nr, queryId, dsref)
+                                    .then(ds => {
+                                        results.set(dsref.id, results.get(dsref.id).concat(ds));
+                                        dispatch(setAdminVisualizationDatasetQueryNetworkState(dsref, CohortStateType.LOADED, nr));
+                                    })
+                                    .catch(err => {
+                                        dispatch(setAdminVisualizationDatasetQueryNetworkState(dsref, CohortStateType.IN_ERROR, nr));
+                                        errInfo.push([ dsref.name, nr.name, err ]);
+                                        console.log(err);
+                                    })
+                                    .finally(() => {
+                                        resolve(null);
+                                    });
                             } else {
                                 dispatch(setAdminVisualizationDatasetQueryNetworkState(dsref, CohortStateType.NOT_IMPLEMENTED, nr));
+                                resolve(null);
                             }
-                        } catch (err) {
-                            dispatch(setAdminVisualizationDatasetQueryNetworkState(dsref, CohortStateType.IN_ERROR, nr));
-                            errInfo.push([ dsref.name, nr.name, err ]);
-                            console.log(err);
-                        }
-                        resolve(null);
+                        });
+                    }))
+                    .then(() => { 
+                        dispatch(setAdminVisualizationDatasetQueryState(dsref, CohortStateType.LOADED));
+                        resolveDataset(null);
                     });
                 });
-                dispatch(setAdminVisualizationDatasetQueryState(dsref, CohortStateType.LOADED));
-                return null;
             }))
             .then( async () => {
                 const atLeastOneSucceededCount = [ ...results.values() ].filter(dsarr => dsarr.length >= 1).length;
 
                 // If at least one part of each requested dataset was successfully pulled
                 if (atLeastOneSucceededCount === deps.size) {
-                    const combined = await combineDatasets(results);
+                    const combined = await combineDatasets(results) as Map<string, any[]>;
+                    console.log(combined);
                     dispatch(setAdminVisualizationDatasets(combined));
                 } else {
                     const info: InformationModalState = {
@@ -129,8 +148,8 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
                     dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                     dispatch(showInfoModal(info));
                 }
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             });
-            dispatch(setNoClickModalState({ state: NotificationStates.Complete }));
         }
     };
 };
