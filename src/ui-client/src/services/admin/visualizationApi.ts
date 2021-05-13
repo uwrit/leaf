@@ -27,7 +27,7 @@ export const createAdminVisualiationPage = async (state: AppState, page: AdminVi
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post('api/admin/visualization', {
-        page,
+        ...page,
         id: null
     });
     const created = resp.data as AdminVisualizationPage;
@@ -40,7 +40,7 @@ export const createAdminVisualiationPage = async (state: AppState, page: AdminVi
 export const updateAdminVisualiationPage = async (state: AppState, page: AdminVisualizationPage): Promise<AdminVisualizationPage> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/visualization/${page.id}`, { page });
+    const resp = await http.put(`api/admin/visualization/${page.id}`, page);
     const updated = resp.data as AdminVisualizationPage;
     return updated;
 };

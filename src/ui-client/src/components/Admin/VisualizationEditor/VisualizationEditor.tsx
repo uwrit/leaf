@@ -15,7 +15,7 @@ import { CohortState, CohortStateType } from '../../../models/state/CohortState'
 import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
-import { setAdminCurrentVisualizationPageWithDatasetCheck, undoAdminVisualizationPageChange } from '../../../actions/admin/visualization';
+import { saveAdminVisualizationPage, setAdminCurrentVisualizationPageWithDatasetCheck, undoAdminVisualizationPageChange } from '../../../actions/admin/visualization';
 import VisualizationPage from './VisualizationPage/VisualizationPage';
 import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
 import { FiChevronRight } from 'react-icons/fi';
@@ -29,27 +29,84 @@ interface Props {
 
 interface State {
     editing: boolean;
+    previewWidth: number;
     selectedComponentIndex: number;
+    sidebarWidth: number;
 }
 
 export class VisualizationEditor extends React.PureComponent<Props,State> {
     private className = 'visualization-editor';
+
     constructor(props: Props) {
         super(props);
+        const dimensions = this.computePageDimensions();
         this.state = {
             editing: false,
-            selectedComponentIndex: -1
+            previewWidth: dimensions ? dimensions.previewWidth : 800,
+            selectedComponentIndex: -1,
+            sidebarWidth: dimensions ? dimensions.sidebarWidth : 200
         }
+    }
+
+    private computePageDimensions = () => {
+        const sidebar = document.getElementsByClassName('visualization-page-sidebar');
+        const main = document.getElementsByClassName('visualization-editor-main-container');
+
+        if (!sidebar.length || !main.length) return;
+
+        const sidebarWidth = sidebar[0].getClientRects()[0].width;
+        const mainWidth = main[0].getClientRects()[0].width;
+        const previewWidth = mainWidth - sidebarWidth;
+
+        return { sidebarWidth, previewWidth };
+    }
+
+    private updateDimensions = () => {
+        const dimensions = this.computePageDimensions();
+        if (!dimensions) return;
+
+        const { previewWidth, sidebarWidth } = dimensions;
+        this.setState({ previewWidth, sidebarWidth });
+    }
+
+    public componentWillMount() {
+        window.addEventListener('resize', this.updateDimensions);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('resize', this.updateDimensions);
     }
 
     public render() {
         const c = this.className;
         const { cohort, data, dispatch } = this.props;
-        const { selectedComponentIndex, editing } = this.state;
+        const { selectedComponentIndex, editing, previewWidth } = this.state;
         const { visualizations } = data;
         const { currentPage, changed } = visualizations;
         const cohortReady = cohort.count.state === CohortStateType.LOADED;
-        let datasetsLoaded = this.checkDatasetsLoaded();
+        let noCanDo = null;
+
+        /**
+         * Check if visualizations can be generated
+         */
+        if (!cohortReady) {
+            noCanDo = (
+                <p>
+                    <span>
+                        Leaf can't show visualizations because you haven't loaded a cohort. To test or create visualizations,
+                        load a cohort on the Find Patients screen, then return here. Leaf will then be able to generate data you
+                        can create visualizations with
+                    </span>
+                </p>
+            );
+        } else if (cohortReady && !data.visualizations.currentPage) {
+            noCanDo = (
+                <p>
+                    <span>Select a Visualization Page from the left to begin editing or </span>
+                    <span className='link-span'>create one</span>
+                </p>
+            );
+        } 
 
         return (
             <Container fluid={true} className={`${c} admin-panel-editor`}>
@@ -62,7 +119,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChangesClick}>
                         Undo Changes
                     </Button>
-                    <Button className='leaf-button leaf-button-primary' disabled={!changed}>
+                    <Button className='leaf-button leaf-button-primary' disabled={!changed} onClick={this.handleSaveClick}>
                         Save
                     </Button>
                     <Button className='leaf-button leaf-button-primary hide-editor' onClick={this.handleHideEditorClick} disabled={!editing}>
@@ -85,38 +142,23 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     <div className={`${c}-preview-container`}>
 
                         {/* Viz Page */}
-                        {data.visualizations.currentPage && datasetsLoaded &&
+                        {!noCanDo &&
                         <VisualizationPage 
                             adminMode={true}
                             editing={editing}
                             componentClickHandler={this.handlePageComponentClick} 
                             datasets={data.visualizations.datasets}
                             dispatch={dispatch} 
-                            padding={editing ? 250 : 0}
+                            padding={editing ? previewWidth / 4 : 0}
                             page={currentPage} 
+                            width={previewWidth}
                         />
                         }
 
-                        {/* 'Select a Page' fallback */}
-                        {!data.visualizations.currentPage &&
-                        <div className={`${c}-no-page-selected`}>
-                            <p>
-                                <span>Select a Visualization Page from the left to begin editing or </span>
-                                <span className='link-span'>create one</span>
-                            </p>
-                        </div>
-                        }
+                        {/* Else show fall back message */}
+                        {noCanDo &&
+                        <div className={`${c}-nocando`}>{noCanDo}</div>}
 
-                        {/* Dependent datasets not yet loaded and no cohort */}
-                        {!datasetsLoaded && !cohortReady &&
-                        <div className={`${c}-no-cohort`}>
-                            <p>
-                                Leaf can't show visualizations because you haven't loaded a cohort. To test or create visualizations,
-                                load a cohort on the Find Patients screen, then return here. Leaf will then be able to generate data you
-                                can create visualizations with
-                            </p>
-                        </div>
-                        }
                     </div>
 
                     {/* Editor, slides in from right */}
@@ -168,7 +210,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     private checkDatasetsLoaded = (): boolean => {
         const { currentPage, datasets } = this.props.data.visualizations;
 
-        if (currentPage) {
+        if (currentPage && datasets.size) {
             for (const comp of currentPage.components) {
                 for (const dsref of comp.datasetQueryRefs) {
                     const status = datasets.get(dsref.id);
@@ -184,12 +226,21 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     }
 
     private handleSidebarClick = (page: VisualizationPageModel) => {
-        const { data, dispatch } = this.props;
+        const { data, dispatch, cohort } = this.props;
+        const cohortReady = cohort.count.state === CohortStateType.LOADED;
 
         if (data.visualizations.changed) {
             const info: InformationModalState = {
                 body: "Please Save or Undo your changes",
                 header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+            return;
+        } else if (!cohortReady) {
+            const info: InformationModalState = {
+                body: "Please create a cohort on the Find Patients screen to use for Visualization, first.",
+                header: "No Cohort Selected",
                 show: true
             };
             dispatch(showInfoModal(info));
@@ -212,6 +263,11 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     private handleUndoChangesClick = () => {
         const { dispatch } = this.props;
         dispatch(undoAdminVisualizationPageChange());
+    }
+
+    private handleSaveClick = () => {
+        const { dispatch, data } = this.props;
+        dispatch(saveAdminVisualizationPage(data.visualizations.currentPage));
     }
 
     private noOp = (): any => null;

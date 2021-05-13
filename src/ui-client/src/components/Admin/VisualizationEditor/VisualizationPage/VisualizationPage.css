@@ -8,6 +8,7 @@
 .visualization-page {
     overflow-x: hidden;
     overflow-y: auto;
+    padding: 0 !important;
 }
 
 .visualization-component-container {

@@ -6,10 +6,9 @@
  */ 
 
 import React from 'react';
-import { Col, Row } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import { VisualizationDatasetState } from '../../../../models/state/CohortState';
 import { VisualizationPage as VisualizationPageModel } from '../../../../models/visualization/Visualization';
-import computeDimensions from '../../../../utils/computeDimensions';
 import { VisualizationComponent } from './VisualizationComponent';
 import './VisualizationPage.css';
 
@@ -22,43 +21,24 @@ interface Props {
     page: VisualizationPageModel;
     padding?: number;
     selectedComponentIndex?: number;
-}
-
-interface State {
     width: number;
 }
 
-export default class VisualizationPage extends React.PureComponent<Props, State> {
+export default class VisualizationPage extends React.PureComponent<Props> {
     private className = 'visualization-page';
-    private maxWidth = 900;
 
-    constructor(props: Props) {
-        super(props);
-        const dimensions = computeDimensions();
-        this.state = { 
-            width: Math.min(dimensions.contentWidth, this.maxWidth) - (this.props.padding ? this.props.padding : 0)
-        };
-    }
-
-    public updateDimensions = () => {
-        const dimensions = computeDimensions();
-        this.setState({ width: Math.min(dimensions.contentWidth, this.maxWidth) - (this.props.padding ? this.props.padding : 0) });
-    }
-
-    public componentWillMount() {
-        window.addEventListener('resize', this.updateDimensions);
-    }
-
-    public componentWillUnmount() {
-        window.removeEventListener('resize', this.updateDimensions);
+    private getWidth = (id: string): number => {
+        const elem = document.getElementById(`${this.className}-${id}`);
+        if (!elem) return 600;
+        return elem.getClientRects()[0].width - 600;
     }
 
     public render() {
         const c = this.className;
-        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets } = this.props;
-        const { width } = this.state;
+        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets, width, padding } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
         const comps: any[] = [];
+        const pad = padding ? padding : 0;
         let i = 0;
 
         while (i < page.components.length) {
@@ -71,7 +51,7 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
             if (!comp.isFullWidth && nextComp && !nextComp.isFullWidth) {
                 comps.push(
                     <Row> 
-                        <Col md={6}>
+                        <Col md={6} id={`${c}-${comp.id}`}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -79,10 +59,10 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={width}
+                                pageWidth={this.getWidth(comp.id)}
                             />
                         </Col>
-                        <Col md={6}>
+                        <Col md={6} id={`${c}-${comp.id}`}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -90,7 +70,7 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
                                 model={comp}
-                                pageWidth={width}
+                                pageWidth={this.getWidth(comp.id)}
                             />
                         </Col>
                     </Row>
@@ -103,7 +83,7 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
             } else {
                 comps.push(
                     <Row> 
-                        <Col md={12}>
+                        <Col md={12} id={`${c}-${comp.id}`}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -111,7 +91,7 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={width - (this.props.padding ? this.props.padding : 0)}
+                                pageWidth={this.getWidth(comp.id)}
                             />
                         </Col>
                     </Row>
@@ -121,8 +101,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
         }
 
         return (
-            <div className={c}>
+            <Container fluid={true} className={c}>
                 {comps}
-            </div>);
+            </Container>);
     }
 }

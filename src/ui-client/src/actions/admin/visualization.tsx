@@ -12,7 +12,7 @@ import {
     createAdminVisualiationPage, 
     updateAdminVisualiationPage, 
     deleteAdminVisualizationPage
-} from "../../services/admin/visualiationApi";
+} from "../../services/admin/visualizationApi";
 import { AdminVisualizationPage } from "../../models/admin/Visualization";
 import { VisualizationDatasetQueryRef, VisualizationPage } from "../../models/visualization/Visualization";
 import { CohortStateType } from "../../models/state/CohortState";
@@ -169,6 +169,8 @@ export const saveAdminVisualizationPage = (page: AdminVisualizationPage) => {
 
             dispatch(removeAdminVisualizationPage(page));
             dispatch(setAdminVisualizationPage(newPage));
+            dispatch(setAdminCurrentVisualizationPage(newPage, false));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Visualization Saved' }));
         } catch (err) {
             console.log(err);
             const info: InformationModalState = {

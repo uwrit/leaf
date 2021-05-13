@@ -20,4 +20,4 @@ export default function computeDimensions(): Dimensions {
     dim.height = window.innerHeight - header.getClientRects()[0].height;
     dim.contentWidth = window.innerWidth - dim.sidebarWidth;
     return dim;
-}
+};

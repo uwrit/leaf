@@ -83,8 +83,8 @@ namespace API.Controllers.Admin
                 {
                     dto.Id = id;
                 }
-                var query = dto.AdminVisualizationPage();
-                var updated = await manager.UpdateDatasetQueryAsync(query);
+                var page = dto.AdminVisualizationPage();
+                var updated = await manager.UpdateDatasetQueryAsync(page);
                 return Ok(updated.AdminVisualizationPageDTO());
             }
             catch (LeafRPCException le)

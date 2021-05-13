@@ -145,7 +145,10 @@ const getDemographics = () => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
         const responders: NetworkIdentity[] = [];
+        const timeDiffUpdateThresholdMs = 1500;
+        let lastUpdateTime = Date.now();
         let atLeastOneSucceeded = false;
+        let updateDeferred = false;
         state.responders.forEach((nr: NetworkIdentity) => { 
             if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED && !nr.isGateway) { 
                 responders.push(nr); 
@@ -174,7 +177,18 @@ const getDemographics = () => {
 
                                 const newState = getState();
                                 const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.responders) as DemographicStatistics;
-                                dispatch(setAggregateVisualizationData(aggregate));
+
+                                /**
+                                 * Recharts occasionally will throw a resursive update error if new data are added
+                                 * while the charts are in transition, so defer updates if last done in the past half second
+                                 * Issue: https://github.com/uwrit/leaf/issues/382
+                                 */
+                                if (Date.now() - lastUpdateTime > timeDiffUpdateThresholdMs) {
+                                    lastUpdateTime = Date.now();
+                                    dispatch(setAggregateVisualizationData(aggregate));
+                                } else {
+                                    updateDeferred = true;
+                                }
                         },  error => {
                             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
                             dispatch(errorNetworkCohortDemographics(nr.id, error.response));
@@ -182,9 +196,17 @@ const getDemographics = () => {
                         .then(() => resolve(null));
                 })
             })                
-        ).then(() => {
+        ).then( async () => {
             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
             if (atLeastOneSucceeded) {
+                /**
+                 * If updates were deferred, finalize all results now
+                 */
+                if (updateDeferred) {
+                    const newState = getState();
+                    const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.responders) as DemographicStatistics;
+                    dispatch(setAggregateVisualizationData(aggregate));
+                }
                 dispatch(setCohortDemographicsFinished());
             } else {
                 dispatch(setCohortDemographicsErrored());
@@ -192,6 +214,7 @@ const getDemographics = () => {
         });
     };
 };
+
 
 // Synchronous
 export const getDemographicsIfNeeded = () => {

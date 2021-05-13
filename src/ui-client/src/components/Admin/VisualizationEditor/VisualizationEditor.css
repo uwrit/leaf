@@ -41,8 +41,9 @@
 
 /* Main */
 .visualization-editor-main-container {
+    align-items: stretch;
+    display: flex;
     padding: 0 0 0 20px;
-    width: 101%;
 }
 
 .visualization-editor-main-container.emphasis-right .visualization-page-sidebar,
@@ -61,7 +62,7 @@
     
 }
 
-.visualization-editor-no-page-selected {
+.visualization-editor-nocando {
     border-radius: 8px;
     color: rgb(50,50,50);
     font-family: Roboto;
@@ -77,21 +78,22 @@
     width: 450px;
 }
 
-.visualization-editor-no-page-selected {
+.visualization-editor-nocando {
     background-color: rgba(28, 170, 221, 0.05);
     border: 2px dashed rgba(28, 170, 221, 0.699);
 }
 
-.visualization-editor-no-page-selected a {
+.visualization-editor-nocando a {
     color: rgb(0, 130, 177) !important;
     cursor: pointer;
 }
 
-.visualization-editor-no-page-selected a:hover {
+.visualization-editor-nocando a:hover {
     text-decoration: underline !important;
 }
 
 /* Preview */
 .visualization-editor-preview-container {
     display: inline-block;
+    flex: 1;
 }

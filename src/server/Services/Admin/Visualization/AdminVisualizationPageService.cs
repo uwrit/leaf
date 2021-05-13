@@ -56,6 +56,7 @@ namespace Services.Admin.Compiler
                     new
                     {
                         name = page.PageName,
+                        categoryid = page.CategoryId,
                         description = page.PageDescription,
                         orderid = page.OrderId,
                         constraints = ResourceConstraintTable.From(page),
@@ -80,7 +81,7 @@ namespace Services.Admin.Compiler
                             jsonSpec = comp.JsonSpec,
                             isFullWidth = comp.IsFullWidth,
                             orderId = comp.OrderId,
-                            datasets = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
+                            datasetids = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
                             user = user.UUID
 
                         },
@@ -107,6 +108,7 @@ namespace Services.Admin.Compiler
                     {
                         id = page.Id,
                         name = page.PageName,
+                        categoryid = page.CategoryId,
                         description = page.PageDescription,
                         orderid = page.OrderId,
                         constraints = ResourceConstraintTable.From(page),
@@ -131,7 +133,7 @@ namespace Services.Admin.Compiler
                             jsonSpec = comp.JsonSpec,
                             isFullWidth = comp.IsFullWidth,
                             orderId = comp.OrderId,
-                            datasets = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
+                            datasetids = ResourceIdTable.From(comp.DatasetQueryRefs.Select(r => r.Id)),
                             user = user.UUID
 
                         },
@@ -176,6 +178,7 @@ namespace Services.Admin.Compiler
             public Guid? Id { get; set; }
             public string PageName { get; set; }
             public string PageDescription { get; set; }
+            public Guid? CategoryId { get; set; }
             public int OrderId { get; set; }
             public DateTime Created { get; set; }
             public string CreatedBy { get; set; }
@@ -284,10 +287,16 @@ namespace Services.Admin.Compiler
 
                 return new AdminVisualizationPage
                 {
+                    Id = (Guid)pageRec.Id,
                     PageName = pageRec.PageName,
+                    CategoryId = pageRec.CategoryId,
                     PageDescription = pageRec.PageDescription,
                     OrderId = pageRec.OrderId,
-                    Constraints = consRecs.Select(c => c.Constraint())
+                    Constraints = consRecs.Select(c => c.Constraint()),
+                    Created = pageRec.Created,
+                    CreatedBy = pageRec.CreatedBy,
+                    Updated = pageRec.Updated,
+                    UpdatedBy = pageRec.UpdatedBy
                 };
             }
 
@@ -300,6 +309,7 @@ namespace Services.Admin.Compiler
 
                 return new AdminVisualizationComponent
                 {
+                    Id = compRec.Id,
                     Header = compRec.Header,
                     SubHeader = compRec.SubHeader,
                     JsonSpec = compRec.JsonSpec,

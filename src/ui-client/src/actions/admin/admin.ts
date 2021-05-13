@@ -17,7 +17,7 @@ import { getPanelFilters } from "../../services/admin/panelFilterApi";
 import { getGlobalPanelFilters } from "../../services/admin/globalPanelFilterApi";
 import { setAdminPanelFilters } from "./panelFilter";
 import { setAdminGlobalPanelFilters } from "./globalPanelFilter";
-import { getAdminVisualizationPages } from "../../services/admin/visualiationApi";
+import { getAdminVisualizationPages } from "../../services/admin/visualizationApi";
 import { setAdminVisualizationPages } from "./visualization";
 import { getVisualizationCategories } from "../../services/admin/visualizationCategoryApi";
 import { setAdminVisualizationCategories } from "./visualizationCategory";
