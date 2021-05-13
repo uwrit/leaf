@@ -97,3 +97,10 @@ export interface VisualizationState {
     demographics: DemographicStatistics;
     state: CohortStateType;
 }
+
+export interface VisualizationDatasetState {
+    id: string;
+    state: CohortStateType;
+    networkState: Map<string, CohortStateType>;
+    data: any[];
+}

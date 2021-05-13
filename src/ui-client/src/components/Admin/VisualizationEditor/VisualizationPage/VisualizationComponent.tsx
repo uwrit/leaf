@@ -7,15 +7,17 @@
 
 import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import { Col, Row } from 'reactstrap';
+import { VisualizationDatasetState } from '../../../../models/state/CohortState';
 import { VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
 import { SectionHeader } from '../../../Other/SectionHeader/SectionHeader';
 
 interface Props {
     adminMode?: boolean;
-    clickHandler: (comp: VisualizationComponentModel) => any;
-    data: VisualizationComponentModel;
+    clickHandler: () => any;
+    datasets: Map<string, VisualizationDatasetState>;
     isSelected?: boolean;
+    model: VisualizationComponentModel;
+    pageWidth: number;
 }
 
 interface ErrorBoundaryState {
@@ -41,13 +43,13 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
     }
 
     public render() {
-        const { adminMode, isSelected, clickHandler, data } = this.props;
+        const { adminMode, isSelected, clickHandler } = this.props;
         const c = this.classname;
         const classes = [ c, isSelected ? 'selected' : '', adminMode ? 'clickable' : '' ].join(' ');
         const err = this.state.errored;
 
         return (
-            <div className={classes} onClick={clickHandler.bind(null, data)}>
+            <div className={classes} onClick={clickHandler.bind(null)}>
                 {!err &&
                 <VisualizationComponentInternal {...this.props} />
                 }
@@ -70,7 +72,101 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { data } = this.props;
+        const { adminMode, model } = this.props;
+
+        const spec = this.getSpec();
+        const data = this.getData();
+
+        return (
+            <div className={c}>
+                <SectionHeader headerText={model.header} subText={model.subHeader} />
+
+                {/* Visualization */}
+                {spec &&
+                <div className={c}>
+                    <VegaLite spec={spec as VisualizationSpec} data={data}/>
+                </div>
+                }
+
+                {/* Invalid spec fallback */}
+                {!spec &&
+                <div className={`${c}-invalid`}>
+                    <p>
+                        {adminMode && "It looks like your Vega .json object has invalid syntax!"}
+                        {!adminMode && "A problem occurred while generating the Leaf visualization. Please contact your Leaf administrator"}
+                    </p>
+                </div>
+                }
+            </div>
+        );
+    }
+
+    private getSpec = () => {
+        const { model, pageWidth } = this.props;
+        const { jsonSpec, datasetQueryRefs } = model;
+        const defaultWidth = model.isFullWidth ? pageWidth : pageWidth / 2;
+
+        /**
+         * Generate base spec (literally just `$schema` & `data`)
+         */
+        const leafGeneratedSpec: any = {
+            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+            data: datasetQueryRefs.length > 1
+                ? datasetQueryRefs.map(dsref => ({ name: dsref.name }))
+                : { name: datasetQueryRefs.length ? datasetQueryRefs[0].name : '' }
+        };
+        const userSpec = this.parseJson(jsonSpec);
+        if (!userSpec) return;
+
+        /**
+         * Merge Leaf-generated & user spec 
+         */ 
+        const merged = {
+            ...leafGeneratedSpec,
+            ...userSpec
+        };
+
+        /**
+         * Compute width. User-defined width is used if available
+         * and less than allowed maximum
+         */
+        merged.width = typeof merged['width'] === 'undefined'
+            ? defaultWidth
+            : Math.min(merged.width, defaultWidth)
+
+        return merged;
+    }
+
+    /** 
+     * Transform user json string to object w/ validity check
+     * Code adapted from https://stackoverflow.com/a/20392392
+     */ 
+    private parseJson = (json: string) => {
+        try {
+            const o = JSON.parse(json);
+            if (o && typeof o === "object") return o;
+        } catch (e) { }
+        return false;
+    }
+
+    private getData = () => {
+        const { model, datasets } = this.props;
+        const dataObj: any = {};
+
+        for (const dsref of model.datasetQueryRefs) {
+            const dataset = datasets.get(dsref.id);
+            if (dataset) {
+                //dataObj["values"] = this.dummyData();
+                dataObj[dsref.name] = dataset.data;
+            }
+        }
+        
+        return dataObj;
+    }
+
+    public demorender() {
+        const c = this.className;
+        const { model } = this.props;
 
         const spec = {
             width: 800,
@@ -126,24 +222,30 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
             }
         } as any;
 
-        const d = { "values": [
+        const data = { "values": [
             {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
             {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
             {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
             ]
-        }
-        
+        };
+
+        console.log('dummy', spec, data);
+        return;
         return (
             <div className={c}>
-                <Row>
-                    <Col md={data.isFullWidth ? 12 : 6}>
-                        <SectionHeader headerText={data.header} />
-                        <div className={c}>
-                            <VegaLite spec={spec as VisualizationSpec} data={d}/>
-                        </div>
-                    </Col>
-                </Row>
+                <SectionHeader headerText={model.header} subText={model.subHeader} />
+                <div className={c}>
+                    <VegaLite spec={spec as VisualizationSpec} data={data}/>
+                </div>
             </div>
         );
+    }
+
+    private dummyData = () => {
+        return [
+            {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
+            {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
+            {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
+        ];
     }
 }

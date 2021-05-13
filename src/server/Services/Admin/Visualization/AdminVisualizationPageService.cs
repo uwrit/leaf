@@ -251,6 +251,7 @@ namespace Services.Admin.Compiler
                         Constraints = consRecs.Where(con => con.VisualizationPageId == page.Id).Select(con => con.Constraint()),
                         Components = compsJoin.Select(comp => new AdminVisualizationComponent
                         {
+                            Id = comp.Component.Id,
                             Header = comp.Component.Header,
                             SubHeader = comp.Component.SubHeader,
                             JsonSpec = comp.Component.JsonSpec,

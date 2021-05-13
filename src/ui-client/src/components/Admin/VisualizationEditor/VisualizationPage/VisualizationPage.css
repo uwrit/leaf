@@ -6,6 +6,7 @@
  */ 
 
 .visualization-page {
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
@@ -22,5 +23,11 @@
 }
 
 .visualization-component {
-    
+    overflow: hidden;
+    padding: 20px;
+}
+
+/* Vega overrides */
+.vega-embed summary {
+    z-index: 100 !important;
 }

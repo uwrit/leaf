@@ -5,16 +5,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.visualization-spec-editor-container {
+.visualization-spec-editor {
     background-color: rgb(240,240,240);
-    bottom: 0;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 -4px 10px 0px;
-    height: 300px;
+    height: calc(100vh - 55px - 84px);
     overflow-y: auto;
-    position: fixed;
-    width: 100%;
+    padding: 20px 0 75px 20px;
 }
 
-.visualization-spec-editor {
-    
+.visualization-spec-editor .leaf-button {
+    margin-bottom: 10px;
+}
+
+.visualization-spec-editor .leaf-button svg {
+    margin: 0 4px -2px 0;
+    transform: scaleX(1.8) scaleY(1.8);
+}
+
+.visualization-spec-editor .admin-panel-checkbox {
+    padding: 0 0 0 15px;
+}
+
+.visualization-spec-editor .checkbox-slider-container {
+    padding-right: 20px;
 }

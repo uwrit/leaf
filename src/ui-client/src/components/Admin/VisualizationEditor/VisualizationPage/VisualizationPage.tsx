@@ -6,42 +6,122 @@
  */ 
 
 import React from 'react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
 import { Col, Row } from 'reactstrap';
-import { VisualizationPage as VisualizationPageModel, VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
+import { VisualizationDatasetState } from '../../../../models/state/CohortState';
+import { VisualizationPage as VisualizationPageModel } from '../../../../models/visualization/Visualization';
+import computeDimensions from '../../../../utils/computeDimensions';
 import { VisualizationComponent } from './VisualizationComponent';
 import './VisualizationPage.css';
 
 interface Props {
     adminMode?: boolean;
-    currentComponent?: VisualizationComponentModel;
-    componentClickHandler: (comp: VisualizationComponentModel) => any;
+    datasets: Map<string, VisualizationDatasetState>;
+    selectedComponentIndex?: number;
+    componentClickHandler: (compIdx: number) => any;
     page: VisualizationPageModel;
     dispatch: any;
 }
 
-export default class VisualizationPage extends React.PureComponent<Props> {
+interface State {
+    width: number;
+}
+
+export default class VisualizationPage extends React.PureComponent<Props, State> {
     private className = 'visualization-page';
+    private maxWidth = 800;
+    private padding = 200;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = { 
+            width: this.maxWidth
+        };
+    }
+
+    public updateDimensions = () => {
+        const dimensions = computeDimensions();
+        this.setState({ width: Math.min(dimensions.contentWidth, this.maxWidth) - this.padding });
+    }
+
+    public componentWillMount() {
+        window.addEventListener('resize', this.updateDimensions);
+    }
+
+    public componentWillUnmount() {
+        window.removeEventListener('resize', this.updateDimensions);
+    }
+
 
     public render() {
         const c = this.className;
-        const { page, adminMode, currentComponent, componentClickHandler } = this.props;
+        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets } = this.props;
+        const { width } = this.state;
+        const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
+        const comps: any[] = [];
+        let i = 0;
 
+        while (i < page.components.length) {
+            const nextComp = i <= page.components.length-1 ? page.components[i+1] : undefined;
+            const comp = page.components[i];
+
+            /**
+             * If half-width & the following component is also half, add into single row
+             */
+            if (!comp.isFullWidth && nextComp && !nextComp.isFullWidth) {
+                comps.push(
+                    <div> 
+                        <div>
+                            <VisualizationComponent 
+                                key={comp.id} 
+                                adminMode={adminMode}
+                                clickHandler={componentClickHandler.bind(null, i)} 
+                                datasets={datasets}
+                                isSelected={checkSelected && selectedComponentIndex === i}
+                                model={comp}
+                                pageWidth={width}
+                            />
+                        </div>
+                        <div>
+                            <VisualizationComponent 
+                                key={comp.id} 
+                                adminMode={adminMode}
+                                clickHandler={componentClickHandler.bind(null, i+1)} 
+                                datasets={datasets}
+                                isSelected={checkSelected && selectedComponentIndex === i+1}
+                                model={comp}
+                                pageWidth={width}
+                            />
+                        </div>
+                    </div>
+                );
+                i += 2;
+
+            /**
+             * Else add just this component into a row
+             */
+            } else {
+                comps.push(
+                    <div> 
+                        <div>
+                            <VisualizationComponent 
+                                key={comp.id} 
+                                adminMode={adminMode}
+                                clickHandler={componentClickHandler.bind(null, i)} 
+                                datasets={datasets}
+                                isSelected={checkSelected && selectedComponentIndex === i}
+                                model={comp}
+                                pageWidth={width}
+                            />
+                        </div>
+                    </div>
+                );
+                i++;
+            }
+        }
 
         return (
             <div className={c}>
-                {page.components.map(comp => {
-                    return (
-                        <VisualizationComponent 
-                            key={comp.id} 
-                            adminMode={adminMode}
-                            clickHandler={componentClickHandler} 
-                            data={comp}
-                            isSelected={adminMode && currentComponent && currentComponent === comp}
-                        />
-                    )})
-                }
+                {comps}
             </div>);
-        
     }
 }

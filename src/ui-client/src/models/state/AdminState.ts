@@ -17,7 +17,7 @@ import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
-import { CohortStateType } from '../state/CohortState';
+import { VisualizationDatasetState } from '../state/CohortState';
 import { AdminVisualizationCategory, AdminVisualizationPage } from '../admin/Visualization';
 
 
@@ -64,12 +64,7 @@ export interface AdminVisualizationCategoryState {
     uneditedCategory?: AdminVisualizationCategory;
 }
 
-export interface AdminVisualizationDatasetState {
-    id: string;
-    state: CohortStateType;
-    networkState: Map<string, CohortStateType>;
-    data: any[];
-}
+export interface AdminVisualizationDatasetState extends VisualizationDatasetState { }
 
 export interface AdminConceptEventState {
     changed: boolean;

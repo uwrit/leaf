@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2021, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,19 +6,18 @@
  */ 
 
 import React from 'react';
-import { Container, Row, Col, Button } from 'reactstrap';
+import { Container, Row, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
-import { VegaLite } from 'react-vega'
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
 import VisualizationPageSidebar from './VisualizationPageSidebar/VisualizationPageSidebar';
-import { AdminVisualizationComponent } from '../../../models/admin/Visualization';
 import VisualizationSpecEditor from './VisualizationSpecEditor/VisualizationSpecEditor';
 import { CohortState, CohortStateType } from '../../../models/state/CohortState';
-import { VisualizationComponent, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
+import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
 import { setAdminCurrentVisualizationPageWithDatasetCheck } from '../../../actions/admin/visualization';
 import VisualizationPage from './VisualizationPage/VisualizationPage';
+import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -28,7 +27,8 @@ interface Props {
 }
 
 interface State {
-    selectedComponent?: AdminVisualizationComponent;
+    editing: boolean;
+    selectedComponentIndex: number;
 }
 
 export class VisualizationEditor extends React.PureComponent<Props,State> {
@@ -36,39 +36,19 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            editing: false,
+            selectedComponentIndex: -1
         }
     }
 
     public render() {
         const c = this.className;
         const { cohort, data, dispatch } = this.props;
-        const { selectedComponent } = this.state;
+        const { selectedComponentIndex, editing } = this.state;
         const { visualizations } = data;
-        const { currentPage, changed, datasets } = visualizations;
+        const { currentPage, changed } = visualizations;
         const cohortReady = cohort.count.state === CohortStateType.LOADED;
-        let spec: any = null;
-        let datasetsLoaded = true;
-
-
-        if (currentPage && selectedComponent) {
-            spec = {
-                data: [
-                    selectedComponent.datasetQueryRefs.map(dsid => ({ name: dsid }))
-                ]
-            }
-        }
-
-        if (currentPage) {
-            for (const comp of currentPage.components) {
-                for (const dsref of comp.datasetQueryRefs) {
-                    const status = datasets.get(dsref.id);
-                    if (!status || status.state !== CohortStateType.LOADED) {
-                        datasetsLoaded = false;
-                        break;
-                    }
-                }
-            }
-        }
+        let datasetsLoaded = this.checkDatasetsLoaded();
 
         return (
             <Container fluid={true} className={`${c} admin-panel-editor`}>
@@ -92,20 +72,22 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     />
                 </div>
 
-                <Row>
+                <Row className={this.getClasses().join(' ')}>
 
                     {/* Sidebar */}
-                    <Col md={2}>
-                        <VisualizationPageSidebar pages={visualizations.pages} clickHandler={this.sidebarClickHandler} />
-                    </Col>
+                    <div className={`${c}-sidebar-container`}>
+                        <VisualizationPageSidebar pages={visualizations.pages} clickHandler={this.handleSidebarClick} />
+                    </div>
 
                     {/* Preview */}
-                    <Col md={10}>
+                    <div className={`${c}-preview-container`}>
+
                         {/* Viz Page */}
                         {data.visualizations.currentPage && datasetsLoaded &&
                         <VisualizationPage 
                             adminMode={true}
                             componentClickHandler={this.handlePageComponentClick} 
+                            datasets={data.visualizations.datasets}
                             dispatch={dispatch} 
                             page={currentPage} 
                         />
@@ -131,25 +113,73 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                             </p>
                         </div>
                         }
-                    </Col>
+                    </div>
 
-                    {/* Editor */}
-                    <Col md={10}>
-
-                        <VisualizationSpecEditor 
-                            currentPage={currentPage} 
-                            currentComponent={selectedComponent} 
+                    {/* Editor, slides in from right */}
+                    <DirectionalSlider
+                        show={editing}
+                        from={Direction.Right}
+                        overlay={false}
+                        toggle={this.noOp}>
+                        <VisualizationSpecEditor
+                            hideEditorClickHandler={this.handleHideEditorClick}
+                            page={currentPage} 
+                            componentIndex={selectedComponentIndex} 
                             dispatch={dispatch} 
                         />
-                        
-                    </Col>
+                    </DirectionalSlider>
 
                 </Row>
 
-            </Container>);
+            </Container>
+        );
     }
 
-    private sidebarClickHandler = (page: VisualizationPageModel) => {
+    private getClasses = (): string[] => {
+        const { editing, selectedComponentIndex } = this.state;
+        const { currentPage } = this.props.data.visualizations;
+        const classes = [ `${this.className}-main-container scrollable-offset-by-header` ];
+
+        if (editing && selectedComponentIndex > -1) {
+            const comp = currentPage.components[selectedComponentIndex];
+            const prevComp = selectedComponentIndex > 0 ? currentPage.components[selectedComponentIndex-1] : undefined;
+            const nextComp = selectedComponentIndex < currentPage.components.length-1 ? currentPage.components[selectedComponentIndex+1] : undefined;
+
+            // If full-width, focus on right side
+            if (comp.isFullWidth) {
+                classes.push('emphasis-right');
+
+            // Else if preceding or following is full width, focus on left
+            } else if ((prevComp && prevComp.isFullWidth) || (nextComp && nextComp.isFullWidth)) {
+                classes.push('emphasis-left');
+            
+            } else {
+                classes.push('emphasis-right');
+            }
+        }
+
+        return classes;
+    }
+
+    private checkDatasetsLoaded = (): boolean => {
+        const { currentPage, datasets } = this.props.data.visualizations;
+
+        if (currentPage) {
+            for (const comp of currentPage.components) {
+                for (const dsref of comp.datasetQueryRefs) {
+                    const status = datasets.get(dsref.id);
+                    if (!status || status.state !== CohortStateType.LOADED) {
+                        return false;
+                    }
+                }
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+
+    private handleSidebarClick = (page: VisualizationPageModel) => {
         const { data, dispatch } = this.props;
 
         if (data.visualizations.changed) {
@@ -159,85 +189,21 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                 show: true
             };
             dispatch(showInfoModal(info));
+            return;
         }
 
         const adminPage = data.visualizations.pages.get(page.id);
-        this.setState({ selectedComponent: undefined });
+        this.setState({ selectedComponentIndex: -1, editing: false });
         dispatch(setAdminCurrentVisualizationPageWithDatasetCheck(adminPage));
     }
 
-    private handlePageComponentClick = (selectedComponent: VisualizationComponent) => {
-        this.setState({ selectedComponent });
+    private handlePageComponentClick = (selectedComponentIndex: number) => {
+        this.setState({ selectedComponentIndex, editing: true });
     }
-    
-    public demorender() {
-        const c = this.className;
 
-        const spec = {
-            width: 800,
-            height: 400,
-            "data": {
-                "name": "values"
-            },
-            "params": [
-                {
-                    "name": "highlight",
-                    "select": { "type": "point", "on": "mouseover" }
-                },
-                { "name": "select", "select": "point" },
-                {
-                    "name": "cornerRadius", "value": 0,
-                    "bind": { "input": "range", "min": 0, "max": 50, "step": 1 }
-                }
-            ],
-            "mark": {
-                "type": "bar",
-                "fill": "#4C78A8",
-                "stroke": "black",
-                "cursor": "pointer",
-                "cornerRadius": { "expr": "cornerRadius" }
-            },
-            "encoding": {
-                "x": { "field": "a", "type": "ordinal" },
-                "y": { "field": "b", "type": "quantitative" },
-                "fillOpacity": {
-                    "condition": { "param": "select", "value": 1 },
-                    "value": 0.3
-                },
-                "strokeWidth": {
-                    "condition": [
-                        {
-                            "param": "select",
-                            "empty": false,
-                            "value": 2
-                        },
-                        {
-                            "param": "highlight",
-                            "empty": false,
-                            "value": 1
-                        }
-                    ],
-                    "value": 0
-                }
-            },
-            "config": {
-                "scale": {
-                    "bandPaddingInner": 0.2
-                }
-            }
-        } as any;
-    
-        const data = { "values": [
-            {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
-            {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
-            {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
-            ]
-        }
-
-        return (
-            <div className={c}>
-                <VegaLite spec={spec} data={data}/>
-            </div>
-        );
+    private handleHideEditorClick = () => {
+        this.setState({ editing: false });
     }
+
+    private noOp = (): any => null;
 }
