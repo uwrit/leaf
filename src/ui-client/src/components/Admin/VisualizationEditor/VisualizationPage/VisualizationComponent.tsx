@@ -73,8 +73,8 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         const c = this.className;
         const { adminMode, model, isSelected } = this.props;
 
+        if (!model.datasetQueryRefs.length) return null;
         const spec = this.getSpec();
-        const data = this.getData();
 
         return (
             <div className={`${c} ${adminMode ? 'selectable' : ''} ${isSelected ? 'selected' : ''}`}>
@@ -83,7 +83,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
                 {/* Visualization */}
                 {spec &&
                 <div className={c}>
-                    <VegaLite spec={spec as VisualizationSpec} data={data} renderer="svg"/>
+                    <VegaLite spec={spec as VisualizationSpec} renderer="svg"/>
                 </div>
                 }
 
@@ -105,18 +105,20 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         const { jsonSpec, datasetQueryRefs } = model;
         const defaultWidth = model.isFullWidth ? pageWidth : pageWidth / 2;
 
-        /**
-         * Generate base spec (literally just `$schema` & `data`)
-         */
-        const leafGeneratedSpec: any = {
-            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-            data: { name: datasetQueryRefs.map(dsref => dsref.name )}
-        };
         const userSpec = this.parseJson(jsonSpec);
         if (!userSpec) return;
 
         /**
-         * Merge Leaf-generated & user spec 
+         * Generate base spec (literally just `$schema` & `data`)
+         */
+        const leafGeneratedSpec: any = {
+            datasets: this.getDatasets(), 
+            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+            data: { name: datasetQueryRefs[0].name }
+        };
+
+        /**
+         * Merge Leaf-generated & user spec, user settings override defaults
          */ 
         const merged = {
             ...leafGeneratedSpec,
@@ -146,7 +148,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         return false;
     }
 
-    private getData = () => {
+    private getDatasets = () => {
         const { model, datasets } = this.props;
         const dataObj: any = {};
 

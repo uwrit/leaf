@@ -113,7 +113,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                         <AceEditor
                         className={`${c}-leaf-json`}
                         editorProps={{ $blockScrolling: Infinity }}
-                        height="70px"
+                        height="82px"
                         width="100%"
                         mode="json"
                         theme="iplastic"
@@ -170,10 +170,10 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
         const leafGeneratedSpec = 
 `{
-    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-    "data": { "name": [ ${datasetQueryRefs.map(dsref => '"' + dsref.name + '"' )} ] }
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "datasets": { ${datasetQueryRefs.map(dsref => '"' + dsref.name + '": [...]' ).join(', ')} },
+  "data": { "name": "${datasetQueryRefs[0].name}" }
 }`;
-
         return leafGeneratedSpec;
     }
 
@@ -195,5 +195,5 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         newPage.components[componentIndex] = newComp;
         newPage.components = newPage.components.slice();
         dispatch(setAdminCurrentVisualizationPage(newPage, true));
-    }, 500)
+    }, 1000)
 }
