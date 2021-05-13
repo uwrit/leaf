@@ -6,20 +6,11 @@
  */ 
 
 .visualization-spec-editor {
-    background-color: rgb(240,240,240);
+    background-color: rgb(245,245,245);
     height: calc(100vh - 55px - 84px);
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 20px 0 75px 20px;
-}
-
-.visualization-spec-editor .leaf-button {
-    margin-bottom: 10px;
-}
-
-.visualization-spec-editor .leaf-button svg {
-    margin: 0 4px -2px 0;
-    transform: scaleX(1.8) scaleY(1.8);
+    padding: 0 0 75px 20px;
 }
 
 .visualization-spec-editor .admin-panel-checkbox {
@@ -28,4 +19,65 @@
 
 .visualization-spec-editor .checkbox-slider-container {
     padding-right: 20px;
+}
+
+.visualization-editor .directional-slider-body {
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 20px 20px 0px;
+    margin-top: -4px;
+    z-index: 101;
+}
+
+.visualization-spec-editor-leaf-json .ace_bracket {
+    display: none;
+}
+
+.visualization-spec-editor .ace_editor {
+    border-radius: 4px !important;
+}
+
+/* Datasets */
+.visualization-spec-editor-datasetqueryref {
+    border-bottom: 1px solid rgb(230,230,230);
+    padding: 0 8px 8px 8px;
+}
+
+.visualization-spec-editor-datasetqueryref > div {
+    display: inline-block;
+}
+
+.visualization-spec-editor-datasetqueryref-name {
+    background-color: rgb(13, 195, 106);
+    border-radius: 4px;
+    color: white;
+    cursor: help;
+    padding: 4px;
+    transition: background-color 0.5s;
+}
+
+.visualization-spec-editor-datasetqueryref-name:hover {
+    background-color: rgb(12, 168, 93) !important;
+}
+
+.visualization-spec-editor-datasetqueryref-delete {
+    border-radius: 8px;
+    color: rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    float: right;
+    padding: 4px;
+}
+
+.visualization-spec-editor-datasetqueryref-delete:hover {
+    background-color: rgba(244, 67, 54, 0.08);
+    border-radius: 8px;
+    color: rgb(244, 67, 54);
+}
+
+.visualization-spec-editor-datasets-addnew {
+    color: rgb(13, 195, 106);
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.visualization-spec-editor-datasets-addnew:hover {
+    text-decoration: underline;
 }

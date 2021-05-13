@@ -55,7 +55,6 @@ export interface AdminVisualizationState {
     datasets: Map<string, AdminVisualizationDatasetState>;
     pages: Map<string, AdminVisualizationPage>;
     selectedId?: string;
-    uneditedPage?: AdminVisualizationPage;
 }
 
 export interface AdminVisualizationCategoryState {

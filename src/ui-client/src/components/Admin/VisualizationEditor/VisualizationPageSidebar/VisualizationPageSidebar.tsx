@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { VisualizationPage } from '../../../../models/visualization/Visualization';
+import './VisualizationPageSidebar.css';
 
 interface Props { 
     clickHandler: (page: VisualizationPage) => any;

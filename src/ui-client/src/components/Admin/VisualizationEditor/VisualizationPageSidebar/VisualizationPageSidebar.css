@@ -1,0 +1,37 @@
+/* Copyright (c) 2021, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+
+/* Sidebar */
+.visualization-page-sidebar {
+    border-right: 1px solid rgb(238,238,238);
+    display: inline-block;
+    height: calc(100vh - 55px - 84px);
+    margin-right: 20px;
+    opacity: 1;
+    padding: 10px 0 0 0;
+    transition: all 0.5s;
+    width: 200px;
+}
+
+.visualization-page-sidebar-inner {
+    padding-left: 6px;
+    list-style-type: none;
+}
+
+.visualization-page-sidebar-item {
+    cursor: pointer;
+}
+
+.visualization-page-sidebar-item:hover,
+.visualization-page-sidebar-item.selected {
+    color: rgb(28,168,221);
+}
+
+.visualization-page-sidebar-item:hover {
+    text-decoration: underline;
+}

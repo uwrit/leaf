@@ -9,19 +9,18 @@ import React from 'react';
 import { AdminVisualizationPage } from '../../../../models/admin/Visualization';
 import { setAdminCurrentVisualizationPage } from '../../../../actions/admin/visualization';
 import { Section } from '../../Section/Section';
-import { Button, Col, Container, Row } from 'reactstrap';
-import { FiChevronRight } from 'react-icons/fi';
+import { Col, Row } from 'reactstrap';
+import { debounce } from 'lodash';
 import 'ace-builds'
 import 'ace-builds/webpack-resolver'
 import 'ace-builds/src-noconflict/mode-json';
-import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/theme-iplastic';
 import AceEditor from 'react-ace'; 
 import { TextArea } from '../../Section/TextArea';
 import { Checkbox } from '../../Section/Checkbox';
 import './VisualizationSpecEditor.css';
 
 interface Props { 
-    hideEditorClickHandler: () => any;
     page?: AdminVisualizationPage;
     componentIndex: number;
     dispatch: any;
@@ -32,7 +31,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
     public render() {
         const c = this.className;
-        const { componentIndex, page, hideEditorClickHandler } = this.props;
+        const { componentIndex, page } = this.props;
 
         if (componentIndex === -1 || componentIndex > page.components.length-1) {
             return (
@@ -45,23 +44,6 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
         return (
             <div className={c}>
-
-                <Button className='leaf-button leaf-button-secondary' onClick={hideEditorClickHandler}>
-                    <span><FiChevronRight/></span>
-                    <span>Hide Editor</span>
-                </Button>
-
-                <Section header='Page Display'>
-                    <Row>
-                        <Col md={12}>
-                        <TextArea
-                            changeHandler={this.handlePageNameChange} propName={'name'} value={page.pageName}
-                            label='Page Name' required={true} subLabel='Name of this Visualization Page. This is the text that is displayed in the left sidebar' 
-                            locked={false} forceValidation={false} errorText='Enter a Name'
-                        />
-                        </Col>
-                    </Row>
-                </Section>
 
                 <Section header='Visualization Display'>
                     <Row>
@@ -94,11 +76,16 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
                 <Section header="Datasets">
                     <div>
+                        <p>
+                            <span>Leaf Datasets supply the underlying data used to populate visualizations. </span>
+                            <span>Hover over any Dataset name below to view a sample of data</span>
+                        </p>
+                    </div>
+                    <div>
                         {comp.datasetQueryRefs.map(dsref => {
                             return (
                                 <div key={dsref.id} className={`${c}-datasetqueryref`}>
                                     <div className={`${c}-datasetqueryref-name`}>{dsref.name}</div>
-                                    <div className={`${c}-datasetqueryref-sample`}>View Sample</div>
                                     <div className={`${c}-datasetqueryref-delete`}>Delete</div>
                                 </div>
                             );
@@ -107,20 +94,39 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                     </div>
                 </Section>
 
-                <Section header='JSON Editor'>
+                <Section header='Vega-Lite JSON Editor'>
                     <div>
                         <p>
                             <span>Leaf Visualizations are defined using the </span>
-                            <a href="https://vega.github.io/vega-lite/docs/">Vega-Lite JSON protocol</a>
+                            <a href="https://vega.github.io/vega-lite/" target="_blank" rel="noreferrer">Vega-Lite JSON specification</a>
+                            <span>. See the Vega-Lite </span>
+                            <a href="https://vega.github.io/vega-lite/docs" target="_blank" rel="noreferrer">documentation</a>
+                            <span> and </span>
+                            <a href="https://vega.github.io/vega-lite/examples" target="_blank" rel="noreferrer">examples gallery</a>
+                            <span> to learn more.</span>
                         </p>
                     </div>
 
                     {/* Leaf-generated JSON */}
                     <div className={`${c}-leaf-json`}>
                         <span>Base JSON visualization specification</span>
-                        <pre style={{ backgroundColor: 'rgb(240,240,240)' }}>
-                            {this.getLeafGeneratedSpec()}
-                        </pre>
+                        <AceEditor
+                        className={`${c}-leaf-json`}
+                        editorProps={{ $blockScrolling: Infinity }}
+                        height="70px"
+                        width="100%"
+                        mode="json"
+                        theme="iplastic"
+                        readOnly={true}
+                        highlightActiveLine={false}
+                        value={this.getLeafGeneratedSpec()}
+                        setOptions={{
+                            fontSize: 12,
+                            showGutter: false,
+                            showLineNumbers: false,
+                            tabSize: 2
+                        }}
+                    />
                     </div>
 
                     {/* JSON Spec Editor */}
@@ -133,20 +139,20 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                     </div>
                     <AceEditor
                         className={`${c}-json`}
-                        style={{ backgroundColor: 'rgb(240,240,240)' }}
                         editorProps={{ $blockScrolling: Infinity }}
                         highlightActiveLine={true}
                         onChange={this.handleJsonSpecChange}
                         height={`${500}px`}
                         width={`${100}%`}
                         mode="json"
+                        theme="iplastic"
                         showPrintMargin={false}
                         value={comp.jsonSpec}
                         setOptions={{
                             fontSize: 12,
                             showGutter: false,
                             showLineNumbers: false,
-                            tabSize: 2,
+                            tabSize: 2
                         }}
                     />
                 
@@ -162,20 +168,13 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         if (componentIndex === -1) return null;
         const { datasetQueryRefs } = page.components[componentIndex];
 
-        const leafGeneratedSpec = {
-            $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-            data: datasetQueryRefs.length > 1
-                ? datasetQueryRefs.map(dsref => ({ name: dsref.name }))
-                : { name: datasetQueryRefs.length ? datasetQueryRefs[0].name : '' }
-        };
+        const leafGeneratedSpec = 
+`{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "data": { "name": [ ${datasetQueryRefs.map(dsref => '"' + dsref.name + '"' )} ] }
+}`;
 
-        return JSON.stringify(leafGeneratedSpec, null, 2);
-    }
-
-    private handlePageNameChange = (value: string) => {
-        const { page, dispatch } = this.props;
-        const newPage = Object.assign({}, page, { pageName: value });
-        dispatch(setAdminCurrentVisualizationPage(newPage));
+        return leafGeneratedSpec;
     }
 
     private noOp = () => null as any;
@@ -185,14 +184,16 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         const newComp = Object.assign({}, page.components[componentIndex], { [propName]: value });
         const newPage = Object.assign({}, page);
         newPage.components[componentIndex] = newComp;
-        dispatch(setAdminCurrentVisualizationPage(newPage));
+        newPage.components = newPage.components.slice();
+        dispatch(setAdminCurrentVisualizationPage(newPage, true));
     }
 
-    private handleJsonSpecChange = (value: string, evt: any) => {
+    private handleJsonSpecChange = debounce((value: string) => {
         const { page, componentIndex, dispatch } = this.props;
         const newComp = Object.assign({}, page.components[componentIndex], { jsonSpec: value });
         const newPage = Object.assign({}, page);
         newPage.components[componentIndex] = newComp;
-        dispatch(setAdminCurrentVisualizationPage(newPage));
-    }
+        newPage.components = newPage.components.slice();
+        dispatch(setAdminCurrentVisualizationPage(newPage, true));
+    }, 500)
 }

@@ -39,17 +39,16 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
     }
     
     public componentDidCatch(error: any, errorInfo: any) {    
-        console.log(error, errorInfo);
+        console.log("This is an error we could capture!", error, errorInfo);
     }
 
     public render() {
-        const { adminMode, isSelected, clickHandler } = this.props;
+        const { clickHandler } = this.props;
         const c = this.classname;
-        const classes = [ c, isSelected ? 'selected' : '', adminMode ? 'clickable' : '' ].join(' ');
         const err = this.state.errored;
 
         return (
-            <div className={classes} onClick={clickHandler.bind(null)}>
+            <div className={c} onClick={clickHandler.bind(null)}>
                 {!err &&
                 <VisualizationComponentInternal {...this.props} />
                 }
@@ -84,7 +83,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
                 {/* Visualization */}
                 {spec &&
                 <div className={c}>
-                    <VegaLite spec={spec as VisualizationSpec} data={data}/>
+                    <VegaLite spec={spec as VisualizationSpec} data={data} renderer="svg"/>
                 </div>
                 }
 
@@ -111,9 +110,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
          */
         const leafGeneratedSpec: any = {
             $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-            data: datasetQueryRefs.length > 1
-                ? datasetQueryRefs.map(dsref => ({ name: dsref.name }))
-                : { name: datasetQueryRefs.length ? datasetQueryRefs[0].name : '' }
+            data: { name: datasetQueryRefs.map(dsref => dsref.name )}
         };
         const userSpec = this.parseJson(jsonSpec);
         if (!userSpec) return;
@@ -156,7 +153,6 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         for (const dsref of model.datasetQueryRefs) {
             const dataset = datasets.get(dsref.id);
             if (dataset) {
-                //dataObj["values"] = this.dummyData();
                 dataObj[dsref.name] = dataset.data;
             }
         }

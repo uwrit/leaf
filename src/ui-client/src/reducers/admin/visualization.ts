@@ -23,17 +23,11 @@ export const setAdminVisualizationPages = (state: AdminState, action: AdminVisua
 };
 
 export const setAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    let uneditedPage = state.visualizations.uneditedPage;
-    if (action.changed && !state.visualizations.changed) {
-        uneditedPage = state.visualizations.pages.get(action.page!.id);
-    }
     state.visualizations.pages.set(action.page!.id, Object.assign({}, action.page));
 
     return Object.assign({}, state, { 
         visualizations: {
-            ...state.visualizations,
-            uneditedPage,
-            changed: action.changed
+            ...state.visualizations
         }
     });
 };
@@ -98,25 +92,27 @@ export const removeAdminVisualizationPage = (state: AdminState, action: AdminVis
 };
 
 export const setCurrentAdminVisualizationPage = (state: AdminState, action: AdminVisualizationAction): AdminState => {
+    const currentPage = Object.assign({}, action.page);
+    currentPage.components = currentPage.components.slice().map(c => Object.assign({}, c));
+
     return Object.assign({}, state, { 
         visualizations: { 
             ...state.visualizations,
-            currentPage: action.page
+            changed: action.changed,
+            currentPage
         }
     });
 };
 
 export const undoAdminVisualizationPageChange = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    const uneditedPage = state.visualizations.uneditedPage;
-
-    if (uneditedPage && uneditedPage.id) {
-        state.visualizations.pages.set(uneditedPage.id, Object.assign({}, uneditedPage));
-    }
+    const uneditedPage = state.visualizations.pages.get(state.visualizations.currentPage.id);
+    uneditedPage.components = uneditedPage.components.slice().map(c => Object.assign({}, c));
 
     return Object.assign({}, state, { 
         visualizations: {
             ...state.visualizations,
-            uneditedPage: undefined,
+            pages: new Map(state.visualizations.pages),
+            currentPage: Object.assign({}, uneditedPage),
             changed: false
         }
     });

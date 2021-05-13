@@ -20,7 +20,7 @@ import { Browser } from '../models/state/GeneralUiState';
 import { RouteConfig } from '../config/routes';
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
-import { loadAdminPanelDataIfNeeded } from './admin/admin';
+import { adminHasActiveChange, loadAdminPanelDataIfNeeded } from './admin/admin';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 import { getAllMetdata } from '../services/dataImport';
@@ -76,12 +76,7 @@ export const handleSidebarTabClick = (route: Routes) => {
         if (route === currentRoute) {
             return;
         } 
-        else if (currentRoute === Routes.AdminPanel && admin && (
-            admin.concepts.changed ||
-            admin.sqlSets.changed  || 
-            admin.datasets.changed || 
-            admin.networkAndIdentity.changed)
-            ) {
+        else if (currentRoute === Routes.AdminPanel && admin && adminHasActiveChange(admin)) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",

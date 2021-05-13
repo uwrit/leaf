@@ -6,7 +6,6 @@
  */ 
 
 import React from 'react';
-import { Col, Row } from 'reactstrap';
 import { VisualizationDatasetState } from '../../../../models/state/CohortState';
 import { VisualizationPage as VisualizationPageModel } from '../../../../models/visualization/Visualization';
 import computeDimensions from '../../../../utils/computeDimensions';
@@ -15,11 +14,13 @@ import './VisualizationPage.css';
 
 interface Props {
     adminMode?: boolean;
-    datasets: Map<string, VisualizationDatasetState>;
-    selectedComponentIndex?: number;
+    editing?: boolean;
     componentClickHandler: (compIdx: number) => any;
-    page: VisualizationPageModel;
+    datasets: Map<string, VisualizationDatasetState>;
     dispatch: any;
+    page: VisualizationPageModel;
+    padding?: number;
+    selectedComponentIndex?: number;
 }
 
 interface State {
@@ -28,19 +29,19 @@ interface State {
 
 export default class VisualizationPage extends React.PureComponent<Props, State> {
     private className = 'visualization-page';
-    private maxWidth = 800;
-    private padding = 200;
+    private maxWidth = 900;
 
     constructor(props: Props) {
         super(props);
+        const dimensions = computeDimensions();
         this.state = { 
-            width: this.maxWidth
+            width: Math.min(dimensions.contentWidth, this.maxWidth) - (this.props.padding ? this.props.padding : 0)
         };
     }
 
     public updateDimensions = () => {
         const dimensions = computeDimensions();
-        this.setState({ width: Math.min(dimensions.contentWidth, this.maxWidth) - this.padding });
+        this.setState({ width: Math.min(dimensions.contentWidth, this.maxWidth) - (this.props.padding ? this.props.padding : 0) });
     }
 
     public componentWillMount() {
@@ -50,7 +51,6 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
     public componentWillUnmount() {
         window.removeEventListener('resize', this.updateDimensions);
     }
-
 
     public render() {
         const c = this.className;
@@ -110,7 +110,7 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={width}
+                                pageWidth={width - (this.props.padding ? this.props.padding : 0)}
                             />
                         </div>
                     </div>

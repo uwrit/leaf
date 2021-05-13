@@ -14,12 +14,12 @@
 
 /* Header */
 .visualization-editor-toprow {
-    background-color: rgb(250, 250, 250);
+    background-color: rgb(245, 245, 245);
     box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
     height: 84px;
     margin-bottom: 4px;
     padding: 20px;
-    z-index: 101;
+    z-index: 100;
 }
 
 .visualization-editor-toprow .leaf-button {
@@ -30,6 +30,15 @@
     background-color: white;
 }
 
+.visualization-editor .leaf-button svg {
+    margin: 0 4px -2px 0;
+    transform: scaleX(1.8) scaleY(1.8);
+}
+
+.visualization-editor .leaf-button.hide-editor {
+    float: right;
+}
+
 /* Main */
 .visualization-editor-main-container {
     padding: 0 0 0 20px;
@@ -38,6 +47,7 @@
 
 .visualization-editor-main-container.emphasis-right .visualization-page-sidebar,
 .visualization-editor-main-container.emphasis-left .visualization-page-sidebar {
+    margin-right: 6px;
     opacity: 0;
     pointer-events: none;
     width: 0px;
@@ -51,30 +61,34 @@
     
 }
 
-/* Sidebar */
-.visualization-page-sidebar {
-    display: inline-block;
-    opacity: 1;
-    padding: 10px 0 0 0;
-    transition: all 0.5s;
-    width: 250px;
+.visualization-editor-no-page-selected {
+    border-radius: 8px;
+    color: rgb(50,50,50);
+    font-family: Roboto;
+    font-size: 1.4rem;
+    font-weight: 300;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+    width: 450px;
 }
 
-.visualization-page-sidebar-inner {
-    list-style-type: none;
+.visualization-editor-no-page-selected {
+    background-color: rgba(28, 170, 221, 0.05);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
 }
 
-.visualization-page-sidebar-item {
+.visualization-editor-no-page-selected a {
+    color: rgb(0, 130, 177) !important;
     cursor: pointer;
 }
 
-.visualization-page-sidebar-item:hover,
-.visualization-page-sidebar-item.selected {
-    color: rgb(28,168,221);
-}
-
-.visualization-page-sidebar-item:hover {
-    text-decoration: underline;
+.visualization-editor-no-page-selected a:hover {
+    text-decoration: underline !important;
 }
 
 /* Preview */

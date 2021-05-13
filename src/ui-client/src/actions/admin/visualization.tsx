@@ -47,7 +47,7 @@ export const setAdminCurrentVisualizationPageWithDatasetCheck = (page: AdminVisu
         if (getState().cohort.count.state === CohortStateType.LOADED) {
             dispatch(loadDependentDatasets(page));
         }
-        dispatch(setAdminCurrentVisualizationPage(page));
+        dispatch(setAdminCurrentVisualizationPage(page, false));
     };
 };
 
@@ -169,7 +169,7 @@ export const saveAdminVisualizationPage = (page: AdminVisualizationPage) => {
                 : await updateAdminVisualiationPage(state, page);
 
             dispatch(removeAdminVisualizationPage(page));
-            dispatch(setAdminVisualizationPage(newPage, false));
+            dispatch(setAdminVisualizationPage(newPage));
         } catch (err) {
             console.log(err);
             const info: InformationModalState = {
@@ -214,9 +214,8 @@ export const deleteAdminVisualization = (page: AdminVisualizationPage) => {
 };
 
 // Synchronous
-export const setAdminVisualizationPage = (page: AdminVisualizationPage, changed: boolean): AdminVisualizationAction => {
+export const setAdminVisualizationPage = (page: AdminVisualizationPage): AdminVisualizationAction => {
     return {
-        changed,
         page,
         type: SET_ADMIN_VISUALIZATION
     };
@@ -242,9 +241,10 @@ export const undoAdminVisualizationPageChange = (): AdminVisualizationAction => 
     };
 };
 
-export const setAdminCurrentVisualizationPage = (page: AdminVisualizationPage): AdminVisualizationAction => {
+export const setAdminCurrentVisualizationPage = (page: AdminVisualizationPage, changed: boolean): AdminVisualizationAction => {
     return {
         page,
+        changed,
         type: SET_ADMIN_VISUALIZATION_CURRENT
     };
 };

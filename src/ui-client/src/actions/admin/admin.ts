@@ -1,6 +1,6 @@
 import { showInfoModal, setNoClickModalState } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
+import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { getAdminSqlConfiguration } from "./configuration";
 import { getSqlSets } from "../../services/admin/sqlSetApi";
@@ -113,15 +113,7 @@ export const loadAdminPanelDataIfNeeded = () => {
  */
 export const checkIfAdminPanelUnsavedAndSetPane = (pane: AdminPanelPane) => {
     return async (dispatch: any, getState: () => AppState) => {
-        const admin = getState().admin!;
-        if (
-            admin.concepts.changed || 
-            admin.sqlSets.changed ||
-            admin.datasets.changed ||
-            admin.networkAndIdentity.changed || 
-            admin.panelFilters.changed ||
-            admin.globalPanelFilters.changed
-        ) {
+        if (adminHasActiveChange(getState().admin)) {
             const info: InformationModalState = {
                 body: "Please save or undo your current changes first.",
                 header: "Save or Undo Changes",
@@ -148,3 +140,15 @@ export const setAdminPanelPane = (pane: number): AdminPanelAction => {
         type: SET_ADMIN_PANEL_PANE
     };
 };
+
+// Utility
+export const adminHasActiveChange = (admin: AdminState): boolean => {
+    return admin.concepts.changed || 
+        admin.sqlSets.changed ||
+        admin.datasets.changed ||
+        admin.networkAndIdentity.changed || 
+        admin.panelFilters.changed ||
+        admin.globalPanelFilters.changed ||
+        admin.visualizations.changed || 
+        admin.visualizationCategories.changed;
+}

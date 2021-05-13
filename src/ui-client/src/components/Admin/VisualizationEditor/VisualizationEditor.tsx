@@ -15,9 +15,10 @@ import { CohortState, CohortStateType } from '../../../models/state/CohortState'
 import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
-import { setAdminCurrentVisualizationPageWithDatasetCheck } from '../../../actions/admin/visualization';
+import { setAdminCurrentVisualizationPageWithDatasetCheck, undoAdminVisualizationPageChange } from '../../../actions/admin/visualization';
 import VisualizationPage from './VisualizationPage/VisualizationPage';
 import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
+import { FiChevronRight } from 'react-icons/fi';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -58,18 +59,19 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                     <Button className='leaf-button leaf-button-addnew'>
                         + Create New Visualization
                     </Button>
-                    <Button className='leaf-button leaf-button-secondary' disabled={!changed}>
+                    <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChangesClick}>
                         Undo Changes
                     </Button>
                     <Button className='leaf-button leaf-button-primary' disabled={!changed}>
                         Save
                     </Button>
+                    <Button className='leaf-button leaf-button-primary hide-editor' onClick={this.handleHideEditorClick} disabled={!editing}>
+                        <span><FiChevronRight/></span>
+                        <span>Hide Editor</span>
+                    </Button>
 
                     {/* Explanation */}
-                    <WhatsThis
-                        question={'What is a Leaf Visualization?'}
-                        body={`Visualizations`}
-                    />
+                    <WhatsThis question={'What is a Leaf Visualization?'} body={`Visualizations`} />
                 </div>
 
                 <Row className={this.getClasses().join(' ')}>
@@ -86,9 +88,11 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                         {data.visualizations.currentPage && datasetsLoaded &&
                         <VisualizationPage 
                             adminMode={true}
+                            editing={editing}
                             componentClickHandler={this.handlePageComponentClick} 
                             datasets={data.visualizations.datasets}
                             dispatch={dispatch} 
+                            padding={editing ? 160 : 0}
                             page={currentPage} 
                         />
                         }
@@ -97,7 +101,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                         {!data.visualizations.currentPage &&
                         <div className={`${c}-no-page-selected`}>
                             <p>
-                                <span>Select a Visualization Page from the left or </span>
+                                <span>Select a Visualization Page from the left to begin editing or </span>
                                 <span className='link-span'>create one</span>
                             </p>
                         </div>
@@ -121,8 +125,8 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                         from={Direction.Right}
                         overlay={false}
                         toggle={this.noOp}>
+
                         <VisualizationSpecEditor
-                            hideEditorClickHandler={this.handleHideEditorClick}
                             page={currentPage} 
                             componentIndex={selectedComponentIndex} 
                             dispatch={dispatch} 
@@ -203,6 +207,11 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
     private handleHideEditorClick = () => {
         this.setState({ editing: false });
+    }
+
+    private handleUndoChangesClick = () => {
+        const { dispatch } = this.props;
+        dispatch(undoAdminVisualizationPageChange());
     }
 
     private noOp = (): any => null;
