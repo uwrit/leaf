@@ -92,7 +92,28 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                     </Row>
                 </Section>
 
+                <Section header="Datasets">
+                    <div>
+                        {comp.datasetQueryRefs.map(dsref => {
+                            return (
+                                <div key={dsref.id} className={`${c}-datasetqueryref`}>
+                                    <div className={`${c}-datasetqueryref-name`}>{dsref.name}</div>
+                                    <div className={`${c}-datasetqueryref-sample`}>View Sample</div>
+                                    <div className={`${c}-datasetqueryref-delete`}>Delete</div>
+                                </div>
+                            );
+                        })}
+                        <div className={`${c}-datasets-addnew`}>+ Add New Dataset</div>
+                    </div>
+                </Section>
+
                 <Section header='JSON Editor'>
+                    <div>
+                        <p>
+                            <span>Leaf Visualizations are defined using the </span>
+                            <a href="https://vega.github.io/vega-lite/docs/">Vega-Lite JSON protocol</a>
+                        </p>
+                    </div>
 
                     {/* Leaf-generated JSON */}
                     <div className={`${c}-leaf-json`}>

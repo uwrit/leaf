@@ -14,17 +14,21 @@
     
 }
 
-.visualization-component-container.clickable .visualization-component {
+.visualization-component {
+    overflow: hidden;
+    padding: 20px 4px;
+}
+
+.visualization-component.selectable {
+    border: 1px solid transparent;
+    border-radius: 7px;
     cursor: pointer;
 }
 
-.visualization-component-container.clickable:hover .visualization-component {
-    background-color: rgba(142, 255, 49, 0.3);
-}
-
-.visualization-component {
-    overflow: hidden;
-    padding: 20px;
+.visualization-component.selectable:hover {
+    background-color: rgba(86, 180, 239, 0.1);
+    border-color: rgb(86, 180, 239);
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.05) inset, 0px 0px 20px rgba(82, 168, 236, 0.6);
 }
 
 /* Vega overrides */

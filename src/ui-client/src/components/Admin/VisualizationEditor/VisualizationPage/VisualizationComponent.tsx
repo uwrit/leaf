@@ -72,13 +72,13 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { adminMode, model } = this.props;
+        const { adminMode, model, isSelected } = this.props;
 
         const spec = this.getSpec();
         const data = this.getData();
 
         return (
-            <div className={c}>
+            <div className={`${c} ${adminMode ? 'selectable' : ''} ${isSelected ? 'selected' : ''}`}>
                 <SectionHeader headerText={model.header} subText={model.subHeader} />
 
                 {/* Visualization */}
