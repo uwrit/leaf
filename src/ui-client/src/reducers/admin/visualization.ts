@@ -105,14 +105,14 @@ export const setCurrentAdminVisualizationPage = (state: AdminState, action: Admi
 };
 
 export const undoAdminVisualizationPageChange = (state: AdminState, action: AdminVisualizationAction): AdminState => {
-    const uneditedPage = state.visualizations.pages.get(state.visualizations.currentPage.id);
+    const uneditedPage = Object.assign({}, state.visualizations.pages.get(state.visualizations.currentPage.id));
     uneditedPage.components = uneditedPage.components.slice().map(c => Object.assign({}, c));
 
     return Object.assign({}, state, { 
         visualizations: {
             ...state.visualizations,
             pages: new Map(state.visualizations.pages),
-            currentPage: Object.assign({}, uneditedPage),
+            currentPage: uneditedPage,
             changed: false
         }
     });

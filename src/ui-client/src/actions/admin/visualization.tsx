@@ -134,7 +134,6 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
                 // If at least one part of each requested dataset was successfully pulled
                 if (atLeastOneSucceededCount === deps.size) {
                     const combined = await combineDatasets(results) as Map<string, any[]>;
-                    console.log(combined);
                     dispatch(setAdminVisualizationDatasets(combined));
                 } else {
                     const info: InformationModalState = {

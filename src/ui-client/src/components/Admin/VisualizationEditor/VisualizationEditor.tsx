@@ -92,7 +92,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                             componentClickHandler={this.handlePageComponentClick} 
                             datasets={data.visualizations.datasets}
                             dispatch={dispatch} 
-                            padding={editing ? 160 : 0}
+                            padding={editing ? 250 : 0}
                             page={currentPage} 
                         />
                         }

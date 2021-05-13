@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import { Col, Row } from 'reactstrap';
 import { VisualizationDatasetState } from '../../../../models/state/CohortState';
 import { VisualizationPage as VisualizationPageModel } from '../../../../models/visualization/Visualization';
 import computeDimensions from '../../../../utils/computeDimensions';
@@ -69,8 +70,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
              */
             if (!comp.isFullWidth && nextComp && !nextComp.isFullWidth) {
                 comps.push(
-                    <div> 
-                        <div>
+                    <Row> 
+                        <Col md={6}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -80,8 +81,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 model={comp}
                                 pageWidth={width}
                             />
-                        </div>
-                        <div>
+                        </Col>
+                        <Col md={6}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -91,8 +92,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 model={comp}
                                 pageWidth={width}
                             />
-                        </div>
-                    </div>
+                        </Col>
+                    </Row>
                 );
                 i += 2;
 
@@ -101,8 +102,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
              */
             } else {
                 comps.push(
-                    <div> 
-                        <div>
+                    <Row> 
+                        <Col md={12}>
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
@@ -112,8 +113,8 @@ export default class VisualizationPage extends React.PureComponent<Props, State>
                                 model={comp}
                                 pageWidth={width - (this.props.padding ? this.props.padding : 0)}
                             />
-                        </div>
-                    </div>
+                        </Col>
+                    </Row>
                 );
                 i++;
             }
