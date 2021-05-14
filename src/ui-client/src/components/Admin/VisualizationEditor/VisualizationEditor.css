@@ -44,6 +44,7 @@
     align-items: stretch;
     display: flex;
     padding: 0 0 0 20px;
+    width: 101%;
 }
 
 .visualization-editor-main-container.emphasis-right .visualization-page-sidebar,

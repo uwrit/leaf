@@ -18,11 +18,14 @@ import 'ace-builds/src-noconflict/theme-iplastic';
 import AceEditor from 'react-ace'; 
 import { TextArea } from '../../Section/TextArea';
 import { Checkbox } from '../../Section/Checkbox';
+import { AdminVisualizationDatasetState } from '../../../../models/state/AdminState';
+import VisualizationDatasetQueryRefRow from './VisualizationDatasetQueryRefRow';
 import './VisualizationSpecEditor.css';
 
 interface Props { 
     page?: AdminVisualizationPage;
     componentIndex: number;
+    datasets: Map<string, AdminVisualizationDatasetState>;
     dispatch: any;
 }
 
@@ -31,7 +34,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
     public render() {
         const c = this.className;
-        const { componentIndex, page } = this.props;
+        const { componentIndex, page, datasets } = this.props;
 
         if (componentIndex === -1 || componentIndex > page.components.length-1) {
             return (
@@ -77,19 +80,13 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                 <Section header="Datasets">
                     <div>
                         <p>
-                            <span>Leaf Datasets supply the underlying data used to populate visualizations. </span>
-                            <span>Hover over any Dataset name below to view a sample of data</span>
+                            <span>Leaf Datasets supply the underlying data used to populate visualizations</span>
                         </p>
                     </div>
                     <div>
-                        {comp.datasetQueryRefs.map(dsref => {
-                            return (
-                                <div key={dsref.id} className={`${c}-datasetqueryref`}>
-                                    <div className={`${c}-datasetqueryref-name`}>{dsref.name}</div>
-                                    <div className={`${c}-datasetqueryref-delete`}>Delete</div>
-                                </div>
-                            );
-                        })}
+                        {comp.datasetQueryRefs.map(dsref => (
+                            <VisualizationDatasetQueryRefRow dataset={datasets.get(dsref.id)} metadata={dsref} />
+                        ))}
                         <div className={`${c}-datasets-addnew`}>+ Add New Dataset</div>
                     </div>
                 </Section>

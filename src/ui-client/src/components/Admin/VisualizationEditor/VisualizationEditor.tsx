@@ -82,7 +82,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         const { cohort, data, dispatch } = this.props;
         const { selectedComponentIndex, editing, previewWidth } = this.state;
         const { visualizations } = data;
-        const { currentPage, changed } = visualizations;
+        const { currentPage, changed, datasets } = visualizations;
         const cohortReady = cohort.count.state === CohortStateType.LOADED;
         let noCanDo = null;
 
@@ -113,7 +113,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                 {/* Header */}
                 <div className={`${c}-toprow`}>
-                    <Button className='leaf-button leaf-button-addnew'>
+                    <Button className='leaf-button leaf-button-addnew' disabled={changed}>
                         + Create New Visualization
                     </Button>
                     <Button className='leaf-button leaf-button-secondary' disabled={!changed} onClick={this.handleUndoChangesClick}>
@@ -169,6 +169,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                         toggle={this.noOp}>
 
                         <VisualizationSpecEditor
+                            datasets={datasets}
                             page={currentPage} 
                             componentIndex={selectedComponentIndex} 
                             dispatch={dispatch} 

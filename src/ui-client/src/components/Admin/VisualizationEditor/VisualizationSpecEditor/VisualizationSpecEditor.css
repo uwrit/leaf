@@ -18,6 +18,7 @@
 }
 
 .visualization-spec-editor .checkbox-slider-container {
+    overflow-x: visible;
     padding-right: 20px;
 }
 
@@ -39,6 +40,7 @@
 .visualization-spec-editor-datasetqueryref {
     border-bottom: 1px solid rgb(230,230,230);
     padding: 0 8px 8px 8px;
+    position: relative;
 }
 
 .visualization-spec-editor-datasetqueryref > div {
@@ -52,6 +54,19 @@
     cursor: help;
     padding: 4px;
     transition: background-color 0.5s;
+}
+
+.visualization-spec-editor-datasetqueryref-show-sample {
+    border-radius: 4px;
+    color: rgb(150,150,150);
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 4px;
+}
+
+.visualization-spec-editor-datasetqueryref-show-sample:hover {
+    background-color: rgb(230,230,230);
+    color: black;
 }
 
 .visualization-spec-editor-datasetqueryref-name:hover {
@@ -80,4 +95,61 @@
 
 .visualization-spec-editor-datasets-addnew:hover {
     text-decoration: underline;
+}
+
+.visualization-dataset-sample {
+    background-color: white;
+    border: 1px solid rgb(220,220,220);
+    border-radius: 2px;
+    box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.24);
+    font-size: 0.7rem;
+    left: -8px;
+    margin: 4px 0;
+    max-height: 500px;
+    opacity: 0;
+    overflow: auto;
+    position: absolute;
+    top: 100%;
+    transition: opacity 0.3s;
+    width: 102%;
+    z-index: 101;
+}
+
+.visualization-dataset-sample.shown {
+    opacity: 1;
+}
+
+.visualization-dataset-sample thead {
+    overflow-y: auto;
+    height: 20px;
+}
+
+.visualization-dataset-sample thead th {
+    border-bottom: 1px solid rgb(150,150,150);
+    border-right: 1px solid rgb(220,220,220);
+    padding: 4px;
+    position: sticky;
+    top: 0;
+}
+
+.visualization-dataset-sample table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.visualization-dataset-sample tbody tr td {
+    border-bottom: 1px solid rgb(220,220,220);
+    border-right: 1px solid rgb(220,220,220);
+    padding: 2px;
+    text-align: center;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.visualization-dataset-sample tbody tr td:hover {
+    background-color: rgba(28, 168, 221, 0.2);
+    text-overflow: inherit;
+    white-space: normal;
 }

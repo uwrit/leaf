@@ -19,6 +19,8 @@ var handleWorkMessage = function (payload) {
 var combineVisualizationDatasets = function (payload) {
     var visualizationData = payload.visualizationData, requestId = payload.requestId;
     var combined = new Map();
+    var defaultPersonId = 'PersonId';
+    var loweredPersonId = 'personId';
     visualizationData.forEach(function (dsarr, dsid) {
         var union = [];
         for (var _i = 0, dsarr_1 = dsarr; _i < dsarr_1.length; _i++) {
@@ -28,6 +30,10 @@ var combineVisualizationDatasets = function (payload) {
                 var p = uniquePatients[i];
                 var rows = ds.results[p];
                 for (var _a = 0, rows_1 = rows; _a < rows_1.length; _a++) {
+                    if (rows_1[_a][defaultPersonId]) {
+                        rows_1[_a][loweredPersonId] = rows_1[_a][defaultPersonId];
+                        delete rows_1[_a][defaultPersonId];
+                    }
                     union.push(rows_1[_a]);
                 }
             }

@@ -6,7 +6,7 @@
  */
 
 import { EncounterId, PatientId } from "../patientList/Patient";
-import { PatientListDatasetSchemaField } from "../patientList/Dataset";
+import { PatientListDatasetSchema } from "../patientList/Dataset";
 
 /*
  * Actual object returned from server following dataset request.
@@ -15,7 +15,7 @@ import { PatientListDatasetSchemaField } from "../patientList/Dataset";
  */
 export interface ConceptDatasetDTO {
     results: ConceptDatasetResults;
-    schema: PatientListDatasetSchemaField;
+    schema: PatientListDatasetSchema;
 }
 
 interface ConceptDatasetResults {

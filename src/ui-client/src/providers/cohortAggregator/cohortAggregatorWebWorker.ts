@@ -120,10 +120,11 @@ export default class CohortAggregatorWebWorker {
         const combineVisualizationDatasets = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { visualizationData, requestId } = payload;
             const combined: Map<string, any[]> = new Map();
+            const defaultPersonId = 'PersonId';
+            const loweredPersonId = 'personId';
             
             visualizationData.forEach((dsarr, dsid) => {
-                const union: any[] = [];
-                const dateFields = dsarr[0].schema.fields.filter((f) => f.type === typeDate);
+                const union: any[] = []
                 for (const ds of dsarr) {
                     const uniquePatients: PatientId[] = Object.keys(ds.results);
                     for (let i = 0; i < uniquePatients.length; i++) {
@@ -131,12 +132,11 @@ export default class CohortAggregatorWebWorker {
                         const rows = ds.results[p];
                         for (const row of rows) {
                             const d = row as any;
-                            for (const datefield of dateFields) {
-                                if (d[datefield.name]) {
-                                    d[datefield.name] = new Date(d[datefield.name]);
-                                }
+                            if (d[defaultPersonId]) {
+                                d[loweredPersonId] = d[defaultPersonId];
+                                delete d[defaultPersonId];
                             }
-                            union.push(d);   
+                            union.push(d);
                         }
                     }
                 }
