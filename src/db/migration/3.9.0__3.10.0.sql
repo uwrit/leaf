@@ -341,8 +341,8 @@ BEGIN
       , VCDQ.VisualizationComponentId
       , VCDQ.DatasetQueryId
       , DatasetQueryUniversalId = DQ.UniversalId
-      , DatasetName = DQ.[Name]
-      , DatasetShape = DQ.Shape
+      , DatasetQueryName = DQ.[Name]
+      , DatasetQueryShape = DQ.Shape
     FROM #VC AS VC
          INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
             ON VC.Id = VCDQ.VisualizationComponentId
