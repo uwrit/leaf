@@ -32,6 +32,7 @@ import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken } from '../services/authApi';
 import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
+import { getVisualizationPages } from '../services/visualizationApi';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -56,8 +57,8 @@ export interface SessionAction {
 export const attestAndLoadSession = (attestation: Attestation) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
-            /* 
-             * Get session token.
+            /**
+             * Get session token
              */
             dispatch(setSessionLoadState('Submitting Attestation', 5));
             dispatch(submitAttestation(attestation));
@@ -65,8 +66,8 @@ export const attestAndLoadSession = (attestation: Attestation) => {
             dispatch(setSessionContext(ctx));
             dispatch(setUserInquiryState({ email: getState().auth.userContext!.name, show: false }))
 
-            /* 
-             * Get home node identity.
+            /**
+             * Get home node identity
              */
             dispatch(setSessionLoadState('Finding Home Leaf server', 10));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
@@ -74,70 +75,77 @@ export const attestAndLoadSession = (attestation: Attestation) => {
                 dispatch(setAdminNetworkIdentity(homeBase.identity, false));
             }
 
-            /* 
-             * Load responders.
+            /**
+             * Load responders
              */
             dispatch(setSessionLoadState('Finding Partner Leaf servers', 20));
             const responders: NetworkIdentity[] = await getResponderIdentities(getState, attestation, homeBase);
             dispatch(setResponders(responders));
             dispatch(registerNetworkCohorts(responders));
 
-            /* 
-             * Load export options.
+            /**
+             * Load export options
              */
             dispatch(setSessionLoadState('Loading Export options', 30));
             const exportOptResponse = await getExportOptions(getState());
             dispatch(setExportOptions(exportOptResponse.data));
 
-            /* 
-             * Load import options.
+            /**
+             * Load import options
              */
             dispatch(setSessionLoadState('Loading Import options', 40));
             const importOptResponse = await getImportOptions(getState());
             const importOpts = importOptResponse.data as ImportOptionsDTO;
             dispatch(setImportOptions(importOpts));
 
-            /* 
-             * Load concepts.
+            /**
+             * Load concepts
              */
             dispatch(setSessionLoadState('Loading Concepts', 50));
             await requestRootConcepts(dispatch, getState);
 
-            /* 
-             * Load datasets.
+            /**
+             * Load datasets
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 60));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
             dispatch(setDatasets(datasets, datasetsCategorized));
-            
-            /*
-             * Load saved queries.
+
+            /**
+             * Load visualizations
              */
-            dispatch(setSessionLoadState('Loading Saved Queries', 70));
+            dispatch(setSessionLoadState('Loading Visualizations', 70));
+            const visualizationPages = await getVisualizationPages(getState());
+            
+            
+            /**
+             * Load saved queries
+             */
+            dispatch(setSessionLoadState('Loading Saved Queries', 80));
             const savedCohorts = await getSavedQueries(getState());
             dispatch(addSavedQueries(savedCohorts));
 
             /*
-             * Load extension concepts.
+             * Load extension concepts
              */
-            dispatch(setSessionLoadState('Loading Extension Concepts', 80));
+            dispatch(setSessionLoadState('Loading Extension Concepts', 90));
             const extensionConcepts = await getExtensionRootConcepts(getState().dataImport, [], savedCohorts);
             dispatch(setExtensionRootConcepts(extensionConcepts));
 
-            /* 
-             * Initiliaze web worker search.
+            /**
+             * Initiliaze web worker search
              */
-            dispatch(setSessionLoadState('Initializing Search Engine', 100));
+            dispatch(setSessionLoadState('Initializing Search Engine', 95));
             await initializeSearchEngine(dispatch, getState);
 
-            /* 
-             * All done.
+            /**
+             * All done
              */
             dispatch(completeAttestation(ctx.rawDecoded["access-nonce"]));
 
-            /* 
-             * Check if continue previous session.
+            /**
+             * Check if continue previous session
              */
             handleSessionReload(dispatch, getState());
         } catch (err) {

@@ -6,28 +6,29 @@
  */ 
 
 import React from 'react';
+import { sampleSize } from 'lodash';
 
 interface Props { 
     data: any[];
-    shown: boolean;
 }
 
 export default class VisualizationDatasetSample extends React.PureComponent<Props> {
     private className = 'visualization-dataset-sample';
+    private sampleN = 10;
 
     public render() {
         const c = this.className;
-        const { data, shown } = this.props;
+        const { data } = this.props;
         const fields = this.getFields();
 
         return (
-            <div className={`${c} ${shown ? 'shown' : ''}`}>
+            <div className={c}>
                 <table>
                     <thead>
                         <tr>{fields.map(f => <th>{f}</th>)}</tr>
                     </thead>
                     <tbody>
-                        {data.slice(0, 10).map(d => {
+                        {sampleSize(data, this.sampleN).map(d => {
                             return <tr>{fields.map(f => <td>{d[f]}</td>)}</tr>;
                         })}
                     </tbody>
@@ -38,6 +39,12 @@ export default class VisualizationDatasetSample extends React.PureComponent<Prop
 
     private getFields = (): string[] => {
         const { data } = this.props;
-        return [ ...new Set(data.map(d => Object.keys(d)).flat()) ];
+        const personId = 'personId';
+        const fields = [ ...new Set(data.map(d => Object.keys(d)).flat()) ];
+        if (fields.length > 1 && fields[fields.length-1] === personId) {
+            fields.unshift(personId);
+            fields.splice(fields.length-1, 1);
+        }
+        return fields;
     }
 }

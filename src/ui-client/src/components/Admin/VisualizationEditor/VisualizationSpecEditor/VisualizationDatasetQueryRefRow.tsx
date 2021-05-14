@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import { Tooltip } from 'reactstrap';
 import { AdminVisualizationDatasetState } from '../../../../models/state/AdminState';
 import { VisualizationDatasetQueryRef } from '../../../../models/visualization/Visualization';
 import VisualizationDatasetSample from './VisualizationDatasetSample';
@@ -33,15 +34,24 @@ export default class VisualizationDatasetQueryRefRow extends React.PureComponent
         const c = this.className;
         const { dataset, metadata } = this.props;
         const { showSample } = this.state;
+        const tooltipId = `${c}-tooltip-${dataset.id}`;
 
         if (!dataset) return null;
 
         return (
             <div key={dataset.id} className={c}>
                 <div className={`${c}-name`}>{metadata.name}</div>
-                <div className={`${c}-show-sample ${showSample ? 'shown' : ''}`} onClick={this.handleShowSampleClick}>{showSample ? 'Hide' : 'Show'} Data Sample</div>
+                <div id={tooltipId} className={`${c}-sample-size`}>{dataset.data.length.toLocaleString()} rows, hover to view sample</div>
+                <Tooltip className={`${c}-sample-tooltip`} 
+                    placement="bottom" 
+                    isOpen={showSample} 
+                    autohide={false} 
+                    target={tooltipId}
+                    toggle={this.handleShowSampleClick}
+                    >
+                    <VisualizationDatasetSample data={dataset.data}/>
+                </Tooltip>
                 <div className={`${c}-delete`}>Delete</div>
-                {dataset && <VisualizationDatasetSample data={dataset.data} shown={showSample}/>}
             </div>
         );
     }

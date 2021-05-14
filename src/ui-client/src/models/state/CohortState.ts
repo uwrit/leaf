@@ -13,6 +13,7 @@ import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
 import { ConceptId } from '../concept/Concept';
 import { PatientListDatasetSchema } from '../patientList/Dataset';
+import { VisualizationPage } from '../visualization/Visualization';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -95,7 +96,11 @@ export interface TimelinesNetworkState {
 }
 
 export interface VisualizationState {
+    currentPageId?: string;
+    datasets: Map<string, VisualizationDatasetState>;
     demographics: DemographicStatistics;
+    pages: Map<string, VisualizationPage>;
+    showBasicDemographics: boolean;
     state: CohortStateType;
 }
 

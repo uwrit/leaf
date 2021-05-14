@@ -51,26 +51,26 @@
     background-color: rgb(13, 195, 106);
     border-radius: 4px;
     color: white;
-    cursor: help;
     padding: 4px;
-    transition: background-color 0.5s;
 }
 
-.visualization-spec-editor-datasetqueryref-show-sample {
+.visualization-spec-editor-datasetqueryref-sample-size {
     border-radius: 4px;
     color: rgb(150,150,150);
-    cursor: pointer;
+    cursor: help;
+    font-size: 0.9rem;
     margin-left: 8px;
     padding: 4px;
+}
+
+.visualization-spec-editor-datasetqueryref-sample-size:hover {
+    background-color: rgb(240,240,240);
+    color: black;
 }
 
 .visualization-spec-editor-datasetqueryref-show-sample:hover {
     background-color: rgb(230,230,230);
     color: black;
-}
-
-.visualization-spec-editor-datasetqueryref-name:hover {
-    background-color: rgb(12, 168, 93) !important;
 }
 
 .visualization-spec-editor-datasetqueryref-delete {
@@ -97,16 +97,31 @@
     text-decoration: underline;
 }
 
+.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip {
+    margin-left: -62%;
+    margin-top: -10%;
+    opacity: 1;
+    width: 50%;
+}
+
+.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip-inner {
+    background-color: transparent;
+}
+
+.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip .arrow {
+    display: none;
+}
+
 .visualization-dataset-sample {
     background-color: white;
-    border: 1px solid rgb(220,220,220);
-    border-radius: 2px;
+    border: 1px solid rgb(200,200,200);
+    border-radius: 4px;
     box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.24);
-    font-size: 0.7rem;
+    font-size: 0.9rem;
     left: -8px;
     margin: 4px 0;
-    max-height: 500px;
-    opacity: 0;
+    max-height: 400px;
+    opacity: 1 !important;
     overflow: auto;
     position: absolute;
     top: 100%;
@@ -115,18 +130,17 @@
     z-index: 101;
 }
 
-.visualization-dataset-sample.shown {
-    opacity: 1;
-}
-
 .visualization-dataset-sample thead {
     overflow-y: auto;
     height: 20px;
 }
 
 .visualization-dataset-sample thead th {
+    background-color: rgb(230,230,230);
     border-bottom: 1px solid rgb(150,150,150);
     border-right: 1px solid rgb(220,220,220);
+    color: black;
+    font-size: 1rem;
     padding: 4px;
     position: sticky;
     top: 0;
@@ -140,16 +154,21 @@
 .visualization-dataset-sample tbody tr td {
     border-bottom: 1px solid rgb(220,220,220);
     border-right: 1px solid rgb(220,220,220);
+    color: black;
+    max-height: 40px;
     padding: 2px;
     text-align: center;
-    max-width: 80px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+}
+
+.visualization-dataset-sample thead th:last-child,
+.visualization-dataset-sample tbody tr td:last-child {
+    border-right: 1px solid transparent;
+}
+
+.visualization-dataset-sample tbody tr:last-child td {
+    border-bottom: 1px solid transparent;
 }
 
 .visualization-dataset-sample tbody tr td:hover {
-    background-color: rgba(28, 168, 221, 0.2);
-    text-overflow: inherit;
-    white-space: normal;
+    background-color: rgba(28, 168, 221, 0.1);
 }

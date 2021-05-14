@@ -298,10 +298,10 @@ BEGIN
 
     -- Check the number of datasets for each visualization that are allowed
     UPDATE #VC
-    SET AllowedDependencyCount = (SELECT COUNT(*) 
+    SET AllowedDependencyCount = (SELECT COUNT(DISTINCT I.Id) 
                                   FROM @datasetids AS I 
                                        INNER JOIN rela.VisualizationComponentDatasetQuery AS VCDQ
-                                            ON I.Id = VCDQ.VisualizationComponentId
+                                            ON I.Id = VCDQ.DatasetQueryId
                                   WHERE VCDQ.VisualizationComponentId = VC.Id)
     FROM #VC AS VC
 

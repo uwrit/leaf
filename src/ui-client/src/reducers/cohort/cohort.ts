@@ -23,8 +23,8 @@ import {
     CohortPatientListAction,
     PATIENT_LIST_INTERACT_DISABLED,
     PATIENT_LIST_SINGLETON_RECEIVED,
-    PATIENTLIST_COLUMN_TOGGLE,
-    PATIENTLIST_SET_PAGINATION,
+    PATIENT_LIST_COLUMN_TOGGLE,
+    PATIENT_LIST_SET_PAGINATION,
     SET_PATIENT_LIST_DISPLAY,
     PATIENT_LIST_DATASET_FAILURE,
     PATIENT_LIST_DATASET_RECEIVED,
@@ -354,9 +354,9 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setPatientList(state, action);
         case PATIENT_LIST_INTERACT_DISABLED:
             return setPatientListNonInteractive(state);
-        case PATIENTLIST_COLUMN_TOGGLE:
+        case PATIENT_LIST_COLUMN_TOGGLE:
             return toggleColumn(state, action);
-        case PATIENTLIST_SET_PAGINATION:
+        case PATIENT_LIST_SET_PAGINATION:
             return setPagination(state, action);
         case PATIENT_LIST_SINGLETON_RECEIVED:
             return setPatientListSingletonReceived(state, action);

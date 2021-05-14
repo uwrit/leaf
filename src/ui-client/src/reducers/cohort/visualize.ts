@@ -11,6 +11,8 @@ import { CohortStateType } from '../../models/state/CohortState';
 
 export const defaultVisualizationState = (): VisualizationState => {
     return {
+        currentPageId: undefined,
+        datasets: new Map(),
         demographics: {
             ageByGenderData: {
                 buckets: {
@@ -39,6 +41,8 @@ export const defaultVisualizationState = (): VisualizationState => {
                 ethnicBackgrounds: {}
             }
         },
+        showBasicDemographics: true,
+        pages: new Map(),
         state: CohortStateType.NOT_LOADED
     };
 };

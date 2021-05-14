@@ -192,5 +192,5 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
         newPage.components[componentIndex] = newComp;
         newPage.components = newPage.components.slice();
         dispatch(setAdminCurrentVisualizationPage(newPage, true));
-    }, 1000)
+    }, 750)
 }
