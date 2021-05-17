@@ -7,45 +7,56 @@
 
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap'
-import { CohortState } from '../../models/state/CohortState';
-import { SectionHeader } from '../Other/SectionHeader/SectionHeader';
+import { NetworkCohortState } from '../../../models/state/CohortState';
+import { NetworkIdentity } from '../../../models/NetworkResponder';
 import { AgeByGender } from './AgeByGender';
 import { Binary } from './Binary';
+import { SectionHeader } from '../../Other/SectionHeader/SectionHeader';
 import { LanguageByHeritage } from './LanguageByHeritage';
 import { Religion } from './Religion';
 import { NihRaceEthnicityGenderTable } from './NihRaceEthnicityGenderTable';
 
 export interface Props {
-    cohort: CohortState;
+    cohort: NetworkCohortState;
     height: number;
+    responder: NetworkIdentity;
     width: number;
 }
 
-export default class AggregateDemographics extends React.PureComponent<Props> {
+export default class ResponderDemographics extends React.PureComponent<Props> {
+    private className = 'visualize-responder';
     private delayIncrementMs = 600;
 
     public render() {
         const { ageByGenderData, binarySplitData, languageByHeritageData, religionData, nihRaceEthnicityData } = this.props.cohort.visualization.demographics;
+        const { primaryColor, name, enabled } = this.props.responder;
         const colWidth = this.props.width / 2;
-        const getDelay = (i: number): number => i * this.delayIncrementMs;
+        const c = this.className;
+        let delay = 0;
+        const getDelay = (): number => { const d = delay; delay += this.delayIncrementMs; return d; }
+
+        if (!enabled) { return null; }
 
         return (
-            <Container className="visualize-demographic-container aggregate" fluid={true}>
+            <Container className="visualize-demographic-container responder" fluid={true}>
+                <div className={`${c}-container`}>
+                    <div className={`${c}-name`} style={{ color: primaryColor }}>{name}</div>
+                </div>
                 <Row>
                     <Col lg={6} md={12} className="visualization-agebygender-container">
-                        <SectionHeader headerText="Current Age By Gender" />
+                        <SectionHeader headerText="Age by Gender" />
                         <AgeByGender 
-                            data={ageByGenderData}
-                            delay={getDelay(0)}
-                            height={this.props.height} 
-                            width={colWidth}
+                            data={ageByGenderData} 
+                            delay={0}
+                            height={this.props.height}
+                            width={colWidth} 
                         />
                     </Col>
                     <Col lg={6} md={12} className="visualization-ataglance-container">
                         <SectionHeader headerText="At a Glance" />
                         <Binary 
                             data={binarySplitData} 
-                            delay={getDelay(1)}
+                            delay={300}
                             height={this.props.height}
                             width={colWidth} 
                         />
@@ -54,9 +65,9 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                 <Row>
                     <Col lg={6} md={12} className="visualization-languagebyheritage-container">
                         <SectionHeader headerText="Ethnic Heritage by Language" />
-                        <LanguageByHeritage 
+                        <LanguageByHeritage
                             bucketset={languageByHeritageData} 
-                            delay={getDelay(2)}
+                            delay={getDelay()}
                             height={this.props.height}
                             width={colWidth}
                         />
@@ -65,7 +76,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                         <SectionHeader headerText="Religious Beliefs" />
                         <Religion
                             counts={religionData} 
-                            delay={getDelay(3)}
+                            delay={getDelay()}
                             height={this.props.height}
                             width={colWidth}
                         />

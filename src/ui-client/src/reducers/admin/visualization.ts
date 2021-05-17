@@ -71,7 +71,7 @@ export const setAdminVisualizationDatasetState = (state: AdminState, action: Adm
             ? datasets.get(dsid)
             : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
         ds.data = rows;
-        datasets.set(dsid, datasets.get(dsid));
+        datasets.set(dsid, ds);
     });
 
     return Object.assign({}, state, { 

@@ -12,6 +12,8 @@ export interface DemographicDTO {
     statistics: DemographicStatistics;
 }
 
+export interface Demographic extends DemographicDTO {}
+
 export interface BinarySplitPair {
     category: string;
     left: BinarySplit;

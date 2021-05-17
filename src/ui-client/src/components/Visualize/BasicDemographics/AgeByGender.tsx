@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { visualizationConfig } from '../../config/visualization';
-import { AgeByGenderBucket, AgeByGenderData } from '../../models/cohort/DemographicDTO';
+import { visualizationConfig } from '../../../config/visualization';
+import { AgeByGenderData } from '../../../models/cohort/Demographic';
 
 interface Props {
     data: AgeByGenderData;
@@ -43,7 +43,7 @@ export class AgeByGender extends React.PureComponent<Props> {
         return (
             <div className={`${c}-column`} style={{ height, width: w }}>
                 <div style={{ height: stackHeight }}>
-                    <ResponsiveContainer >
+                    <ResponsiveContainer>
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-female`}
                                 margin={{top: 20, right: 0, left: 0, bottom: 10}}>
                             <XAxis dataKey="label" type="category" interval={0} axisLine={false} />
@@ -55,7 +55,7 @@ export class AgeByGender extends React.PureComponent<Props> {
                     </ResponsiveContainer>
                 </div>
                 <div style={{ height: stackHeight }}>
-                    <ResponsiveContainer >
+                    <ResponsiveContainer>
                         <BarChart data={data} barSize={config.barSize} barCategoryGap={config.barCategoryGap} className={`${c}-male`}
                                 margin={{top: 20, right: 0, left: 0, bottom: 10}} >
                             <XAxis dataKey="label" type="category" interval={0} axisLine={false} />

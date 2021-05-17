@@ -8,11 +8,10 @@
 import { CancelTokenSource } from 'axios';
 import { PatientListConfiguration } from '../patientList/Configuration';
 import { PatientListRow } from '../patientList/Patient';
-import { DemographicStatistics } from '../cohort/DemographicDTO';
+import { DemographicStatistics } from '../cohort/Demographic';
 import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
 import { ConceptId } from '../concept/Concept';
-import { PatientListDatasetSchema } from '../patientList/Dataset';
 import { VisualizationPage } from '../visualization/Visualization';
 
 export enum CohortStateType {

@@ -7,19 +7,17 @@
 
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap';
-import { VisualizationDatasetState } from '../../../../models/state/CohortState';
-import { VisualizationPage as VisualizationPageModel } from '../../../../models/visualization/Visualization';
+import { VisualizationDatasetState } from '../../../models/state/CohortState';
+import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
 import { VisualizationComponent } from './VisualizationComponent';
 import './VisualizationPage.css';
 
 interface Props {
     adminMode?: boolean;
     editing?: boolean;
-    componentClickHandler: (compIdx: number) => any;
+    componentClickHandler?: (compIdx: number) => any;
     datasets: Map<string, VisualizationDatasetState>;
-    dispatch: any;
     page: VisualizationPageModel;
-    padding?: number;
     selectedComponentIndex?: number;
     width: number;
 }
@@ -27,18 +25,11 @@ interface Props {
 export default class VisualizationPage extends React.PureComponent<Props> {
     private className = 'visualization-page';
 
-    private getWidth = (id: string): number => {
-        const elem = document.getElementById(`${this.className}-${id}`);
-        if (!elem) return 600;
-        return elem.getClientRects()[0].width - 600;
-    }
-
     public render() {
         const c = this.className;
-        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets, width, padding } = this.props;
+        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets, width } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
         const comps: any[] = [];
-        const pad = padding ? padding : 0;
         let i = 0;
 
         while (i < page.components.length) {
@@ -59,7 +50,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={this.getWidth(comp.id)}
+                                pageWidth={width / 2}
                             />
                         </Col>
                         <Col md={6} id={`${c}-${comp.id}`}>
@@ -70,7 +61,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
                                 model={comp}
-                                pageWidth={this.getWidth(comp.id)}
+                                pageWidth={width / 2}
                             />
                         </Col>
                     </Row>
@@ -91,7 +82,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={this.getWidth(comp.id)}
+                                pageWidth={width}
                             />
                         </Col>
                     </Row>

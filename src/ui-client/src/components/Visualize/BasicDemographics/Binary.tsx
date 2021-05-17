@@ -8,8 +8,8 @@
 import React from 'react';
 import { Row } from 'reactstrap';
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, XAxis } from 'recharts';
-import { visualizationConfig } from '../../config/visualization';
-import { BinarySplit, BinarySplitPair} from '../../models/cohort/DemographicDTO';
+import { visualizationConfig } from '../../../config/visualization';
+import { BinarySplit, BinarySplitPair} from '../../../models/cohort/Demographic';
 
 interface Props {
     data: BinarySplitPair[];

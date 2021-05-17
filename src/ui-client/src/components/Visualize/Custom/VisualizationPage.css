@@ -16,6 +16,7 @@
 }
 
 .visualization-component {
+    margin-bottom: 50px;
     overflow: hidden;
     padding: 20px 4px;
 }

@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { NihRaceEthnicityBuckets, EthnicBackgroundGenderMap } from '../../models/cohort/DemographicDTO';
+import { NihRaceEthnicityBuckets, EthnicBackgroundGenderMap } from '../../../models/cohort/Demographic';
 import './NihRaceEthnicityGenderTable.css';
 
 interface Props {

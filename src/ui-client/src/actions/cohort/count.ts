@@ -10,7 +10,7 @@ import { Dispatch } from 'redux';
 import { AppState } from '../../models/state/AppState';
 import { CohortStateType, PatientCountState } from '../../models/state/CohortState';
 import { PatientCountDTO } from '../../models/PatientCountDTO';
-import { DemographicDTO, DemographicStatistics } from '../../models/cohort/DemographicDTO';
+import { DemographicDTO, DemographicStatistics } from '../../models/cohort/Demographic';
 import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkResponder';
 import { panelToDto } from '../../models/panel/Panel';
 import { PanelFilter } from '../../models/panel/PanelFilter';
@@ -40,7 +40,7 @@ export const COHORT_DEMOGRAPHICS_SET = 'COHORT_DEMOGRAPHICS_SET';
 export const COHORT_DEMOGRAPHICS_ERROR = 'COHORT_DEMOGRAPHICS_ERROR';
 
 export interface CohortCountAction {
-    id: number;
+    id?: number;
     cancel?: CancelTokenSource;
     cohorts?: NetworkIdentity[];
     countResults?: PatientCountState;

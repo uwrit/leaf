@@ -16,7 +16,7 @@ import { VisualizationPage as VisualizationPageModel } from '../../../models/vis
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
 import { saveAdminVisualizationPage, setAdminCurrentVisualizationPageWithDatasetCheck, undoAdminVisualizationPageChange } from '../../../actions/admin/visualization';
-import VisualizationPage from './VisualizationPage/VisualizationPage';
+import VisualizationPage from '../../Visualize/Custom/VisualizationPage';
 import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
 import { FiChevronRight } from 'react-icons/fi';
 import './VisualizationEditor.css';
@@ -143,13 +143,11 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                         {/* Viz Page */}
                         {!noCanDo &&
-                        <VisualizationPage 
+                        <VisualizationPage
                             adminMode={true}
                             editing={editing}
                             componentClickHandler={this.handlePageComponentClick} 
                             datasets={data.visualizations.datasets}
-                            dispatch={dispatch} 
-                            padding={editing ? previewWidth / 4 : 0}
                             page={currentPage} 
                             width={previewWidth}
                         />

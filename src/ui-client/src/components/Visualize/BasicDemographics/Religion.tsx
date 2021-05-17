@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, LabelList, Cell } from 'recharts';
-import { visualizationConfig } from '../../config/visualization';
-import { PatientCountMap } from '../../models/cohort/DemographicDTO';
+import { visualizationConfig } from '../../../config/visualization';
+import { PatientCountMap } from '../../../models/cohort/Demographic';
 
 interface Props {
     counts: PatientCountMap;

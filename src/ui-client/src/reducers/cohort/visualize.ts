@@ -76,7 +76,7 @@ export const setNetworkCohortVisualization = (state: CohortState, action: Cohort
     const network = new Map(state.networkCohorts).set(action.id, networkCohort);
     return Object.assign({}, state, {
         networkCohorts: network,
-    }) as CohortState;
+    });
 };
 
 export const setAggregateCohortVisualization = (state: CohortState, action: CohortVisualizationAction): CohortState => {
@@ -85,5 +85,72 @@ export const setAggregateCohortVisualization = (state: CohortState, action: Coho
             demographics: action.vizResults!,
             state: CohortStateType.LOADED
         }
-    }) as CohortState;
+    });
+};
+
+export const setVisualizationPages = (state: CohortState, action: CohortVisualizationAction): CohortState => {
+    return Object.assign({}, state, {
+        visualization: {
+            ...state.visualization,
+            pages: new Map(action.pages)
+        }
+    });
+};
+
+export const setCurrentVisualizationPage = (state: CohortState, action: CohortVisualizationAction): CohortState => {
+    return Object.assign({}, state, {
+        visualization: {
+            currentPageId: action.pageId
+        }
+    });
+};
+
+export const setVisualizationDatasetState = (state: CohortState, action: CohortVisualizationAction): CohortState => {
+    const datasets = new Map(state.visualization.datasets);
+    action.vizDatasets.forEach((rows, dsid) => {
+        const ds = datasets.has(dsid)
+            ? datasets.get(dsid)
+            : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+        ds.data = rows;
+        datasets.set(dsid, ds);
+    });
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualization,
+            datasets
+        }
+    });
+};
+
+export const setVisualizationDatasetQueryState = (state: CohortState, action: CohortVisualizationAction): CohortState => {
+    const datasets = new Map(state.visualization.datasets);
+    const newds = datasets.has(action.datasetQueryRef.id)
+        ? datasets.get(action.datasetQueryRef.id)
+        : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+    newds.state = action.dsState;
+    datasets.set(newds.id, newds);
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualization,
+            datasets
+        }
+    });
+};
+
+export const setVisualizationDatasetQueryNetworkState = (state: CohortState, action: CohortVisualizationAction): CohortState => {
+    const datasets = new Map(state.visualization.datasets);
+    const newds = datasets.has(action.datasetQueryRef.id)
+        ? datasets.get(action.datasetQueryRef.id)
+        : { id: action.datasetQueryRef.id, state: action.dsState, networkState: new Map(), data: [] as any[] };
+    newds.networkState.set(action.id, action.dsState);
+    datasets.set(newds.id, newds);
+
+    return Object.assign({}, state, { 
+        visualizations: {
+            ...state.visualization,
+            datasets
+        }
+    });
 };

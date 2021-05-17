@@ -8,7 +8,7 @@
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { CohortStateType } from '../models/state/CohortState';
-import { DemographicStatistics } from '../models/cohort/DemographicDTO';
+import { DemographicStatistics } from '../models/cohort/Demographic';
 import { NetworkIdentity } from '../models/NetworkResponder';
 import { aggregateStatistics } from '../services/cohortAggregatorApi';
 import { setAggregateVisualizationData } from './cohort/visualize';

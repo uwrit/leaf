@@ -7,9 +7,9 @@
 
 import React from 'react';
 import { VegaLite, VisualizationSpec } from 'react-vega';
-import { VisualizationDatasetState } from '../../../../models/state/CohortState';
-import { VisualizationComponent as VisualizationComponentModel } from '../../../../models/visualization/Visualization';
-import { SectionHeader } from '../../../Other/SectionHeader/SectionHeader';
+import { VisualizationDatasetState } from '../../../models/state/CohortState';
+import { VisualizationComponent as VisualizationComponentModel } from '../../../models/visualization/Visualization';
+import { SectionHeader } from '../../Other/SectionHeader/SectionHeader';
 
 interface Props {
     adminMode?: boolean;
@@ -69,12 +69,25 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
 class VisualizationComponentInternal extends React.PureComponent<Props> {
     private className = 'visualization-component';
 
+    public constructor(props: Props) {
+        super(props);
+    }
+
+    private getStyle = (userSpec: any): React.CSSProperties => {
+        const style: React.CSSProperties = { width: userSpec.width };
+        if (userSpec['background'] && userSpec['background']['url']) {
+            style.background = `url(${userSpec['background'] && userSpec['background']['url']})`;
+        }
+        return style;
+    }
+
     public render() {
         const c = this.className;
         const { adminMode, model, isSelected } = this.props;
 
         if (!model.datasetQueryRefs.length) return null;
         const spec = this.getSpec();
+        const style = spec ? this.getStyle(spec) : null;
 
         return (
             <div className={`${c} ${adminMode ? 'selectable' : ''} ${isSelected ? 'selected' : ''}`}>
@@ -83,7 +96,9 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
                 {/* Visualization */}
                 {spec &&
                 <div className={c}>
-                    <VegaLite spec={spec as VisualizationSpec} renderer="svg"/>
+                    <div className={`${c}-inner`} style={style}>
+                        <VegaLite spec={spec as VisualizationSpec} renderer="svg"/>
+                    </div>
                 </div>
                 }
 
@@ -160,90 +175,5 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
         }
         
         return dataObj;
-    }
-
-    public demorender() {
-        const c = this.className;
-        const { model } = this.props;
-
-        const spec = {
-            width: 800,
-            height: 400,
-            "data": {
-                "name": "values"
-            },
-            "params": [
-                {
-                    "name": "highlight",
-                    "select": { "type": "point", "on": "mouseover" }
-                },
-                { "name": "select", "select": "point" },
-                {
-                    "name": "cornerRadius", "value": 0,
-                    "bind": { "input": "range", "min": 0, "max": 50, "step": 1 }
-                }
-            ],
-            "mark": {
-                "type": "bar",
-                "fill": "#4C78A8",
-                "stroke": "black",
-                "cursor": "pointer",
-                "cornerRadius": { "expr": "cornerRadius" }
-            },
-            "encoding": {
-                "x": { "field": "a", "type": "ordinal" },
-                "y": { "field": "b", "type": "quantitative" },
-                "fillOpacity": {
-                    "condition": { "param": "select", "value": 1 },
-                    "value": 0.3
-                },
-                "strokeWidth": {
-                    "condition": [
-                        {
-                            "param": "select",
-                            "empty": false,
-                            "value": 2
-                        },
-                        {
-                            "param": "highlight",
-                            "empty": false,
-                            "value": 1
-                        }
-                    ],
-                    "value": 0
-                }
-            },
-            "config": {
-                "scale": {
-                    "bandPaddingInner": 0.2
-                }
-            }
-        } as any;
-
-        const data = { "values": [
-            {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
-            {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
-            {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
-            ]
-        };
-
-        console.log('dummy', spec, data);
-        return;
-        return (
-            <div className={c}>
-                <SectionHeader headerText={model.header} subText={model.subHeader} />
-                <div className={c}>
-                    <VegaLite spec={spec as VisualizationSpec} data={data}/>
-                </div>
-            </div>
-        );
-    }
-
-    private dummyData = () => {
-        return [
-            {"a": "A", "b": 28}, {"a": "B", "b": 55}, {"a": "C", "b": 43},
-            {"a": "D", "b": 91}, {"a": "E", "b": 81}, {"a": "F", "b": 53},
-            {"a": "G", "b": 19}, {"a": "H", "b": 87}, {"a": "I", "b": 52}
-        ];
     }
 }

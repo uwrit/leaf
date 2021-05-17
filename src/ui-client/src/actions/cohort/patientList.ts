@@ -41,7 +41,7 @@ export const PATIENT_LIST_ISOPEN_TOGGLE = 'PATIENT_LIST_ISOPEN_TOGGLE';
 export const PATIENT_LIST_SET_AVAILABLE = 'PATIENT_LIST_SET_AVAILABLE';
 
 export interface CohortPatientListAction {
-    id: number;
+    id?: number;
     column?: PatientListColumn;
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];

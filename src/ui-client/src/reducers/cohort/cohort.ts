@@ -35,7 +35,12 @@ import {
 import { 
     CohortVisualizationAction,
     VISUALIZATION_SET_AGGREGATE,
-    VISUALIZATION_SET_NETWORK
+    VISUALIZATION_SET_NETWORK,
+    VISUALIZATION_SET_PAGES,
+    VISUALIZATION_SET_CURRENT_PAGE,
+    VISUALIZATION_SET_DATASETS,
+    VISUALIAZATION_SET_DATASET_QUERY_STATE,
+    VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE
 } from '../../actions/cohort/visualize';
 
 import {
@@ -52,7 +57,8 @@ import {
     TIMELINES_SET_AGGREGATE_DATASET,
     TIMELINES_SET_CONFIG,
     TIMELINES_INDEX_SET_PANEL_ID,
-    TIMELINES_REMOVE_CONCEPT_DATASET
+    TIMELINES_REMOVE_CONCEPT_DATASET,
+    CohortTimelinesAction
 } from '../../actions/cohort/timelines';
 import { 
     DISABLE_RESPONDER, 
@@ -94,7 +100,13 @@ import {
 import { 
     defaultVisualizationState, 
     setAggregateCohortVisualization, 
-    setNetworkCohortVisualization } from './visualize';
+    setCurrentVisualizationPage, 
+    setNetworkCohortVisualization, 
+    setVisualizationDatasetState, 
+    setVisualizationPages,
+    setVisualizationDatasetQueryState,
+    setVisualizationDatasetQueryNetworkState
+} from './visualize';
 import {
     OPEN_SAVED_QUERY
 } from '../../actions/queries';
@@ -280,7 +292,7 @@ const errorCohortDemographics = (state: CohortState, action: CohortCountAction):
     };
 };
 
-type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction;
+type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction | CohortTimelinesAction;
 
 export const cohort = (state: CohortState = defaultCohortState(), action: CohortAction): CohortState => {
     switch (action.type) {
@@ -318,6 +330,16 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkCohortVisualization(state, action);
         case VISUALIZATION_SET_AGGREGATE:
             return setAggregateCohortVisualization(state, action);
+        case VISUALIZATION_SET_PAGES:
+            return setVisualizationPages(state, action);
+        case VISUALIZATION_SET_CURRENT_PAGE:
+            return setCurrentVisualizationPage(state, action);
+        case VISUALIZATION_SET_DATASETS:
+            return setVisualizationDatasetState(state, action);
+        case VISUALIAZATION_SET_DATASET_QUERY_STATE:
+            return setVisualizationDatasetQueryState(state, action);
+        case VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE:
+            return setVisualizationDatasetQueryNetworkState(state, action);
 
         // Timelines
         case TIMELINES_SET_CONFIG:
