@@ -19,7 +19,7 @@ import { requestRootConcepts, setExtensionRootConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { showConfirmationModal, setUserInquiryState } from '../actions/generalUi';
+import { showConfirmationModal, setUserInquiryState, setVisualizationPages } from '../actions/generalUi';
 import { getSavedQueries, getExtensionRootConcepts } from '../services/queryApi';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
@@ -117,7 +117,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
              */
             dispatch(setSessionLoadState('Loading Visualizations', 70));
             const visualizationPages = await getVisualizationPages(getState());
-            
+            dispatch(setVisualizationPages(new Map(visualizationPages.map(p => [ p.id, p ]))));
             
             /**
              * Load saved queries

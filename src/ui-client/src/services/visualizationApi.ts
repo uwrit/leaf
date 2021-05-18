@@ -14,10 +14,11 @@ import { HttpFactory } from './HttpFactory';
 /**
  * Get all Visualization Pages available to user
  */
-export const getVisualizationPages = (state: AppState): Promise<VisualizationPageDTO> => {
+export const getVisualizationPages = async (state: AppState): Promise<VisualizationPageDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.get("/api/visualization") as Promise<VisualizationPageDTO>;
+    const pagesObj = await http.get("/api/visualization");
+    return pagesObj.data as Promise<VisualizationPageDTO[]>;
 };
 
 /**

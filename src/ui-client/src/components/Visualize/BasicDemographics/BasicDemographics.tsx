@@ -39,7 +39,7 @@ export class BasicDemographicsVisualization extends React.Component<Props> {
         });
 
         /**
-         * Show a loading spinner if no responders have completed yet.
+         * Show generic error if any failed
          */
         if (cohort.visualization.state === CohortStateType.IN_ERROR) {
             return (

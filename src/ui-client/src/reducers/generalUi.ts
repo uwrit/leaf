@@ -24,7 +24,12 @@ import {
     NOCLICK_MODAL_SET_STATE,
     SIDE_NOTIFICATION_SET_STATE,
     SET_MYLEAF_TAB,
-    SET_USER_QUESTION_STATE
+    SET_USER_QUESTION_STATE,
+    VISUALIZATION_SET_CURRENT_RESPONDER,
+    VISUALIZATION_SHOW_BASIC_DEMOGRAPHICS,
+    VISUALIZATION_SHOW_OVERALL,
+    VISUALIZATION_SET_CURRENT_PAGE,
+    VISUALIZATION_SET_PAGES
 } from '../actions/generalUi';
 import { SET_PANEL_FILTERS, TOGGLE_PANEL_FILTER } from '../actions/panelFilter';
 import { 
@@ -85,6 +90,13 @@ export const defaultGeneralUiState = (): GeneralUiState => {
             show: false,
             type: UserInquiryType.HelpMakingQuery,
             text: ''
+        },
+        visualization: {
+            currentPageId: undefined,
+            currentResponderId: undefined,
+            pages: new Map(),
+            showBasicDemographics: true,
+            showOverall: true
         }
     };
 };
@@ -144,6 +156,16 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
             return Object.assign({}, state, { browser: action.browser! });
         case SET_USER_QUESTION_STATE:
             return Object.assign({}, state, { userQuestion: { ...state.userQuestion, ...action.userInquiry } });
+        case VISUALIZATION_SET_PAGES: 
+            return Object.assign({}, state, { visualization: { ...state.visualization, pages: new Map(action.pages) } });
+        case VISUALIZATION_SET_CURRENT_RESPONDER:
+            return Object.assign({}, state, { visualization: { ...state.visualization,currentResponderId: action.id, showOverall: false } });
+        case VISUALIZATION_SHOW_BASIC_DEMOGRAPHICS:
+            return Object.assign({}, state, { visualization: { ...state.visualization,currentPageId: undefined, showBasicDemographics: true } });
+        case VISUALIZATION_SHOW_OVERALL:
+            return Object.assign({}, state, { visualization: { ...state.visualization,currentResponderId: undefined, showOverall: true } });
+        case VISUALIZATION_SET_CURRENT_PAGE:
+            return Object.assign({}, state, {  visualization: { ...state.visualization,currentPageId: action.pageId, showBasicDemographics: false } });
         
         case ADD_PANEL_ITEM:
         case REMOVE_PANEL_ITEM:

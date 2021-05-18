@@ -10,19 +10,23 @@ import { connect } from 'react-redux'
 import { AppState, AuthorizationState } from '../../models/state/AppState';
 import { CohortState, CohortStateType } from '../../models/state/CohortState';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
+import { VisualizationPage as VisualizationPageModel } from '../../models/visualization/Visualization';
 import computeDimensions from '../../utils/computeDimensions';
 import CohortTooLargeBox from '../../components/Other/CohortTooLargeBox/CohortTooLargeBox';
 import { BasicDemographicsVisualization } from '../../components/Visualize/BasicDemographics/BasicDemographics';
 import VisualizationPage from '../../components/Visualize/Custom/VisualizationPage';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
+import { setCurrentVisualizationPageWithDatasetCheck } from '../../actions/cohort/visualize';
+import { setCurrentVisualizationResponder, setVisualizationShowBasicDemographics, setVisualizationShowOverall } from '../../actions/generalUi';
+import { GeneralUiState } from '../../models/state/GeneralUiState';
 import './Visualize.css';
-import { setCurrentVisualizationPage } from '../../actions/cohort/visualize';
 
 interface OwnProps { }
 interface StateProps {
     auth: AuthorizationState;
     cohort: CohortState;
+    generalUi: GeneralUiState;
     responders: NetworkResponderMap;
 }
 interface DispatchProps {
@@ -98,7 +102,7 @@ class Visualize extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { cohort, auth, responders } = this.props;
+        const { cohort, auth, responders, generalUi } = this.props;
         const { cacheLimit } = auth.config!.cohort;
 
         /**
@@ -125,7 +129,7 @@ class Visualize extends React.Component<Props, State> {
             <div className={`${c}-container`}>
 
                 {/* Visualization Page and/or Responder selection dropdowns */}
-                {(cohort.visualization.pages.size || responders.size) &&
+                {(generalUi.visualization.pages.size || responders.size > 1) &&
                 <div className={`${c}-top-row`}>
                     {this.getDropdowns()}
                 </div>
@@ -142,8 +146,8 @@ class Visualize extends React.Component<Props, State> {
 
     private getDropdowns = () => {
         const c = this.className;
-        const { cohort, responders } = this.props;
-        const { currentPageId, pages, showBasicDemographics } = cohort.visualization;
+        const { responders, generalUi } = this.props;
+        const { currentPageId, pages, showBasicDemographics, showOverall } = generalUi.visualization;
         const { responderDropdownOpen, pageDropdownOpen } = this.state;
         let pageSelector = null;
         let responderSelector = null;
@@ -175,7 +179,7 @@ class Visualize extends React.Component<Props, State> {
                     );
                 }
                 pageElems.push(
-                    <DropdownItem onClick={this.handlePageDropdownItemClick.bind(null, page.id)}>
+                    <DropdownItem onClick={this.handlePageDropdownItemClick.bind(null, page)}>
                         <div className={`${c}-page-option ${page.id === currentPageId ? 'selected' : ''}`}>{page.pageName}</div>
                     </DropdownItem>
                 );
@@ -209,7 +213,7 @@ class Visualize extends React.Component<Props, State> {
         /**
          * Responders
          */
-        if (responders.size) {
+        if (responders.size > 1) {
             const displayText = 'Overall';
 
             responderSelector = (
@@ -224,8 +228,8 @@ class Visualize extends React.Component<Props, State> {
                         <div className={`${c}-dropdown-item-container`}>
 
                             {/* Overall */}
-                            <DropdownItem onClick={this.handleBasicDemographicsDropdownItemClick.bind(null)}>
-                                <div className={`${c}-page-option ${showBasicDemographics ? 'selected' : ''}`}>Basic Demographics</div>
+                            <DropdownItem onClick={this.handleOverallDropdownItemClick.bind(null)}>
+                                <div className={`${c}-page-option ${showOverall ? 'selected' : ''}`}>Overall</div>
                             </DropdownItem>
                             <DropdownItem divider={true} />
 
@@ -248,19 +252,22 @@ class Visualize extends React.Component<Props, State> {
 
     private handleBasicDemographicsDropdownItemClick = () => {
         const { dispatch } = this.props;
+        dispatch(setVisualizationShowBasicDemographics());
     }
 
     private handleOverallDropdownItemClick = () => {
         const { dispatch } = this.props;
+        dispatch(setVisualizationShowOverall());
     }
 
-    private handlePageDropdownItemClick = (id: string) => {
+    private handlePageDropdownItemClick = (page: VisualizationPageModel) => {
         const { dispatch } = this.props;
-        dispatch(setCurrentVisualizationPage(id));
+        dispatch(setCurrentVisualizationPageWithDatasetCheck(page));
     }
 
     private handleResponderDropdownItemClick = (id: number) => {
         const { dispatch } = this.props;
+        dispatch(setCurrentVisualizationResponder(id));
     }
 
     private togglePageSelectorOpen = () => {
@@ -272,8 +279,8 @@ class Visualize extends React.Component<Props, State> {
     }
 
     private getVisualizationContent = () => {
-        const { cohort, auth, responders } = this.props;
-        const { showBasicDemographics, currentPageId, pages, datasets } = cohort.visualization;
+        const { cohort, generalUi, auth, responders } = this.props;
+        const { showBasicDemographics, currentPageId, pages } = generalUi.visualization;
         const { width } = this.state;
 
         /**
@@ -286,7 +293,7 @@ class Visualize extends React.Component<Props, State> {
          * Else if there is a custom current page, show that
          */
         } else if (currentPageId && pages.has(currentPageId)) {
-            return <VisualizationPage datasets={datasets} page={pages.get(currentPageId)} width={width} />
+            return <VisualizationPage datasets={cohort.visualization.datasets} page={pages.get(currentPageId)} width={width} />
         }
 
         return null;
@@ -297,6 +304,7 @@ const mapStateToProps = (state: AppState, ownProps: OwnProps): StateProps => {
     return { 
         auth: state.auth,
         cohort: state.cohort,
+        generalUi: state.generalUi,
         responders: state.responders
     };
 };

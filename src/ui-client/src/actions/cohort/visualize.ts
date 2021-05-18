@@ -14,28 +14,22 @@ import { InformationModalState, NotificationStates } from '../../models/state/Ge
 import { VisualizationDatasetQueryRef, VisualizationPage } from '../../models/visualization/Visualization';
 import { combineDatasets } from '../../services/cohortAggregatorApi';
 import { fetchVisualizationDataset } from '../../services/visualizationApi';
-import { setNoClickModalState, showInfoModal } from '../generalUi';
+import { setCurrentVisualizationPage, setNoClickModalState, showInfoModal } from '../generalUi';
 
 // Cohort visualize actions
 export const VISUALIZATION_REQUEST = 'REQUEST_VISUALIZATION_DATA';
 export const VISUALIZATION_SET_NETWORK = 'VISUALIZATION_SET_NETWORK';
 export const VISUALIZATION_SET_AGGREGATE = 'VISUALIZATION_SET_AGGREGATE';
-export const VISUALIZATION_SET_PAGES = 'VISUALIZATION_SET_PAGES';
-export const VISUALIZATION_SET_CURRENT_PAGE = 'VISUALIZATION_SET_CURRENT_PAGE';
 export const VISUALIZATION_SET_DATASETS = 'VISUALIZATION_SET_DATASETS';
-export const VISUALIAZATION_SET_DATASET_QUERY_STATE = 'VISUALIAZATION_SET_DATASET_QUERY_STATE';
-export const VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE = 'VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE';
-export const VISUALIZE_SHOW_BASIC_DEMOGRAPHICS = 'VISUALIZE_SHOW_BASIC_DEMOGRAPHICS';
-export const VISUALIZE_SHOW_OVERALL = 'VISUALIZE_SHOW_OVERALL';
-export const VISUALIZE_SET_CURRENT_RESPONDER = 'VISUALIZE_SET_CURRENT_RESPONDER';
+export const VISUALIZATION_SET_DATASET_QUERY_STATE = 'VISUALIZATION_SET_DATASET_QUERY_STATE';
+export const VISUALIZATION_SET_DATASET_QUERY_NETWORK_STATE = 'VISUALIZATION_SET_DATASET_QUERY_NETWORK_STATE';
+
 
 export interface CohortVisualizationAction {
     id?: number;
     vizDatasets?: Map<string, any[]>;
     dsState?: CohortStateType;
     vizResults?: DemographicStatistics;
-    pageId?: string;
-    pages?: Map<string, VisualizationPage>;
     error?: string;
     datasetQueryRef?: VisualizationDatasetQueryRef;
     type: string;
@@ -50,7 +44,6 @@ export const setCurrentVisualizationPageWithDatasetCheck = (page: VisualizationP
         dispatch(setCurrentVisualizationPage(page.id));
     };
 };
-
 
 export const loadDependentDatasets = (page: VisualizationPage) => {
     return async (dispatch: any, getState: () => AppState) => {
@@ -159,20 +152,6 @@ export const setAggregateVisualizationData = (vizResults: DemographicStatistics)
     };
 };
 
-export const setVisualizationPages = (pages: Map<string, VisualizationPage>): CohortVisualizationAction => {
-    return {
-        pages,
-        type: VISUALIZATION_SET_PAGES
-    };
-};
-
-export const setCurrentVisualizationPage = (pageId: string): CohortVisualizationAction => {
-    return {
-        pageId,
-        type: VISUALIZATION_SET_CURRENT_PAGE
-    };
-};
-
 export const setVisualizationDatasets = (vizDatasets: Map<string, any[]>): CohortVisualizationAction => {
     return {
         vizDatasets,
@@ -184,7 +163,7 @@ export const setVisualizationDatasetQueryState = (datasetQueryRef: Visualization
     return {
         datasetQueryRef,
         dsState,
-        type: VISUALIAZATION_SET_DATASET_QUERY_STATE
+        type: VISUALIZATION_SET_DATASET_QUERY_STATE
     };
 };
 
@@ -197,6 +176,6 @@ export const setVisualizationDatasetQueryNetworkState = (
         datasetQueryRef,
         dsState,
         id,
-        type: VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE
+        type: VISUALIZATION_SET_DATASET_QUERY_NETWORK_STATE
     };
 };

@@ -7,6 +7,7 @@
 
 import { RouteConfig } from "../../config/routes";
 import { SavedQueryRef } from "../Query";
+import { VisualizationPage } from "../visualization/Visualization";
 
 export enum Routes {
     FindPatients = 1,
@@ -94,6 +95,7 @@ export interface GeneralUiState {
     showExportDataModal: boolean;
     showSaveQueryPane: boolean;
     sideNotification: SideNotificationState;
+    visualization: GeneralUiVisualizationState;
     userQuestion: UserInquiryState;
 }
 
@@ -120,4 +122,10 @@ export interface Browser {
     version: string;
 }
 
-    
+export interface GeneralUiVisualizationState {
+    currentPageId?: string;
+    currentResponderId?: number;
+    pages: Map<string, VisualizationPage>;
+    showBasicDemographics: boolean;
+    showOverall: boolean;
+}

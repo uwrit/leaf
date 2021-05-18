@@ -7,8 +7,9 @@
 
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap';
-import { VisualizationDatasetState } from '../../../models/state/CohortState';
-import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
+import { CohortStateType, VisualizationDatasetState } from '../../../models/state/CohortState';
+import { VisualizationDatasetQueryRef, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
+import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { VisualizationComponent } from './VisualizationComponent';
 import './VisualizationPage.css';
 
@@ -27,7 +28,63 @@ export default class VisualizationPage extends React.PureComponent<Props> {
 
     public render() {
         const c = this.className;
-        const { page, adminMode, selectedComponentIndex, componentClickHandler, datasets, width } = this.props;
+        const { page, datasets } = this.props;
+        const needed = this.getAllDatasetRefs(page);
+        const ready = this.checkDatasetsReady(needed);
+        const failed = [ ...datasets.values() ].find(ds => ds.id in needed && ds.state === CohortStateType.IN_ERROR);
+
+
+        console.log('datasets!', datasets);
+
+        /**
+         * Show generic error if any failed
+         */
+         if (failed) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>
+                        Whoops! An error occurred while loading patient visualizations. We are sorry for the inconvenience. 
+                        Please contact your Leaf administrator if this error continues.
+                    </p>
+                </div>
+            );
+        } 
+
+        /**
+         * Show a loading spinner if datasets being pulled
+         */
+        if (!ready) {
+            return (
+                <div className={`${c}-loading`}>
+                    <LoaderIcon size={100} />
+                </div>
+            );
+        } 
+
+        return (
+            <Container fluid={true} className={c}>
+                {this.getComponents()}
+            </Container>);
+    }
+
+    private checkDatasetsReady = (needed: Set<VisualizationDatasetQueryRef>) => {
+        const { datasets } = this.props;
+
+        for (const dsref of needed) {
+            const ds = datasets.get(dsref.id);
+            if (!ds || ds.state !== CohortStateType.LOADED) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    private getAllDatasetRefs = (page: VisualizationPageModel) => new Set(page.components.map(c => c.datasetQueryRefs).flat());
+
+    private getComponents = () => {
+        const c = this.className;
+        const { page, adminMode, selectedComponentIndex, datasets, width } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
         const comps: any[] = [];
         let i = 0;
@@ -46,7 +103,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
-                                clickHandler={componentClickHandler.bind(null, i)} 
+                                clickHandler={this.handleComponentClick.bind(null, i)} 
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
@@ -57,7 +114,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
-                                clickHandler={componentClickHandler.bind(null, i+1)} 
+                                clickHandler={this.handleComponentClick.bind(null, i+1)} 
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
                                 model={comp}
@@ -78,7 +135,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                             <VisualizationComponent 
                                 key={comp.id} 
                                 adminMode={adminMode}
-                                clickHandler={componentClickHandler.bind(null, i)} 
+                                clickHandler={this.handleComponentClick.bind(null, i)} 
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
@@ -90,10 +147,13 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                 i++;
             }
         }
+        return comps;
+    }
 
-        return (
-            <Container fluid={true} className={c}>
-                {comps}
-            </Container>);
+    private handleComponentClick = (compIdx: number) => {
+        const { componentClickHandler } = this.props;
+        if (componentClickHandler) {
+            componentClickHandler(compIdx);
+        }
     }
 }

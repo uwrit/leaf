@@ -36,11 +36,9 @@ import {
     CohortVisualizationAction,
     VISUALIZATION_SET_AGGREGATE,
     VISUALIZATION_SET_NETWORK,
-    VISUALIZATION_SET_PAGES,
-    VISUALIZATION_SET_CURRENT_PAGE,
     VISUALIZATION_SET_DATASETS,
-    VISUALIAZATION_SET_DATASET_QUERY_STATE,
-    VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE
+    VISUALIZATION_SET_DATASET_QUERY_STATE,
+    VISUALIZATION_SET_DATASET_QUERY_NETWORK_STATE
 } from '../../actions/cohort/visualize';
 
 import {
@@ -99,11 +97,9 @@ import {
 } from './patientList';
 import { 
     defaultVisualizationState, 
-    setAggregateCohortVisualization, 
-    setCurrentVisualizationPage, 
+    setAggregateCohortVisualization,
     setNetworkCohortVisualization, 
-    setVisualizationDatasetState, 
-    setVisualizationPages,
+    setVisualizationDatasetState,
     setVisualizationDatasetQueryState,
     setVisualizationDatasetQueryNetworkState
 } from './visualize';
@@ -220,9 +216,13 @@ const startDemographicQuery = (state: CohortState, action: CohortCountAction): C
             patientList: {
                 ...defaultNetworkPatientListState(),
                 state: newState
-            }, 
+            },
+            timelines: {
+                ...defaultNetworkTimelinesState(),
+                state: newState
+            },
             visualization: {
-                ...defaultVisualizationState,
+                ...defaultVisualizationState(),
                 state: newState
             }
         });
@@ -236,8 +236,12 @@ const startDemographicQuery = (state: CohortState, action: CohortCountAction): C
             ...defaultPatientListState(),
             state: CohortStateType.REQUESTING
         },
+        timelines: {
+            ...defaultTimelinesState(),
+            state: CohortStateType.REQUESTING
+        },
         visualization: {
-            ...defaultVisualizationState,
+            ...defaultVisualizationState(),
             state: CohortStateType.REQUESTING
         }
     }) as CohortState;
@@ -330,16 +334,13 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkCohortVisualization(state, action);
         case VISUALIZATION_SET_AGGREGATE:
             return setAggregateCohortVisualization(state, action);
-        case VISUALIZATION_SET_PAGES:
-            return setVisualizationPages(state, action);
-        case VISUALIZATION_SET_CURRENT_PAGE:
-            return setCurrentVisualizationPage(state, action);
         case VISUALIZATION_SET_DATASETS:
             return setVisualizationDatasetState(state, action);
-        case VISUALIAZATION_SET_DATASET_QUERY_STATE:
+        case VISUALIZATION_SET_DATASET_QUERY_STATE:
             return setVisualizationDatasetQueryState(state, action);
-        case VISUALIAZATION_SET_DATASET_QUERY_NETWORK_STATE:
-            return setVisualizationDatasetQueryNetworkState(state, action);
+        case VISUALIZATION_SET_DATASET_QUERY_NETWORK_STATE:
+            return setVisualizationDatasetQueryNetworkState(state, action); 
+        
 
         // Timelines
         case TIMELINES_SET_CONFIG:

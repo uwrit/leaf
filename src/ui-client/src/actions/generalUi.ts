@@ -28,6 +28,7 @@ import { getExtensionRootConcepts } from '../services/queryApi';
 import { sendUserInquiry } from '../services/notificationApi';
 import { setExtensionRootConcepts } from './concepts';
 import { setImportsMetadata } from './dataImport';
+import { VisualizationPage } from '../models/visualization/Visualization';
 
 export const SET_MYLEAF_TAB = 'SET_MYLEAF_TAB';
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
@@ -46,6 +47,11 @@ export const CONFIRM_MODAL_HIDE = 'CONFIRM_MODAL_HIDE';
 export const NOCLICK_MODAL_SET_STATE = 'NOCLICK_MODAL_SET_STATE';
 export const SIDE_NOTIFICATION_SET_STATE = 'SIDE_NOTIFICATION_SET_STATE';
 export const SET_USER_QUESTION_STATE = 'SET_USER_QUESTION_STATE'
+export const VISUALIZATION_SET_PAGES = 'VISUALIZATION_SET_PAGES';
+export const VISUALIZATION_SET_CURRENT_PAGE = 'VISUALIZATION_SET_CURRENT_PAGE';
+export const VISUALIZATION_SHOW_BASIC_DEMOGRAPHICS = 'VISUALIZATION_SHOW_BASIC_DEMOGRAPHICS';
+export const VISUALIZATION_SHOW_OVERALL = 'VISUALIZATION_SHOW_OVERALL';
+export const VISUALIZATION_SET_CURRENT_RESPONDER = 'VISUALIZATION_SET_CURRENT_RESPONDER';
 
 export interface GeneralUiAction {
     browser?: Browser;
@@ -53,8 +59,11 @@ export interface GeneralUiAction {
     cohortCountBoxMinimized?: boolean;
     cohortInfoButtonVisible?: boolean;
     confirmModal?: ConfirmationModalState;
+    id?: number;
     infoModal?: InformationModalState;
     noclickModal?: NoClickModalState;
+    pageId?: string;
+    pages?: Map<string, VisualizationPage>;
     searchTerm?: string;
     route?: Routes;
     routeConfig?: RouteConfig[];
@@ -255,4 +264,37 @@ export const setMyLeafTab = (tab: MyLeafTabType): GeneralUiAction  => {
         tab,
         type: SET_MYLEAF_TAB
     }
+};
+
+export const setVisualizationPages = (pages: Map<string, VisualizationPage>): GeneralUiAction => {
+    return {
+        pages,
+        type: VISUALIZATION_SET_PAGES
+    };
+};
+
+export const setCurrentVisualizationPage = (pageId: string): GeneralUiAction => {
+    return {
+        pageId,
+        type: VISUALIZATION_SET_CURRENT_PAGE
+    };
+};
+
+export const setCurrentVisualizationResponder = (id: number): GeneralUiAction => {
+    return {
+        id,
+        type: VISUALIZATION_SET_CURRENT_RESPONDER
+    };
+};
+
+export const setVisualizationShowBasicDemographics = (): GeneralUiAction => {
+    return {
+        type: VISUALIZATION_SHOW_BASIC_DEMOGRAPHICS
+    };
+};
+
+export const setVisualizationShowOverall = (): GeneralUiAction => {
+    return {
+        type: VISUALIZATION_SHOW_OVERALL
+    };
 };

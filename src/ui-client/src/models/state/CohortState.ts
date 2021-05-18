@@ -95,11 +95,8 @@ export interface TimelinesNetworkState {
 }
 
 export interface VisualizationState {
-    currentPageId?: string;
     datasets: Map<string, VisualizationDatasetState>;
     demographics: DemographicStatistics;
-    pages: Map<string, VisualizationPage>;
-    showBasicDemographics: boolean;
     state: CohortStateType;
 }
 
