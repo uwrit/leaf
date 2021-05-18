@@ -96,7 +96,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
              */
             if (!comp.isFullWidth && nextComp && !nextComp.isFullWidth) {
                 comps.push(
-                    <Row> 
+                    <Row key={comp.id + '_' + nextComp.id}> 
                         <Col md={6} id={`${c}-${comp.id}`}>
                             <VisualizationComponent 
                                 key={comp.id} 
@@ -108,14 +108,14 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 pageWidth={computedWidth / 2}
                             />
                         </Col>
-                        <Col md={6} id={`${c}-${comp.id}`}>
+                        <Col md={6} id={`${c}-${nextComp.id}`}>
                             <VisualizationComponent 
-                                key={comp.id} 
+                                key={nextComp.id} 
                                 adminMode={adminMode}
                                 clickHandler={this.handleComponentClick.bind(null, i+1)} 
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
-                                model={comp}
+                                model={nextComp}
                                 pageWidth={computedWidth / 2}
                             />
                         </Col>
@@ -128,7 +128,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
              */
             } else {
                 comps.push(
-                    <Row> 
+                    <Row key={comp.id}> 
                         <Col md={12} id={`${c}-${comp.id}`}>
                             <VisualizationComponent 
                                 key={comp.id} 

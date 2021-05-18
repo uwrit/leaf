@@ -5,9 +5,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+ .visualize-container {
+    padding-top: 59px;
+    position: relative;
+ }
+
 /* Top row */
 .visualize-top-row {
+    background-color: rgb(247,247,247);
+    border-bottom: 1px solid rgb(238,238,238);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 59px;
     padding: 10px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
 /* Dropdown */

@@ -42,7 +42,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         const dimensions = this.computePageDimensions();
         this.state = {
             editing: false,
-            previewWidth: dimensions ? dimensions.previewWidth : 800,
+            previewWidth: dimensions ? dimensions.previewWidth : 1000,
             selectedComponentIndex: -1,
             sidebarWidth: dimensions ? dimensions.sidebarWidth : 200
         }

@@ -6,6 +6,7 @@
  */ 
 
 .visualization-page {
+    margin-bottom: 50px;
     overflow-x: hidden;
     overflow-y: auto;
 }
@@ -15,11 +16,11 @@
 }
 
 .visualization-component {
-    margin-bottom: 50px;
     opacity: 1;
     overflow: hidden;
     padding: 20px 4px;
     transition: opacity 1s;
+    z-index: 100;
 }
 
 .visualization-component.hidden {
@@ -39,6 +40,21 @@
 }
 
 /* Vega overrides */
-.vega-embed summary {
+.visualization-component .vega-embed summary {
     z-index: 100 !important;
+}
+
+.visualization-component .vega-embed {
+    z-index: 100;
+}
+
+.visualization-component .chart-wrapper {
+    z-index: 100;
+}
+
+.visualization-component text {
+    font-family: Roboto;
+    fill: rgba(33, 37, 41, 1) !important;
+    font-size: 0.8rem;
+    text-rendering: optimizeLegibility;
 }

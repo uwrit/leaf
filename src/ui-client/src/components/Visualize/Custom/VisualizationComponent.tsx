@@ -81,7 +81,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props, State> {
     }
 
     public componentDidMount() {
-        setTimeout(() => this.setState({ hidden: false }), this.props.model.orderId * 100);
+        setTimeout(() => this.setState({ hidden: false }), this.props.model.orderId * 300);
     }
 
     public render() {

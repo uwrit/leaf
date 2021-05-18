@@ -55,7 +55,7 @@ export const setAdminCurrentVisualizationPageWithDatasetCheck = (page: AdminVisu
 export const loadDependentDatasets = (page: VisualizationPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        const deps: Set<VisualizationDatasetQueryRef> = new Set();
+        const deps: Map<string, VisualizationDatasetQueryRef> = new Map();
         const results: Map<string, PatientListDatasetDTO[]> = new Map();
         const errInfo: any[] = [];
 
@@ -69,7 +69,7 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
         for (const comp of page.components) {
             for (const dsref of comp.datasetQueryRefs) {
                 if (!viz.datasets.has(dsref.id) || viz.datasets.get(dsref.id).state !== CohortStateType.LOADED) {
-                    deps.add(dsref);
+                    deps.set(dsref.id, dsref);
                 }
             }
         }

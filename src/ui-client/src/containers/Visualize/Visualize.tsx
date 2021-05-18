@@ -137,7 +137,7 @@ class Visualize extends React.Component<Props, State> {
                 }
 
                 {/* Visualization content */}
-                <div className={`${c}-main`}>
+                <div className={`${c}-main scrollable-offset-by-header`}>
                     {this.getVisualizationContent()}
                 </div>
 
@@ -187,9 +187,9 @@ class Visualize extends React.Component<Props, State> {
             }
 
             pageSelector = (
-                <div className={`${c}-dropdown-container`}>
+                <div key={0} className={`${c}-dropdown-container`}>
                     <div className={`${c}-top-row-text`}>Selected Visualization</div>
-                    <Dropdown key={0} isOpen={pageDropdownOpen} toggle={this.togglePageSelectorOpen}>
+                    <Dropdown isOpen={pageDropdownOpen} toggle={this.togglePageSelectorOpen}>
                         <DropdownToggle>
                             <div>
                                 {displayText} 
