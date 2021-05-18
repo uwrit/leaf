@@ -33,15 +33,12 @@ export default class VisualizationPage extends React.PureComponent<Props> {
         const ready = this.checkDatasetsReady(needed);
         const failed = [ ...datasets.values() ].find(ds => ds.id in needed && ds.state === CohortStateType.IN_ERROR);
 
-
-        console.log('datasets!', datasets);
-
         /**
          * Show generic error if any failed
          */
          if (failed) {
             return (
-                <div className={`${c}-error`}>
+                <div className={'visualize-error'}>
                     <p>
                         Whoops! An error occurred while loading patient visualizations. We are sorry for the inconvenience. 
                         Please contact your Leaf administrator if this error continues.
@@ -55,7 +52,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
          */
         if (!ready) {
             return (
-                <div className={`${c}-loading`}>
+                <div className={'visualize-loading'}>
                     <LoaderIcon size={100} />
                 </div>
             );
@@ -76,7 +73,6 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                 return false;
             }
         }
-        
         return true;
     }
 
@@ -84,8 +80,10 @@ export default class VisualizationPage extends React.PureComponent<Props> {
 
     private getComponents = () => {
         const c = this.className;
-        const { page, adminMode, selectedComponentIndex, datasets, width } = this.props;
+        const { page, editing, adminMode, selectedComponentIndex, datasets, width } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
+        const padding = width * 0.3 + (editing ? width * 0.4 : 0);
+        const computedWidth = width - padding;
         const comps: any[] = [];
         let i = 0;
 
@@ -107,7 +105,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={width / 2}
+                                pageWidth={computedWidth / 2}
                             />
                         </Col>
                         <Col md={6} id={`${c}-${comp.id}`}>
@@ -118,7 +116,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
                                 model={comp}
-                                pageWidth={width / 2}
+                                pageWidth={computedWidth / 2}
                             />
                         </Col>
                     </Row>
@@ -139,7 +137,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 datasets={datasets}
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
-                                pageWidth={width}
+                                pageWidth={computedWidth}
                             />
                         </Col>
                     </Row>

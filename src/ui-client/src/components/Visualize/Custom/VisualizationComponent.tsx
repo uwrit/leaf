@@ -20,6 +20,10 @@ interface Props {
     pageWidth: number;
 }
 
+interface State {
+    hidden: boolean;
+}
+
 interface ErrorBoundaryState {
     errored: boolean;
 }
@@ -66,31 +70,36 @@ export class VisualizationComponent extends React.Component<Props, ErrorBoundary
     }
 }
 
-class VisualizationComponentInternal extends React.PureComponent<Props> {
+class VisualizationComponentInternal extends React.PureComponent<Props, State> {
     private className = 'visualization-component';
 
     public constructor(props: Props) {
         super(props);
+        this.state = {
+            hidden: true
+        }
     }
 
-    private getStyle = (userSpec: any): React.CSSProperties => {
-        const style: React.CSSProperties = { width: userSpec.width };
-        if (userSpec['background'] && userSpec['background']['url']) {
-            style.background = `url(${userSpec['background'] && userSpec['background']['url']})`;
-        }
-        return style;
+    public componentDidMount() {
+        setTimeout(() => this.setState({ hidden: false }), this.props.model.orderId * 100);
     }
 
     public render() {
         const c = this.className;
         const { adminMode, model, isSelected } = this.props;
+        const { hidden } = this.state;
 
         if (!model.datasetQueryRefs.length) return null;
         const spec = this.getSpec();
         const style = spec ? this.getStyle(spec) : null;
+        const classes = [ c ];
+
+        if (adminMode)  classes.push('selectable');
+        if (isSelected) classes.push('selected');
+        if (hidden)     classes.push('hidden');
 
         return (
-            <div className={`${c} ${adminMode ? 'selectable' : ''} ${isSelected ? 'selected' : ''}`}>
+            <div className={classes.join(' ')}>
                 <SectionHeader headerText={model.header} subText={model.subHeader} />
 
                 {/* Visualization */}
@@ -113,6 +122,14 @@ class VisualizationComponentInternal extends React.PureComponent<Props> {
                 }
             </div>
         );
+    }
+
+    private getStyle = (userSpec: any): React.CSSProperties => {
+        const style: React.CSSProperties = { width: userSpec.width };
+        if (userSpec['background'] && userSpec['background']['url']) {
+            style.background = `url(${userSpec['background'] && userSpec['background']['url']})`;
+        }
+        return style;
     }
 
     private getSpec = () => {

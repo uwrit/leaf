@@ -8,7 +8,6 @@
 .visualization-page {
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 0 !important;
 }
 
 .visualization-component-container {
@@ -17,8 +16,14 @@
 
 .visualization-component {
     margin-bottom: 50px;
+    opacity: 1;
     overflow: hidden;
     padding: 20px 4px;
+    transition: opacity 1s;
+}
+
+.visualization-component.hidden {
+    opacity: 0;
 }
 
 .visualization-component.selectable {

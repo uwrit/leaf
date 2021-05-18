@@ -21,11 +21,11 @@ interface Props {
 }
 
 export class BasicDemographicsVisualization extends React.Component<Props> {
-
+    private className = 'visualize';
 
     public render() {
         let completedResponders = 0;
-        const c = 'visualize';
+        const c = this.className;
         const { cohort, responders, auth, width } = this.props;
         const demogHeight = 400;
         const respPadding = 200;

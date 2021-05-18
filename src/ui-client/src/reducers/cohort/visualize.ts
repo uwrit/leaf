@@ -100,13 +100,6 @@ export const setVisualizationDatasetState = (state: CohortState, action: CohortV
         datasets.set(dsid, ds);
     });
 
-    console.log('reducer datasets!', Object.assign({}, state, { 
-        visualization: {
-            ...state.visualization,
-            datasets
-        }
-    }));
-
     return Object.assign({}, state, { 
         visualization: {
             ...state.visualization,

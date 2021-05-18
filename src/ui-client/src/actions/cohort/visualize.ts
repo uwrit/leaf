@@ -90,6 +90,9 @@ export const loadDependentDatasets = (page: VisualizationPage) => {
                                 const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                                 fetchVisualizationDataset(state, nr, queryId, dsref)
                                     .then(ds => {
+                                        // Make sure query hasn't been cancelled
+                                        if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
+                                        
                                         results.set(dsref.id, results.get(dsref.id).concat(ds));
                                         dispatch(setVisualizationDatasetQueryNetworkState(dsref, CohortStateType.LOADED, nr.id));
                                     })

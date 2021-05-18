@@ -80,8 +80,9 @@ class Visualize extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        const dimensions = computeDimensions();
         this.state = { 
-            width: 1000,
+            width: dimensions.contentWidth,
             pageDropdownOpen: false,
             responderDropdownOpen: false
         };
@@ -173,40 +174,43 @@ class Visualize extends React.Component<Props, State> {
             for (const page of sortedPages) {
                 if (page.category && page.category !== prevCat) {
                     pageElems.push(
-                        <DropdownItem>
+                        <DropdownItem key={page.category}>
                             <div className={`${c}-page-option-category`}>{page.category}</div>
                         </DropdownItem>
                     );
                 }
                 pageElems.push(
-                    <DropdownItem onClick={this.handlePageDropdownItemClick.bind(null, page)}>
+                    <DropdownItem key={page.id} className="leaf-dropdown-item" onClick={this.handlePageDropdownItemClick.bind(null, page)}>
                         <div className={`${c}-page-option ${page.id === currentPageId ? 'selected' : ''}`}>{page.pageName}</div>
                     </DropdownItem>
                 );
             }
 
             pageSelector = (
-                <Dropdown key={0} isOpen={pageDropdownOpen} toggle={this.togglePageSelectorOpen}>
-                    <DropdownToggle>
-                        <div>
-                            {displayText} 
-                            <FaChevronDown className={`${c}-dropdown-chevron`}/>
-                        </div>
-                    </DropdownToggle>
-                    <DropdownMenu>
+                <div className={`${c}-dropdown-container`}>
+                    <div className={`${c}-top-row-text`}>Selected Visualization</div>
+                    <Dropdown key={0} isOpen={pageDropdownOpen} toggle={this.togglePageSelectorOpen}>
+                        <DropdownToggle>
+                            <div>
+                                {displayText} 
+                                <FaChevronDown className={`${c}-dropdown-chevron`}/>
+                            </div>
+                        </DropdownToggle>
+                        <DropdownMenu className="leaf-dropdown-menu">
 
-                        {/* Basic Demographics */}
-                        <DropdownItem onClick={this.handleBasicDemographicsDropdownItemClick.bind(null)}>
-                            <div className={`${c}-page-option ${showBasicDemographics ? 'selected' : ''}`}>Basic Demographics</div>
-                        </DropdownItem>
-                        <DropdownItem divider={true} />
+                            {/* Basic Demographics */}
+                            <DropdownItem onClick={this.handleBasicDemographicsDropdownItemClick.bind(null)} className="leaf-dropdown-item">
+                                <div className={`${c}-page-option ${showBasicDemographics ? 'selected' : ''}`}>Basic Demographics</div>
+                            </DropdownItem>
+                            <DropdownItem divider={true} />
 
-                        {/* Custom pages */}
-                        <div className={`${c}-dropdown-item-container`}>
-                            {pageElems}
-                        </div>
-                    </DropdownMenu>
-                </Dropdown>
+                            {/* Custom pages */}
+                            <div className={`${c}-dropdown-item-container`}>
+                                {pageElems}
+                            </div>
+                        </DropdownMenu>
+                    </Dropdown>
+                </div>
             );
         }
 
@@ -236,7 +240,7 @@ class Visualize extends React.Component<Props, State> {
                             {/* By Responder */}
                             {[ ...responders.values() ].map(r => {
                                 return (
-                                    <DropdownItem onClick={this.handleResponderDropdownItemClick.bind(null, r.id)}>
+                                    <DropdownItem key={r.id} onClick={this.handleResponderDropdownItemClick.bind(null, r.id)} className="leaf-dropdown-item">
                                         <div className={`${c}-page-option `}>{r.name}</div>
                                     </DropdownItem>
                                 )

@@ -5,6 +5,69 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+/* Top row */
+.visualize-top-row {
+    padding: 10px;
+}
+
+/* Dropdown */
+.visualize-top-row .dropdown {
+    outline: none;
+    width: 250px;
+}
+
+.visualize-top-row .dropdown-menu {
+    border-bottom: 1px solid rgb(238, 238, 238);
+    width: 100%;
+}
+
+.visualize-dropdown-container > div {
+    display: inline-block !important;
+}
+
+.visualize-top-row-text {
+    font-family: Roboto;
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin: 8px 10px 0;
+}
+
+.visualize-top-row .dropdown button {
+    background-color: rgba(28, 168, 221, 0.05) !important;
+    border: 1px solid rgba(28, 168, 221, 0.1) !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    border: none;
+    color: rgb(28, 168, 221) !important;
+    font-family: Roboto;
+    font-size: 1.1rem;
+    margin-top: -2px;
+    text-align: left;
+    width: 100%;
+}
+
+.visualize-top-row .dropdown .dropdown-item.selected,
+.visualize-top-row .dropdown button:active ,
+.visualize-top-row .dropdown button:hover {
+    background-color: rgba(28, 168, 221, 0.1) !important;
+    border-color:rgba(28, 168, 221, 0.2) !important;
+}
+
+.visualize-dropdown-chevron {
+    float: right;
+    margin-top: 5px;
+    transform: scale(0.7);
+}
+
+.visualize-top-row .dropdown .dropdown-item {
+    background-color: transparent !important;
+    border: none !important;
+    color: rgb(50,50,50) !important;
+    cursor: pointer;
+    font-size: 1.0rem;
+    outline: none;
+}
+
 /* Loading icon */
 .visualize-loading {
     width: 100%;

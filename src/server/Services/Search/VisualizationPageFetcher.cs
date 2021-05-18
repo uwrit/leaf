@@ -69,6 +69,7 @@ namespace Services.Search
                         OrderId = page.OrderId,
                         Components = compsJoin.Select(comp => new VisualizationComponent
                         {
+                            Id = comp.Component.Id,
                             Header = comp.Component.Header,
                             SubHeader = comp.Component.SubHeader,
                             JsonSpec = comp.Component.JsonSpec,
