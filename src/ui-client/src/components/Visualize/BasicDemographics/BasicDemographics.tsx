@@ -64,7 +64,7 @@ export class BasicDemographicsVisualization extends React.Component<Props> {
         } 
 
         return  (
-            <div className={`${c}-container scrollable-offset-by-header`}>
+            <div className={`${c}-basic-demographics-container scrollable-offset-by-header`}>
                 <AggregateDemographics 
                     cohort={cohort} 
                     height={demogHeight}

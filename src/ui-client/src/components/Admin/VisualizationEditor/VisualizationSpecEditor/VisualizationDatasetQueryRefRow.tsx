@@ -41,8 +41,8 @@ export default class VisualizationDatasetQueryRefRow extends React.PureComponent
         return (
             <div key={dataset.id} className={c}>
                 <div className={`${c}-name`}>{metadata.name}</div>
-                <div id={tooltipId} className={`${c}-sample-size`}>{dataset.data.length.toLocaleString()} rows, hover to view sample</div>
-                <Tooltip className={`${c}-sample-tooltip`} 
+                <div id={tooltipId} className={`visualization-spec-editor-sample-size`}>{dataset.data.length.toLocaleString()} rows, hover to view sample</div>
+                <Tooltip className={`visualization-spec-editor-sample-tooltip`} 
                     placement="bottom" 
                     isOpen={showSample} 
                     autohide={false} 

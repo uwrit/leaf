@@ -6,7 +6,8 @@
  */ 
 
 import React from 'react';
-import { VegaLite, VisualizationSpec } from 'react-vega';
+import { View, ViewListener } from 'react-vega';
+import { VegaLite, VisualizationSpec } from '../../../bundled/react-vega' //'react-vega';
 import { VisualizationDatasetState } from '../../../models/state/CohortState';
 import { VisualizationComponent as VisualizationComponentModel } from '../../../models/visualization/Visualization';
 import { SectionHeader } from '../../Other/SectionHeader/SectionHeader';
@@ -18,6 +19,7 @@ interface Props {
     isSelected?: boolean;
     model: VisualizationComponentModel;
     pageWidth: number;
+    viewUpdateHandler?: ViewListener;
 }
 
 interface State {
@@ -106,7 +108,7 @@ class VisualizationComponentInternal extends React.PureComponent<Props, State> {
                 {spec &&
                 <div className={c}>
                     <div className={`${c}-inner`} style={style}>
-                        <VegaLite spec={spec as VisualizationSpec} renderer="svg"/>
+                        <VegaLite spec={spec as VisualizationSpec} renderer="svg" onNewView={this.handleViewUpdate} />
                     </div>
                 </div>
                 }
@@ -122,6 +124,13 @@ class VisualizationComponentInternal extends React.PureComponent<Props, State> {
                 }
             </div>
         );
+    }
+
+    private handleViewUpdate = (view: View) => {
+        const { viewUpdateHandler, isSelected } = this.props;
+        if (isSelected && viewUpdateHandler) {
+            viewUpdateHandler(view);
+        }
     }
 
     private getStyle = (userSpec: any): React.CSSProperties => {

@@ -32,6 +32,10 @@
     display: none;
 }
 
+.visualization-spec-editor-user-json {
+    margin-top: 20px;
+}
+
 .visualization-spec-editor .ace_editor {
     border-radius: 4px !important;
 }
@@ -54,7 +58,7 @@
     padding: 4px;
 }
 
-.visualization-spec-editor-datasetqueryref-sample-size {
+.visualization-spec-editor-sample-size {
     border-radius: 4px;
     color: rgb(150,150,150);
     cursor: help;
@@ -63,12 +67,12 @@
     padding: 4px;
 }
 
-.visualization-spec-editor-datasetqueryref-sample-size:hover {
+.visualization-spec-editor-sample-size:hover {
     background-color: rgb(240,240,240);
     color: black;
 }
 
-.visualization-spec-editor-datasetqueryref-show-sample:hover {
+.visualization-spec-editor-show-sample:hover {
     background-color: rgb(230,230,230);
     color: black;
 }
@@ -97,18 +101,18 @@
     text-decoration: underline;
 }
 
-.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip {
+.visualization-spec-editor-sample-tooltip .tooltip {
     margin-left: -62%;
     margin-top: -10%;
     opacity: 1;
     width: 50%;
 }
 
-.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip-inner {
+.visualization-spec-editor-sample-tooltip .tooltip-inner {
     background-color: transparent;
 }
 
-.visualization-spec-editor-datasetqueryref-sample-tooltip .tooltip .arrow {
+.visualization-spec-editor-sample-tooltip .tooltip .arrow {
     display: none;
 }
 

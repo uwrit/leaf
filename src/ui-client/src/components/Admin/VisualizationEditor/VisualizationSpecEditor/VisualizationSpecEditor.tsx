@@ -9,7 +9,7 @@ import React from 'react';
 import { AdminVisualizationPage } from '../../../../models/admin/Visualization';
 import { setAdminCurrentVisualizationPage } from '../../../../actions/admin/visualization';
 import { Section } from '../../Section/Section';
-import { Col, Row } from 'reactstrap';
+import { Col, Row, Tooltip } from 'reactstrap';
 import { debounce } from 'lodash';
 import 'ace-builds'
 import 'ace-builds/webpack-resolver'
@@ -21,20 +21,34 @@ import { Checkbox } from '../../Section/Checkbox';
 import { AdminVisualizationDatasetState } from '../../../../models/state/AdminState';
 import VisualizationDatasetQueryRefRow from './VisualizationDatasetQueryRefRow';
 import './VisualizationSpecEditor.css';
+import VisualizationDatasetSample from './VisualizationDatasetSample';
 
 interface Props { 
     page?: AdminVisualizationPage;
     componentIndex: number;
     datasets: Map<string, AdminVisualizationDatasetState>;
     dispatch: any;
+    vizInputSample?: any[];
 }
 
-export default class VisualizationSpecEditor extends React.PureComponent<Props> {
+interface State {
+    showInputSample: boolean;
+}
+
+export default class VisualizationSpecEditor extends React.PureComponent<Props, State> {
     private className = 'visualization-spec-editor';
+
+    public constructor(props: Props) {
+        super(props);
+        this.state = { 
+            showInputSample: false
+        };
+    }
 
     public render() {
         const c = this.className;
-        const { componentIndex, page, datasets } = this.props;
+        const { componentIndex, page, datasets, vizInputSample } = this.props;
+        const testtooltipId = `${c}-tooltip-test`;
 
         if (componentIndex === -1 || componentIndex > page.components.length-1) {
             return (
@@ -85,11 +99,28 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                     </div>
                     <div>
                         {comp.datasetQueryRefs.map(dsref => (
-                            <VisualizationDatasetQueryRefRow dataset={datasets.get(dsref.id)} metadata={dsref} />
+                            <VisualizationDatasetQueryRefRow key={dsref.id} dataset={datasets.get(dsref.id)} metadata={dsref} />
                         ))}
                         <div className={`${c}-datasets-addnew`}>+ Add New Dataset</div>
                     </div>
                 </Section>
+                            
+                {2+2 === 5 && vizInputSample && 
+                <div>
+                    <div id={testtooltipId} className={`${c}-viz-sample-size`}>Test</div>
+                    <Tooltip className={`visualization-spec-editor-sample-tooltip`} 
+                        placement="bottom" 
+                        isOpen={this.state.showInputSample} 
+                        autohide={false} 
+                        target={testtooltipId}
+                        toggle={this.toggleShowInputSample}
+                        >
+                        <VisualizationDatasetSample data={vizInputSample}/>
+                    </Tooltip>
+                </div>
+                }
+
+                <div className={`${c}-delete`}>Delete</div>
 
                 <Section header='Vega-Lite JSON Editor'>
                     <div>
@@ -106,7 +137,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
 
                     {/* Leaf-generated JSON */}
                     <div className={`${c}-leaf-json`}>
-                        <span>Base JSON visualization specification</span>
+                        <div>Base JSON visualization specification</div>
                         <AceEditor
                         className={`${c}-leaf-json`}
                         editorProps={{ $blockScrolling: Infinity }}
@@ -127,7 +158,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                     </div>
 
                     {/* JSON Spec Editor */}
-                    <span>JSON visualization specification</span>
+                    <div className={`${c}-user-json`}>JSON visualization specification</div>
                     <div>
                         <small className="form-text text-muted">
                             Enter a valid Vega JSON specification here. Your JSON will be merged with the Leaf auto-generated specification
@@ -139,7 +170,7 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
                         editorProps={{ $blockScrolling: Infinity }}
                         highlightActiveLine={true}
                         onChange={this.handleJsonSpecChange}
-                        height={`${500}px`}
+                        height={`${800}px`}
                         width={`${100}%`}
                         mode="json"
                         theme="iplastic"
@@ -172,6 +203,10 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props> 
   "data": { "name": "${datasetQueryRefs[0].name}" }
 }`;
         return leafGeneratedSpec;
+    }
+
+    private toggleShowInputSample = () => {
+        this.setState({ showInputSample: !this.state.showInputSample });
     }
 
     private noOp = () => null as any;

@@ -6,6 +6,7 @@
  */ 
 
 import React from 'react';
+import { ViewListener } from 'react-vega';
 import { Col, Container, Row } from 'reactstrap';
 import { CohortStateType, VisualizationDatasetState } from '../../../models/state/CohortState';
 import { VisualizationDatasetQueryRef, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
@@ -21,6 +22,7 @@ interface Props {
     page: VisualizationPageModel;
     selectedComponentIndex?: number;
     width: number;
+    viewUpdateHandler?: ViewListener;
 }
 
 export default class VisualizationPage extends React.PureComponent<Props> {
@@ -80,9 +82,9 @@ export default class VisualizationPage extends React.PureComponent<Props> {
 
     private getComponents = () => {
         const c = this.className;
-        const { page, editing, adminMode, selectedComponentIndex, datasets, width } = this.props;
+        const { page, editing, adminMode, selectedComponentIndex, datasets, width, viewUpdateHandler } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
-        const padding = width * 0.3 + (editing ? width * 0.4 : 0);
+        const padding = width * 0.3 + (editing ? width * 0.15 : 0);
         const computedWidth = width - padding;
         const comps: any[] = [];
         let i = 0;
@@ -106,6 +108,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
                                 pageWidth={computedWidth / 2}
+                                viewUpdateHandler={viewUpdateHandler}
                             />
                         </Col>
                         <Col md={6} id={`${c}-${nextComp.id}`}>
@@ -117,6 +120,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 isSelected={checkSelected && selectedComponentIndex === i+1}
                                 model={nextComp}
                                 pageWidth={computedWidth / 2}
+                                viewUpdateHandler={viewUpdateHandler}
                             />
                         </Col>
                     </Row>
@@ -138,6 +142,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
                                 isSelected={checkSelected && selectedComponentIndex === i}
                                 model={comp}
                                 pageWidth={computedWidth}
+                                viewUpdateHandler={viewUpdateHandler}
                             />
                         </Col>
                     </Row>

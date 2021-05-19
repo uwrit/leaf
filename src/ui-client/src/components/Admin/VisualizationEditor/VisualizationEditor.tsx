@@ -19,6 +19,7 @@ import { saveAdminVisualizationPage, setAdminCurrentVisualizationPageWithDataset
 import VisualizationPage from '../../Visualize/Custom/VisualizationPage';
 import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
 import { FiChevronRight } from 'react-icons/fi';
+import { View, ViewListener } from '../../../bundled/react-vega';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -30,8 +31,36 @@ interface Props {
 interface State {
     editing: boolean;
     previewWidth: number;
+    vizInputSample?: any[];
     selectedComponentIndex: number;
     sidebarWidth: number;
+}
+
+interface HydratedView extends View {
+    _runtime: HydratedViewRuntime;
+}
+
+interface HydratedViewRuntime {
+    data: HydratedViewRuntimeData;
+}
+
+interface HydratedViewRuntimeData {
+    data_0?: HydratedViewRuntimeSource;
+    data_1?: HydratedViewRuntimeSource;
+    marks: any;
+    root: any;
+    source_0?: HydratedViewRuntimeSource;
+    source_1?: HydratedViewRuntimeSource;
+}
+
+interface HydratedViewRuntimeSource {
+    input: HydratedViewRuntimeSourceValueArray;
+    output: HydratedViewRuntimeSourceValueArray;
+    values: HydratedViewRuntimeSourceValueArray;
+}
+
+interface HydratedViewRuntimeSourceValueArray {
+    value: any[];
 }
 
 export class VisualizationEditor extends React.PureComponent<Props,State> {
@@ -56,7 +85,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
         const sidebarWidth = sidebar[0].getClientRects()[0].width;
         const mainWidth = main[0].getClientRects()[0].width;
-        const previewWidth = mainWidth - sidebarWidth;
+        const previewWidth = mainWidth + sidebarWidth;
 
         return { sidebarWidth, previewWidth };
     }
@@ -69,7 +98,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         this.setState({ previewWidth, sidebarWidth });
     }
 
-    public componentWillMount() {
+    public componentDidMount() {
         window.addEventListener('resize', this.updateDimensions);
     }
 
@@ -80,7 +109,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
     public render() {
         const c = this.className;
         const { cohort, data, dispatch } = this.props;
-        const { selectedComponentIndex, editing, previewWidth } = this.state;
+        const { selectedComponentIndex, editing, previewWidth, vizInputSample } = this.state;
         const { visualizations } = data;
         const { currentPage, changed, datasets } = visualizations;
         const cohortReady = cohort.count.state === CohortStateType.LOADED;
@@ -149,7 +178,9 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                             componentClickHandler={this.handlePageComponentClick} 
                             datasets={data.visualizations.datasets}
                             page={currentPage} 
+                            selectedComponentIndex={selectedComponentIndex}
                             width={previewWidth}
+                            viewUpdateHandler={this.handleViewUpdate}
                         />
                         }
 
@@ -170,7 +201,8 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
                             datasets={datasets}
                             page={currentPage} 
                             componentIndex={selectedComponentIndex} 
-                            dispatch={dispatch} 
+                            dispatch={dispatch}
+                            vizInputSample={vizInputSample}
                         />
                     </DirectionalSlider>
 
@@ -206,22 +238,19 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         return classes;
     }
 
-    private checkDatasetsLoaded = (): boolean => {
-        const { currentPage, datasets } = this.props.data.visualizations;
+    private handleViewUpdate: ViewListener = (view: View) => {
+        return;
+        const v = view as HydratedView;
 
-        if (currentPage && datasets.size) {
-            for (const comp of currentPage.components) {
-                for (const dsref of comp.datasetQueryRefs) {
-                    const status = datasets.get(dsref.id);
-                    if (!status || status.state !== CohortStateType.LOADED) {
-                        return false;
-                    }
-                }
+        try {
+            if (v._runtime && v._runtime.data && (v._runtime.data.data_0 || v._runtime.data.source_0)) {
+                const d = v._runtime.data.data_0 ? v._runtime.data.data_0 : v._runtime.data.source_0;
+                const top10keys = Object.keys(d.input.value).slice(0, 10);
+                const sample: any[] = top10keys.map(k => d.input.value[k as any])
+                this.setState({ vizInputSample: sample });
+                console.log(sample[0]);
             }
-        } else {
-            return false;
-        }
-        return true;
+        } catch (err) {}
     }
 
     private handleSidebarClick = (page: VisualizationPageModel) => {
