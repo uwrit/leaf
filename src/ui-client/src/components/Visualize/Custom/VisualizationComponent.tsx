@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { View, ViewListener } from 'react-vega';
+import { View } from 'react-vega';
 import { VegaLite, VisualizationSpec } from '../../../bundled/react-vega' //'react-vega';
 import { VisualizationDatasetState } from '../../../models/state/CohortState';
 import { VisualizationComponent as VisualizationComponentModel } from '../../../models/visualization/Visualization';
@@ -19,7 +19,7 @@ interface Props {
     isSelected?: boolean;
     model: VisualizationComponentModel;
     pageWidth: number;
-    viewUpdateHandler?: ViewListener;
+    viewUpdateHandler?: (name: string, view: View) => void;
 }
 
 interface State {
@@ -127,9 +127,9 @@ class VisualizationComponentInternal extends React.PureComponent<Props, State> {
     }
 
     private handleViewUpdate = (view: View) => {
-        const { viewUpdateHandler, isSelected } = this.props;
-        if (isSelected && viewUpdateHandler) {
-            viewUpdateHandler(view);
+        const { viewUpdateHandler, isSelected, model } = this.props;
+        if (viewUpdateHandler) {
+            viewUpdateHandler(model.header, view);
         }
     }
 

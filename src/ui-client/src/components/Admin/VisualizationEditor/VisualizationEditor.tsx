@@ -19,7 +19,7 @@ import { saveAdminVisualizationPage, setAdminCurrentVisualizationPageWithDataset
 import VisualizationPage from '../../Visualize/Custom/VisualizationPage';
 import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/DirectionalSlider';
 import { FiChevronRight } from 'react-icons/fi';
-import { View, ViewListener } from '../../../bundled/react-vega';
+import { View } from '../../../bundled/react-vega';
 import './VisualizationEditor.css';
 
 interface Props { 
@@ -85,7 +85,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
         const sidebarWidth = sidebar[0].getClientRects()[0].width;
         const mainWidth = main[0].getClientRects()[0].width;
-        const previewWidth = mainWidth + sidebarWidth;
+        const previewWidth = mainWidth - sidebarWidth;
 
         return { sidebarWidth, previewWidth };
     }
@@ -238,17 +238,21 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         return classes;
     }
 
-    private handleViewUpdate: ViewListener = (view: View) => {
-        return;
+    private handleViewUpdate = (name: string, view: View) => {
         const v = view as HydratedView;
 
         try {
             if (v._runtime && v._runtime.data && (v._runtime.data.data_0 || v._runtime.data.source_0)) {
-                const d = v._runtime.data.data_0 ? v._runtime.data.data_0 : v._runtime.data.source_0;
-                const top10keys = Object.keys(d.input.value).slice(0, 10);
-                const sample: any[] = top10keys.map(k => d.input.value[k as any])
-                this.setState({ vizInputSample: sample });
-                console.log(sample[0]);
+                for (const k of [ 'data_0', 'source_0']) {
+                    const d = (v._runtime.data as any)[k];
+                    if (d) {
+                        const top10keys = Object.keys(d.input.value).slice(0, 10);
+                        const sample: any[] = top10keys.map(k => d.input.value[k as any]);
+                        if (sample[0]) {
+                            console.log(name, k, Object.keys(sample[0]));
+                        }
+                    }
+                }
             }
         } catch (err) {}
     }

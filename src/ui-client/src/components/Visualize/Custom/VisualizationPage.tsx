@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ViewListener } from 'react-vega';
+import { View } from 'react-vega';
 import { Col, Container, Row } from 'reactstrap';
 import { CohortStateType, VisualizationDatasetState } from '../../../models/state/CohortState';
 import { VisualizationDatasetQueryRef, VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
@@ -22,7 +22,7 @@ interface Props {
     page: VisualizationPageModel;
     selectedComponentIndex?: number;
     width: number;
-    viewUpdateHandler?: ViewListener;
+    viewUpdateHandler?: (name: string, view: View) => void;
 }
 
 export default class VisualizationPage extends React.PureComponent<Props> {
@@ -84,7 +84,7 @@ export default class VisualizationPage extends React.PureComponent<Props> {
         const c = this.className;
         const { page, editing, adminMode, selectedComponentIndex, datasets, width, viewUpdateHandler } = this.props;
         const checkSelected = adminMode && typeof selectedComponentIndex !== 'undefined';
-        const padding = width * 0.3 + (editing ? width * 0.15 : 0);
+        const padding = width * 0.3 + (editing ? width * 0.3 : 0);
         const computedWidth = width - padding;
         const comps: any[] = [];
         let i = 0;
