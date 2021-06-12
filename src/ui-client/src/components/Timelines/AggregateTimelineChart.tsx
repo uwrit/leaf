@@ -8,7 +8,6 @@
 import React from 'react';
 import { XAxis, YAxis, Scatter, ScatterChart, ZAxis, Tooltip, CartesianGrid } from 'recharts';
 import { deleteConceptDataset } from '../../actions/cohort/timelines';
-import { Concept } from '../../models/concept/Concept';
 import { NumericFilterType } from '../../models/panel/NumericFilter';
 import { Panel } from '../../models/panel/Panel';
 import { PanelItem } from '../../models/panel/PanelItem';
@@ -99,7 +98,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
 
                             {/* Y-axis */}
                             <YAxis type="number" dataKey="displayValueY" domain={[1,1]} axisLine={false} width={150} orientation="right"
-                                tick={<CustomizedYAxisTick height={isLast ? swimlaneHeight - 28 : swimlaneHeight} panel={d.panel} clickHandler={this.handleLabelClick}/>}
+                                tick={<CustomizedYAxisTick count={data.length} height={isLast ? swimlaneHeight - 28 : swimlaneHeight} panel={d.panel} clickHandler={this.handleLabelClick}/>}
                             />
 
                             {/* Z-axis (bubble size) */}
@@ -150,8 +149,8 @@ export default class AggregateTimelineChart extends React.Component<Props, State
     
             return (
                 <div className={c}>
-                    <span className={`${c}-count`}>{count}</span>
-                    <span className={`${c}-denom`}>/{denom}</span>
+                    <span className={`${c}-count`}>{count.toLocaleString()}</span>
+                    <span className={`${c}-denom`}>/{denom.toLocaleString()}</span>
                     <span> patients </span>
                     <span className={`${c}-subtext`}>(</span>
                     <span className={`${c}-percent`}>{pct}%</span>
@@ -168,6 +167,7 @@ export default class AggregateTimelineChart extends React.Component<Props, State
  */
 interface YTickProps {
     clickHandler: (panel: Panel) => void;
+    count: number;
     height: number;
     panel: Panel;
     x?: any;
@@ -183,22 +183,38 @@ const closeX = (
 class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
     public render () {
         const c = 'timelines-aggregate-yaxis';
-        const { x, y, payload, panel, clickHandler, height } = this.props;
+        const { x, y, payload, panel, clickHandler, height, count } = this.props;
         if (payload.value !== 1) { return null; }
         const pi = panel.subPanels[0].panelItems[0];
+        const text = this.getText(pi, panel);
 
         return (
             <foreignObject className={c} x={x+1} y={0} height={height}>
-                <div className={`${c}-container`} onClick={clickHandler.bind(null, panel)}>
-                    <div className={`${c}-remove`}>
+                <div className={`${c}-container`}>
+                    <div className={`${c}-remove`} onClick={clickHandler.bind(null, panel)}>
                         {closeX}
                     </div>
-                    <div className={`${c}-label`} >
-                        {this.getText(pi, panel)}
+                    <div className={`${c}-label ${this.getClasses(text.length, count)}`} >
+                        <div className={`${c}-label-inner`} >
+                            {text}
+                        </div>
                     </div>
                 </div>
             </foreignObject>
         );
+    }
+
+    private getClasses = (textLen: number, conceptCount: number): string => {
+        let classes = [];
+        if (conceptCount <= 4) {
+            classes.push('center');
+        } else if (textLen < 100) {
+            classes.push('center');
+        }
+        if (conceptCount > 4) {
+            classes.push('font-small')
+        }
+        return classes.join(' ');
     }
 
     private getText = (pi: PanelItem, panel: Panel): string => {
@@ -236,11 +252,6 @@ class CustomizedYAxisTick extends React.PureComponent<YTickProps> {
         }
         if (panel.dateFilter.display && panel.dateFilter.display !== 'Anytime') {
             addText += ` (${panel.dateFilter.display.replace('In ', '')})`;
-        }
-
-        const shortenVal = addText.length ? 70 : 80;
-        if (coreText.length > shortenVal) {
-            coreText = `${coreText.slice(0, shortenVal)} ...`
         }
 
         return `${coreText} ${addText}`

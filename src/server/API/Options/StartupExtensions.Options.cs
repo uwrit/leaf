@@ -161,6 +161,7 @@ namespace API.Options
             services.Configure<AttestationOptions>(opts =>
             {
                 opts.Enabled = config.GetValue<bool>(Config.Attestation.Enabled);
+                opts.Text = config.GetSection(Config.Attestation.Text).Get<string[]>();
             });
 
             return services;

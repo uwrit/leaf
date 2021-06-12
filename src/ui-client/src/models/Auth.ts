@@ -27,6 +27,7 @@ interface AuthenticationConfigDTO {
 
 interface AttestationOptionsDTO {
     enabled: boolean;
+    text?: string[];
 }
 
 interface CohortConfigDTO {

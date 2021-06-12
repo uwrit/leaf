@@ -312,3 +312,13 @@
     font-size: 1.0rem;
     font-weight: 700;
 }
+
+.attestation-custom-text {
+    border: none;
+    font-size: 1.15rem;
+    font-family: Roboto;
+    font-weight: 300;
+    outline: none;
+    resize: none;
+    width: 100%;
+}

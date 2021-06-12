@@ -10,5 +10,6 @@ namespace Model.Options
     public class AttestationOptions
     {
         public bool Enabled { get; set; }
+        public string[] Text { get; set; }
     }
 }

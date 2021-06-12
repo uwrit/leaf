@@ -9,6 +9,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import { SessionType } from '../../models/Session'
 import { AppConfig } from '../../models/Auth';
+import TextareaAutosize from 'react-textarea-autosize';
 
 interface Props {
     config?: AppConfig;
@@ -31,6 +32,7 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
         const useDisplay = sessionType === SessionType.Research ? 'Research' : 'Quality Improvement';
         const phiDisplay = isIdentified ? 'Identified' : 'Deidentified';
         const showText = config && config.attestation.enabled;
+        const useCustomText = config.attestation.text && config.attestation.text.length > 0;
 
         return  (
             <div className={confirmationClass}>
@@ -39,8 +41,20 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
                     {useDisplay} - {phiDisplay}
                 </div>,
                 <p key='2'>
-                    I attest that the information I have entered is accurate and I will
-                    use the application, Leaf, as I have indicated.
+                    {/* If no custom text, use default */}
+                    {!useCustomText &&
+                    <span>
+                        I attest that the information I have entered is accurate and I will
+                        use the application, Leaf, as I have indicated.
+                    </span>
+                    }
+
+                    {/* Else use custom text */}
+                    {useCustomText &&
+                        config.attestation.text.map((t,i) => {
+                            return <TextareaAutosize key={i} className={`${c}-custom-text`} defaultValue={t} readOnly={true} />;
+                        })
+                    }
                 </p>
                 ]}
                 {!(isSubmittingAttestation || hasAttested) &&

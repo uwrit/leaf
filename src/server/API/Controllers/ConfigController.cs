@@ -57,7 +57,8 @@ namespace API.Controllers
                 },
                 Attestation = new AttestationConfigDTO
                 {
-                    Enabled = attestationOptions.Enabled
+                    Enabled = attestationOptions.Enabled,
+                    Text = attestationOptions.Text
                 },
                 Cohort = new CohortConfigDTO
                 {

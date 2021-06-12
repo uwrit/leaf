@@ -70,7 +70,6 @@ const timelines = (): RouteConfig => {
         display: 'Timelines',
         icon: <FiSliders />,
         index: Routes.Timelines,
-        isBeta: true,
         path: '/timelines',
         render: () => <Timelines />
     };

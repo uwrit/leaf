@@ -100,7 +100,7 @@ class Timelines extends React.Component<Props, State> {
                 }
 
                 {/* Main content */}
-                <Container fluid={true} className={`${c}-main`}>
+                <Container fluid={true} className={`${c}-main ${showConcepts ? 'overlayed' : ''}`}>
                     <Row>
 
                         {/* Control panel */}

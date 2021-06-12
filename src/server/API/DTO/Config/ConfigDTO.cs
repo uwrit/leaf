@@ -34,6 +34,7 @@ namespace API.DTO.Config
     public class AttestationConfigDTO
     {
         public bool Enabled { get; set; }
+        public string[] Text { get; set; }
     }
 
     public class ClientOptionsDTO

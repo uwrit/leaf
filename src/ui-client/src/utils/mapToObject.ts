@@ -19,7 +19,8 @@ export const objectToMapRecursive = (input: any) => {
                 ob[key] = demap(val);
                 break;
             case "Object":
-                ob[key] = objectToMapRecursive(val)
+                ob[key] = objectToMapRecursive(val);
+                break;
             default:
                 break;
         } 
