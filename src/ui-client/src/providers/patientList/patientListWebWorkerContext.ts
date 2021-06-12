@@ -119,7 +119,7 @@ var addSingletonDataset = function (payload) {
             var f = dateFields[k].id;
             var v = row[f];
             if (v) {
-                row[f] = new Date(v);
+                row[f] = parseTimestamp(v);
             }
         }
         patientData.set(def.id, new Map(Object.entries(row)));
@@ -156,7 +156,7 @@ var addMultiRowDataset = function (payload) {
                 var f = dateFields[k].id;
                 var v = row[f];
                 if (v) {
-                    row[f] = new Date(v);
+                    row[f] = parseTimestamp(v);
                 }
             }
         }
@@ -345,6 +345,13 @@ var setDetailRows = function (patId) {
     pat.detailValues = [];
     encMap.forEach(function (v, k) { return pat.detailValues.push({ encounterId: k, rows: v }); });
     pat.detailRowCount = rowCount;
+};
+/**
+* Parse a string timestamp. More info at https://github.com/uwrit/leaf/issues/418
+*/
+var parseTimestamp = function (timestampStr) {
+    var _date = new Date(timestampStr);
+    return new Date(_date.getTime() + (_date.getTimezoneOffset() * 60 * 1000));
 };
 /*
  * Return patient ids unsorted.

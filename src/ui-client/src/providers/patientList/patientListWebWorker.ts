@@ -290,7 +290,7 @@ export default class PatientListWebWorker {
                     const f = dateFields[k].id;
                     const v = row[f];
                     if (v) {
-                        row[f] = new Date(v);
+                        row[f] = parseTimestamp(v);
                     }
                 }
                 patientData.set(def!.id, new Map(Object.entries(row)));
@@ -329,7 +329,7 @@ export default class PatientListWebWorker {
                         const f = dateFields[k].id;
                         const v = row[f];
                         if (v) {
-                            row[f] = new Date(v);
+                            row[f] = parseTimestamp(v);
                         }
                     }
                 }
@@ -527,6 +527,14 @@ export default class PatientListWebWorker {
             pat.detailValues = [];
             encMap.forEach((v, k) => pat.detailValues.push({ encounterId: k, rows: v }));
             pat.detailRowCount = rowCount;
+        };
+
+        /**
+         * Parse a string timestamp. More info at https://github.com/uwrit/leaf/issues/418
+         */
+        const parseTimestamp = (timestampStr: string): Date => {
+            const _date = new Date(timestampStr);
+            return new Date(_date.getTime() + (_date.getTimezoneOffset() * 60 * 1000));
         };
 
         /*
