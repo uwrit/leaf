@@ -10,7 +10,6 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux'
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { attestAndLoadSession } from '../../actions/session';
-import AttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
 import AttestationContent from '../../components/Attestation/AttestationContent';
 import AttestationFooter from '../../components/Attestation/AttestationFooter';
 import { AppState } from '../../models/state/AppState';
@@ -22,9 +21,9 @@ import { Browser } from '../../models/state/GeneralUiState';
 import BrowserError from '../../components/Attestation/BrowserError';
 import moment from 'moment';
 import { version } from '../../../package.json'
-import './Attestation.css';
 import CustomAttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
 import StandardAttestationConfirmation from '../../components/Attestation/StandardAttestationConfirmation';
+import './Attestation.css';
 
 interface DispatchProps {
     dispatch: any;
@@ -184,8 +183,7 @@ class Attestation extends React.PureComponent<Props, State> {
         );
     }
 
-    private getAttestationConfirmation = 
-        (
+    private getAttestationConfirmation = (
             config: AppConfig,
             hasAttested: boolean,
             isIdentified: boolean,
