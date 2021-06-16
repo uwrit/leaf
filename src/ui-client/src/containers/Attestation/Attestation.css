@@ -141,8 +141,7 @@
 }
 
 .attestation-content,
-.attestation-confirmation-container,
-.attestation-session-load-display-container {
+.attestation-confirmation-container {
     flex-shrink: 0;
     max-height: 50px;
     transition: max-height 1.0s, margin-left 1.2s, margin-right 1.2s;
@@ -179,12 +178,13 @@
 }
 
 .attestation-session-load-display-container {
-    max-height: 1000px;
+    display: block;
     text-align: right;
-    width: 100%;
 }
 
 .attestation-session-load-display-container span {
+    color: #212529 !important;
+    float: right;
     margin-right: 20px;
 }
 
@@ -324,6 +324,10 @@
     font-family: "Mukta Mahee";
     font-size: 1.0rem;
     font-weight: 700;
+}
+
+.attestation-default-text {
+    margin-top: 10px;
 }
 
 .attestation-custom-text-container,

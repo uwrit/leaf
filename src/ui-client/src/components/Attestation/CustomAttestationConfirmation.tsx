@@ -24,7 +24,7 @@ interface Props {
     sessionType: SessionType;
 }
 
-export default class AttestationConfirmation extends React.PureComponent<Props> {
+export default class CustomAttestationConfirmation extends React.PureComponent<Props> {
     public render() {
         const c = this.props.className;
         const { show, handleGoBackClick, handleIAgreeClick, isIdentified, sessionType, sessionLoadDisplay, hasAttested, isSubmittingAttestation, config } = this.props;
@@ -32,8 +32,7 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
         const useDisplay = sessionType === SessionType.Research ? 'Research' : 'Quality Improvement';
         const phiDisplay = isIdentified ? 'Identified' : 'Deidentified';
         const showText = config && config.attestation.enabled;
-        const useCustomText = config.attestation.text && config.attestation.text.length > 0;
-        const useHtml = useCustomText && config.attestation.type && config.attestation.type === CustomAttestationType.Html;
+        const useHtml = config.attestation.type && config.attestation.type === CustomAttestationType.Html;
 
         return  (
             <div className={confirmationClass}>
@@ -60,31 +59,25 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
                             </Button>
                         </Col>
                         }
+                        {(isSubmittingAttestation || hasAttested) &&
+                        <Col md={6} className="right">
+                            <div className={`${c}-session-load-display-container`}>
+                                <div className={`${c}-session-load-display`}>
+                                    <span>...{sessionLoadDisplay}</span>
+                                </div>
+                            </div>
+                        </Col>
+                        }
                     </Row>
 
-                    {(isSubmittingAttestation || hasAttested) &&
-                        <div className={`${c}-session-load-display-container`}>
-                            <div className={`${c}-session-load-display`}>
-                                <span>...{sessionLoadDisplay}</span>
-                            </div>
-                        </div>
-                    }
-
                     <div>
-                        {/* If no custom text, use default */}
-                        {!useCustomText &&
-                        <span>
-                            I attest that the information I have entered is accurate and I will
-                            use the application, Leaf, as I have indicated.
-                        </span>
-                        }
 
                         {/* Else use custom text */}
                         {useHtml &&
                         <div className={`${c}-custom-html`} dangerouslySetInnerHTML={ {__html: config.attestation.text.join("")} }></div>
                         }
 
-                        {useCustomText && !useHtml &&
+                        {!useHtml &&
                         <div className={`${c}-custom-text-container`}>
                             {config.attestation.text.map((t,i) => {
                                 return <TextareaAutosize key={i} className={`${c}-custom-text`} defaultValue={t} readOnly={true} />;

@@ -10,7 +10,7 @@ import { Dispatch } from 'redux';
 import { connect } from 'react-redux'
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { attestAndLoadSession } from '../../actions/session';
-import AttestationConfirmation from '../../components/Attestation/AttestationConfirmation';
+import AttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
 import AttestationContent from '../../components/Attestation/AttestationContent';
 import AttestationFooter from '../../components/Attestation/AttestationFooter';
 import { AppState } from '../../models/state/AppState';
@@ -23,6 +23,8 @@ import BrowserError from '../../components/Attestation/BrowserError';
 import moment from 'moment';
 import { version } from '../../../package.json'
 import './Attestation.css';
+import CustomAttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
+import StandardAttestationConfirmation from '../../components/Attestation/StandardAttestationConfirmation';
 
 interface DispatchProps {
     dispatch: any;
@@ -171,18 +173,10 @@ class Attestation extends React.PureComponent<Props, State> {
                         key='1'
                         show={showContent}
                         userContext={userContext}/>),
-                    (<AttestationConfirmation 
-                        className={this.className}
-                        config={config}
-                        handleGoBackClick={this.handleConfirmGoBackClick}
-                        handleIAgreeClick={this.handleConfirmIAgreeClick}
-                        hasAttested={hasAttested}
-                        isIdentified={attestation.isIdentified}
-                        isSubmittingAttestation={isSubmittingAttestation}
-                        key='2'
-                        show={showConfirmation}
-                        sessionLoadDisplay={sessionLoadDisplay}
-                        sessionType={attestation.sessionType} />)
+
+                    this.getAttestationConfirmation(
+                        config, hasAttested, attestation.isIdentified, isSubmittingAttestation, showConfirmation, 
+                        sessionLoadDisplay, attestation.sessionType)
                     ]}
                 </ModalBody>
                 <AttestationFooter />
@@ -190,6 +184,31 @@ class Attestation extends React.PureComponent<Props, State> {
         );
     }
 
+    private getAttestationConfirmation = 
+        (
+            config: AppConfig,
+            hasAttested: boolean,
+            isIdentified: boolean,
+            isSubmittingAttestation: boolean,
+            show: boolean,
+            sessionLoadDisplay: string,
+            sessionType: SessionType
+        ) => {
+        const className = this.className;
+        const handleGoBackClick = this.handleConfirmGoBackClick;
+        const handleIAgreeClick = this.handleConfirmIAgreeClick;
+
+        const props = { 
+            className, config, handleGoBackClick, handleIAgreeClick, hasAttested, 
+            isIdentified, isSubmittingAttestation, show, sessionLoadDisplay, sessionType
+        };
+        
+        if (config.attestation.text && config.attestation.text.length > 0) {
+            return <CustomAttestationConfirmation {...props} />
+        }
+        return <StandardAttestationConfirmation {...props} />;
+    };
+    
     private handleSessionTypeClick = (sessionType: SessionType) => {
         this.setState({ 
             attestation: { ...this.state.attestation, sessionType },
