@@ -247,35 +247,29 @@ export const logout = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
         const config = state.auth.config!;
-        let logoutUri = config.authentication.logoutUri;
+        let logoutUri = config.authentication.logout.uri;
 
         if (config.authentication.mechanism !== AuthMechanismType.Unsecured) {
 
-            /*
-             * Logout from the server, which will blacklist the current tokens.
-             */
-            const loggedOut = await logoutFromServer(getState());
-
-            /*
-             * Clear the cached user token, which is now blacklisted on the server.
+            /** 
+             * Clear the cached user token, which is now invalidated on the server.
              */
             clearCurrentUserToken(config);
 
-            /*
-             * Set the logoutURI to redirect the user.
+            /**
+             * Logout from the server, which will invalidate the current tokens.
              */
-            if (loggedOut) {
-                logoutUri = loggedOut.logoutURI;
-            }
+            const loggedOut = await logoutFromServer(getState());
         }
 
-        /*
+        /**
          * If a redirect was provided, go there.
          */
         if (logoutUri) {
             window.location = (logoutUri as any);
         }
-        /*
+        
+        /**
          * Else fall back to a hard reload of the Leaf client,
          * which should get caught by the IdP to force a re-login.
          */

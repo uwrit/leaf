@@ -729,7 +729,7 @@ export default class PatientListWebWorker {
          * Return a map and column id lookup object for
          * a given non-numeric dataset definition.
          */
-        const getNonNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
+        const getNonNumericSummaryDatasetColumns = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
             const cols = getDerivedNonNumericColumnsTemplate() as any;
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
@@ -764,7 +764,7 @@ export default class PatientListWebWorker {
          * is returned to the caller, and rows are added to the cache.
          */
         const deriveNonNumericSummaryFromDataset = (def: PatientListDatasetDefinition, ids: PatientId[]): PatientListDatasetDefinition => {
-            const cols = getNonNumericSummaryDatasetColums(def);
+            const cols = getNonNumericSummaryDatasetColumns(def);
             const sumDef: PatientListDatasetDefinition = {
                 columns: cols.map,
                 displayName: def.displayName,

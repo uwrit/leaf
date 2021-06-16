@@ -122,10 +122,12 @@ export default class UserButton extends React.PureComponent<Props> {
 
                         <div className={`${c}-option-divider`} />
 
+                        {auth && auth.config && auth.config.authentication.logout.enabled && 
                         <div className={`${c}-option ${c}-option-logout`} onClick={logoutClickHandler}>
                             <FaDoorOpen className="myleaf-menu-icon myleaf-menu-icon-logout" />
                             <span>Log Out</span>
                         </div>
+                        }
                     </div>
                 </div>
             </NavItem>

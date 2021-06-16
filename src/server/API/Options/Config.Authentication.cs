@@ -4,9 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace API.Options
 {
@@ -18,9 +15,13 @@ namespace API.Options
             public const string Mechanism = @"Authentication:Mechanism";
             public const string SessionTimeout = @"Authentication:SessionTimeoutMinutes";
             public const string InactivityTimeout = @"Authentication:InactivityTimeoutMinutes";
-            public const string LogoutURI = @"Authentication:LogoutURI";
-
             public const string SAML2 = @"Authentication:SAML2";
+
+            public static class Logout
+            {
+                public const string Enabled = @"Authentication:Logout:Enabled";
+                public const string URI = @"Authentication:Logout:URI";
+            }
         }
     }
 }

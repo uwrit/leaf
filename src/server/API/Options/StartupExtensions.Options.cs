@@ -158,10 +158,21 @@ namespace API.Options
 
         static IServiceCollection ConfigureAttestationOptions(this IServiceCollection services, IConfiguration config)
         {
+            var attest = new AttestationOptions { Enabled = config.GetValue<bool>(Config.Attestation.Enabled) };
+
+            if (attest.Enabled)
+            {
+                attest.WithAttestationType(config.GetValue<string>(Config.Attestation.Type));
+                if (attest.Type != CustomAttestationType.None)
+                {
+                    attest.Text = config.GetSection(Config.Attestation.Text).Get<string[]>();
+                }
+            }
             services.Configure<AttestationOptions>(opts =>
             {
-                opts.Enabled = config.GetValue<bool>(Config.Attestation.Enabled);
-                opts.Text = config.GetSection(Config.Attestation.Text).Get<string[]>();
+                opts.Enabled = attest.Enabled;
+                opts.Text = attest.Text;
+                opts.Type = attest.Type;
             });
 
             return services;
@@ -177,8 +188,12 @@ namespace API.Options
                 rc.BatchSize = config.GetValue<int>(Config.Export.REDCap.BatchSize);
                 rc.RowLimit = config.GetValue<int>(Config.Export.REDCap.RowLimit);
                 rc.Scope = config.GetValue<string>(Config.Export.REDCap.Scope);
-                rc.SuperToken = config.GetByProxy(Config.Export.REDCap.SuperToken);
                 rc.IncludeScopeInUsername = config.GetValue<bool>(Config.Export.REDCap.IncludeScopeInUsername);
+                config.TryGetByProxy(Config.Export.REDCap.SuperToken, out string superToken);
+                if (!string.IsNullOrWhiteSpace(superToken))
+                {
+                    rc.SuperToken = superToken;
+                }
             }
 
             services.Configure<REDCapExportOptions>(opts =>
@@ -440,7 +455,8 @@ namespace API.Options
                 opts.Mechanism = auth.Mechanism;
                 opts.SessionTimeoutMinutes = auth.SessionTimeoutMinutes;
                 opts.InactiveTimeoutMinutes = auth.InactiveTimeoutMinutes;
-                opts.LogoutURI = auth.LogoutURI;
+                opts.Logout.Enabled = auth.Logout.Enabled;
+                opts.Logout.URI = auth.Logout.URI;
             });
 
             switch (auth.Mechanism)
@@ -487,16 +503,17 @@ namespace API.Options
                 }
                 auth.SessionTimeoutMinutes = session;
 
-                if (!config.TryGetValue<string>(Config.Authentication.LogoutURI, out var logout))
+                if (!config.TryGetValue<string>(Config.Authentication.Logout.URI, out var logout))
                 {
                     if (!auth.IsUnsecured)
                     {
-                        throw new LeafConfigurationException($"{Config.Authentication.LogoutURI} is required for all secure authentication types");
+                        throw new LeafConfigurationException($"{Config.Authentication.Logout.URI} is required for all secure authentication types");
                     }
                 }
-                if (!string.IsNullOrWhiteSpace(logout))
+                auth.Logout.Enabled = config.GetValue<bool>(Config.Authentication.Logout.Enabled);
+                if (auth.Logout.Enabled && !string.IsNullOrWhiteSpace(logout))
                 {
-                    auth.LogoutURI = new Uri(logout);
+                    auth.Logout.URI = new Uri(logout);
                 }
 
                 if (!config.TryGetValue<int>(Config.Authentication.InactivityTimeout, out var inactive))
@@ -510,9 +527,9 @@ namespace API.Options
 
                 return auth;
             }
-            catch (UriFormatException)
+            catch (UriFormatException ex)
             {
-                throw new LeafConfigurationException($"{Config.Authentication.LogoutURI} must be a valid URI");
+                throw new LeafConfigurationException($"{Config.Authentication.Logout.URI} must be a valid URI");
             }
         }
 

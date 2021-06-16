@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
-import { Button } from 'reactstrap';
+import { Button, Row, Col } from 'reactstrap';
 import { SessionType } from '../../models/Session'
-import { AppConfig } from '../../models/Auth';
+import { AppConfig, CustomAttestationType } from '../../models/Auth';
 import TextareaAutosize from 'react-textarea-autosize';
 
 interface Props {
@@ -33,53 +33,66 @@ export default class AttestationConfirmation extends React.PureComponent<Props> 
         const phiDisplay = isIdentified ? 'Identified' : 'Deidentified';
         const showText = config && config.attestation.enabled;
         const useCustomText = config.attestation.text && config.attestation.text.length > 0;
+        const useHtml = useCustomText && config.attestation.type && config.attestation.type === CustomAttestationType.Html;
 
         return  (
             <div className={confirmationClass}>
-                {showText && [
-                <div className={`${c}-confirmation-settings`} key='1'>
-                    {useDisplay} - {phiDisplay}
-                </div>,
-                <p key='2'>
-                    {/* If no custom text, use default */}
-                    {!useCustomText &&
-                    <span>
-                        I attest that the information I have entered is accurate and I will
-                        use the application, Leaf, as I have indicated.
-                    </span>
+                {showText &&
+                
+                <div>
+                    <Row className={`${c}-confirmation-settings`} key='1'>
+                        <Col md={6} className="left">
+                            {useDisplay} - {phiDisplay}
+                        </Col>
+                        {!(isSubmittingAttestation || hasAttested) &&
+                        <Col md={6} className="right">
+                            <Button 
+                                onClick={handleIAgreeClick} 
+                                tabIndex={-1}
+                                className="leaf-button leaf-button-primary">
+                                I Agree
+                            </Button>
+                            <Button 
+                                onClick={handleGoBackClick} 
+                                tabIndex={-1}
+                                className="leaf-button">
+                                Go Back
+                            </Button>
+                        </Col>
+                        }
+                    </Row>
+
+                    {(isSubmittingAttestation || hasAttested) &&
+                        <div className={`${c}-session-load-display-container`}>
+                            <div className={`${c}-session-load-display`}>
+                                <span>...{sessionLoadDisplay}</span>
+                            </div>
+                        </div>
                     }
 
-                    {/* Else use custom text */}
-                    {useCustomText &&
-                        config.attestation.text.map((t,i) => {
-                            return <TextareaAutosize key={i} className={`${c}-custom-text`} defaultValue={t} readOnly={true} />;
-                        })
-                    }
-                </p>
-                ]}
-                {!(isSubmittingAttestation || hasAttested) &&
-                <div className={`${c}-confirmation-footer`}>
-                    <Button 
-                        onClick={handleGoBackClick} 
-                        tabIndex={-1}
-                        className="leaf-button mr-auto">
-                        Go Back
-                    </Button>
-                    <Button 
-                        onClick={handleIAgreeClick} 
-                        tabIndex={-1}
-                        className="leaf-button leaf-button-primary" 
-                        style={{ float: 'right' }}>
-                        I Agree
-                    </Button>
-                </div>
-                }
-                {(isSubmittingAttestation || hasAttested) &&
-                    <div className={`${c}-session-load-display-container`}>
-                        <div className={`${c}-session-load-display`}>
-                            <span>...{sessionLoadDisplay}</span>
+                    <div>
+                        {/* If no custom text, use default */}
+                        {!useCustomText &&
+                        <span>
+                            I attest that the information I have entered is accurate and I will
+                            use the application, Leaf, as I have indicated.
+                        </span>
+                        }
+
+                        {/* Else use custom text */}
+                        {useHtml &&
+                        <div className={`${c}-custom-html`} dangerouslySetInnerHTML={ {__html: config.attestation.text.join("")} }></div>
+                        }
+
+                        {useCustomText && !useHtml &&
+                        <div className={`${c}-custom-text-container`}>
+                            {config.attestation.text.map((t,i) => {
+                                return <TextareaAutosize key={i} className={`${c}-custom-text`} defaultValue={t} readOnly={true} />;
+                            })}
                         </div>
+                        }
                     </div>
+                </div>
                 }
             </div>
         );

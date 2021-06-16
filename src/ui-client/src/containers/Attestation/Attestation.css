@@ -272,6 +272,19 @@
     color: rgb(0, 138, 0);
 }
 
+.attestation-confirmation-settings .left,
+.attestation-confirmation-settings .right {
+    display: inline-block;
+}
+
+.attestation-confirmation-settings .right > button {
+    float: right;
+}
+
+.attestation-confirmation-settings .right > button.leaf-button-primary {
+    margin-left: 20px;
+}
+
 /* Footer */
 .attestation-footer {
     background-color: white;
@@ -313,12 +326,28 @@
     font-weight: 700;
 }
 
-.attestation-custom-text {
-    border: none;
-    font-size: 1.15rem;
+.attestation-custom-text-container,
+.attestation-custom-html {
+    font-size: 1rem;
     font-family: Roboto;
     font-weight: 300;
+}
+
+.attestation-custom-text-container {
+    border: none;
     outline: none;
     resize: none;
     width: 100%;
+}
+
+.attestation-custom-html {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.attestation-custom-html > div,
+.attestation-custom-html > span,
+.attestation-custom-html > p,
+.attestation-custom-html > li {
+    font-size: 1rem !important;
 }
