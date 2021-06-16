@@ -204,9 +204,9 @@ class Attestation extends React.PureComponent<Props, State> {
         };
         
         if (config.attestation.text && config.attestation.text.length > 0) {
-            return <CustomAttestationConfirmation {...props} />
+            return <CustomAttestationConfirmation key="2" {...props} />
         }
-        return <StandardAttestationConfirmation {...props} />;
+        return <StandardAttestationConfirmation key="2" {...props} />;
     };
     
     private handleSessionTypeClick = (sessionType: SessionType) => {
