@@ -141,8 +141,7 @@
 }
 
 .attestation-content,
-.attestation-confirmation-container,
-.attestation-session-load-display-container {
+.attestation-confirmation-container {
     flex-shrink: 0;
     max-height: 50px;
     transition: max-height 1.0s, margin-left 1.2s, margin-right 1.2s;
@@ -179,12 +178,13 @@
 }
 
 .attestation-session-load-display-container {
-    max-height: 1000px;
+    display: block;
     text-align: right;
-    width: 100%;
 }
 
 .attestation-session-load-display-container span {
+    color: #212529 !important;
+    float: right;
     margin-right: 20px;
 }
 
@@ -272,6 +272,19 @@
     color: rgb(0, 138, 0);
 }
 
+.attestation-confirmation-settings .left,
+.attestation-confirmation-settings .right {
+    display: inline-block;
+}
+
+.attestation-confirmation-settings .right > button {
+    float: right;
+}
+
+.attestation-confirmation-settings .right > button.leaf-button-primary {
+    margin-left: 20px;
+}
+
 /* Footer */
 .attestation-footer {
     background-color: white;
@@ -311,4 +324,34 @@
     font-family: "Mukta Mahee";
     font-size: 1.0rem;
     font-weight: 700;
+}
+
+.attestation-default-text {
+    margin-top: 10px;
+}
+
+.attestation-custom-text-container,
+.attestation-custom-html {
+    font-size: 1rem;
+    font-family: Roboto;
+    font-weight: 300;
+}
+
+.attestation-custom-text-container {
+    border: none;
+    outline: none;
+    resize: none;
+    width: 100%;
+}
+
+.attestation-custom-html {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
+.attestation-custom-html > div,
+.attestation-custom-html > span,
+.attestation-custom-html > p,
+.attestation-custom-html > li {
+    font-size: 1rem !important;
 }

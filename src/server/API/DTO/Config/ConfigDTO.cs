@@ -21,7 +21,24 @@ namespace API.DTO.Config
     {
         public AuthenticationMechanism Mechanism { get; set; }
         public int InactivityTimeoutMinutes { get; set; }
-        public string LogoutURI { get; set; }
+        public LogoutConfigDTO Logout { get; set; }
+
+        public class LogoutConfigDTO
+        {
+            public bool Enabled { get; set; }
+            public string URI { get; set; }
+
+            public LogoutConfigDTO() { }
+
+            public LogoutConfigDTO(LogoutOptions opts)
+            {
+                Enabled = opts.Enabled;
+                if (Enabled)
+                {
+                    URI = opts.URI.ToString();
+                }
+            }
+        }
     }
 
     public class CohortConfigDTO
@@ -34,6 +51,8 @@ namespace API.DTO.Config
     public class AttestationConfigDTO
     {
         public bool Enabled { get; set; }
+        public string[] Text { get; set; }
+        public CustomAttestationType Type { get; set; }
     }
 
     public class ClientOptionsDTO

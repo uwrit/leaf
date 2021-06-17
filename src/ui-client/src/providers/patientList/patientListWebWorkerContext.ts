@@ -119,7 +119,7 @@ var addSingletonDataset = function (payload) {
             var f = dateFields[k].id;
             var v = row[f];
             if (v) {
-                row[f] = new Date(v);
+                row[f] = parseTimestamp(v);
             }
         }
         patientData.set(def.id, new Map(Object.entries(row)));
@@ -156,7 +156,7 @@ var addMultiRowDataset = function (payload) {
                 var f = dateFields[k].id;
                 var v = row[f];
                 if (v) {
-                    row[f] = new Date(v);
+                    row[f] = parseTimestamp(v);
                 }
             }
         }
@@ -346,6 +346,13 @@ var setDetailRows = function (patId) {
     encMap.forEach(function (v, k) { return pat.detailValues.push({ encounterId: k, rows: v }); });
     pat.detailRowCount = rowCount;
 };
+/**
+* Parse a string timestamp. More info at https://github.com/uwrit/leaf/issues/418
+*/
+var parseTimestamp = function (timestampStr) {
+    var _date = new Date(timestampStr);
+    return new Date(_date.getTime() + (_date.getTimezoneOffset() * 60 * 1000));
+};
 /*
  * Return patient ids unsorted.
  */
@@ -524,7 +531,7 @@ var deriveNumericSummaryFromDataset = function (def, ids) {
  * Return a map and column id lookup object for
  * a given non-numeric dataset definition.
  */
-var getNonNumericSummaryDatasetColums = function (def) {
+var getNonNumericSummaryDatasetColumns = function (def) {
     var cols = getDerivedNonNumericColumnsTemplate();
     Array.from(Object.keys(cols)).forEach(function (k, i) {
         var col = cols[k];
@@ -557,7 +564,7 @@ var getNonNumericSummaryDatasetColums = function (def) {
  * is returned to the caller, and rows are added to the cache.
  */
 var deriveNonNumericSummaryFromDataset = function (def, ids) {
-    var cols = getNonNumericSummaryDatasetColums(def);
+    var cols = getNonNumericSummaryDatasetColumns(def);
     var sumDef = {
         columns: cols.map,
         displayName: def.displayName,

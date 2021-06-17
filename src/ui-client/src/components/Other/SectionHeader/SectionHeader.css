@@ -15,11 +15,11 @@
     font-size: 1.8rem;
     font-weight: 300;
     height: 28px;
-    margin-bottom: 10px;
 }
 
 .section-header > small {
     color: rgb(174, 174, 174);
-    font-size: 0.8rem;
+    font-size: 1rem;
     font-weight: 500;
+    margin-bottom: 10px;
 }

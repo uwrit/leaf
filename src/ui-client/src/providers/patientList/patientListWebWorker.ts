@@ -290,7 +290,7 @@ export default class PatientListWebWorker {
                     const f = dateFields[k].id;
                     const v = row[f];
                     if (v) {
-                        row[f] = new Date(v);
+                        row[f] = parseTimestamp(v);
                     }
                 }
                 patientData.set(def!.id, new Map(Object.entries(row)));
@@ -329,7 +329,7 @@ export default class PatientListWebWorker {
                         const f = dateFields[k].id;
                         const v = row[f];
                         if (v) {
-                            row[f] = new Date(v);
+                            row[f] = parseTimestamp(v);
                         }
                     }
                 }
@@ -529,6 +529,14 @@ export default class PatientListWebWorker {
             pat.detailRowCount = rowCount;
         };
 
+        /**
+         * Parse a string timestamp. More info at https://github.com/uwrit/leaf/issues/418
+         */
+        const parseTimestamp = (timestampStr: string): Date => {
+            const _date = new Date(timestampStr);
+            return new Date(_date.getTime() + (_date.getTimezoneOffset() * 60 * 1000));
+        };
+
         /*
          * Return patient ids unsorted.
          */
@@ -721,7 +729,7 @@ export default class PatientListWebWorker {
          * Return a map and column id lookup object for
          * a given non-numeric dataset definition.
          */
-        const getNonNumericSummaryDatasetColums = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
+        const getNonNumericSummaryDatasetColumns = (def: PatientListDatasetDefinition): DerivedColumnLookup => {
             const cols = getDerivedNonNumericColumnsTemplate() as any;
             Array.from(Object.keys(cols)).forEach((k: string, i: number) => {
                 const col = cols[k];
@@ -756,7 +764,7 @@ export default class PatientListWebWorker {
          * is returned to the caller, and rows are added to the cache.
          */
         const deriveNonNumericSummaryFromDataset = (def: PatientListDatasetDefinition, ids: PatientId[]): PatientListDatasetDefinition => {
-            const cols = getNonNumericSummaryDatasetColums(def);
+            const cols = getNonNumericSummaryDatasetColumns(def);
             const sumDef: PatientListDatasetDefinition = {
                 columns: cols.map,
                 displayName: def.displayName,

@@ -73,7 +73,10 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                 </Row>
                 <Row>
                     <Col md={12} className="visualization-nih">
-                        <SectionHeader headerText="NIH Race, Ethnicity, and Gender" />
+                        <SectionHeader 
+                            headerText="NIH Race, Ethnicity, and Gender" 
+                            subText="Excludes patients missing gender or ethnicity information"
+                        />
                     </Col>
                     <Col lg={{ size: 8, order: 2, offset: 2 }} md={12}>
                         <NihRaceEthnicityGenderTable data={nihRaceEthnicityData} />

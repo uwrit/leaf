@@ -22,11 +22,23 @@ export interface ConfigDTO {
 interface AuthenticationConfigDTO {
     mechanism: AuthMechanismType;
     inactivityTimeoutMinutes: number;
-    logoutUri: string;
+    logout: LogoutConfigDTO;
+}
+
+interface LogoutConfigDTO {
+    enabled: boolean;
+    uri: string;
 }
 
 interface AttestationOptionsDTO {
     enabled: boolean;
+    text?: string[];
+    type?: CustomAttestationType
+}
+
+export enum CustomAttestationType {
+    Text = 1,
+    Html = 2
 }
 
 interface CohortConfigDTO {

@@ -14,12 +14,12 @@ import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
 import { getExportOptions, getImportOptions } from '../services/redcapApi';
-import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer } from '../services/sessionApi';
+import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer, attemptLoginRetryIfPossible } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionRootConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
 import { errorResponder, setResponders } from './networkResponders';
-import { showConfirmationModal, setUserInquiryState } from '../actions/generalUi';
+import { showConfirmationModal, setUserInquiryState, setRouteConfig } from '../actions/generalUi';
 import { getSavedQueries, getExtensionRootConcepts } from '../services/queryApi';
 import { addSavedQueries, setCurrentQuery } from './queries';
 import { ConfirmationModalState } from '../models/state/GeneralUiState';
@@ -29,9 +29,11 @@ import { indexDatasets } from '../services/datasetSearchApi';
 import { AuthMechanismType } from '../models/Auth';
 import { setDatasets } from './datasets';
 import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
-import { clearCurrentUserToken } from '../services/authApi';
+import { clearCurrentUserToken, getUserTokenAndContext } from '../services/authApi';
 import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
+import { getIdToken, receiveIdToken, failureIdToken } from './auth';
+import { getRoutes } from '../config/routes';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -50,23 +52,65 @@ export interface SessionAction {
 }
 
 // Asynchronous
-/*
- * Attemp to attest and load data necessary for the session.
- */
 export const attestAndLoadSession = (attestation: Attestation) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        try {
-            /* 
-             * Get session token.
-             */
-            dispatch(setSessionLoadState('Submitting Attestation', 5));
-            dispatch(submitAttestation(attestation));
-            const ctx = await getSessionTokenAndContext(getState(), attestation) as SessionContext;
-            dispatch(setSessionContext(ctx));
-            dispatch(setUserInquiryState({ email: getState().auth.userContext!.name, show: false }))
 
-            /* 
-             * Get home node identity.
+        /**
+         * Get session token
+         */
+        dispatch(setSessionLoadState('Submitting Attestation', 5));
+        dispatch(submitAttestation(attestation));
+        getSessionTokenAndContext(getState(), attestation)
+            .then((ctx) => {
+                dispatch(setSessionContext(ctx));
+                dispatch(setUserInquiryState({ email: getState().auth.userContext!.name, show: false }));
+
+                /**
+                 * Load data needed for Leaf session
+                 */
+                dispatch(loadSession(attestation, ctx));
+            })
+            .catch((reason) => {
+                console.log(reason);
+                const unauthorized = reason.response && reason.response.status === 401;
+                const failMessage = "The Leaf server was found but unexpectedly returned an error, possibly due to an expired access token. Please clear your Leaf browser history and try again.";
+
+                /**
+                 * If unauthorized, try to request a new user token and load session again
+                 */
+                if (unauthorized) {
+                    const config = getState().auth.config;
+                    getUserTokenAndContext(config, true)
+                        .then((token) => {
+                            dispatch(setRouteConfig(getRoutes(config, token)));
+                            dispatch(receiveIdToken(token));
+
+                            /**
+                             * Try again
+                             */
+                            getSessionTokenAndContext(getState(), attestation)
+                                .then((ctx) => {
+                                    dispatch(setSessionContext(ctx));
+                                    dispatch(setUserInquiryState({ email: getState().auth.userContext!.name, show: false }));
+                                    dispatch(loadSession(attestation, ctx));
+                                })
+                                .catch(() => dispatch(failureIdToken(failMessage)));
+                        })
+                        .catch(() => dispatch(failureIdToken(failMessage)));
+                }
+            });
+    };
+};
+
+/*
+ * Attempt to attest and load data necessary for the session.
+ */
+export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        try {
+
+            /**
+             * Get home node identity
              */
             dispatch(setSessionLoadState('Finding Home Leaf server', 10));
             const homeBase = await fetchHomeIdentityAndResponders(getState()) as NetworkIdentityRespondersDTO;
@@ -74,70 +118,70 @@ export const attestAndLoadSession = (attestation: Attestation) => {
                 dispatch(setAdminNetworkIdentity(homeBase.identity, false));
             }
 
-            /* 
-             * Load responders.
+            /**
+             * Load responders
              */
             dispatch(setSessionLoadState('Finding Partner Leaf servers', 20));
             const responders: NetworkIdentity[] = await getResponderIdentities(getState, attestation, homeBase);
             dispatch(setResponders(responders));
             dispatch(registerNetworkCohorts(responders));
 
-            /* 
-             * Load export options.
+            /**
+             * Load export options
              */
             dispatch(setSessionLoadState('Loading Export options', 30));
             const exportOptResponse = await getExportOptions(getState());
             dispatch(setExportOptions(exportOptResponse.data));
 
-            /* 
-             * Load import options.
+            /**
+             * Load import options
              */
             dispatch(setSessionLoadState('Loading Import options', 40));
             const importOptResponse = await getImportOptions(getState());
             const importOpts = importOptResponse.data as ImportOptionsDTO;
             dispatch(setImportOptions(importOpts));
 
-            /* 
-             * Load concepts.
+            /**
+             * Load concepts
              */
             dispatch(setSessionLoadState('Loading Concepts', 50));
             await requestRootConcepts(dispatch, getState);
 
-            /* 
-             * Load datasets.
+            /**
+             * Load datasets
              */
             dispatch(setSessionLoadState('Loading Patient List Datasets', 60));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
             dispatch(setDatasets(datasets, datasetsCategorized));
             
-            /*
-             * Load saved queries.
+            /**
+             * Load saved queries
              */
             dispatch(setSessionLoadState('Loading Saved Queries', 70));
             const savedCohorts = await getSavedQueries(getState());
             dispatch(addSavedQueries(savedCohorts));
 
-            /*
-             * Load extension concepts.
+            /**
+             * Load extension concepts
              */
             dispatch(setSessionLoadState('Loading Extension Concepts', 80));
             const extensionConcepts = await getExtensionRootConcepts(getState().dataImport, [], savedCohorts);
             dispatch(setExtensionRootConcepts(extensionConcepts));
 
-            /* 
-             * Initiliaze web worker search.
+            /**
+             * Initiliaze web worker search
              */
             dispatch(setSessionLoadState('Initializing Search Engine', 100));
             await initializeSearchEngine(dispatch, getState);
 
-            /* 
-             * All done.
+            /**
+             * All done
              */
             dispatch(completeAttestation(ctx.rawDecoded["access-nonce"]));
 
-            /* 
-             * Check if continue previous session.
+            /**
+             * Check if continue previous session
              */
             handleSessionReload(dispatch, getState());
         } catch (err) {
@@ -203,35 +247,29 @@ export const logout = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const state = getState();
         const config = state.auth.config!;
-        let logoutUri = config.authentication.logoutUri;
+        let logoutUri = config.authentication.logout.uri;
 
         if (config.authentication.mechanism !== AuthMechanismType.Unsecured) {
 
-            /*
-             * Logout from the server, which will blacklist the current tokens.
-             */
-            const loggedOut = await logoutFromServer(getState());
-
-            /*
-             * Clear the cached user token, which is now blacklisted on the server.
+            /** 
+             * Clear the cached user token, which is now invalidated on the server.
              */
             clearCurrentUserToken(config);
 
-            /*
-             * Set the logoutURI to redirect the user.
+            /**
+             * Logout from the server, which will invalidate the current tokens.
              */
-            if (loggedOut) {
-                logoutUri = loggedOut.logoutURI;
-            }
+            const loggedOut = await logoutFromServer(getState());
         }
 
-        /*
+        /**
          * If a redirect was provided, go there.
          */
         if (logoutUri) {
             window.location = (logoutUri as any);
         }
-        /*
+        
+        /**
          * Else fall back to a hard reload of the Leaf client,
          * which should get caught by the IdP to force a re-login.
          */

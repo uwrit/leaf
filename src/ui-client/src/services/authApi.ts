@@ -86,7 +86,7 @@ export const clearCurrentUserToken = (config: AppConfig) => {
  * Return the id token key to look for
  * to retrieve a user token.
  */
-export const getUserTokenAndContext = async (config: AppConfig): Promise<UserContext> => {
+export const getUserTokenAndContext = async (config: AppConfig, forceNew: boolean = false): Promise<UserContext> => {
     return new Promise( async (resolve, reject) => {
         const idTokenKey = getIdTokenKey(config);
         let token;
@@ -94,7 +94,7 @@ export const getUserTokenAndContext = async (config: AppConfig): Promise<UserCon
         
         // Try to get from local storage
         token = window.localStorage.getItem(idTokenKey)!;
-        if (token) {
+        if (token && !forceNew) {
             ctx = decodeToken(token);
 
             // If the date time is greater than now, use current

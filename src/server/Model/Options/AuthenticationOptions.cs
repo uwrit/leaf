@@ -19,10 +19,10 @@ namespace Model.Options
         public static readonly IEnumerable<string> FederatedMechanisms = new string[] { Saml2 };
         public static readonly IEnumerable<string> ValidMechanisms = LocalMechanisms.Concat(FederatedMechanisms);
 
-        public Uri LogoutURI { get; set; }
         public int SessionTimeoutMinutes { get; set; }
         public int InactiveTimeoutMinutes { get; set; }
         public AuthenticationMechanism Mechanism { get; set; }
+        public LogoutOptions Logout = new LogoutOptions();
 
         static bool ValidMechanism(string mech) => ValidMechanisms.Contains(mech);
         public AuthenticationOptions WithMechanism(string value)
@@ -46,12 +46,6 @@ namespace Model.Options
             return this;
         }
 
-        public AuthenticationOptions WithLogoutURI(string value)
-        {
-            LogoutURI = new Uri(value);
-            return this;
-        }
-
         public bool IsSaml2 => Mechanism == AuthenticationMechanism.Saml2;
         public bool IsUnsecured => Mechanism == AuthenticationMechanism.Unsecured;
     }
@@ -64,6 +58,18 @@ namespace Model.Options
         public bool DefaultEqual()
         {
             return Headers == null;
+        }
+    }
+
+    public class LogoutOptions
+    {
+        public bool Enabled { get; set; }
+        public Uri URI { get; set; }
+
+        public LogoutOptions WithURI(string value)
+        {
+            URI = new Uri(value);
+            return this;
         }
     }
 

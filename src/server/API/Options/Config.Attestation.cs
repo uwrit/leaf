@@ -13,6 +13,8 @@ namespace API.Options
         {
             public const string Section = @"Attestation";
             public const string Enabled = @"Attestation:Enabled";
+            public const string Type = @"Attestation:Type";
+            public const string Text = @"Attestation:Text";
         }
     }
 }

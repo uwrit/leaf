@@ -115,27 +115,27 @@ export default class LearnMoreButton extends React.PureComponent<Props,State> {
                     {/* Counts by Year chart */}
                     {countsByYear &&
                     <ResponsiveContainer height={this.height}>
-                    <BarChart 
-                        data={data} 
-                        barCategoryGap={5} 
-                        className={`${c}-chart`}
-                        margin={this.margin}>
-                        <XAxis 
-                            dataKey="year" 
-                            interval={0} 
-                            axisLine={false} 
-                            tickLine={false} 
-                            label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
-                        <Bar 
-                            barSize={28}
-                            dataKey="patientCount" 
-                            fill={'rgb(255, 132, 8)'} 
-                            isAnimationActive={true}>
-                            <LabelList 
-                                dataKey="label" 
-                                position="top"/>
-                        </Bar>
-                    </BarChart>
+                        <BarChart 
+                            data={data} 
+                            barCategoryGap={5} 
+                            className={`${c}-chart`}
+                            margin={this.margin}>
+                            <XAxis 
+                                dataKey="year" 
+                                interval={0} 
+                                axisLine={false} 
+                                tickLine={false} 
+                                label={{ value: 'Unique patients by Year', position: 'bottom', className:`${c}-axis-label` }}/>
+                            <Bar 
+                                barSize={28}
+                                dataKey="patientCount" 
+                                fill={'rgb(255, 132, 8)'} 
+                                isAnimationActive={true}>
+                                <LabelList 
+                                    dataKey="label" 
+                                    position="top"/>
+                            </Bar>
+                        </BarChart>
                     </ResponsiveContainer>}
 
                     {this.hasOutOfBoundYears && 

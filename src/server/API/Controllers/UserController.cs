@@ -146,7 +146,7 @@ namespace API.Controllers
         [HttpPost("logout")]
         public async Task<ActionResult<LogoutDTO>> LogoutAsync([FromServices] ITokenBlacklistService blacklistService)
         {
-            if (authenticationOptions.IsUnsecured)
+            if (authenticationOptions.IsUnsecured || !authenticationOptions.Logout.Enabled)
             {
                 return StatusCode(StatusCodes.Status404NotFound);
             }
@@ -164,7 +164,7 @@ namespace API.Controllers
                 logger.LogError("Failed to logout user. Error:{Error}", e.ToString());
             }
 
-            return Ok(new LogoutDTO { LogoutURI = authenticationOptions.LogoutURI?.AbsoluteUri });
+            return Ok(new LogoutDTO { LogoutURI = authenticationOptions.Logout.URI?.AbsoluteUri });
         }
     }
 }

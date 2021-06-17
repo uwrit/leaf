@@ -4,15 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Threading.Tasks;
 using API.DTO.Config;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Authorization;
-using Model.Network;
 using Model.Options;
 
 namespace API.Controllers
@@ -53,11 +48,13 @@ namespace API.Controllers
                 {
                     Mechanism = authenticationOptions.Mechanism,
                     InactivityTimeoutMinutes = authenticationOptions.InactiveTimeoutMinutes,
-                    LogoutURI = authenticationOptions.LogoutURI.ToString()
+                    Logout = new AuthenticationConfigDTO.LogoutConfigDTO(authenticationOptions.Logout)
                 },
                 Attestation = new AttestationConfigDTO
                 {
-                    Enabled = attestationOptions.Enabled
+                    Enabled = attestationOptions.Enabled,
+                    Text = attestationOptions.Text,
+                    Type = attestationOptions.Type
                 },
                 Cohort = new CohortConfigDTO
                 {

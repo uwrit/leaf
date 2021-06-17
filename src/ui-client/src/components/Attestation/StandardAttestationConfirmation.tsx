@@ -23,7 +23,7 @@ interface Props {
     sessionType: SessionType;
 }
 
-export default class AttestationConfirmation extends React.PureComponent<Props> {
+export default class StandardAttestationConfirmation extends React.PureComponent<Props> {
     public render() {
         const c = this.props.className;
         const { show, handleGoBackClick, handleIAgreeClick, isIdentified, sessionType, sessionLoadDisplay, hasAttested, isSubmittingAttestation, config } = this.props;

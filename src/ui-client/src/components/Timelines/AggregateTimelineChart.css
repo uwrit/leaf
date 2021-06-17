@@ -81,20 +81,47 @@
 
 .timelines-aggregate-yaxis-container { 
     background-color: transparent;
-    border-radius: 4px;
-    cursor: pointer;
+    border-bottom: 1px solid rgb(230,230,230);
+    border-top: 1px solid rgb(230,230,230);
     height: 100%;
-    padding: 4px;
+    overflow: hidden;
     position: relative;
+    transition: border-color 0.3s;
     width: 145px;
 }
 
+.timelines-main.overlayed .timelines-aggregate-yaxis-container {
+    border-bottom-color: rgb(100,100,100);
+    border-top-color: rgb(100,100,100);
+}
+
+.timelines-aggregate-yaxis-container::after {
+    background-image: linear-gradient(to bottom, rgba(255,255,255,0), white);
+    bottom: 0;
+    content: "";
+    height: 10px;
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    width: 100%;
+}
+
 .timelines-aggregate-yaxis-container:hover { 
-    background-color: rgba(0,0,0,0.2);
+    background-color: rgba(0,0,0,0.05);
+    overflow-y: auto;
+}
+
+.timelines-main.overlayed .timelines-aggregate-yaxis-container::after,
+.timelines-aggregate-yaxis-container:hover::after {
+    background-image: none;
 }
 
 .timelines-aggregate-yaxis-label {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+}
+
+.timelines-aggregate-yaxis-label.center {
     margin: auto;
     pointer-events: none;
     position: absolute;
@@ -102,9 +129,14 @@
     transform: translate(0, -50%);
 }
 
+.timelines-aggregate-yaxis-label.font-small {
+    font-size: 0.85rem;
+}
+
 .timelines-aggregate-yaxis-remove {
     background-color: transparent;
     border-radius: 50%;
+    cursor: pointer;
     height: 38px;
     left: 50%;
     margin: auto;
@@ -116,7 +148,11 @@
 }
 
 .timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove {
-    background-color: rgb(102, 102, 102);
+    background-color: rgba(80, 75, 75, 0.2);
+}
+
+.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove svg path {
+    fill: rgba(252, 74, 74, 0.5);
 }
 
 .timelines-aggregate-yaxis-remove svg {
@@ -132,8 +168,12 @@
     fill: transparent;
 }
 
-.timelines-aggregate-yaxis-container:hover .timelines-aggregate-yaxis-remove svg path {
-    fill: rgb(252, 74, 74);
+.timelines-aggregate-yaxis-remove:hover {
+    background-color: rgba(80, 75, 75, 0.5) !important;
+}
+
+.timelines-aggregate-yaxis-remove:hover svg path {
+    fill: rgb(252, 74, 74) !important; 
 }
 
 .timelines-aggregate-xaxis {
