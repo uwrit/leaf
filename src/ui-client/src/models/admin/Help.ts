@@ -11,16 +11,35 @@ export interface CreateHelpPageDTO {
     orderId: number;
     type: string;
     textContent: string;
-    imageContent: Uint16Array;
+    // imageContent: Uint16Array;
+    imageContent: string;
     imageId: string;
-
-    unsaved?: boolean;
 }
 
 export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
     pageId: number;
 }
 
-export interface CreateHelpPage extends CreateHelpPageDTO { }
-export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO { }
-// export interface GetHelpPageContent extends UpdateHelpPageContentDTO { }
+export interface CreateHelpPage extends CreateHelpPageDTO {}
+export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO {}
+
+
+
+
+export interface ContentRow {
+    pageId: number;
+    orderId: number;
+    type: string;
+    textContent: string;
+    // imageContent: Uint16Array;
+    imageContent: string;
+    imageId: string;
+}
+
+export interface AdminHelpContentDTO {
+    title: string;
+    category: string;
+    content: ContentRow[];
+}
+
+export interface AdminHelpContent extends AdminHelpContentDTO {}

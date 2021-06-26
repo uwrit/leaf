@@ -17,7 +17,8 @@ namespace API.DTO.Admin.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        public byte[] ImageContent { get; set; }
+        //public byte[] ImageContent { get; set; }
+        public string ImageContent { get; set; }
         public string ImageId { get; set; }
 
         public AdminHelpCreateUpdateDTO() { }
@@ -38,8 +39,7 @@ namespace API.DTO.Admin.Compiler
     public class AdminHelpContentDTO
     {
         public string Title { get; set; }
-
-        public HelpPageCategory Category { get; set; }
+        public string Category { get; set; }
 
         public IEnumerable<HelpPageContent> Content { get; set; }
 

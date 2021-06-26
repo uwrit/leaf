@@ -15,7 +15,10 @@ import { UserContext } from '../../models/Auth';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { AdminHelp } from '../Admin/AdminHelp';
 import './Help.css';
-import AdminHelpState from '../../models/state/AdminHelpState';
+import { AdminHelpState } from '../../models/state/AdminState';
+
+import { HelpPage, HelpPageContent } from '../../models/Help/Help';
+import { HelpPageContentTState } from '../../models/state/HelpState';
 
 interface OwnProps { }
 
@@ -38,20 +41,37 @@ export class Help extends React.PureComponent<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, helpPages, user } = this.props;
+        const { dispatch, helpPages, user, adminHelp } = this.props;
+        
+        if (adminHelp.state === HelpPageLoadState.LOADED) {
+            return (
+                <AdminHelp
+                    categories={helpPages.categories}
+                    // content={helpPages.content.content}
+                    currentPage={helpPages.currentSelectedPage}
+                    dispatch={dispatch}
+                    // adminHelpContent={this.props.adminHelp.helpContent}
+                    // page={helpPages.page}
+                    page={adminHelp.page}
+                />
+            );
+        }
 
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
-            if (user.isAdmin) {
-                return (
-                    <AdminHelp
-                        categories={helpPages.categories}
-                        content={helpPages.content.content}
-                        currentPage={helpPages.currentSelectedPage}
-                        dispatch={dispatch}
-                        adminHelpContent={this.props.adminHelp.helpContent.content!}
-                    />
-                );
-            };
+            // if (user.isAdmin) {
+
+            //     // this.getAdminContent();
+            //     return (
+            //         <AdminHelp
+            //             categories={helpPages.categories}
+            //             // content={helpPages.content.content}
+            //             currentPage={helpPages.currentSelectedPage}
+            //             dispatch={dispatch}
+            //             // adminHelpContent={this.props.adminHelp.helpContent}
+            //             page={helpPages.page}
+            //         />
+            //     );
+            // };
 
             return (
                 <div className={`${c}-content`}>
@@ -73,6 +93,7 @@ export class Help extends React.PureComponent<Props, State> {
                         <Categories
                             categories={helpPages.categories}
                             dispatch={dispatch}
+                            isAdmin={user.isAdmin}
                         />
                     }
                 </div>

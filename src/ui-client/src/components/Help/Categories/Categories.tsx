@@ -14,6 +14,7 @@ import './Categories.css';
 interface Props {
     categories: HelpCategoryMap;
     dispatch: any;
+    isAdmin: boolean;
 }
 
 export class Categories extends React.Component<Props> {
@@ -21,7 +22,7 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categories, dispatch } = this.props;
+        const { categories, dispatch, isAdmin } = this.props;
         const cats = [ ...categories.values() ];
 
         return (
@@ -31,6 +32,7 @@ export class Categories extends React.Component<Props> {
                         key={c.id}
                         category={c}
                         dispatch={dispatch}
+                        isAdmin={isAdmin}
                     />
                 )}
             </Row>

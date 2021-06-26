@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Button, Col } from 'reactstrap';
+import { getAdminHelpPageContent } from '../../../actions/admin/helpPage';
 import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
 import { HelpPageCategory } from '../../../models/Help/Help';
 import { HelpPage } from '../../../models/Help/Help';
@@ -16,6 +17,7 @@ import './Pages.css';
 interface Props {
     category: HelpPageCategory;
     dispatch: any;
+    isAdmin: boolean;
 }
 
 interface State {
@@ -68,8 +70,10 @@ export class Pages extends React.Component<Props, State> {
     };
 
     private handleHelpPageTitleClick = (page: HelpPage) => {
-        const { dispatch } = this.props;
-        dispatch(fetchSingleHelpPageContent(page));
+        const { dispatch, isAdmin } = this.props;
+
+        // dispatch(fetchSingleHelpPageContent(page));
+        isAdmin ? dispatch(getAdminHelpPageContent(page)) : dispatch(fetchSingleHelpPageContent(page));
     };
 
     private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };

@@ -11,14 +11,14 @@ import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
+import { AdminHelpContent } from '../admin/Help';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
-import AdminHelpState from './AdminHelpState';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
-
+import { HelpPageLoadState } from './HelpState';
 
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
@@ -108,6 +108,11 @@ export interface AdminUserQueryState {
     queries: SavedQueryRef[];
     searchTerm: string;
     users: LeafUser[];
+}
+
+export interface AdminHelpState {
+    page: AdminHelpContent;
+    state: HelpPageLoadState;
 }
 
 export default interface AdminState {

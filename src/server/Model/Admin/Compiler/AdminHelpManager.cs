@@ -20,7 +20,7 @@ namespace Model.Admin.Compiler
         {
             Task<AdminHelpPageContentSql> GetAsync(int id);
             Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p);
-            Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p);
+            Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
             Task<int?> DeleteAsync(int id);
         }
 
@@ -59,19 +59,19 @@ namespace Model.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p)
+        public async Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
-            ThrowIfCreateInvalid(p);
+            ThrowIfUpdateInvalid(contentRows);
 
             try
             {
-                var updated = await svc.UpdateAsync(p);
-                log.LogInformation("Updated help page. Page:{@Page}", updated);
+                var updated = await svc.UpdateAsync(contentRows);
+                log.LogInformation("Updated help page. Content:{@content}", updated);
                 return updated;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", p, de.ErrorCode, de.Message);
+                log.LogError("Failed to update help page. Content:{@ContentRows} Code:{Code} Error:{Error}", contentRows, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -97,6 +97,12 @@ namespace Model.Admin.Compiler
         void ThrowIfCreateInvalid(AdminHelpPageCreateUpdateSql c)
         {
             Ensure.NotNull(c, nameof(c));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void ThrowIfUpdateInvalid(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        {
+            Ensure.NotNull(contentRows, nameof(contentRows));
         }
     }
 }

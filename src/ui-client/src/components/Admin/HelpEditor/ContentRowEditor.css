@@ -1,0 +1,64 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+.content-row-editor {
+    font-size: 17px;
+    width: 100%;
+    margin-left: 19%;
+}
+
+.content-row-editor-markdown {
+    border-left: 2px solid transparent;
+    /* font-size: 17px; */
+    padding-left: 1%;
+    /* width: 60%; */
+}
+
+.content-row-editor-markdown:hover {
+    border-left-color: rgb(28,168,221);
+}
+
+.content-row-editor-markdown-slide-left {
+    margin-left: -25%;
+    padding: 10px;
+    width: 75%;
+    transition: margin-left 3s, padding 3s;
+    transition-timing-function: ease-in-out;
+}
+
+.content-row-editor-text {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+
+.content-row-editor-text-edit {
+    margin-left: -45%;
+    transition: margin-left 3s;
+    transition-timing-function: ease-in-out;
+}
+
+.content-row-editor-text-edit:hover .hover-button {
+    display: block;
+    position: absolute;
+    margin-top: -32px;
+}
+
+.content-row-editor-text-edit > textarea {
+    background-color: #ffffff91;
+    border: none;
+    border-radius: 10px;
+    box-sizing: content-box;
+    box-shadow: 3px 3px 10px 5px #b3b5b7;
+    outline: none;
+    padding: 10px;
+    width: 60%;
+}
+
+.hover-button {
+    display: none;
+}

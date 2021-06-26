@@ -27,6 +27,7 @@ export interface HelpPageContentDTO {
 }
 
 export type categoryId = number;
+export type orderId = number;
 export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
 
 export interface HelpPageCategory extends HelpPageCategoryDTO {

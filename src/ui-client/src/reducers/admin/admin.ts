@@ -5,9 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { adminHelp } from "./help";
+// import { adminHelp } from "./help";
 import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
-import { AdminHelpPane } from "../../models/state/AdminHelpState";
+// import { AdminHelpPane } from "../../models/state/AdminHelpState";
 import {
     SET_ADMIN_PANEL_PANE,
     SET_ADMIN_PANEL_LOAD_STATE,
@@ -112,6 +112,10 @@ import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChang
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 
+import { SET_ADMIN_HELP_CONTENT, AdminHelpAction } from "../../actions/admin/helpPage";
+import { setAdminHelpContent } from "./help";
+import { HelpPageLoadState } from "../../models/state/HelpState";
+
 export const defaultAdminState = (): AdminState => {
     return {
         activePane: AdminPanelPane.CONCEPTS,
@@ -158,15 +162,12 @@ export const defaultAdminState = (): AdminState => {
             data: new Map()
         },
         help: {
-            activePane: AdminHelpPane.CONTENT,
-            helpContent: {
-                changed: false,
-                // state: AdminHelpLoadState.NOT_LOADED
+            page: {
+                title: "",
+                category: "",
+                content: []
             },
-            helpPage: {
-                changed: false,
-                // state: AdminHelpLoadState.NOT_LOADED
-            }
+            state: HelpPageLoadState.NOT_LOADED
         },
         networkAndIdentity: {
             changed: false,
@@ -210,9 +211,9 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
     });
 }; 
 
-type AdminAction = AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
+type AdminAction = AdminHelpAction | AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
-const adminPanel = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
+export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
 
         // UI
@@ -341,6 +342,10 @@ const adminPanel = (state: AdminState = defaultAdminState(), action: AdminAction
         case TOGGLE_ADMIN_NETWORK_CERT_MODAL_SHOWN:
             return setAdminNetworkCertModalShown(state, action);
 
+        // Help
+        case SET_ADMIN_HELP_CONTENT:
+            return setAdminHelpContent(state, action);
+
         // User Queries
         case SET_ADMIN_QUERIES:
             return setAdminUserQueries(state, action);
@@ -356,5 +361,3 @@ const adminPanel = (state: AdminState = defaultAdminState(), action: AdminAction
             return state;
     }
 };
-
-export const admin = adminPanel || adminHelp;

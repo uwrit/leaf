@@ -10,37 +10,57 @@ import AdminState from '../../models/state/AdminState';
 import { AdminHelpAction } from '../../actions/admin/helpPage';
 import {
     SET_ADMIN_HELP_PANE,
+    SET_ADMIN_HELP_CONTENT,
     CREATE_ADMIN_HELP_PAGE,
-    UPDATE_ADMIN_HELP_CONTENT,
+    UPDATE_ADMIN_HELP_CONTENT
 } from '../../actions/admin/helpPage';
 
-export const createAdminHelpPage = (state: AdminState, action: AdminHelpAction): AdminState => {
-    return Object.assign({}, state, { 
-        helpPage: action.page
-    });
-};
+import { AdminHelpContent } from '../../models/admin/Help';
+import { HelpPageLoadState } from '../../models/state/HelpState';
 
-export const updateAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
+// export const createAdminHelpPage = (state: AdminState, action: AdminHelpAction): AdminState => {
+//     return Object.assign({}, state, { 
+//         helpPage: action.page
+//     });
+// };
+
+// export const setAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
+//     const contentRows = [...state.help.helpContent.content!, action.content];
+//     const changed = true;
+
+//     return Object.assign({}, state, {
+//         content: contentRows,
+//         changed: changed
+//     });
+// };
+
+export const setAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
-        helpContent: action.content
+        help: {
+            page: action.content,
+            state: action.contentLoadState
+        }
     });
 };
 
-export const setAdminHelpPane = (state: AdminState, action: AdminHelpAction): AdminState => {
-    return Object.assign({}, state, {
-        activePane: action.pane
-    });
-};
+// export const setAdminHelpPane = (state: AdminState, action: AdminHelpAction): AdminState => {
+//     return Object.assign({}, state, {
+//         activePane: action.pane
+//     });
+// };
 
-export const adminHelp = (state: AdminState = defaultAdminState(), action: AdminHelpAction): AdminState => {
-    switch (action.type) {
-        case SET_ADMIN_HELP_PANE:
-            return setAdminHelpPane(state, action);
-        case CREATE_ADMIN_HELP_PAGE:
-            return createAdminHelpPage(state, action);
-        case UPDATE_ADMIN_HELP_CONTENT:
-            return updateAdminHelpContent(state, action);
-        default:
-            return state;
-    };
-};
+// export const adminHelp = (state: AdminState = defaultAdminState(), action: AdminHelpAction): AdminState => {
+//     switch (action.type) {
+//         case SET_ADMIN_HELP_PANE:
+//             return setAdminHelpPane(state, action);
+//         case SET_ADMIN_HELP_CONTENT:
+//             return setAdminHelpContent(state, action);
+//         case CREATE_ADMIN_HELP_PAGE:
+//             return createAdminHelpPage(state, action);
+//         case UPDATE_ADMIN_HELP_CONTENT:
+//             console.log("THIS RAN AT LEAST")
+//             return updateAdminHelpContent(state, action);
+//         default:
+//             return state;
+//     };
+// };

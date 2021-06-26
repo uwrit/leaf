@@ -19,9 +19,16 @@ export interface HelpPageContentState {
     state: HelpPageLoadState;
 }
 
+export interface HelpPageContentTState {
+    page: HelpPage;
+    content: HelpPageContentDTO[];
+    state: HelpPageLoadState;
+}
+
 export interface HelpPageState {
     categories: HelpCategoryMap;
     currentSelectedPage: HelpPage;
     content: HelpPageContentState;
     state: HelpPageLoadState;
+    // page: HelpPageContentTState;
 }

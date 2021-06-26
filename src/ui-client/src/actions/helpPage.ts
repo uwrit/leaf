@@ -17,6 +17,8 @@ export const SET_CURRENT_HELP_PAGE = 'SET_CURRENT_HELP_PAGE';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
 export const SET_HELP_PAGE_CONTENT = 'SET_HELP_PAGE_CONTENT';
 
+export const SET_HELP_PAGE_AND_CONTENT = 'SET_HELP_PAGE_AND_CONTENT';
+
 export interface HelpPageAction {
     categories?: HelpPageCategoryDTO[];
     currentSelectedPage?: HelpPage;
@@ -26,6 +28,13 @@ export interface HelpPageAction {
 }
 
 export interface HelpPageContentAction {
+    content?: HelpPageContentDTO[];
+    state?: HelpPageLoadState;
+    type: string;
+}
+
+export interface HelpPageAndContentAction {
+    page?: HelpPage;
     content?: HelpPageContentDTO[];
     state?: HelpPageLoadState;
     type: string;
@@ -75,6 +84,7 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
 export const fetchSingleHelpPageContent = (page: HelpPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
+        // this is a redundant check right? b/c content isn't loaded to begin with.
         if (state.help.content.state === HelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
@@ -84,6 +94,9 @@ export const fetchSingleHelpPageContent = (page: HelpPage) => {
                  * Fetch help page content.
                  */
                 const content = await fetchHelpPageContent(getState(), page.id);
+
+                // dispatch(setHelpPageAndcontent(HelpPageLoadState.LOADED, page, content));
+                
                 dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
                 
                 // Set user selected help page as current selected page.
@@ -147,5 +160,14 @@ export const setHelpPageContent = (state: HelpPageLoadState, content?: HelpPageC
         content,
         state,
         type: SET_HELP_PAGE_CONTENT
+    };
+};
+
+export const setHelpPageAndcontent = (state: HelpPageLoadState, page: HelpPage, content?: HelpPageContentDTO[]): HelpPageAndContentAction => {
+    return {
+        page,
+        content,
+        state,
+        type: SET_HELP_PAGE_AND_CONTENT
     };
 };

@@ -6,17 +6,31 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { CreateHelpPageDTO, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { CreateHelpPageDTO, UpdateHelpPageContentDTO, AdminHelpContentDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*
  * Updates help page category, title, and content.
  */
-export const updateAdminHelpPageAndContent = async (state: AppState, content: UpdateHelpPageContentDTO) => {
+// export const updateAdminHelpPageAndContent = async (state: AppState, content: UpdateHelpPageContentDTO) => {
+//     const { token } = state.session.context!;
+//     const http = HttpFactory.authenticated(token);
+//     const resp = await http.put(`api/admin/help/${content.pageId.toString()}`, content);
+//     return resp.data as UpdateHelpPageContentDTO;
+// };
+
+export const getAdminHelpPageAndContent = async (state: AppState, pageId: number) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/help/${content.pageId.toString()}`, content);
-    return resp.data as UpdateHelpPageContentDTO;
+    const resp = await http.get(`api/admin/help/${pageId.toString()}`);
+    return resp.data as AdminHelpContentDTO;
+};
+
+export const updateAdminHelpPageAndContent = async (state: AppState, pageId: number, content: UpdateHelpPageContentDTO[]) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.put(`api/admin/help/${pageId.toString()}`, content);
+    return resp.data as AdminHelpContentDTO;
 };
 
 /*

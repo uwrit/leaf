@@ -12,7 +12,7 @@ using Model.Authorization;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Threading.Tasks;
-using System.Linq;
+using Services.Tables;
 
 namespace Services.Admin.Compiler
 {
@@ -23,8 +23,8 @@ namespace Services.Admin.Compiler
 
         static class Sql
         {
-            public const string Get = "adm.sp_GetHelpPageAndContent";
-            public const string Update = "adm.sp_UpdateHelpPageAndContent";
+            public const string Get = "adm.sp_GetHelpPageAndContentTEST";
+            public const string Update = "adm.sp_UpdateHelpPageAndContentTEST";
             public const string Create = "adm.sp_CreateHelpPageAndContent";
             public const string Delete = "adm.sp_DeleteHelpPageAndContent";
         }
@@ -45,7 +45,7 @@ namespace Services.Admin.Compiler
 
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Get,
-                    new { id, user = user.UUID },
+                    new { id },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -81,31 +81,41 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageCreateUpdateSql> UpdateAsync(AdminHelpPageCreateUpdateSql p)
+        public async Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
-                await cn.OpenAsync();
 
-                var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.Update,
-                    new
-                    {
-                        pageId = p.PageId,
-                        title = p.Title,
-                        category = p.Category,
-                        orderId = p.OrderId,
-                        type = p.Type,
-                        textContent = p.TextContent,
-                        imageContent = p.ImageContent,
-                        imageId = p.ImageId,
-                        user = user.UUID
-                    },
+                    new { content = HelpContentTable.From(contentRows) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return updated;
+                return AdminHelpReader.Read(grid);
+
+                //await cn.OpenAsync();
+
+                //var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
+                //    Sql.Update,
+                //    new
+                //    {
+                //        //pageId = contentRows[0].PageId,
+                //        //title = contentRows[0].Title,
+                //        //category = contentRows[0].Category,
+                //        //orderId = contentRows[0].OrderId,
+                //        //type = contentRows[0].Type,
+                //        //textContent = contentRows[0].TextContent,
+                //        //imageContent = contentRows[0].ImageContent,
+                //        //imageId = contentRows[0].ImageId
+                //        updateContent = HelpUpdateContentTable.From(contentRows)
+                //    },
+                //    commandType: CommandType.StoredProcedure,
+                //    commandTimeout: opts.DefaultTimeout
+                //);
+
+                //return updated;
             }
         }
 
@@ -117,7 +127,7 @@ namespace Services.Admin.Compiler
 
                 var deleted = await cn.QueryFirstOrDefaultAsync<int?>(
                     Sql.Delete,
-                    new { id, user = user.UUID },
+                    new { id },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -154,7 +164,7 @@ namespace Services.Admin.Compiler
             return new AdminHelpPageContentSql
             {
                 Title = Title,
-                Category = category,
+                Category = category.Category,
                 Content = content ?? new List<HelpPageContent>()
             };
         }

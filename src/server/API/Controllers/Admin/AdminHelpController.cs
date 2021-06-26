@@ -51,21 +51,16 @@ namespace API.Controllers.Admin
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<AdminHelpPageCreateUpdateSql>> Update(int id, [FromBody] AdminHelpPageCreateUpdateSql p)
+        public async Task<ActionResult<AdminHelpPageContentSql>> Update([FromBody] IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
             try
             {
-                if (p != null)
-                {
-                    p.PageId = id;
-                }
-
-                var updated = await manager.UpdateAsync(p);
-                return Ok(new AdminHelpCreateUpdateDTO(updated));
+                var updated = await manager.UpdateAsync(contentRows);
+                return Ok(new AdminHelpContentDTO(updated));
             }
             catch (ArgumentException ae)
             {
-                logger.LogError("Invalid update help page. Page:{@Page} Error:{Error}", p, ae.Message);
+                logger.LogError("Invalid update help page. Content:{@ContentRows} Error:{Error}", contentRows, ae.Message);
                 return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCreateUpdateSql)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
@@ -74,7 +69,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to update help page. Page:{@Page} Error:{Error}", p, e.ToString());
+                logger.LogError("Failed to update help page. Content:{@ContentRows} Error:{Error}", contentRows, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
