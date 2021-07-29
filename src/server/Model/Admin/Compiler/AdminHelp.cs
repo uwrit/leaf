@@ -16,8 +16,7 @@ namespace Model.Admin.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        //public byte[] ImageContent { get; set; }
-        public string ImageContent { get; set; }
+        public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
     }
 
@@ -40,8 +39,7 @@ namespace Model.Admin.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        //public byte[] ImageContent { get; set; }
-        public string ImageContent { get; set; }
+        public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
     }
 }

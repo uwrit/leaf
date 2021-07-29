@@ -11,7 +11,6 @@ export interface CreateHelpPageDTO {
     orderId: number;
     type: string;
     textContent: string;
-    // imageContent: Uint16Array;
     imageContent: string;
     imageId: string;
 }
@@ -31,7 +30,6 @@ export interface ContentRow {
     orderId: number;
     type: string;
     textContent: string;
-    // imageContent: Uint16Array;
     imageContent: string;
     imageId: string;
 }

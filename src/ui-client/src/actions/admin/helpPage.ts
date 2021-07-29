@@ -108,7 +108,6 @@ export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[])
 
                 dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
 
-                console.log(contentRows);
                 const content = await updateAdminHelpPageAndContent(state, pageId, contentRows);
                 
                 dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));

@@ -47,8 +47,7 @@ namespace Services.Tables
             cols.Add(new DataColumn(orderId, typeof(int)));
             cols.Add(new DataColumn(type, typeof(string)));
             cols.Add(new DataColumn(textContent, typeof(string)));
-            //cols.Add(new DataColumn(imageContent, typeof(byte[])));
-            cols.Add(new DataColumn(imageContent, typeof(string)));
+            cols.Add(new DataColumn(imageContent, typeof(byte[])));
             cols.Add(new DataColumn(imageId, typeof(string)));
 
             return dt;
