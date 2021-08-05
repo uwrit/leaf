@@ -18,12 +18,13 @@ import './AdminHelp.css';
 import TextareaAutosize from 'react-textarea-autosize';
 
 // import { AdminHelpContentState, AdminHelpPane } from '../../models/state/AdminHelpState';
-import { updateAdminHelpPageContent, deleteHelpPageAndContent, checkIfAdminHelpContentUnsaved } from '../../actions/admin/helpPage';
-import { AdminHelpContent, ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { setCurrentAdminHelpContent, updateAdminHelpPageContent, deleteHelpPageAndContent, checkIfAdminHelpContentUnsaved } from '../../actions/admin/helpPage';
+import { AdminHelpContent, AdminHelpContentDTO, ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HelpPageContentTState } from '../../models/state/HelpState';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../actions/generalUi';
+import { generate as generateId } from 'shortid';
 
 interface Props {
     categories: HelpCategoryMap;
@@ -31,14 +32,14 @@ interface Props {
     dispatch: any;
 
     page: AdminHelpContent;
+    currentCont: AdminHelpContent;
 }
 
 interface State {
     disabled: boolean;
     currentCategory: string;
     currentTitle: string;
-    // currentContent: Map<orderId, ContentRow>;
-    currContent: ContentRow[];
+    currentContent: ContentRow[];
     unsaved: boolean;
 }
 
@@ -52,16 +53,15 @@ export class AdminHelp extends React.Component<Props, State> {
             disabled: false,
             currentCategory: this.props.page.category,
             currentTitle: this.props.page.title,
-            // currentContent: this.loadContentMap(this.props.page.content),
-            currContent: this.props.page.content,
+            currentContent: this.props.page.content.slice(),
             unsaved: false
         }
     }
 
     public render() {
         const c = this.className;
-        const { dispatch } = this.props;
-        const { currentCategory, currentTitle, disabled, unsaved, currContent } = this.state;
+        const { dispatch, currentCont } = this.props;
+        const { currentCategory, currentTitle, currentContent, disabled, unsaved } = this.state;
         const arrowMove = disabled ? {marginLeft: "-30%", transition: "3s", transitionTimingFunction: "ease-in-out"} : {};
 
         // const contentRows = [...this.state.currentContent.values()];
@@ -119,9 +119,8 @@ export class AdminHelp extends React.Component<Props, State> {
                     unsaved={unsaved}
                 />
 
-                {/* {sortedContentRows.map((cr,i) => */}
-                {currContent.map((cr,i) =>
-                // cr.textContent &&
+                {currentContent.map((cr,i) =>
+                // {currentCont.content.map((cr,i) =>
                     // <div key={i} className={`${c}-content-text`}>
                         <ContentRowEditor
                             key={i}
@@ -133,28 +132,12 @@ export class AdminHelp extends React.Component<Props, State> {
                             title={currentTitle}
                             contentHandler={this.handleContentChange}
                             newSectionHandler={this.handleNewSection}
-                            // newTextSectionHandler={this.handleNewTextSection}
-                            // newImageSectionHandler={this.handleNewImageSection}
                         />
                     // </div>
                 )}
                 </div>
             </div>
         );
-    };
-
-    // private loadContentMap = (content: ContentRow[]): Map<orderId, ContentRow> => {
-    //     const contentMap = new Map<orderId, ContentRow>();
-    //     content.map(c => contentMap.set(c.orderId, c));
-        
-    //     return contentMap;
-    // };
-
-    private loadContentMap = (content: ContentRow[]): ContentRow[] => {
-        let cont = [];
-        cont = content;
-        
-        return cont;
     };
 
     private handleTitleChange = (text: string) => {
@@ -165,24 +148,23 @@ export class AdminHelp extends React.Component<Props, State> {
         this.setState({ disabled: true, currentCategory: text, unsaved: true});
     };
 
-    private handleContentChange = (val: string, orderId: number, index: number) => {
-        const { currContent } = this.state;
-        // const k = currentContent.get(orderId);
-        const kk = currContent.find((_, i) => i == index);
+    private handleContentChange = (val: string, index: number) => {
+        const { dispatch } = this.props;
+        const { currentContent } = this.state;
+        const k = currentContent.find((_, i) => i == index);
 
         if (val) {
-            // const v = Object.assign({}, k, { textContent: val }) as ContentRow;
-            const vv = Object.assign({}, kk, { textContent: val }) as ContentRow;
-            // currentContent.set(orderId, v);
-            currContent.splice(index, 1, vv);
+            const v = Object.assign({}, k, { textContent: val }) as ContentRow;
+            currentContent.splice(index, 1, v);
         } else {
-            // currentContent.delete(orderId);
-            currContent.splice(index, 1);
+            currentContent.splice(index, 1);
         }
         
-        console.log("stateCont:", this.state.currContent);
-        console.log("propCont:", this.props.page.content);
-        this.setState({ currContent: currContent, disabled: true, unsaved: true });
+        // dispatch(setCurrentAdminHelpContent(Object.assign({}) as AdminHelpContentDTO)); 
+        // console.log("stateCont:", this.state.currentContent);
+        // console.log("propCont:", this.props.page.content);
+        this.setState({ disabled: true, unsaved: true });
+        // this.setState({ currentContent: currentContent, disabled: true, unsaved: true });
     };
 
     private handleUndoChanges = () => {
@@ -190,7 +172,7 @@ export class AdminHelp extends React.Component<Props, State> {
             currentCategory: this.props.page.category,
             currentTitle: this.props.page.title,
             // currentContent: this.loadContentMap(this.props.page.content),
-            currContent: this.props.page.content,
+            currentContent: this.props.page.content.slice(),
             disabled: false,
             unsaved: false
         })
@@ -198,25 +180,10 @@ export class AdminHelp extends React.Component<Props, State> {
 
     private handleSaveChanges = () => {
         const { dispatch } = this.props;
-        const { currentCategory, currentTitle, currContent } = this.state;
-        // const updateContent: UpdateHelpPageContent[] = [];
-        const updateCurrContent: UpdateHelpPageContent[] = [];
+        const { currentCategory, currentTitle, currentContent } = this.state;
+        const updateContent: UpdateHelpPageContent[] = [];
 
-        // [...currentContent.values()].map(c => {
-        //     const updatedContent = {
-        //         title: currentTitle,
-        //         category: currentCategory,
-        //         pageId: c.pageId,
-        //         orderId: c.orderId,
-        //         type: c.type,
-        //         textContent: c.textContent,
-        //         imageContent: c.imageContent,
-        //         imageId: c.imageId
-        //     } as UpdateHelpPageContentDTO;
-        //     updateContent.push(updatedContent);
-        // });
-
-        currContent.map(c => {
+        currentContent.map(c => {
             const updatedContent = {
                 title: currentTitle,
                 category: currentCategory,
@@ -227,11 +194,10 @@ export class AdminHelp extends React.Component<Props, State> {
                 imageContent: c.imageContent,
                 imageId: c.imageId
             } as UpdateHelpPageContentDTO;
-            updateCurrContent.push(updatedContent);
+            updateContent.push(updatedContent);
         });
 
-        // dispatch(updateAdminHelpPageContent(updateContent));
-        dispatch(updateAdminHelpPageContent(updateCurrContent));
+        dispatch(updateAdminHelpPageContent(updateContent));
         this.setState({ disabled: false, unsaved: false });
     };
 
@@ -258,21 +224,27 @@ export class AdminHelp extends React.Component<Props, State> {
     };
 
     // new section logic
-    private handleNewSection = (index: number, contentRow: ContentRow, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => {
-        const content = this.state.currContent;
+    private handleNewSection = (index: number, pageId: number, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
+        const content = this.state.currentContent;
+        
+        // console.log(index);
+        // console.log(content);
+        // const uniqueId = generateId();
+
         if (text) {
             const con = Object.assign({}, {
-                pageId: contentRow.pageId,
+                pageId: pageId,
                 orderId: 0,
                 type: 'text',
-                textContent: 'NEW SECTION',
+                textContent: 'New Section Added',
                 imageContent: '',
                 imageId: ''
             }) as ContentRow;
             content.splice(index, 0, con);
-            this.setState({ currContent: content, disabled: true, unsaved: true });
+            content.forEach((c,i) => c.orderId = i);
+            this.setState({ currentContent: content, disabled: true, unsaved: true });
         } else {
-            const image = evt!.currentTarget.files!.item(0)!;
+            const image = e!.currentTarget.files!.item(0)!;
             const imgId = image.name;
             const reader = new FileReader();
             reader.readAsDataURL(image);
@@ -280,7 +252,7 @@ export class AdminHelp extends React.Component<Props, State> {
             reader.onload = () => {
                 const imageString = reader.result!.toString().split(',')[1];
                 const con = Object.assign({}, {
-                    pageId: contentRow.pageId,
+                    pageId: pageId,
                     orderId: 0,
                     type: 'image',
                     textContent: '',
@@ -289,9 +261,10 @@ export class AdminHelp extends React.Component<Props, State> {
                 }) as ContentRow;
 
                 content.splice(index, 0, con);
-                this.setState({ currContent: content, disabled: true, unsaved: true });
+                content.forEach((c,i) => c.orderId = i);
+                this.setState({ currentContent: content, disabled: true, unsaved: true });
             };
-            evt!.currentTarget.remove();
+            e!.currentTarget.remove();
         };
     };
 }

@@ -34,9 +34,19 @@ import { HelpPageLoadState } from '../../models/state/HelpState';
 //     });
 // };
 
+export const setCurrentAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
+    return Object.assign({}, state, {
+        help: {
+            ...state.help,
+            currentHelpContent: action.currentContent
+        }
+    });
+};
+
 export const setAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
         help: {
+            ...state.help,
             page: action.content,
             state: action.contentLoadState
         }

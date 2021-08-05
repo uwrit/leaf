@@ -112,8 +112,8 @@ import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChang
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 
-import { SET_ADMIN_HELP_CONTENT, AdminHelpAction } from "../../actions/admin/helpPage";
-import { setAdminHelpContent } from "./help";
+import { SET_ADMIN_HELP_CONTENT, SET_CURRENT_ADMIN_HELP_CONTENT, AdminHelpAction } from "../../actions/admin/helpPage";
+import { setCurrentAdminHelpContent, setAdminHelpContent } from "./help";
 import { HelpPageLoadState } from "../../models/state/HelpState";
 
 export const defaultAdminState = (): AdminState => {
@@ -343,6 +343,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminNetworkCertModalShown(state, action);
 
         // Help
+        case SET_CURRENT_ADMIN_HELP_CONTENT:
+            return setCurrentAdminHelpContent(state, action);
         case SET_ADMIN_HELP_CONTENT:
             return setAdminHelpContent(state, action);
 

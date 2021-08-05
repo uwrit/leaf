@@ -25,10 +25,8 @@ interface Props {
     category: string;
     title: string;
 
-    contentHandler: (val: string, orderId: number, index: number) => void;
-    // newTextSectionHandler: (index: number, contentRow: ContentRow, above: boolean) => void;
-    // newImageSectionHandler: (evt: React.ChangeEvent<HTMLInputElement>, index: number, ContentRow: ContentRow) => void;
-    newSectionHandler: (index: number, contentRow: ContentRow, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
+    contentHandler: (val: string, index: number) => void;
+    newSectionHandler: (index: number, pageId: number, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
 
     index: number;
 }
@@ -54,7 +52,6 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const markdownText = selected ? 'markdown-slide-left' : 'markdown';
         const markdownEdit = selected ? 'text-edit' : 'text';
 
-        // console.log(contentRow)
         return (
             <div className={c}>
                 <Row>
@@ -92,15 +89,12 @@ export class ContentRowEditor extends React.Component<Props, State> {
                                     </label>
                                 </Button>
 
-                                {/* <Button onClick={this.handleAddSectionAbove}>Add Text Above</Button>
-                                <Button onClick={this.handleAddSectionBelow}>Add Text Below</Button> */}
                                 <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
                                 <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
                             </div>
 
                             <TextareaAutosize
                                 onChange={this.handleChange}
-                                // value={cont}
                                 value={contentRow.textContent}
                             />
                         </div>
@@ -111,10 +105,11 @@ export class ContentRowEditor extends React.Component<Props, State> {
         );
     };
 
-    private handleNewSection = (above: boolean, text: boolean, e?: any) => {
+    private handleNewSection = (above: boolean, text: boolean, event?: any) => {
         const { contentRow, index, newSectionHandler } = this.props;
-        const currIndex = above ? index : index+1;
-        newSectionHandler(currIndex, contentRow, text, e);
+        const pageId = contentRow.pageId;
+        const updatedIndex = above ? index : index+1;
+        newSectionHandler(updatedIndex, pageId, text, event);
         this.setState({ selected: false });
     };
 
@@ -123,6 +118,6 @@ export class ContentRowEditor extends React.Component<Props, State> {
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const { contentRow, contentHandler } = this.props;
         const newVal = e.currentTarget.value;
-        contentHandler(newVal, contentRow.orderId, this.props.index);
+        contentHandler(newVal, this.props.index);
     };
 }

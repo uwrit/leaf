@@ -53,6 +53,7 @@ export class Help extends React.PureComponent<Props, State> {
                     // adminHelpContent={this.props.adminHelp.helpContent}
                     // page={helpPages.page}
                     page={adminHelp.page}
+                    currentCont={adminHelp.currentHelpContent!}
                 />
             );
         }

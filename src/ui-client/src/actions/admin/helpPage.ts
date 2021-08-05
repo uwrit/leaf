@@ -22,11 +22,13 @@ export const SET_ADMIN_HELP_LOAD_STATE = 'SET_ADMIN_HELP_LOAD_STATE';
 
 export const CREATE_ADMIN_HELP_PAGE = 'CREATE_ADMIN_HELP_PAGE';
 export const SET_ADMIN_HELP_CONTENT = 'SET_ADMIN_HELP_CONTENT';
+export const SET_CURRENT_ADMIN_HELP_CONTENT = 'SET_CURRENT_ADMIN_HELP_CONTENT';
 export const UPDATE_ADMIN_HELP_CONTENT = 'UPDATE_ADMIN_HELP_CONTENT';
 export const SAVE_ADMIN_HELP_CONTENT = 'SAVE_ADMIN_HELP_CONTENT';
 
 export interface AdminHelpAction {
     // changed?: boolean;
+    currentContent?: AdminHelpContentDTO;
     content?: AdminHelpContentDTO;
     contentLoadState?: HelpPageLoadState;
     // page?: CreateHelpPage;
@@ -50,7 +52,10 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
                 dispatch(setCurrentHelpPage(page));
 
                 const content = await getAdminHelpPageAndContent(state, page.id);
+                dispatch(setCurrentAdminHelpContent(content));
                 dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+                
+                // dispatch(setCurrentAdminHelpContent(content));
 
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -111,6 +116,7 @@ export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[])
                 const content = await updateAdminHelpPageAndContent(state, pageId, contentRows);
                 
                 dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+                dispatch(setCurrentAdminHelpContent(content));
                 
                 dispatch(reloadContent());
 
@@ -186,6 +192,7 @@ export const resetAdminHelpContent = () => {
             // Set admin help content to empty.
             // Set admin help content load state to NOT_LOADED.
             dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));
+            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
         } catch (err) {
             console.log(err);
         }
@@ -230,6 +237,13 @@ export const checkIfAdminHelpContentUnsaved = (unsaved: boolean) => {
 //         type: SET_ADMIN_HELP_CONTENT
 //     };
 // };
+
+export const setCurrentAdminHelpContent = (currentContent: AdminHelpContentDTO): AdminHelpAction => {
+    return {
+        currentContent,
+        type: SET_CURRENT_ADMIN_HELP_CONTENT
+    };
+};
 
 export const setAdminHelpContent = (content: AdminHelpContentDTO, contentLoadState: HelpPageLoadState): AdminHelpAction => {
     return {
