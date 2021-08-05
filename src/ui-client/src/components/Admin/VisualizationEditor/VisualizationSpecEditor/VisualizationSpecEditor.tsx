@@ -20,8 +20,8 @@ import { TextArea } from '../../Section/TextArea';
 import { Checkbox } from '../../Section/Checkbox';
 import { AdminVisualizationDatasetState } from '../../../../models/state/AdminState';
 import VisualizationDatasetQueryRefRow from './VisualizationDatasetQueryRefRow';
-import './VisualizationSpecEditor.css';
 import VisualizationDatasetSample from './VisualizationDatasetSample';
+import './VisualizationSpecEditor.css';
 
 interface Props { 
     page?: AdminVisualizationPage;
@@ -119,8 +119,6 @@ export default class VisualizationSpecEditor extends React.PureComponent<Props, 
                     </Tooltip>
                 </div>
                 }
-
-                <div className={`${c}-delete`}>Delete</div>
 
                 <Section header='Vega-Lite JSON Editor'>
                     <div>

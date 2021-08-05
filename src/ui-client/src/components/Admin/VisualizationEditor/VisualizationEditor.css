@@ -8,16 +8,15 @@
 .visualization-editor {
     background-color: white;
     height: calc(100vh - 55px);
-    padding: 0 0 75px 0;
+    padding: 0;
     position: relative;
 }
 
 /* Header */
 .visualization-editor-toprow {
     background-color: rgb(245, 245, 245);
-    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
-    height: 84px;
-    margin-bottom: 4px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 6px 10px 0px;
+    height: 140px;
     padding: 20px;
     z-index: 100;
 }
@@ -37,6 +36,31 @@
 
 .visualization-editor .leaf-button.hide-editor {
     float: right;
+}
+
+.visualization-selector-row {
+    margin-top: 20px;
+}
+
+.visualization-selector-row > div {
+    display: inline-block;
+    margin: 0;
+}
+
+.visualization-selector-row .form-group {
+    margin-left: 8px;
+    min-width: 250px;
+}
+
+.dataset-editor-dataset-visualization-delete {
+    color: rgb(200, 200, 200);
+    cursor: pointer;
+    float: right;
+    font-size: 0.9rem;
+}
+
+.dataset-editor-dataset-visualization-delete:hover {
+    color:rgb(244, 67, 54);
 }
 
 /* Main */

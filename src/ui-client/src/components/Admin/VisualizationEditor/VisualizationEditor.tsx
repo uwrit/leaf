@@ -9,7 +9,6 @@ import React from 'react';
 import { Container, Row, Button } from 'reactstrap';
 import AdminState from '../../../models/state/AdminState';
 import { WhatsThis } from '../../Other/WhatsThis/WhatsThis';
-import VisualizationPageSidebar from './VisualizationPageSidebar/VisualizationPageSidebar';
 import VisualizationSpecEditor from './VisualizationSpecEditor/VisualizationSpecEditor';
 import { CohortState, CohortStateType } from '../../../models/state/CohortState';
 import { VisualizationPage as VisualizationPageModel } from '../../../models/visualization/Visualization';
@@ -21,6 +20,7 @@ import { Direction, DirectionalSlider } from '../../Other/DirectionalSlider/Dire
 import { FiChevronRight } from 'react-icons/fi';
 import { View } from '../../../bundled/react-vega';
 import './VisualizationEditor.css';
+import { VisualizationPageDropdown } from './VisualizationPageDropdown/VisualizationPageDropdown';
 
 interface Props { 
     cohort: CohortState;
@@ -142,6 +142,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                 {/* Header */}
                 <div className={`${c}-toprow`}>
+
                     <Button className='leaf-button leaf-button-addnew' disabled={changed}>
                         + Create New Visualization
                     </Button>
@@ -158,14 +159,20 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
 
                     {/* Explanation */}
                     <WhatsThis question={'What is a Leaf Visualization?'} body={`Visualizations`} />
+
+                    {/* Visualization selector row */}
+                    <div className={'visualization-selector-row'}>
+                        <div className={`${c}-top-row-text`}>Selected Visualization</div>
+                        <VisualizationPageDropdown 
+                            dispatch={dispatch}
+                            pages={visualizations.pages} 
+                            changeHandler={this.handleVisualizationPageSelectorClick} 
+                        />
+                    </div>
+
                 </div>
 
                 <Row className={this.getClasses().join(' ')}>
-
-                    {/* Sidebar */}
-                    <div className={`${c}-sidebar-container`}>
-                        <VisualizationPageSidebar pages={visualizations.pages} clickHandler={this.handleSidebarClick} />
-                    </div>
 
                     {/* Preview */}
                     <div className={`${c}-preview-container`}>
@@ -257,7 +264,7 @@ export class VisualizationEditor extends React.PureComponent<Props,State> {
         } catch (err) {}
     }
 
-    private handleSidebarClick = (page: VisualizationPageModel) => {
+    private handleVisualizationPageSelectorClick = (page: VisualizationPageModel) => {
         const { data, dispatch, cohort } = this.props;
         const cohortReady = cohort.count.state === CohortStateType.LOADED;
 

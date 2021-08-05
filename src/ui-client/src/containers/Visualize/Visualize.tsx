@@ -105,6 +105,7 @@ class Visualize extends React.Component<Props, State> {
         const c = this.className;
         const { cohort, auth, responders, generalUi } = this.props;
         const { cacheLimit } = auth.config!.cohort;
+        const showSelector = generalUi.visualization.pages.size || responders.size > 1;
 
         /**
          * If too many patients for caching, let user know.
@@ -127,10 +128,10 @@ class Visualize extends React.Component<Props, State> {
         }
 
         return (
-            <div className={`${c}-container`}>
+            <div className={`${c}-container ${showSelector ? "pad-top" : ""}`}>
 
                 {/* Visualization Page and/or Responder selection dropdowns */}
-                {(generalUi.visualization.pages.size || responders.size > 1) &&
+                {showSelector &&
                 <div className={`${c}-top-row`}>
                     {this.getDropdowns()}
                 </div>

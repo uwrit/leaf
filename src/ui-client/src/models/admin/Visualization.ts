@@ -12,10 +12,10 @@ export interface AdminVisualizationPageDTO extends VisualizationPageDTO {
     categoryId?: string;
     components: AdminVisualizationComponentDTO[];
     constraints: Constraint[];
-    created: Date;
-    createdBy: string;
-    updated: Date;
-    updatedBy: string;
+    created?: Date;
+    createdBy?: string;
+    updated?: Date;
+    updatedBy?: string;
 }
 
 export interface AdminVisualizationPage extends AdminVisualizationPageDTO {

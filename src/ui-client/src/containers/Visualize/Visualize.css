@@ -5,10 +5,13 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
- .visualize-container {
-    padding-top: 59px;
+.visualize-container {
     position: relative;
- }
+}
+
+.visualize-container.pad-top {
+    padding-top: 59px;
+}
 
 /* Top row */
 .visualize-top-row {

@@ -51,7 +51,7 @@
     "ts-jest": "^26.3.0",
     "vega": "^5.20.2",
     "vega-embed": "^6.5.1",
-    "vega-lite": "^5.1.0",
+    "vega-lite": "5.0.0",
     "vega-tooltip": "^0.25.1"
   },
   "scripts": {
