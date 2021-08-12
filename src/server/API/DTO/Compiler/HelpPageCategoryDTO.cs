@@ -9,7 +9,7 @@ namespace API.DTO.Compiler
 {
     public class HelpPageCategoryDTO
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Category { get; set; }
 
         public HelpPageCategoryDTO() { }

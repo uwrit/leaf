@@ -10,7 +10,8 @@ namespace Model.Admin.Compiler
 {
     public class AdminHelpPageCreateUpdateSql
     {
-        public int PageId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PageId { get; set; }
         public string Title { get; set; }
         public string Category { get; set; }
         public int OrderId { get; set; }
@@ -35,7 +36,8 @@ namespace Model.Admin.Compiler
 
     public class HelpPageContent
     {
-        public int PageId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }

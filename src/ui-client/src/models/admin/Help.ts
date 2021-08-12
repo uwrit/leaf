@@ -16,7 +16,7 @@ export interface CreateHelpPageDTO {
 }
 
 export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
-    pageId: number;
+    pageId: string;
 }
 
 export interface CreateHelpPage extends CreateHelpPageDTO {}
@@ -26,7 +26,8 @@ export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO {}
 
 
 export interface ContentRow {
-    pageId: number;
+    id: string;
+    pageId: string;
     orderId: number;
     type: string;
     textContent: string;

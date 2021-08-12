@@ -6,18 +6,18 @@
  */ 
 
 export interface HelpPageCategoryDTO {
-    id: number;
+    id: string;
     category: string;
 }
 
 export interface HelpPageDTO {
-    id: number;
-    categoryId: number;
+    id: string;
+    categoryId: string;
     title: string;
 }
 
 export interface HelpPageContentDTO {
-    id: number;
+    id: string;
     pageId: number;
     orderId: number;
     type: string;
@@ -26,7 +26,7 @@ export interface HelpPageContentDTO {
     imageId: string;
 }
 
-export type categoryId = number;
+export type categoryId = string;
 export type orderId = number;
 export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
 

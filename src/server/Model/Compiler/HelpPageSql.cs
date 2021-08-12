@@ -9,15 +9,15 @@ namespace Model.Compiler
 {
     public class HelpPageSql
     {
-        public int Id { get; set; }
-        public int CategoryId { get; set; }
+        public Guid Id { get; set; }
+        public Guid CategoryId { get; set; }
         public string Title { get; set; }
     }
 
     public class HelpPageContentSql
     {
-        public int Id { get; set; }
-        public int PageId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
@@ -27,7 +27,7 @@ namespace Model.Compiler
 
     public class HelpPageCategorySql
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Category { get; set; }
     }
 }

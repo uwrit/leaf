@@ -38,7 +38,7 @@ export const setCurrentAdminHelpContent = (state: AdminState, action: AdminHelpA
     return Object.assign({}, state, {
         help: {
             ...state.help,
-            currentHelpContent: action.currentContent
+            currentContent: action.currentContent
         }
     });
 };
@@ -47,30 +47,8 @@ export const setAdminHelpContent = (state: AdminState, action: AdminHelpAction):
     return Object.assign({}, state, {
         help: {
             ...state.help,
-            page: action.content,
+            content: action.content,
             state: action.contentLoadState
         }
     });
 };
-
-// export const setAdminHelpPane = (state: AdminState, action: AdminHelpAction): AdminState => {
-//     return Object.assign({}, state, {
-//         activePane: action.pane
-//     });
-// };
-
-// export const adminHelp = (state: AdminState = defaultAdminState(), action: AdminHelpAction): AdminState => {
-//     switch (action.type) {
-//         case SET_ADMIN_HELP_PANE:
-//             return setAdminHelpPane(state, action);
-//         case SET_ADMIN_HELP_CONTENT:
-//             return setAdminHelpContent(state, action);
-//         case CREATE_ADMIN_HELP_PAGE:
-//             return createAdminHelpPage(state, action);
-//         case UPDATE_ADMIN_HELP_CONTENT:
-//             console.log("THIS RAN AT LEAST")
-//             return updateAdminHelpContent(state, action);
-//         default:
-//             return state;
-//     };
-// };

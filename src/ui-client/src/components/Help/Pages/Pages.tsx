@@ -72,7 +72,6 @@ export class Pages extends React.Component<Props, State> {
     private handleHelpPageTitleClick = (page: HelpPage) => {
         const { dispatch, isAdmin } = this.props;
 
-        // dispatch(fetchSingleHelpPageContent(page));
         isAdmin ? dispatch(getAdminHelpPageContent(page)) : dispatch(fetchSingleHelpPageContent(page));
     };
 

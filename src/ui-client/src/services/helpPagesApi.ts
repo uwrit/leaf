@@ -38,7 +38,7 @@ export const fetchHelpPageCategories = async (state: AppState) => {
 /*
  * Fetch help page content.
  */
-export const fetchHelpPageContent = async (state: AppState, pageId: number) => {
-    const content = await makeRequest(state, `api/help/${pageId.toString()}/content`);
+export const fetchHelpPageContent = async (state: AppState, pageId: string) => {
+    const content = await makeRequest(state, `api/help/${pageId}/content`);
     return content.data as HelpPageContentDTO[];
 };

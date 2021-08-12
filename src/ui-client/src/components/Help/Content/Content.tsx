@@ -62,7 +62,7 @@ export class Content extends React.Component<Props> {
 
         if (content.textContent != null) {
             return (
-                <div className={`${c}-text`}>
+                <div className={`${c}-text`} key={content.id}>
                     {/* <TextareaAutosize
                         readOnly={true}
                         spellCheck={false}
@@ -73,7 +73,7 @@ export class Content extends React.Component<Props> {
             );
         } else if (content.imageContent != null) {
             return (
-                <div className={`${c}-image`}>
+                <div className={`${c}-image`} key={content.id}>
                     {/* <img
                         // src={`data:image/jpeg;base64,${content.imageContent}`}
                         src={`data:image;base64,${content.imageContent}`}

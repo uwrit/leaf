@@ -11,7 +11,8 @@ namespace API.DTO.Admin.Compiler
 {
     public class AdminHelpCreateUpdateDTO
     {
-        public int PageId { get; set; }
+        public Guid Id { get; set; }
+        public Guid PageId { get; set; }
         public string Title { get; set; }
         public string Category { get; set; }
         public int OrderId { get; set; }
@@ -24,6 +25,7 @@ namespace API.DTO.Admin.Compiler
 
         public AdminHelpCreateUpdateDTO(AdminHelpPageCreateUpdateSql p)
         {
+            Id = p.Id;
             PageId = p.PageId;
             Title = p.Title;
             Category = p.Category;

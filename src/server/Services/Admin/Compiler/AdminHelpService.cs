@@ -3,6 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<AdminHelpPageContentSql> GetAsync(int id)
+        public async Task<AdminHelpPageContentSql> GetAsync(Guid id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -94,38 +95,16 @@ namespace Services.Admin.Compiler
                 );
 
                 return AdminHelpReader.Read(grid);
-
-                //await cn.OpenAsync();
-
-                //var updated = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
-                //    Sql.Update,
-                //    new
-                //    {
-                //        //pageId = contentRows[0].PageId,
-                //        //title = contentRows[0].Title,
-                //        //category = contentRows[0].Category,
-                //        //orderId = contentRows[0].OrderId,
-                //        //type = contentRows[0].Type,
-                //        //textContent = contentRows[0].TextContent,
-                //        //imageContent = contentRows[0].ImageContent,
-                //        //imageId = contentRows[0].ImageId
-                //        updateContent = HelpUpdateContentTable.From(contentRows)
-                //    },
-                //    commandType: CommandType.StoredProcedure,
-                //    commandTimeout: opts.DefaultTimeout
-                //);
-
-                //return updated;
             }
         }
 
-        public async Task<int?> DeleteAsync(int id)
+        public async Task<Guid?> DeleteAsync(Guid id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var deleted = await cn.QueryFirstOrDefaultAsync<int?>(
+                var deleted = await cn.QueryFirstOrDefaultAsync<Guid?>(
                     Sql.Delete,
                     new { id },
                     commandType: CommandType.StoredProcedure,

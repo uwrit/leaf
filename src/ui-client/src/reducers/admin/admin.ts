@@ -162,7 +162,7 @@ export const defaultAdminState = (): AdminState => {
             data: new Map()
         },
         help: {
-            page: {
+            content: {
                 title: "",
                 category: "",
                 content: []

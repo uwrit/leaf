@@ -18,10 +18,10 @@ namespace Model.Admin.Compiler
     {
         public interface IAdminHelpPageService
         {
-            Task<AdminHelpPageContentSql> GetAsync(int id);
+            Task<AdminHelpPageContentSql> GetAsync(Guid id);
             Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p);
             Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
-            Task<int?> DeleteAsync(int id);
+            Task<Guid?> DeleteAsync(Guid id);
         }
 
         readonly ILogger<AdminHelpManager> log;
@@ -35,7 +35,7 @@ namespace Model.Admin.Compiler
             this.svc = svc;
         }
 
-        public async Task<AdminHelpPageContentSql> GetAsync(int id)
+        public async Task<AdminHelpPageContentSql> GetAsync(Guid id)
         {
             log.LogInformation("Getting help page. Id:{Id}", id);
             return await svc.GetAsync(id);
@@ -77,7 +77,7 @@ namespace Model.Admin.Compiler
             }
         }
 
-        public async Task<int?> DeleteAsync(int id)
+        public async Task<Guid?> DeleteAsync(Guid id)
         {
             Ensure.NotDefault(id, nameof(id));
 

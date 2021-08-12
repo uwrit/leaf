@@ -20,11 +20,6 @@ export const defaultHelpPagesState = (): HelpPageState => {
     return {
         categories: new Map<categoryId, HelpPageCategory>(),
         currentSelectedPage: Object.assign({}) as HelpPage,
-        // page: {
-        //     page: Object.assign({}) as HelpPage,
-        //     content: [],
-        //     state: HelpPageLoadState.NOT_LOADED
-        // },
         content: {
             content: [],
             state: HelpPageLoadState.NOT_LOADED

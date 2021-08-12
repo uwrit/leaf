@@ -7,6 +7,7 @@ using Model.Help;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Options;
+using System;
 using System.Data.SqlClient;
 using System.Data;
 using System.Collections.Generic;
@@ -70,7 +71,7 @@ namespace Services.Help
             }
         }
 
-        public async Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid)
+        public async Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(Guid pageid)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {

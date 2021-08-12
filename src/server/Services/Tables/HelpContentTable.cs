@@ -41,7 +41,7 @@ namespace Services.Tables
             var dt = new DataTable();
             var cols = dt.Columns;
 
-            cols.Add(new DataColumn(pageId, typeof(int)));
+            cols.Add(new DataColumn(pageId, typeof(Guid)));
             cols.Add(new DataColumn(category, typeof(string)));
             cols.Add(new DataColumn(title, typeof(string)));
             cols.Add(new DataColumn(orderId, typeof(int)));

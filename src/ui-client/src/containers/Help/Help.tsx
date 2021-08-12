@@ -19,6 +19,7 @@ import { AdminHelpState } from '../../models/state/AdminState';
 
 import { HelpPage, HelpPageContent } from '../../models/Help/Help';
 import { HelpPageContentTState } from '../../models/state/HelpState';
+import { Button } from 'reactstrap';
 
 interface OwnProps { }
 
@@ -46,34 +47,15 @@ export class Help extends React.PureComponent<Props, State> {
         if (adminHelp.state === HelpPageLoadState.LOADED) {
             return (
                 <AdminHelp
-                    categories={helpPages.categories}
-                    // content={helpPages.content.content}
                     currentPage={helpPages.currentSelectedPage}
                     dispatch={dispatch}
-                    // adminHelpContent={this.props.adminHelp.helpContent}
-                    // page={helpPages.page}
-                    page={adminHelp.page}
-                    currentCont={adminHelp.currentHelpContent!}
+                    content={adminHelp.content}
+                    currentContent={adminHelp.currentContent!}
                 />
             );
-        }
+        };
 
         if (helpPages.content.state === HelpPageLoadState.LOADED) {
-            // if (user.isAdmin) {
-
-            //     // this.getAdminContent();
-            //     return (
-            //         <AdminHelp
-            //             categories={helpPages.categories}
-            //             // content={helpPages.content.content}
-            //             currentPage={helpPages.currentSelectedPage}
-            //             dispatch={dispatch}
-            //             // adminHelpContent={this.props.adminHelp.helpContent}
-            //             page={helpPages.page}
-            //         />
-            //     );
-            // };
-
             return (
                 <div className={`${c}-content`}>
                     <Content
@@ -88,8 +70,20 @@ export class Help extends React.PureComponent<Props, State> {
         return (
             <div className={c}>
                 <div className={`${c}-display`}>
+                    {/* {user.isAdmin ? <Button></Button> : null} */}
+
                     <HelpSearch />
 
+                    {/* {user.isAdmin
+                        ? <div>TEST</div>
+                        : ((helpPages.state === HelpPageLoadState.LOADED) &&
+                            <Categories
+                                categories={helpPages.categories}
+                                dispatch={dispatch}
+                                isAdmin={user.isAdmin}
+                            />)
+                    } */}
+                    
                     {(helpPages.state === HelpPageLoadState.LOADED) &&
                         <Categories
                             categories={helpPages.categories}

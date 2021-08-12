@@ -3,6 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
+using System;
 using System.Data.Common;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace Model.Help
         {
             Task<IEnumerable<HelpPageSql>> GetAllPagesAsync();
             Task<IEnumerable<HelpPageCategorySql>> GetHelpPageCategoriesAsync();
-            Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid);
+            Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(Guid pageid);
         }
 
         readonly IHelpPage help;
@@ -59,7 +60,7 @@ namespace Model.Help
             }
         }
 
-        public async Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(int pageid)
+        public async Task<IEnumerable<HelpPageContentSql>> GetPageContentAsync(Guid pageid)
         {
             log.LogInformation("Getting all help pages.");
             try

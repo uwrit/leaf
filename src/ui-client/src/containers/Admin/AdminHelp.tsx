@@ -27,20 +27,17 @@ import { showConfirmationModal } from '../../actions/generalUi';
 import { generate as generateId } from 'shortid';
 
 interface Props {
-    categories: HelpCategoryMap;
     currentPage: HelpPage;
     dispatch: any;
 
-    page: AdminHelpContent;
-    currentCont: AdminHelpContent;
+    content: AdminHelpContent;
+    currentContent: AdminHelpContent;
 }
 
 interface State {
     disabled: boolean;
-    currentCategory: string;
-    currentTitle: string;
-    currentContent: ContentRow[];
     unsaved: boolean;
+    stateIndex: number;
 }
 
 export class AdminHelp extends React.Component<Props, State> {
@@ -51,23 +48,18 @@ export class AdminHelp extends React.Component<Props, State> {
         
         this.state = {
             disabled: false,
-            currentCategory: this.props.page.category,
-            currentTitle: this.props.page.title,
-            currentContent: this.props.page.content.slice(),
-            unsaved: false
+            unsaved: false,
+            stateIndex: 0
         }
     }
 
     public render() {
         const c = this.className;
-        const { dispatch, currentCont } = this.props;
-        const { currentCategory, currentTitle, currentContent, disabled, unsaved } = this.state;
+        const { dispatch, currentContent } = this.props;
+        const { disabled, unsaved } = this.state;
         const arrowMove = disabled ? {marginLeft: "-30%", transition: "3s", transitionTimingFunction: "ease-in-out"} : {};
 
-        // const contentRows = [...this.state.currentContent.values()];
-        // const sortedContentRows = contentRows.sort((a, b) => (a.orderId > b.orderId) ? 1 : -1);
-
-        // console.log(contentRows);
+        currentContent.content.forEach((c, i) => c.orderId = i);
 
         return (
             <div className={c}>
@@ -104,89 +96,90 @@ export class AdminHelp extends React.Component<Props, State> {
                 {/* <ReactMarkdown className={`${c}-content-title`} children={currentPage.title} /> */}
 
                 <div className={`${c}-content-text`}>
-                {/* {this.getTitleAndCategory()} */}
-                <TextEditor
-                // talk to NIC: showing the unsaved button when changes happen
-                    text={currentTitle}
-                    textHandler={this.handleTitleChange}
-                    unsaved={unsaved}
-                />
+                    <TextEditor
+                    // talk to NIC: showing the unsaved button when changes happen
+                        text={currentContent.title}
+                        textHandler={this.handleTitleChange}
+                        unsaved={unsaved}
+                    />
 
-                <TextEditor
-                    category={true}
-                    text={currentCategory}
-                    textHandler={this.handleCategoryChange}
-                    unsaved={unsaved}
-                />
+                    <TextEditor
+                        category={true}
+                        text={currentContent.category}
+                        textHandler={this.handleCategoryChange}
+                        unsaved={unsaved}
+                    />
 
-                {currentContent.map((cr,i) =>
-                // {currentCont.content.map((cr,i) =>
-                    // <div key={i} className={`${c}-content-text`}>
-                        <ContentRowEditor
-                            key={i}
-                            index={i}
-                            contentRow={cr}
-                            dispatch={dispatch}
+                    {currentContent.content.map((cr,i) =>
+                        // <div key={i} className={`${c}-content-text`}>
+                            <ContentRowEditor
+                                key={cr.id}
+                                index={i}
+                                contentRow={cr}
+                                dispatch={dispatch}
 
-                            category={currentCategory}
-                            title={currentTitle}
-                            contentHandler={this.handleContentChange}
-                            newSectionHandler={this.handleNewSection}
-                        />
-                    // </div>
-                )}
+                                contentHandler={this.handleContentChange}
+                                newSectionHandler={this.handleNewSection}
+                                indexHandler={this.updateStateIndex}
+                            />
+                        // </div>
+                    )}
                 </div>
             </div>
         );
     };
 
     private handleTitleChange = (text: string) => {
-        this.setState({ disabled: true, currentTitle: text, unsaved: true});
+        const { dispatch, currentContent } = this.props;
+        const newContent = Object.assign({}, currentContent, { title: text }) as AdminHelpContent;
+        dispatch(setCurrentAdminHelpContent(newContent));
+
+        this.setState({ disabled: true, unsaved: true});
     };
 
     private handleCategoryChange = (text: string) => {
-        this.setState({ disabled: true, currentCategory: text, unsaved: true});
+        const { dispatch, currentContent } = this.props;
+        const newContent = Object.assign({}, currentContent, { category: text }) as AdminHelpContent;
+        dispatch(setCurrentAdminHelpContent(newContent));
+
+        this.setState({ disabled: true, unsaved: true});
     };
 
     private handleContentChange = (val: string, index: number) => {
-        const { dispatch } = this.props;
-        const { currentContent } = this.state;
-        const k = currentContent.find((_, i) => i == index);
+        const { dispatch, currentContent } = this.props;
+
+        // Make copy of current content to edit
+        const contentCopy = currentContent.content.slice();
+        // Find content row via index to edit
+        const contentRow = contentCopy.find((_, i) => i == index);
 
         if (val) {
-            const v = Object.assign({}, k, { textContent: val }) as ContentRow;
-            currentContent.splice(index, 1, v);
+            const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
+            contentCopy.splice(index, 1, updatedContentRow);
         } else {
-            currentContent.splice(index, 1);
+            contentCopy.splice(index, 1);
         }
-        
-        // dispatch(setCurrentAdminHelpContent(Object.assign({}) as AdminHelpContentDTO)); 
-        // console.log("stateCont:", this.state.currentContent);
-        // console.log("propCont:", this.props.page.content);
+        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+        dispatch(setCurrentAdminHelpContent(newContent));
+
         this.setState({ disabled: true, unsaved: true });
-        // this.setState({ currentContent: currentContent, disabled: true, unsaved: true });
     };
 
     private handleUndoChanges = () => {
-        this.setState({
-            currentCategory: this.props.page.category,
-            currentTitle: this.props.page.title,
-            // currentContent: this.loadContentMap(this.props.page.content),
-            currentContent: this.props.page.content.slice(),
-            disabled: false,
-            unsaved: false
-        })
+        const { dispatch, content } = this.props;
+        dispatch(setCurrentAdminHelpContent(content));
+
+        this.setState({ disabled: false, unsaved: false });
     };
 
     private handleSaveChanges = () => {
-        const { dispatch } = this.props;
-        const { currentCategory, currentTitle, currentContent } = this.state;
+        const { dispatch, currentContent } = this.props;
         const updateContent: UpdateHelpPageContent[] = [];
 
-        currentContent.map(c => {
+        currentContent.content.map(c => {
             const updatedContent = {
-                title: currentTitle,
-                category: currentCategory,
+                title: currentContent.title,
+                category: currentContent.category,
                 pageId: c.pageId,
                 orderId: c.orderId,
                 type: c.type,
@@ -208,11 +201,10 @@ export class AdminHelp extends React.Component<Props, State> {
     };
 
     private handleDeleteContent = () => {
-        const { dispatch, currentPage } = this.props;
-        const { currentTitle } = this.state;
+        const { dispatch, currentPage, currentContent } = this.props;
 
         const confirm: ConfirmationModalState = {
-            body: `Are you sure you want to delete the page, "${currentTitle}"? This will take effect immediately and can't be undone.`,
+            body: `Are you sure you want to delete the page, "${currentContent.title}"? This will take effect immediately and can't be undone.`,
             header: 'Delete Page',
             onClickNo: () => null,
             onClickYes: () => { dispatch(deleteHelpPageAndContent(currentPage)) },
@@ -224,25 +216,32 @@ export class AdminHelp extends React.Component<Props, State> {
     };
 
     // new section logic
-    private handleNewSection = (index: number, pageId: number, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
-        const content = this.state.currentContent;
-        
-        // console.log(index);
-        // console.log(content);
-        // const uniqueId = generateId();
+    private handleNewSection = (above: boolean, indexZ: number, pageId: string, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
+        const { dispatch, currentContent } = this.props;
+        // Make copy of current content to edit
+        const contentCopy = currentContent.content.slice();
+        const uniqueId = generateId();
+
+        const stateIndex = this.state.stateIndex;
+        const index = above ? stateIndex : stateIndex+1;
 
         if (text) {
             const con = Object.assign({}, {
+                id: uniqueId,
                 pageId: pageId,
                 orderId: 0,
                 type: 'text',
-                textContent: 'New Section Added',
+                textContent: 'New Section Added.',
                 imageContent: '',
                 imageId: ''
             }) as ContentRow;
-            content.splice(index, 0, con);
-            content.forEach((c,i) => c.orderId = i);
-            this.setState({ currentContent: content, disabled: true, unsaved: true });
+            contentCopy.splice(index, 0, con);
+            contentCopy.forEach((c,i) => c.orderId = i);
+            
+            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+            dispatch(setCurrentAdminHelpContent(newContent));
+
+            this.setState({ disabled: true, unsaved: true });
         } else {
             const image = e!.currentTarget.files!.item(0)!;
             const imgId = image.name;
@@ -252,6 +251,7 @@ export class AdminHelp extends React.Component<Props, State> {
             reader.onload = () => {
                 const imageString = reader.result!.toString().split(',')[1];
                 const con = Object.assign({}, {
+                    id: uniqueId,
                     pageId: pageId,
                     orderId: 0,
                     type: 'image',
@@ -260,12 +260,21 @@ export class AdminHelp extends React.Component<Props, State> {
                     imageId: imgId
                 }) as ContentRow;
 
-                content.splice(index, 0, con);
-                content.forEach((c,i) => c.orderId = i);
-                this.setState({ currentContent: content, disabled: true, unsaved: true });
+                contentCopy.splice(index, 0, con);
+                contentCopy.forEach((c,i) => c.orderId = i);
+
+                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+                dispatch(setCurrentAdminHelpContent(newContent));
+                
+                this.setState({ disabled: true, unsaved: true });
             };
             e!.currentTarget.remove();
         };
+        this.setState({ stateIndex: above ? stateIndex+1 : stateIndex });
+    };
+
+    private updateStateIndex = (indexVal: number) => {
+        this.setState({ stateIndex: indexVal });
     };
 }
 

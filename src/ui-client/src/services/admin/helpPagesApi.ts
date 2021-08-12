@@ -19,17 +19,17 @@ import { HttpFactory } from '../HttpFactory';
 //     return resp.data as UpdateHelpPageContentDTO;
 // };
 
-export const getAdminHelpPageAndContent = async (state: AppState, pageId: number) => {
+export const getAdminHelpPageAndContent = async (state: AppState, pageId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get(`api/admin/help/${pageId.toString()}`);
+    const resp = await http.get(`api/admin/help/${pageId}`);
     return resp.data as AdminHelpContentDTO;
 };
 
-export const updateAdminHelpPageAndContent = async (state: AppState, pageId: number, content: UpdateHelpPageContentDTO[]) => {
+export const updateAdminHelpPageAndContent = async (state: AppState, pageId: string, content: UpdateHelpPageContentDTO[]) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/help/${pageId.toString()}`, content);
+    const resp = await http.put(`api/admin/help/${pageId}`, content);
     return resp.data as AdminHelpContentDTO;
 };
 
@@ -46,8 +46,8 @@ export const createAdminHelpPageAndContent = async (state: AppState, content: Cr
 /*
  * Deletes help page category, title, and content.
  */
-export const deleteAdminHelpPageAndContent = async (state: AppState, pageId: number) => {
+export const deleteAdminHelpPageAndContent = async (state: AppState, pageId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.delete(`api/admin/help/${pageId.toString()}`);
+    return http.delete(`api/admin/help/${pageId}`);
 };

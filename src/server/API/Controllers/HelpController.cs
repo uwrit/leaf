@@ -70,7 +70,7 @@ namespace API.Controllers
 
         [HttpGet("{pageid}/content")]
         public async Task<ActionResult<IEnumerable<HelpPageContentDTO>>> GetHelpPageContent(
-            int pageid,
+            Guid pageid,
             [FromServices] HelpPage helpPage)
         {
             try

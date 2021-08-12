@@ -111,8 +111,8 @@ export interface AdminUserQueryState {
 }
 
 export interface AdminHelpState {
-    currentHelpContent?: AdminHelpContent;
-    page: AdminHelpContent;
+    currentContent?: AdminHelpContent;
+    content: AdminHelpContent;
     state: HelpPageLoadState;
 }
 

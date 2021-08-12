@@ -30,5 +30,4 @@ export interface HelpPageState {
     currentSelectedPage: HelpPage;
     content: HelpPageContentState;
     state: HelpPageLoadState;
-    // page: HelpPageContentTState;
 }

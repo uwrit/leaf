@@ -27,12 +27,9 @@ export const UPDATE_ADMIN_HELP_CONTENT = 'UPDATE_ADMIN_HELP_CONTENT';
 export const SAVE_ADMIN_HELP_CONTENT = 'SAVE_ADMIN_HELP_CONTENT';
 
 export interface AdminHelpAction {
-    // changed?: boolean;
     currentContent?: AdminHelpContentDTO;
     content?: AdminHelpContentDTO;
     contentLoadState?: HelpPageLoadState;
-    // page?: CreateHelpPage;
-    // pane?: AdminHelpPane;
     type: string;
 }
 
@@ -52,10 +49,9 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
                 dispatch(setCurrentHelpPage(page));
 
                 const content = await getAdminHelpPageAndContent(state, page.id);
+                
                 dispatch(setCurrentAdminHelpContent(content));
                 dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
-                
-                // dispatch(setCurrentAdminHelpContent(content));
 
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -115,8 +111,8 @@ export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[])
 
                 const content = await updateAdminHelpPageAndContent(state, pageId, contentRows);
                 
-                dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
                 dispatch(setCurrentAdminHelpContent(content));
+                dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
                 
                 dispatch(reloadContent());
 
@@ -189,10 +185,11 @@ export const resetAdminHelpContent = () => {
             // Set current help page to empty.
             dispatch(setCurrentHelpPage({} as HelpPage));
 
+            // Set current admin help content to empty.
+            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
             // Set admin help content to empty.
             // Set admin help content load state to NOT_LOADED.
             dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));
-            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
         } catch (err) {
             console.log(err);
         }
@@ -216,6 +213,8 @@ export const checkIfAdminHelpContentUnsaved = (unsaved: boolean) => {
             // Set current help page to empty.
             dispatch(setCurrentHelpPage({} as HelpPage));
 
+            // Set current admin help content to empty.
+            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
             // Set admin help content to empty.
             // Set admin help content load state to NOT_LOADED.
             dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));

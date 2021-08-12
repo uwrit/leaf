@@ -36,7 +36,7 @@ namespace API.Controllers.Admin
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<AdminHelpPageContentSql>> Get(int id)
+        public async Task<ActionResult<AdminHelpPageContentSql>> Get(Guid id)
         {
             try
             {
@@ -100,7 +100,7 @@ namespace API.Controllers.Admin
 
         //Deletes help page and content
        [HttpDelete("{id}")]
-        public async Task<ActionResult<int?>> Delete(int id)
+        public async Task<ActionResult<Guid?>> Delete(Guid id)
         {
             try
             {
