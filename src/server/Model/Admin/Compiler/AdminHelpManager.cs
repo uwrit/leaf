@@ -19,7 +19,7 @@ namespace Model.Admin.Compiler
         public interface IAdminHelpPageService
         {
             Task<AdminHelpPageContentSql> GetAsync(Guid id);
-            Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p);
+            Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
             Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
             Task<Guid?> DeleteAsync(Guid id);
         }
@@ -41,19 +41,19 @@ namespace Model.Admin.Compiler
             return await svc.GetAsync(id);
         }
 
-        public async Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p)
+        public async Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
-            ThrowIfCreateInvalid(p);
+            ThrowIfCreateInvalid(contentRows);
 
             try
             {
-                var created = await svc.CreateAsync(p);
-                log.LogInformation("Created help page. Page:{@Page}", created);
+                var created = await svc.CreateAsync(contentRows);
+                log.LogInformation("Created help page. Content:{@content}", created);
                 return created;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", p, de.ErrorCode, de.Message);
+                log.LogError("Failed to create help page. Content:{@ContentRows} Code:{Code} Error:{Error}", contentRows, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -94,9 +94,9 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfCreateInvalid(AdminHelpPageCreateUpdateSql c)
+        void ThrowIfCreateInvalid(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
-            Ensure.NotNull(c, nameof(c));
+            Ensure.NotNull(contentRows, nameof(contentRows));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

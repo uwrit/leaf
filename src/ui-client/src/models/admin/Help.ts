@@ -35,10 +35,27 @@ export interface ContentRow {
     imageId: string;
 }
 
-export interface AdminHelpContentDTO {
+export interface AdminHelpEditContentDTO {
     title: string;
     category: string;
     content: ContentRow[];
 }
 
-export interface AdminHelpContent extends AdminHelpContentDTO {}
+export interface AdminHelpEditContent extends AdminHelpEditContentDTO {}
+
+export interface CreateRow {
+    id: string;
+    orderId: number;
+    type: string;
+    textContent: string;
+    imageContent: string;
+    imageId: string;
+}
+
+export interface AdminHelpCreateContentDTO {
+    title: string;
+    category: string;
+    content: CreateRow[];
+}
+
+export interface AdminHelpCreateContent extends AdminHelpCreateContentDTO {}

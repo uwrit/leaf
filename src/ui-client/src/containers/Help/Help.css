@@ -17,6 +17,16 @@
     margin: 10px 50px 10px 50px;
 }
 
+.help-page-create-button {
+    font-family: Roboto;
+    margin-top: 10px;
+    float: right;
+}
+
+.help-page-create-button:hover {
+    opacity: 0.7;
+}
+
 .help-page-content {
     background-color: rgb(240,240,240);
     height: calc(100vh - 55px);

@@ -8,7 +8,7 @@
 import { AppState } from '../../models/state/AppState';
 import { showInfoModal, setNoClickModalState, setSideNotificationState } from '../generalUi';
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { CreateHelpPage, UpdateHelpPageContent, UpdateHelpPageContentDTO, AdminHelpContentDTO } from '../../models/admin/Help';
+import { CreateHelpPage, UpdateHelpPageContent, UpdateHelpPageContentDTO, AdminHelpEditContentDTO } from '../../models/admin/Help';
 // import { AdminHelpPane } from '../../models/state/AdminHelpState';
 import { createAdminHelpPageAndContent, deleteAdminHelpPageAndContent, getAdminHelpPageAndContent, updateAdminHelpPageAndContent } from '../../services/admin/helpPagesApi';
 
@@ -27,8 +27,8 @@ export const UPDATE_ADMIN_HELP_CONTENT = 'UPDATE_ADMIN_HELP_CONTENT';
 export const SAVE_ADMIN_HELP_CONTENT = 'SAVE_ADMIN_HELP_CONTENT';
 
 export interface AdminHelpAction {
-    currentContent?: AdminHelpContentDTO;
-    content?: AdminHelpContentDTO;
+    currentContent?: AdminHelpEditContentDTO;
+    content?: AdminHelpEditContentDTO;
     contentLoadState?: HelpPageLoadState;
     type: string;
 }
@@ -70,31 +70,37 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
 /*
  * Create admin help page content.
  */
-// export const createAdminHelpPageContent = (content: CreateHelpPage) => {
-//     return async (dispatch: any, getState: () => AppState) => {
-//         const state = getState();
-//         // might not need check for active pane since update will only exist on that content pane
-//         if (state.auth.userContext!.isAdmin && state.admin!.help.activePane === AdminHelpPane.PAGE) {
-//             try {
-//                 // Update content.
-//                 const page = await createAdminHelpPageAndContent(getState(), content);
+export const createAdminHelpPageContent = (contentRows: CreateHelpPage[]) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        // might not need check for active pane since update will only exist on that content pane
+        if (state.auth.userContext!.isAdmin) {
+            try {
                 
-//                 dispatch(setNoClickModalState({ message: "Creating", state: NotificationStates.Working }));
-//                 dispatch(createAdminHelpPage(page));
+                dispatch(setNoClickModalState({ message: "Creating Page", state: NotificationStates.Working }));
                 
-//                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-//             } catch (err) {
-//                 const info: InformationModalState = {
-//                     body: "Leaf encountered an error while attempting to create Admin data. Please check the Leaf log files for more information.",
-//                     header: "Error Loading Admin Data",
-//                     show: true
-//                 };
-//                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-//                 dispatch(showInfoModal(info));
-//             }
-//         }
-//     };
-// };
+                // Create content.
+                const content = await createAdminHelpPageAndContent(getState(), contentRows);
+
+                // dispatch(setCurrentAdminHelpContent(content));
+                // dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+                dispatch(reloadContent());
+                
+                // dispatch(createAdminHelpPage(page));
+                dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Page Created' }));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            } catch (err) {
+                const info: InformationModalState = {
+                    body: "Leaf encountered an error while attempting to create Admin data. Please check the Leaf log files for more information.",
+                    header: "Error Creating Admin Data",
+                    show: true
+                };
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+                dispatch(showInfoModal(info));
+            }
+        }
+    };
+};
 
 /*
  * Update admin help page content.
@@ -186,10 +192,10 @@ export const resetAdminHelpContent = () => {
             dispatch(setCurrentHelpPage({} as HelpPage));
 
             // Set current admin help content to empty.
-            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
+            dispatch(setCurrentAdminHelpContent({} as AdminHelpEditContentDTO));
             // Set admin help content to empty.
             // Set admin help content load state to NOT_LOADED.
-            dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));
+            dispatch(setAdminHelpContent({} as AdminHelpEditContentDTO, HelpPageLoadState.NOT_LOADED));
         } catch (err) {
             console.log(err);
         }
@@ -214,10 +220,10 @@ export const checkIfAdminHelpContentUnsaved = (unsaved: boolean) => {
             dispatch(setCurrentHelpPage({} as HelpPage));
 
             // Set current admin help content to empty.
-            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
+            dispatch(setCurrentAdminHelpContent({} as AdminHelpEditContentDTO));
             // Set admin help content to empty.
             // Set admin help content load state to NOT_LOADED.
-            dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));
+            dispatch(setAdminHelpContent({} as AdminHelpEditContentDTO, HelpPageLoadState.NOT_LOADED));
         };
     };
 };
@@ -237,14 +243,14 @@ export const checkIfAdminHelpContentUnsaved = (unsaved: boolean) => {
 //     };
 // };
 
-export const setCurrentAdminHelpContent = (currentContent: AdminHelpContentDTO): AdminHelpAction => {
+export const setCurrentAdminHelpContent = (currentContent: AdminHelpEditContentDTO): AdminHelpAction => {
     return {
         currentContent,
         type: SET_CURRENT_ADMIN_HELP_CONTENT
     };
 };
 
-export const setAdminHelpContent = (content: AdminHelpContentDTO, contentLoadState: HelpPageLoadState): AdminHelpAction => {
+export const setAdminHelpContent = (content: AdminHelpEditContentDTO, contentLoadState: HelpPageLoadState): AdminHelpAction => {
     return {
         content,
         contentLoadState,

@@ -11,11 +11,12 @@ import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { AppState } from '../../models/state/AppState';
+import { AdminHelpState } from '../../models/state/AdminState';
 import { UserContext } from '../../models/Auth';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
-import { AdminHelp } from '../Admin/AdminHelp';
+import { AdminHelpContent } from '../Admin/AdminHelpContent';
+import { AdminHelpCreate } from '../Admin/AdminHelpCreate';
 import './Help.css';
-import { AdminHelpState } from '../../models/state/AdminState';
 
 import { HelpPage, HelpPageContent } from '../../models/Help/Help';
 import { HelpPageContentTState } from '../../models/state/HelpState';
@@ -33,20 +34,36 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface State { }
+interface State {
+    createNewPage: boolean;
+}
 
 type Props = StateProps & OwnProps & DispatchProps;
 
 export class Help extends React.PureComponent<Props, State> {
     private className = "help-page";
 
+    constructor(props: Props) {
+        super(props);   
+        this.state = { createNewPage: false }
+    }
+
     public render() {
         const c = this.className;
         const { dispatch, helpPages, user, adminHelp } = this.props;
+        const { createNewPage } = this.state;
+        
+        if (createNewPage) {
+            return (
+                <AdminHelpCreate
+                    dispatch={dispatch}
+                />
+            );
+        };
         
         if (adminHelp.state === HelpPageLoadState.LOADED) {
             return (
-                <AdminHelp
+                <AdminHelpContent
                     currentPage={helpPages.currentSelectedPage}
                     dispatch={dispatch}
                     content={adminHelp.content}
@@ -70,19 +87,14 @@ export class Help extends React.PureComponent<Props, State> {
         return (
             <div className={c}>
                 <div className={`${c}-display`}>
-                    {/* {user.isAdmin ? <Button></Button> : null} */}
+                    
+                    {user.isAdmin &&
+                        <Button className={`${c}-create-button`} color="success" onClick={this.handleCreateNewPage}>
+                            Create New Help Page
+                        </Button>
+                    }
 
                     <HelpSearch />
-
-                    {/* {user.isAdmin
-                        ? <div>TEST</div>
-                        : ((helpPages.state === HelpPageLoadState.LOADED) &&
-                            <Categories
-                                categories={helpPages.categories}
-                                dispatch={dispatch}
-                                isAdmin={user.isAdmin}
-                            />)
-                    } */}
                     
                     {(helpPages.state === HelpPageLoadState.LOADED) &&
                         <Categories
@@ -94,6 +106,10 @@ export class Help extends React.PureComponent<Props, State> {
                 </div>
             </div>
         );
+    };
+
+    private handleCreateNewPage = () => {
+        this.setState({ createNewPage: true });
     };
 };
 

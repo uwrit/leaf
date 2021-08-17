@@ -6,41 +6,38 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { CreateHelpPageDTO, UpdateHelpPageContentDTO, AdminHelpContentDTO } from '../../models/admin/Help';
+import { CreateHelpPageDTO, UpdateHelpPageContentDTO, AdminHelpEditContentDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*
- * Updates help page category, title, and content.
+ * Gets help page category, title, and content.
  */
-// export const updateAdminHelpPageAndContent = async (state: AppState, content: UpdateHelpPageContentDTO) => {
-//     const { token } = state.session.context!;
-//     const http = HttpFactory.authenticated(token);
-//     const resp = await http.put(`api/admin/help/${content.pageId.toString()}`, content);
-//     return resp.data as UpdateHelpPageContentDTO;
-// };
-
 export const getAdminHelpPageAndContent = async (state: AppState, pageId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/help/${pageId}`);
-    return resp.data as AdminHelpContentDTO;
+    return resp.data as AdminHelpEditContentDTO;
 };
 
+/*
+ * Creates help page title and content, and category if it doesn't exist.
+ */
+export const createAdminHelpPageAndContent = async (state: AppState, content: CreateHelpPageDTO[]) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.post('api/admin/help', content);
+    // return resp.data as CreateHelpPageDTO;
+    return resp.data as AdminHelpEditContentDTO;
+};
+
+/*
+ * Updates help page category, title, and content.
+ */
 export const updateAdminHelpPageAndContent = async (state: AppState, pageId: string, content: UpdateHelpPageContentDTO[]) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/help/${pageId}`, content);
-    return resp.data as AdminHelpContentDTO;
-};
-
-/*
- * Creates help page category, title, and content.
- */
-export const createAdminHelpPageAndContent = async (state: AppState, content: CreateHelpPageDTO) => {
-    const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.post('api/admin/help', content);
-    return resp.data as CreateHelpPageDTO;
+    return resp.data as AdminHelpEditContentDTO;
 };
 
 /*

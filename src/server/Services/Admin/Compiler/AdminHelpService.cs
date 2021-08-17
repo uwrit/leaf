@@ -26,7 +26,7 @@ namespace Services.Admin.Compiler
         {
             public const string Get = "adm.sp_GetHelpPageAndContent";
             public const string Update = "adm.sp_UpdateHelpPageAndContentTEST";
-            public const string Create = "adm.sp_CreateHelpPageAndContent";
+            public const string Create = "adm.sp_CreateHelpPageAndContentTEST";
             public const string Delete = "adm.sp_DeleteHelpPageAndContent";
         }
 
@@ -55,30 +55,18 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageCreateUpdateSql> CreateAsync(AdminHelpPageCreateUpdateSql p)
+        public async Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
-                await cn.OpenAsync();
-
-                var created = await cn.QueryFirstOrDefaultAsync<AdminHelpPageCreateUpdateSql>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.Create,
-                    new
-                    {
-                        title = p.Title,
-                        category = p.Category,
-                        orderId = p.OrderId,
-                        type = p.Type,
-                        textContent = p.TextContent,
-                        imageContent = p.ImageContent,
-                        imageId = p.ImageId,
-                        user = user.UUID
-                    },
+                    new { content = HelpContentTable.From(contentRows) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return created;
+                return AdminHelpReader.Read(grid);
             }
         }
 

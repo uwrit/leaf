@@ -19,13 +19,11 @@ import { ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../
 
 interface Props {
     contentRow: ContentRow;
-
     dispatch: any;
 
     contentHandler: (val: string, index: number) => void;
-    newSectionHandler: (above: boolean, index: number, pageId: string, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
+    newSectionHandler: (index: number, pageId: string, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
 
-    indexHandler: (indexVal: number) => void;
     index: number;
 }
 
@@ -73,17 +71,17 @@ export class ContentRowEditor extends React.Component<Props, State> {
                                 {/* <Button onClick={this.handleAddSectionAbove}>Add Section Above</Button>
                                 <Button onClick={this.handleAddSectionBelow}>Add Section Below</Button> */}
 
-                                <Button onClick={this.handleButtonClick}>
-                                    <label htmlFor="above">
+                                <Button>
+                                    <label htmlFor={`${contentRow.id}-above`}>
                                         <span>Add Image/Gif Above</span>
-                                        <input id="above" type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
+                                        <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
                                     </label>
                                 </Button>
 
-                                <Button onClick={this.handleButtonClick}>
-                                    <label htmlFor="below">
+                                <Button>
+                                    <label htmlFor={`${contentRow.id}-below`}>
                                         <span>Add Image/Gif Below</span>
-                                        <input id="below" type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
+                                        <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
                                     </label>
                                 </Button>
 
@@ -103,26 +101,16 @@ export class ContentRowEditor extends React.Component<Props, State> {
         );
     };
 
-    private handleButtonClick = () => {
-        const ind = this.props.index;
-        console.log("index from button click: ", ind);
-    };
-
     private handleNewSection = (above: boolean, text: boolean, event?: any) => {
         const { contentRow, index, newSectionHandler } = this.props;
         const pageId = contentRow.pageId;
         const updatedIndex = above ? index : index+1;
 
-        newSectionHandler(above, updatedIndex, pageId, text, event);
+        newSectionHandler(updatedIndex, pageId, text, event);
         this.setState({ selected: false });
     };
 
-    private handleClick = () => {
-        this.setState({ selected: true });
-        this.props.indexHandler(this.props.index);
-    
-        // console.log(this.props.index);
-    };
+    private handleClick = () => { this.setState({ selected: true }) };
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const { contentHandler } = this.props;

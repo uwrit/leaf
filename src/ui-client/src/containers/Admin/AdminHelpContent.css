@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.admin-help {
+.admin-help-content {
     background-color: rgb(240,240,240);
     font-family: "Source Serif Pro";
     /* height: calc(100vh - 55px); */
@@ -14,11 +14,11 @@
     /* overflow-x: hidden; */
 }
 
-.admin-help-buttons {
+.admin-help-content-buttons {
     margin-left: 15% !important;
 }
 
-.admin-help-back-arrow {
+.admin-help-content-back-arrow {
     color: rgb(0, 130, 177);
     cursor: pointer;
     /* margin-top: 5px; */
@@ -28,22 +28,22 @@
     width: 50px;
 }
 
-.admin-help-back-arrow:hover {
+.admin-help-content-back-arrow:hover {
     opacity: 0.7;
 }
 
-.admin-help-edit-button {
+.admin-help-content-edit-button {
     font-family: Roboto;
     margin-right: 20px;
     margin-bottom: 10px;
     min-width: 100px;
 }
 
-.admin-help-edit-button:hover {
+.admin-help-content-edit-button:hover {
     opacity: 0.7;
 }
 
-.admin-help-content-text {
+.admin-help-content-content-text {
     height: calc(100vh - 130px);
     overflow-y: auto;
     overflow-x: hidden;
@@ -51,20 +51,20 @@
 
 /*  */
 
-.admin-help-content-title {
+.admin-help-content-content-title {
     color: rgb(78, 78, 78);
     font-size: 23px;
     margin-left: 19%;
     padding-left: 0.5%;
 }
 
-.admin-help-edit {
+.admin-help-content-edit {
     color: rgb(78, 78, 78);
     font-size: 23px;
     margin-left: 20%;
 }
 
-.admin-help-edit-title > textarea {
+.admin-help-content-edit-title > textarea {
     width: 60%;
 
     /* background-color: white; */

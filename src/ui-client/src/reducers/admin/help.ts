@@ -14,8 +14,6 @@ import {
     CREATE_ADMIN_HELP_PAGE,
     UPDATE_ADMIN_HELP_CONTENT
 } from '../../actions/admin/helpPage';
-
-import { AdminHelpContent } from '../../models/admin/Help';
 import { HelpPageLoadState } from '../../models/state/HelpState';
 
 // export const createAdminHelpPage = (state: AdminState, action: AdminHelpAction): AdminState => {

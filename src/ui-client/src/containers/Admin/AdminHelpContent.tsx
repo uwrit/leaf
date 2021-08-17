@@ -14,12 +14,12 @@ import { HelpPage, HelpPageContent, HelpCategoryMap, orderId } from '../../model
 import { Content } from '../../components/Help/Content/Content';
 import { resetHelpPageContent } from '../../actions/helpPage';
 import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
-import './AdminHelp.css';
+import './AdminHelpContent.css';
 import TextareaAutosize from 'react-textarea-autosize';
 
 // import { AdminHelpContentState, AdminHelpPane } from '../../models/state/AdminHelpState';
 import { setCurrentAdminHelpContent, updateAdminHelpPageContent, deleteHelpPageAndContent, checkIfAdminHelpContentUnsaved } from '../../actions/admin/helpPage';
-import { AdminHelpContent, AdminHelpContentDTO, ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { AdminHelpEditContent, ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HelpPageContentTState } from '../../models/state/HelpState';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
@@ -30,26 +30,24 @@ interface Props {
     currentPage: HelpPage;
     dispatch: any;
 
-    content: AdminHelpContent;
-    currentContent: AdminHelpContent;
+    content: AdminHelpEditContent;
+    currentContent: AdminHelpEditContent;
 }
 
 interface State {
     disabled: boolean;
     unsaved: boolean;
-    stateIndex: number;
 }
 
-export class AdminHelp extends React.Component<Props, State> {
-    private className = "admin-help"
+export class AdminHelpContent extends React.Component<Props, State> {
+    private className = "admin-help-content"
 
     constructor(props: Props) {
         super(props);
         
         this.state = {
             disabled: false,
-            unsaved: false,
-            stateIndex: 0
+            unsaved: false
         }
     }
 
@@ -58,8 +56,6 @@ export class AdminHelp extends React.Component<Props, State> {
         const { dispatch, currentContent } = this.props;
         const { disabled, unsaved } = this.state;
         const arrowMove = disabled ? {marginLeft: "-30%", transition: "3s", transitionTimingFunction: "ease-in-out"} : {};
-
-        currentContent.content.forEach((c, i) => c.orderId = i);
 
         return (
             <div className={c}>
@@ -120,7 +116,6 @@ export class AdminHelp extends React.Component<Props, State> {
 
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
-                                indexHandler={this.updateStateIndex}
                             />
                         // </div>
                     )}
@@ -131,7 +126,7 @@ export class AdminHelp extends React.Component<Props, State> {
 
     private handleTitleChange = (text: string) => {
         const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { title: text }) as AdminHelpContent;
+        const newContent = Object.assign({}, currentContent, { title: text }) as AdminHelpEditContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
         this.setState({ disabled: true, unsaved: true});
@@ -139,7 +134,7 @@ export class AdminHelp extends React.Component<Props, State> {
 
     private handleCategoryChange = (text: string) => {
         const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { category: text }) as AdminHelpContent;
+        const newContent = Object.assign({}, currentContent, { category: text }) as AdminHelpEditContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
         this.setState({ disabled: true, unsaved: true});
@@ -159,7 +154,7 @@ export class AdminHelp extends React.Component<Props, State> {
         } else {
             contentCopy.splice(index, 1);
         }
-        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
         this.setState({ disabled: true, unsaved: true });
@@ -216,14 +211,11 @@ export class AdminHelp extends React.Component<Props, State> {
     };
 
     // new section logic
-    private handleNewSection = (above: boolean, indexZ: number, pageId: string, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
+    private handleNewSection = (index: number, pageId: string, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
         const { dispatch, currentContent } = this.props;
         // Make copy of current content to edit
         const contentCopy = currentContent.content.slice();
         const uniqueId = generateId();
-
-        const stateIndex = this.state.stateIndex;
-        const index = above ? stateIndex : stateIndex+1;
 
         if (text) {
             const con = Object.assign({}, {
@@ -238,10 +230,8 @@ export class AdminHelp extends React.Component<Props, State> {
             contentCopy.splice(index, 0, con);
             contentCopy.forEach((c,i) => c.orderId = i);
             
-            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
             dispatch(setCurrentAdminHelpContent(newContent));
-
-            this.setState({ disabled: true, unsaved: true });
         } else {
             const image = e!.currentTarget.files!.item(0)!;
             const imgId = image.name;
@@ -263,21 +253,17 @@ export class AdminHelp extends React.Component<Props, State> {
                 contentCopy.splice(index, 0, con);
                 contentCopy.forEach((c,i) => c.orderId = i);
 
-                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
                 dispatch(setCurrentAdminHelpContent(newContent));
-                
-                this.setState({ disabled: true, unsaved: true });
             };
+            
             e!.currentTarget.remove();
         };
-        this.setState({ stateIndex: above ? stateIndex+1 : stateIndex });
-    };
-
-    private updateStateIndex = (indexVal: number) => {
-        this.setState({ stateIndex: indexVal });
+        this.setState({ disabled: true, unsaved: true });
     };
 }
 
 // Uploading files
 // https://www.positronx.io/understand-html5-filereader-api-to-upload-image-and-text-files/
 // https://stackoverflow.com/questions/7179627/files-input-change-event-fires-only-once
+// https://stackoverflow.com/questions/62933678/when-using-map-and-input-tag-inside-the-index-is-always-0
