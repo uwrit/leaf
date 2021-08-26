@@ -46,21 +46,9 @@
     border: none;
     border-radius: 10px;
     box-sizing: content-box;
-    box-shadow: 3px 3px 10px 5px #b3b5b7;
+    box-shadow: 5px 5px 5px 0px #b3b5b7;
     font-size: 17px;
     outline: none;
     padding: 10px;
     width: 60%;
-}
-
-/*  */
-
-.text-editor-text-edit .hover-button {
-    display: block;
-    position: absolute;
-    margin-top: -16px;
-}
-
-.hover-button {
-    display: none;
 }

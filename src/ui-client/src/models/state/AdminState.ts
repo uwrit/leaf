@@ -111,9 +111,11 @@ export interface AdminUserQueryState {
 }
 
 export interface AdminHelpState {
-    currentContent?: AdminHelpEditContent;
+    currentContent: AdminHelpEditContent;
     content: AdminHelpEditContent;
     state: HelpPageLoadState;
+    createNew: boolean;
+    unsaved: boolean;
 }
 
 export default interface AdminState {

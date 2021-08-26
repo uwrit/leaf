@@ -3,59 +3,42 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import { Button, Col, Row } from 'reactstrap';
 import { IoIosArrowRoundBack } from 'react-icons/io';
-import { Button, Col, Row, Input, ModalHeader } from 'reactstrap';
-import { FaCheckSquare, FaRegEdit } from "react-icons/fa";
-import { HelpPage, HelpPageContent, HelpCategoryMap, orderId } from '../../models/Help/Help';
-import { Content } from '../../components/Help/Content/Content';
-import { resetHelpPageContent } from '../../actions/helpPage';
-import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
-import './AdminHelpContent.css';
-import TextareaAutosize from 'react-textarea-autosize';
-
-// import { AdminHelpContentState, AdminHelpPane } from '../../models/state/AdminHelpState';
-import { setCurrentAdminHelpContent, updateAdminHelpPageContent, deleteHelpPageAndContent, checkIfAdminHelpContentUnsaved } from '../../actions/admin/helpPage';
-import { AdminHelpEditContent, ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
-import { HelpPageContentTState } from '../../models/state/HelpState';
-import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
-import { ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { showConfirmationModal } from '../../actions/generalUi';
+import { setCurrentHelpPage } from '../../actions/helpPage';
+import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent, createAdminHelpPageContent,
+         deleteHelpPageAndContent, isAdminHelpContentNew, resetAdminHelpContent, setAdminHelpContent,
+         setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
+import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
+import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
+import { AdminHelpEditContent, ContentRow, CreateHelpPage,
+         CreateHelpPageDTO, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { HelpPage } from '../../models/Help/Help';
+import { ConfirmationModalState } from '../../models/state/GeneralUiState';
+import { HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
+import './AdminHelpContent.css';
 
 interface Props {
-    currentPage: HelpPage;
     dispatch: any;
-
     content: AdminHelpEditContent;
     currentContent: AdminHelpEditContent;
-}
-
-interface State {
-    disabled: boolean;
+    currentPage: HelpPage;
+    createNew: boolean;
     unsaved: boolean;
 }
 
-export class AdminHelpContent extends React.Component<Props, State> {
+// TODO: Rename to AdminHelp. Correct css after change.
+export class AdminHelpContent extends React.Component<Props> {
     private className = "admin-help-content"
-
-    constructor(props: Props) {
-        super(props);
-        
-        this.state = {
-            disabled: false,
-            unsaved: false
-        }
-    }
 
     public render() {
         const c = this.className;
-        const { dispatch, currentContent } = this.props;
-        const { disabled, unsaved } = this.state;
-        const arrowMove = disabled ? {marginLeft: "-30%", transition: "3s", transitionTimingFunction: "ease-in-out"} : {};
+        const { dispatch, currentContent, unsaved } = this.props;
 
         return (
             <div className={c}>
@@ -63,146 +46,182 @@ export class AdminHelpContent extends React.Component<Props, State> {
                     <Col>
                         <IoIosArrowRoundBack
                             className={`${c}-back-arrow`}
-                            style={arrowMove}
                             onClick={this.handleContentGoBackClick}>
-
-                            {/* TODO: on hover, show text below */}
-                            {/* <span className={`${c}-back-arrow-text`}>
-                                Go back
-                            </span> */}
                         </IoIosArrowRoundBack>
                     </Col>
 
                     <Col>
-                        <Button className={`${c}-edit-button`} color="secondary" disabled={!disabled} onClick={this.handleUndoChanges}>
+                        <Button className={`${c}-edit-button`} color="primary" disabled={unsaved} onClick={this.handleCreateNew}>
+                            Create New
+                        </Button>
+
+                        <Button className={`${c}-edit-button`} color="secondary" disabled={!unsaved} onClick={this.handleUndoChanges}>
                             Undo Changes
                         </Button>
 
-                        <Button className={`${c}-edit-button`} color="success" disabled={!disabled} onClick={this.handleSaveChanges}>
+                        <Button className={`${c}-edit-button`} color="success" disabled={!unsaved} onClick={this.handleSaveChanges}>
                             Save
                         </Button>
 
-                        <Button className={`${c}-edit-button`} color="danger" disabled={disabled} onClick={this.handleDeleteContent}>
+                        <Button className={`${c}-edit-button`} color="danger" onClick={this.handleDeleteContent}>
                             Delete
                         </Button>
                     </Col>
                 </Row>
 
-                {/* <ReactMarkdown className={`${c}-content-title`} children={category} /> */}
-                {/* <ReactMarkdown className={`${c}-content-title`} children={currentPage.title} /> */}
-
                 <div className={`${c}-content-text`}>
                     <TextEditor
-                    // talk to NIC: showing the unsaved button when changes happen
                         text={currentContent.title}
-                        textHandler={this.handleTitleChange}
-                        unsaved={unsaved}
+                        textHandler={this.handleTextChange}
                     />
 
                     <TextEditor
-                        category={true}
+                        isCategory={true}
                         text={currentContent.category}
-                        textHandler={this.handleCategoryChange}
-                        unsaved={unsaved}
+                        textHandler={this.handleTextChange}
                     />
 
-                    {currentContent.content.map((cr,i) =>
-                        // <div key={i} className={`${c}-content-text`}>
+                    <div style={{marginTop: "10px"}}>
+                        {currentContent.content.map((cr,i) =>
                             <ContentRowEditor
                                 key={cr.id}
-                                index={i}
-                                contentRow={cr}
                                 dispatch={dispatch}
-
+                                contentRow={cr}
+                                index={i}
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
                             />
-                        // </div>
                     )}
+                    </div>
                 </div>
             </div>
         );
     };
 
-    private handleTitleChange = (text: string) => {
-        const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { title: text }) as AdminHelpEditContent;
+    private handleCreateNew = () => {
+        const { dispatch } = this.props;
+        const uniqueId = generateId();
+
+        const contentRow = Object.assign({}, {
+            id: uniqueId,
+            pageId: '',
+            orderId: 0,
+            type: 'text',
+            textContent: 'Enter Text Here.',
+            imageContent: '',
+            imageId: ''
+        }) as ContentRow;
+
+        const newContent = Object.assign({}, {
+            title: 'Enter Title Here',
+            category: 'Enter Category Here',
+            content: [ contentRow ]
+        }) as AdminHelpEditContent;
+
         dispatch(setCurrentAdminHelpContent(newContent));
 
-        this.setState({ disabled: true, unsaved: true});
+        dispatch(setAdminHelpContent(newContent, HelpPageLoadState.LOADED));
+        dispatch(setCurrentHelpPage({ id: '', categoryId: '', title: '' } as HelpPage));
+        dispatch(isAdminHelpContentNew(true));
+        dispatch(adminHelpContentUnsaved(true));
     };
 
-    private handleCategoryChange = (text: string) => {
+    private handleTextChange = (val: string, propName: string) => {
         const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { category: text }) as AdminHelpEditContent;
+        const newContent = Object.assign({}, currentContent, { [propName]: val }) as AdminHelpEditContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
-        this.setState({ disabled: true, unsaved: true});
+        dispatch(adminHelpContentUnsaved(true));
     };
 
     private handleContentChange = (val: string, index: number) => {
         const { dispatch, currentContent } = this.props;
-
         // Make copy of current content to edit
         const contentCopy = currentContent.content.slice();
         // Find content row via index to edit
-        const contentRow = contentCopy.find((_, i) => i == index);
+        const contentRow = contentCopy.find((_, i) => i === index);
 
         if (val) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
+        } else if (!val && contentCopy.length === 1) {
+            const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
+            contentCopy.splice(index, 1, updatedContentRow);
         } else {
             contentCopy.splice(index, 1);
         }
+
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
-        this.setState({ disabled: true, unsaved: true });
+        dispatch(adminHelpContentUnsaved(true));
     };
 
     private handleUndoChanges = () => {
-        const { dispatch, content } = this.props;
-        dispatch(setCurrentAdminHelpContent(content));
+        const { dispatch, content, createNew, unsaved } = this.props;
 
-        this.setState({ disabled: false, unsaved: false });
+        if (createNew && unsaved) {
+            dispatch(confirmLeavingAdminHelpContent());
+        } else {
+            dispatch(setCurrentAdminHelpContent(content));
+            dispatch(adminHelpContentUnsaved(false));
+        };
     };
 
     private handleSaveChanges = () => {
-        const { dispatch, currentContent } = this.props;
+        const { dispatch, currentContent, createNew, currentPage } = this.props;
         const updateContent: UpdateHelpPageContent[] = [];
+        const createContent: CreateHelpPage[] = [];
 
-        currentContent.content.map(c => {
-            const updatedContent = {
-                title: currentContent.title,
-                category: currentContent.category,
-                pageId: c.pageId,
-                orderId: c.orderId,
-                type: c.type,
-                textContent: c.textContent,
-                imageContent: c.imageContent,
-                imageId: c.imageId
-            } as UpdateHelpPageContentDTO;
-            updateContent.push(updatedContent);
-        });
-
-        dispatch(updateAdminHelpPageContent(updateContent));
-        this.setState({ disabled: false, unsaved: false });
+        if (createNew) {
+            currentContent.content.map(c => {
+                const createdContent = {
+                    title: currentContent.title,
+                    category: currentContent.category,
+                    orderId: c.orderId,
+                    type: c.type,
+                    textContent: c.textContent,
+                    imageContent: c.imageContent,
+                    imageId: c.imageId
+                } as CreateHelpPageDTO;
+                createContent.push(createdContent);
+            });
+            dispatch(createAdminHelpPageContent(createContent));       
+        } else {
+            currentContent.content.map(c => {
+                const updatedContent = {
+                    title: currentContent.title,
+                    category: currentContent.category,
+                    pageId: currentPage.id,
+                    orderId: c.orderId,
+                    type: c.type,
+                    textContent: c.textContent,
+                    imageContent: c.imageContent,
+                    imageId: c.imageId
+                } as UpdateHelpPageContentDTO;
+                updateContent.push(updatedContent);
+            });
+            dispatch(updateAdminHelpPageContent(updateContent));
+        };
     };
 
     private handleContentGoBackClick = () => {
         const { dispatch } = this.props;
-        const { unsaved } = this.state;
-        dispatch(checkIfAdminHelpContentUnsaved(unsaved));
+        dispatch(confirmLeavingAdminHelpContent());
     };
 
     private handleDeleteContent = () => {
-        const { dispatch, currentPage, currentContent } = this.props;
+        const { dispatch, currentPage, currentContent, createNew } = this.props;
 
         const confirm: ConfirmationModalState = {
             body: `Are you sure you want to delete the page, "${currentContent.title}"? This will take effect immediately and can't be undone.`,
             header: 'Delete Page',
             onClickNo: () => null,
-            onClickYes: () => { dispatch(deleteHelpPageAndContent(currentPage)) },
+            onClickYes: () => {
+                createNew
+                    ? dispatch(resetAdminHelpContent())
+                    : dispatch(deleteHelpPageAndContent(currentPage));
+            },
             show: true,
             noButtonText: `No`,
             yesButtonText: `Yes, Delete Page`
@@ -210,7 +229,6 @@ export class AdminHelpContent extends React.Component<Props, State> {
         dispatch(showConfirmationModal(confirm));
     };
 
-    // new section logic
     private handleNewSection = (index: number, pageId: string, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
         const { dispatch, currentContent } = this.props;
         // Make copy of current content to edit
@@ -227,7 +245,10 @@ export class AdminHelpContent extends React.Component<Props, State> {
                 imageContent: '',
                 imageId: ''
             }) as ContentRow;
+
+            // Add new text section at index
             contentCopy.splice(index, 0, con);
+            // Order the content rows by their index
             contentCopy.forEach((c,i) => c.orderId = i);
             
             const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
@@ -250,20 +271,18 @@ export class AdminHelpContent extends React.Component<Props, State> {
                     imageId: imgId
                 }) as ContentRow;
 
+                // Add new image section at index
                 contentCopy.splice(index, 0, con);
+                // Order the content rows by their index
                 contentCopy.forEach((c,i) => c.orderId = i);
 
                 const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
                 dispatch(setCurrentAdminHelpContent(newContent));
             };
             
-            e!.currentTarget.remove();
+            // Removes input value so that onChange function runs again. Otherwise, nothing happens on onChange because value exists.
+            e!.currentTarget.value = '';
         };
-        this.setState({ disabled: true, unsaved: true });
+        dispatch(adminHelpContentUnsaved(true));
     };
 }
-
-// Uploading files
-// https://www.positronx.io/understand-html5-filereader-api-to-upload-image-and-text-files/
-// https://stackoverflow.com/questions/7179627/files-input-change-event-fires-only-once
-// https://stackoverflow.com/questions/62933678/when-using-map-and-input-tag-inside-the-index-is-always-0

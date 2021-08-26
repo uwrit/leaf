@@ -12,10 +12,9 @@ import TextareaAutosize from 'react-textarea-autosize';
 import './TextEditor.css';
 
 interface Props {
+    isCategory?: boolean;
     text: string;
-    category?: boolean;
-    textHandler: (text: string) => void;
-    unsaved: boolean;
+    textHandler: (val: string, propName: string) => void;
 }
 
 interface State {
@@ -34,7 +33,7 @@ export class TextEditor extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { category, text } = this.props;
+        const { isCategory, text } = this.props;
         const { selected } = this.state;
         const markdownText = selected ? 'markdown-slide-left' : 'markdown';
         const markdownEdit = selected ? 'text-edit' : 'text';
@@ -45,16 +44,12 @@ export class TextEditor extends React.Component<Props, State> {
 
                     <Col>
                         <div className={`${c}-${markdownText}`} onClick={this.handleClick}>
-                            <ReactMarkdown children={category ? `Category: ${text}` : text} />
+                            {isCategory ? `Category: ${text}` : text}
                         </div>
                     </Col>
 
                     <Col>
                         <div className={`${c}-${markdownEdit}`}>
-                            <div className={'hover-button'}>
-                                {this.props.unsaved && <Button>Unsaved</Button>}
-                            </div>
-
                             <TextareaAutosize
                                 onChange={this.handleChange}
                                 value={text}
@@ -67,16 +62,13 @@ export class TextEditor extends React.Component<Props, State> {
         );
     };
 
-    private handleClick = () => {
-        this.setState({
-            selected: true
-        });
-    };
+    private handleClick = () => { this.setState({ selected: true }) };
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const { textHandler } = this.props;
-        const newText = e.currentTarget.value;
-
-        textHandler(newText);
+        const { textHandler, isCategory } = this.props;
+        const propName = isCategory ? 'category' : 'title';
+        const newVal = e.currentTarget.value;
+        
+        textHandler(newVal, propName);
     };
 }

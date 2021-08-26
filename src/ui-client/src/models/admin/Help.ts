@@ -22,9 +22,6 @@ export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
 export interface CreateHelpPage extends CreateHelpPageDTO {}
 export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO {}
 
-
-
-
 export interface ContentRow {
     id: string;
     pageId: string;
@@ -42,20 +39,3 @@ export interface AdminHelpEditContentDTO {
 }
 
 export interface AdminHelpEditContent extends AdminHelpEditContentDTO {}
-
-export interface CreateRow {
-    id: string;
-    orderId: number;
-    type: string;
-    textContent: string;
-    imageContent: string;
-    imageId: string;
-}
-
-export interface AdminHelpCreateContentDTO {
-    title: string;
-    category: string;
-    content: CreateRow[];
-}
-
-export interface AdminHelpCreateContent extends AdminHelpCreateContentDTO {}

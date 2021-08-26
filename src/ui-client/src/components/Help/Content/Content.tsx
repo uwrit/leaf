@@ -10,7 +10,6 @@ import ReactMarkdown from 'react-markdown';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { resetHelpPageContent } from '../../../actions/helpPage';
 import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
-import TextareaAutosize from 'react-textarea-autosize';
 import './Content.css';
 
 interface Props {
@@ -31,21 +30,15 @@ export class Content extends React.Component<Props> {
                 <IoIosArrowRoundBack
                     className={`${c}-back-arrow`}
                     onClick={this.handleContentGoBackClick}>
-
-                    {/* TODO: on hover, show text below */}
-                    {/* <span className={`${c}-back-arrow-text`}>
-                        Go back
-                    </span> */}
                 </IoIosArrowRoundBack>
 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
-                        {/* <b>{currentPage.title}</b> */}
                         <ReactMarkdown children={currentPage.title} />
                         
                     </div>
 
-                    {content.map(content => this.getContent(content))}
+                    {content.map(c => this.getContent(c))}
                 </div>
             </div>
         );
@@ -58,34 +51,23 @@ export class Content extends React.Component<Props> {
 
     private getContent = (content: HelpPageContent) => {
         const c = this.className;
-        const altText = "content-image";
 
         if (content.textContent != null) {
             return (
                 <div className={`${c}-text`} key={content.id}>
-                    {/* <TextareaAutosize
-                        readOnly={true}
-                        spellCheck={false}
-                        value={content.textContent}>
-                    </TextareaAutosize> */}
                     <ReactMarkdown children={content.textContent} />
                 </div>
             );
         } else if (content.imageContent != null) {
             return (
                 <div className={`${c}-image`} key={content.id}>
-                    {/* <img
-                        // src={`data:image/jpeg;base64,${content.imageContent}`}
+                    <img
                         src={`data:image;base64,${content.imageContent}`}
-                        alt={altText}
-                    /> */}
-                    {/* TODO: page loads slower compared to using the img tag. */}
-                    <ReactMarkdown
-                        children={`![${altText}](data:image;base64,${content.imageContent})`}
+                        alt={content.imageId}
                     />
                 </div>
             );
-        }
+        };
 
         return ;
     };

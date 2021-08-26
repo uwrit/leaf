@@ -10,11 +10,11 @@ import {
     SET_CURRENT_HELP_PAGE,
     SET_HELP_PAGE_LOAD_STATE,
     SET_HELP_PAGE_CONTENT,
-    SET_HELP_PAGE_AND_CONTENT,
+    HelpPageAction,
+    HelpPageContentAction,
 } from '../actions/helpPage';
-import { HelpPageAction, HelpPageContentAction, HelpPageAndContentAction } from '../actions/helpPage';
-import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
 import { categoryId, HelpCategoryMap, HelpPage, HelpPageCategory, HelpPageCategoryDTO, HelpPageDTO } from '../models/Help/Help';
+import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
 
 export const defaultHelpPagesState = (): HelpPageState => {
     return {
@@ -78,18 +78,7 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
     });
 };
 
-const setHelpPageAndcontent = (state: HelpPageState, action: HelpPageAndContentAction): HelpPageState => {
-    return Object.assign({}, state, {
-        page: {
-            page: action.page,
-            ...state.content,
-            content: (action.state === HelpPageLoadState.LOADED) ? action.content : undefined,
-            state: action.state
-        }
-    });
-};
-
-type HelpAction = HelpPageAction | HelpPageContentAction | HelpPageAndContentAction;
+type HelpAction = HelpPageAction | HelpPageContentAction;
 
 export const help = (state: HelpPageState = defaultHelpPagesState(), action: HelpAction): HelpPageState => {
     switch (action.type) {
@@ -101,8 +90,6 @@ export const help = (state: HelpPageState = defaultHelpPagesState(), action: Hel
             return setHelpPageLoadState(state, action);
         case SET_HELP_PAGE_CONTENT:
             return setHelpPageContent(state, action);
-        case SET_HELP_PAGE_AND_CONTENT:
-            return setHelpPageAndcontent(state, action);
         default:
             return state;
     }

@@ -6,8 +6,8 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
 import { showInfoModal, setNoClickModalState } from "./generalUi";
+import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
 import { HelpPage, HelpPageDTO, HelpPageCategoryDTO, HelpPageContentDTO } from '../models/Help/Help';
 import { HelpPageLoadState } from '../models/state/HelpState';
 import { fetchHelpPages, fetchHelpPageCategories, fetchHelpPageContent } from '../services/helpPagesApi';
@@ -16,8 +16,6 @@ export const SET_HELP_PAGES_AND_CATEGORIES = 'SET_HELP_PAGES_AND_CATEGORIES';
 export const SET_CURRENT_HELP_PAGE = 'SET_CURRENT_HELP_PAGE';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
 export const SET_HELP_PAGE_CONTENT = 'SET_HELP_PAGE_CONTENT';
-
-export const SET_HELP_PAGE_AND_CONTENT = 'SET_HELP_PAGE_AND_CONTENT';
 
 export interface HelpPageAction {
     categories?: HelpPageCategoryDTO[];
@@ -33,15 +31,7 @@ export interface HelpPageContentAction {
     type: string;
 }
 
-export interface HelpPageAndContentAction {
-    page?: HelpPage;
-    content?: HelpPageContentDTO[];
-    state?: HelpPageLoadState;
-    type: string;
-}
-
 // Async actions
-
 /*
  * Fetch help pages and categories if it hasn't already been loaded.
  */
@@ -84,36 +74,25 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
 export const fetchSingleHelpPageContent = (page: HelpPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        // this is a redundant check right? b/c content isn't loaded to begin with.
-        if (state.help.content.state === HelpPageLoadState.NOT_LOADED) {
-            try {
-                dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
+        try {
+            dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
-                dispatch(setCurrentHelpPage(page));
-                /*
-                 * Fetch help page content.
-                 */
-                const content = await fetchHelpPageContent(getState(), page.id);
-
-                // dispatch(setHelpPageAndcontent(HelpPageLoadState.LOADED, page, content));
-                
-                dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
-                
-                // Set user selected help page as current selected page.
-                // dispatch(SetCurrentHelpPage(page));
-                /*
-                 * Finish.
-                 */
-                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-            } catch (err) {
-                const info: InformationModalState = {
-                    body: "Leaf encountered an error while attempting to load Help page content. Please check the Leaf log files for more information.",
-                    header: "Error Loading Help Page Content",
-                    show: true
-                };
-                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-                dispatch(showInfoModal(info));
-            }
+            dispatch(setCurrentHelpPage(page));
+            
+            // Fetch help page content.
+            const content = await fetchHelpPageContent(state, page.id);
+            
+            dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
+            
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+        } catch (err) {
+            const info: InformationModalState = {
+                body: "Leaf encountered an error while attempting to load Help page content. Please check the Leaf log files for more information.",
+                header: "Error Loading Help Page Content",
+                show: true
+            };
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            dispatch(showInfoModal(info));
         }
     };
 };
@@ -126,6 +105,8 @@ export const resetHelpPageContent = () => {
         try {
             // Set page content load state to NOT_LOADED.
             dispatch(setHelpPageContent(HelpPageLoadState.NOT_LOADED));
+            // Set current help page to empty.
+            dispatch(setCurrentHelpPage({} as HelpPage));
         } catch (err) {
             console.log(err);
         }
@@ -160,14 +141,5 @@ export const setHelpPageContent = (state: HelpPageLoadState, content?: HelpPageC
         content,
         state,
         type: SET_HELP_PAGE_CONTENT
-    };
-};
-
-export const setHelpPageAndcontent = (state: HelpPageLoadState, page: HelpPage, content?: HelpPageContentDTO[]): HelpPageAndContentAction => {
-    return {
-        page,
-        content,
-        state,
-        type: SET_HELP_PAGE_AND_CONTENT
     };
 };

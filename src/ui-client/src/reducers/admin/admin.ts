@@ -5,9 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-// import { adminHelp } from "./help";
 import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
-// import { AdminHelpPane } from "../../models/state/AdminHelpState";
 import {
     SET_ADMIN_PANEL_PANE,
     SET_ADMIN_PANEL_LOAD_STATE,
@@ -98,6 +96,13 @@ import {
     SET_ADMIN_QUERY_USERS,
     SET_ADMIN_QUERY_USER_SEARCH_TERM
 } from "../../actions/admin/userQuery";
+import {
+    IS_ADMIN_HELP_CONTENT_NEW,
+    SAVE_ADMIN_HELP_CONTENT,
+    SET_ADMIN_HELP_CONTENT,
+    SET_CURRENT_ADMIN_HELP_CONTENT,
+    AdminHelpAction
+} from "../../actions/admin/helpPage";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
 import { setAdminConceptSqlSets, deleteAdminConceptSqlSet, setAdminUneditedConceptSqlSet, undoAdminConceptSqlSetChanges, setAdminConceptSqlSetUnchanged, syncAdminConceptSqlSetUnsavedWithSaved } from "./sqlSet";
@@ -111,9 +116,7 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-
-import { SET_ADMIN_HELP_CONTENT, SET_CURRENT_ADMIN_HELP_CONTENT, AdminHelpAction } from "../../actions/admin/helpPage";
-import { setCurrentAdminHelpContent, setAdminHelpContent } from "./help";
+import { adminHelpContentUnsaved, isAdminHelpContentNew, setAdminHelpContent, setCurrentAdminHelpContent } from "./help";
 import { HelpPageLoadState } from "../../models/state/HelpState";
 
 export const defaultAdminState = (): AdminState => {
@@ -162,12 +165,19 @@ export const defaultAdminState = (): AdminState => {
             data: new Map()
         },
         help: {
+            currentContent: {
+                title: "",
+                category: "",
+                content: []    
+            },
             content: {
                 title: "",
                 category: "",
                 content: []
             },
-            state: HelpPageLoadState.NOT_LOADED
+            state: HelpPageLoadState.NOT_LOADED,
+            createNew: false,
+            unsaved: false
         },
         networkAndIdentity: {
             changed: false,
@@ -347,6 +357,10 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setCurrentAdminHelpContent(state, action);
         case SET_ADMIN_HELP_CONTENT:
             return setAdminHelpContent(state, action);
+        case IS_ADMIN_HELP_CONTENT_NEW:
+            return isAdminHelpContentNew(state, action);
+        case SAVE_ADMIN_HELP_CONTENT:
+            return adminHelpContentUnsaved(state, action);
 
         // User Queries
         case SET_ADMIN_QUERIES:

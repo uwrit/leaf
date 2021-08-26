@@ -7,24 +7,17 @@
 
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import { MdTextFields } from 'react-icons/md';
-import { Button, Col, Row, Input, Navbar, NavItem } from 'reactstrap';
-import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
 import TextareaAutosize from 'react-textarea-autosize';
+import { Button, Col, Row } from 'reactstrap';
+import { ContentRow } from '../../../models/admin/Help';
 import './ContentRowEditor.css';
-import { TextArea } from '../Section/TextArea';
-
-import { ContentRow, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../../models/admin/Help';
 
 interface Props {
-    contentRow: ContentRow;
     dispatch: any;
-
+    contentRow: ContentRow;
+    index: number;
     contentHandler: (val: string, index: number) => void;
     newSectionHandler: (index: number, pageId: string, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
-
-    index: number;
 }
 
 interface State {
@@ -54,23 +47,13 @@ export class ContentRowEditor extends React.Component<Props, State> {
 
                     <Col>
                         <div className={`${c}-${markdownText}`} onClick={this.handleClick}>
-                            {/* <ReactMarkdown children={cont} /> */}
-                            {/* {console.log(contentRow.imageContent)} */}
-                            {this.props.contentRow.imageContent &&
-                                <img src={`data:image;base64,${contentRow.imageContent}`} />
-                            }
-                            
-                            <ReactMarkdown children={contentRow.textContent} />
-                            {/* <img src={this.props.im}/> */}
+                            {this.getContent()}
                         </div>
                     </Col>
 
                     <Col>
                         <div className={`${c}-${markdownEdit}`}>
                             <div className={'hover-button'}>
-                                {/* <Button onClick={this.handleAddSectionAbove}>Add Section Above</Button>
-                                <Button onClick={this.handleAddSectionBelow}>Add Section Below</Button> */}
-
                                 <Button>
                                     <label htmlFor={`${contentRow.id}-above`}>
                                         <span>Add Image/Gif Above</span>
@@ -101,20 +84,30 @@ export class ContentRowEditor extends React.Component<Props, State> {
         );
     };
 
-    private handleNewSection = (above: boolean, text: boolean, event?: any) => {
+    private getContent = () => {
+        const { contentRow } = this.props;
+        if (contentRow.textContent) {
+            return <ReactMarkdown children={contentRow.textContent} />
+        } else if (contentRow.imageContent) {
+            return <img src={`data:image;base64,${contentRow.imageContent}`} alt={contentRow.imageId} />
+        };
+        return ;
+    };
+
+    private handleNewSection = (above: boolean, text: boolean, evt?: any) => {
         const { contentRow, index, newSectionHandler } = this.props;
         const pageId = contentRow.pageId;
         const updatedIndex = above ? index : index+1;
 
-        newSectionHandler(updatedIndex, pageId, text, event);
+        newSectionHandler(updatedIndex, pageId, text, evt);
         this.setState({ selected: false });
     };
 
     private handleClick = () => { this.setState({ selected: true }) };
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const { contentHandler } = this.props;
+        const { contentHandler, index } = this.props;
         const newVal = e.currentTarget.value;
-        contentHandler(newVal, this.props.index);
+        contentHandler(newVal, index);
     };
 }

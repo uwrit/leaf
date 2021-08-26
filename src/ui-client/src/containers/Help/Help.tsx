@@ -6,21 +6,22 @@
  */ 
 
 import React from 'react';
+import { Button } from 'reactstrap';
 import { connect } from 'react-redux';
+import { AdminHelpContent } from '../Admin/AdminHelpContent';
+import { setCurrentHelpPage } from '../../actions/helpPage';
+import { adminHelpContentUnsaved, isAdminHelpContentNew, setAdminHelpContent, setCurrentAdminHelpContent } from '../../actions/admin/helpPage';
 import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
+import { UserContext } from '../../models/Auth';
+import { HelpPage } from '../../models/Help/Help';
+import { AdminHelpEditContent, ContentRow } from '../../models/admin/Help';
 import { AppState } from '../../models/state/AppState';
 import { AdminHelpState } from '../../models/state/AdminState';
-import { UserContext } from '../../models/Auth';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
-import { AdminHelpContent } from '../Admin/AdminHelpContent';
-import { AdminHelpCreate } from '../Admin/AdminHelpCreate';
+import { generate as generateId } from 'shortid';
 import './Help.css';
-
-import { HelpPage, HelpPageContent } from '../../models/Help/Help';
-import { HelpPageContentTState } from '../../models/state/HelpState';
-import { Button } from 'reactstrap';
 
 interface OwnProps { }
 
@@ -34,9 +35,7 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface State {
-    createNewPage: boolean;
-}
+interface State { }
 
 type Props = StateProps & OwnProps & DispatchProps;
 
@@ -45,29 +44,22 @@ export class Help extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);   
-        this.state = { createNewPage: false }
+        this.state = { }
     }
 
     public render() {
         const c = this.className;
         const { dispatch, helpPages, user, adminHelp } = this.props;
-        const { createNewPage } = this.state;
-        
-        if (createNewPage) {
-            return (
-                <AdminHelpCreate
-                    dispatch={dispatch}
-                />
-            );
-        };
         
         if (adminHelp.state === HelpPageLoadState.LOADED) {
             return (
                 <AdminHelpContent
-                    currentPage={helpPages.currentSelectedPage}
-                    dispatch={dispatch}
+                    dispatch={dispatch}    
                     content={adminHelp.content}
-                    currentContent={adminHelp.currentContent!}
+                    currentContent={adminHelp.currentContent}
+                    currentPage={helpPages.currentSelectedPage}
+                    createNew={adminHelp.createNew}
+                    unsaved={adminHelp.unsaved}
                 />
             );
         };
@@ -109,7 +101,30 @@ export class Help extends React.PureComponent<Props, State> {
     };
 
     private handleCreateNewPage = () => {
-        this.setState({ createNewPage: true });
+        const { dispatch } = this.props;
+        const uniqueId = generateId();
+
+        const contentRow = Object.assign({}, {
+            id: uniqueId,
+            pageId: '',
+            orderId: 0,
+            type: 'text',
+            textContent: 'Enter Text Here.',
+            imageContent: '',
+            imageId: ''
+        }) as ContentRow;
+
+        const newContent = Object.assign({}, {
+            title: 'Enter Title Here',
+            category: 'Enter Category Here',
+            content: [ contentRow ]
+        }) as AdminHelpEditContent;
+
+        dispatch(setCurrentAdminHelpContent(newContent));
+        dispatch(setAdminHelpContent(newContent, HelpPageLoadState.LOADED));
+        dispatch(setCurrentHelpPage({ id: '', categoryId: '', title: '' } as HelpPage));
+        dispatch(isAdminHelpContentNew(true));
+        dispatch(adminHelpContentUnsaved(true));
     };
 };
 
