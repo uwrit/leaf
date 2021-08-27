@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { CreateHelpPageDTO, UpdateHelpPageContentDTO, AdminHelpEditContentDTO } from '../../models/admin/Help';
+import { AdminHelpContentDTO, CreateHelpPageDTO, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*
@@ -16,7 +16,7 @@ export const getAdminHelpPageAndContent = async (state: AppState, pageId: string
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/help/${pageId}`);
-    return resp.data as AdminHelpEditContentDTO;
+    return resp.data as AdminHelpContentDTO;
 };
 
 /*
@@ -26,8 +26,7 @@ export const createAdminHelpPageAndContent = async (state: AppState, content: Cr
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.post('api/admin/help', content);
-    // return resp.data as CreateHelpPageDTO;
-    return resp.data as AdminHelpEditContentDTO;
+    return resp.data as AdminHelpContentDTO;
 };
 
 /*
@@ -37,7 +36,7 @@ export const updateAdminHelpPageAndContent = async (state: AppState, pageId: str
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.put(`api/admin/help/${pageId}`, content);
-    return resp.data as AdminHelpEditContentDTO;
+    return resp.data as AdminHelpContentDTO;
 };
 
 /*

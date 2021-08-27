@@ -6,8 +6,7 @@
  */ 
 
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
-import { Button, Col, Row } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
 import TextareaAutosize from 'react-textarea-autosize';
 import './TextEditor.css';
 

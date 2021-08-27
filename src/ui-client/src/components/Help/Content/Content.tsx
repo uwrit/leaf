@@ -52,13 +52,13 @@ export class Content extends React.Component<Props> {
     private getContent = (content: HelpPageContent) => {
         const c = this.className;
 
-        if (content.textContent != null) {
+        if (content.textContent) {
             return (
                 <div className={`${c}-text`} key={content.id}>
                     <ReactMarkdown children={content.textContent} />
                 </div>
             );
-        } else if (content.imageContent != null) {
+        } else if (content.imageContent) {
             return (
                 <div className={`${c}-image`} key={content.id}>
                     <img

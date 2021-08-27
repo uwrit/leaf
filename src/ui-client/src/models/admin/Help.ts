@@ -32,10 +32,10 @@ export interface ContentRow {
     imageId: string;
 }
 
-export interface AdminHelpEditContentDTO {
+export interface AdminHelpContentDTO {
     title: string;
     category: string;
     content: ContentRow[];
 }
 
-export interface AdminHelpEditContent extends AdminHelpEditContentDTO {}
+export interface AdminHelpContent extends AdminHelpContentDTO {}

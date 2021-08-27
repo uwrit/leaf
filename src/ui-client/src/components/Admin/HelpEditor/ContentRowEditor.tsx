@@ -78,18 +78,89 @@ export class ContentRowEditor extends React.Component<Props, State> {
                             />
                         </div>
                     </Col>
-
                 </Row>
             </div>
         );
     };
 
+    // private editContent = () => {
+    //     const c = this.className;
+    //     const { contentRow } = this.props;
+    //     const { selected } = this.state;
+    //     const markdownEdit = selected ? 'text-edit' : 'text';
+
+    //     if (contentRow.textContent) {
+    //         return (
+    //             <Col>
+    //                 <div className={`${c}-${markdownEdit}`}>
+    //                     <div className={'hover-button'}>
+    //                         <Button>
+    //                             <label htmlFor={`${contentRow.id}-above`}>
+    //                                 <span>Add Image/Gif Above</span>
+    //                                 <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
+    //                             </label>
+    //                         </Button>
+
+    //                         <Button>
+    //                             <label htmlFor={`${contentRow.id}-below`}>
+    //                                 <span>Add Image/Gif Below</span>
+    //                                 <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
+    //                             </label>
+    //                         </Button>
+
+    //                         <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
+    //                         <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
+    //                     </div>
+
+    //                     <TextareaAutosize
+    //                         onChange={this.handleChange}
+    //                         value={contentRow.textContent}
+    //                     />
+    //                 </div>
+    //             </Col>
+    //         );
+    //     }
+    //     // else if (contentRow.imageContent) {
+    //     //     return (
+    //     //         <div className={`${c}-${markdownEdit}`}>
+    //     //             <Button>
+    //     //                 <label htmlFor={`${contentRow.id}-above`}>
+    //     //                     <span>Add Image/Gif Above</span>
+    //     //                     <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
+    //     //                 </label>
+    //     //             </Button>
+
+    //     //             <Button>
+    //     //                 <label htmlFor={`${contentRow.id}-below`}>
+    //     //                     <span>Add Image/Gif Below</span>
+    //     //                     <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
+    //     //                 </label>
+    //     //             </Button>
+
+    //     //             <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
+    //     //             <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
+    //     //         </div>
+    //     //     );
+    //     // };
+    //     return ;
+    // };
+
     private getContent = () => {
+        const c = this.className;
         const { contentRow } = this.props;
+        const { selected } = this.state;
+        const markdownText = selected ? 'markdown-slide-left' : 'markdown';
+
         if (contentRow.textContent) {
-            return <ReactMarkdown children={contentRow.textContent} />
+            return <ReactMarkdown children={contentRow.textContent} /> ;
         } else if (contentRow.imageContent) {
-            return <img src={`data:image;base64,${contentRow.imageContent}`} alt={contentRow.imageId} />
+            return (
+                <img
+                    src={`data:image;base64,${contentRow.imageContent}`}
+                    alt={contentRow.imageId}
+                    style={{marginBottom: "10px"}}
+                />
+            );
         };
         return ;
     };

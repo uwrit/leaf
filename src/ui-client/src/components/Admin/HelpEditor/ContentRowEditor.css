@@ -20,7 +20,6 @@
     display: block;
     height: auto;
     max-width: 100%;
-    margin-bottom: 10px;
 }
 
 .content-row-editor-markdown:hover {
@@ -35,12 +34,15 @@
     transition-timing-function: ease-in-out;
 }
 
+/* REVIST */
+
 .content-row-editor-markdown-slide-left > img {
     display: block;
     height: auto;
     max-width: 100%;
-    margin-bottom: 10px;
 }
+
+/*  */
 
 .content-row-editor-text {
     position: absolute;
@@ -74,3 +76,26 @@
 .hover-button {
     display: none;
 }
+
+/* WORKING */
+/* .content-row-editor-image {
+    display: block;
+    position: absolute;
+    margin-bottom: -32px;
+} */
+
+
+/* .content-row-editor-image {
+    border-left: 2px solid transparent;
+    padding-left: 1%;
+}
+
+.content-row-editor-image > img {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}
+
+.content-row-editor-image:hover {
+    border-left-color: rgb(28,168,221);
+} */

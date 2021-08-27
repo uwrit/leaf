@@ -15,26 +15,25 @@ import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent, createAdminHel
          setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
 import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
-import { AdminHelpEditContent, ContentRow, CreateHelpPage,
+import { AdminHelpContent, ContentRow, CreateHelpPage,
          CreateHelpPageDTO, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
-import './AdminHelpContent.css';
+import './AdminHelp.css';
 
 interface Props {
     dispatch: any;
-    content: AdminHelpEditContent;
-    currentContent: AdminHelpEditContent;
+    content: AdminHelpContent;
+    currentContent: AdminHelpContent;
     currentPage: HelpPage;
     createNew: boolean;
     unsaved: boolean;
 }
 
-// TODO: Rename to AdminHelp. Correct css after change.
-export class AdminHelpContent extends React.Component<Props> {
-    private className = "admin-help-content"
+export class AdminHelp extends React.Component<Props> {
+    private className = "admin-help"
 
     public render() {
         const c = this.className;
@@ -71,11 +70,13 @@ export class AdminHelpContent extends React.Component<Props> {
 
                 <div className={`${c}-content-text`}>
                     <TextEditor
+                        // key={}
                         text={currentContent.title}
                         textHandler={this.handleTextChange}
                     />
 
                     <TextEditor
+                        // key={generateId()}
                         isCategory={true}
                         text={currentContent.category}
                         textHandler={this.handleTextChange}
@@ -91,7 +92,7 @@ export class AdminHelpContent extends React.Component<Props> {
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
                             />
-                    )}
+                        )}
                     </div>
                 </div>
             </div>
@@ -116,10 +117,9 @@ export class AdminHelpContent extends React.Component<Props> {
             title: 'Enter Title Here',
             category: 'Enter Category Here',
             content: [ contentRow ]
-        }) as AdminHelpEditContent;
+        }) as AdminHelpContent;
 
         dispatch(setCurrentAdminHelpContent(newContent));
-
         dispatch(setAdminHelpContent(newContent, HelpPageLoadState.LOADED));
         dispatch(setCurrentHelpPage({ id: '', categoryId: '', title: '' } as HelpPage));
         dispatch(isAdminHelpContentNew(true));
@@ -128,9 +128,9 @@ export class AdminHelpContent extends React.Component<Props> {
 
     private handleTextChange = (val: string, propName: string) => {
         const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { [propName]: val }) as AdminHelpEditContent;
+        const newContent = Object.assign({}, currentContent, { [propName]: val }) as AdminHelpContent;
+        
         dispatch(setCurrentAdminHelpContent(newContent));
-
         dispatch(adminHelpContentUnsaved(true));
     };
 
@@ -151,7 +151,7 @@ export class AdminHelpContent extends React.Component<Props> {
             contentCopy.splice(index, 1);
         }
 
-        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
+        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
         dispatch(adminHelpContentUnsaved(true));
@@ -206,8 +206,8 @@ export class AdminHelpContent extends React.Component<Props> {
     };
 
     private handleContentGoBackClick = () => {
-        const { dispatch } = this.props;
-        dispatch(confirmLeavingAdminHelpContent());
+        const { dispatch, unsaved } = this.props;
+        unsaved ? dispatch(confirmLeavingAdminHelpContent()) : dispatch(resetAdminHelpContent());
     };
 
     private handleDeleteContent = () => {
@@ -251,7 +251,7 @@ export class AdminHelpContent extends React.Component<Props> {
             // Order the content rows by their index
             contentCopy.forEach((c,i) => c.orderId = i);
             
-            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
+            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
             dispatch(setCurrentAdminHelpContent(newContent));
         } else {
             const image = e!.currentTarget.files!.item(0)!;
@@ -276,7 +276,7 @@ export class AdminHelpContent extends React.Component<Props> {
                 // Order the content rows by their index
                 contentCopy.forEach((c,i) => c.orderId = i);
 
-                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpEditContent;
+                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
                 dispatch(setCurrentAdminHelpContent(newContent));
             };
             

@@ -5,17 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.admin-help-content {
+.admin-help {
     background-color: rgb(240,240,240);
     font-family: "Source Serif Pro";
     padding-top: 20px;
 }
 
-.admin-help-content-buttons {
+.admin-help-buttons {
     margin-left: 15% !important;
 }
 
-.admin-help-content-back-arrow {
+.admin-help-back-arrow {
     color: rgb(0, 130, 177);
     cursor: pointer;
     margin-left: -25%;
@@ -23,24 +23,26 @@
     width: 50px;
 }
 
-.admin-help-content-back-arrow:hover {
+.admin-help-back-arrow:hover {
     opacity: 0.7;
 }
 
-.admin-help-content-edit-button {
+.admin-help-edit-button {
     font-family: Roboto;
     margin-right: 20px;
     margin-bottom: 10px;
     min-width: 100px;
 }
 
-.admin-help-content-edit-button:hover {
+.admin-help-edit-button:hover {
     opacity: 0.7;
 }
 
-.admin-help-content-content-text {
+.admin-help-content-text {
     height: calc(100vh - 130px);
     overflow-y: auto;
     overflow-x: hidden;
-    padding-bottom: 20px;
+    
+    /* REVISIT: page cuts off when small screen, height changes causing issue */
+    padding-bottom: 75px;
 }

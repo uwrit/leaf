@@ -8,7 +8,7 @@
 import React from 'react';
 import { Button } from 'reactstrap';
 import { connect } from 'react-redux';
-import { AdminHelpContent } from '../Admin/AdminHelpContent';
+import { AdminHelp } from '../Admin/AdminHelp';
 import { setCurrentHelpPage } from '../../actions/helpPage';
 import { adminHelpContentUnsaved, isAdminHelpContentNew, setAdminHelpContent, setCurrentAdminHelpContent } from '../../actions/admin/helpPage';
 import { Content } from '../../components/Help/Content/Content';
@@ -16,7 +16,7 @@ import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { UserContext } from '../../models/Auth';
 import { HelpPage } from '../../models/Help/Help';
-import { AdminHelpEditContent, ContentRow } from '../../models/admin/Help';
+import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
 import { AppState } from '../../models/state/AppState';
 import { AdminHelpState } from '../../models/state/AdminState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
@@ -53,7 +53,7 @@ export class Help extends React.PureComponent<Props, State> {
         
         if (adminHelp.state === HelpPageLoadState.LOADED) {
             return (
-                <AdminHelpContent
+                <AdminHelp
                     dispatch={dispatch}    
                     content={adminHelp.content}
                     currentContent={adminHelp.currentContent}
@@ -118,7 +118,7 @@ export class Help extends React.PureComponent<Props, State> {
             title: 'Enter Title Here',
             category: 'Enter Category Here',
             content: [ contentRow ]
-        }) as AdminHelpEditContent;
+        }) as AdminHelpContent;
 
         dispatch(setCurrentAdminHelpContent(newContent));
         dispatch(setAdminHelpContent(newContent, HelpPageLoadState.LOADED));
