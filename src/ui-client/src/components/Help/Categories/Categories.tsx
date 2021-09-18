@@ -6,12 +6,15 @@
  */ 
 
 import React from 'react';
-import { Row } from 'reactstrap';
+import { Row, Col } from 'reactstrap';
 import { HelpCategoryMap } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
+    newCategory: string;
+    newTitle: string;
+    
     categories: HelpCategoryMap;
     dispatch: any;
     isAdmin: boolean;
@@ -22,8 +25,11 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categories, dispatch, isAdmin } = this.props;
+        const { categories, dispatch, isAdmin, newCategory, newTitle } = this.props;
         const cats = [ ...categories.values() ];
+        
+        const existingCategory = cats.find(c => c.category.toLowerCase() === newCategory);
+        console.log(existingCategory);
 
         return (
             <Row className={c}>
@@ -35,6 +41,13 @@ export class Categories extends React.Component<Props> {
                         isAdmin={isAdmin}
                     />
                 )}
+                
+                {newCategory &&
+                    <Col>
+                        <div><b>{newCategory.toUpperCase()}</b></div>
+                        <div style={{color: "#007bff"}}>{newTitle}</div>
+                    </Col>
+                }
             </Row>
         );
     };

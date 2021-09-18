@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { Button } from 'reactstrap';
+import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { connect } from 'react-redux';
 import { AdminHelp } from '../Admin/AdminHelp';
 import { setCurrentHelpPage } from '../../actions/helpPage';
@@ -15,13 +15,15 @@ import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { UserContext } from '../../models/Auth';
-import { HelpPage } from '../../models/Help/Help';
+import { HelpPage, HelpPageCategory } from '../../models/Help/Help';
 import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
 import { AppState } from '../../models/state/AppState';
 import { AdminHelpState } from '../../models/state/AdminState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
 import './Help.css';
+
+import TextareaAutosize from 'react-textarea-autosize';
 
 interface OwnProps { }
 
@@ -35,7 +37,11 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface State { }
+interface State {
+    show: boolean;
+    category: string;
+    title: string;
+}
 
 type Props = StateProps & OwnProps & DispatchProps;
 
@@ -44,12 +50,17 @@ export class Help extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);   
-        this.state = { }
+        this.state = {
+            show: false,
+            category: '',
+            title: ''
+        }
     }
 
     public render() {
         const c = this.className;
         const { dispatch, helpPages, user, adminHelp } = this.props;
+        const { show, category, title } = this.state;
         
         if (adminHelp.state === HelpPageLoadState.LOADED) {
             return (
@@ -81,9 +92,26 @@ export class Help extends React.PureComponent<Props, State> {
                 <div className={`${c}-display`}>
                     
                     {user.isAdmin &&
-                        <Button className={`${c}-create-button`} color="success" onClick={this.handleCreateNewPage}>
+                        <div>
+                        {/* <Button className={`${c}-create-button`} color="success" onClick={this.handleCreateNewPage}>
                             Create New Help Page
-                        </Button>
+                        </Button> */}
+                        {/* <Button onClick={this.handleShow}>Create New</Button> */}
+                        <Dropdown isOpen={show} toggle={this.handleShow}>
+                            <DropdownToggle color="primary" caret>
+                                New Help Page
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                {/* <DropdownItem> */}
+                                    Category: <Input value={category} onChange={this.handleCategoryChange} />
+                                    Title: <Input value={title} onChange={this.handleTitleChange} />
+                                    <Button color="success" onClick={this.handleCreateNewPage}>
+                                        Create
+                                    </Button>
+                                {/* </DropdownItem> */}
+                            </DropdownMenu>
+                        </Dropdown>
+                        </div>
                     }
 
                     <HelpSearch />
@@ -93,11 +121,30 @@ export class Help extends React.PureComponent<Props, State> {
                             categories={helpPages.categories}
                             dispatch={dispatch}
                             isAdmin={user.isAdmin}
+
+                            newCategory={category}
+                            newTitle={title}
                         />
                     }
                 </div>
             </div>
         );
+    };
+
+    private handleShow = () => {
+        const { show } = this.state;
+        const uniqueId = generateId();
+        this.setState({ show: !show, category: '', title: '' });
+    };
+
+    private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.currentTarget.value;
+        this.setState({ category: val });
+    };
+
+    private handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.currentTarget.value;
+        this.setState({ title: val });
     };
 
     private handleCreateNewPage = () => {

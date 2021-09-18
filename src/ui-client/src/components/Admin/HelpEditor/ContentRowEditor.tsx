@@ -12,6 +12,9 @@ import { Button, Col, Row } from 'reactstrap';
 import { ContentRow } from '../../../models/admin/Help';
 import './ContentRowEditor.css';
 
+import * as components from 'idyll-components';
+import IdyllDocument from 'idyll-document';
+
 interface Props {
     dispatch: any;
     contentRow: ContentRow;
@@ -152,9 +155,16 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const markdownText = selected ? 'markdown-slide-left' : 'markdown';
 
         if (contentRow.textContent) {
+            // []() breaks page if empty, need to provide value inside [].
+            // works fine on reactmarkdown.
+            // return <IdyllDocument markup={contentRow.textContent} components={components} />;
             return <ReactMarkdown children={contentRow.textContent} /> ;
         } else if (contentRow.imageContent) {
             return (
+                // ![Hello World](data:image/png;base64,<image_base64>
+                // image breaks if pasted base64
+                // doesnt load image if idyll
+                // <IdyllDocument markup={`![Image](data:image;base64,${contentRow.imageContent})`} components={components} />
                 <img
                     src={`data:image;base64,${contentRow.imageContent}`}
                     alt={contentRow.imageId}
