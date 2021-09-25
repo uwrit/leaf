@@ -18,6 +18,8 @@ interface Props {
     category: HelpPageCategory;
     dispatch: any;
     isAdmin: boolean;
+
+    tempHelpPage: HelpPage;
 }
 
 interface State {
@@ -30,7 +32,7 @@ export class Pages extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { category } = this.props;
+        const { category, tempHelpPage } = this.props;
         const { show } = this.state;
 
         const pages = category.categoryPages;
@@ -46,6 +48,8 @@ export class Pages extends React.Component<Props, State> {
                 <div className={`${c}-category`}>
                     <b>{category.category.toUpperCase()}</b>
                 </div>
+
+                {category.id === tempHelpPage.categoryId && <div style={{color: "#FF0000"}}>{tempHelpPage.title}</div>}
 
                 {slicedPages.map(p =>
                     <div key={p.id} className={`${c}-page`}>

@@ -149,6 +149,7 @@ export class Help extends React.PureComponent<Props, State> {
 
     private handleCreateNewPage = () => {
         const { dispatch } = this.props;
+        const { category, title, show } = this.state;
         const uniqueId = generateId();
 
         const contentRow = Object.assign({}, {
@@ -162,8 +163,8 @@ export class Help extends React.PureComponent<Props, State> {
         }) as ContentRow;
 
         const newContent = Object.assign({}, {
-            title: 'Enter Title Here',
-            category: 'Enter Category Here',
+            title: title ? title : ' Enter Title Here',
+            category: category ? category : 'Enter Category Here',
             content: [ contentRow ]
         }) as AdminHelpContent;
 
@@ -172,6 +173,9 @@ export class Help extends React.PureComponent<Props, State> {
         dispatch(setCurrentHelpPage({ id: '', categoryId: '', title: '' } as HelpPage));
         dispatch(isAdminHelpContentNew(true));
         dispatch(adminHelpContentUnsaved(true));
+        
+        //  Clear the values so that when user clicks the "go back arrow" from content, category/title are reset.
+        this.setState({ show: !show, category: '', title: '' });
     };
 };
 

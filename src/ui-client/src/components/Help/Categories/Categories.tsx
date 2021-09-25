@@ -7,17 +7,16 @@
 
 import React from 'react';
 import { Row, Col } from 'reactstrap';
-import { HelpCategoryMap } from '../../../models/Help/Help';
+import { HelpCategoryMap, HelpPageDTO } from '../../../models/Help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
-    newCategory: string;
-    newTitle: string;
-    
     categories: HelpCategoryMap;
     dispatch: any;
     isAdmin: boolean;
+    newCategory: string;
+    newTitle: string;
 }
 
 export class Categories extends React.Component<Props> {
@@ -27,9 +26,11 @@ export class Categories extends React.Component<Props> {
         const c = this.className;
         const { categories, dispatch, isAdmin, newCategory, newTitle } = this.props;
         const cats = [ ...categories.values() ];
-        
-        const existingCategory = cats.find(c => c.category.toLowerCase() === newCategory);
-        console.log(existingCategory);
+
+        // Getting first value from filter array since there will only be one match.
+        const existingCat = cats.filter(c => c.category.toLowerCase() === newCategory.toLowerCase())[0];
+        const tempCatId = existingCat ? existingCat.id : '';
+        const tempPage = { id: '', categoryId: tempCatId, title: newTitle } as HelpPageDTO;
 
         return (
             <Row className={c}>
@@ -39,13 +40,15 @@ export class Categories extends React.Component<Props> {
                         category={c}
                         dispatch={dispatch}
                         isAdmin={isAdmin}
+
+                        tempHelpPage={tempPage}
                     />
                 )}
                 
-                {newCategory &&
+                {(newCategory && !tempCatId) &&
                     <Col>
                         <div><b>{newCategory.toUpperCase()}</b></div>
-                        <div style={{color: "#007bff"}}>{newTitle}</div>
+                        <div style={{color: "#FF0000"}}>{newTitle}</div>
                     </Col>
                 }
             </Row>
