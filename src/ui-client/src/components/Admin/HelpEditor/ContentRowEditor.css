@@ -77,6 +77,15 @@
     display: none;
 }
 
+.image-edit-buttons {
+    display: none;
+    position: absolute;
+}
+
+.image-edit:hover .image-edit-buttons {
+    display: block;
+}
+
 /* WORKING */
 /* .content-row-editor-image {
     display: block;

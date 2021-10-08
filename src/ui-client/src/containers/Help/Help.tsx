@@ -90,27 +90,26 @@ export class Help extends React.PureComponent<Props, State> {
         return (
             <div className={c}>
                 <div className={`${c}-display`}>
-                    
                     {user.isAdmin &&
                         <div>
-                        {/* <Button className={`${c}-create-button`} color="success" onClick={this.handleCreateNewPage}>
-                            Create New Help Page
-                        </Button> */}
-                        {/* <Button onClick={this.handleShow}>Create New</Button> */}
-                        <Dropdown isOpen={show} toggle={this.handleShow}>
-                            <DropdownToggle color="primary" caret>
-                                New Help Page
-                            </DropdownToggle>
-                            <DropdownMenu>
-                                {/* <DropdownItem> */}
-                                    Category: <Input value={category} onChange={this.handleCategoryChange} />
-                                    Title: <Input value={title} onChange={this.handleTitleChange} />
-                                    <Button color="success" onClick={this.handleCreateNewPage}>
-                                        Create
-                                    </Button>
-                                {/* </DropdownItem> */}
-                            </DropdownMenu>
-                        </Dropdown>
+                            <Dropdown className={`${c}-create-button`} isOpen={show} toggle={this.handleShow}>
+                                <DropdownToggle color="primary" caret>
+                                    New Help Page
+                                </DropdownToggle>
+                                <DropdownMenu>
+                                    <div className={`${c}-create-button-item`}>
+                                        Category: <Input value={category} onChange={this.handleCategoryChange} />
+                                    </div>
+                                    <div className={`${c}-create-button-item`}>
+                                        Title: <Input value={title} onChange={this.handleTitleChange} />
+                                    </div>
+                                    <div className={`${c}-create-button-item`}>
+                                        <Button color="success" onClick={this.handleCreateNewPage}>
+                                            Create
+                                        </Button>
+                                    </div>
+                                </DropdownMenu>
+                            </Dropdown>
                         </div>
                     }
 
@@ -133,7 +132,6 @@ export class Help extends React.PureComponent<Props, State> {
 
     private handleShow = () => {
         const { show } = this.state;
-        const uniqueId = generateId();
         this.setState({ show: !show, category: '', title: '' });
     };
 

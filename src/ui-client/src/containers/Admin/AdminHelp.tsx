@@ -145,6 +145,7 @@ export class AdminHelp extends React.Component<Props> {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
         } else if (!val && contentCopy.length === 1) {
+            // ERROR: deletes text row when it should leave the last one.
             const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
         } else {
