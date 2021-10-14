@@ -91,6 +91,7 @@ export class AdminHelp extends React.Component<Props> {
                                 index={i}
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
+                                deleteImageHandler={this.handleDeleteImage}
                             />
                         )}
                     </div>
@@ -138,19 +139,33 @@ export class AdminHelp extends React.Component<Props> {
         const { dispatch, currentContent } = this.props;
         // Make copy of current content to edit
         const contentCopy = currentContent.content.slice();
+
+        // WORK ON: dont feel comfortable with filter, is there a better way?
+        const textContentLength = contentCopy.filter(c => c.textContent).length;
+
         // Find content row via index to edit
         const contentRow = contentCopy.find((_, i) => i === index);
 
         if (val) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
-        } else if (!val && contentCopy.length === 1) {
-            // ERROR: deletes text row when it should leave the last one.
+        } else if (!val && textContentLength === 1) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
         } else {
             contentCopy.splice(index, 1);
         }
+
+        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+        dispatch(setCurrentAdminHelpContent(newContent));
+
+        dispatch(adminHelpContentUnsaved(true));
+    };
+
+    private handleDeleteImage = (index: number) => {
+        const { dispatch, currentContent } = this.props;
+        const contentCopy = currentContent.content.slice();
+        contentCopy.splice(index, 1);
 
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
         dispatch(setCurrentAdminHelpContent(newContent));

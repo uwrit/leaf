@@ -21,6 +21,7 @@ interface Props {
     index: number;
     contentHandler: (val: string, index: number) => void;
     newSectionHandler: (index: number, pageId: string, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
+    deleteImageHandler: (index: number) => void;
 }
 
 interface State {
@@ -95,40 +96,33 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const { selected } = this.state;
         const markdownEdit = selected ? 'text-edit' : 'text';
 
-        // TODO: 1. fix last text row from being deleted.
-        //       2. add image delete functionality.
+        return (
+            <div className={`${c}-${markdownEdit}`}>
+                <div className={'hover-button'}>
+                    <Button>
+                        <label htmlFor={`${contentRow.id}-above`}>
+                            <span>Add Image/Gif Above</span>
+                            <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
+                        </label>
+                    </Button>
 
-        // if (contentRow.textContent) {
-            return (
-                <div className={`${c}-${markdownEdit}`}>
-                    <div className={'hover-button'}>
-                        <Button>
-                            <label htmlFor={`${contentRow.id}-above`}>
-                                <span>Add Image/Gif Above</span>
-                                <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
-                            </label>
-                        </Button>
+                    <Button>
+                        <label htmlFor={`${contentRow.id}-below`}>
+                            <span>Add Image/Gif Below</span>
+                            <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
+                        </label>
+                    </Button>
 
-                        <Button>
-                            <label htmlFor={`${contentRow.id}-below`}>
-                                <span>Add Image/Gif Below</span>
-                                <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
-                            </label>
-                        </Button>
-
-                        <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
-                        <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
-                    </div>
-                  
-                    <TextareaAutosize
-                    onChange={this.handleChange}
-                    value={contentRow.textContent}
-                    />
+                    <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
+                    <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
                 </div>
-            );
-        // };
-        
-        // return null;
+                
+                <TextareaAutosize
+                onChange={this.handleChange}
+                value={contentRow.textContent}
+                />
+            </div>
+        );
     };
 
     private getContent = () => {
@@ -182,7 +176,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
                 // />
                 // </div>
                 
-                <div className={`${c}-markdown image-edit` } onClick={this.handleClick}>
+                <div className={`${c}-markdown image-edit` }>
                     
                     <div className={'image-edit-buttons'}>
                         <Button>
@@ -202,7 +196,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
                         <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
                         <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
 
-                        <Button>X</Button>
+                        <Button onClick={this.deleteImage}>X</Button>
                     </div>
 
                     <img
@@ -225,14 +219,17 @@ export class ContentRowEditor extends React.Component<Props, State> {
         this.setState({ selected: false });
     };
 
-    private handleClick = () => {
-        const { contentRow } = this.props;
-        if (contentRow.textContent) { this.setState({ selected: true }) };
-    }
+    private handleClick = () => { this.setState({ selected: true }) };
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const { contentHandler, index } = this.props;
         const newVal = e.currentTarget.value;
         contentHandler(newVal, index);
     };
+
+    private deleteImage = () => {
+        const { deleteImageHandler, index } = this.props;
+        deleteImageHandler(index);
+    };
+
 }
