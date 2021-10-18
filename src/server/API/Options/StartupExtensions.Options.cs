@@ -539,9 +539,11 @@ namespace API.Options
             var log = sp.GetRequiredService<ILogger<Startup>>();
             var authentication = sp.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
             var authorization = new AuthorizationOptions().WithMechanism(config.GetValue<string>(Config.Authorization.Mechanism));
+            config.TryGetValue(Config.Authorization.AllowAllAuthenticatedUsers, out bool allowAllAuthenticated);
             services.Configure<AuthorizationOptions>(opts =>
             {
                 opts.Mechanism = authorization.Mechanism;
+                opts.AllowAllAuthenticatedUsers = allowAllAuthenticated;
             });
 
             switch (authorization.Mechanism)

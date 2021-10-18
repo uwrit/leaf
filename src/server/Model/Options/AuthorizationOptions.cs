@@ -20,6 +20,7 @@ namespace Model.Options
         public static readonly IEnumerable<string> ValidMechanisms = DirectMechanisms.Concat(PassiveMechanisms);
 
         public AuthorizationMechanism Mechanism { get; set; }
+        public bool AllowAllAuthenticatedUsers { get; set; }
 
         static bool ValidMechanism(string mech) => ValidMechanisms.Contains(mech);
         public AuthorizationOptions WithMechanism(string value)
