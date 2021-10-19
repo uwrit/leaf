@@ -27,7 +27,6 @@ namespace API.Jwt
     public class JwtProvider : IUserJwtProvider, IApiJwtProvider
     {
         readonly AuthenticationOptions authenticationOptions;
-        readonly AuthorizationOptions authorizationOptions;
         readonly JwtSigningOptions jwtOptions;
         readonly LeafVersionOptions versionOptions;
         readonly IFederatedEntitlementProvider entitlementService;
@@ -39,7 +38,6 @@ namespace API.Jwt
         public JwtProvider(
             IOptions<JwtSigningOptions> signingOpts,
             IOptions<AuthenticationOptions> authOpts,
-            IOptions<AuthorizationOptions> authoOpts,
             IOptions<LeafVersionOptions> versionOpts,
             IFederatedIdentityProvider identityService,
             IFederatedEntitlementProvider entitlementService,
@@ -48,7 +46,6 @@ namespace API.Jwt
         {
             jwtOptions = signingOpts.Value;
             authenticationOptions = authOpts.Value;
-            authorizationOptions = authoOpts.Value;
             versionOptions = versionOpts.Value;
             this.idProvider = identityService;
             this.entitlementService = entitlementService;
@@ -69,19 +66,9 @@ namespace API.Jwt
 
         List<Claim> IdClaims(IScopedIdentity identity, Entitlement entitlement)
         {
-            if (authorizationOptions.AllowAllAuthenticatedUsers)
+            if (!entitlement.Mask.HasFlag(RoleMask.User))
             {
-                if (string.IsNullOrWhiteSpace(identity.ScopedIdentity))
-                {
-                    throw new LeafAuthenticationException("Setting AllowAllAuthenticatedUsers is `true` but user has no ScopedIdentity.");
-                }
-            }
-            else
-            {
-                if (!entitlement.Mask.HasFlag(RoleMask.User))
-                {
-                    throw new LeafAuthenticationException($"{identity.Identity} is not a Leaf user.");
-                }
+                throw new LeafAuthenticationException($"{identity.Identity} is not a Leaf user.");
             }
 
             var idNonce = Guid.NewGuid().ToString();

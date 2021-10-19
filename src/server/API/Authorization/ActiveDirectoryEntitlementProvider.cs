@@ -18,14 +18,17 @@ namespace API.Authorization
     {
         readonly RolesMappingOptions roles;
         readonly IMembershipProvider mProvider;
+        readonly AuthorizationOptions authorizationOptions;
 
         public ActiveDirectoryEntitlementProvider(
             IOptions<ActiveDirectoryAuthorizationOptions> authOpts,
+            IOptions<AuthorizationOptions> authorizationOptions,
             IMembershipProvider membershipProvider
         )
         {
             roles = authOpts.Value.RolesMapping;
             mProvider = membershipProvider;
+            this.authorizationOptions = authorizationOptions.Value;
         }
 
         public Entitlement GetEntitlement(HttpContext _, IScopedIdentity identity)
@@ -46,6 +49,11 @@ namespace API.Authorization
             var mask = RoleMask.None;
 
             if (!string.IsNullOrWhiteSpace(roles.User) && groups.Any(g => g.Equals(roles.User, StringComparison.InvariantCultureIgnoreCase)))
+            {
+                mask |= RoleMask.User;
+            }
+
+            if (authorizationOptions.AllowAllAuthenticatedUsers)
             {
                 mask |= RoleMask.User;
             }
