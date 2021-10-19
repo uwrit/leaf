@@ -220,6 +220,11 @@ namespace API.Options
                     services.AddScoped<IFederatedEntitlementProvider, ActiveDirectoryEntitlementProvider>();
                     break;
 
+                case AuthorizationMechanism.AppDb:
+                    services.AddSingleton<IFederatedEntitlementProvider, AppDbEntitlementProvider>();
+                    services.AddScoped<IDbUserRoleAndGroupProvider, AppDbUserRoleProvider>();
+                    break;
+
                 case AuthorizationMechanism.Unsecured:
                     services.AddSingleton<IFederatedEntitlementProvider, UnsecureEntitlementProvider>();
                     break;

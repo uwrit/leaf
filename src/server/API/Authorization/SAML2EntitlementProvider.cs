@@ -17,10 +17,15 @@ namespace API.Authorization
     public class SAML2EntitlementProvider : IFederatedEntitlementProvider
     {
         readonly SAML2AuthorizationOptions options;
+        readonly AuthorizationOptions authorizationOptions;
 
-        public SAML2EntitlementProvider(IOptions<SAML2AuthorizationOptions> saml)
+        public SAML2EntitlementProvider(
+            IOptions<SAML2AuthorizationOptions> saml,
+            IOptions<AuthorizationOptions> authorizationOptions
+        )
         {
             options = saml.Value;
+            this.authorizationOptions = authorizationOptions.Value;
         }
 
         public Entitlement GetEntitlement(HttpContext context, IScopedIdentity _)
@@ -52,7 +57,7 @@ namespace API.Authorization
             var roles = options.RolesMapping;
             var mask = RoleMask.None;
 
-            if (!string.IsNullOrWhiteSpace(roles.User) && asserts.Contains(roles.User))
+            if ((!string.IsNullOrWhiteSpace(roles.User) && asserts.Contains(roles.User)) || authorizationOptions.AllowAllAuthenticatedUsers)
             {
                 mask |= RoleMask.User;
             }

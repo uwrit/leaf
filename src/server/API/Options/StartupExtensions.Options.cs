@@ -593,6 +593,13 @@ namespace API.Options
                         opts.RolesMapping = ad.RolesMapping;
                     });
                     break;
+
+                case AuthorizationMechanism.AppDb:
+                    if (authentication.IsUnsecured)
+                    {
+                        throw new LeafConfigurationException($"AppDb authorization mechanism is not compatible with Unsecured authentication");
+                    }
+                    break;
             }
 
             return services;

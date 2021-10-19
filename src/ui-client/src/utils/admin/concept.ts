@@ -139,7 +139,8 @@ export const createEmptyConcept = (currentAdminConcept?: AdminConcept): EmptyCon
         isEncounterBased: false,
         isEventBased: false,
         isFetching: false,
-        isOpen: false
+        isOpen: false,
+        specializationGroups: []
     };
     if (currentAdminConcept) {
         adminConcept.sqlSetId = currentAdminConcept.sqlSetId;
