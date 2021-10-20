@@ -67,7 +67,7 @@
 }
 
 .leaf-button-addnew {
-    background-color: rgb(13,195,106);
+    background-color: rgb(13,195,106) !important;
     border: 1px solid rgb(13,195,106) !important;
     color: rgb(245, 245, 245) !important;
 }

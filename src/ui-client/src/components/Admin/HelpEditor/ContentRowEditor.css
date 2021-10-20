@@ -5,14 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.content-row-editor {
+.content-row-editor-container {
     font-size: 17px;
     width: 100%;
     margin-left: 19%;
 }
 
 .content-row-editor-markdown {
-    border-left: 2px solid transparent;
+    border-left: 3px solid transparent;
+    cursor: pointer;
     padding-left: 1%;
 }
 
@@ -23,6 +24,7 @@
 }
 
 .content-row-editor-markdown:hover {
+    background-color: rgba(28,168,221, 0.05);
     border-left-color: rgb(28,168,221);
 }
 
@@ -34,7 +36,7 @@
     transition-timing-function: ease-in-out;
 }
 
-/* REVIST */
+/* REVISIT */
 
 .content-row-editor-markdown-slide-left > img {
     display: block;
@@ -44,28 +46,31 @@
 
 /*  */
 
-.content-row-editor-text {
+.content-row-editor {
+    left: 30%;
+    opacity: 0;
+    pointer-events: none;
     position: absolute;
-    top: -9999px;
-    left: -9999px;
+    top: -5px;
+    transition: opacity .3s;
+    width: 700px;
 }
 
-.content-row-editor-text-edit {
-    margin-left: -45%;
-    transition: margin-left 3s;
-    transition-timing-function: ease-in-out;
+.content-row-editor.editing {
+    opacity: 1;
+    pointer-events: all;
 }
 
-.content-row-editor-text-edit:hover .hover-button {
+.content-row-editor.editing:hover .hover-button {
     display: block;
     position: absolute;
     margin-top: -32px;
 }
 
-.content-row-editor-text-edit > textarea {
-    background-color: #ffffff91;
+.content-row-editor > textarea {
+    background-color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 2px;
     box-sizing: content-box;
     box-shadow: 5px 5px 5px 0px #b3b5b7;
     outline: none;

@@ -21,6 +21,7 @@ import { AppState } from '../../models/state/AppState';
 import { AdminHelpState } from '../../models/state/AdminState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
+import { TextArea } from '../../components/Admin/Section/TextArea';
 import './Help.css';
 
 import TextareaAutosize from 'react-textarea-autosize';
@@ -92,20 +93,20 @@ export class Help extends React.PureComponent<Props, State> {
                 <div className={`${c}-display`}>
                     {user.isAdmin &&
                         <div>
-                            <Dropdown className={`${c}-create-button`} isOpen={show} toggle={this.handleShow}>
-                                <DropdownToggle color="primary" caret>
+                            <Dropdown className={`${c}-create-dropdown-container`} isOpen={show} toggle={this.handleShow}>
+                                <DropdownToggle caret className="leaf-button-addnew">
                                     New Help Page
                                 </DropdownToggle>
-                                <DropdownMenu>
+                                <DropdownMenu right>
                                     <div className={`${c}-create-button-item`}>
-                                        Category: <Input value={category} onChange={this.handleCategoryChange} />
+                                        Title <Input value={title} onChange={this.handleTitleChange} />
                                     </div>
                                     <div className={`${c}-create-button-item`}>
-                                        Title: <Input value={title} onChange={this.handleTitleChange} />
+                                        Category <Input value={category} onChange={this.handleCategoryChange} />
                                     </div>
                                     <div className={`${c}-create-button-item`}>
-                                        <Button color="success" onClick={this.handleCreateNewPage}>
-                                            Create
+                                        <Button className="leaf-button-addnew" onClick={this.handleCreateNewPage}>
+                                            <span>+ Create</span>
                                         </Button>
                                     </div>
                                 </DropdownMenu>

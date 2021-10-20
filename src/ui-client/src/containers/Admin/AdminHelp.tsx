@@ -50,10 +50,6 @@ export class AdminHelp extends React.Component<Props> {
                     </Col>
 
                     <Col>
-                        <Button className={`${c}-edit-button`} color="primary" disabled={unsaved} onClick={this.handleCreateNew}>
-                            Create New
-                        </Button>
-
                         <Button className={`${c}-edit-button`} color="secondary" disabled={!unsaved} onClick={this.handleUndoChanges}>
                             Undo Changes
                         </Button>
@@ -72,13 +68,6 @@ export class AdminHelp extends React.Component<Props> {
                     <TextEditor
                         // key={}
                         text={currentContent.title}
-                        textHandler={this.handleTextChange}
-                    />
-
-                    <TextEditor
-                        // key={generateId()}
-                        isCategory={true}
-                        text={currentContent.category}
                         textHandler={this.handleTextChange}
                     />
 

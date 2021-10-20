@@ -16,14 +16,28 @@
     margin: 10px 50px 10px 50px;
 }
 
-.help-page-create-button {
+.help-page-create-dropdown-container {
+    float: right;
     font-family: Roboto;
     margin-top: 10px;
-    float: right;
+}
+
+.help-page-create-dropdown-container > button {
+    font-size: 1.1rem;
+}
+
+.help-page-create-dropdown-container .dropdown-menu {
+    font-size: 1.1rem !important;
+    width: 400px;
 }
 
 .help-page-create-button-item {
     margin: 5px;
+}
+
+.help-page-create-button-item > button {
+    font-size: 1.2rem !important;
+    margin-top: 10px;
 }
 
 .help-page-content {
