@@ -8,15 +8,15 @@ using Model.Extensions;
 
 namespace Model.Authentication
 {
-    public class BlacklistedToken
+    public class InvalidatedToken
     {
         public Guid IdNonce { get; set; }
         public DateTime Expires { get; set; }
 
-        public static BlacklistedToken FromUTCTicks(string nonce, long ticks)
+        public static InvalidatedToken FromUTCTicks(string nonce, long ticks)
         {
             var date = DateTimes.FromUTCTicks(ticks);
-            return new BlacklistedToken { IdNonce = new Guid(nonce), Expires = date };
+            return new InvalidatedToken { IdNonce = new Guid(nonce), Expires = date };
         }
     }
 }

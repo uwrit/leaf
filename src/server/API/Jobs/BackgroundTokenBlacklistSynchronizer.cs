@@ -12,42 +12,42 @@ using Model.Authentication;
 
 namespace API.Jobs
 {
-    public class BackgroundTokenBlacklistSynchronizer : BackgroundService
+    public class BackgroundTokenInvalidatedSynchronizer : BackgroundService
     {
-        readonly ITokenBlacklistCache cache;
-        readonly ITokenBlacklistService tokenBlacklistService;
-        readonly ILogger<BackgroundTokenBlacklistSynchronizer> logger;
+        readonly ITokenInvalidatedCache cache;
+        readonly ITokenInvalidatedService tokenInvalidatedService;
+        readonly ILogger<BackgroundTokenInvalidatedSynchronizer> logger;
 
-        public BackgroundTokenBlacklistSynchronizer(
-            ITokenBlacklistCache cache,
-            ITokenBlacklistService tokenBlacklistService,
-            ILogger<BackgroundTokenBlacklistSynchronizer> logger)
+        public BackgroundTokenInvalidatedSynchronizer(
+            ITokenInvalidatedCache cache,
+            ITokenInvalidatedService tokenInvalidatedService,
+            ILogger<BackgroundTokenInvalidatedSynchronizer> logger)
         {
             this.cache = cache;
-            this.tokenBlacklistService = tokenBlacklistService;
+            this.tokenInvalidatedService = tokenInvalidatedService;
             this.logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            logger.LogInformation("BackgroundTokenBlacklistSynchronizer is starting");
+            logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is starting");
 
             stoppingToken.Register(() =>
             {
-                logger.LogInformation("BackgroundTokenBlacklistSynchronizer is stopped");
+                logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is stopped");
             });
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    var list = await tokenBlacklistService.GetBlacklist();
+                    var list = await tokenInvalidatedService.GetInvalidated();
                     cache.Overwrite(list);
-                    logger.LogInformation("Refreshed TokenBlacklistCache");
+                    logger.LogInformation("Refreshed TokenInvalidatedCache");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("Failed to refresh TokenBlacklistCache. Error: {Error}", e.ToString());
+                    logger.LogError("Failed to refresh TokenInvalidatedCache. Error: {Error}", e.ToString());
                 }
                 finally
                 {
@@ -55,7 +55,7 @@ namespace API.Jobs
                 }
             }
 
-            logger.LogInformation("BackgroundTokenBlacklistSynchronizer is stopped");
+            logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is stopped");
         }
     }
 }

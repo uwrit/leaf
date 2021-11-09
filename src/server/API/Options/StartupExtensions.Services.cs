@@ -154,9 +154,9 @@ namespace API.Options
 
         static IServiceCollection AddIAMServices(this IServiceCollection services)
         {
-            services.AddSingleton<ITokenBlacklistCache, TokenBlacklistCache>();
-            services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>();
-            services.AddHostedService<BackgroundTokenBlacklistSynchronizer>();
+            services.AddSingleton<ITokenInvalidatedCache, TokenInvalidatedCache>();
+            services.AddSingleton<ITokenInvalidatedService, TokenInvalidatedService>();
+            services.AddHostedService<BackgroundTokenInvalidatedSynchronizer>();
 
             var sp = services.BuildServiceProvider();
             var authenticationOptions = sp.GetRequiredService<IOptions<AuthenticationOptions>>().Value;

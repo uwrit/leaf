@@ -8,38 +8,36 @@ using Model.Authentication;
 using Model.Options;
 using Dapper;
 using System.Threading.Tasks;
-using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace Services.Authentication
 {
-    public class TokenBlacklistService : ITokenBlacklistService
+    public class TokenInvalidatedService : ITokenInvalidatedService
     {
-        const string queryBlacklist = @"auth.sp_BlacklistToken";
+        const string queryInvalidated = @"auth.sp_BlacklistToken";
         const string queryRefresh = @"auth.sp_RefreshTokenBlacklist";
 
         readonly AppDbOptions opts;
-        readonly ITokenBlacklistCache blacklistCache;
+        readonly ITokenInvalidatedCache invalidatedCache;
 
-        public TokenBlacklistService(IOptions<AppDbOptions> dbOpts, ITokenBlacklistCache blacklistCache)
+        public TokenInvalidatedService(IOptions<AppDbOptions> dbOpts, ITokenInvalidatedCache invalidatedCache)
         {
             opts = dbOpts.Value;
-            this.blacklistCache = blacklistCache;
+            this.invalidatedCache = invalidatedCache;
         }
 
-        public async Task Blacklist(BlacklistedToken token)
+        public async Task Invalidate(InvalidatedToken token)
         {
-            blacklistCache.Blacklist(token);
+            invalidatedCache.Invalidate(token);
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
                 await cn.ExecuteAsync(
-                    queryBlacklist,
+                    queryInvalidated,
                     new { idNonce = token.IdNonce, exp = token.Expires },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
@@ -47,13 +45,13 @@ namespace Services.Authentication
             }
         }
 
-        public async Task<IEnumerable<BlacklistedToken>> GetBlacklist()
+        public async Task<IEnumerable<InvalidatedToken>> GetInvalidated()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                return await cn.QueryAsync<BlacklistedToken>(
+                return await cn.QueryAsync<InvalidatedToken>(
                     queryRefresh,
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout

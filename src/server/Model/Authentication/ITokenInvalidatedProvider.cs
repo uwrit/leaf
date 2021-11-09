@@ -9,9 +9,9 @@ using System.Collections.Generic;
 
 namespace Model.Authentication
 {
-    public interface ITokenBlacklistService
+    public interface ITokenInvalidatedService
     {
-        Task<IEnumerable<BlacklistedToken>> GetBlacklist();
-        Task Blacklist(BlacklistedToken token);
+        Task<IEnumerable<InvalidatedToken>> GetInvalidated();
+        Task Invalidate(InvalidatedToken token);
     }
 }
