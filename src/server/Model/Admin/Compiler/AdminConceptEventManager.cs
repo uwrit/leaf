@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -6,10 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Admin;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Model.Options;
 using System.Data.Common;
 using Model.Error;
 using Model.Validation;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -17,22 +17,22 @@ namespace API.Options
 {
     public static partial class StartupExtensions
     {
-        public static IApplicationBuilder UseTokenInvalidatedMiddleware(this IApplicationBuilder app)
+        public static IApplicationBuilder UseInvalidatedTokenMiddleware(this IApplicationBuilder app)
         {
             var sp = app.ApplicationServices;
-            var cache = sp.GetRequiredService<ITokenInvalidatedCache>();
-            var logger = sp.GetRequiredService<ILogger<TokenInvalidatedMiddleware>>();
+            var cache = sp.GetRequiredService<IInvalidatedTokenCache>();
+            var logger = sp.GetRequiredService<ILogger<InvalidatedTokenMiddleware>>();
 
-            return app.UseMiddleware<TokenInvalidatedMiddleware>(cache, logger);
+            return app.UseMiddleware<InvalidatedTokenMiddleware>(cache, logger);
         }
 
-        class TokenInvalidatedMiddleware
+        class InvalidatedTokenMiddleware
         {
             readonly RequestDelegate next;
-            readonly ITokenInvalidatedCache cache;
-            readonly ILogger<TokenInvalidatedMiddleware> logger;
+            readonly IInvalidatedTokenCache cache;
+            readonly ILogger<InvalidatedTokenMiddleware> logger;
 
-            public TokenInvalidatedMiddleware(RequestDelegate next, ITokenInvalidatedCache cache, ILogger<TokenInvalidatedMiddleware> logger)
+            public InvalidatedTokenMiddleware(RequestDelegate next, IInvalidatedTokenCache cache, ILogger<InvalidatedTokenMiddleware> logger)
             {
                 this.next = next;
                 this.cache = cache;

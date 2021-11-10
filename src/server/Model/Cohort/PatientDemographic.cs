@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -24,7 +24,7 @@ namespace Model.Cohort
         [Field(Name = DemographicColumns.Gender, Type = LeafType.String, Required = true)]
         public string Gender { get; set; }
 
-        // NOTE(cspital) this gets calculated after sql runs, so there is no field for this
+        // NOTE(ndobb) this gets calculated after sql runs, so there is no field for this
         public int? Age { get; set; }
 
         [Field(Name = DemographicColumns.Language, Type = LeafType.String, Required = true)]

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,16 +12,16 @@ using Model.Authentication;
 
 namespace API.Jobs
 {
-    public class BackgroundTokenInvalidatedSynchronizer : BackgroundService
+    public class BackgroundInvalidatedTokenSynchronizer : BackgroundService
     {
-        readonly ITokenInvalidatedCache cache;
-        readonly ITokenInvalidatedService tokenInvalidatedService;
-        readonly ILogger<BackgroundTokenInvalidatedSynchronizer> logger;
+        readonly IInvalidatedTokenCache cache;
+        readonly IInvalidatedTokenService tokenInvalidatedService;
+        readonly ILogger<BackgroundInvalidatedTokenSynchronizer> logger;
 
-        public BackgroundTokenInvalidatedSynchronizer(
-            ITokenInvalidatedCache cache,
-            ITokenInvalidatedService tokenInvalidatedService,
-            ILogger<BackgroundTokenInvalidatedSynchronizer> logger)
+        public BackgroundInvalidatedTokenSynchronizer(
+            IInvalidatedTokenCache cache,
+            IInvalidatedTokenService tokenInvalidatedService,
+            ILogger<BackgroundInvalidatedTokenSynchronizer> logger)
         {
             this.cache = cache;
             this.tokenInvalidatedService = tokenInvalidatedService;
@@ -30,11 +30,11 @@ namespace API.Jobs
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is starting");
+            logger.LogInformation("BackgroundInvalidatedTokenSynchronizer is starting");
 
             stoppingToken.Register(() =>
             {
-                logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is stopped");
+                logger.LogInformation("BackgroundInvalidatedTokenSynchronizer is stopped");
             });
 
             while (!stoppingToken.IsCancellationRequested)
@@ -43,11 +43,11 @@ namespace API.Jobs
                 {
                     var list = await tokenInvalidatedService.GetInvalidated();
                     cache.Overwrite(list);
-                    logger.LogInformation("Refreshed TokenInvalidatedCache");
+                    logger.LogInformation("Refreshed InvalidatedTokenCache");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("Failed to refresh TokenInvalidatedCache. Error: {Error}", e.ToString());
+                    logger.LogError("Failed to refresh InvalidatedTokenCache. Error: {Error}", e.ToString());
                 }
                 finally
                 {
@@ -55,7 +55,7 @@ namespace API.Jobs
                 }
             }
 
-            logger.LogInformation("BackgroundTokenInvalidatedSynchronizer is stopped");
+            logger.LogInformation("BackgroundInvalidatedTokenSynchronizer is stopped");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +15,6 @@ using Microsoft.Extensions.Logging;
 using Model.Network;
 using Model.Admin.Network;
 
-// NOTE(cspital) this does not support clustered deployments yet....Redis impl incoming soon
 
 namespace API.Jobs
 {

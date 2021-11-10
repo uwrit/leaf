@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,15 +15,15 @@ using System.Collections.Generic;
 
 namespace Services.Authentication
 {
-    public class TokenInvalidatedService : ITokenInvalidatedService
+    public class TokenInvalidatedService : IInvalidatedTokenService
     {
-        const string queryInvalidated = @"auth.sp_BlacklistToken";
-        const string queryRefresh = @"auth.sp_RefreshTokenBlacklist";
+        const string queryInvalidated = @"auth.sp_InvalidateToken";
+        const string queryRefresh = @"auth.sp_RefreshInvalidatedTokenList";
 
         readonly AppDbOptions opts;
-        readonly ITokenInvalidatedCache invalidatedCache;
+        readonly IInvalidatedTokenCache invalidatedCache;
 
-        public TokenInvalidatedService(IOptions<AppDbOptions> dbOpts, ITokenInvalidatedCache invalidatedCache)
+        public TokenInvalidatedService(IOptions<AppDbOptions> dbOpts, IInvalidatedTokenCache invalidatedCache)
         {
             opts = dbOpts.Value;
             this.invalidatedCache = invalidatedCache;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -74,10 +74,10 @@ namespace API
 
             app.UseAuthentication();
 
-            // NOTE(cspital) Register HTTP Middleware here, in order of execution.
+            // NOTE(ndobb) Register HTTP Middleware here, in order of execution.
             app.UseUserContextLogging();
             app.UseRejectInvalidFederatedUserMiddleware();
-            app.UseTokenInvalidatedMiddleware();
+            app.UseInvalidatedTokenMiddleware();
 
             app.UseMvc();
         }

@@ -1,11 +1,11 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 
-// TODO(cspital) add ctors for dbexception and new interface describing errorcode and message requirements.
+// TODO(ndobb) add ctors for dbexception and new interface describing errorcode and message requirements.
 
 namespace Model.Error
 {

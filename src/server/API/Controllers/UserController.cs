@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -76,7 +76,7 @@ namespace API.Controllers
         [HttpGet("attest")]
         public ActionResult<AccessTokenDTO> Attest(
             [FromQuery] Attestation attestation,
-            [FromServices] ITokenInvalidatedCache invalidatedCache)
+            [FromServices] IInvalidatedTokenCache invalidatedCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -107,7 +107,7 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Access)]
         [Authorize(Policy = Access.Institutional)]
         [HttpGet("refresh")]
-        public ActionResult<AccessTokenDTO> Refresh([FromServices] ITokenInvalidatedCache invalidatedCache)
+        public ActionResult<AccessTokenDTO> Refresh([FromServices] IInvalidatedTokenCache invalidatedCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -138,7 +138,7 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Id)]
         [Authorize(Policy = Access.Institutional)]
         [HttpPost("logout")]
-        public async Task<ActionResult<LogoutDTO>> LogoutAsync([FromServices] ITokenInvalidatedService invalidatedService)
+        public async Task<ActionResult<LogoutDTO>> LogoutAsync([FromServices] IInvalidatedTokenService invalidatedService)
         {
             if (authenticationOptions.IsUnsecured || !authenticationOptions.Logout.Enabled)
             {
