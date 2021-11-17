@@ -15,18 +15,18 @@ using Model.Notification;
 
 namespace Services.Authentication
 {
-    public class AppStateService : IAppStateProvider
+    public class ServerStateService : IServerStateProvider
     {
-        const string queryRefresh = @"app.sp_GetAppStateAndNotifications";
+        const string queryRefresh = @"app.sp_GetServerStateAndNotifications";
 
         readonly AppDbOptions opts;
 
-        public AppStateService(IOptions<AppDbOptions> dbOpts)
+        public ServerStateService(IOptions<AppDbOptions> dbOpts)
         {
             opts = dbOpts.Value;
         }
 
-        public async Task<AppState> GetAppState()
+        public async Task<ServerState> GetServerState()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -42,12 +42,12 @@ namespace Services.Authentication
             }
         }
 
-        AppState Read(SqlMapper.GridReader grid)
+        ServerState Read(SqlMapper.GridReader grid)
         {
-            var appState = grid.Read<AppState>().First();
-            appState.Notifications = grid.Read<UserNotification>();
+            var state = grid.Read<ServerState>().First();
+            state.Notifications = grid.Read<UserNotification>();
 
-            return appState;
+            return state;
         }
     }
 }

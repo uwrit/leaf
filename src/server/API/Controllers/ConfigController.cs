@@ -24,7 +24,7 @@ namespace API.Controllers
         readonly ClientOptions clientOptions;
         readonly AttestationOptions attestationOptions;
         readonly DeidentificationOptions deidentOptions;
-        readonly IAppStateCache appStateCache;
+        readonly IServerStateCache serverStateCache;
 
         public ConfigController(
             IOptions<AuthenticationOptions> authenticationOptions,
@@ -33,7 +33,7 @@ namespace API.Controllers
             IOptions<ClientOptions> clientOptions,
             IOptions<AttestationOptions> attestationOptions,
             IOptions<DeidentificationOptions> deidentOptions,
-            IAppStateCache appStateCache)
+            IServerStateCache serverStateCache)
         {
             this.authenticationOptions = authenticationOptions.Value;
             this.versionOptions = versionOptions.Value;
@@ -41,13 +41,13 @@ namespace API.Controllers
             this.clientOptions = clientOptions.Value;
             this.attestationOptions = attestationOptions.Value;
             this.deidentOptions = deidentOptions.Value;
-            this.appStateCache = appStateCache;
+            this.serverStateCache = serverStateCache;
         }
 
-        [HttpGet("state")]
-        public AppState GetAppState()
+        [HttpGet("serverstate")]
+        public ServerStateDTO GetServerState()
         {
-            return appStateCache.GetAppState();
+            return new ServerStateDTO(serverStateCache.GetServerState());
         }
 
         public ActionResult<ConfigDTO> Get()

@@ -13,16 +13,19 @@ import { attemptLoginRetryIfPossible, removeSessionRetryKey } from '../services/
 import { setRouteConfig } from './generalUi';
 import { getRoutes } from '../config/routes';
 import { setSessionLoadState } from './session';
+import { ServerStateDTO } from '../models/state/ServerState';
 
 export const REQUEST_ID_TOKEN = 'REQUEST_ID_TOKEN';
 export const RECEIVE_ID_TOKEN = 'RECEIVE_ID_TOKEN';
 export const FAILURE_ID_TOKEN = 'FAILURE_ID_TOKEN';
 export const RECEIVE_AUTH_CONFIG = 'RECEIVE_AUTH_CONFIG';
+export const SET_SERVER_STATE = 'SET_SERVER_STATE';
 
 export interface AuthorizationAction {
     config?: AppConfig;
     message?: string;
     context?: UserContext;
+    serverState?: ServerStateDTO;
     type: string;
 }
 
@@ -106,5 +109,12 @@ export const failureIdToken = (message: string): AuthorizationAction => {
     return {
         message,
         type: FAILURE_ID_TOKEN
+    };
+};
+
+export const setServerState = (serverState: ServerStateDTO): AuthorizationAction => {
+    return {
+        serverState,
+        type: SET_SERVER_STATE
     };
 };

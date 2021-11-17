@@ -48,7 +48,7 @@ namespace Tests
             var opts = GetOptions();
             var identity = GetUserContext("johndoe@entity.tld");
 
-            var eProvider = new ActiveDirectoryEntitlementProvider(opts, mock);
+            var eProvider = new ActiveDirectoryEntitlementProvider(opts, Options.Create(new AuthorizationOptions()), mock);
 
             var e = eProvider.GetEntitlement(HttpHelper.GetHttpContext(), identity);
 

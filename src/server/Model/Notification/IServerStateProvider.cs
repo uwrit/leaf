@@ -4,21 +4,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Model.Notification
 {
-    public class AppState
+    public interface IServerStateProvider
     {
-        public bool IsUp { get; set; }
-        public string DowntimeMessage { get; set; }
-        public DateTime DowntimeUntil { get; set; }
-        public IEnumerable<UserNotification> Notifications;
-    }
-
-    public class UserNotification
-    {
-        public Guid Id { get; set; }
-        public string Message { get; set; }
+        Task<ServerState> GetServerState();
     }
 }

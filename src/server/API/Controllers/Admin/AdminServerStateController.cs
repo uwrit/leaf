@@ -20,40 +20,40 @@ namespace API.Controllers.Admin
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
     [Route("api/admin/state")]
-    public class AdminAppStateController : Controller
+    public class AdminServerStateController : Controller
     {
-        readonly ILogger<AdminAppStateController> log;
-        readonly AdminAppStateManager manager;
+        readonly ILogger<AdminServerStateController> log;
+        readonly AdminServerStateManager manager;
 
-        public AdminAppStateController(
-            AdminAppStateManager manager,
-            ILogger<AdminAppStateController> log)
+        public AdminServerStateController(
+            AdminServerStateManager manager,
+            ILogger<AdminServerStateController> log)
         {
             this.manager = manager;
             this.log = log;
         }
 
         [HttpGet]
-        public async Task<ActionResult<AdminAppState>> GetAppState()
+        public async Task<ActionResult<AdminServerState>> GetServerState()
         {
             try
             {
-                var state = await manager.GetAppStateAsync();
+                var state = await manager.GetServerStateAsync();
                 return Ok(state);
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to get AdminAppState. Error:{Error}", ex.ToString());
+                log.LogError("Failed to get AdminServerState. Error:{Error}", ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpPut]
-        public async Task<ActionResult<AdminAppState>> Update(AdminAppState appState)
+        public async Task<ActionResult<AdminServerState>> Update(AdminServerState state)
         {
             try
             {
-                var updated = await manager.UpdateAppStateAsync(appState);
+                var updated = await manager.UpdateServerStateAsync(state);
                 return Ok(updated);
             }
             catch (LeafRPCException le)
@@ -62,7 +62,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to update AdminAppState. AdminAppState:{@AdminAppState} Error:{Error}", appState, ex.ToString());
+                log.LogError("Failed to update AdminServerState. AdminServerState:{@AdminServerState} Error:{Error}", state, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

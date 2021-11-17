@@ -6,26 +6,20 @@
 using System;
 using System.Collections.Generic;
 
-namespace Model.Admin.Notification
+namespace Model.Notification
 {
-    public class AdminAppState
+    public class ServerState
     {
         public bool IsUp { get; set; }
         public string DowntimeMessage { get; set; }
+        public DateTime DowntimeFrom { get; set; }
         public DateTime DowntimeUntil { get; set; }
-        public DateTime Updated { get; set; }
-        public string UpdatedBy { get; set; }
-        public IEnumerable<AdminUserNotification> Notifications;
+        public IEnumerable<UserNotification> Notifications;
     }
 
-    public class AdminUserNotification
+    public class UserNotification
     {
         public Guid Id { get; set; }
         public string Message { get; set; }
-        public DateTime Until { get; set; }
-        public DateTime Created { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime Updated { get; set; }
-        public string UpdatedBy { get; set; }
     }
 }

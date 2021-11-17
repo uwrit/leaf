@@ -11,14 +11,15 @@ import { AccessTokenDTO, Attestation, DecodedAccessToken, SessionContext, Stored
 import { HttpFactory } from './HttpFactory';
 import { LogoutDTO } from '../models/Auth';
 import { getPanelItemCount } from '../utils/panelUtils';
+import { ServerStateDTO } from '../models/state/ServerState';
+import axios from 'axios';
 
 /*
  * Decodes the session JWT to pull out server-sent
  * info on whether user is an admin, token lifespan, etc.
  */
-const decodeToken = (token: string): SessionContext => {
+export const decodeToken = (token: string): SessionContext => {
     const decoded: DecodedAccessToken = jwt_decode(token);
-
     const ctx: SessionContext = {
         expirationDate: new Date(decoded.exp * 1000),
         issueDate: new Date(decoded.iat * 1000),
@@ -69,7 +70,39 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 };
 
 /*
- * Tells the server to blacklist this token, as the uses is logging out.
+ * Gets current server state.
+ */
+export const getServerState = (): Promise<ServerStateDTO> => {
+    return new Promise( async (resolve, reject) => {
+        const request = axios.get('api/config/serverstate');
+        const response = await request;
+        resolve(response.data as ServerStateDTO);
+    });
+};
+
+/*
+ * 
+ */
+export const getViewedNotifications = (): string[] => {
+    const key = getViewedNotificationsKey();
+    let idsJson = window.localStorage.getItem(key);
+
+    if (idsJson) {
+        return JSON.parse(idsJson);
+    } else {
+        var ids: string[] = [];
+        window.localStorage.setItem(key, JSON.stringify(ids));
+        return ids;
+    }
+};
+
+export const syncViewedNotifications = (ids: string) => {
+    const key = getViewedNotificationsKey();
+    window.localStorage.setItem(key, JSON.stringify(ids));
+};
+
+/*
+ * Tells the server to invalidate this token, as the uses is logging out.
  */
 export const logoutFromServer = async (state: AppState): Promise<LogoutDTO | undefined> => {
     try {
@@ -164,3 +197,4 @@ const getStoredSessionObject = (state: AppState): StoredSessionState => {
 
 const getSessionStorageKey = (state: AppState) => `__leaf_session_v${state.auth.config!.version}_${window.location.pathname}__`;
 const getSessionRetryKey = () => `__leaf_session_retry__`;
+const getViewedNotificationsKey = () => `__leaf_viewed_notifications__`;

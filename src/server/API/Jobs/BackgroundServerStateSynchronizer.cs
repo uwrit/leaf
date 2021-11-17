@@ -12,42 +12,42 @@ using Model.Notification;
 
 namespace API.Jobs
 {
-    public class BackgroundAppStateSynchronizer : BackgroundService
+    public class BackgroundServerStateSynchronizer : BackgroundService
     {
-        readonly IAppStateCache cache;
-        readonly IAppStateProvider appStateProvider;
+        readonly IServerStateCache cache;
+        readonly IServerStateProvider serverStateProvider;
         readonly ILogger<BackgroundInvalidatedTokenSynchronizer> logger;
 
-        public BackgroundAppStateSynchronizer(
-            IAppStateCache cache,
-            IAppStateProvider appStateProvider,
+        public BackgroundServerStateSynchronizer(
+            IServerStateCache cache,
+            IServerStateProvider serverStateProvider,
             ILogger<BackgroundInvalidatedTokenSynchronizer> logger)
         {
             this.cache = cache;
-            this.appStateProvider = appStateProvider;
+            this.serverStateProvider = serverStateProvider;
             this.logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            logger.LogInformation("BackgroundAppStateSynchronizer is starting");
+            logger.LogInformation("BackgroundServerStateSynchronizer is starting");
 
             stoppingToken.Register(() =>
             {
-                logger.LogInformation("BackgroundAppStateSynchronizer is stopped");
+                logger.LogInformation("BackgroundServerStateSynchronizer is stopped");
             });
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
                 {
-                    var newState = await appStateProvider.GetAppState();
+                    var newState = await serverStateProvider.GetServerState();
                     cache.Overwrite(newState);
-                    logger.LogInformation("Refreshed AppState");
+                    logger.LogInformation("Refreshed ServerState");
                 }
                 catch (Exception e)
                 {
-                    logger.LogError("Failed to refresh AppStateCache. Error: {Error}", e.ToString());
+                    logger.LogError("Failed to refresh ServerStateCache. Error: {Error}", e.ToString());
                 }
                 finally
                 {
@@ -55,7 +55,7 @@ namespace API.Jobs
                 }
             }
 
-            logger.LogInformation("BackgroundAppStateSynchronizer is stopped");
+            logger.LogInformation("BackgroundServerStateSynchronizer is stopped");
         }
     }
 }

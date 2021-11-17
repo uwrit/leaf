@@ -12,7 +12,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { attestAndLoadSession } from '../../actions/session';
 import AttestationContent from '../../components/Attestation/AttestationContent';
 import AttestationFooter from '../../components/Attestation/AttestationFooter';
-import { AppState } from '../../models/state/AppState';
+import { AppState, AuthorizationState } from '../../models/state/AppState';
 import { Attestation as AttestationModel, DocumentationApproval, SessionType } from '../../models/Session';
 import { UserContext, AppConfig } from '../../models/Auth';
 import { getBrowser } from '../../utils/browser';
@@ -23,18 +23,21 @@ import moment from 'moment';
 import { version } from '../../../package.json'
 import CustomAttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
 import StandardAttestationConfirmation from '../../components/Attestation/StandardAttestationConfirmation';
+import { ServerState } from '../../models/state/ServerState';
+import { IoMdConstruct } from 'react-icons/io';
 import './Attestation.css';
 
 interface DispatchProps {
     dispatch: any;
 }
 interface StateProps {
-    authError?: string;
+    auth: AuthorizationState;
     browser?: Browser;
     config?: AppConfig;
     hasAttested: boolean;
     hasUserIdToken: boolean;
     isSubmittingAttestation: boolean;
+    serverState?: ServerState,
     sessionError?: boolean;
     sessionLoadDisplay: string;
     sessionLoadProgressPercent: number;
@@ -100,14 +103,21 @@ class Attestation extends React.PureComponent<Props, State> {
 
     public render() {
         const { sessionTypeSelected, documentationStatusSelected, identificationTypeSelected, attestation } = this.state;
-        const { sessionLoadProgressPercent, hasAttested, isSubmittingAttestation, hasUserIdToken, authError, sessionError, sessionLoadDisplay, userContext, browser, config } = this.props;
+        const { 
+            sessionLoadProgressPercent, hasAttested, isSubmittingAttestation, hasUserIdToken, auth, 
+            sessionError, sessionLoadDisplay, userContext, browser, config, serverState
+        } = this.props;
         const browserError = browser && browser.error;
         const c = this.className;
         const showConfirmation = sessionTypeSelected && documentationStatusSelected && identificationTypeSelected;
         const showContent = !showConfirmation;
-        const progressBarClasses = [ 'leaf-progressbar', 'animate', 'attestation-progressbar' ]
+        const progressBarClasses = [ 'leaf-progressbar', 'animate', 'attestation-progressbar' ];
+        const showDowntime = serverState && !serverState.isUp && auth && auth.userContext;// && !auth.userContext.isAdmin;
         
-        if (isSubmittingAttestation || !hasUserIdToken) {
+        /**
+         * Show progress bar if waiting on data from server
+         */
+        if (isSubmittingAttestation || !hasUserIdToken || !serverState) {
             progressBarClasses.push('show');
             if (!hasUserIdToken) {
                 progressBarClasses.push('slow');
@@ -145,9 +155,9 @@ class Attestation extends React.PureComponent<Props, State> {
                 </div>
                 }
                 <ModalBody className={`${c}-body`}>
-                    {authError && 
+                    {auth.error && 
                     <div className={`${c}-error-text`}>
-                        <p>{authError}</p>
+                        <p>{auth.error}</p>
                     </div>
                     }
                     {sessionError && 
@@ -155,10 +165,24 @@ class Attestation extends React.PureComponent<Props, State> {
                         <p>{sessionLoadDisplay}</p>
                     </div>
                     }
+                    {showDowntime && 
+                    <div className={`${c}-downtime-text`}>
+                        <div><IoMdConstruct/></div>
+                        {serverState.downtimeMessage && 
+                            <p>{serverState.downtimeMessage}</p>
+                        }
+                        {!serverState.downtimeMessage &&
+                            <div>
+                                <p>The Leaf server is currently down for maintenance. Please check back again soon, or email your Leaf Administrator for more information.</p>
+                                <p>Thank you and we apologize for the inconvenience.</p>
+                            </div>
+                        }
+                    </div>
+                    }
                     {browserError && 
                     <BrowserError />
                     }
-                    {hasUserIdToken && !sessionError && !browserError && [   
+                    {hasUserIdToken && !sessionError && !browserError && !showDowntime && [   
                     (<AttestationContent 
                         allowPhiIdentified={this.allowPhiIdentified}
                         parentState={this.state}
@@ -343,12 +367,13 @@ class Attestation extends React.PureComponent<Props, State> {
 const mapStateToProps = (state: AppState): StateProps => {
     const { auth, session } = state;
     return { 
-        authError: auth.error,
+        auth: auth,
         browser: state.generalUi.browser,
         config: state.auth.config,
         hasAttested: session.hasAttested,
         hasUserIdToken: !!auth.userContext,
         isSubmittingAttestation: session.isSubmittingAttestation,
+        serverState: state.auth.serverState,
         sessionError: session.error,
         sessionLoadDisplay: session.loadingDisplay,
         sessionLoadProgressPercent: session.loadingProgressPercent,

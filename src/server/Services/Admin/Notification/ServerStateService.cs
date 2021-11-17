@@ -17,46 +17,46 @@ using System.Collections.Generic;
 
 namespace Services.Admin.Notification
 {
-    public class AdminAppStateService : AdminAppStateManager.IAdminAppStateService
+    public class AdminServerStateService : AdminServerStateManager.IAdminServerStateService
     {
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminAppStateService(IOptions<AppDbOptions> opts, IUserContext userContext)
+        public AdminServerStateService(IOptions<AppDbOptions> opts, IUserContext userContext)
         {
             this.opts = opts.Value;
             this.user = userContext;
         }
 
-        public async Task<AdminAppState> GetAppStateAsync()
+        public async Task<AdminServerState> GetServerStateAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var appState = await cn.QueryFirstOrDefaultAsync<AdminAppState>(
-                    Sql.GetAppState,
+                var state = await cn.QueryFirstOrDefaultAsync<AdminServerState>(
+                    Sql.GetServerState,
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                return appState;
+                return state;
             }
         }
 
-        public async Task<AdminAppState> UpdateAppStateAsync(AdminAppState appState)
+        public async Task<AdminServerState> UpdateServerStateAsync(AdminServerState state)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var updated = await cn.QueryFirstOrDefaultAsync<AdminAppState>(
-                    Sql.UpdateAppState,
+                var updated = await cn.QueryFirstOrDefaultAsync<AdminServerState>(
+                    Sql.UpdateServerState,
                     new
                     {
                         user = user.UUID,
-                        isUp = appState.IsUp,
-                        downtimeMessage = appState.DowntimeMessage,
-                        downtimeUntil = appState.DowntimeUntil
+                        isUp = state.IsUp,
+                        downtimeMessage = state.DowntimeMessage,
+                        downtimeUntil = state.DowntimeUntil
                     },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
@@ -104,8 +104,8 @@ namespace Services.Admin.Notification
 
         class Sql
         {
-            public const string GetAppState = "adm.sp_GetAppState";
-            public const string UpdateAppState = "adm.sp_UpdateAppState";
+            public const string GetServerState = "adm.sp_GetServerState";
+            public const string UpdateServerState = "adm.sp_UpdateServerState";
             public const string GetNotifications = "adm.sp_GetUserNotifications";
             public const string UpsertNotification = "adm.sp_UpsertNotifications";
         }

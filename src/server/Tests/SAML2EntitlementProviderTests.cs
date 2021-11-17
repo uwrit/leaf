@@ -50,7 +50,7 @@ namespace Tests
                 Admin = "leaf_admin"
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
-            var eProvider = new SAML2EntitlementProvider(opts);
+            var eProvider = new SAML2EntitlementProvider(opts, Options.Create(new AuthorizationOptions()));
             var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users; leaf_admin; surgery"));
             var identity = GetUserContext("johndoe@entity.tld");
 
@@ -80,7 +80,7 @@ namespace Tests
                 Admin = "leaf_admin"
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
-            var eProvider = new SAML2EntitlementProvider(opts);
+            var eProvider = new SAML2EntitlementProvider(opts, Options.Create(new AuthorizationOptions()));
             var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users"));
             var identity = GetUserContext("johndoe@entity.tld");
 
@@ -108,7 +108,7 @@ namespace Tests
                 Admin = "leaf_admin"
             };
             var opts = GetAuthOptions(headerDigestion, roleMapping);
-            var eProvider = new SAML2EntitlementProvider(opts);
+            var eProvider = new SAML2EntitlementProvider(opts, Options.Create(new AuthorizationOptions()));
             var ctx = HttpHelper.GetHttpContext(("iam-groups", "leaf_users"));
             var identity = GetUserContext("johndoe@entity.tld");
 

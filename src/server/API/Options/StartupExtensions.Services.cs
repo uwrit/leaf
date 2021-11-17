@@ -69,7 +69,7 @@ namespace API.Options
 
             services.AddIAMServices();
 
-            services.AddHostedService<BackgroundAppStateSynchronizer>();
+            services.AddHostedService<BackgroundServerStateSynchronizer>();
 
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
 
@@ -93,8 +93,8 @@ namespace API.Options
                 services.AddHostedService<BackgroundCertificateSynchronizer>();
             }
 
-            services.AddSingleton<IAppStateCache, AppStateCache>();
-            services.AddSingleton<IAppStateProvider, AppStateService>();
+            services.AddSingleton<IServerStateCache, ServerStateCache>();
+            services.AddSingleton<IServerStateProvider, ServerStateService>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
@@ -125,7 +125,7 @@ namespace API.Options
 
         static IServiceCollection AddAdminServices(this IServiceCollection services)
         {
-            services.AddTransient<AdminAppStateManager.IAdminAppStateService, AdminAppStateService>();
+            services.AddTransient<AdminServerStateManager.IAdminServerStateService, AdminServerStateService>();
             services.AddTransient<AdminConceptSqlSetManager.IAdminConceptSqlSetService, AdminConceptSqlSetService>();
             services.AddTransient<AdminSpecializationManager.IAdminSpecializationService, AdminSpecializationService>();
             services.AddTransient<AdminSpecializationGroupManager.IAdminSpecializationGroupService, AdminSpecializationGroupService>();

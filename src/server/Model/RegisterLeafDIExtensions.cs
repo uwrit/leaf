@@ -44,7 +44,7 @@ namespace Model
             services.AddTransient<PanelDatasetProvider>();
             services.AddTransient<PanelDatasetCompilerValidationContextProvider>();
 
-            services.AddTransient<AdminAppStateManager>();
+            services.AddTransient<AdminServerStateManager>();
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();
             services.AddTransient<AdminSpecializationGroupManager>();

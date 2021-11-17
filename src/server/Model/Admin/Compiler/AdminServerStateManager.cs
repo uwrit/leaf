@@ -13,44 +13,44 @@ using Model.Admin.Notification;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminAppStateManager
+    public class AdminServerStateManager
     {
-        public interface IAdminAppStateService
+        public interface IAdminServerStateService
         {
-            Task<AdminAppState> GetAppStateAsync();
-            Task<AdminAppState> UpdateAppStateAsync(AdminAppState appState);
+            Task<AdminServerState> GetServerStateAsync();
+            Task<AdminServerState> UpdateServerStateAsync(AdminServerState serverState);
             Task<IEnumerable<AdminUserNotification>> GetUserNotificationsAsync();
             Task<AdminUserNotification> UpsertUserNotificationAsync(AdminUserNotification notification);
         }
 
-        readonly IAdminAppStateService svc;
-        readonly ILogger<AdminAppStateManager> log;
+        readonly IAdminServerStateService svc;
+        readonly ILogger<AdminServerStateManager> log;
 
-        public AdminAppStateManager(
-            IAdminAppStateService service,
-            ILogger<AdminAppStateManager> log)
+        public AdminServerStateManager(
+            IAdminServerStateService service,
+            ILogger<AdminServerStateManager> log)
         {
             svc = service;
             this.log = log;
         }
 
-        public async Task<AdminAppState> GetAppStateAsync()
+        public async Task<AdminServerState> GetServerStateAsync()
         {
-            log.LogInformation("Getting AppState.");
-            return await svc.GetAppStateAsync();
+            log.LogInformation("Getting ServerState.");
+            return await svc.GetServerStateAsync();
         }
 
-        public async Task<AdminAppState> UpdateAppStateAsync(AdminAppState appState)
+        public async Task<AdminServerState> UpdateServerStateAsync(AdminServerState state)
         {
             try
             {
-                var updated = await svc.UpdateAppStateAsync(appState);
-                log.LogInformation("Updated AppState. AppState:{@AppState}", updated);
+                var updated = await svc.UpdateServerStateAsync(state);
+                log.LogInformation("Updated ServerState. ServerState:{@ServerState}", updated);
                 return updated;
             }
             catch (DbException db)
             {
-                log.LogError("Failed to update AppState. AppState:{@AppState} Code:{Code} Error:{Error}", appState, db.ErrorCode, db.Message);
+                log.LogError("Failed to update ServerState. ServerState:{@ServerState} Code:{Code} Error:{Error}", state, db.ErrorCode, db.Message);
                 db.MapThrow();
                 throw;
             }

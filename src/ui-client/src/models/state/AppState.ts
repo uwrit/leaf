@@ -20,13 +20,16 @@ import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 import ImportState from "./Import";
+import { ServerState } from "./ServerState";
 
 export type ConceptMap = Map<string, Concept>;
 
 export interface AuthorizationState {
     config?: AppConfig;
     error?: string;
+    serverState?: ServerState;
     userContext?: UserContext;
+    viewedNotifications: string[];
 }
 
 export interface ConceptsState {

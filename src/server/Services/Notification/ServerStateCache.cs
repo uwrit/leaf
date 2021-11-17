@@ -9,35 +9,35 @@ using System.Threading;
 
 namespace API.Jwt
 {
-    public class AppStateCache : IAppStateCache
+    public class ServerStateCache : IServerStateCache
     {
         readonly ReaderWriterLockSlim sync;
-        private AppState appState;
+        private ServerState serverState;
 
-        public AppStateCache()
+        public ServerStateCache()
         {
             sync = new ReaderWriterLockSlim();
-            appState = new AppState();
+            serverState = new ServerState();
         }
 
-        public AppStateCache(AppState initialState)
+        public ServerStateCache(ServerState initialState)
         {
             sync = new ReaderWriterLockSlim();
-            appState = initialState;
+            serverState = initialState;
         }
 
-        public AppState GetAppState()
+        public ServerState GetServerState()
         {
-            return appState;
+            return serverState;
         }
 
-        public void Overwrite(AppState newState)
+        public void Overwrite(ServerState newState)
         {
             sync.EnterWriteLock();
             try
             {
 
-                appState = newState;
+                serverState = newState;
             }
             finally
             {
