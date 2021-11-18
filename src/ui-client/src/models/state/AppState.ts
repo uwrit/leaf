@@ -29,7 +29,7 @@ export interface AuthorizationState {
     error?: string;
     serverState?: ServerState;
     userContext?: UserContext;
-    viewedNotifications: string[];
+    viewedNotifications: Set<string>;
 }
 
 export interface ConceptsState {

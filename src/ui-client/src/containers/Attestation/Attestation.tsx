@@ -112,7 +112,7 @@ class Attestation extends React.PureComponent<Props, State> {
         const showConfirmation = sessionTypeSelected && documentationStatusSelected && identificationTypeSelected;
         const showContent = !showConfirmation;
         const progressBarClasses = [ 'leaf-progressbar', 'animate', 'attestation-progressbar' ];
-        const showDowntime = serverState && !serverState.isUp && auth && auth.userContext;// && !auth.userContext.isAdmin;
+        const showDowntime = serverState && !serverState.isUp && auth && auth.userContext && !auth.userContext.isAdmin;
         
         /**
          * Show progress bar if waiting on data from server

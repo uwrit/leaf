@@ -20,9 +20,11 @@ export const RECEIVE_ID_TOKEN = 'RECEIVE_ID_TOKEN';
 export const FAILURE_ID_TOKEN = 'FAILURE_ID_TOKEN';
 export const RECEIVE_AUTH_CONFIG = 'RECEIVE_AUTH_CONFIG';
 export const SET_SERVER_STATE = 'SET_SERVER_STATE';
+export const SET_USER_NOTIFICATIONS_SEEN = 'SET_USER_NOTIFICATIONS';
 
 export interface AuthorizationAction {
     config?: AppConfig;
+    dontShowNotificationsAgain?: boolean;
     message?: string;
     context?: UserContext;
     serverState?: ServerStateDTO;
@@ -116,5 +118,12 @@ export const setServerState = (serverState: ServerStateDTO): AuthorizationAction
     return {
         serverState,
         type: SET_SERVER_STATE
+    };
+};
+
+export const setUserNotificationsSeen = (dontShowNotificationsAgain: boolean): AuthorizationAction => {
+    return {
+        dontShowNotificationsAgain,
+        type: SET_USER_NOTIFICATIONS_SEEN
     };
 };

@@ -5,7 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import moment from 'moment';
 import React from 'react';
 
 import { connect } from 'react-redux';
@@ -36,6 +35,8 @@ import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
 import { sleep } from '../utils/Sleep';
 import './App.css';
+import NotificationModal from '../components/Modals/NotificationModal/NotificationModal';
+import MaintainenceModal from '../components/Modals/MaintainenceModal/MaintainenceModal';
 
 
 interface OwnProps {
@@ -62,12 +63,10 @@ interface StateProps {
 
 type Props = StateProps & DispatchProps & OwnProps;
 let inactivityTimer: NodeJS.Timer;
-let sessionTimer: NodeJS.Timer;
-let serverStateTime: NodeJS.Timer;
 
 class App extends React.Component<Props> {
     private sessionTokenRefreshMinutes = 4;
-    private serverStateCheckIntervalMinutes = 5;
+    private serverStateCheckIntervalMinutes = 1;
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
 
@@ -120,6 +119,12 @@ class App extends React.Component<Props> {
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
+                {auth.serverState && 
+                <NotificationModal dispatch={dispatch} />
+                }
+                {session.context && !auth.serverState.isUp && session.hasAttested && auth.userContext.isAdmin &&
+                <MaintainenceModal />
+                }
             </div>
         );
     }

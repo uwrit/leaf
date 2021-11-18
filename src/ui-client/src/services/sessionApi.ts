@@ -81,24 +81,27 @@ export const getServerState = (): Promise<ServerStateDTO> => {
 };
 
 /*
- * 
+ * Get IDs for all notifications user has seen.
  */
-export const getViewedNotifications = (): string[] => {
+export const getViewedNotifications = (): Set<string> => {
     const key = getViewedNotificationsKey();
     let idsJson = window.localStorage.getItem(key);
 
     if (idsJson) {
-        return JSON.parse(idsJson);
+        return new Set(JSON.parse(idsJson));
     } else {
         var ids: string[] = [];
         window.localStorage.setItem(key, JSON.stringify(ids));
-        return ids;
+        return new Set(ids);
     }
 };
 
-export const syncViewedNotifications = (ids: string) => {
+/*
+ * Update IDs for all notifications user has seen.
+ */
+export const syncViewedNotifications = (ids: Set<string>) => {
     const key = getViewedNotificationsKey();
-    window.localStorage.setItem(key, JSON.stringify(ids));
+    window.localStorage.setItem(key, JSON.stringify(Array.from(ids)));
 };
 
 /*

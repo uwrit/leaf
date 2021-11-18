@@ -6,16 +6,17 @@ SET [Version] = '3.10.1'
 GO
 
 /**
- * [app].[AppState]
+ * [app].[ServerState]
  */
-IF OBJECT_ID('app.AppState') IS NOT NULL
-	DROP TABLE [app].[AppState];
+IF OBJECT_ID('app.ServerState') IS NOT NULL
+	DROP TABLE [app].[ServerState];
 GO
 
-CREATE TABLE [app].[AppState](
+CREATE TABLE [app].[ServerState](
 	[Lock] [char](1) NOT NULL,
     [IsUp] BIT NOT NULL,
     [DowntimeMessage] NVARCHAR(2000) NULL,
+    [DowntimeFrom] DATETIME NULL,
     [DowntimeUntil] DATETIME NULL,
     [Updated] DATETIME NOT NULL,
     [UpdatedBy] NVARCHAR(1000)
@@ -23,19 +24,19 @@ CREATE TABLE [app].[AppState](
 GO
 SET ANSI_PADDING ON
 GO
-ALTER TABLE [app].[AppState] ADD  CONSTRAINT [PK_AppState] PRIMARY KEY CLUSTERED 
+ALTER TABLE [app].[ServerState] ADD  CONSTRAINT [PK_ServerState] PRIMARY KEY CLUSTERED 
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
-ALTER TABLE [app].[AppState] ADD  CONSTRAINT [DF_AppState_Lock]  DEFAULT ('X') FOR [Lock]
+ALTER TABLE [app].[ServerState] ADD  CONSTRAINT [DF_ServerState_Lock]  DEFAULT ('X') FOR [Lock]
 GO
-ALTER TABLE [app].[AppState]  WITH CHECK ADD  CONSTRAINT [CK_AppState_1] CHECK  (([Lock]='X'))
+ALTER TABLE [app].[ServerState]  WITH CHECK ADD  CONSTRAINT [CK_ServerState_1] CHECK  (([Lock]='X'))
 GO
-ALTER TABLE [app].[AppState] CHECK CONSTRAINT [CK_AppState_1]
+ALTER TABLE [app].[ServerState] CHECK CONSTRAINT [CK_ServerState_1]
 GO
 
-INSERT INTO app.AppState (Lock, IsUp, Updated, UpdatedBy)
+INSERT INTO app.ServerState (Lock, IsUp, Updated, UpdatedBy)
 SELECT 'X', 1, GETDATE(), 'Leaf Migration Script'
 
 
@@ -68,10 +69,10 @@ ALTER TABLE [app].[Notification] ADD  CONSTRAINT [DF_Notification_Id]  DEFAULT (
 GO
 
 /*
- * [app].[sp_GetAppStateAndNotifications]
+ * [app].[sp_GetServerStateAndNotifications]
  */
-IF OBJECT_ID('app.sp_GetAppStateAndNotifications', 'P') IS NOT NULL
-    DROP PROCEDURE [app].[sp_GetAppStateAndNotifications];
+IF OBJECT_ID('app.sp_GetServerStateAndNotifications', 'P') IS NOT NULL
+    DROP PROCEDURE [app].[sp_GetServerStateAndNotifications];
 GO
 
 -- =======================================
@@ -79,17 +80,26 @@ GO
 -- Create date: 2021/11/2
 -- Description: Gets app state and notifications, first deleting old notifications
 -- =======================================
-CREATE PROCEDURE [app].[sp_GetAppStateAndNotifications]
+CREATE PROCEDURE [app].[sp_GetServerStateAndNotifications]
 AS
 BEGIN
     SET NOCOUNT ON
 
+    -- Delete stale messages
     DELETE FROM app.Notification
     WHERE Until < GETDATE()
 
-    -- App state
-    SELECT IsUp, DowntimeMessage, DowntimeUntil
-    FROM app.AppState
+    -- Set IsUp = 1 if downtime has passed
+    UPDATE app.ServerState
+    SET IsUp = 1
+      , DowntimeFrom    = NULL
+      , DowntimeUntil   = NULL
+      , DowntimeMessage = NULL
+    WHERE DowntimeUntil < GETDATE()
+
+    -- Server state
+    SELECT IsUp, DowntimeMessage, DowntimeFrom, DowntimeUntil
+    FROM app.ServerState
 
     -- Notifications
     SELECT Id, [Message]
@@ -99,10 +109,10 @@ END
 GO
 
 /*
- * [adm].[sp_GetAppState]
+ * [adm].[sp_GetServerState]
  */
-IF OBJECT_ID('adm.sp_GetAppState', 'P') IS NOT NULL
-    DROP PROCEDURE [adm].[sp_GetAppState];
+IF OBJECT_ID('adm.sp_GetServerState', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_GetServerState];
 GO
 
 -- =======================================
@@ -110,22 +120,22 @@ GO
 -- Create date: 2021/11/2
 -- Description: Gets app state
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetAppState]
+CREATE PROCEDURE [adm].[sp_GetServerState]
 AS
 BEGIN
     SET NOCOUNT ON
 
-    SELECT IsUp, DowntimeMessage, DowntimeUntil, Updated, UpdatedBy
-    FROM app.AppState
+    SELECT IsUp, DowntimeMessage, DowntimeFrom, DowntimeUntil, Updated, UpdatedBy
+    FROM app.ServerState
 
 END
 GO
 
 /*
- * [adm].[sp_UpdateAppState]
+ * [adm].[sp_UpdateServerState]
  */
-IF OBJECT_ID('adm.sp_UpdateAppState', 'P') IS NOT NULL
-    DROP PROCEDURE [adm].[sp_UpdateAppState];
+IF OBJECT_ID('adm.sp_UpdateServerState', 'P') IS NOT NULL
+    DROP PROCEDURE [adm].[sp_UpdateServerState];
 GO
 
 -- =======================================
@@ -133,18 +143,20 @@ GO
 -- Create date: 2021/11/2
 -- Description: Sets app state
 -- =======================================
-CREATE PROCEDURE [adm].[sp_UpdateAppState]
+CREATE PROCEDURE [adm].[sp_UpdateServerState]
     @user NVARCHAR(100),
     @isUp BIT,
     @downtimeMessage NVARCHAR(2000),
+    @downtimeFrom DATETIME,
     @downtimeUntil DATETIME
 AS
 BEGIN
     SET NOCOUNT ON
 
-    UPDATE app.AppState
+    UPDATE app.ServerState
     SET IsUp = @isUp
       , DowntimeMessage = @downtimeMessage
+      , DowntimeFrom = @downtimeFrom
       , DowntimeUntil = @downtimeUntil
       , Updated = GETDATE()
       , UpdatedBy = @user
