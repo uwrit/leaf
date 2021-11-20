@@ -26,8 +26,9 @@ namespace Services.Tables
         const string orderId = "OrderId";
         const string type = "Type";
         const string textContent = "TextContent";
-        const string imageContent = "ImageContent";
         const string imageId = "ImageId";
+        const string imageContent = "ImageContent";
+        const string imageSize = "ImageSize";
 
         HelpContentTable(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
         {
@@ -47,8 +48,9 @@ namespace Services.Tables
             cols.Add(new DataColumn(orderId, typeof(int)));
             cols.Add(new DataColumn(type, typeof(string)));
             cols.Add(new DataColumn(textContent, typeof(string)));
-            cols.Add(new DataColumn(imageContent, typeof(byte[])));
             cols.Add(new DataColumn(imageId, typeof(string)));
+            cols.Add(new DataColumn(imageContent, typeof(byte[])));
+            cols.Add(new DataColumn(imageSize, typeof(int)));
 
             return dt;
         }
@@ -64,8 +66,9 @@ namespace Services.Tables
                 row[orderId] = r.OrderId;
                 row[type] = r.Type;
                 row[textContent] = r.TextContent;
-                row[imageContent] = r.ImageContent;
                 row[imageId] = r.ImageId;
+                row[imageContent] = r.ImageContent;
+                row[imageSize] = r.ImageSize;
                 table.Rows.Add(row);
             }
         }

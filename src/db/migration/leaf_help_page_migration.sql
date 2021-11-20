@@ -1,4 +1,11 @@
+USE [LeafDB] -- replace with site DB
+GO
+
 -- TABLES
+
+DROP TABLE IF EXISTS [app].[HelpPageContent]
+DROP TABLE IF EXISTS [app].[HelpPage]
+DROP TABLE IF EXISTS [app].[HelpPageCategory]
 
 -- Create table listing categories
 DROP TABLE IF EXISTS [app].[HelpPageCategory]
@@ -33,8 +40,9 @@ CREATE TABLE [app].[HelpPageContent] (
     OrderId INT NOT NULL,
     Type NVARCHAR(255) NOT NULL,
     TextContent NVARCHAR(MAX) NULL,
+    ImageId NVARCHAR(255) NULL,
     ImageContent VARBINARY(MAX) NULL,
-    ImageId NVARCHAR(255) NULL
+    ImageSize INT NULL
 )
 GO
 
@@ -98,8 +106,9 @@ CREATE TYPE [adm].[HelpContentTable] AS TABLE(
 	[OrderId] [INT] NOT NULL,
 	[Type] [NVARCHAR](255) NOT NULL,
 	[TextContent] [NVARCHAR](MAX) NULL,
-	[ImageContent] [VARBINARY](MAX) NULL,
-	[ImageId] [NVARCHAR](255) NULL
+	[ImageId] [NVARCHAR](255) NULL,
+    [ImageContent] [VARBINARY](MAX) NULL,
+    [ImageSize] [INT] NULL
 )
 GO
 
@@ -123,7 +132,7 @@ BEGIN
     FROM app.HelpPageCategory
     WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @id)
 
-    SELECT Id, PageId, OrderId, Type, TextContent, ImageContent, ImageId
+    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @id
 END
@@ -178,8 +187,8 @@ BEGIN
     DELETE FROM app.HelpPageContent
     WHERE PageId = @pageId
 
-    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageContent, ImageId)
-    SELECT PageId, OrderId, Type, TextContent, ImageContent, ImageId
+    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
+    SELECT PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
     EXEC adm.sp_GetHelpPageAndContent @pageId
@@ -229,10 +238,10 @@ BEGIN
     DECLARE @pageId UNIQUEIDENTIFIER;
     SELECT @pageId = PageId FROM @pageIdTable;
 
-    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageContent, ImageId)
+    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
     SELECT
         PageId = (CASE WHEN PageId IS NULL THEN (SELECT Id FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId) ELSE @pageId END),
-        OrderId, Type, TextContent, ImageContent, ImageId
+        OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
     EXEC adm.sp_GetHelpPageAndContent @pageId

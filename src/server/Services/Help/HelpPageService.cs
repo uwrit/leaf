@@ -90,8 +90,9 @@ namespace Services.Help
                     OrderId = c.OrderId,
                     Type = c.Type,
                     TextContent = c.TextContent,
+                    ImageId = c.ImageId,
                     ImageContent = c.ImageContent,
-                    ImageId = c.ImageId
+                    ImageSize = c.ImageSize
                 });
             }
         }

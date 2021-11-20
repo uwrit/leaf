@@ -15,8 +15,9 @@ namespace API.DTO.Compiler
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
-        public byte[] ImageContent { get; set; }
         public string ImageId { get; set; }
+        public byte[] ImageContent { get; set; }
+        public int ImageSize { get; set; }
 
         public HelpPageContentDTO() { }
 
@@ -27,8 +28,9 @@ namespace API.DTO.Compiler
             OrderId = content.OrderId;
             Type = content.Type;
             TextContent = content.TextContent;
-            ImageContent = content.ImageContent;
             ImageId = content.ImageId;
+            ImageContent = content.ImageContent;
+            ImageSize = content.ImageSize;
         }
     }
 }

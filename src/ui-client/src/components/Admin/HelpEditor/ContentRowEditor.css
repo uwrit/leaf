@@ -15,12 +15,9 @@
     border-left: 3px solid transparent;
     cursor: pointer;
     padding-left: 1%;
-}
 
-.content-row-editor-markdown > img {
-    display: block;
-    height: auto;
-    max-width: 100%;
+    /* needed for width control of markdown text */
+    /* width: 60%; */
 }
 
 .content-row-editor-markdown:hover {
@@ -28,88 +25,79 @@
     border-left-color: rgb(28,168,221);
 }
 
-.content-row-editor-markdown-slide-left {
-    margin-left: -25%;
-    padding: 10px;
-    width: 75%;
-    transition: margin-left 3s, padding 3s;
-    transition-timing-function: ease-in-out;
-}
+/* image css */
 
-/* REVISIT */
-
-.content-row-editor-markdown-slide-left > img {
+/* start: might not need this code */
+/* .content-row-editor-markdown > img {
     display: block;
     height: auto;
     max-width: 100%;
-}
-
-/*  */
-
-.content-row-editor {
-    left: 30%;
-    opacity: 0;
-    pointer-events: none;
-    position: absolute;
-    top: -5px;
-    transition: opacity .3s;
-    width: 700px;
-}
-
-.content-row-editor.editing {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.content-row-editor.editing:hover .hover-button {
-    display: block;
-    position: absolute;
-    margin-top: -32px;
-}
-
-.content-row-editor > textarea {
-    background-color: white;
-    border: none;
-    border-radius: 2px;
-    box-sizing: content-box;
-    box-shadow: 5px 5px 5px 0px #b3b5b7;
-    outline: none;
-    padding: 10px;
-    width: 60%;
-}
-
-.hover-button {
-    display: none;
-}
+} */
+/* end */
 
 .image-edit-buttons {
     display: none;
+   
+}
+
+.content-row-editor-markdown:hover .image-edit-buttons {
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+    justify-content: space-between;
+    left: -1%;
     position: absolute;
+    width: 50px;
 }
 
-.image-edit:hover .image-edit-buttons {
-    display: block;
+.image-edit-button {
+    height: 20px;
+    width: 20px;
+    /* background-color: yellow; */
 }
 
-/* WORKING */
-/* .content-row-editor-image {
-    display: block;
-    position: absolute;
-    margin-bottom: -32px;
-} */
+/* text css below */
 
-
-/* .content-row-editor-image {
-    border-left: 2px solid transparent;
-    padding-left: 1%;
+.content-row-editor {
+    /* left: 30%; */
+    /* opacity: 0; */
+    /* pointer-events: none; */
+    /* position: absolute; */
+    /* top: -5px; */
+    /* transition: opacity .3s; */
+    /* width: 700px; */
 }
 
-.content-row-editor-image > img {
-    display: block;
-    height: auto;
-    max-width: 100%;
+.content-row-editor.editing {
+    /* opacity: 1; */
+    /* pointer-events: all; */
 }
 
-.content-row-editor-image:hover {
-    border-left-color: rgb(28,168,221);
-} */
+.content-row-editor.editing:hover .text-edit-buttons {
+    /* display: block; */
+    /* position: absolute; */
+    /* margin-top: -32px; */
+}
+
+.text-edit-buttons {
+    display: none;
+}
+
+.content-row-editor > textarea {
+    /* background-color: white; */
+    /* border: none; */
+    /* border-radius: 2px; */
+    /* box-sizing: content-box; */
+    /* box-shadow: 5px 5px 5px 0px #b3b5b7; */
+    /* outline: none; */
+    /* padding: 10px; */
+    /* width: 60%; */
+    
+    background-color: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    width: 60%;
+    padding: 10px;
+
+}

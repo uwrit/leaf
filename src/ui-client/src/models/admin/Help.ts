@@ -11,8 +11,9 @@ export interface CreateHelpPageDTO {
     orderId: number;
     type: string;
     textContent: string;
-    imageContent: string;
     imageId: string;
+    imageContent: string;
+    imageSize: number;
 }
 
 export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
@@ -28,8 +29,9 @@ export interface ContentRow {
     orderId: number;
     type: string;
     textContent: string;
-    imageContent: string;
     imageId: string;
+    imageContent: string;
+    imageSize: number;
 }
 
 export interface AdminHelpContentDTO {

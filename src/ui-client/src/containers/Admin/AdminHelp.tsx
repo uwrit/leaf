@@ -80,6 +80,7 @@ export class AdminHelp extends React.Component<Props> {
                                 index={i}
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
+                                imageSizeHandler={this.handleImageSizeChange}
                                 deleteImageHandler={this.handleDeleteImage}
                             />
                         )}
@@ -87,33 +88,6 @@ export class AdminHelp extends React.Component<Props> {
                 </div>
             </div>
         );
-    };
-
-    private handleCreateNew = () => {
-        const { dispatch } = this.props;
-        const uniqueId = generateId();
-
-        const contentRow = Object.assign({}, {
-            id: uniqueId,
-            pageId: '',
-            orderId: 0,
-            type: 'text',
-            textContent: 'Enter Text Here.',
-            imageContent: '',
-            imageId: ''
-        }) as ContentRow;
-
-        const newContent = Object.assign({}, {
-            title: 'Enter Title Here',
-            category: 'Enter Category Here',
-            content: [ contentRow ]
-        }) as AdminHelpContent;
-
-        dispatch(setCurrentAdminHelpContent(newContent));
-        dispatch(setAdminHelpContent(newContent, HelpPageLoadState.LOADED));
-        dispatch(setCurrentHelpPage({ id: '', categoryId: '', title: '' } as HelpPage));
-        dispatch(isAdminHelpContentNew(true));
-        dispatch(adminHelpContentUnsaved(true));
     };
 
     private handleTextChange = (val: string, propName: string) => {
@@ -140,6 +114,26 @@ export class AdminHelp extends React.Component<Props> {
             contentCopy.splice(index, 1, updatedContentRow);
         } else if (!val && textContentLength === 1) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
+            contentCopy.splice(index, 1, updatedContentRow);
+        } else {
+            contentCopy.splice(index, 1);
+        }
+
+        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
+        dispatch(setCurrentAdminHelpContent(newContent));
+
+        dispatch(adminHelpContentUnsaved(true));
+    };
+
+    private handleImageSizeChange = (val: number, index: number) => {
+        const { dispatch, currentContent } = this.props;
+        // Make copy of current content to edit
+        const contentCopy = currentContent.content.slice();
+        // Find content row via index to edit
+        const contentRow = contentCopy.find((_, i) => i === index);
+
+        if (val) {
+            const updatedContentRow = Object.assign({}, contentRow, { imageSize: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
         } else {
             contentCopy.splice(index, 1);
@@ -186,8 +180,9 @@ export class AdminHelp extends React.Component<Props> {
                     orderId: c.orderId,
                     type: c.type,
                     textContent: c.textContent,
+                    imageId: c.imageId,
                     imageContent: c.imageContent,
-                    imageId: c.imageId
+                    imageSize: c.imageSize
                 } as CreateHelpPageDTO;
                 createContent.push(createdContent);
             });
@@ -201,8 +196,9 @@ export class AdminHelp extends React.Component<Props> {
                     orderId: c.orderId,
                     type: c.type,
                     textContent: c.textContent,
+                    imageId: c.imageId,
                     imageContent: c.imageContent,
-                    imageId: c.imageId
+                    imageSize: c.imageSize
                 } as UpdateHelpPageContentDTO;
                 updateContent.push(updatedContent);
             });
@@ -247,8 +243,9 @@ export class AdminHelp extends React.Component<Props> {
                 orderId: 0,
                 type: 'text',
                 textContent: 'New Section Added.',
+                imageId: '',
                 imageContent: '',
-                imageId: ''
+                imageSize: 0
             }) as ContentRow;
 
             // Add new text section at index
@@ -259,10 +256,10 @@ export class AdminHelp extends React.Component<Props> {
             const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
             dispatch(setCurrentAdminHelpContent(newContent));
         } else {
-            const image = e!.currentTarget.files!.item(0)!;
-            const imgId = image.name;
+            const img = e!.currentTarget.files!.item(0)!;
+            const imageId = img.name;
             const reader = new FileReader();
-            reader.readAsDataURL(image);
+            reader.readAsDataURL(img);
 
             reader.onload = () => {
                 const imageString = reader.result!.toString().split(',')[1];
@@ -272,8 +269,9 @@ export class AdminHelp extends React.Component<Props> {
                     orderId: 0,
                     type: 'image',
                     textContent: '',
+                    imageId: imageId,
                     imageContent: imageString,
-                    imageId: imgId
+                    imageSize: 50 // Set initial image size to 50%.
                 }) as ContentRow;
 
                 // Add new image section at index

@@ -157,8 +157,9 @@ export class Help extends React.PureComponent<Props, State> {
             orderId: 0,
             type: 'text',
             textContent: 'Enter Text Here.',
+            imageId: '',
             imageContent: '',
-            imageId: ''
+            imageSize: 0
         }) as ContentRow;
 
         const newContent = Object.assign({}, {
@@ -173,7 +174,7 @@ export class Help extends React.PureComponent<Props, State> {
         dispatch(isAdminHelpContentNew(true));
         dispatch(adminHelpContentUnsaved(true));
         
-        //  Clear the values so that when user clicks the "go back arrow" from content, category/title are reset.
+        //  Clear the values so that when user clicks the "go back arrow" from content after clicking "+ Create", category/title are reset.
         this.setState({ show: !show, category: '', title: '' });
     };
 };
