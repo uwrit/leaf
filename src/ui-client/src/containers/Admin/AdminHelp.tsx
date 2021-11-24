@@ -66,11 +66,11 @@ export class AdminHelp extends React.Component<Props> {
 
                 <div className={`${c}-content-text`}>
                     <TextEditor
-                        // key={}
                         text={currentContent.title}
                         textHandler={this.handleTextChange}
                     />
 
+                    {/* add marginbottom to title instead */}
                     <div style={{marginTop: "10px"}}>
                         {currentContent.content.map((cr,i) =>
                             <ContentRowEditor
@@ -81,7 +81,7 @@ export class AdminHelp extends React.Component<Props> {
                                 contentHandler={this.handleContentChange}
                                 newSectionHandler={this.handleNewSection}
                                 imageSizeHandler={this.handleImageSizeChange}
-                                deleteImageHandler={this.handleDeleteImage}
+                                deleteRowHandler={this.handleDeleteRow}
                             />
                         )}
                     </div>
@@ -145,7 +145,7 @@ export class AdminHelp extends React.Component<Props> {
         dispatch(adminHelpContentUnsaved(true));
     };
 
-    private handleDeleteImage = (index: number) => {
+    private handleDeleteRow = (index: number) => {
         const { dispatch, currentContent } = this.props;
         const contentCopy = currentContent.content.slice();
         contentCopy.splice(index, 1);

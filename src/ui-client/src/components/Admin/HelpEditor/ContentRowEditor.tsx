@@ -8,12 +8,15 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import TextareaAutosize from 'react-textarea-autosize';
-import { Button, Col, Input, Row } from 'reactstrap';
+import { Button, Col, Input, InputGroup, InputGroupText, Row } from 'reactstrap';
 import { ContentRow } from '../../../models/admin/Help';
 import { FaSortAlphaUp, FaSortAlphaDown, FaRegImage, FaRegWindowClose, FaAngleDoubleUp, FaAngleDoubleDown } from 'react-icons/fa';
 import { MdTextFields } from 'react-icons/md';
 import './ContentRowEditor.css';
 
+import { generate as generateId } from 'shortid';
+
+// TODO: need to delete idyll component (does not work as expected)
 import * as components from 'idyll-components';
 import IdyllDocument from 'idyll-document';
 
@@ -24,7 +27,7 @@ interface Props {
     contentHandler: (val: string, index: number) => void;
     newSectionHandler: (index: number, pageId: string, text: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
     imageSizeHandler: (val: number, index: number) => void;
-    deleteImageHandler: (index: number) => void;
+    deleteRowHandler: (index: number) => void;
 }
 
 interface State {
@@ -32,14 +35,29 @@ interface State {
 }
 
 export class ContentRowEditor extends React.Component<Props, State> {
-    private className = "content-row-editor"
+    private className = "content-row-editor";
+    private textEditorClassName = "";
 
     constructor(props: Props){
         super(props)
         this.state = {
             selected: false
         }
-    }
+    };
+
+    public componentDidMount() {
+        this.textEditorClassName = `${this.className}-markdown-text-edit-${generateId()}`;
+    };
+
+    public componentDidUpdate() {
+        const textEditRowElement: any = document.getElementsByClassName(`${this.textEditorClassName}`);
+
+        // When text row is clicked, textarea already has focus and sets cursor to end of text.
+        if (textEditRowElement && textEditRowElement[0]) {
+            textEditRowElement[0].focus()
+            textEditRowElement[0].selectionStart = textEditRowElement[0].value.length;
+        };
+    };
 
     public render() {
         const c = this.className;
@@ -49,7 +67,6 @@ export class ContentRowEditor extends React.Component<Props, State> {
                 <Row>
                     <Col md={12}>
                         {this.getContent()}
-                        {/* {this.editContent()} */}
                     </Col>
                 </Row>
             </div>
@@ -62,139 +79,75 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const { selected } = this.state;
 
         if (contentRow.textContent) {
-            // return (
-            //     <div className={`${c}-markdown`} onClick={this.handleClick}>
-            //         <ReactMarkdown children={contentRow.textContent} />
-            //     </div>
-            // );
-
-            // START TEST FEATURE
-            if (selected) { //replace true with selected when css figured out
+            if (!selected) {
                 return (
-                    <div className={`${c} ${selected ? "editing" : ""}`}>
-                        <div className={'text-edit-buttons'}>
-                            <Button>
-                                <label htmlFor={`${contentRow.id}-above`}>
-                                    <span>Add Image/Gif Above</span>
-                                    <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
-                                </label>
-                            </Button>
+                    <div className={`${c}-markdown`} onClick={this.handleClick}>
+                        {this.getEditButtons()}
 
-                            <Button>
-                                <label htmlFor={`${contentRow.id}-below`}>
-                                    <span>Add Image/Gif Below</span>
-                                    <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
-                                </label>
-                            </Button>
-
-                            <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
-                            <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
-                        </div>
-                    
-                        <TextareaAutosize
-                            onChange={this.handleChange}
-                            value={contentRow.textContent}
-                            onBlur={this.handleBlur}
-                        />
+                        <ReactMarkdown children={contentRow.textContent} />
                     </div>
                 );
             } else {
                 return (
-                    <div className={`${c}-markdown`} onClick={this.handleClick}>
-                        <ReactMarkdown children={contentRow.textContent} />
+                    <div className={`${c}-markdown`}>                   
+                        <TextareaAutosize
+                            className={this.textEditorClassName}
+                            onBlur={this.handleBlur}
+                            onChange={this.handleChange}
+                            value={contentRow.textContent}
+                        />
                     </div>
                 );
             }
-            // END TEST FEATURE
-
         } else if (contentRow.imageContent) {
             return (
-                
                 <div className={`${c}-markdown` }>
-                    
-                    <div className={'image-edit-buttons'}>
-
-                        {/* <Button onClick={this.deleteImage}>X</Button> */}
-                        <FaRegWindowClose className={'image-edit-button'} onClick={this.deleteImage} />
-                        
-                        <FaAngleDoubleUp className={'image-edit-button'} style={{cursor: "default"}} />
-                        
-                        {/* <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button> */}
-                        <MdTextFields className={'image-edit-button'} onClick={this.handleNewSection.bind(null, true, true)}/>
-                        
-                        
-                        {/* <Button> */}
-                            <label htmlFor={`${contentRow.id}-above`} style={{cursor: "pointer", marginBottom: 0}}>
-                                <FaRegImage className={'image-edit-button'} />
-                                <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
-                            </label>
-                        {/* </Button> */}
-
-                        {/* <Button> */}
-                            <label htmlFor={`${contentRow.id}-below`} style={{cursor: "pointer", backgroundColor:"red"}}>
-                            {/* <label htmlFor={`${contentRow.id}-below`} style={{cursor: "pointer"}}> */}
-                                <FaRegImage className={'image-edit-button'} />
-                                <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
-                            </label>
-                        {/* </Button> */}
-                        
-                        {/* <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button> */}
-                        <MdTextFields className={'image-edit-button'} onClick={this.handleNewSection.bind(null, false, true)}/>
-                        
-                        <Input type="number" onChange={this.imageSizeChange} value={contentRow.imageSize} />
-
-                        <FaAngleDoubleDown className={'image-edit-button'} style={{cursor: "default"}} />
-                    </div>
+                    {this.getEditButtons()}
 
                     <img
-                        src={`data:image;base64,${contentRow.imageContent}`}
                         alt={contentRow.imageId}
+                        src={`data:image;base64,${contentRow.imageContent}`}
                         style={{marginBottom: "10px", maxWidth: `${contentRow.imageSize}%`}}
-                        // edit maxWidth and make it a variable
                     />
-                    {/* <div>
-                        random text below
-                    </div> */}
+                    {/* caption: <div>random text below</div> */}
                 </div>
             );
         };
         return ;
     };
 
-    private editContent = () => {
-        const c = this.className;
+    private getEditButtons = () => {
         const { contentRow } = this.props;
-        const { selected } = this.state;
-
         return (
-            <div className={`${c} ${selected ? "editing" : ""}`}>
-                <div className={'text-edit-buttons'}>
-                    <Button>
-                        <label htmlFor={`${contentRow.id}-above`}>
-                            <span>Add Image/Gif Above</span>
-                            <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
-                        </label>
-                    </Button>
+            <div className={'edit-buttons'}>
+                <FaRegWindowClose className={'edit-button'} onClick={this.deleteRow} />
+                <FaAngleDoubleUp className={'edit-button'} style={{cursor: "default"}} />
+                <MdTextFields className={'edit-button'} onClick={this.handleNewSection.bind(null, true, true)}/>
+                <label htmlFor={`${contentRow.id}-above`} style={{cursor: "pointer"}}>
+                    <FaRegImage className={'edit-button'} />
+                    <input id={`${contentRow.id}-above`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, true, false)}/>
+                </label>
+                <label htmlFor={`${contentRow.id}-below`} style={{cursor: "pointer"}}>
+                    <FaRegImage className={'edit-button'} />
+                    <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
+                </label>
+                <MdTextFields className={'edit-button'} style={{marginTop: "-13px"}} onClick={this.handleNewSection.bind(null, false, true)}/>
+                <FaAngleDoubleDown className={'edit-button'} style={{cursor: "default"}} />
 
-                    <Button>
-                        <label htmlFor={`${contentRow.id}-below`}>
-                            <span>Add Image/Gif Below</span>
-                            <input id={`${contentRow.id}-below`} type="file" accept="image/*" style={{display: "none"}} onChange={this.handleNewSection.bind(null, false, false)}/>
-                        </label>
-                    </Button>
-
-                    <Button onClick={this.handleNewSection.bind(null, true, true)}>Add Text Above</Button>
-                    <Button onClick={this.handleNewSection.bind(null, false, true)}>Add Text Below</Button>
-                </div>
-                
-                <TextareaAutosize
-                    onChange={this.handleChange}
-                    value={contentRow.textContent}
-                    onBlur={this.handleBlur}
-                />
+                {contentRow.imageContent && <Input className={'edit-button image-size'} type="number" onChange={this.imageSizeChange} min={40} value={contentRow.imageSize} />}
             </div>
         );
     };
+
+    private handleBlur = () => { this.setState({ selected: false }) };
+
+    private handleClick = () => { this.setState({ selected: true }) };
+
+    private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        const { contentHandler, index } = this.props;
+        const newVal = e.currentTarget.value;
+        contentHandler(newVal, index);
+    };    
 
     private handleNewSection = (above: boolean, text: boolean, evt?: any) => {
         const { contentRow, index, newSectionHandler } = this.props;
@@ -205,25 +158,14 @@ export class ContentRowEditor extends React.Component<Props, State> {
         this.setState({ selected: false });
     };
 
-    private handleClick = () => { this.setState({ selected: true }) };
-
-    private handleBlur = () => { this.setState({ selected: false }) };
-
-    private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        const { contentHandler, index } = this.props;
-        const newVal = e.currentTarget.value;
-        contentHandler(newVal, index);
-    };
-
     private imageSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { imageSizeHandler, index } = this.props;
         const newImageSize = e.currentTarget.valueAsNumber;
         imageSizeHandler(newImageSize, index);
     };
 
-    private deleteImage = () => {
-        const { deleteImageHandler, index } = this.props;
-        deleteImageHandler(index);
+    private deleteRow = () => {
+        const { deleteRowHandler, index } = this.props;
+        deleteRowHandler(index);
     };
-
 }

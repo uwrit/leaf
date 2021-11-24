@@ -8,47 +8,27 @@
  .text-editor {
     color: rgb(78, 78, 78);
     font-size: 22px;
-    width: 100%;
     margin-left: 19%;
+    width: 100%;
 }
 
 .text-editor-markdown {
     border-left: 3px solid transparent;
     padding-left: 1%;
+
+    /* needed for width control of markdown text */
+    /* width: 60%; */
 }
 
 .text-editor-markdown:hover {
+    background-color: rgba(28,168,221, 0.05);
     border-left-color: rgb(28,168,221);
 }
 
-.text-editor-markdown-slide-left {
-    margin-left: -25%;
-    padding: 10px;
-    width: 75%;
-    transition: margin-left 3s, padding 3s;
-    transition-timing-function: ease-in-out;
-}
-
-.text-editor-text {
-    position: absolute;
-    top: -9999px;
-    left: -9999px;
-}
-
-.text-editor-text-edit {
-    margin-left: -45%;
-    transition: margin-left 3s;
-    transition-timing-function: ease-in-out;
-}
-
-.text-editor-text-edit > textarea {
-    background-color: #ffffff91;
+.text-editor-markdown > textarea {
+    background-color: transparent;
     border: none;
-    border-radius: 10px;
-    box-sizing: content-box;
-    box-shadow: 5px 5px 5px 0px #b3b5b7;
-    font-size: 17px;
     outline: none;
-    padding: 10px;
+    resize: none;
     width: 60%;
 }

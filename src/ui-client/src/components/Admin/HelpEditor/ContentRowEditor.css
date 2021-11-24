@@ -7,8 +7,8 @@
 
 .content-row-editor-container {
     font-size: 17px;
-    width: 100%;
     margin-left: 19%;
+    width: 100%;
 }
 
 .content-row-editor-markdown {
@@ -25,79 +25,48 @@
     border-left-color: rgb(28,168,221);
 }
 
-/* image css */
-
-/* start: might not need this code */
-/* .content-row-editor-markdown > img {
-    display: block;
-    height: auto;
-    max-width: 100%;
-} */
-/* end */
-
-.image-edit-buttons {
-    display: none;
-   
-}
-
-.content-row-editor-markdown:hover .image-edit-buttons {
-    display: flex;
-    flex-direction: column;
-    height: 80%;
-    justify-content: space-between;
-    left: -1%;
-    position: absolute;
-    width: 50px;
-}
-
-.image-edit-button {
-    height: 20px;
-    width: 20px;
-    /* background-color: yellow; */
-}
-
-/* text css below */
-
-.content-row-editor {
-    /* left: 30%; */
-    /* opacity: 0; */
-    /* pointer-events: none; */
-    /* position: absolute; */
-    /* top: -5px; */
-    /* transition: opacity .3s; */
-    /* width: 700px; */
-}
-
-.content-row-editor.editing {
-    /* opacity: 1; */
-    /* pointer-events: all; */
-}
-
-.content-row-editor.editing:hover .text-edit-buttons {
-    /* display: block; */
-    /* position: absolute; */
-    /* margin-top: -32px; */
-}
-
-.text-edit-buttons {
-    display: none;
-}
-
-.content-row-editor > textarea {
-    /* background-color: white; */
-    /* border: none; */
-    /* border-radius: 2px; */
-    /* box-sizing: content-box; */
-    /* box-shadow: 5px 5px 5px 0px #b3b5b7; */
-    /* outline: none; */
-    /* padding: 10px; */
-    /* width: 60%; */
-    
+.content-row-editor-markdown > textarea {
     background-color: transparent;
     border: none;
     outline: none;
     resize: none;
     width: 60%;
-    padding: 10px;
+}
 
+.edit-buttons {
+    display: none;
+}
+
+.content-row-editor-markdown:hover .edit-buttons {
+    color: rgb(0, 130, 177);
+    display: flex;
+    flex-direction: column;
+    height: 275px;
+    justify-content: space-between;
+    left: -50px;
+    padding-left: 20px;
+    position: absolute;
+    width: 70px;
+
+    /* top: -50%; */
+}
+
+.edit-button {
+    height: 20px;
+    width: 20px;
+}
+
+.edit-button.image-size {
+    background-color: transparent;
+    border-color: rgb(0, 130, 177);
+    color: rgb(0, 130, 177);
+    height: 35px;
+    margin-left: -40px;
+    width: 60px;
+}
+
+.edit-buttons > input:focus {
+    background-color: transparent;
+    border: none;
+    color: rgb(0, 130, 177);
 }
