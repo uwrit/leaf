@@ -16,6 +16,7 @@ import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 import { GlobalPanelFilterEditor } from '../../components/Admin/GlobalPanelFilterEditor/GlobalPanelFilterEditor';
 import './AdminPanel.css';
+import { DowntimesEditor } from '../../components/Admin/DowntimesEditor/DowntimesEditor';
 
 interface StateProps { 
     admin?: AdminState;
@@ -61,6 +62,8 @@ class AdminPanel extends React.PureComponent<Props> {
                 return <DatasetEditor data={admin!} dispatch={dispatch} datasets={datasets}/>;
             case AdminPanelPane.NETWORK:
                 return <NetworkAndIdentityEditor data={admin!} dispatch={dispatch} />
+            case AdminPanelPane.DOWNTIMES_AND_NOTIFICATIONS:
+                return <DowntimesEditor data={admin!} dispatch={dispatch} />
             default: 
                 return null;
         }

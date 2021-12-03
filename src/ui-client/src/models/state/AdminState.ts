@@ -33,7 +33,8 @@ export enum AdminPanelPane {
     PANEL_FILTERS = 3,
     GLOBAL_PANEL_FILTERS = 4,
     DATASETS = 5,
-    NETWORK = 6
+    NETWORK = 6,
+    DOWNTIMES_AND_NOTIFICATIONS = 7
 }
 
 export interface AdminConceptState {

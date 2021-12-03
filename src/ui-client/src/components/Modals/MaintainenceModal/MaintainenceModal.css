@@ -6,8 +6,8 @@
  */ 
 
 .maintainence-modal {
-    background-color: rgba(0,0,0,0.02);
-    border: 1px solid rgb(180, 162, 61);
+    background-color: white;
+    border: 1px solid rgba(61, 180, 71, 0.5);
     border-radius: 4px;
     bottom: 5%;
     box-shadow: 0px 4px 10px rgba(7, 7, 7, 0.3);
@@ -17,9 +17,17 @@
     height: 60px;
     position: absolute;
     width: 300px;
+
+    animation: pulse-green 2s linear 1s infinite;
 }
 
 .maintainence-modal-inner {
     padding: 10px;
     text-align: center;
+}
+
+@keyframes pulse-green {
+    0% { box-shadow:0 0 5px rgb(35, 255, 108), inset 0 0 5px rgb(98, 236, 144); }
+    50% { box-shadow:0 0 20px rgb(35, 255, 108), inset 0 0 20px rgb(98, 236, 144); }
+    100% { box-shadow:0 0 5px rgb(35, 255, 108), inset 0 0 5px rgb(98, 236, 144); }
 }

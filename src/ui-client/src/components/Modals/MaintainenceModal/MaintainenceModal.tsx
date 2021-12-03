@@ -17,8 +17,7 @@ export default class MaintainenceModal extends React.PureComponent {
         return (
             <div className={classes.join(' ')}> 
                 <div className={`${c}-inner`}>
-                    <div>Leaf is in Maintainence Mode</div>
-                    <div>Non-admin users cannot access it</div>
+                    <div>Maintainence Mode</div>
                 </div>
             </div>
         );

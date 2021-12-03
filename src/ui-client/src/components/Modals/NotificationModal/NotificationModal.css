@@ -11,15 +11,15 @@
     border: 1px solid rgb(230,230,230);
     box-shadow: 0px 4px 10px rgba(7, 7, 7, 0.3);
     font-family: Roboto;
-    left: 100%;
+    right: -700px;
     position: absolute;
-    transition: left 0.75s;
+    transition: right 0.75s;
     width: 600px;
     z-index: 101;
 }
 
 .notification-modal.show {
-    left: 62%;
+    right: 40px;
 }
 
 .notification-modal-footer {
