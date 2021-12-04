@@ -14,10 +14,14 @@
 .content-row-editor-markdown {
     border-left: 3px solid transparent;
     cursor: pointer;
-    padding-left: 1%;
+    /* padding-left: 1%; */
+    width: 70%;
+    word-wrap: break-word;
+}
 
-    /* needed for width control of markdown text */
-    /* width: 60%; */
+.content-row-editor-markdown.second {
+    padding-left: 1%;
+    cursor: default;
 }
 
 .content-row-editor-markdown:hover {
@@ -30,7 +34,7 @@
     border: none;
     outline: none;
     resize: none;
-    width: 60%;
+    width: 100%;
 }
 
 .edit-buttons {
@@ -47,8 +51,6 @@
     padding-left: 20px;
     position: absolute;
     width: 70px;
-
-    /* top: -50%; */
 }
 
 .edit-button {
@@ -69,4 +71,8 @@
     background-color: transparent;
     border: none;
     color: rgb(0, 130, 177);
+}
+
+.testing-name {
+    margin-left: 1%;
 }

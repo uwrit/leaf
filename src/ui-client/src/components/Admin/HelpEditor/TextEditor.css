@@ -5,19 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
- .text-editor {
+ .text-editor-container {
     color: rgb(78, 78, 78);
-    font-size: 22px;
+    font-size: 25px;
+    margin-bottom: 10px;
     margin-left: 19%;
-    width: 100%;
+    width: 70%;
 }
 
 .text-editor-markdown {
     border-left: 3px solid transparent;
+    cursor: pointer;
     padding-left: 1%;
-
-    /* needed for width control of markdown text */
-    /* width: 60%; */
+    word-wrap: break-word;
 }
 
 .text-editor-markdown:hover {
@@ -28,7 +28,8 @@
 .text-editor-markdown > textarea {
     background-color: transparent;
     border: none;
+    color: rgb(78, 78, 78);
     outline: none;
     resize: none;
-    width: 60%;
+    width: 100%;
 }

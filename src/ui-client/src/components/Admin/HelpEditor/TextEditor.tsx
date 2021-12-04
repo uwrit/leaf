@@ -22,6 +22,7 @@ interface State {
 
 export class TextEditor extends React.Component<Props, State> {
     private className = "text-editor";
+    private focused = false;
     private textEditorClassName = "";
 
     constructor(props: Props){
@@ -39,19 +40,20 @@ export class TextEditor extends React.Component<Props, State> {
         const textEditRowElement: any = document.getElementsByClassName(`${this.textEditorClassName}`);
 
         // When text row is clicked, textarea already has focus and sets cursor to end of text.
-        if (textEditRowElement && textEditRowElement[0]) {
+        if (textEditRowElement && textEditRowElement[0] && !this.focused) {
             textEditRowElement[0].focus()
             textEditRowElement[0].selectionStart = textEditRowElement[0].value.length;
+            
+            this.focused = true;
         };
+        // FIX: find a better solution than focused.
     };
 
     public render() {
         const c = this.className;
-        const { text } = this.props;
-        const { selected } = this.state;
 
         return (
-            <div className={c}>
+            <div className={`${c}-container`}>
                 <Row>
                     <Col>
                         {this.getContent()}
@@ -86,7 +88,7 @@ export class TextEditor extends React.Component<Props, State> {
         };
     };
 
-    private handleBlur = () => { this.setState({ selected: false }) };
+    private handleBlur = () => { this.focused = false; this.setState({ selected: false }) };
 
     private handleClick = () => { this.setState({ selected: true }) };
 

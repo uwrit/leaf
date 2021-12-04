@@ -36,6 +36,7 @@ interface State {
 
 export class ContentRowEditor extends React.Component<Props, State> {
     private className = "content-row-editor";
+    private focused = false;
     private textEditorClassName = "";
 
     constructor(props: Props){
@@ -53,10 +54,25 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const textEditRowElement: any = document.getElementsByClassName(`${this.textEditorClassName}`);
 
         // When text row is clicked, textarea already has focus and sets cursor to end of text.
-        if (textEditRowElement && textEditRowElement[0]) {
+        if (textEditRowElement && textEditRowElement[0] && !this.focused) {
             textEditRowElement[0].focus()
             textEditRowElement[0].selectionStart = textEditRowElement[0].value.length;
+
+            this.focused = true;
         };
+        // TODO:
+        //      1. remove idyll markdown library
+        //      2. find a better solution than focused
+        //      3. fix overflow for edit buttons
+        //      4. highlighting to copy turns on onClick in text
+        //      5. limit/check what happens when a lot of categories are added
+        //      6. test general doc creation process
+        //      7. page height (padding bottom on adminhelp)
+        //      8. fix classname for markdown css
+
+        // https://github.com/remarkjs/react-markdown
+        // linkTarget fixed open in new tab issue
+        // look into https://github.com/remarkjs/remark-gfm, plugin for react markdown
     };
 
     public render() {
@@ -81,15 +97,17 @@ export class ContentRowEditor extends React.Component<Props, State> {
         if (contentRow.textContent) {
             if (!selected) {
                 return (
-                    <div className={`${c}-markdown`} onClick={this.handleClick}>
+                    <div className={`${c}-markdown`}>
                         {this.getEditButtons()}
 
-                        <ReactMarkdown children={contentRow.textContent} />
+                        <div className={"testing-name"} onClick={this.handleClick}>
+                            <ReactMarkdown children={contentRow.textContent} linkTarget={"_blank"} />
+                        </div>
                     </div>
                 );
             } else {
                 return (
-                    <div className={`${c}-markdown`}>                   
+                    <div className={`${c}-markdown second`}>                   
                         <TextareaAutosize
                             className={this.textEditorClassName}
                             onBlur={this.handleBlur}
@@ -101,7 +119,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
             }
         } else if (contentRow.imageContent) {
             return (
-                <div className={`${c}-markdown` }>
+                <div className={`${c}-markdown`}>
                     {this.getEditButtons()}
 
                     <img
@@ -134,12 +152,12 @@ export class ContentRowEditor extends React.Component<Props, State> {
                 <MdTextFields className={'edit-button'} style={{marginTop: "-13px"}} onClick={this.handleNewSection.bind(null, false, true)}/>
                 <FaAngleDoubleDown className={'edit-button'} style={{cursor: "default"}} />
 
-                {contentRow.imageContent && <Input className={'edit-button image-size'} type="number" onChange={this.imageSizeChange} min={40} value={contentRow.imageSize} />}
+                {contentRow.imageContent && <Input className={'edit-button image-size'} type="number" onChange={this.imageSizeChange} min={30} value={contentRow.imageSize} />}
             </div>
         );
     };
 
-    private handleBlur = () => { this.setState({ selected: false }) };
+    private handleBlur = () => { this.focused = false; this.setState({ selected: false }) };
 
     private handleClick = () => { this.setState({ selected: true }) };
 

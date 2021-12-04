@@ -44,5 +44,7 @@
     overflow-x: hidden;
     
     /* REVISIT: page cuts off when small screen, height changes causing issue */
-    padding-bottom: 75px;
+    /* originally, 75px. working solution 275px. */
+    /* padding-bottom: 75px; */
+    padding-bottom: 275px;
 }

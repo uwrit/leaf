@@ -70,21 +70,18 @@ export class AdminHelp extends React.Component<Props> {
                         textHandler={this.handleTextChange}
                     />
 
-                    {/* add marginbottom to title instead */}
-                    <div style={{marginTop: "10px"}}>
-                        {currentContent.content.map((cr,i) =>
-                            <ContentRowEditor
-                                key={cr.id}
-                                dispatch={dispatch}
-                                contentRow={cr}
-                                index={i}
-                                contentHandler={this.handleContentChange}
-                                newSectionHandler={this.handleNewSection}
-                                imageSizeHandler={this.handleImageSizeChange}
-                                deleteRowHandler={this.handleDeleteRow}
-                            />
-                        )}
-                    </div>
+                    {currentContent.content.map((cr,i) =>
+                        <ContentRowEditor
+                            key={cr.id}
+                            dispatch={dispatch}
+                            contentRow={cr}
+                            index={i}
+                            contentHandler={this.handleContentChange}
+                            newSectionHandler={this.handleNewSection}
+                            imageSizeHandler={this.handleImageSizeChange}
+                            deleteRowHandler={this.handleDeleteRow}
+                        />
+                    )}
                 </div>
             </div>
         );
