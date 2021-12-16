@@ -139,6 +139,18 @@
     color: rgb(24, 142, 185);
 }
 
+.patientlist-column-selector-nameQualifier {
+    position: relative;
+    width: 50px;
+    margin-left: 2px
+}
+
+.patientlist-column-selector-nameQualifier-dateBoundsAbbrev {
+    position: absolute;
+    top: 10px;
+    font-size: 10px;
+}
+
 .patientlist-dataset-column-selector-container {
     font-family: Roboto;
     min-height: 40px;
