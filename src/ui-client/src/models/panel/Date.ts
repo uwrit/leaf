@@ -7,6 +7,7 @@
 
 export interface DateBoundary {
     display?: string;
+    abbrev?: string;
     start: DateFilter;
     end: DateFilter;
 }

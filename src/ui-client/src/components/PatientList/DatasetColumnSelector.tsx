@@ -12,6 +12,7 @@ import CheckBoxSlider from '../Other/CheckboxSlider/CheckboxSlider';
 import PopupBox from '../Other/PopupBox/PopupBox';
 import { PatientListDatasetDefinition, PatientListDatasetSummaryType } from '../../models/patientList/Dataset';
 import { PatientListColumn } from '../../models/patientList/Column';
+import { GiBackwardTime } from "react-icons/gi";
 
 interface Props {
     allowRemove: boolean;
@@ -44,6 +45,12 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
         return (
             <div className={`${c}-dataset`} onClick={this.handleClick}>
                 {data.displayName}
+                {data.dateBounds && data.dateBounds!.abbrev &&
+                    <abbr title={data.dateBounds!.display} className={`${cs}-name-qualifier`}>
+                        <span className={`${cs}-name-qualifier-date-bounds-abbrev`}>{data.dateBounds!.abbrev}</span>
+                        <GiBackwardTime />
+                    </abbr>
+                }
                 {this.state.showColumnBox &&
                     <PopupBox 
                         parentDomRect={this.state.DOMRect!} 
