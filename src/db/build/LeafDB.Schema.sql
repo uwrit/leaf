@@ -1,4 +1,4 @@
--- Copyright (c) 2021, UW Medicine Research IT, University of Washington
+-- Copyright (c) 2022, UW Medicine Research IT, University of Washington
 -- Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -664,43 +664,6 @@ CREATE TABLE [app].[Concept](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [auth].[UserRole]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [auth].[UserRole](
-	[ScopedIdentity] [nvarchar](200) NOT NULL,
-    [IsUser] [bit] NOT NULL,
-    [IsAdmin] [bit] NOT NULL,
-    [IsSuper] [bit] NOT NULL,
-    [IsIdentified] [bit] NOT NULL,
-    [IsFederated] [bit] NOT NULL,
-    [Created] datetime NOT NULL,
-    [Updated] datetime NOT NULL
- CONSTRAINT [PK__UserRole] PRIMARY KEY CLUSTERED 
-(
-	[ScopedIdentity] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] 
-GO
-/****** Object:  Table [auth].[UserGroup]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [auth].[UserGroup](
-	[ScopedIdentity] [nvarchar](200) NOT NULL,
-    [GroupName] [nvarchar](200) NOT NULL,
-    [Created] datetime NOT NULL,
-    [Updated] datetime NOT NULL
- CONSTRAINT [PK__UserGroup] PRIMARY KEY CLUSTERED 
-(
-	[ScopedIdentity] ASC,
-    [GroupName] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] 
-GO
 /****** Object:  Table [app].[ConceptEvent]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -787,6 +750,26 @@ CREATE TABLE [app].[ConceptTokenizedIndex](
  CONSTRAINT [PK_ConceptTokenizedIndex] PRIMARY KEY CLUSTERED 
 (
 	[ConceptId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [app].[Dashboard]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [app].[Dashboard](
+	[Id] [uniqueidentifier] NOT NULL,
+	[JsonConfig] [nvarchar](max) NOT NULL,
+	[UiDisplayName] [nvarchar](200) NOT NULL,
+	[UiDisplayDescription] [nvarchar](4000) NOT NULL,
+	[Created] [datetime] NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
+	[Updated] [datetime] NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
+ CONSTRAINT [PK__Dashboard] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
@@ -998,6 +981,25 @@ CREATE TABLE [app].[ImportPatientMappingQuery](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [app].[Notification]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [app].[Notification](
+	[Id] [uniqueidentifier] NOT NULL,
+	[Message] [nvarchar](2000) NULL,
+	[Until] [datetime] NULL,
+	[Created] [datetime] NOT NULL,
+	[CreatedBy] [nvarchar](1000) NOT NULL,
+	[Updated] [datetime] NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NOT NULL,
+ CONSTRAINT [PK_Notification_1] PRIMARY KEY CLUSTERED 
+(
+	[Id] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
 /****** Object:  Table [app].[PanelFilter]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -1055,6 +1057,25 @@ PRIMARY KEY CLUSTERED
 	[QueryId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+/****** Object:  Table [app].[ServerState]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [app].[ServerState](
+	[Lock] [char](1) NOT NULL,
+	[IsUp] [bit] NOT NULL,
+	[DowntimeMessage] [nvarchar](2000) NULL,
+	[DowntimeFrom] [datetime] NULL,
+	[DowntimeUntil] [datetime] NULL,
+	[Updated] [datetime] NOT NULL,
+	[UpdatedBy] [nvarchar](1000) NULL,
+ CONSTRAINT [PK_ServerState] PRIMARY KEY CLUSTERED 
+(
+	[Lock] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
 GO
 /****** Object:  Table [app].[Specialization]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -1156,6 +1177,16 @@ CREATE TABLE [auth].[ImportMetadataConstraint](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+/****** Object:  Table [auth].[InvalidatedToken]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [auth].[InvalidatedToken](
+	[IdNonce] [uniqueidentifier] NOT NULL,
+	[Expires] [datetime] NOT NULL
+) ON [PRIMARY]
+GO
 /****** Object:  Table [auth].[Login]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -1189,16 +1220,6 @@ CREATE TABLE [auth].[QueryConstraint](
 	[ConstraintId] ASC,
 	[ConstraintValue] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY]
-GO
-/****** Object:  Table [auth].[TokenBlacklist]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [auth].[TokenBlacklist](
-	[IdNonce] [uniqueidentifier] NOT NULL,
-	[Expires] [datetime] NOT NULL
 ) ON [PRIMARY]
 GO
 /****** Object:  Table [network].[Endpoint]    Script Date: ******/
@@ -1437,18 +1458,18 @@ CREATE NONCLUSTERED INDEX [IX_Query_UniversalId] ON [app].[Query]
 	[UniversalId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
+/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: ******/
+CREATE NONCLUSTERED INDEX [IX_TokenBlacklist_Expires] ON [auth].[InvalidatedToken]
+(
+	[Expires] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+GO
 SET ANSI_PADDING ON
 GO
 /****** Object:  Index [IX_Login_ScopedIdentity]    Script Date: ******/
 CREATE NONCLUSTERED INDEX [IX_Login_ScopedIdentity] ON [auth].[Login]
 (
 	[ScopedIdentity] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-GO
-/****** Object:  Index [IX_TokenBlacklist_Expires]    Script Date: ******/
-CREATE NONCLUSTERED INDEX [IX_TokenBlacklist_Expires] ON [auth].[TokenBlacklist]
-(
-	[Expires] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 GO
 SET ANSI_PADDING ON
@@ -1471,6 +1492,8 @@ ALTER TABLE [app].[Concept] ADD  CONSTRAINT [DF_Concept_Id]  DEFAULT (newsequent
 GO
 ALTER TABLE [app].[Concept] ADD  CONSTRAINT [DF_Concept_AddDateTime]  DEFAULT (getdate()) FOR [AddDateTime]
 GO
+ALTER TABLE [app].[Dashboard] ADD  CONSTRAINT [DF_Dashboard_]  DEFAULT (newid()) FOR [Id]
+GO
 ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
 ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Created]  DEFAULT (getdate()) FOR [Created]
@@ -1485,6 +1508,12 @@ ALTER TABLE [app].[ImportMetadata] ADD  CONSTRAINT [DF_Id]  DEFAULT (newsequenti
 GO
 ALTER TABLE [app].[ImportPatientMappingQuery] ADD  CONSTRAINT [DF_ImportPatientMappingQuery_Lock]  DEFAULT ('X') FOR [Lock]
 GO
+ALTER TABLE [app].[Notification] ADD  CONSTRAINT [DF_Notification_Id]  DEFAULT (newsequentialid()) FOR [Id]
+GO
+ALTER TABLE [app].[Notification] ADD  CONSTRAINT [DF_Notification_Created]  DEFAULT (getdate()) FOR [Created]
+GO
+ALTER TABLE [app].[Notification] ADD  CONSTRAINT [DF_Notification_Updated]  DEFAULT (getdate()) FOR [Updated]
+GO
 ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_Created]  DEFAULT (getdate()) FOR [Created]
 GO
 ALTER TABLE [app].[PanelFilter] ADD  CONSTRAINT [DF_PanelFilter_Updated]  DEFAULT (getdate()) FOR [Updated]
@@ -1498,6 +1527,8 @@ GO
 ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Updated]  DEFAULT (getdate()) FOR [Updated]
 GO
 ALTER TABLE [app].[Query] ADD  CONSTRAINT [DF_Query_Ver]  DEFAULT ((1)) FOR [Ver]
+GO
+ALTER TABLE [app].[ServerState] ADD  CONSTRAINT [DF_ServerState_Lock]  DEFAULT ('X') FOR [Lock]
 GO
 ALTER TABLE [app].[Specialization] ADD  CONSTRAINT [DF_ConceptSpecialization_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
@@ -1692,6 +1723,10 @@ GO
 ALTER TABLE [app].[ImportPatientMappingQuery]  WITH CHECK ADD  CONSTRAINT [CK_ImportPatientMappingQuery_1] CHECK  (([Lock]='X'))
 GO
 ALTER TABLE [app].[ImportPatientMappingQuery] CHECK CONSTRAINT [CK_ImportPatientMappingQuery_1]
+GO
+ALTER TABLE [app].[ServerState]  WITH CHECK ADD  CONSTRAINT [CK_ServerState_1] CHECK  (([Lock]='X'))
+GO
+ALTER TABLE [app].[ServerState] CHECK CONSTRAINT [CK_ServerState_1]
 GO
 ALTER TABLE [network].[Identity]  WITH CHECK ADD  CONSTRAINT [CK_NetworkIdentity_1] CHECK  (([Lock]='X'))
 GO
@@ -2832,6 +2867,39 @@ BEGIN
     END CATCH;
 END
 GO
+/****** Object:  StoredProcedure [adm].[sp_DeleteNotification]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/5
+-- Description: Deletes a notification
+-- =======================================
+CREATE PROCEDURE [adm].[sp_DeleteNotification]
+    @id UNIQUEIDENTIFIER = NULL
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @deleted TABLE ([Id] [uniqueidentifier], [Message] NVARCHAR(2000), [Until] DATETIME, [Created] DATETIME , [CreatedBy] NVARCHAR(1000), [Updated] DATETIME , [UpdatedBy] NVARCHAR(1000))
+
+    IF NOT EXISTS(SELECT 1 FROM app.Notification WHERE Id = @id)
+        BEGIN;
+            THROW 70404, N'Notification not found.', 1;
+        END;
+
+    DELETE FROM app.Notification
+    OUTPUT deleted.Id, deleted.Message, deleted.Until, deleted.Created, deleted.CreatedBy, deleted.Updated, deleted.UpdatedBy INTO @deleted
+    WHERE Id = @id
+
+    SELECT * FROM @deleted
+
+END
+
+GO
 /****** Object:  StoredProcedure [adm].[sp_DeletePanelFilter]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -3226,6 +3294,28 @@ BEGIN
 
 END
 GO
+/****** Object:  StoredProcedure [adm].[sp_GetServerState]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/2
+-- Description: Gets app state
+-- =======================================
+CREATE PROCEDURE [adm].[sp_GetServerState]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT IsUp, DowntimeMessage, DowntimeFrom, DowntimeUntil, Updated, UpdatedBy
+    FROM app.ServerState
+
+END
+
+GO
 /****** Object:  StoredProcedure [adm].[sp_GetSpecializationGroups]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -3313,6 +3403,28 @@ END
 
 
 
+
+GO
+/****** Object:  StoredProcedure [adm].[sp_GetUserNotifications]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/2
+-- Description: Gets user notifications
+-- =======================================
+CREATE PROCEDURE [adm].[sp_GetUserNotifications]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT Id, [Message], Until, Created, CreatedBy, Updated, UpdatedBy
+    FROM app.Notification
+
+END
 
 GO
 /****** Object:  StoredProcedure [adm].[sp_GetUsersBySearchTerm]    Script Date: ******/
@@ -4139,6 +4251,38 @@ BEGIN
     END CATCH;
 END
 GO
+/****** Object:  StoredProcedure [adm].[sp_UpdateServerState]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/2
+-- Description: Sets app state
+-- =======================================
+CREATE PROCEDURE [adm].[sp_UpdateServerState]
+    @user NVARCHAR(100),
+    @isUp BIT,
+    @downtimeMessage NVARCHAR(2000),
+    @downtimeFrom DATETIME,
+    @downtimeUntil DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    UPDATE app.ServerState
+    SET IsUp = @isUp
+      , DowntimeMessage = @downtimeMessage
+      , DowntimeFrom = @downtimeFrom
+      , DowntimeUntil = @downtimeUntil
+      , Updated = GETDATE()
+      , UpdatedBy = @user
+
+END
+
+GO
 /****** Object:  StoredProcedure [adm].[sp_UpdateSpecialization]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -4284,6 +4428,51 @@ BEGIN
 
     COMMIT;
 END
+GO
+/****** Object:  StoredProcedure [adm].[sp_UpsertNotification]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/5
+-- Description: Updates or inserts a notification
+-- =======================================
+CREATE PROCEDURE [adm].[sp_UpsertNotification]
+    @user NVARCHAR(100),
+    @id UNIQUEIDENTIFIER = NULL,
+    @message NVARCHAR(2000),
+    @until DATETIME
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    DECLARE @upserted TABLE ([Id] [uniqueidentifier], [Message] NVARCHAR(2000), [Until] DATETIME, [Created] DATETIME , [CreatedBy] NVARCHAR(1000), [Updated] DATETIME , [UpdatedBy] NVARCHAR(1000))
+
+    IF @id IS NULL
+    BEGIN
+        INSERT INTO app.Notification ([Message], Until, Created, CreatedBy, Updated, UpdatedBy)
+        OUTPUT inserted.Id, inserted.Message, inserted.Until, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy INTO @upserted
+        SELECT @message, @until, GETDATE(), @user, GETDATE(), @user
+    END
+
+    ELSE
+    BEGIN
+        UPDATE app.Notification
+        SET [Message] = @message
+          , Until = @until
+          , Updated = GETDATE()
+          , UpdatedBy = @user
+        OUTPUT inserted.Id, inserted.Message, inserted.Until, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy INTO @upserted
+        WHERE Id = @id
+    END
+
+    SELECT * FROM @upserted
+
+END
+
 GO
 /****** Object:  StoredProcedure [app].[sp_CalculateConceptPatientCount]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -5675,6 +5864,33 @@ BEGIN
     WHERE Q.UniversalId = @queryuid;
 
     EXEC [app].[sp_GetContextById] @qid, @user, @groups, @admin
+
+END
+
+GO
+/****** Object:  StoredProcedure [app].[sp_GetDashboardConfig]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/12/3
+-- Description: Gets JSON dashboard configuration
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetDashboardConfig]
+    @id uniqueidentifier,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    SELECT TOP 1 D.Id, D.JsonConfig, D.UiDisplayName, D.UiDisplayDescription
+    FROM [app].[Dashboard] AS D
+    WHERE D.Id = @id
 
 END
 
@@ -7341,6 +7557,45 @@ BEGIN
 END
 
 GO
+/****** Object:  StoredProcedure [app].[sp_GetServerStateAndNotifications]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/2
+-- Description: Gets app state and notifications, first deleting old notifications
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetServerStateAndNotifications]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Delete stale messages
+    DELETE FROM app.Notification
+    WHERE Until < GETDATE()
+
+    -- Set IsUp = 1 if downtime has passed
+    UPDATE app.ServerState
+    SET IsUp = 1
+      , DowntimeFrom    = NULL
+      , DowntimeUntil   = NULL
+      , DowntimeMessage = NULL
+    WHERE DowntimeUntil < GETDATE()
+
+    -- Server state
+    SELECT IsUp, DowntimeMessage, DowntimeFrom, DowntimeUntil
+    FROM app.ServerState
+
+    -- Notifications
+    SELECT Id, [Message]
+    FROM app.Notification
+
+END
+
+GO
 /****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -7435,42 +7690,16 @@ BEGIN
 	WHERE EXISTS (SELECT 1 FROM @specializedGroups sg WHERE sg.Id = s.SpecializationGroupId)
 
 END
+
+
+
+
+
+
+
+
+
 GO
-
-
-/****** Object:  StoredProcedure [auth].[sp_GetUserGroupsAndRoles]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
--- =======================================
--- Author:      Nic Dobbins
--- Create date: 2021/10/19
--- Description: Gets user roles
--- =======================================
-CREATE PROCEDURE [auth].[sp_GetUserGroupsAndRoles]
-    @scopedId nvarchar(200)
-AS
-BEGIN
-    SET NOCOUNT ON
-
-    -- Roles
-    SELECT IsUser, IsAdmin, IsSuper, IsIdentified, IsFederated
-    FROM [auth].[UserRole] AS R
-    WHERE R.ScopedIdentity = @scopedId
-
-    -- Groups
-    SELECT GroupName
-    FROM [auth].[UserGroup] AS G
-    WHERE G.ScopedIdentity = @scopedId
-
-END
-GO
-
-
-
-
-
 /****** Object:  StoredProcedure [app].[sp_ImportData]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -8414,63 +8643,51 @@ END
 
 
 GO
-/****** Object:  StoredProcedure [auth].[sp_BlacklistToken]    Script Date: ******/
+/****** Object:  StoredProcedure [auth].[sp_InvalidateToken]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
 -- =======================================
--- Author:      Cliff Spital
--- Create date: 2018/9/27
--- Description: Blacklists a token
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/9
+-- Description: Invalidates a token
 -- =======================================
-CREATE PROCEDURE [auth].[sp_BlacklistToken]
+CREATE PROCEDURE [auth].[sp_InvalidateToken]
     @idNonce UNIQUEIDENTIFIER,
     @exp datetime
 AS
 BEGIN
     SET NOCOUNT ON
 
-    INSERT INTO auth.TokenBlacklist
+    INSERT INTO auth.InvalidatedToken
     VALUES (@idNonce, @exp);
 END
 
-
-
-
-
-
-
 GO
-/****** Object:  StoredProcedure [auth].[sp_RefreshTokenBlacklist]    Script Date: ******/
+/****** Object:  StoredProcedure [auth].[sp_RefreshInvalidatedTokenList]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
 -- =======================================
--- Author:      Cliff Spital
--- Create date: 2018/9/27
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/9
 -- Description: Clears expired tokens, and returns remainder.
 -- =======================================
-CREATE PROCEDURE [auth].[sp_RefreshTokenBlacklist]
+CREATE PROCEDURE [auth].[sp_RefreshInvalidatedTokenList]
 AS
 BEGIN
     SET NOCOUNT ON
 
-    DELETE FROM auth.TokenBlacklist
+    DELETE FROM auth.InvalidatedToken
     WHERE Expires < GETDATE();
 
     SELECT IdNonce, Expires
-    FROM auth.TokenBlacklist;
+    FROM auth.InvalidatedToken;
 END
-
-
-
-
-
-
 
 GO
 /****** Object:  StoredProcedure [auth].[sp_UpsertLogin]    Script Date: ******/
