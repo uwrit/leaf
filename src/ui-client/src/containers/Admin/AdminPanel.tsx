@@ -62,8 +62,6 @@ class AdminPanel extends React.PureComponent<Props> {
                 return <DatasetEditor data={admin!} dispatch={dispatch} datasets={datasets}/>;
             case AdminPanelPane.NETWORK:
                 return <NetworkAndIdentityEditor data={admin!} dispatch={dispatch} />
-            case AdminPanelPane.DOWNTIMES_AND_NOTIFICATIONS:
-                return <DowntimesEditor data={admin!} dispatch={dispatch} />
             default: 
                 return null;
         }

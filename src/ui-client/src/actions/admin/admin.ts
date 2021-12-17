@@ -38,43 +38,43 @@ export const loadAdminPanelDataIfNeeded = () => {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
-                /*
-                 * Load Leaf instance configuration.
+                /**
+                 * Load instance configuration
                  */
                 dispatch(getAdminSqlConfiguration());
 
-                /*
-                 * Load Concept-related data.
+                /**
+                 * Load Concepts
                  */ 
                 const sqlSets = await getSqlSets(state);
                 const conceptEvents = await getConceptEvents(state);
                 dispatch(setAdminConceptSqlSets(sqlSets, false));
                 dispatch(setAdminConceptEvents(conceptEvents));
 
-                /*
-                 * Load panel filter-related data.
+                /**
+                 * Load panel filters
                  */
                 const panelFilters = await getPanelFilters(state);
                 const globalPanelFilters = await getGlobalPanelFilters(state);
                 dispatch(setAdminPanelFilters(panelFilters));
                 dispatch(setAdminGlobalPanelFilters(globalPanelFilters));
 
-                /*
-                 * Load datasets data.
+                /**
+                 * Load datasets
                  */
                 const demographics = await getAdminDemographicsDataset(state);
                 const datasetQueryCategories = await getDatasetQueryCategories(state);
                 dispatch(setAdminDemographicsDataset(demographics, false));
                 dispatch(setAdminDatasetQueryCategories(datasetQueryCategories));
 
-                /*
-                 * Load network & identity data.
+                /**
+                 * Load network & identity
                  */
                 const endpoints = await getNetworkEndpoints(state);
                 dispatch(setAdminNetworkEndpoints(endpoints));
 
-                /*
-                 * Finish.
+                /**
+                 * Finish
                  */
                 dispatch(setAdminPanelLoadState(AdminPanelLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));

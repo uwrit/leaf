@@ -16,7 +16,7 @@ namespace API.DTO.Config
         public string DowntimeMessage { get; set; }
         public DateTime DowntimeFrom { get; set; }
         public DateTime DowntimeUntil { get; set; }
-        public IEnumerable<UserNotificationDTO> Notifications;
+        public IEnumerable<UserNotificationDTO> Notifications = new List<UserNotificationDTO>();
 
         public ServerStateDTO(ServerState state)
         {
@@ -24,7 +24,11 @@ namespace API.DTO.Config
             DowntimeMessage = state.DowntimeMessage;
             DowntimeFrom = state.DowntimeFrom;
             DowntimeUntil = state.DowntimeUntil;
-            Notifications = state.Notifications.Select(n => new UserNotificationDTO(n));
+
+            if (state.Notifications.Any())
+            {
+                Notifications = state.Notifications.Select(n => new UserNotificationDTO(n));
+            }
         }
     }
 

@@ -34,9 +34,9 @@ import { version } from '../../package.json'
 import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
 import { sleep } from '../utils/Sleep';
-import './App.css';
 import NotificationModal from '../components/Modals/NotificationModal/NotificationModal';
 import MaintainenceModal from '../components/Modals/MaintainenceModal/MaintainenceModal';
+import './App.css';
 
 
 interface OwnProps {

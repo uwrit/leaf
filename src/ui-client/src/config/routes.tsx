@@ -117,9 +117,6 @@ const admin = (): RouteConfig => {
         }, {
             clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.NETWORK)),
             display: 'Network and Identity',
-        }, {
-            clickHandler: (dispatch: any) => dispatch(checkIfAdminPanelUnsavedAndSetPane(AdminPanelPane.DOWNTIMES_AND_NOTIFICATIONS)),
-            display: 'Downtimes and Notifications',
         }]
     };
 }
