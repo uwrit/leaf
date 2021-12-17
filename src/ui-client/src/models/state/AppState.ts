@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,13 +20,16 @@ import { SessionState } from "../Session";
 import AdminState from "./AdminState";
 import { PatientListDatasetQuery, CategorizedDatasetRef, PatientListDatasetQueryIndex } from "../patientList/Dataset";
 import ImportState from "./Import";
+import { ServerState } from "./ServerState";
 
 export type ConceptMap = Map<string, Concept>;
 
 export interface AuthorizationState {
     config?: AppConfig;
     error?: string;
+    serverState?: ServerState;
     userContext?: UserContext;
+    viewedNotifications: Set<string>;
 }
 
 export interface ConceptsState {

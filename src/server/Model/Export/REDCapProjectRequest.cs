@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Model.Export
 {
-    // TODO(cspital) figure out better way to maintain project styling while accomplishing snake case in json for redcap
+    // TODO(ndobb) figure out better way to maintain project styling while accomplishing snake case in json for redcap
     public class REDCapProjectRequest
     {
         public string Project_title { get; set; }

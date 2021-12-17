@@ -1,11 +1,9 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2022, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,12 +13,8 @@ using Microsoft.Extensions.Logging;
 using Model.Options;
 using Model.Authentication;
 using Model.Authorization;
-using Model.Network;
-using Services;
-using Services.Authorization;
 using API.Jwt;
 using API.DTO.User;
-using API.DTO.Config;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace API.Controllers
@@ -82,7 +76,7 @@ namespace API.Controllers
         [HttpGet("attest")]
         public ActionResult<AccessTokenDTO> Attest(
             [FromQuery] Attestation attestation,
-            [FromServices] ITokenBlacklistCache blacklistCache)
+            [FromServices] IInvalidatedTokenCache invalidatedCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -91,9 +85,9 @@ namespace API.Controllers
 
             try
             {
-                if (blacklistCache.IsBlacklisted(userContext.IdNonce))
+                if (invalidatedCache.IsInvalidated(userContext.IdNonce))
                 {
-                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce, attestation);
+                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce, attestation);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
@@ -113,7 +107,7 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Access)]
         [Authorize(Policy = Access.Institutional)]
         [HttpGet("refresh")]
-        public ActionResult<AccessTokenDTO> Refresh([FromServices] ITokenBlacklistCache blacklistCache)
+        public ActionResult<AccessTokenDTO> Refresh([FromServices] IInvalidatedTokenCache invalidatedCache)
         {
             if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
             {
@@ -122,9 +116,9 @@ namespace API.Controllers
 
             try
             {
-                if (blacklistCache.IsBlacklisted(userContext.IdNonce))
+                if (invalidatedCache.IsInvalidated(userContext.IdNonce))
                 {
-                    logger.LogWarning("Id token is blacklisted. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce);
+                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
@@ -144,7 +138,7 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Id)]
         [Authorize(Policy = Access.Institutional)]
         [HttpPost("logout")]
-        public async Task<ActionResult<LogoutDTO>> LogoutAsync([FromServices] ITokenBlacklistService blacklistService)
+        public async Task<ActionResult<LogoutDTO>> LogoutAsync([FromServices] IInvalidatedTokenService invalidatedService)
         {
             if (authenticationOptions.IsUnsecured || !authenticationOptions.Logout.Enabled)
             {
@@ -153,11 +147,11 @@ namespace API.Controllers
 
             var nonce = User.FindFirst(Nonce.Id).Value;
             var ticks = Convert.ToInt64(User.FindFirst(JwtRegisteredClaimNames.Exp).Value);
-            var token = BlacklistedToken.FromUTCTicks(nonce, ticks);
+            var token = InvalidatedToken.FromUTCTicks(nonce, ticks);
             try
             {
-                logger.LogInformation("Blacklisting Token: {@Token}", token);
-                await blacklistService.Blacklist(token);
+                logger.LogInformation("Invalidating Token: {@Token}", token);
+                await invalidatedService.Invalidate(token);
             }
             catch (Exception e)
             {

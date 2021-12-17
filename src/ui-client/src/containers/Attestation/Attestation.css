@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -28,10 +28,17 @@
 
 .attestation-error-text,
 .attestation-browser-error,
-.attestation-deidentonly {
+.attestation-deidentonly,
+.attestation-downtime-text {
     font-size: 1.2rem;
     text-align: center;
     width: 100%;
+}
+
+.attestation-downtime-text svg {
+    color: orange;
+    filter: drop-shadow( 2px 2px 1px rgba(0, 0, 0, 0.1) );
+    font-size: 3rem;
 }
 
 .attestation-browser-error-inner,

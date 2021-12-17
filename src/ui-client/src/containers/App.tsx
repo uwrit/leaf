@@ -1,16 +1,15 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import moment from 'moment';
 import React from 'react';
 
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
-import { refreshSession, saveSessionAndLogout } from '../actions/session';
+import { refreshSession, saveSessionAndLogout, refreshServerState } from '../actions/session';
 import { RouteConfig } from '../config/routes';
 import Attestation from '../containers/Attestation/Attestation';
 import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
@@ -18,7 +17,7 @@ import Header from '../containers/Header/Header';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import ExportState from '../models/state/Export';
 import { Routes, ConfirmationModalState, InformationModalState, NoClickModalState, Browser, BrowserType, SideNotificationState, UserInquiryState } from '../models/state/GeneralUiState';
-import { SessionContext, SessionState } from '../models/Session';
+import { SessionState } from '../models/Session';
 import MyLeafModal from './MyLeafModal/MyLeafModal';
 import SaveQueryPanel from './SaveQueryPanel/SaveQueryPanel';
 import Sidebar from './Sidebar/Sidebar';
@@ -34,6 +33,9 @@ import DataImportContainer from '../containers/DataImport/DataImport';
 import { version } from '../../package.json'
 import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
+import { sleep } from '../utils/Sleep';
+import NotificationModal from '../components/Modals/NotificationModal/NotificationModal';
+import MaintainenceModal from '../components/Modals/MaintainenceModal/MaintainenceModal';
 import './App.css';
 
 
@@ -61,30 +63,25 @@ interface StateProps {
 
 type Props = StateProps & DispatchProps & OwnProps;
 let inactivityTimer: NodeJS.Timer;
-let sessionTimer: NodeJS.Timer;
 
 class App extends React.Component<Props> {
-    private sessionTokenRefreshPaddingMinutes = 2;
+    private sessionTokenRefreshMinutes = 4;
+    private serverStateCheckIntervalMinutes = 1;
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
 
     public componentDidMount() {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
+        this.handleSessionTokenRefresh();
+        this.handleServerStateRefresh();
         dispatch(getIdToken());
+        dispatch(refreshServerState());
         console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 
         return; 
-    }
-
-    public getSnapshotBeforeUpdate(nextProps: Props): any {
-        const { session } = nextProps;
-        if (session.context) {
-            this.handleSessionTokenRefresh(session.context);
-        }
-        return null;
     }
 
     public render() {
@@ -122,6 +119,12 @@ class App extends React.Component<Props> {
                 <InformationModal informationModal={informationModal} dispatch={dispatch} />
                 <ConfirmationModal confirmationModal={confirmationModal} dispatch={dispatch} />
                 <NoClickModal state={noclickModal} dispatch={dispatch} />
+                {auth.serverState && 
+                <NotificationModal dispatch={dispatch} />
+                }
+                {session.context && !auth.serverState.isUp && session.hasAttested && auth.userContext.isAdmin &&
+                <MaintainenceModal />
+                }
             </div>
         );
     }
@@ -145,20 +148,29 @@ class App extends React.Component<Props> {
     }
 
     /*
-     * Refresh user session token (should be short interval, e.g., 4 minutes).
+     * Poll every few minutes to check for downtimes and notifications from the server.
      */
-    private handleSessionTokenRefresh(ctx: SessionContext) {
+    private async handleServerStateRefresh() {
         const { dispatch } = this.props;
-        const refreshDtTm = moment(ctx.expirationDate).add(-this.sessionTokenRefreshPaddingMinutes, 'minute').toDate();
-        const diffMs = refreshDtTm.getTime() - new Date().getTime();
-        const timeoutMs = diffMs < 0 ? 0 : diffMs;
+        await sleep(this.serverStateCheckIntervalMinutes * 60000);
+        dispatch(refreshServerState());
+        this.handleServerStateRefresh();
+    }
 
-        if (sessionTimer) {
-            clearTimeout(sessionTimer);
-        }
-        sessionTimer = setTimeout(() => {
+    /*
+     * Refresh user session token every 4 minutes.
+     */
+    private async handleSessionTokenRefresh() {
+        const { dispatch, session } = this.props;
+
+        if (session.context) {
+            await sleep(this.sessionTokenRefreshMinutes * 60000);
             dispatch(refreshSession());
-        }, timeoutMs);
+            this.handleSessionTokenRefresh();
+        } else {
+            await sleep(10000);
+            this.handleSessionTokenRefresh();
+        }
     }
 
     /*

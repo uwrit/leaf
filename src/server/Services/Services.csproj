@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <!-- <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> -->
     <TieredCompilation>true</TieredCompilation>
+    <ReleaseVersion>3.1</ReleaseVersion>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -31,6 +32,10 @@
     <Folder Include="Authentication\" />
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
+    <Folder Include="Admin\Notification\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Admin\Notification\" />
+  </ItemGroup>
 </Project>

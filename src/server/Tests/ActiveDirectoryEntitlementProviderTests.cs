@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -48,7 +48,7 @@ namespace Tests
             var opts = GetOptions();
             var identity = GetUserContext("johndoe@entity.tld");
 
-            var eProvider = new ActiveDirectoryEntitlementProvider(opts, mock);
+            var eProvider = new ActiveDirectoryEntitlementProvider(opts, Options.Create(new AuthorizationOptions()), mock);
 
             var e = eProvider.GetEntitlement(HttpHelper.GetHttpContext(), identity);
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2022, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -11,29 +11,29 @@ using System.Collections.Generic;
 
 namespace API.Jwt
 {
-    public class TokenBlacklistCache : ITokenBlacklistCache
+    public class TokenInvalidatedCache : IInvalidatedTokenCache
     {
         readonly ReaderWriterLockSlim sync;
-        HashSet<Guid> blacklist;
+        HashSet<Guid> invalidated;
 
-        public TokenBlacklistCache()
+        public TokenInvalidatedCache()
         {
             sync = new ReaderWriterLockSlim();
-            blacklist = new HashSet<Guid>();
+            invalidated = new HashSet<Guid>();
         }
 
-        public TokenBlacklistCache(IEnumerable<BlacklistedToken> initial)
+        public TokenInvalidatedCache(IEnumerable<InvalidatedToken> initial)
         {
             sync = new ReaderWriterLockSlim();
-            blacklist = UniqNonces(initial);
+            invalidated = UniqNonces(initial);
         }
 
-        public bool IsBlacklisted(Guid idNonce)
+        public bool IsInvalidated(Guid idNonce)
         {
             sync.EnterReadLock();
             try
             {
-                return blacklist.Contains(idNonce);
+                return invalidated.Contains(idNonce);
             }
             finally
             {
@@ -41,7 +41,7 @@ namespace API.Jwt
             }
         }
 
-        public void Overwrite(IEnumerable<BlacklistedToken> tokens)
+        public void Overwrite(IEnumerable<InvalidatedToken> tokens)
         {
             var set = UniqNonces(tokens);
             if (set == null)
@@ -53,7 +53,7 @@ namespace API.Jwt
             try
             {
 
-                blacklist = set;
+                invalidated = set;
             }
             finally
             {
@@ -61,12 +61,12 @@ namespace API.Jwt
             }
         }
 
-        public void Blacklist(BlacklistedToken token)
+        public void Invalidate(InvalidatedToken token)
         {
             sync.EnterWriteLock();
             try
             {
-                blacklist.Add(token.IdNonce);
+                invalidated.Add(token.IdNonce);
             }
             finally
             {
@@ -74,7 +74,7 @@ namespace API.Jwt
             }
         }
 
-        static HashSet<Guid> UniqNonces(IEnumerable<BlacklistedToken> tokens)
+        static HashSet<Guid> UniqNonces(IEnumerable<InvalidatedToken> tokens)
         {
             return tokens?.Select(t => t.IdNonce)?.ToHashSet();
         }

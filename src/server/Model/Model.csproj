@@ -17,6 +17,7 @@
     <Folder Include="Error\" />
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
+    <Folder Include="Admin\Notification\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.1.0" />
@@ -25,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Compiler\appsettings.json" />
+    <None Remove="Admin\Notification\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Import\ImportMappingQuery.cs" />

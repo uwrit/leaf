@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -13,16 +13,21 @@ import { attemptLoginRetryIfPossible, removeSessionRetryKey } from '../services/
 import { setRouteConfig } from './generalUi';
 import { getRoutes } from '../config/routes';
 import { setSessionLoadState } from './session';
+import { ServerStateDTO } from '../models/state/ServerState';
 
 export const REQUEST_ID_TOKEN = 'REQUEST_ID_TOKEN';
 export const RECEIVE_ID_TOKEN = 'RECEIVE_ID_TOKEN';
 export const FAILURE_ID_TOKEN = 'FAILURE_ID_TOKEN';
 export const RECEIVE_AUTH_CONFIG = 'RECEIVE_AUTH_CONFIG';
+export const SET_SERVER_STATE = 'SET_SERVER_STATE';
+export const SET_USER_NOTIFICATIONS_SEEN = 'SET_USER_NOTIFICATIONS';
 
 export interface AuthorizationAction {
     config?: AppConfig;
+    dontShowNotificationsAgain?: boolean;
     message?: string;
     context?: UserContext;
+    serverState?: ServerStateDTO;
     type: string;
 }
 
@@ -106,5 +111,19 @@ export const failureIdToken = (message: string): AuthorizationAction => {
     return {
         message,
         type: FAILURE_ID_TOKEN
+    };
+};
+
+export const setServerState = (serverState: ServerStateDTO): AuthorizationAction => {
+    return {
+        serverState,
+        type: SET_SERVER_STATE
+    };
+};
+
+export const setUserNotificationsSeen = (dontShowNotificationsAgain: boolean): AuthorizationAction => {
+    return {
+        dontShowNotificationsAgain,
+        type: SET_USER_NOTIFICATIONS_SEEN
     };
 };

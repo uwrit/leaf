@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2021, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -225,7 +225,7 @@ namespace Model.Compiler
             }
         }
 
-        // NOTE(cspital) at this point, we are certain the counts are the same.
+        // NOTE(ndobb) at this point, we are certain the counts are the same.
         IEnumerable<PanelItemMapping> ZipContextItems(PanelValidationContext ctx)
         {
             var dtos = ctx.Requested

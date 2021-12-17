@@ -1,4 +1,4 @@
-/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
  * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -14,7 +14,7 @@ import { SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { fetchHomeIdentityAndResponders, fetchResponderIdentity } from '../services/networkRespondersApi';
 import { getExportOptions, getImportOptions } from '../services/redcapApi';
-import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer, attemptLoginRetryIfPossible } from '../services/sessionApi';
+import { getSessionTokenAndContext, refreshSessionTokenAndContext, saveSessionAndForceReLogin, getPrevSession, logoutFromServer, attemptLoginRetryIfPossible, getServerState } from '../services/sessionApi';
 import { requestRootConcepts, setExtensionRootConcepts } from './concepts';
 import { setExportOptions } from './dataExport';
 import { fetchAvailableDatasets } from '../services/cohortApi';
@@ -32,7 +32,7 @@ import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken, getUserTokenAndContext } from '../services/authApi';
 import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
-import { getIdToken, receiveIdToken, failureIdToken } from './auth';
+import { getIdToken, receiveIdToken, failureIdToken, setServerState } from './auth';
 import { getRoutes } from '../config/routes';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
@@ -227,6 +227,16 @@ export const refreshSession = () => {
         const state = getState();
         const ctx = await refreshSessionTokenAndContext(state) as SessionContext;
         dispatch(setSessionContext(ctx));
+    };
+};
+
+/*
+ * Get server state.
+ */
+export const refreshServerState = () => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        const serverState = await getServerState();
+        dispatch(setServerState(serverState));
     };
 };
 

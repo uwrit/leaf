@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2022, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -8,6 +8,7 @@ using API.DTO.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Model.Notification;
 using Model.Options;
 
 namespace API.Controllers
@@ -23,6 +24,7 @@ namespace API.Controllers
         readonly ClientOptions clientOptions;
         readonly AttestationOptions attestationOptions;
         readonly DeidentificationOptions deidentOptions;
+        readonly IServerStateCache serverStateCache;
 
         public ConfigController(
             IOptions<AuthenticationOptions> authenticationOptions,
@@ -30,7 +32,8 @@ namespace API.Controllers
             IOptions<CohortOptions> cohortOptions,
             IOptions<ClientOptions> clientOptions,
             IOptions<AttestationOptions> attestationOptions,
-            IOptions<DeidentificationOptions> deidentOptions)
+            IOptions<DeidentificationOptions> deidentOptions,
+            IServerStateCache serverStateCache)
         {
             this.authenticationOptions = authenticationOptions.Value;
             this.versionOptions = versionOptions.Value;
@@ -38,6 +41,13 @@ namespace API.Controllers
             this.clientOptions = clientOptions.Value;
             this.attestationOptions = attestationOptions.Value;
             this.deidentOptions = deidentOptions.Value;
+            this.serverStateCache = serverStateCache;
+        }
+
+        [HttpGet("serverstate")]
+        public ServerStateDTO GetServerState()
+        {
+            return new ServerStateDTO(serverStateCache.GetServerState());
         }
 
         public ActionResult<ConfigDTO> Get()

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2020, UW Medicine Research IT, University of Washington
+﻿// Copyright (c) 2022, UW Medicine Research IT, University of Washington
 // Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -34,6 +34,7 @@ using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
 using Services.Admin.User;
+using Services.Admin.Notification;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
@@ -68,6 +69,8 @@ namespace API.Options
 
             services.AddIAMServices();
 
+            services.AddHostedService<BackgroundServerStateSynchronizer>();
+
             services.AddTransient<ISqlCompiler, SqlServerCompiler>();
 
             services.AddTransient<NetworkEndpointProvider.INetworkEndpointReader, NetworkEndpointReader>();
@@ -90,6 +93,8 @@ namespace API.Options
                 services.AddHostedService<BackgroundCertificateSynchronizer>();
             }
 
+            services.AddSingleton<IServerStateCache, ServerStateCache>();
+            services.AddSingleton<IServerStateProvider, ServerStateService>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
@@ -120,6 +125,7 @@ namespace API.Options
 
         static IServiceCollection AddAdminServices(this IServiceCollection services)
         {
+            services.AddTransient<AdminServerStateManager.IAdminServerStateService, AdminServerStateService>();
             services.AddTransient<AdminConceptSqlSetManager.IAdminConceptSqlSetService, AdminConceptSqlSetService>();
             services.AddTransient<AdminSpecializationManager.IAdminSpecializationService, AdminSpecializationService>();
             services.AddTransient<AdminSpecializationGroupManager.IAdminSpecializationGroupService, AdminSpecializationGroupService>();
@@ -154,9 +160,9 @@ namespace API.Options
 
         static IServiceCollection AddIAMServices(this IServiceCollection services)
         {
-            services.AddSingleton<ITokenBlacklistCache, TokenBlacklistCache>();
-            services.AddSingleton<ITokenBlacklistService, TokenBlacklistService>();
-            services.AddHostedService<BackgroundTokenBlacklistSynchronizer>();
+            services.AddSingleton<IInvalidatedTokenCache, TokenInvalidatedCache>();
+            services.AddSingleton<IInvalidatedTokenService, TokenInvalidatedService>();
+            services.AddHostedService<BackgroundInvalidatedTokenSynchronizer>();
 
             var sp = services.BuildServiceProvider();
             var authenticationOptions = sp.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
