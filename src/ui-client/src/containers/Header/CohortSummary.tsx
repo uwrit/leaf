@@ -93,7 +93,7 @@ export class CohortSummary extends React.Component<Props> {
         const { plusMinus, withinLowCellThreshold, value } = this.props.count;
         const infoBoxClasses = [ 'cohort-summary-info-box' ];
         const duration = value === 0 && this.prevCount > 0 ? 0.2 : 1.0;
-        const displayName = this.props.currentQuery.name === '' ? 'New Query' : this.props.currentQuery.name;
+        const displayName = this.props.currentQuery.name === '' ? 'Unsaved Query' : this.props.currentQuery.name;
 
         if (infoButtonVisible) { infoBoxClasses.push('show'); }
 
