@@ -46,8 +46,8 @@ export default class DatasetColumnSelector extends React.PureComponent<Props, St
             <div className={`${c}-dataset`} onClick={this.handleClick}>
                 {data.displayName}
                 {data.dateBounds && data.dateBounds!.abbrev &&
-                    <abbr title={data.dateBounds!.display} className={`${cs}-nameQualifier`}>
-                        <span className={`${cs}-nameQualifier-dateBoundsAbbrev`}>{data.dateBounds!.abbrev}</span>
+                    <abbr title={data.dateBounds!.display} className={`${cs}-name-qualifier`}>
+                        <span className={`${cs}-name-qualifier-date-bounds-abbrev`}>{data.dateBounds!.abbrev}</span>
                         <GiBackwardTime />
                     </abbr>
                 }

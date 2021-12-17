@@ -139,13 +139,13 @@
     color: rgb(24, 142, 185);
 }
 
-.patientlist-column-selector-nameQualifier {
+.patientlist-column-selector-name-qualifier {
     position: relative;
     width: 50px;
     margin-left: 2px
 }
 
-.patientlist-column-selector-nameQualifier-dateBoundsAbbrev {
+.patientlist-column-selector-name-qualifier-date-bounds-abbrev {
     position: absolute;
     top: 10px;
     font-size: 10px;
