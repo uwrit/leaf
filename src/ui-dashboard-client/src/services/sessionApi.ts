@@ -52,7 +52,8 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
     const http = HttpFactory.authenticated(state.auth.userContext!.token);
 
-    const request = http.get('api/user/attest', {
+    console.log('http.get');
+    const response = await http.get('api/user/attest', {
         params: {
             'documentation.expirationDate': attestation.documentation.expirationDate,
             'documentation.institution': attestation.documentation.institution,
@@ -60,8 +61,6 @@ export const getSessionTokenAndContext = async (state: AppState, attestation: At
             ...attestation
         }
     });
-
-    const response = await request;
     const respData = response.data as AccessTokenDTO;
     const ctx = decodeToken(respData.accessToken);
     return ctx;

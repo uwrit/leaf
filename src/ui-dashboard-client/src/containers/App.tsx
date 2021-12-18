@@ -45,16 +45,8 @@ class App extends React.Component<Props> {
     }
 
     public componentDidUpdate() { 
-        return; 
-    }
-
-    public getSnapshotBeforeUpdate(nextProps: Props): any {
         const { dispatch, auth } = this.props;
-        const { session } = nextProps;
-        if (session.context) {
-            this.handleSessionTokenRefresh(session.context);
-        }
-        if (!this.hasAttested && auth) {
+        if (!this.hasAttested && auth && auth.userContext) {
             const dummyAttest = {
                 documentation: { institution: '', title: '' },
                 isIdentified: false,
@@ -62,6 +54,13 @@ class App extends React.Component<Props> {
             };
             dispatch(attestAndLoadSession(dummyAttest));
             this.hasAttested = true;
+        }
+    }
+
+    public getSnapshotBeforeUpdate(nextProps: Props): any {
+        const { session } = nextProps;
+        if (session.context) {
+            this.handleSessionTokenRefresh(session.context);
         }
         return null;
     }

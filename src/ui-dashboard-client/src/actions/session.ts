@@ -39,6 +39,7 @@ export const attestAndLoadSession = (attestation: Attestation) => {
          */
         dispatch(setSessionLoadState('Submitting Attestation', 5));
         dispatch(submitAttestation(attestation));
+        console.log('getSessionTokenAndContext');
         getSessionTokenAndContext(getState(), attestation)
             .then((ctx) => {
                 dispatch(setSessionContext(ctx));
