@@ -1,20 +1,21 @@
 import { DashboardConfig } from "../models/config/config";
+import { PatientListDatasetShape } from "../models/patientList/Dataset";
 
 export const config: DashboardConfig = 
 {
     main: {
         title: "Memory and Brain Wellness Dashboard",
         cohortId: "d3f1423e-f36b-1410-81bf-0018c8508655",
-        datasetIds: [
-            "d6f1423e-f36b-1410-81bf-0018c8508655",
-            "d9f1423e-f36b-1410-81bf-0018c8508655",
-            "e0f1423e-f36b-1410-81bf-0018c8508655",
-            "e3f1423e-f36b-1410-81bf-0018c8508655",
-            "e6f1423e-f36b-1410-81bf-0018c8508655",
-            "ebf1423e-f36b-1410-81bf-0018c8508655",
-            "f0f1423e-f36b-1410-81bf-0018c8508655",
-            "f2f1423e-f36b-1410-81bf-0018c8508655",
-            "f4f1423e-f36b-1410-81bf-0018c8508655"
+        datasets: [
+            { id: "d6f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "d9f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "e0f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "e3f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "e6f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "ebf1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "f0f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "f2f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic },
+            { id: "f4f1423e-f36b-1410-81bf-0018c8508655", shape: PatientListDatasetShape.Dynamic }
         ],
         content: []
     },

@@ -34,7 +34,6 @@ export interface PatientListRow {
 export interface PatientListRowDTO {
     [key: string]: PatientId;
     encounterId: EncounterId;
-    personId: string;
 }
 
 export interface PatientListDetailEncounter {

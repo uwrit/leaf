@@ -14,6 +14,8 @@ import rootReducer from '../reducers/rootReducer';
 import { AppState } from '../models/state/AppState';
 import { defaultAuthorizationState } from '../reducers/auth';
 import { defaultSessionState } from '../reducers/session';
+import { defaultDashboardConfigurationState } from '../reducers/config';
+import { defaultCohortState } from '../reducers/cohort';
 
 const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({ 
     history: createBrowserHistory(),
@@ -33,6 +35,8 @@ export default function configureStore(preloadedState: any) {
 
 export const beginState: AppState = {
     auth: defaultAuthorizationState(),
+    cohort: defaultCohortState(),
+    config: defaultDashboardConfigurationState(),
     session: defaultSessionState()
 };
 

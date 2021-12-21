@@ -1,3 +1,4 @@
+import { PatientListDatasetShape } from "../patientList/Dataset";
 import { ContentType } from "./content";
 
 export interface DashboardConfig {
@@ -5,28 +6,33 @@ export interface DashboardConfig {
     patient: PatientPageConfig;
 };
 
-interface DashboardPageConfig {
+export interface DashboardPageConfig {
     title: string;
     
 };
 
-interface MainPageConfig extends DashboardPageConfig {
+export interface MainPageConfig extends DashboardPageConfig {
     cohortId: string;
     content: ContentType[];
-    datasetIds: string[];
+    datasets: DatasetConfig[];
 };
 
-interface PatientPageConfig extends DashboardPageConfig {
+export interface DatasetConfig {
+    id: string,
+    shape: PatientListDatasetShape;
+}
+
+export interface PatientPageConfig extends DashboardPageConfig {
     content: ContentType[];
     demographics: DemographicsConfig;
     search: SearchConfig;
 };
 
-interface SearchConfig {
+export interface SearchConfig {
     enabled: boolean;
 };
 
-interface DemographicsConfig {
+export interface DemographicsConfig {
     datasetId: string;
     fieldName?: string;
     fieldAge?: string;

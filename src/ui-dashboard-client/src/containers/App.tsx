@@ -11,12 +11,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
 import { attestAndLoadSession, refreshSession } from '../actions/session';
-import { AppState, AuthorizationState } from '../models/state/AppState';
-import { SessionContext, SessionState } from '../models/Session';
+import { AppState } from '../models/state/AppState';
+import { SessionContext } from '../models/Session';
 import { version } from '../../package.json'
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import Patient from './Patient/Patient';
-import { config } from '../test/mock';
+import { history } from '../store/configureStore';
 import './App.css';
 
 
@@ -26,8 +26,7 @@ interface DispatchProps {
     dispatch: any;
 }
 interface StateProps {
-    auth?: AuthorizationState;
-    session: SessionState;
+    state: AppState
 }
 
 type Props = StateProps & DispatchProps & OwnProps;
@@ -39,16 +38,23 @@ class App extends React.Component<Props> {
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
     private hasAttested = false;
+    private unlisten: any;
 
     public componentDidMount() {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         dispatch(getIdToken());
         console.info(`Leaf client application running version ${version}`);
+
+        
+        this.unlisten = history.listen(({ action, location }) => {
+            console.log("on route change", action, location);
+        });
     }
 
     public componentDidUpdate() { 
-        const { dispatch, auth } = this.props;
+        const { dispatch, state } = this.props;
+        const { auth } = state;
         if (!this.hasAttested && auth && auth.userContext) {
             const dummyAttest = {
                 documentation: { institution: '', title: '' },
@@ -61,7 +67,8 @@ class App extends React.Component<Props> {
     }
 
     public getSnapshotBeforeUpdate(nextProps: Props): any {
-        const { session } = nextProps;
+        const { state } = nextProps;
+        const { session } = state;
         if (session.context) {
             this.handleSessionTokenRefresh(session.context);
         }
@@ -69,7 +76,8 @@ class App extends React.Component<Props> {
     }
 
     public render() {
-        const { auth, dispatch, session } = this.props;
+        const { dispatch, state } = this.props;
+        const { auth, session } = state;
         const classes = [ 'app-container' ];
 
         return (
@@ -78,9 +86,9 @@ class App extends React.Component<Props> {
                 {session && session.context &&
                 <div id="main-content">
                     <Routes>
-                        <Route path="/" element={<div>main!</div>} />
-                        <Route path="/patient/:patientId" element={<Patient />} />
-                        <Route path="*" element={<div>404!</div>} />
+                        <Route path="/dashboards/:dashboardId" element={<div>main!</div>} />
+                        <Route path="/dashboards/:dashboardId/patients/:patientId" element={<Patient />} />
+                        <Route path="*" element={<Navigate to="/dashboards/test" />} />
                     </Routes>
                 </div>
                 }
@@ -127,7 +135,8 @@ class App extends React.Component<Props> {
      * Handle user activity via mouse or key action, which resets the inactivity timeout.
      */
     private handleActivity = () => {
-        const { dispatch, auth, session } = this.props;
+        const { dispatch, state } = this.props;
+        const { auth, session } = state;
         if (!session.context || auth!.config!.authentication.inactivityTimeoutMinutes <= 0) { return; }
 
         if (inactivityTimer) {
@@ -137,16 +146,11 @@ class App extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: AppState) => {
-    return {
-        auth: state.auth,
-        session: state.session,
-    };
+    return { state };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
-    return {
-        dispatch
-    };
+    return { dispatch };
 };
 
 export default connect<StateProps, DispatchProps, OwnProps, AppState>

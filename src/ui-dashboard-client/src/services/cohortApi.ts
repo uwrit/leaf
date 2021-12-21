@@ -10,7 +10,8 @@ import { AppState } from '../models/state/AppState';
 import { baseUrl, HttpFactory } from './HttpFactory';
 import moment from 'moment'
 import { DateBoundary, DateFilter, DateIncrementType } from '../models/Date';
-import { PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patientList/Dataset';
+import { PatientListDatasetDTO } from '../models/patientList/Dataset';
+import { DatasetConfig } from '../models/config/config';
 
 /**
  * Fetch a dataset, which may or may not have date boundaries.
@@ -18,17 +19,14 @@ import { PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patien
 export const fetchDataset = async (
         state: AppState, 
         queryId: string, 
-        dataset: PatientListDatasetQuery, 
+        dataset: DatasetConfig, 
         dates?: DateBoundary,
         panelIndex?: number
     ): Promise<PatientListDatasetDTO> => {
 
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const params: any = {
-        datasetid: dataset.id,
-        shape: dataset.shape
-    }
+    const params: any = { ...dataset }
     if (typeof panelIndex !== 'undefined') {
         params.panelIdx = panelIndex
     } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {

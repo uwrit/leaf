@@ -70,7 +70,7 @@ export interface PatientListDatasetSchemaField {
     type: PatientListColumnType;
 }
 
-interface PatientListDatasetResults {
+export interface PatientListDatasetResults {
     [p: string]: PatientListRowDTO[];
 }
 

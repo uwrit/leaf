@@ -6,7 +6,9 @@
  */ 
 
 import { AppConfig, UserContext } from "../Auth";
+import { DashboardConfig } from "../config/config";
 import { SessionState } from "../Session";
+import { CohortState } from "./CohortState";
 
 
 export interface AuthorizationState {
@@ -17,5 +19,7 @@ export interface AuthorizationState {
 
 export interface AppState {
     auth: AuthorizationState;
+    cohort: CohortState;
+    config: DashboardConfig;
     session: SessionState;
 }

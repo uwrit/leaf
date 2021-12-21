@@ -6,7 +6,7 @@ interface Props {
     patientId?: string;
 }
 
-class Patient extends React.Component<Props> {
+class Cohort extends React.Component<Props> {
     private className = 'patient';
 
     public render() {
@@ -20,11 +20,11 @@ class Patient extends React.Component<Props> {
     }
 };
 
-const withRouter = (Patient: any) => (props: Props) => {
+const withRouter = (Cohort: any) => (props: Props) => {
     const params = useParams();
     const { dashboardId, patientId } = params;
     console.log(dashboardId, patientId);
-    return <Patient patientId={patientId} />;
+    return <Cohort patientId={patientId} />;
 };
 
-export default withRouter(Patient);
+export default withRouter(Cohort);
