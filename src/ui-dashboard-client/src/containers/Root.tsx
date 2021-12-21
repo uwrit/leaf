@@ -9,30 +9,22 @@ import React from 'react';
 import { DndProvider } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
 import { Provider } from 'react-redux';
-import { AppState } from '../models/state/AppState';
-import { defaultAuthorizationState } from '../reducers/auth';
-import { defaultSessionState } from '../reducers/session';
-import configureStore from '../store/configureStore';
-import { BrowserRouter } from "react-router-dom";
+import configureStore, { beginState, history } from '../store/configureStore';
+import { HistoryRouter as Router } from "redux-first-history/rr6";
 import App from './App';
-
-const beginState: AppState = {
-    auth: defaultAuthorizationState(),
-    session: defaultSessionState()
-}
 
 const store = configureStore(beginState);
 
 export default class Root extends React.Component {
     public render() {
         return (
-            <BrowserRouter>
-                <Provider store={store}>
+            <Provider store={store}>
+                <Router history={history} >
                     <DndProvider backend={HTML5Backend}>
                         <App />
                     </DndProvider>
-                </Provider>
-            </BrowserRouter>
+                </Router>
+            </Provider>
         )
     }
 }

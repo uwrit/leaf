@@ -8,6 +8,7 @@
 import Axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { AppConfig, DecodedIdToken, IdTokenDTO, UserContext } from '../models/Auth';
+import { baseUrl } from './HttpFactory';
 
 /*
  * Return the id token key to look for
@@ -104,7 +105,7 @@ export const getUserTokenAndContext = async (config: AppConfig, forceNew: boolea
         }
 
         // Else phone home for a new one
-        Axios.get('/api/user')
+        Axios.get(`${baseUrl}/api/user`)
             .then(response => {
                 const respData: IdTokenDTO = response.data;
                 ctx = decodeToken(respData.idToken);
@@ -123,7 +124,7 @@ export const getUserTokenAndContext = async (config: AppConfig, forceNew: boolea
  * Return the configuration for this Leaf instance.
  */
 export const getAuthConfig = async () => {
-    const request = await Axios.get('/api/config');
+    const request = await Axios.get(`${baseUrl}/api/config`);
     const config = request.data as AppConfig;
     return config;
 };

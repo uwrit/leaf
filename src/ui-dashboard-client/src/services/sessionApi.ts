@@ -8,7 +8,7 @@
 import jwt_decode from 'jwt-decode';
 import { AppState } from '../models/state/AppState';
 import { AccessTokenDTO, Attestation, DecodedAccessToken, SessionContext } from '../models/Session';
-import { HttpFactory } from './HttpFactory';
+import { baseUrl, HttpFactory } from './HttpFactory';
 import { LogoutDTO } from '../models/Auth';
 
 /*
@@ -35,7 +35,7 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
     return new Promise( async (resolve, reject) => {
         try {
             const http = HttpFactory.authenticated(state.session.context!.token);
-            const request = http.get('api/user/refresh');
+            const request = http.get(`${baseUrl}/api/user/refresh`);
             const response = await request;
             const respData = response.data as AccessTokenDTO;
             const ctx = decodeToken(respData.accessToken);
@@ -51,9 +51,7 @@ export const refreshSessionTokenAndContext = (state: AppState) => {
  */
 export const getSessionTokenAndContext = async (state: AppState, attestation: Attestation) => {
     const http = HttpFactory.authenticated(state.auth.userContext!.token);
-
-    console.log('http.get');
-    const response = await http.get('api/user/attest', {
+    const response = await http.get(`${baseUrl}/api/user/attest`, {
         params: {
             'documentation.expirationDate': attestation.documentation.expirationDate,
             'documentation.institution': attestation.documentation.institution,
@@ -72,7 +70,7 @@ export const getSessionTokenAndContext = async (state: AppState, attestation: At
 export const logoutFromServer = async (state: AppState): Promise<LogoutDTO | undefined> => {
     try {
         const http = HttpFactory.authenticated(state.auth.userContext!.token);
-        const request = await http.post('api/user/logout');
+        const request = await http.post(`${baseUrl}/api/user/logout`);
         return request.data as LogoutDTO;
     } catch (err) {
         console.log(err);

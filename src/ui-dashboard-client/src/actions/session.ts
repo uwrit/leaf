@@ -39,7 +39,6 @@ export const attestAndLoadSession = (attestation: Attestation) => {
          */
         dispatch(setSessionLoadState('Submitting Attestation', 5));
         dispatch(submitAttestation(attestation));
-        console.log('getSessionTokenAndContext');
         getSessionTokenAndContext(getState(), attestation)
             .then((ctx) => {
                 dispatch(setSessionContext(ctx));
@@ -85,11 +84,16 @@ export const attestAndLoadSession = (attestation: Attestation) => {
 export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
-            
-            /**
-             * All done
+
+            /** 
+             * Session token
              */
             dispatch(completeAttestation(ctx.rawDecoded["access-nonce"]));
+
+            /**
+             * Get datasets
+             */
+            
 
         } catch (err) {
             console.log(err);

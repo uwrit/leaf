@@ -14,6 +14,9 @@ import { attestAndLoadSession, refreshSession } from '../actions/session';
 import { AppState, AuthorizationState } from '../models/state/AppState';
 import { SessionContext, SessionState } from '../models/Session';
 import { version } from '../../package.json'
+import { Route, Routes } from 'react-router-dom';
+import Patient from './Patient/Patient';
+import { config } from '../test/mock';
 import './App.css';
 
 
@@ -66,17 +69,19 @@ class App extends React.Component<Props> {
     }
 
     public render() {
-        const { 
-            auth, dispatch, session
-        } = this.props;
+        const { auth, dispatch, session } = this.props;
         const classes = [ 'app-container' ];
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
                 App Container yo
-                {session.context &&
+                {session && session.context &&
                 <div id="main-content">
-                    It's working!
+                    <Routes>
+                        <Route path="/" element={<div>main!</div>} />
+                        <Route path="/patient/:patientId" element={<Patient />} />
+                        <Route path="*" element={<div>404!</div>} />
+                    </Routes>
                 </div>
                 }
             </div>

@@ -8,10 +8,18 @@
 import { combineReducers } from 'redux';
 import { auth } from './auth';
 import { session } from './session';
+import { createReduxHistoryContext, reachify } from "redux-first-history";
+import { createBrowserHistory } from 'history';
+
+const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({ 
+    history: createBrowserHistory(),
+});
 
 const rootReducer = combineReducers({
     auth,
-    session
+    session,
+    
+    router: routerReducer
 });
 
 export default rootReducer;

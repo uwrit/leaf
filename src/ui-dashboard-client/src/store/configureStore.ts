@@ -8,16 +8,33 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly'
+import { createReduxHistoryContext, reachify } from "redux-first-history";
+import { createBrowserHistory } from 'history';
 import rootReducer from '../reducers/rootReducer';
+import { AppState } from '../models/state/AppState';
+import { defaultAuthorizationState } from '../reducers/auth';
+import { defaultSessionState } from '../reducers/session';
+
+const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHistoryContext({ 
+    history: createBrowserHistory(),
+});
 
 export default function configureStore(preloadedState: any) {
     return createStore(
         rootReducer,
-        /* preloadedState, */
         composeWithDevTools(
             applyMiddleware(
-                thunkMiddleware
+                thunkMiddleware,
+                routerMiddleware
             )
         )
     )
 };
+
+export const beginState: AppState = {
+    auth: defaultAuthorizationState(),
+    session: defaultSessionState()
+};
+
+export const history = createReduxHistory(configureStore(beginState));
+export const reachHistory = reachify(history);

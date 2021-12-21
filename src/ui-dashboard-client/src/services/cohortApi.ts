@@ -7,8 +7,10 @@
 
 import { CancelTokenSource } from 'axios';
 import { AppState } from '../models/state/AppState';
-import { HttpFactory } from './HttpFactory';
+import { baseUrl, HttpFactory } from './HttpFactory';
 import moment from 'moment'
+import { DateBoundary, DateFilter, DateIncrementType } from '../models/Date';
+import { PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patientList/Dataset';
 
 /**
  * Fetch a dataset, which may or may not have date boundaries.
@@ -34,7 +36,7 @@ export const fetchDataset = async (
         params.late = deriveDateTicks(dates.end);
     }
 
-    const result = await http.get(`/api/cohort/${queryId}/dataset`, { params });
+    const result = await http.get(`${baseUrl}/api/cohort/${queryId}/dataset`, { params });
     return result.data as PatientListDatasetDTO
 };
 
