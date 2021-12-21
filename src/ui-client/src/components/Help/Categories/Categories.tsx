@@ -40,7 +40,6 @@ export class Categories extends React.Component<Props> {
                         category={c}
                         dispatch={dispatch}
                         isAdmin={isAdmin}
-
                         tempHelpPage={tempPage}
                     />
                 )}

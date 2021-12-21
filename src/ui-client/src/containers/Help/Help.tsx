@@ -8,6 +8,7 @@
 import React from 'react';
 import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { connect } from 'react-redux';
+import { exampleText }  from './ExampleText';
 import { AdminHelp } from '../Admin/AdminHelp';
 import { setCurrentHelpPage } from '../../actions/helpPage';
 import { adminHelpContentUnsaved, isAdminHelpContentNew, setAdminHelpContent, setCurrentAdminHelpContent } from '../../actions/admin/helpPage';
@@ -15,16 +16,13 @@ import { Content } from '../../components/Help/Content/Content';
 import { Categories } from '../../components/Help/Categories/Categories';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
 import { UserContext } from '../../models/Auth';
-import { HelpPage, HelpPageCategory } from '../../models/Help/Help';
+import { HelpPage } from '../../models/Help/Help';
 import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
 import { AppState } from '../../models/state/AppState';
 import { AdminHelpState } from '../../models/state/AdminState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
-import { TextArea } from '../../components/Admin/Section/TextArea';
 import './Help.css';
-
-import TextareaAutosize from 'react-textarea-autosize';
 
 interface OwnProps { }
 
@@ -121,7 +119,6 @@ export class Help extends React.PureComponent<Props, State> {
                             categories={helpPages.categories}
                             dispatch={dispatch}
                             isAdmin={user.isAdmin}
-
                             newCategory={category}
                             newTitle={title}
                         />
@@ -156,15 +153,15 @@ export class Help extends React.PureComponent<Props, State> {
             pageId: '',
             orderId: 0,
             type: 'text',
-            textContent: 'Enter Text Here.',
+            textContent: exampleText,
             imageId: '',
             imageContent: '',
             imageSize: 0
         }) as ContentRow;
 
         const newContent = Object.assign({}, {
-            title: title ? title : ' Enter Title Here',
-            category: category ? category : 'Enter Category Here',
+            title: title ? title : ' Example Title',
+            category: category ? category : 'Example Category',
             content: [ contentRow ]
         }) as AdminHelpContent;
 

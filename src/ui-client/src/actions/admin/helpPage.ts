@@ -103,6 +103,7 @@ export const createAdminHelpPageContent = (contentRows: CreateHelpPage[]) => {
 export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[]) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
+        // NOTE: pageId is empty if no content rows, throws error
         const pageId = contentRows[0].pageId;
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));

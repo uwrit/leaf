@@ -86,7 +86,7 @@ BEGIN
     IF ((SELECT COUNT(*) FROM app.HelpPageContent WHERE PageId = @pageId) = 0)
         THROW 70404, 'Content not found and/or does not exist for page.', 1;
 
-    SELECT Id, PageId, OrderId, Type, TextContent, ImageContent, ImageId
+    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @pageId;
 END

@@ -9,17 +9,15 @@ import React from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { showConfirmationModal } from '../../actions/generalUi';
-import { setCurrentHelpPage } from '../../actions/helpPage';
-import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent, createAdminHelpPageContent,
-         deleteHelpPageAndContent, isAdminHelpContentNew, resetAdminHelpContent, setAdminHelpContent,
-         setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
+import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent,
+         createAdminHelpPageContent, deleteHelpPageAndContent,
+         resetAdminHelpContent, setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
 import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
 import { AdminHelpContent, ContentRow, CreateHelpPage,
          CreateHelpPageDTO, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
-import { HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
 import './AdminHelp.css';
 
@@ -101,7 +99,9 @@ export class AdminHelp extends React.Component<Props> {
         const contentCopy = currentContent.content.slice();
 
         // WORK ON: dont feel comfortable with filter, is there a better way?
-        const textContentLength = contentCopy.filter(c => c.textContent).length;
+        // const textContentLength = contentCopy.filter(c => c.textContent).length;
+        const textContentRows = contentCopy.filter(c => c.type === "text").length;
+        // TODO
 
         // Find content row via index to edit
         const contentRow = contentCopy.find((_, i) => i === index);
@@ -109,12 +109,16 @@ export class AdminHelp extends React.Component<Props> {
         if (val) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
-        } else if (!val && textContentLength === 1) {
+        } else if (!val && textContentRows === 1) {
             const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
         } else {
             contentCopy.splice(index, 1);
-        }
+        };
+
+        // else if (!val && textContentLength !== 1) {
+        //     contentCopy.splice(index, 1);
+        // }
 
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
         dispatch(setCurrentAdminHelpContent(newContent));
@@ -129,11 +133,12 @@ export class AdminHelp extends React.Component<Props> {
         // Find content row via index to edit
         const contentRow = contentCopy.find((_, i) => i === index);
 
+        const isLastContentRow = this.isLastContentRow();
         if (val) {
             const updatedContentRow = Object.assign({}, contentRow, { imageSize: val }) as ContentRow;
             contentCopy.splice(index, 1, updatedContentRow);
-        } else {
-            contentCopy.splice(index, 1);
+        } else if (!val && !isLastContentRow) {
+            contentCopy.splice(index, 1)
         }
 
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
@@ -145,12 +150,25 @@ export class AdminHelp extends React.Component<Props> {
     private handleDeleteRow = (index: number) => {
         const { dispatch, currentContent } = this.props;
         const contentCopy = currentContent.content.slice();
-        contentCopy.splice(index, 1);
 
+        const isLastContentRow = this.isLastContentRow();
+        if (!isLastContentRow) {
+            contentCopy.splice(index, 1);
+        }
+        // TODO
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
         dispatch(setCurrentAdminHelpContent(newContent));
 
         dispatch(adminHelpContentUnsaved(true));
+    };
+
+    private isLastContentRow = (): boolean => {
+        const { currentContent } = this.props;
+        const contentLength = currentContent.content.length;
+        
+        if (contentLength === 1) { return true };
+        
+        return false;
     };
 
     private handleUndoChanges = () => {
@@ -183,7 +201,7 @@ export class AdminHelp extends React.Component<Props> {
                 } as CreateHelpPageDTO;
                 createContent.push(createdContent);
             });
-            dispatch(createAdminHelpPageContent(createContent));       
+            dispatch(createAdminHelpPageContent(createContent));
         } else {
             currentContent.content.map(c => {
                 const updatedContent = {
@@ -227,13 +245,19 @@ export class AdminHelp extends React.Component<Props> {
         dispatch(showConfirmationModal(confirm));
     };
 
-    private handleNewSection = (index: number, pageId: string, text: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
+    private handleNewSection = (index: number, pageId: string, isTypeText: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
         const { dispatch, currentContent } = this.props;
         // Make copy of current content to edit
         const contentCopy = currentContent.content.slice();
         const uniqueId = generateId();
 
-        if (text) {
+        const isLastContentRow = this.isLastContentRow();
+        const isLastTextRowEmpty = (!contentCopy[0].textContent && contentCopy[0].type === "text");
+        if (isLastContentRow && isLastTextRowEmpty) {
+            contentCopy.splice(0, 1);
+        };
+
+        if (isTypeText) {
             const con = Object.assign({}, {
                 id: uniqueId,
                 pageId: pageId,
@@ -253,10 +277,10 @@ export class AdminHelp extends React.Component<Props> {
             const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
             dispatch(setCurrentAdminHelpContent(newContent));
         } else {
-            const img = e!.currentTarget.files!.item(0)!;
-            const imageId = img.name;
+            const image = e!.currentTarget.files!.item(0)!;
+            const imageId = image.name;
             const reader = new FileReader();
-            reader.readAsDataURL(img);
+            reader.readAsDataURL(image);
 
             reader.onload = () => {
                 const imageString = reader.result!.toString().split(',')[1];

@@ -13,15 +13,32 @@
 
 .content-row-editor-markdown {
     border-left: 3px solid transparent;
-    cursor: pointer;
-    /* padding-left: 1%; */
+    padding-left: 1%;
     width: 70%;
     word-wrap: break-word;
 }
 
-.content-row-editor-markdown.second {
-    padding-left: 1%;
-    cursor: default;
+.content-row-editor-markdown-text {
+    cursor: pointer;
+}
+
+/* CSS for images inside markdown text */
+.content-row-editor-markdown-text img {
+    max-width: 100%;
+}
+
+/* CSS for code inside markdown text */
+.content-row-editor-markdown-text code {
+    /* background-color: beige; */
+    /* color: red; */
+    white-space: pre-wrap;
+
+    /* EDIT CONTENT.CSS AS WELL */
+}
+
+.content-row-editor-markdown-image {
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .content-row-editor-markdown:hover {
@@ -37,15 +54,15 @@
     width: 100%;
 }
 
-.edit-buttons {
+.content-row-editor-markdown-edit-buttons {
     display: none;
 }
 
-.content-row-editor-markdown:hover .edit-buttons {
+.content-row-editor-markdown:hover .content-row-editor-markdown-edit-buttons {
     color: rgb(0, 130, 177);
     display: flex;
     flex-direction: column;
-    height: 275px;
+    height: 250px;
     justify-content: space-between;
     left: -50px;
     padding-left: 20px;
@@ -53,12 +70,13 @@
     width: 70px;
 }
 
-.edit-button {
+.content-row-editor-markdown-edit-button {
+    cursor: pointer;
     height: 20px;
     width: 20px;
 }
 
-.edit-button.image-size {
+.content-row-editor-markdown-edit-button.image-size {
     background-color: transparent;
     border-color: rgb(0, 130, 177);
     color: rgb(0, 130, 177);
@@ -67,12 +85,8 @@
     width: 60px;
 }
 
-.edit-buttons > input:focus {
+.content-row-editor-markdown-edit-buttons > input:focus {
     background-color: transparent;
     border: none;
     color: rgb(0, 130, 177);
-}
-
-.testing-name {
-    margin-left: 1%;
 }

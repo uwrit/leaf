@@ -26,7 +26,7 @@ export class Content extends React.Component<Props> {
         const { content, currentPage } = this.props;
 
         return (
-            <div className={c}>
+            <div className={`${c}-container`}>
                 <IoIosArrowRoundBack
                     className={`${c}-back-arrow`}
                     onClick={this.handleContentGoBackClick}>
@@ -34,8 +34,7 @@ export class Content extends React.Component<Props> {
 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
-                        <ReactMarkdown children={currentPage.title} />
-                        
+                        {currentPage.title}
                     </div>
 
                     {content.map(c => this.getContent(c))}
@@ -55,15 +54,17 @@ export class Content extends React.Component<Props> {
         if (content.textContent) {
             return (
                 <div className={`${c}-text`} key={content.id}>
-                    <ReactMarkdown children={content.textContent} />
+                    {/* linkTarget allows for links to open in new tab. */}
+                    <ReactMarkdown children={content.textContent} linkTarget={"_blank"} />
                 </div>
             );
         } else if (content.imageContent) {
             return (
                 <div className={`${c}-image`} key={content.id}>
                     <img
-                        src={`data:image;base64,${content.imageContent}`}
                         alt={content.imageId}
+                        src={`data:image;base64,${content.imageContent}`}
+                        style={{maxWidth: `${content.imageSize}%`}}
                     />
                 </div>
             );

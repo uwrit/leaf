@@ -6,9 +6,9 @@
  */ 
 
 import React from 'react';
+import TextareaAutosize from 'react-textarea-autosize';
 import { Col, Row } from 'reactstrap';
 import { generate as generateId } from 'shortid';
-import TextareaAutosize from 'react-textarea-autosize';
 import './TextEditor.css';
 
 interface Props {
@@ -22,7 +22,6 @@ interface State {
 
 export class TextEditor extends React.Component<Props, State> {
     private className = "text-editor";
-    private focused = false;
     private textEditorClassName = "";
 
     constructor(props: Props){
@@ -38,15 +37,13 @@ export class TextEditor extends React.Component<Props, State> {
 
     public componentDidUpdate() {
         const textEditRowElement: any = document.getElementsByClassName(`${this.textEditorClassName}`);
+        const focused = (document.activeElement === textEditRowElement[0]);
 
         // When text row is clicked, textarea already has focus and sets cursor to end of text.
-        if (textEditRowElement && textEditRowElement[0] && !this.focused) {
+        if (textEditRowElement && textEditRowElement[0] && !focused) {
             textEditRowElement[0].focus()
             textEditRowElement[0].selectionStart = textEditRowElement[0].value.length;
-            
-            this.focused = true;
         };
-        // FIX: find a better solution than focused.
     };
 
     public render() {
@@ -70,17 +67,20 @@ export class TextEditor extends React.Component<Props, State> {
 
         if (!selected) {
             return (
-                <div className={`${c}-markdown`} onClick={this.handleClick}>
-                    {text}
+                <div className={`${c}-row`}>
+                    <div className={`${c}-row-text`} onClick={this.handleClick}>
+                        {text ? text : 'Placeholder title'}
+                    </div>
                 </div>
             );
         } else {
             return (
-                <div className={`${c}-markdown`}>
+                <div className={`${c}-row`}>
                     <TextareaAutosize
                         className={this.textEditorClassName}
                         onBlur={this.handleBlur}
                         onChange={this.handleChange}
+                        placeholder={'Enter title'}
                         value={text}
                     />
                 </div>
@@ -88,7 +88,7 @@ export class TextEditor extends React.Component<Props, State> {
         };
     };
 
-    private handleBlur = () => { this.focused = false; this.setState({ selected: false }) };
+    private handleBlur = () => { this.setState({ selected: false }) };
 
     private handleClick = () => { this.setState({ selected: true }) };
 

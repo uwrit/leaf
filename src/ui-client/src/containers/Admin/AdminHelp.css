@@ -18,8 +18,8 @@
 .admin-help-back-arrow {
     color: rgb(0, 130, 177);
     cursor: pointer;
-    margin-left: -25%;
     height: 50px;
+    margin-left: -25%;
     width: 50px;
 }
 
@@ -29,8 +29,8 @@
 
 .admin-help-edit-button {
     font-family: Roboto;
-    margin-right: 20px;
     margin-bottom: 10px;
+    margin-right: 20px;
     min-width: 100px;
 }
 
@@ -40,11 +40,7 @@
 
 .admin-help-content-text {
     height: calc(100vh - 130px);
-    overflow-y: auto;
     overflow-x: hidden;
-    
-    /* REVISIT: page cuts off when small screen, height changes causing issue */
-    /* originally, 75px. working solution 275px. */
-    /* padding-bottom: 75px; */
-    padding-bottom: 275px;
+    overflow-y: auto;
+    padding-bottom: 250px;
 }

@@ -5,27 +5,30 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
- .text-editor-container {
+.text-editor-container {
     color: rgb(78, 78, 78);
     font-size: 25px;
-    margin-bottom: 10px;
     margin-left: 19%;
     width: 70%;
 }
 
-.text-editor-markdown {
+.text-editor-row {
     border-left: 3px solid transparent;
-    cursor: pointer;
     padding-left: 1%;
     word-wrap: break-word;
 }
 
-.text-editor-markdown:hover {
+.text-editor-row-text {
+    cursor: pointer;
+    padding-left: 5px;
+}
+
+.text-editor-row:hover {
     background-color: rgba(28,168,221, 0.05);
     border-left-color: rgb(28,168,221);
 }
 
-.text-editor-markdown > textarea {
+.text-editor-row > textarea {
     background-color: transparent;
     border: none;
     color: rgb(78, 78, 78);

@@ -22,8 +22,9 @@ export interface HelpPageContentDTO {
     orderId: number;
     type: string;
     textContent: string;
-    imageContent: string;
     imageId: string;
+    imageContent: string;
+    imageSize: number;
 }
 
 export type categoryId = string;

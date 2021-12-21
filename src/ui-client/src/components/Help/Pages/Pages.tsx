@@ -18,7 +18,6 @@ interface Props {
     category: HelpPageCategory;
     dispatch: any;
     isAdmin: boolean;
-
     tempHelpPage: HelpPage;
 }
 
