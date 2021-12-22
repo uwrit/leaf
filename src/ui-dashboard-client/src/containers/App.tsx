@@ -18,6 +18,8 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import Patient from './Patient/Patient';
 import { history } from '../store/configureStore';
 import './App.css';
+import Header from './Header/Header';
+import Cohort from './Cohort/Cohort';
 
 
 interface OwnProps {
@@ -46,7 +48,6 @@ class App extends React.Component<Props> {
         dispatch(getIdToken());
         console.info(`Leaf client application running version ${version}`);
 
-        
         this.unlisten = history.listen(({ action, location }) => {
             console.log("on route change", action, location);
         });
@@ -58,7 +59,7 @@ class App extends React.Component<Props> {
         if (!this.hasAttested && auth && auth.userContext) {
             const dummyAttest = {
                 documentation: { institution: '', title: '' },
-                isIdentified: false,
+                isIdentified: true,
                 sessionType: 1
             };
             dispatch(attestAndLoadSession(dummyAttest));
@@ -82,11 +83,11 @@ class App extends React.Component<Props> {
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
-                App Container yo
+                <Header dashboardName={state.config.main.title} />
                 {session && session.context &&
                 <div id="main-content">
                     <Routes>
-                        <Route path="/dashboards/:dashboardId" element={<div>main!</div>} />
+                        <Route path="/dashboards/:dashboardId" element={<Cohort cohort={state.cohort} />} />
                         <Route path="/dashboards/:dashboardId/patients/:patientId" element={<Patient />} />
                         <Route path="*" element={<Navigate to="/dashboards/test" />} />
                     </Routes>

@@ -14,13 +14,8 @@ export interface DashboardPageConfig {
 export interface MainPageConfig extends DashboardPageConfig {
     cohortId: string;
     content: ContentType[];
-    datasets: DatasetConfig[];
+    datasetIds: string[];
 };
-
-export interface DatasetConfig {
-    id: string,
-    shape: PatientListDatasetShape;
-}
 
 export interface PatientPageConfig extends DashboardPageConfig {
     content: ContentType[];

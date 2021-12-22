@@ -13,6 +13,7 @@ import { getSessionTokenAndContext, logoutFromServer, refreshSessionTokenAndCont
 import { AuthMechanismType } from '../models/Auth';
 import { clearCurrentUserToken, getUserTokenAndContext } from '../services/authApi';
 import { getIdToken, receiveIdToken, failureIdToken } from './auth';
+import { getCohortDatasets } from './cohort';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -93,7 +94,7 @@ export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
             /**
              * Get datasets
              */
-            
+            dispatch(getCohortDatasets());
 
         } catch (err) {
             console.log(err);

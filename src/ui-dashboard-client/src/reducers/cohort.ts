@@ -7,9 +7,9 @@
 
 import { 
     CohortAction,
-    SET_COHORT_DATASET
+    SET_COHORT_DATASETS
 } from '../actions/cohort';
-import { PatientListDatasetDTO } from '../models/patientList/Dataset';
+import { CohortDataMap } from '../models/cohortData/cohortData';
 import { CohortState } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
@@ -23,14 +23,11 @@ export function defaultCohortState(): CohortState {
     };
 }
 
-const setCohortDataset = (state: CohortState, id: string, data: PatientListDatasetDTO) => {
-    const cohortData = new Map(state.cohort.data);
-    cohortData.set(id, { id, data: data.results })
-
+const setCohortDatasets = (state: CohortState, data: CohortDataMap) => {
     return Object.assign({}, state, {
         ...state,
         cohort: {
-            data: cohortData
+            data: new Map(data)
         }
     });
 }
@@ -46,8 +43,8 @@ const clearCohortDatasets = (state: CohortState) => {
 
 export function cohort(state: CohortState = defaultCohortState(), action: CohortAction): CohortState {
     switch (action.type) {
-        case SET_COHORT_DATASET:
-            return setCohortDataset(state, action.id!, action.data!);
+        case SET_COHORT_DATASETS:
+            return setCohortDatasets(state, action.data!);
         default:
             return state;
     }

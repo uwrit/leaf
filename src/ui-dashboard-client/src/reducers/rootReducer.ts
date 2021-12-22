@@ -9,6 +9,7 @@ import { combineReducers } from 'redux';
 import { auth } from './auth';
 import { config } from './config';
 import { session } from './session';
+import { cohort } from './cohort';
 import { createReduxHistoryContext } from "redux-first-history";
 import { createBrowserHistory } from 'history';
 
@@ -18,6 +19,7 @@ const { createReduxHistory, routerMiddleware, routerReducer } = createReduxHisto
 
 const rootReducer = combineReducers({
     auth,
+    cohort,
     config,
     session,
     router: routerReducer

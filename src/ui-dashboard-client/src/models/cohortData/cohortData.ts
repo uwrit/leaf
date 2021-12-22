@@ -1,10 +1,7 @@
-import { PatientListDatasetResults } from "../patientList/Dataset";
+import { PatientListRowDTO } from "../patientList/Patient";
+
+export type CohortDataMap = Map<string, Map<string, PatientListRowDTO[]>>;
 
 export interface CohortData {
-    data: Map<string, CohortDataset>;
-}
-
-interface CohortDataset {
-    id: string;
-    data: PatientListDatasetResults;
+    data: CohortDataMap;
 }

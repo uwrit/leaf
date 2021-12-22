@@ -10,8 +10,7 @@ import { AppState } from '../models/state/AppState';
 import { baseUrl, HttpFactory } from './HttpFactory';
 import moment from 'moment'
 import { DateBoundary, DateFilter, DateIncrementType } from '../models/Date';
-import { PatientListDatasetDTO } from '../models/patientList/Dataset';
-import { DatasetConfig } from '../models/config/config';
+import { PatientListDatasetDTO, PatientListDatasetQueryDTO, PatientListDatasetShape } from '../models/patientList/Dataset';
 
 /**
  * Fetch a dataset, which may or may not have date boundaries.
@@ -19,23 +18,25 @@ import { DatasetConfig } from '../models/config/config';
 export const fetchDataset = async (
         state: AppState, 
         queryId: string, 
-        dataset: DatasetConfig, 
-        dates?: DateBoundary,
-        panelIndex?: number
+        datasetid: string, 
+        shape: PatientListDatasetShape,
+        dates?: DateBoundary
     ): Promise<PatientListDatasetDTO> => {
 
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const params: any = { ...dataset }
-    if (typeof panelIndex !== 'undefined') {
-        params.panelIdx = panelIndex
-    } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
-        params.early = deriveDateTicks(dates.start);
-        params.late = deriveDateTicks(dates.end);
-    }
+    const params: any = { datasetid, shape };
 
     const result = await http.get(`${baseUrl}/api/cohort/${queryId}/dataset`, { params });
     return result.data as PatientListDatasetDTO
+};
+
+export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.get(`${baseUrl}/api/dataset`);
+    const ds = resp.data as PatientListDatasetQueryDTO[];
+    return ds;
 };
 
 /**
