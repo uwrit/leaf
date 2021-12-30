@@ -59,11 +59,9 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //          - check all errors during save and throw to user
     //      2. review api actions, name uniformity, types check (single type for api calls)
     //          - check for admin/non-admin api calls
-    //      3. saving with title only should be valid, do content check
-    //          - only title, no rows throws no title error b/c save has no value
-    //      4. notify users why last row wont delete?
-    //      5. deleterow handler says content unsaved, shouldn't do that
-    //      6. figure out textContentRows vs. textContentLength
+    //          - add getallhelppages for admin api call
+    //      3. notify users why last row wont delete?
+    //          - remove delete function on last row?
 
     public render() {
         const c = this.className;
@@ -83,9 +81,10 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const c = this.className;
         const { contentRow } = this.props;
         const { selected } = this.state;
+        const imageRow = "image";
+        const textRow = "text";
 
-        // if (contentRow.textContent) {
-        if (contentRow.type === "text") {
+        if (contentRow.type === textRow) {
             if (!selected) {
                 return (
                     <div className={`${c}-markdown`}>
@@ -110,8 +109,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
                     </div>
                 );
             }
-        // } else if (contentRow.imageContent) {
-        } else if (contentRow.type === "image") {
+        } else if (contentRow.type === imageRow) {
             return (
                 <div className={`${c}-markdown`}>
                     {this.getEditButtons()}
@@ -168,7 +166,6 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const { contentRow, index, newSectionHandler } = this.props;
         const pageId = contentRow.pageId;
         const updatedIndex = isAbove ? index : index+1;
-
         newSectionHandler(updatedIndex, pageId, isTypeText, evt);
         this.setState({ selected: false });
     };

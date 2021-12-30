@@ -22,17 +22,16 @@ namespace Model.Admin.Compiler
         public int ImageSize { get; set; }
     }
 
+    public class HelpPageCategory
+    {
+        public string Category { get; set; }
+    }
+
     public class AdminHelpPageContentSql
     {
         public string Title { get; set; }
         public string Category { get; set; }
-
         public IEnumerable<HelpPageContent> Content { get; set; }
-    }
-
-    public class HelpPageCategory
-    {
-        public string Category { get; set; }
     }
 
     public class HelpPageContent

@@ -96,7 +96,6 @@ export class TextEditor extends React.Component<Props, State> {
         const { textHandler } = this.props;
         const propName = 'title';
         const newVal = e.currentTarget.value;
-        
         textHandler(newVal, propName);
     };
 }

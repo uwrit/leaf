@@ -24,9 +24,9 @@ namespace Services.Admin.Compiler
 
         static class Sql
         {
-            public const string Get = "adm.sp_GetHelpPageAndContent";
-            public const string Update = "adm.sp_UpdateHelpPageAndContent";
+            public const string Get    = "adm.sp_GetHelpPageAndContent";
             public const string Create = "adm.sp_CreateHelpPageAndContent";
+            public const string Update = "adm.sp_UpdateHelpPageAndContent";
             public const string Delete = "adm.sp_DeleteHelpPageAndContent";
         }
 
