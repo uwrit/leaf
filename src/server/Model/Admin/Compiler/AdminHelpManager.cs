@@ -18,9 +18,9 @@ namespace Model.Admin.Compiler
     {
         public interface IAdminHelpPageService
         {
-            Task<AdminHelpPageContentSql> GetAsync(Guid id);
-            Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
-            Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows);
+            Task<AdminHelpPage> GetAsync(Guid id);
+            Task<AdminHelpPage> CreateAsync(AdminHelpPage page);
+            Task<AdminHelpPage> UpdateAsync(AdminHelpPage page);
             Task<Guid?> DeleteAsync(Guid id);
         }
 
@@ -35,43 +35,45 @@ namespace Model.Admin.Compiler
             this.svc = svc;
         }
 
-        public async Task<AdminHelpPageContentSql> GetAsync(Guid id)
+        public async Task<AdminHelpPage> GetAsync(Guid id)
         {
+            Ensure.NotNullOrWhitespace(id.ToString(), nameof(id));
+
             log.LogInformation("Getting help page. Id:{Id}", id);
             return await svc.GetAsync(id);
         }
 
-        public async Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        public async Task<AdminHelpPage> CreateAsync(AdminHelpPage page)
         {
-            ThrowIfCreateInvalid(contentRows);
+            ThrowIfCreateUpdateInvalid(page);
 
             try
             {
-                var created = await svc.CreateAsync(contentRows);
-                log.LogInformation("Created help page. Content:{@content}", created);
+                var created = await svc.CreateAsync(page);
+                log.LogInformation("Created help page. Page:{@Page}", created);
                 return created;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to create help page. Content:{@ContentRows} Code:{Code} Error:{Error}", contentRows, de.ErrorCode, de.Message);
+                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", page, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
         }
 
-        public async Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        public async Task<AdminHelpPage> UpdateAsync(AdminHelpPage page)
         {
-            ThrowIfUpdateInvalid(contentRows);
+            ThrowIfCreateUpdateInvalid(page);
 
             try
             {
-                var updated = await svc.UpdateAsync(contentRows);
-                log.LogInformation("Updated help page. Content:{@content}", updated);
+                var updated = await svc.UpdateAsync(page);
+                log.LogInformation("Updated help page. Page:{@Page}", updated);
                 return updated;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to update help page. Content:{@ContentRows} Code:{Code} Error:{Error}", contentRows, de.ErrorCode, de.Message);
+                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", page, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
@@ -79,7 +81,7 @@ namespace Model.Admin.Compiler
 
         public async Task<Guid?> DeleteAsync(Guid id)
         {
-            Ensure.NotDefault(id, nameof(id));
+            Ensure.NotNullOrWhitespace(id.ToString(), nameof(id));
 
             var deleted = await svc.DeleteAsync(id);
             if (deleted.HasValue)
@@ -94,15 +96,9 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfCreateInvalid(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        void ThrowIfCreateUpdateInvalid(AdminHelpPage page)
         {
-            Ensure.NotNull(contentRows, nameof(contentRows));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfUpdateInvalid(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
-        {
-            Ensure.NotNull(contentRows, nameof(contentRows));
+            Ensure.NotNull(page, nameof(page));
         }
     }
 }

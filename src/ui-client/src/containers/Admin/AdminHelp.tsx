@@ -14,8 +14,7 @@ import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent,
          resetAdminHelpContent, setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
 import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
-import { AdminHelpContent, ContentRow, CreateHelpPage,
-         CreateHelpPageDTO, UpdateHelpPageContent, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { AdminHelpContent, ContentRow, CreateHelpPageDTO, UpdateHelpPageContentDTO } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { generate as generateId } from 'shortid';
@@ -179,19 +178,25 @@ export class AdminHelp extends React.Component<Props> {
         const { dispatch, currentContent, createNew, currentPage } = this.props;
 
         if (createNew) {
-            const createContent = currentContent.content.map(c => {
-                const createdContent = {
-                    title: currentContent.title,
-                    category: currentContent.category,
-                    orderId: c.orderId,
-                    type: c.type,
-                    textContent: c.textContent,
-                    imageId: c.imageId,
-                    imageContent: c.imageContent,
-                    imageSize: c.imageSize
-                } as CreateHelpPageDTO;
-                return createdContent;
-            });
+            // const createContent = currentContent.content.map(c => {
+            //     const createdContent = {
+            //         title: currentContent.title,
+            //         category: currentContent.category,
+            //         orderId: c.orderId,
+            //         type: c.type,
+            //         textContent: c.textContent,
+            //         imageId: c.imageId,
+            //         imageContent: c.imageContent,
+            //         imageSize: c.imageSize
+            //     } as CreateHelpPageDTO;
+            //     return createdContent;
+            // });
+
+            const createContent = {
+                title: currentContent.title,
+                category: currentContent.category,
+                content: currentContent.content
+            } as AdminHelpContent;
             dispatch(createAdminHelpPageContent(createContent));
         } else {
             const updateContent = currentContent.content.map(c => {

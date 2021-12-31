@@ -23,6 +23,12 @@ export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
 export interface CreateHelpPage extends CreateHelpPageDTO {}
 export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO {}
 
+
+
+
+
+
+
 export interface ContentRow {
     id: string;
     pageId: string;

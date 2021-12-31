@@ -100,9 +100,9 @@ DROP TYPE IF EXISTS [adm].[HelpContentTable]
 GO
 
 CREATE TYPE [adm].[HelpContentTable] AS TABLE(
-	[PageId] [UNIQUEIDENTIFIER] NOT NULL,
-	[Category] [NVARCHAR](255) NOT NULL,
-	[Title] [NVARCHAR](400) NOT NULL,
+    [Title] [NVARCHAR](400) NOT NULL,
+    [Category] [NVARCHAR](255) NOT NULL,
+    [PageId] [UNIQUEIDENTIFIER] NOT NULL,
 	[OrderId] [INT] NOT NULL,
 	[Type] [NVARCHAR](255) NOT NULL,
 	[TextContent] [NVARCHAR](MAX) NULL,
@@ -135,6 +135,59 @@ BEGIN
     SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @id
+END
+GO
+
+
+-- SP to create help page title, content, and category
+DROP PROCEDURE IF EXISTS [adm].[sp_CreateHelpPageAndContent]
+GO
+
+CREATE PROCEDURE [adm].[sp_CreateHelpPageAndContent]
+    @content adm.HelpContentTable READONLY
+AS
+BEGIN
+    DECLARE @title NVARCHAR(400)
+    SET @title = (SELECT TOP(1) Title FROM @content)
+
+    DECLARE @category NVARCHAR(255)
+    SET @category = (SELECT TOP(1) Category FROM @content)
+
+    DECLARE @orderId INT
+    SET @orderId = (SELECT TOP(1) OrderId FROM @content)
+
+    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Category = @category))
+        INSERT INTO app.HelpPageCategory (Category) SELECT Category = @category
+
+    DECLARE @categoryId UNIQUEIDENTIFIER
+    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Category = @category)
+        
+    IF (app.fn_NullOrWhitespace(@title) = 1)
+        THROW 70400, N'Title is required.', 1;
+        
+    IF (app.fn_NullOrWhitespace(@category) = 1)
+        THROW 70400, N'Category is required.', 1;
+
+    IF EXISTS(SELECT 1 FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId)
+        THROW 70409, N'Page title and category already exist.', 1;
+    
+    DECLARE @pageIdTable Table (PageId UNIQUEIDENTIFIER);
+
+    INSERT INTO app.HelpPage (Title, CategoryId)
+    OUTPUT inserted.Id
+    INTO @pageIdTable
+    SELECT Title = @title, CategoryId = @categoryId
+
+    DECLARE @pageId UNIQUEIDENTIFIER;
+    SELECT @pageId = PageId FROM @pageIdTable;
+
+    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
+    SELECT
+        PageId = (CASE WHEN PageId IS NULL THEN (SELECT Id FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId) ELSE @pageId END),
+        OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    FROM @content
+
+    EXEC adm.sp_GetHelpPageAndContent @pageId
 END
 GO
 
@@ -189,59 +242,6 @@ BEGIN
 
     INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
     SELECT PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
-    FROM @content
-
-    EXEC adm.sp_GetHelpPageAndContent @pageId
-END
-GO
-
-
--- SP to create help page title, content, and category
-DROP PROCEDURE IF EXISTS [adm].[sp_CreateHelpPageAndContent]
-GO
-
-CREATE PROCEDURE [adm].[sp_CreateHelpPageAndContent]
-    @content adm.HelpContentTable READONLY
-AS
-BEGIN
-    DECLARE @title NVARCHAR(400)
-    SET @title = (SELECT TOP(1) Title FROM @content)
-
-    DECLARE @category NVARCHAR(255)
-    SET @category = (SELECT TOP(1) Category FROM @content)
-
-    DECLARE @orderId INT
-    SET @orderId = (SELECT TOP(1) OrderId FROM @content)
-
-    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Category = @category))
-        INSERT INTO app.HelpPageCategory (Category) SELECT Category = @category
-
-    DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Category = @category)
-        
-    IF (app.fn_NullOrWhitespace(@title) = 1)
-        THROW 70400, N'Title is required.', 1;
-        
-    IF (app.fn_NullOrWhitespace(@category) = 1)
-        THROW 70400, N'Category is required.', 1;
-
-    IF EXISTS(SELECT 1 FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId)
-        THROW 70409, N'Page title and category already exist.', 1;
-    
-    DECLARE @pageIdTable Table (PageId UNIQUEIDENTIFIER);
-
-    INSERT INTO app.HelpPage (Title, CategoryId)
-    OUTPUT inserted.Id
-    INTO @pageIdTable
-    SELECT Title = @title, CategoryId = @categoryId
-
-    DECLARE @pageId UNIQUEIDENTIFIER;
-    SELECT @pageId = PageId FROM @pageIdTable;
-
-    INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
-    SELECT
-        PageId = (CASE WHEN PageId IS NULL THEN (SELECT Id FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId) ELSE @pageId END),
-        OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
     EXEC adm.sp_GetHelpPageAndContent @pageId

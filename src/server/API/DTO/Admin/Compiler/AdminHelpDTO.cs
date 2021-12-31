@@ -9,48 +9,34 @@ using Model.Admin.Compiler;
 
 namespace API.DTO.Admin.Compiler
 {
-    public class AdminHelpCreateUpdateDTO
+    public class AdminHelpPageDTO
     {
-        public Guid Id { get; set; }
-        public Guid PageId { get; set; }
+        // TODO: update title type once sql reader figured out
         public string Title { get; set; }
-        public string Category { get; set; }
-        public int OrderId { get; set; }
-        public string Type { get; set; }
-        public string TextContent { get; set; }
-        public byte[] ImageContent { get; set; }
-        public string ImageId { get; set; }
+        public AdminHelpPageCategory Category { get; set; }
+        public IEnumerable<AdminHelpPageContent> Content { get; set; }
 
-        public AdminHelpCreateUpdateDTO() { }
+        public AdminHelpPageDTO() { }
 
-        public AdminHelpCreateUpdateDTO(AdminHelpPageCreateUpdateSql p)
-        {
-            Id = p.Id;
-            PageId = p.PageId;
-            Title = p.Title;
-            Category = p.Category;
-            OrderId = p.OrderId;
-            Type = p.Type;
-            TextContent = p.TextContent;
-            ImageContent = p.ImageContent;
-            ImageId = p.ImageId;
-        }
-    }
-
-    public class AdminHelpContentDTO
-    {
-        public string Title { get; set; }
-        public string Category { get; set; }
-
-        public IEnumerable<HelpPageContent> Content { get; set; }
-
-        public AdminHelpContentDTO() { }
-
-        public AdminHelpContentDTO(AdminHelpPageContentSql p)
+        public AdminHelpPageDTO(AdminHelpPage p)
         {
             Title = p.Title;
             Category = p.Category;
             Content = p.Content;
+        }
+    }
+
+    public static class AdminHelpPageExtensions
+    {
+        public static AdminHelpPage HelpPage(this AdminHelpPageDTO dto)
+        {
+            if (dto == null) return null;
+            return new AdminHelpPage
+            {
+                Title = dto.Title,
+                Category = dto.Category,
+                Content = dto.Content
+            };
         }
     }
 }

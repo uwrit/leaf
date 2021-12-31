@@ -8,33 +8,25 @@ using System.Collections.Generic;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminHelpPageCreateUpdateSql
-    {
-        public Guid Id { get; set; }
-        public Guid PageId { get; set; }
-        public string Title { get; set; }
-        public string Category { get; set; }
-        public int OrderId { get; set; }
-        public string Type { get; set; }
-        public string TextContent { get; set; }
-        public string ImageId { get; set; }
-        public byte[] ImageContent { get; set; }
-        public int ImageSize { get; set; }
-    }
-
-    public class HelpPageCategory
-    {
-        public string Category { get; set; }
-    }
-
-    public class AdminHelpPageContentSql
+    public class AdminHelpPage
     {
         public string Title { get; set; }
-        public string Category { get; set; }
-        public IEnumerable<HelpPageContent> Content { get; set; }
+        public AdminHelpPageCategory Category { get; set; }
+        public IEnumerable<AdminHelpPageContent> Content { get; set; }
     }
 
-    public class HelpPageContent
+    // TODO: change to this once sql reader figured out
+    //public class AdminHelpPageTitle
+    //{
+    //    public string Title { get; set; }
+    //}
+
+    public class AdminHelpPageCategory
+    {
+        public string Category { get; set; }
+    }
+
+    public class AdminHelpPageContent
     {
         public Guid Id { get; set; }
         public Guid PageId { get; set; }

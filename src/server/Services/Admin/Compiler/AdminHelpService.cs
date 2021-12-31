@@ -38,7 +38,7 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<AdminHelpPageContentSql> GetAsync(Guid id)
+        public async Task<AdminHelpPage> GetAsync(Guid id)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -55,13 +55,13 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageContentSql> CreateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        public async Task<AdminHelpPage> CreateAsync(AdminHelpPage page)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Create,
-                    new { content = HelpContentTable.From(contentRows) },
+                    new { content = HelpPageTable.From(page) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -70,14 +70,14 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageContentSql> UpdateAsync(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        public async Task<AdminHelpPage> UpdateAsync(AdminHelpPage page)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
 
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Update,
-                    new { content = HelpContentTable.From(contentRows) },
+                    new { content = HelpPageTable.From(page) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -106,17 +106,15 @@ namespace Services.Admin.Compiler
 
     static class AdminHelpReader
     {
-        public static AdminHelpPageContentSql Read(SqlMapper.GridReader grid)
+        public static AdminHelpPage Read(SqlMapper.GridReader grid)
         {
+            // TODO: check if i can do ReadSingle for title
             var page = grid.ReadFirstOrDefault<HelpPageRecord>();
-            if (page == null)
-            {
-                return null;
-            }
+            if (page == null) { return null; }
 
-            var category = grid.ReadSingle<HelpPageCategory>();
+            var category = grid.ReadSingle<AdminHelpPageCategory>();
 
-            var content = grid.Read<HelpPageContent>();
+            var content = grid.Read<AdminHelpPageContent>();
 
             return page.Content(category, content);
         }
@@ -126,13 +124,13 @@ namespace Services.Admin.Compiler
     {
         public string Title { get; set; }
 
-        public AdminHelpPageContentSql Content(HelpPageCategory category = null, IEnumerable<HelpPageContent> content = null)
+        public AdminHelpPage Content(AdminHelpPageCategory category = null, IEnumerable<AdminHelpPageContent> content = null)
         {
-            return new AdminHelpPageContentSql
+            return new AdminHelpPage
             {
                 Title = Title,
-                Category = category.Category,
-                Content = content ?? new List<HelpPageContent>()
+                Category = category,
+                Content = content ?? new List<AdminHelpPageContent>()
             };
         }
     }

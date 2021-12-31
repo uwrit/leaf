@@ -8,7 +8,7 @@
 import { AppState } from '../../models/state/AppState';
 import { showInfoModal, setNoClickModalState, setSideNotificationState, showConfirmationModal } from '../generalUi';
 import { setCurrentHelpPage, setHelpPagesAndCategories } from '../helpPage';
-import { AdminHelpContentDTO, CreateHelpPage, UpdateHelpPageContent } from '../../models/admin/Help';
+import { AdminHelpContent, AdminHelpContentDTO, CreateHelpPage, UpdateHelpPageContent } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState, InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { HelpPageLoadState } from '../../models/state/HelpState';
@@ -64,19 +64,19 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
 /*
  * Create admin help page content.
  */
-export const createAdminHelpPageContent = (contentRows: CreateHelpPage[]) => {
+export const createAdminHelpPageContent = (page: AdminHelpContent) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Creating Page", state: NotificationStates.Working }));
             
-            // Create content.
-            const content = await createAdminHelpPageAndContent(state, contentRows);
+            // Create help page.
+            const created = await createAdminHelpPageAndContent(state, page);
 
-            dispatch(setCurrentAdminHelpContent(content));
-            dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+            dispatch(setCurrentAdminHelpContent(created));
+            dispatch(setAdminHelpContent(created, HelpPageLoadState.LOADED));
 
-            const pageId = content.content[0].pageId;
+            const pageId = created.content[0].pageId;
             dispatch(reloadContent(pageId));
 
             dispatch(isAdminHelpContentNew(false));
@@ -109,7 +109,7 @@ export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[])
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
 
             const content = await updateAdminHelpPageAndContent(state, pageId, contentRows);
-            
+
             dispatch(setCurrentAdminHelpContent(content));
             dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
             
@@ -140,7 +140,7 @@ export const reloadContent = (pageId?: string) => {
             dispatch(setHelpPagesAndCategories(categories, pages));
 
             if (pageId) {
-                const page = pages.find(p => p.id == pageId)!;
+                const page = pages.find(p => p.id === pageId)!;
                 dispatch(setCurrentHelpPage(page));
             };
         } catch (err) {

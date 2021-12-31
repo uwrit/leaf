@@ -62,6 +62,9 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //          - add getallhelppages for admin api call
     //      3. notify users why last row wont delete?
     //          - remove delete function on last row?
+    //      4. create new page, dont save, able to go to other tabs
+    //          - reevaluate
+    //          - follow concept create rule: alert page isn't saved
 
     public render() {
         const c = this.className;

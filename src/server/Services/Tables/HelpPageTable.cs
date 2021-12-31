@@ -11,7 +11,7 @@ using Model.Admin.Compiler;
 
 namespace Services.Tables
 {
-    public class HelpContentTable : ISqlTableType
+    public class HelpPageTable : ISqlTableType
     {
         public DataTable Value
         {
@@ -19,21 +19,21 @@ namespace Services.Tables
             private set;
         }
 
-        public const string Type = "adm.HelpContentTable";
-        const string pageId = "PageId";
-        const string category = "Category";
-        const string title = "Title";
-        const string orderId = "OrderId";
-        const string type = "Type";
-        const string textContent = "TextContent";
-        const string imageId = "ImageId";
+        public const string Type  = "adm.HelpContentTable";
+        const string title        = "Title";
+        const string category     = "Category";
+        const string pageId       = "PageId";
+        const string orderId      = "OrderId";
+        const string type         = "Type";
+        const string textContent  = "TextContent";
+        const string imageId      = "ImageId";
         const string imageContent = "ImageContent";
-        const string imageSize = "ImageSize";
+        const string imageSize    = "ImageSize";
 
-        HelpContentTable(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        HelpPageTable(AdminHelpPage page)
         {
             var table = Schema();
-            Fill(table, contentRows);
+            Fill(table, page);
             Value = table;
         }
 
@@ -42,9 +42,9 @@ namespace Services.Tables
             var dt = new DataTable();
             var cols = dt.Columns;
 
-            cols.Add(new DataColumn(pageId, typeof(Guid)));
-            cols.Add(new DataColumn(category, typeof(string)));
             cols.Add(new DataColumn(title, typeof(string)));
+            cols.Add(new DataColumn(category, typeof(string)));
+            cols.Add(new DataColumn(pageId, typeof(Guid)));
             cols.Add(new DataColumn(orderId, typeof(int)));
             cols.Add(new DataColumn(type, typeof(string)));
             cols.Add(new DataColumn(textContent, typeof(string)));
@@ -55,28 +55,28 @@ namespace Services.Tables
             return dt;
         }
 
-        void Fill(DataTable table, IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        void Fill(DataTable table, AdminHelpPage p)
         {
-            foreach (var r in contentRows)
+            foreach (var r in p.Content)
             {
                 var row = table.NewRow();
-                row[pageId] = r.PageId;
-                row[category] = r.Category;
-                row[title] = r.Title;
-                row[orderId] = r.OrderId;
-                row[type] = r.Type;
-                row[textContent] = r.TextContent;
-                row[imageId] = r.ImageId;
+                row[title]        = p.Title;
+                row[category]     = p.Category;
+                row[pageId]       = r.PageId;
+                row[orderId]      = r.OrderId;
+                row[type]         = r.Type;
+                row[textContent]  = r.TextContent;
+                row[imageId]      = r.ImageId;
                 row[imageContent] = r.ImageContent;
-                row[imageSize] = r.ImageSize;
+                row[imageSize]    = r.ImageSize;
                 table.Rows.Add(row);
             }
         }
 
-        public static DataTable From(IEnumerable<AdminHelpPageCreateUpdateSql> contentRows)
+        public static DataTable From(AdminHelpPage page)
         {
-            var cr = contentRows ?? new List<AdminHelpPageCreateUpdateSql>();
-            return new HelpContentTable(cr).Value;
+            var p = page ?? new AdminHelpPage();
+            return new HelpPageTable(p).Value;
         }
     }
 }

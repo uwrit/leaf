@@ -22,10 +22,24 @@ export const getAdminHelpPageAndContent = async (state: AppState, pageId: string
 /*
  * Creates help page title and content, and category if it doesn't exist.
  */
-export const createAdminHelpPageAndContent = async (state: AppState, content: CreateHelpPageDTO[]) => {
+export const createAdminHelpPageAndContent = async (state: AppState, page: AdminHelpContentDTO) => {
     const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.post('api/admin/help', content);
+    const http = HttpFactory.authenticated(token);    
+    // const resp = await http.post('api/admin/help', page);
+    const resp = await http.post('api/admin/help', {
+        title: 'test6',
+        category: 'tests',
+        content: [{
+            id: '0X-U7pW5h',
+            imageContent: '',
+            imageId: '',
+            imageSize: 0,
+            orderId: 0,
+            pageId: '',
+            textContent: 'This doc supports Markdown.',
+            type: 'text'
+        }]
+    });
     return resp.data as AdminHelpContentDTO;
 };
 
