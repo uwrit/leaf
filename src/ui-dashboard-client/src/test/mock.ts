@@ -23,28 +23,23 @@ export const config: DashboardConfig =
         search: {
             enabled: true
         },
-        demographics: {
-            datasetId: "",
-            fieldName: "Name",
-            fieldAge: "Age",
-            fieldSex: "Sex"
-        },
         content: [
             {
                 type: "row",
                 content: [
                     {
                         color: [143, 31, 177],
+                        icon: "checklist",
                         type: "checklist",
                         title: "Quality Care Checklists",
-                        width: 6,
+                        width: 5,
                         datasets: [
                             {
                                 title: "MBWC Quality Measures",
-                                datasetId: "f0f1423e-f36b-1410-81bf-0018c8508655",
+                                id: "f0f1423e-f36b-1410-81bf-0018c8508655",
                                 fieldValues: "obs_value_str",
                                 items: [
-                                    "MRI Brain","FDG PET Brain","CSF","Hearing Screening","Vision Screening","Family Conference","Neuropsychology","MoCA", "MMSE"
+                                    "MRI Brain","FDG PET Brain","CSF","Hearing Screening","Vision Screening","Family Conference","Neuropsychology","MoCA","MMSE","In MBWC Program"
                                 ]
                             }
                         ]
@@ -52,15 +47,17 @@ export const config: DashboardConfig =
                     },
                     {
                         color: [35, 122, 35],
+                        icon: "plus",
                         type: "list",
                         title: "Problem List",
-                        width: 3,
+                        width: 4,
                         datasetId: "f2f1423e-f36b-1410-81bf-0018c8508655",
                         fieldName: "prob_name",
                         fieldDate: "prob_date"
                     },
                     {
                         color: [36, 77, 138],
+                        icon: "med",
                         type: "list",
                         title: "Active Medications",
                         width: 3,
@@ -79,27 +76,27 @@ export const config: DashboardConfig =
                 datasets: [
                     {
                         title: "Body weight (lbs)",
-                        datasetId: "d6f1423e-f36b-1410-81bf-0018c8508655"
+                        id: "d6f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "PHQ9 score",
-                        datasetId: "d9f1423e-f36b-1410-81bf-0018c8508655"
+                        id: "d9f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "MoCA score",
-                        datasetId: "e0f1423e-f36b-1410-81bf-0018c8508655"
+                        id: "e0f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "NPI Severity",
-                        datasetId: "e3f1423e-f36b-1410-81bf-0018c8508655"
+                        id: "e3f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "# Intact iADLs",
-                        datasetId: "e6f1423e-f36b-1410-81bf-0018c8508655"
+                        id: "e6f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "Latest Social / Health Change",
-                        datasetId: "ebf1423e-f36b-1410-81bf-0018c8508655"
+                        id: "ebf1423e-f36b-1410-81bf-0018c8508655"
                     }
                 ]
             }

@@ -1,47 +1,59 @@
-export type ContentIdType = 
-    "row" | "checklist" | "list" | "timeline";
+
+/**
+ * Types
+ */
+export type ContentIdType =  "row" | "checklist" | "list" | "timeline";
 
 export type ContentType = 
-    ContentRowConfig | ContentChecklistConfig |
+    ContentRowConfig  | ContentChecklistConfig |
     ContentListConfig | ContentTimelineConfig;
+
+export type RgbValues = [ number, number, number ];
+
+export type Icons = "checklist" | "plus" | "med";
 
 /**
  * Abstract config type
  */
-export interface ContentConfig {
-    title?: string;
+interface BaseContentConfig {
     type: ContentIdType;
+};
+
+interface TitledContentConfig extends BaseContentConfig {
+    title: string;
 }
+
+interface StyledContentConfig extends TitledContentConfig {
+    color?: RgbValues;
+    icon?: Icons;
+    width?: number;
+};
 
 /**
  * Row
  */
-export interface ContentRowConfig extends ContentConfig {
+export interface ContentRowConfig extends BaseContentConfig {
     content: (ContentChecklistConfig | ContentListConfig | ContentTimelineConfig)[];
-}
+};
 
 /**
  * List
  */
-export interface ContentListConfig extends ContentConfig {
-    color?: RgbValues;
+export interface ContentListConfig extends StyledContentConfig {
     datasetId: string;
     fieldDate: string;
     fieldName: string;
-    width?: number;
-}
+};
 
 /**
  * Checklist
  */
-export interface ContentChecklistConfig extends ContentConfig {
-    color?: RgbValues;
+export interface ContentChecklistConfig extends StyledContentConfig {
     datasets: ContentChecklistDatasetConfig[];
-    width?: number;
-}
+};
 
-interface ContentChecklistDatasetConfig {
-    datasetId: string;
+export interface ContentChecklistDatasetConfig {
+    id: string;
     fieldValues: string;
     items: string[];
     title: string;
@@ -50,25 +62,16 @@ interface ContentChecklistDatasetConfig {
 /**
  * Timeline
  */
- export interface ContentTimelineConfig extends ContentConfig {
+ export interface ContentTimelineConfig extends BaseContentConfig {
     datasets: ContentTimelineDatasetConfig[];
     export: ContentTimelineExportConfig;
-    width?: number;
-}
+};
 
 interface ContentTimelineDatasetConfig {
-    datasetId: string;
+    id: string;
     title: string;
 };
 
 interface ContentTimelineExportConfig {
     enabled: boolean;
-}
-
-export interface zzRgbValues {
-    red: number;
-    green: number;
-    blue: number;
-}
-
-export type RgbValues = [number,number,number];
+};

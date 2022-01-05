@@ -18,7 +18,6 @@ export function defaultCohortState(): CohortState {
 }
 
 const setCohortDatasets = (state: CohortState, cohort: CohortState) => {
-    console.log('reducer', cohort);
     return Object.assign({}, cohort);
 }
 

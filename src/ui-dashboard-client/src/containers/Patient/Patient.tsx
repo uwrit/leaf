@@ -2,8 +2,8 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { CohortState } from '../../models/state/CohortState';
 import { PatientPageConfig } from '../../models/config/config';
-import { renderDynamic } from '../../utils/dynamicRender';
 import PatientHeaderBar from './PatientHeaderBar/PatientHeaderBar';
+import { renderDynamicComponent } from '../../utils/dynamic';
 
 
 interface Props {
@@ -35,7 +35,7 @@ class Patient extends React.Component<Props> {
                 <PatientHeaderBar patient={patient} config={config} />
 
                 {/* Dynamically read & render content */}
-                {config.content.map(content => renderDynamic(content, patient))}
+                {config.content.map((content, i) => renderDynamicComponent(content, patient, i))}
             </div>
         );
     }

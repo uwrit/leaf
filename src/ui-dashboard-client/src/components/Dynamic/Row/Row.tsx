@@ -2,7 +2,7 @@ import React from 'react';
 import { Row } from 'reactstrap';
 import { ContentRowConfig } from '../../../models/config/content';
 import { PatientData } from '../../../models/state/CohortState';
-import { renderDynamic } from '../../../utils/dynamicRender';
+import { renderDynamicComponent } from '../../../utils/dynamic';
 import './Row.css';
 
 interface Props {
@@ -19,7 +19,7 @@ export default class DynamicRow extends React.Component<Props> {
 
         return (
             <Row className={`${c}-container`}>
-                {config.content.map(innerContent => renderDynamic(innerContent, patient))}
+                {config.content.map((innerContent, i) => renderDynamicComponent(innerContent, patient, i))}
             </Row>
         );
     }

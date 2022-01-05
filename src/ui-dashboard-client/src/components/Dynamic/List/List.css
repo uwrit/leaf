@@ -1,0 +1,8 @@
+.dynamic-list-container {
+    padding: 20px;
+}
+
+.dynamic-list-inner {
+    border-radius: 12px;
+    height: 100%;
+}

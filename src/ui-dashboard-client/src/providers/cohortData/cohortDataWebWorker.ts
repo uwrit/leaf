@@ -145,8 +145,6 @@ export default class CohortDataWebWorker {
                 }
             }
 
-            console.log('web worker result', result);
-
             return { result, requestId };
         }
 

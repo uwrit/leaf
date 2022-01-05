@@ -1,3 +1,4 @@
 .dynamic-row-container {
-    min-height: 300px;
+    min-height: 100px;
+    padding: 0 20px; 
 }

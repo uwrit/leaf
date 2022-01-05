@@ -80,8 +80,6 @@ class App extends React.Component<Props> {
         const { auth, config, session } = state;
         const classes = [ 'app-container' ];
 
-        console.log('app', state.cohort);
-
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
                 <Header dashboardName={state.config.main.title} />

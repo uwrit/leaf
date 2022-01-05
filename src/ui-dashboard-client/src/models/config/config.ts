@@ -18,17 +18,9 @@ export interface MainPageConfig extends DashboardPageConfig {
 
 export interface PatientPageConfig extends DashboardPageConfig {
     content: ContentType[];
-    demographics: DemographicsConfig;
     search: SearchConfig;
 };
 
 export interface SearchConfig {
     enabled: boolean;
-};
-
-export interface DemographicsConfig {
-    datasetId: string;
-    fieldName?: string;
-    fieldAge?: string;
-    fieldSex?: string;
 };
