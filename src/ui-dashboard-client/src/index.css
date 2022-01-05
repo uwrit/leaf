@@ -88,13 +88,6 @@ body {
     html {
         font-size: 13.3px;
     }
-    #main-content {
-        margin-left: 145px;
-    }
-    #sidebar-container,
-    #sidebar {
-        width: 145px;
-    }
     .leaf-button-main {
         height: 45px;
         width: 180px;
@@ -105,13 +98,6 @@ body {
 @media only screen and (min-width: 1701px) {
     html {
         font-size: 14px;
-    }
-    #main-content {
-        margin-left: 160px;
-    }
-    #sidebar-container,
-    #sidebar {
-        width: 160px;
     }
     .leaf-button-main {
         height: 48px;

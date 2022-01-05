@@ -24,6 +24,7 @@ export interface ContentRowConfig extends ContentConfig {
  * List
  */
 export interface ContentListConfig extends ContentConfig {
+    color?: RgbValues;
     datasetId: string;
     fieldDate: string;
     fieldName: string;
@@ -34,6 +35,7 @@ export interface ContentListConfig extends ContentConfig {
  * Checklist
  */
 export interface ContentChecklistConfig extends ContentConfig {
+    color?: RgbValues;
     datasets: ContentChecklistDatasetConfig[];
     width?: number;
 }
@@ -62,3 +64,11 @@ interface ContentTimelineDatasetConfig {
 interface ContentTimelineExportConfig {
     enabled: boolean;
 }
+
+export interface zzRgbValues {
+    red: number;
+    green: number;
+    blue: number;
+}
+
+export type RgbValues = [number,number,number];

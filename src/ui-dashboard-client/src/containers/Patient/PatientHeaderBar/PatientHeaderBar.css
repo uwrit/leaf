@@ -1,0 +1,55 @@
+.patient-header-bar-container {
+    background-image: linear-gradient(60deg, rgb(240, 240, 240), rgb(255, 255, 255));
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 60px;
+    font-family: Roboto;
+    font-size: 2rem;
+    font-weight: 300;
+}
+
+.patient-header-bar-container-left,
+.patient-header-bar-container-right {
+    align-items: center;
+    display: flex;
+}
+
+.patient-header-bar-container-right {
+    float: right;
+}
+
+.patient-header-bar-container .row,
+.patient-header-bar-container .col-md-6 {
+    height: 100%;
+}
+
+.patient-header-bar-name {
+    border-left: 4px solid rgb(143, 31, 177);
+    color: rgb(143, 31, 177);
+    font-size: 3rem;
+    font-weight: 300;
+    padding: 0 0 0 20px;
+}
+
+.patient-header-bar-separator {
+    background-color: rgb(200,200,200);
+    height: 40px;
+    margin: 0 20px;
+    width: 1px;
+}
+
+.patient-header-bar-age {
+    margin: 0 10px 0 0;
+}
+
+.patient-header-bar-backto-dashboard {
+    font-size: 1.3rem;
+    font-weight: 500;
+    margin-left: auto;
+    margin-right: 20px;
+    order: 2;
+}
+
+.patient-header-bar-backto-dashboard svg {
+    margin-right: 4px;
+    stroke-width: 4px;
+}

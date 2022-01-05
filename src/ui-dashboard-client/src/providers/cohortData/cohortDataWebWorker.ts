@@ -10,6 +10,8 @@ import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../../models/
 //import { workerContext } from './cohortDataWebWorkerContext';
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
+import { DemographicRow } from '../../models/cohortData/DemographicDTO';
+import { CohortState } from '../../models/state/CohortState';
 
 const TRANSFORM = 'TRANSFORM';
 
@@ -20,6 +22,7 @@ const typeSparkline = PatientListColumnType.Sparkline;
 
 interface InboundMessagePartialPayload {
     data?: [PatientListDatasetQueryDTO, PatientListDatasetDTO];
+    demographics?: DemographicRow[];
     message: string;
 }
 
@@ -66,8 +69,8 @@ export default class CohortDataWebWorker {
         this.worker.onerror = error => this.reject(error);
     }
 
-    public transform = (data: [PatientListDatasetQueryDTO, PatientListDatasetDTO]) => {
-        return this.postMessage({ message: TRANSFORM, data });
+    public transform = (data: [PatientListDatasetQueryDTO, PatientListDatasetDTO], demographics: DemographicRow[]) => {
+        return this.postMessage({ message: TRANSFORM, data, demographics });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -110,8 +113,12 @@ export default class CohortDataWebWorker {
         };
 
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { data, requestId } = payload;
-            const result = new Map();
+            const { data, demographics, requestId } = payload;
+            const result: CohortState = { patients: new Map() };
+
+            for (const row of demographics!) {
+                result.patients.set(row.personId, { demographics: row, datasets: new Map() });
+            };
 
             for (const pair of data!) {
                 const [ dsRef, dataset ] = pair as any;
@@ -119,9 +126,7 @@ export default class CohortDataWebWorker {
 
                 for (const patientId of Object.keys(dataset.results)) {
                     const rows = dataset.results[patientId];
-                    let patient = result.get(patientId);
-
-                    if (!patient) { patient = new Map(); }
+                    let patient = result.patients.get(patientId)!;
 
                     // Convert strings to dates
                     for (let j = 0; j < rows.length; j++) {
@@ -135,10 +140,12 @@ export default class CohortDataWebWorker {
                         }
                     }
                     rows.sort(((a: any, b: any) => a[dsRef.dateValueColumn!] - b[dsRef.dateValueColumn!]));
-                    patient.set(dsRef.id, rows);
-                    result.set(patientId, patient);
+                    patient.datasets.set(dsRef.id, rows);
+                    result.patients.set(patientId, patient);
                 }
             }
+
+            console.log('web worker result', result);
 
             return { result, requestId };
         }

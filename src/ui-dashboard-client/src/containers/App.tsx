@@ -17,10 +17,9 @@ import { version } from '../../package.json'
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Patient from './Patient/Patient';
 import { history } from '../store/configureStore';
-import './App.css';
 import Header from './Header/Header';
 import Cohort from './Cohort/Cohort';
-
+import './App.css';
 
 interface OwnProps {
 }
@@ -78,8 +77,10 @@ class App extends React.Component<Props> {
 
     public render() {
         const { dispatch, state } = this.props;
-        const { auth, session } = state;
+        const { auth, config, session } = state;
         const classes = [ 'app-container' ];
+
+        console.log('app', state.cohort);
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
@@ -87,9 +88,9 @@ class App extends React.Component<Props> {
                 {session && session.context &&
                 <div id="main-content">
                     <Routes>
-                        <Route path="/dashboards/:dashboardId" element={<Cohort cohort={state.cohort} />} />
-                        <Route path="/dashboards/:dashboardId/patients/:patientId" element={<Patient />} />
-                        <Route path="*" element={<Navigate to="/dashboards/test" />} />
+                        <Route path="/:dashboardId" element={<Cohort cohort={state.cohort} config={config.main} />} />
+                        <Route path="/:dashboardId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} />} />
+                        <Route path="*" element={<Navigate to="/test" />} />
                     </Routes>
                 </div>
                 }

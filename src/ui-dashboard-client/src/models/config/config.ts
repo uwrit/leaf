@@ -1,4 +1,3 @@
-import { PatientListDatasetShape } from "../patientList/Dataset";
 import { ContentType } from "./content";
 
 export interface DashboardConfig {

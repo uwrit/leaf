@@ -1,5 +1,4 @@
 import { DashboardConfig } from "../models/config/config";
-import { PatientListDatasetShape } from "../models/patientList/Dataset";
 
 export const config: DashboardConfig = 
 {
@@ -35,7 +34,7 @@ export const config: DashboardConfig =
                 type: "row",
                 content: [
                     {
-                        
+                        color: [143, 31, 177],
                         type: "checklist",
                         title: "Quality Care Checklists",
                         width: 6,
@@ -52,6 +51,7 @@ export const config: DashboardConfig =
                         
                     },
                     {
+                        color: [35, 122, 35],
                         type: "list",
                         title: "Problem List",
                         width: 3,
@@ -60,6 +60,7 @@ export const config: DashboardConfig =
                         fieldDate: "prob_date"
                     },
                     {
+                        color: [36, 77, 138],
                         type: "list",
                         title: "Active Medications",
                         width: 3,

@@ -9,34 +9,24 @@ import {
     CohortAction,
     SET_COHORT_DATASETS
 } from '../actions/cohort';
-import { CohortDataMap } from '../models/cohortData/cohortData';
 import { CohortState } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
     return { 
-        cohort: {
-            data: new Map()
-        },
-        patient: {
-            data: new Map()
-        }
+        patients: new Map(),
     };
 }
 
-const setCohortDatasets = (state: CohortState, data: CohortDataMap) => {
-    return Object.assign({}, state, {
-        ...state,
-        cohort: {
-            data: new Map(data)
-        }
-    });
+const setCohortDatasets = (state: CohortState, cohort: CohortState) => {
+    console.log('reducer', cohort);
+    return Object.assign({}, cohort);
 }
 
 const clearCohortDatasets = (state: CohortState) => {
     return Object.assign({}, state, {
         ...state,
         cohort: {
-            data: new Map()
+            patients: new Map()
         }
     });
 }
@@ -44,7 +34,7 @@ const clearCohortDatasets = (state: CohortState) => {
 export function cohort(state: CohortState = defaultCohortState(), action: CohortAction): CohortState {
     switch (action.type) {
         case SET_COHORT_DATASETS:
-            return setCohortDatasets(state, action.data!);
+            return setCohortDatasets(state, action.cohort!);
         default:
             return state;
     }

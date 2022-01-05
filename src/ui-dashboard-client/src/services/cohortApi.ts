@@ -13,6 +13,19 @@ import { DateBoundary, DateFilter, DateIncrementType } from '../models/Date';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO, PatientListDatasetShape } from '../models/patientList/Dataset';
 
 /**
+ * Fetch demographics (shared by patient list and visuzalization)
+ * based on already run patient counts.
+ */
+ export const fetchDemographics = (
+        state: AppState,
+        queryId: string
+    ) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    return http.get(`${baseUrl}/api/cohort/${queryId}/demographics`);
+};
+
+/**
  * Fetch a dataset, which may or may not have date boundaries.
  */
 export const fetchDataset = async (

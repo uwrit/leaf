@@ -1,5 +1,5 @@
 .app-container {
-    height: 100%;
+    height: calc(100vh - 55px);
     display: flex;
     box-orient: horizontal;
 }

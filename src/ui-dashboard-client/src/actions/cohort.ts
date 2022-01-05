@@ -6,15 +6,16 @@
  */ 
 
 import { Dispatch } from 'redux';
-import { CohortDataMap } from '../models/cohortData/cohortData';
+import { CohortState } from '../models/state/CohortState';
+import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { AppState } from '../models/state/AppState';
-import { fetchAvailableDatasets, fetchDataset } from '../services/cohortApi';
+import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../services/cohortApi';
 import { transform } from '../services/cohortDataApi';
 
 export const SET_COHORT_DATASETS = 'SET_COHORT_DATASETS';
 
 export interface CohortAction {
-    data?: CohortDataMap;
+    cohort?: CohortState;
     id?: string;
     message?: string;
     type: string;
@@ -31,6 +32,10 @@ export const getCohortDatasets = () => {
         const available = new Map(availableDTO.map(ds => [ds.id, ds]));
         const dtos: any = [];
 
+        // Demographics
+        const demogResp = await fetchDemographics(state, cohortId);
+        const demographics = (demogResp.data as any).patients as DemographicRow[];
+
         // Loop through each dataset, request data
         for (const id of datasetIds) {
             const ref = available.get(id);
@@ -41,16 +46,17 @@ export const getCohortDatasets = () => {
             }
         }
 
-        const transformed = await transform(dtos);
-        dispatch(setCohortDataset(transformed))
+        // Clean & transform
+        const transformed = await transform(dtos, demographics);
         console.log(transformed);
+        dispatch(setCohortDataset(transformed))
     };
 };
 
 // Synchronous
-export const setCohortDataset = (data: CohortDataMap): CohortAction => {
+export const setCohortDataset = (cohort: CohortState): CohortAction => {
     return {
-        data,
+        cohort,
         type: SET_COHORT_DATASETS
     };
 };

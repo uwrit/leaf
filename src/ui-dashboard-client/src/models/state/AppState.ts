@@ -6,10 +6,9 @@
  */ 
 
 import { AppConfig, UserContext } from "../Auth";
+import { CohortState } from "./CohortState";
 import { DashboardConfig } from "../config/config";
 import { SessionState } from "../Session";
-import { CohortState } from "./CohortState";
-
 
 export interface AuthorizationState {
     config?: AppConfig;

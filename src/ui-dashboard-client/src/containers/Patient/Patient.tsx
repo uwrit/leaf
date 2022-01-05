@@ -1,10 +1,14 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { CohortDataMap } from '../../models/cohortData/cohortData';
+import { CohortState } from '../../models/state/CohortState';
+import { PatientPageConfig } from '../../models/config/config';
+import { renderDynamic } from '../../utils/dynamicRender';
+import PatientHeaderBar from './PatientHeaderBar/PatientHeaderBar';
 
 
 interface Props {
-    cohort?: CohortDataMap;
+    cohort?: CohortState;
+    config?: PatientPageConfig;
     patientId?: string;
 }
 
@@ -13,11 +17,25 @@ class Patient extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { cohort } = this.props;
+        const { cohort, config, patientId } = this.props;
+
+        console.log(this.props);
+
+        // Bail if no data
+        if (!cohort || !config || !patientId) { return null; }
+        const patient = cohort.patients.get(patientId);
+
+        // Bail if no patient - TODO(ndobb) should be 404
+        if (!patient) { return null; }
 
         return (
             <div className={`${c}-container`}>
-                patient data
+
+                {/* Name, age, search, etc. */}
+                <PatientHeaderBar patient={patient} config={config} />
+
+                {/* Dynamically read & render content */}
+                {config.content.map(content => renderDynamic(content, patient))}
             </div>
         );
     }
@@ -26,8 +44,10 @@ class Patient extends React.Component<Props> {
 const withRouter = (Patient: any) => (props: Props) => {
     const params = useParams();
     const { dashboardId, patientId } = params;
-    console.log(dashboardId, patientId);
-    return <Patient patientId={patientId} cohort={props.cohort} />;
+
+    if (!patientId || !props.cohort || !props.config) { return null; }
+
+    return <Patient patientId={patientId} config={props.config} cohort={props.cohort} />;
 };
 
 export default withRouter(Patient);
