@@ -4,7 +4,7 @@ import { CohortState } from '../../models/state/CohortState';
 import { PatientPageConfig } from '../../models/config/config';
 import PatientHeaderBar from './PatientHeaderBar/PatientHeaderBar';
 import { renderDynamicComponent } from '../../utils/dynamic';
-
+import './Patient.css';
 
 interface Props {
     cohort?: CohortState;
@@ -19,11 +19,10 @@ class Patient extends React.Component<Props> {
         const c = this.className;
         const { cohort, config, patientId } = this.props;
 
-        console.log(this.props);
-
         // Bail if no data
         if (!cohort || !config || !patientId) { return null; }
-        const patient = cohort.patients.get(patientId);
+        const { metadata, patients } = cohort;
+        const patient = patients.get(patientId);
 
         // Bail if no patient - TODO(ndobb) should be 404
         if (!patient) { return null; }
@@ -35,7 +34,7 @@ class Patient extends React.Component<Props> {
                 <PatientHeaderBar patient={patient} config={config} />
 
                 {/* Dynamically read & render content */}
-                {config.content.map((content, i) => renderDynamicComponent(content, patient, i))}
+                {config.content.map((content, i) => renderDynamicComponent(content, patient, metadata, i))}
             </div>
         );
     }

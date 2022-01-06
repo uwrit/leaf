@@ -41,7 +41,6 @@ export const getCohortDatasets = () => {
             const ref = available.get(id);
             if (ref) {
                 const dataDTO = await fetchDataset(state, cohortId, id, ref.shape);
-                console.log(ref, dataDTO);
                 dtos.push([ ref, dataDTO ]);
             }
         }

@@ -1,4 +1,6 @@
 .dynamic-row-container {
+    display: flex;
     min-height: 100px;
-    padding: 0 20px; 
+    padding: 10px 0; 
+    width: 100%;
 }

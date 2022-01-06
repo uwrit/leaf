@@ -32,12 +32,11 @@ export const config: DashboardConfig =
                         icon: "checklist",
                         type: "checklist",
                         title: "Quality Care Checklists",
-                        width: 5,
+                        width: 44,
                         datasets: [
                             {
                                 title: "MBWC Quality Measures",
                                 id: "f0f1423e-f36b-1410-81bf-0018c8508655",
-                                fieldValues: "obs_value_str",
                                 items: [
                                     "MRI Brain","FDG PET Brain","CSF","Hearing Screening","Vision Screening","Family Conference","Neuropsychology","MoCA","MMSE","In MBWC Program"
                                 ]
@@ -50,20 +49,16 @@ export const config: DashboardConfig =
                         icon: "plus",
                         type: "list",
                         title: "Problem List",
-                        width: 4,
-                        datasetId: "f2f1423e-f36b-1410-81bf-0018c8508655",
-                        fieldName: "prob_name",
-                        fieldDate: "prob_date"
+                        width: 29,
+                        datasetId: "f2f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         color: [36, 77, 138],
                         icon: "med",
                         type: "list",
                         title: "Active Medications",
-                        width: 3,
-                        datasetId: "f4f1423e-f36b-1410-81bf-0018c8508655",
-                        fieldName: "med_name",
-                        fieldDate: "med_date"
+                        width: 28,
+                        datasetId: "f4f1423e-f36b-1410-81bf-0018c8508655"
                     }
                 ]
             },

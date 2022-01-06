@@ -1,5 +1,5 @@
 .dynamic-checklist-container {
-    padding: 20px;
+    padding: 10px;
 }
 
 .dynamic-checklist-inner {
@@ -24,6 +24,7 @@
 .dynamic-checklist-title-container {
     border-radius: 4px;
     padding: 4px 8px;
+    text-align: center;
     width: max-content;
 }
 
@@ -33,7 +34,7 @@
 }
 
 .dynamic-checklist-title {
-    font-size: 1.7rem;
+    font-size: 1.6rem;
     font-weight: 200;
 }
 

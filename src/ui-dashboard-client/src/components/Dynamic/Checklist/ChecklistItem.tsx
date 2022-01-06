@@ -1,11 +1,11 @@
 import React from 'react';
-import { Col, Row } from 'reactstrap';
 import { PatientListRowDTO } from '../../../models/patientList/Patient';
 import { FiCheck } from 'react-icons/fi';
+import { DatasetMetadataColumns } from '../../../utils/datasetMetadata';
 
 interface Props {
     data?: PatientListRowDTO[];
-    fieldValues: string;
+    cols: DatasetMetadataColumns;
     name: string;
 }
 
@@ -13,12 +13,12 @@ export default class DynamicChecklistItem extends React.Component<Props> {
     private className = 'dynamic-checklist-item';
 
     public render() {
-        const { data, fieldValues, name } = this.props;
+        const { data, cols, name } = this.props;
         const c = this.className;
     
         if (!data) { return null; }
 
-        const checked = data.find(d => d[fieldValues] === name);
+        const checked = cols && cols.fieldValueString && data.find(d => d[cols.fieldValueString!] === name);
 
         return (
             <div className={c}>

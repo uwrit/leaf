@@ -1,8 +1,81 @@
 .dynamic-list-container {
-    padding: 20px;
+    padding: 10px;
 }
 
 .dynamic-list-inner {
-    border-radius: 12px;
+    align-content: stretch;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: row;
     height: 100%;
+    padding: 10px;
+}
+
+.dynamic-list-inner-left,
+.dynamic-list-inner-right {
+    height: 100%;
+}
+
+.dynamic-list-inner-left {
+    max-width: 40%;
+}
+
+.dynamic-list-inner-right {
+    flex-grow: 2;
+    width: 60%;
+    padding: 0;
+}
+
+.dynamic-list-title-container {
+    border-radius: 4px;
+    padding: 4px 8px;
+    text-align: center;
+}
+
+.dynamic-list-title-container svg {
+    font-size: 2rem;
+    margin: 0 8px -4px 0;
+}
+
+.dynamic-list-title {
+    font-size: 1.6rem;
+    font-weight: 200;
+}
+
+.dynamic-list-item-container {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    display: flex;
+    padding: 6px 0;
+}
+
+.dynamic-list-item-container:hover {
+    border-color: rgb(200,200,200);
+    cursor: pointer;
+}
+
+.dynamic-list-item-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    max-width: calc(100% - 125px);
+    padding-right: 10px;
+    text-align: right;
+    width: 100%;
+}
+
+.dynamic-list-item-date {
+    border-left: 1px solid rgb(210,210,210);
+    margin-left: auto;
+    padding: 0 8px;
+    width: 125px;
+}
+
+.dynamic-list-item-datediff {
+    color: green;
+    font-size: 0.9rem;
+}
+
+.dynamic-list-item-paren {
+    color: rgb(100,100,100);
+    font-size: 0.9rem;
 }

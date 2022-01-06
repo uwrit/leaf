@@ -13,7 +13,8 @@ import { CohortState } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
     return { 
-        patients: new Map(),
+        metadata: new Map(),
+        patients: new Map()
     };
 }
 

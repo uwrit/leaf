@@ -1,15 +1,16 @@
 import React from 'react';
 import { Col, Row } from 'reactstrap';
 import { ContentChecklistConfig, ContentChecklistDatasetConfig } from '../../../models/config/content';
-import { PatientData } from '../../../models/state/CohortState';
+import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
 import DynamicChecklistItem from './ChecklistItem';
+import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import './Checklist.css';
-import { PatientListRowDTO } from '../../../models/patientList/Patient';
 
 interface Props {
     config: ContentChecklistConfig;
     patient: PatientData;
+    metadata: Map<DatasetId, DatasetMetadata>;
 }
 
 interface State {
@@ -31,11 +32,11 @@ export default class DynamicChecklist extends React.Component<Props, State> {
      * Render
      */
     public render() {
-        const { config, patient } = this.props;
+        const { config } = this.props;
         const c = this.className;
 
         return (
-            <Col className={`${c}-container`} md={config.width ?? settings.defaultWidth}>
+            <div className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%` }}>
                 <div className={`${c}-inner`} style={this.getStyle(config)}>
 
                     {/* Left column */}
@@ -46,10 +47,10 @@ export default class DynamicChecklist extends React.Component<Props, State> {
 
                     {/* Right column */}
                     <div className={`${c}-inner-right`}>
-                        {this.getChecklistItems(patient)}
+                        {this.getChecklistItems()}
                     </div>
                 </div>
-            </Col>
+            </div>
         );
     }
 
@@ -106,14 +107,17 @@ export default class DynamicChecklist extends React.Component<Props, State> {
     /**
      * Get checklist items for currently selected checklist
      */
-    private getChecklistItems = (patient: PatientData): JSX.Element | null => {
+    private getChecklistItems = (): JSX.Element | null => {
+        const { patient, metadata } = this.props;
         const { selectedDatasetConfig } = this.state;
         const className = `${this.className}-item-container`;
         
         if (!selectedDatasetConfig || !patient.datasets.has(selectedDatasetConfig.id)) { return null; }
 
+        const { items } = selectedDatasetConfig;
+        const meta = metadata.get(selectedDatasetConfig.id);
         const data = patient.datasets.get(selectedDatasetConfig.id);
-        const { items, fieldValues } = selectedDatasetConfig;
+        const cols = getDatasetMetadataColumns(meta!);
 
         // 2 columns if more than 5 elements
         if (items.length > 5) {
@@ -124,12 +128,12 @@ export default class DynamicChecklist extends React.Component<Props, State> {
                 <Row className={className}>
                     <Col md={6}>
                         {left.map((item, i) => {
-                            return <DynamicChecklistItem key={i} data={data} fieldValues={fieldValues} name={item} />
+                            return <DynamicChecklistItem key={i} data={data} cols={cols} name={item} />
                         })}
                     </Col>
                     <Col md={6}>
                         {right.map((item, i) => {
-                            return <DynamicChecklistItem key={i} data={data} fieldValues={fieldValues} name={item} />
+                            return <DynamicChecklistItem key={i} data={data} cols={cols} name={item} />
                         })}
                     </Col>
                 </Row>
@@ -140,7 +144,7 @@ export default class DynamicChecklist extends React.Component<Props, State> {
             return (
                 <div className={className}>
                     {selectedDatasetConfig.items.map((item, i) => {
-                        return <DynamicChecklistItem key={i} data={data} fieldValues={fieldValues} name={item} />
+                        return <DynamicChecklistItem key={i} data={data} cols={cols} name={item} />
                     })}
                 </div>
             )
@@ -156,7 +160,7 @@ const settings = {
         size: 1,
         transparency: 0.3,
     },
-    defaultWidth: 12,
+    defaultWidth: 100,
     title: {
         transparency: 0.15
     }

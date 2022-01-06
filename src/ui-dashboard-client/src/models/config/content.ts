@@ -41,8 +41,6 @@ export interface ContentRowConfig extends BaseContentConfig {
  */
 export interface ContentListConfig extends StyledContentConfig {
     datasetId: string;
-    fieldDate: string;
-    fieldName: string;
 };
 
 /**
@@ -54,7 +52,6 @@ export interface ContentChecklistConfig extends StyledContentConfig {
 
 export interface ContentChecklistDatasetConfig {
     id: string;
-    fieldValues: string;
     items: string[];
     title: string;
 };
@@ -67,7 +64,7 @@ export interface ContentChecklistDatasetConfig {
     export: ContentTimelineExportConfig;
 };
 
-interface ContentTimelineDatasetConfig {
+export interface ContentTimelineDatasetConfig {
     id: string;
     title: string;
 };

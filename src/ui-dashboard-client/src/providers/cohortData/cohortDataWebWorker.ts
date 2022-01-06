@@ -11,7 +11,7 @@ import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../../models/
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
-import { CohortState } from '../../models/state/CohortState';
+import { CohortState, DatasetMetadata } from '../../models/state/CohortState';
 
 const TRANSFORM = 'TRANSFORM';
 
@@ -114,7 +114,7 @@ export default class CohortDataWebWorker {
 
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { data, demographics, requestId } = payload;
-            const result: CohortState = { patients: new Map() };
+            const result: CohortState = { patients: new Map(), metadata: new Map() };
 
             for (const row of demographics!) {
                 result.patients.set(row.personId, { demographics: row, datasets: new Map() });
@@ -122,6 +122,7 @@ export default class CohortDataWebWorker {
 
             for (const pair of data!) {
                 const [ dsRef, dataset ] = pair as any;
+                const meta: DatasetMetadata = { ref: dsRef, schema: dataset.schema };
                 const dateFields = dataset.schema.fields.filter((field: any) => field.type === typeDate).map((field: any) => field.name);
 
                 for (const patientId of Object.keys(dataset.results)) {
@@ -142,6 +143,7 @@ export default class CohortDataWebWorker {
                     rows.sort(((a: any, b: any) => a[dsRef.dateValueColumn!] - b[dsRef.dateValueColumn!]));
                     patient.datasets.set(dsRef.id, rows);
                     result.patients.set(patientId, patient);
+                    result.metadata.set(dsRef.id, meta);
                 }
             }
 
