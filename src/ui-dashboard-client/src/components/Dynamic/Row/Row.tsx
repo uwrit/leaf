@@ -1,11 +1,11 @@
 import React from 'react';
-import { ContentRowConfig } from '../../../models/config/content';
+import { WidgetRowConfig } from '../../../models/config/content';
 import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { renderDynamicComponent } from '../../../utils/dynamic';
 import './Row.css';
 
 interface Props {
-    config: ContentRowConfig;
+    config: WidgetRowConfig;
     patient: PatientData;
     metadata: Map<DatasetId, DatasetMetadata>;
 }

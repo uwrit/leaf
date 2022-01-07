@@ -2,11 +2,11 @@
 /**
  * Types
  */
-export type ContentIdType =  "row" | "checklist" | "list" | "timeline";
+export type WidgetIdType =  "row" | "checklist" | "list" | "timeline";
 
-export type ContentType = 
-    ContentRowConfig  | ContentChecklistConfig |
-    ContentListConfig | ContentTimelineConfig;
+export type WidgetType = 
+    WidgetRowConfig  | WidgetChecklistConfig |
+    WidgetListConfig | WidgetTimelineConfig;
 
 export type RgbValues = [ number, number, number ];
 
@@ -15,15 +15,15 @@ export type Icons = "checklist" | "plus" | "med";
 /**
  * Abstract config type
  */
-interface BaseContentConfig {
-    type: ContentIdType;
+interface BaseWidgetConfig {
+    type: WidgetIdType;
 };
 
-interface TitledContentConfig extends BaseContentConfig {
+interface TitledWidgetConfig extends BaseWidgetConfig {
     title: string;
 }
 
-interface StyledContentConfig extends TitledContentConfig {
+interface StyledWidgetConfig extends TitledWidgetConfig {
     color?: RgbValues;
     icon?: Icons;
     width?: number;
@@ -32,21 +32,21 @@ interface StyledContentConfig extends TitledContentConfig {
 /**
  * Row
  */
-export interface ContentRowConfig extends BaseContentConfig {
-    content: (ContentChecklistConfig | ContentListConfig | ContentTimelineConfig)[];
+export interface WidgetRowConfig extends BaseWidgetConfig {
+    content: (WidgetChecklistConfig | WidgetListConfig | WidgetTimelineConfig)[];
 };
 
 /**
  * List
  */
-export interface ContentListConfig extends StyledContentConfig {
+export interface WidgetListConfig extends StyledWidgetConfig {
     datasetId: string;
 };
 
 /**
  * Checklist
  */
-export interface ContentChecklistConfig extends StyledContentConfig {
+export interface WidgetChecklistConfig extends StyledWidgetConfig {
     datasets: ContentChecklistDatasetConfig[];
 };
 
@@ -59,16 +59,23 @@ export interface ContentChecklistDatasetConfig {
 /**
  * Timeline
  */
- export interface ContentTimelineConfig extends BaseContentConfig {
-    datasets: ContentTimelineDatasetConfig[];
-    export: ContentTimelineExportConfig;
+ export interface WidgetTimelineConfig extends TitledWidgetConfig {
+    comparison: WidgetTimelineComparisonConfig;
+    datasets: WidgetTimelineDatasetConfig[];
+    export: WidgetTimelineExportConfig;
 };
 
-export interface ContentTimelineDatasetConfig {
+export interface WidgetTimelineDatasetConfig {
     id: string;
     title: string;
 };
 
-interface ContentTimelineExportConfig {
+interface WidgetTimelineExportConfig {
     enabled: boolean;
+};
+
+interface WidgetTimelineComparisonConfig {
+    columnText: string;
+    enabled: boolean;
+    title: string;
 };

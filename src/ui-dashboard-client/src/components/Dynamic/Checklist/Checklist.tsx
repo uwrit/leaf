@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'reactstrap';
-import { ContentChecklistConfig, ContentChecklistDatasetConfig } from '../../../models/config/content';
+import { WidgetChecklistConfig, ContentChecklistDatasetConfig } from '../../../models/config/content';
 import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
 import DynamicChecklistItem from './ChecklistItem';
@@ -8,7 +8,7 @@ import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import './Checklist.css';
 
 interface Props {
-    config: ContentChecklistConfig;
+    config: WidgetChecklistConfig;
     patient: PatientData;
     metadata: Map<DatasetId, DatasetMetadata>;
 }
@@ -57,7 +57,7 @@ export default class DynamicChecklist extends React.Component<Props, State> {
     /**
      * Get style for main checklist element
      */
-    private getStyle = (config: ContentChecklistConfig): React.CSSProperties => {
+    private getStyle = (config: WidgetChecklistConfig): React.CSSProperties => {
         return {
             backgroundColor: getDynamicColor(config.color, settings.background.transparency),
             border: `${settings.border.size}px solid ${getDynamicColor(config.color, settings.border.transparency)}`
@@ -67,7 +67,7 @@ export default class DynamicChecklist extends React.Component<Props, State> {
     /**
      * Get title of the checklist
      */
-    private getTitle = (config: ContentChecklistConfig): JSX.Element => {
+    private getTitle = (config: WidgetChecklistConfig): JSX.Element => {
         const c = this.className;
         return (
             <div className={`${c}-title-container`} style={{ backgroundColor: getDynamicColor(config.color, settings.title.transparency) }}>
@@ -80,7 +80,7 @@ export default class DynamicChecklist extends React.Component<Props, State> {
     /**
      * Get list of available sub-checklists (ie, datasets) in checklist
      */
-    private getDatasetsSelector = (config: ContentChecklistConfig): JSX.Element | null => {
+    private getDatasetsSelector = (config: WidgetChecklistConfig): JSX.Element | null => {
         const { selectedDatasetConfig } = this.state;
         const c = this.className;
 

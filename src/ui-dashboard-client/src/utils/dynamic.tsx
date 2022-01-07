@@ -2,7 +2,7 @@ import React from "react";
 import DynamicChecklist from "../components/Dynamic/Checklist/Checklist";
 import DynamicList from "../components/Dynamic/List/List";
 import DynamicRow from "../components/Dynamic/Row/Row";
-import { ContentChecklistConfig, ContentListConfig, ContentRowConfig, ContentTimelineConfig, ContentType, Icons } from "../models/config/content";
+import { WidgetChecklistConfig, WidgetListConfig, WidgetRowConfig, WidgetTimelineConfig, WidgetType, Icons } from "../models/config/content";
 import { DatasetId, DatasetMetadata, PatientData } from "../models/state/CohortState";
 import { RgbValues } from "../models/config/content";
 import { VscChecklist } from "react-icons/vsc";
@@ -11,16 +11,16 @@ import { GiMedicines } from "react-icons/gi";
 import DynamicTimeline from "../components/Dynamic/Timeline/Timeline";
 
 export const renderDynamicComponent = (
-        content: ContentType, 
+        content: WidgetType, 
         patient: PatientData, 
         metadata: Map<DatasetId, DatasetMetadata>,
         key?: string | number)
     : JSX.Element | null => {
     switch (content.type) {
-        case "row":       return <DynamicRow key={key} config={content as ContentRowConfig} patient={patient} metadata={metadata} />;
-        case "list":      return <DynamicList key={key} config={content as ContentListConfig} patient={patient} metadata={metadata} />;
-        case "checklist": return <DynamicChecklist key={key} config={content as ContentChecklistConfig} patient={patient} metadata={metadata} />;
-        case "timeline":  return <DynamicTimeline key={key} config={content as ContentTimelineConfig} patient={patient} metadata={metadata} />;;
+        case "row":       return <DynamicRow key={key} config={content as WidgetRowConfig} patient={patient} metadata={metadata} />;
+        case "list":      return <DynamicList key={key} config={content as WidgetListConfig} patient={patient} metadata={metadata} />;
+        case "checklist": return <DynamicChecklist key={key} config={content as WidgetChecklistConfig} patient={patient} metadata={metadata} />;
+        case "timeline":  return <DynamicTimeline key={key} config={content as WidgetTimelineConfig} patient={patient} metadata={metadata} />;;
         default:
             return null;
     }

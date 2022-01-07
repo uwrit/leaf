@@ -1,10 +1,12 @@
 import moment from 'moment';
 import React from 'react';
 import { IoMdArrowRoundUp as UpArrow, IoMdArrowRoundDown as DownArrow, IoMdArrowRoundForward as RightArrow } from "react-icons/io"
+import { BsPersonFill as Person } from "react-icons/bs"
 import { TimelineValueSet } from './Timeline';
 
 interface Props {
     color: string;
+    comparison: boolean;
     values: TimelineValueSet;
 }
 
@@ -12,7 +14,7 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
     private className = 'dynamic-timeline-trend-bar';
 
     public render() {
-        const { values, color } = this.props;
+        const { values, color, comparison } = this.props;
         const { ds, data } = values;
         const c = this.className;
     
@@ -33,9 +35,11 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
                         <div className={`${c}-datediff`}>{this.getDateDiff(date)}</div>
                     </div>
                 </div>
+                {comparison && 
                 <div className={`${c}-all-diff`}>
                     +1.1
                 </div>
+                }
             </div>
         );
     }
@@ -69,7 +73,7 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
         const last = data[data.length - 1][cols.fieldValueNumeric!];
         const prev = data[data.length - 2][cols.fieldValueNumeric!];
 
-        if (!last || !prev) { return <span>-</span>; }
+        if (!last || !prev) { return <Person />; }
         if (last < prev)   { return <DownArrow /> }
         if (last === prev) { return <RightArrow /> }
 

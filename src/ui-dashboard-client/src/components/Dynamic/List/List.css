@@ -27,7 +27,7 @@
 }
 
 .dynamic-list-title-container {
-    border-radius: 4px;
+    border-radius: 8px;
     padding: 4px 8px;
     text-align: center;
 }
@@ -46,7 +46,7 @@
     border: 1px solid transparent;
     border-radius: 4px;
     display: flex;
-    padding: 6px 0;
+    padding: 2px 0;
 }
 
 .dynamic-list-item-container:hover {

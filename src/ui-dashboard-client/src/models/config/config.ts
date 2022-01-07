@@ -1,23 +1,19 @@
-import { ContentType } from "./content";
+import { WidgetType } from "./content";
 
 export interface DashboardConfig {
     main: MainPageConfig;
     patient: PatientPageConfig;
 };
 
-export interface DashboardPageConfig {
-    title: string;
-    
-};
-
-export interface MainPageConfig extends DashboardPageConfig {
+export interface MainPageConfig {
     cohortId: string;
-    content: ContentType[];
+    content: WidgetType[];
     datasetIds: string[];
+    title: string;
 };
 
-export interface PatientPageConfig extends DashboardPageConfig {
-    content: ContentType[];
+export interface PatientPageConfig {
+    content: WidgetType[];
     search: SearchConfig;
 };
 

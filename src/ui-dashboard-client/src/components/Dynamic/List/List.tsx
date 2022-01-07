@@ -1,14 +1,14 @@
 import moment from 'moment';
 import React from 'react';
 import { Row, Col } from 'reactstrap';
-import { ContentListConfig } from '../../../models/config/content';
+import { WidgetListConfig } from '../../../models/config/content';
 import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
 import './List.css';
 
 interface Props {
-    config: ContentListConfig;
+    config: WidgetListConfig;
     patient: PatientData;
     metadata: Map<DatasetId, DatasetMetadata>;
 }
