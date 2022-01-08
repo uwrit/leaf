@@ -104,7 +104,7 @@
 .dynamic-timeline-small-multiples-container:hover .recharts-layer.recharts-line path,
 .dynamic-timeline-small-multiples-container:hover .recharts-line-dots circle {
     filter: none;
-    stroke-opacity: 0.5;
+    stroke-opacity: 0.3;
 }
 
 .dynamic-timeline-small-multiples-container .recharts-surface:hover .recharts-layer.recharts-line path,
@@ -128,7 +128,7 @@
 
 .dynamic-timelines-event-box {
     filter: drop-shadow(2px 3px 4px rgb(0,0,0,0.25));
-    height: 53px;
+    height: 100px;
     text-align: center;
     width: 100px;
 }
@@ -137,6 +137,9 @@
     border: 2px solid rgb(192, 31, 45);
     border-radius: 8px;
     background-color: white;
+    font-size: 1.1rem;
+    min-width: 70px;
+    max-width: 100px;
     padding: 4px;
 }
 
@@ -145,7 +148,7 @@
     background-color: white;
     border: 1px solid rgb(220,220,220);
     box-shadow: 0 2px 10px rgb(0,0,0,0.4);
-    height: 532px;
+    height: 462px;
     pointer-events: none;
     position: absolute;
     right: 0;

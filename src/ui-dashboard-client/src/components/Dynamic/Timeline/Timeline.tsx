@@ -164,7 +164,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                                     }
 
                                     {!cols.fieldValueNumeric && 
-                                    _data.map(d => <ReferenceDot className={`${c}-chart-event-dot`} x={d[cols.fieldDate!]} y={0.05} />)
+                                    _data.map(d => <ReferenceDot className={`${c}-chart-event-dot`} x={d[cols.fieldDate!]} y={0.03} />)
                                     }
 
                                 </LineChart>
@@ -205,7 +205,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                 }
             }
         }
-        return [min,max];
+        return [ min, max ];
     }
 
     private getValueSets = (): TimelineValueSet[] => {
