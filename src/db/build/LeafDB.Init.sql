@@ -39,4 +39,7 @@ SELECT
    ,[SecondaryColor] = 'rgb(183, 165, 122)'
 
 INSERT INTO [ref].[Version] (Lock, [Version])
-SELECT 'X', N'3.10.0';
+SELECT 'X', N'3.10.1';
+
+INSERT INTO app.ServerState (Lock, IsUp, Updated, UpdatedBy)
+SELECT 'X', 1, GETDATE(), 'Leaf Initialization Script'
