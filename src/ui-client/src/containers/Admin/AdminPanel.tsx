@@ -16,7 +16,6 @@ import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 import { GlobalPanelFilterEditor } from '../../components/Admin/GlobalPanelFilterEditor/GlobalPanelFilterEditor';
 import './AdminPanel.css';
-import { DowntimesEditor } from '../../components/Admin/DowntimesEditor/DowntimesEditor';
 
 interface StateProps { 
     admin?: AdminState;
