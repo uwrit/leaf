@@ -68,7 +68,7 @@ export class Help extends React.PureComponent<Props, State> {
                     content={adminHelp.content}
                     currentContent={adminHelp.currentContent}
                     currentPage={helpPages.currentSelectedPage}
-                    createNew={adminHelp.createNew}
+                    isNew={adminHelp.isNew}
                     unsaved={adminHelp.unsaved}
                 />
             );

@@ -45,8 +45,7 @@ namespace Model.Admin.Compiler
 
         public async Task<AdminHelpPage> CreateAsync(AdminHelpPage page)
         {
-            ThrowIfCreateUpdateInvalid(page);
-
+            ThrowIfInvalid(page);
             try
             {
                 var created = await svc.CreateAsync(page);
@@ -63,8 +62,7 @@ namespace Model.Admin.Compiler
 
         public async Task<AdminHelpPage> UpdateAsync(AdminHelpPage page)
         {
-            ThrowIfCreateUpdateInvalid(page);
-
+            ThrowIfInvalid(page);
             try
             {
                 var updated = await svc.UpdateAsync(page);
@@ -96,7 +94,7 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfCreateUpdateInvalid(AdminHelpPage page)
+        void ThrowIfInvalid(AdminHelpPage page)
         {
             Ensure.NotNull(page, nameof(page));
         }

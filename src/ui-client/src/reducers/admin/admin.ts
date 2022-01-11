@@ -176,7 +176,7 @@ export const defaultAdminState = (): AdminState => {
                 content: []
             },
             state: HelpPageLoadState.NOT_LOADED,
-            createNew: false,
+            isNew: false,
             unsaved: false
         },
         networkAndIdentity: {

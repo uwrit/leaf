@@ -11,7 +11,6 @@ namespace API.DTO.Admin.Compiler
 {
     public class AdminHelpPageDTO
     {
-        // TODO: update title type once sql reader figured out
         public string Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }

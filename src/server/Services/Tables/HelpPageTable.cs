@@ -19,7 +19,7 @@ namespace Services.Tables
             private set;
         }
 
-        public const string Type  = "adm.HelpContentTable";
+        public const string Type  = "adm.HelpContentTableZ";
         const string title        = "Title";
         const string category     = "Category";
         const string pageId       = "PageId";
@@ -61,22 +61,27 @@ namespace Services.Tables
             {
                 var row = table.NewRow();
                 row[title]        = p.Title;
-                row[category]     = p.Category;
-                row[pageId]       = r.PageId;
+                row[category]     = p.Category.Category;
                 row[orderId]      = r.OrderId;
                 row[type]         = r.Type;
                 row[textContent]  = r.TextContent;
                 row[imageId]      = r.ImageId;
                 row[imageContent] = r.ImageContent;
                 row[imageSize]    = r.ImageSize;
+
+                if (r.PageId != null)
+                {
+                    row[pageId] = r.PageId;
+                };
+
                 table.Rows.Add(row);
             }
         }
 
-        public static DataTable From(AdminHelpPage page)
+        public static DataTable From(AdminHelpPage p)
         {
-            var p = page ?? new AdminHelpPage();
-            return new HelpPageTable(p).Value;
+            var page = p ?? new AdminHelpPage();
+            return new HelpPageTable(page).Value;
         }
     }
 }

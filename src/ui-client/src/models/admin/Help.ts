@@ -5,30 +5,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export interface CreateHelpPageDTO {
-    title: string;
-    category: string;
-    orderId: number;
-    type: string;
-    textContent: string;
-    imageId: string;
-    imageContent: string;
-    imageSize: number;
-}
-
-export interface UpdateHelpPageContentDTO extends CreateHelpPageDTO {
-    pageId: string;
-}
-
-export interface CreateHelpPage extends CreateHelpPageDTO {}
-export interface UpdateHelpPageContent extends UpdateHelpPageContentDTO {}
-
-
-
-
-
-
-
 export interface ContentRow {
     id: string;
     pageId: string;
@@ -40,10 +16,12 @@ export interface ContentRow {
     imageSize: number;
 }
 
+// rename to AdminHelpPageDTO
 export interface AdminHelpContentDTO {
     title: string;
     category: string;
     content: ContentRow[];
 }
 
+// rename to AdminHelpPage
 export interface AdminHelpContent extends AdminHelpContentDTO {}

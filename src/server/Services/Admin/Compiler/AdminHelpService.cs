@@ -74,7 +74,6 @@ namespace Services.Admin.Compiler
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
-
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Update,
                     new { content = HelpPageTable.From(page) },

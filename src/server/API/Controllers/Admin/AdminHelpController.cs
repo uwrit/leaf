@@ -37,7 +37,23 @@ namespace API.Controllers.Admin
         }
 
         // TODO: write method GetAll to return all pages, categories
+        // Gets all help page titles and categories and its content.
+        [HttpGet]
+        public async Task<ActionResult<AdminHelpPageDTO>> Get(Guid id)
+        {
+            try
+            {
+                var page = await manager.GetAsync(id);
+                return Ok(new AdminHelpPageDTO(page));
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Failed to get help page. Id:{id} Error:{Error}", id, e.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
 
+        // Gets a single help page and its content.
         [HttpGet("{id}")]
         public async Task<ActionResult<AdminHelpPageDTO>> GetOne(Guid id)
         {
@@ -103,7 +119,7 @@ namespace API.Controllers.Admin
             }
         }
 
-        // TODO : return deleted page
+        // TODO : return deleted page, return type adminhelpdto?
        [HttpDelete("{id}")]
         public async Task<ActionResult<Guid?>> Delete(Guid id)
         {

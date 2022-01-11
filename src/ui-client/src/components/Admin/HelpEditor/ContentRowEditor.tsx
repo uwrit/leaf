@@ -65,6 +65,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //      4. create new page, dont save, able to go to other tabs
     //          - reevaluate
     //          - follow concept create rule: alert page isn't saved
+    //      5. update category feature needed.
 
     public render() {
         const c = this.className;

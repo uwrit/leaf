@@ -21,7 +21,7 @@ export const isAdminHelpContentNew = (state: AdminState, action: AdminHelpAction
     return Object.assign({}, state, {
         help: {
             ...state.help,
-            createNew: action.createNew
+            isNew: action.isNew
         }
     });
 };

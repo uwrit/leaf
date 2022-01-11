@@ -13,7 +13,7 @@ GO
 
 CREATE TABLE [app].[HelpPageCategory] (
     Id [UNIQUEIDENTIFIER] DEFAULT (NEWSEQUENTIALID()) NOT NULL PRIMARY KEY,
-    Category NVARCHAR(255) NOT NULL UNIQUE
+    Name NVARCHAR(255) NOT NULL UNIQUE
 )
 GO
 
@@ -48,43 +48,58 @@ GO
 
 -- STORED PROCEDURES
 
--- SP to get all categories
-DROP PROCEDURE IF EXISTS [app].[sp_GetHelpCategories]
+-- SP to get all help pages and categories
+DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPagesAndCategories]
 GO
 
-CREATE PROCEDURE [app].[sp_GetHelpCategories]
+CREATE PROCEDURE [app].[sp_GetHelpPagesAndCategories]
 AS
 BEGIN
-    SELECT Id, Category
+    SELECT Id, CategoryId, Title
+    FROM app.HelpPage
+    
+    SELECT Id, Name
     FROM app.HelpPageCategory
 END
 GO
 
 
--- SP to get all help pages
-DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPages]
-GO
+-- SP to get all categories
+-- DROP PROCEDURE IF EXISTS [app].[sp_GetHelpCategories]
+-- GO
 
-CREATE PROCEDURE [app].[sp_GetHelpPages]
-AS
-BEGIN
-    SELECT Id, CategoryId, Title
-    FROM app.HelpPage
-END
-GO
+-- CREATE PROCEDURE [app].[sp_GetHelpCategories]
+-- AS
+-- BEGIN
+--     SELECT Id, Name
+--     FROM app.HelpPageCategory
+-- END
+-- GO
+
+
+-- SP to get all help pages
+-- DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPages]
+-- GO
+
+-- CREATE PROCEDURE [app].[sp_GetHelpPages]
+-- AS
+-- BEGIN
+--     SELECT Id, CategoryId, Title
+--     FROM app.HelpPage
+-- END
+-- GO
 
 
 -- SP to get content for a page
-DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPageContentByPageId]
+DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPageContent]
 GO
 
-CREATE PROCEDURE [app].[sp_GetHelpPageContentByPageId]
+CREATE PROCEDURE [app].[sp_GetHelpPageContent]
     @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
-    -- Throws error if page content does not exist.
-    IF ((SELECT COUNT(*) FROM app.HelpPageContent WHERE PageId = @pageId) = 0)
-        THROW 70404, 'Content not found and/or does not exist for page.', 1;
+    IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
+        THROW 70404, N'Could not find page and/or does not exist.', 1;
 
     SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
@@ -102,7 +117,7 @@ GO
 CREATE TYPE [adm].[HelpContentTable] AS TABLE(
     [Title] [NVARCHAR](400) NOT NULL,
     [Category] [NVARCHAR](255) NOT NULL,
-    [PageId] [UNIQUEIDENTIFIER] NOT NULL,
+    [PageId] [UNIQUEIDENTIFIER] NULL,
 	[OrderId] [INT] NOT NULL,
 	[Type] [NVARCHAR](255) NOT NULL,
 	[TextContent] [NVARCHAR](MAX) NULL,
@@ -114,27 +129,48 @@ GO
 
 
 -- SP to get help page title, category, and content
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPagesAndCategories]
+GO
+
+CREATE PROCEDURE [adm].[sp_GetHelpPagesAndCategories]
+AS
+BEGIN
+    SELECT Id, CategoryId, Title
+    FROM app.HelpPage
+    
+    SELECT Id, Name
+    FROM app.HelpPageCategory
+END
+GO
+
+
+-- SP to get help page title, category, and content
 DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPageAndContent]
 GO
 
 CREATE PROCEDURE [adm].[sp_GetHelpPageAndContent]
-    @id UNIQUEIDENTIFIER
+    @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
-    IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @id)
+    IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
-    
-    SELECT Title
-    FROM app.HelpPage
-    WHERE Id = @id
-    
-    SELECT Category
-    FROM app.HelpPageCategory
-    WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @id)
 
     SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
-    WHERE PageId = @id
+    WHERE PageId = @pageId;
+
+    
+    -- SELECT Title
+    -- FROM app.HelpPage
+    -- WHERE Id = @pageId
+    
+    -- SELECT Id, Name
+    -- FROM app.HelpPageCategory
+    -- WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @pageId)
+
+    -- SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    -- FROM app.HelpPageContent
+    -- WHERE PageId = @pageId
 END
 GO
 
@@ -156,11 +192,11 @@ BEGIN
     DECLARE @orderId INT
     SET @orderId = (SELECT TOP(1) OrderId FROM @content)
 
-    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Category = @category))
-        INSERT INTO app.HelpPageCategory (Category) SELECT Category = @category
+    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category))
+        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @category
 
     DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Category = @category)
+    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
         
     IF (app.fn_NullOrWhitespace(@title) = 1)
         THROW 70400, N'Title is required.', 1;
@@ -182,9 +218,7 @@ BEGIN
     SELECT @pageId = PageId FROM @pageIdTable;
 
     INSERT INTO app.HelpPageContent (PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize)
-    SELECT
-        PageId = (CASE WHEN PageId IS NULL THEN (SELECT Id FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId) ELSE @pageId END),
-        OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    SELECT PageId = @pageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
     EXEC adm.sp_GetHelpPageAndContent @pageId
@@ -216,11 +250,11 @@ BEGIN
     SET @orderId = (SELECT TOP(1) OrderId FROM @content)
 
     DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Category = @category)
+    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
 
     IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
-    IF NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Category = @category)
+    IF NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category)
         THROW 70404, N'Could not find category and/or does not exist.', 1;
     IF (app.fn_NullOrWhitespace(@title) = 1)
         THROW 70400, N'Title is required.', 1;
@@ -234,7 +268,7 @@ BEGIN
     UPDATE app.HelpPage
     SET
         Title = @title,
-        CategoryId = (SELECT Id FROM app.HelpPageCategory WHERE Category = @category)
+        CategoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
     WHERE Id = @pageId
 
     DELETE FROM app.HelpPageContent
@@ -254,21 +288,23 @@ DROP PROCEDURE IF EXISTS [adm].[sp_DeleteHelpPageAndContent]
 GO
 
 CREATE PROCEDURE [adm].[sp_DeleteHelpPageAndContent]
-    @id UNIQUEIDENTIFIER
+    @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
     DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT CategoryId FROM app.HelpPage WHERE Id = @id)
+    SET @categoryId = (SELECT CategoryId FROM app.HelpPage WHERE Id = @pageId)
 
-    IF (NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @id))
+    IF (NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId))
         THROW 70404, N'Could not find page and/or does not exist.', 1;
 
+    -- reevalute b/c category may or may not be deleted although it returns category; not consistent
+    EXEC adm.sp_GetHelpPageAndContent @pageId
+
     DELETE FROM app.HelpPageContent
-    WHERE PageId = @id
+    WHERE PageId = @pageId
 
     DELETE FROM app.HelpPage
-    OUTPUT deleted.Id
-    WHERE Id = @id
+    WHERE Id = @pageId
     
     IF ((SELECT COUNT(*) FROM app.HelpPage WHERE CategoryId = @categoryId) = 0)
     BEGIN;

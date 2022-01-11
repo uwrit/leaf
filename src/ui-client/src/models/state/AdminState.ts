@@ -114,7 +114,7 @@ export interface AdminHelpState {
     currentContent: AdminHelpContent;
     content: AdminHelpContent;
     state: HelpPageLoadState;
-    createNew: boolean;
+    isNew: boolean;
     unsaved: boolean;
 }
 

@@ -14,7 +14,7 @@ import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent,
          resetAdminHelpContent, setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
 import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
 import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
-import { AdminHelpContent, ContentRow, CreateHelpPageDTO, UpdateHelpPageContentDTO } from '../../models/admin/Help';
+import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState } from '../../models/state/GeneralUiState';
 import { generate as generateId } from 'shortid';
@@ -25,7 +25,7 @@ interface Props {
     content: AdminHelpContent;
     currentContent: AdminHelpContent;
     currentPage: HelpPage;
-    createNew: boolean;
+    isNew: boolean;
     unsaved: boolean;
 }
 
@@ -164,9 +164,9 @@ export class AdminHelp extends React.Component<Props> {
     };
 
     private handleUndoChanges = () => {
-        const { dispatch, content, createNew, unsaved } = this.props;
+        const { dispatch, content, isNew, unsaved } = this.props;
 
-        if (createNew && unsaved) {
+        if (isNew && unsaved) {
             dispatch(confirmLeavingAdminHelpContent());
         } else {
             dispatch(setCurrentAdminHelpContent(content));
@@ -175,9 +175,9 @@ export class AdminHelp extends React.Component<Props> {
     };
 
     private handleSaveChanges = () => {
-        const { dispatch, currentContent, createNew, currentPage } = this.props;
+        const { dispatch, currentContent, isNew, currentPage } = this.props;
 
-        if (createNew) {
+        if (isNew) {
             // const createContent = currentContent.content.map(c => {
             //     const createdContent = {
             //         title: currentContent.title,
@@ -192,28 +192,40 @@ export class AdminHelp extends React.Component<Props> {
             //     return createdContent;
             // });
 
+            const d = currentContent.content.slice();
+            d.forEach(c => c.id = '');
+            // doesnt work if id is defined.
             const createContent = {
                 title: currentContent.title,
                 category: currentContent.category,
-                content: currentContent.content
+                // content: currentContent.content
+                content: d
             } as AdminHelpContent;
             dispatch(createAdminHelpPageContent(createContent));
         } else {
-            const updateContent = currentContent.content.map(c => {
-                const updatedContent = {
-                    title: currentContent.title,
-                    category: currentContent.category,
-                    pageId: currentPage.id,
-                    orderId: c.orderId,
-                    type: c.type,
-                    textContent: c.textContent,
-                    imageId: c.imageId,
-                    imageContent: c.imageContent,
-                    imageSize: c.imageSize
-                } as UpdateHelpPageContentDTO;
-                return updatedContent;
-            });
-            dispatch(updateAdminHelpPageContent(updateContent));
+            // const updateContent = currentContent.content.map(c => {
+            //     const updatedContent = {
+            //         title: currentContent.title,
+            //         category: currentContent.category,
+            //         pageId: currentPage.id,
+            //         orderId: c.orderId,
+            //         type: c.type,
+            //         textContent: c.textContent,
+            //         imageId: c.imageId,
+            //         imageContent: c.imageContent,
+            //         imageSize: c.imageSize
+            //     } as UpdateHelpPageContentDTO;
+            //     return updatedContent;
+            // });
+            const d = currentContent.content.slice();
+            d.forEach(c => c.id = '');
+            const updateContent = {
+                title: currentContent.title,
+                category: currentContent.category,
+                // content: currentContent.content
+                content: d
+            } as AdminHelpContent;
+            dispatch(updateAdminHelpPageContent(updateContent, currentPage.id));
         };
     };
 
@@ -223,14 +235,14 @@ export class AdminHelp extends React.Component<Props> {
     };
 
     private handleDeleteContent = () => {
-        const { dispatch, currentPage, currentContent, createNew } = this.props;
+        const { dispatch, currentPage, currentContent, isNew } = this.props;
 
         const confirm: ConfirmationModalState = {
             body: `Are you sure you want to delete the page, "${currentContent.title}"? This will take effect immediately and can't be undone.`,
             header: 'Delete Page',
             onClickNo: () => null,
             onClickYes: () => {
-                createNew
+                isNew
                     ? dispatch(resetAdminHelpContent())
                     : dispatch(deleteHelpPageAndContent(currentPage));
             },

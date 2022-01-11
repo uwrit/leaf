@@ -8,7 +8,7 @@
 import { AppState } from '../../models/state/AppState';
 import { showInfoModal, setNoClickModalState, setSideNotificationState, showConfirmationModal } from '../generalUi';
 import { setCurrentHelpPage, setHelpPagesAndCategories } from '../helpPage';
-import { AdminHelpContent, AdminHelpContentDTO, CreateHelpPage, UpdateHelpPageContent } from '../../models/admin/Help';
+import { AdminHelpContent, AdminHelpContentDTO } from '../../models/admin/Help';
 import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState, InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { HelpPageLoadState } from '../../models/state/HelpState';
@@ -24,7 +24,7 @@ export interface AdminHelpAction {
     currentContent?: AdminHelpContentDTO;
     content?: AdminHelpContentDTO;
     contentLoadState?: HelpPageLoadState;
-    createNew?: boolean;
+    isNew?: boolean;
     unsaved?: boolean;
     type: string;
 }
@@ -42,7 +42,7 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
             dispatch(setCurrentHelpPage(page));
 
             const content = await getAdminHelpPageAndContent(state, page.id);
-            
+
             dispatch(setCurrentAdminHelpContent(content));
             dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
 
@@ -100,15 +100,13 @@ export const createAdminHelpPageContent = (page: AdminHelpContent) => {
 /*
  * Update admin help page content.
  */
-export const updateAdminHelpPageContent = (contentRows: UpdateHelpPageContent[]) => {
+export const updateAdminHelpPageContent = (page: AdminHelpContent, pageId: string) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        // NOTE: pageId is empty if no content rows, throws error
-        const pageId = contentRows[0].pageId;
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
 
-            const content = await updateAdminHelpPageAndContent(state, pageId, contentRows);
+            const content = await updateAdminHelpPageAndContent(state, page, pageId);
 
             dispatch(setCurrentAdminHelpContent(content));
             dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
@@ -246,9 +244,9 @@ export const setAdminHelpContent = (content: AdminHelpContentDTO, contentLoadSta
     };
 };
 
-export const isAdminHelpContentNew = (createNew: boolean): AdminHelpAction => {
+export const isAdminHelpContentNew = (isNew: boolean): AdminHelpAction => {
     return {
-        createNew: createNew,
+        isNew: isNew,
         type: IS_ADMIN_HELP_CONTENT_NEW
     };
 };

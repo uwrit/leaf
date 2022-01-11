@@ -15,21 +15,16 @@ namespace Model.Admin.Compiler
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
     }
 
-    // TODO: change to this once sql reader figured out
-    //public class AdminHelpPageTitle
-    //{
-    //    public string Title { get; set; }
-    //}
-
     public class AdminHelpPageCategory
     {
+        public Guid? Id { get; set; }
         public string Category { get; set; }
     }
 
     public class AdminHelpPageContent
     {
-        public Guid Id { get; set; }
-        public Guid PageId { get; set; }
+        public Guid? Id { get; set; }
+        public Guid? PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
