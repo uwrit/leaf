@@ -6,7 +6,7 @@
  */
 
 .notification-modal {
-    background-color: rgba(0,0,0,0.02);
+    background-color: white;
     bottom: 4%;
     border: 1px solid rgb(230,230,230);
     box-shadow: 0px 4px 10px rgba(7, 7, 7, 0.3);
