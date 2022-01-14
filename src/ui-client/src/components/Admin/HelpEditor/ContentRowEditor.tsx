@@ -66,6 +66,8 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //          - reevaluate
     //          - follow concept create rule: alert page isn't saved
     //      5. update category feature needed.
+    //          - edit category for multiple pages (dropdown)
+    //          - single page category update, add dropdown
 
     public render() {
         const c = this.className;

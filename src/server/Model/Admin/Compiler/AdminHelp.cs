@@ -10,15 +10,22 @@ namespace Model.Admin.Compiler
 {
     public class AdminHelpPage
     {
-        public string Title { get; set; }
+        public AdminHelpPageTitle Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
+    }
+
+    public class AdminHelpPageTitle
+    {
+        public Guid? Id { get; set; }
+        public Guid? CategoryId { get; set; }
+        public string Title { get; set; }
     }
 
     public class AdminHelpPageCategory
     {
         public Guid? Id { get; set; }
-        public string Category { get; set; }
+        public string Name { get; set; }
     }
 
     public class AdminHelpPageContent

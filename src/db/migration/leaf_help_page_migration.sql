@@ -48,46 +48,30 @@ GO
 
 -- STORED PROCEDURES
 
--- SP to get all help pages and categories
-DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPagesAndCategories]
+-- SP to get all help pages
+DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPages]
 GO
 
-CREATE PROCEDURE [app].[sp_GetHelpPagesAndCategories]
+CREATE PROCEDURE [app].[sp_GetHelpPages]
 AS
 BEGIN
     SELECT Id, CategoryId, Title
     FROM app.HelpPage
-    
-    SELECT Id, Name
-    FROM app.HelpPageCategory
 END
 GO
 
 
 -- SP to get all categories
--- DROP PROCEDURE IF EXISTS [app].[sp_GetHelpCategories]
--- GO
+DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPageCategories]
+GO
 
--- CREATE PROCEDURE [app].[sp_GetHelpCategories]
--- AS
--- BEGIN
---     SELECT Id, Name
---     FROM app.HelpPageCategory
--- END
--- GO
-
-
--- SP to get all help pages
--- DROP PROCEDURE IF EXISTS [app].[sp_GetHelpPages]
--- GO
-
--- CREATE PROCEDURE [app].[sp_GetHelpPages]
--- AS
--- BEGIN
---     SELECT Id, CategoryId, Title
---     FROM app.HelpPage
--- END
--- GO
+CREATE PROCEDURE [app].[sp_GetHelpPageCategories]
+AS
+BEGIN
+    SELECT Id, Name
+    FROM app.HelpPageCategory
+END
+GO
 
 
 -- SP to get content for a page
@@ -128,16 +112,26 @@ CREATE TYPE [adm].[HelpContentTable] AS TABLE(
 GO
 
 
--- SP to get help page title, category, and content
-DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPagesAndCategories]
+-- SP to get all help pages
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPages]
 GO
 
-CREATE PROCEDURE [adm].[sp_GetHelpPagesAndCategories]
+CREATE PROCEDURE [adm].[sp_GetHelpPages]
 AS
 BEGIN
     SELECT Id, CategoryId, Title
     FROM app.HelpPage
-    
+END
+GO
+
+
+-- SP to get all categories
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPageCategories]
+GO
+
+CREATE PROCEDURE [adm].[sp_GetHelpPageCategories]
+AS
+BEGIN
     SELECT Id, Name
     FROM app.HelpPageCategory
 END
@@ -145,10 +139,10 @@ GO
 
 
 -- SP to get help page title, category, and content
-DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPageAndContent]
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPageContent]
 GO
 
-CREATE PROCEDURE [adm].[sp_GetHelpPageAndContent]
+CREATE PROCEDURE [adm].[sp_GetHelpPageContent]
     @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -157,29 +151,42 @@ BEGIN
 
     SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
-    WHERE PageId = @pageId;
+    WHERE PageId = @pageId
+END
+GO
 
-    
-    -- SELECT Title
-    -- FROM app.HelpPage
-    -- WHERE Id = @pageId
-    
-    -- SELECT Id, Name
-    -- FROM app.HelpPageCategory
-    -- WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @pageId)
 
-    -- SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
-    -- FROM app.HelpPageContent
-    -- WHERE PageId = @pageId
+-- SP to get help page title, category, and content
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPage]
+GO
+
+CREATE PROCEDURE [adm].[sp_GetHelpPage]
+    @pageId UNIQUEIDENTIFIER
+AS
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
+        THROW 70404, N'Could not find page and/or does not exist.', 1;
+    
+    SELECT Id, CategoryId, Title
+    FROM app.HelpPage
+    WHERE Id = @pageId
+    
+    SELECT Id, Name
+    FROM app.HelpPageCategory
+    WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @pageId)
+
+    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    FROM app.HelpPageContent
+    WHERE PageId = @pageId
 END
 GO
 
 
 -- SP to create help page title, content, and category
-DROP PROCEDURE IF EXISTS [adm].[sp_CreateHelpPageAndContent]
+DROP PROCEDURE IF EXISTS [adm].[sp_CreateHelpPage]
 GO
 
-CREATE PROCEDURE [adm].[sp_CreateHelpPageAndContent]
+CREATE PROCEDURE [adm].[sp_CreateHelpPage]
     @content adm.HelpContentTable READONLY
 AS
 BEGIN
@@ -221,16 +228,16 @@ BEGIN
     SELECT PageId = @pageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
-    EXEC adm.sp_GetHelpPageAndContent @pageId
+    EXEC adm.sp_GetHelpPage @pageId
 END
 GO
 
 
 -- SP to update help page title, content, and category
-DROP PROCEDURE IF EXISTS [adm].[sp_UpdateHelpPageAndContent]
+DROP PROCEDURE IF EXISTS [adm].[sp_UpdateHelpPage]
 GO
 
-CREATE PROCEDURE [adm].[sp_UpdateHelpPageAndContent]
+CREATE PROCEDURE [adm].[sp_UpdateHelpPage]
     @content adm.HelpContentTable READONLY
 AS
 BEGIN
@@ -278,16 +285,16 @@ BEGIN
     SELECT PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
-    EXEC adm.sp_GetHelpPageAndContent @pageId
+    EXEC adm.sp_GetHelpPage @pageId
 END
 GO
 
 
 -- SP to delete help page title, content, and category
-DROP PROCEDURE IF EXISTS [adm].[sp_DeleteHelpPageAndContent]
+DROP PROCEDURE IF EXISTS [adm].[sp_DeleteHelpPage]
 GO
 
-CREATE PROCEDURE [adm].[sp_DeleteHelpPageAndContent]
+CREATE PROCEDURE [adm].[sp_DeleteHelpPage]
     @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
@@ -297,8 +304,7 @@ BEGIN
     IF (NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId))
         THROW 70404, N'Could not find page and/or does not exist.', 1;
 
-    -- reevalute b/c category may or may not be deleted although it returns category; not consistent
-    EXEC adm.sp_GetHelpPageAndContent @pageId
+    EXEC adm.sp_GetHelpPage @pageId
 
     DELETE FROM app.HelpPageContent
     WHERE PageId = @pageId

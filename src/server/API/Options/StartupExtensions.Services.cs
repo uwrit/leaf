@@ -24,7 +24,6 @@ using Model.Cohort;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Export;
-using Model.Help;
 using Model.Network;
 using Model.Options;
 using Model.Search;
@@ -108,7 +107,7 @@ namespace API.Options
             services.AddTransient<DataImporter.IImportIdentifierMappingService, ImportIdentifierMappingService>();
             services.AddTransient<NotificationManager.INotificationService, SmtpService>();
             services.AddTransient<IObfuscationService, ObfuscationService>();
-            services.AddTransient<HelpPage.IHelpPage, HelpPageService>();
+            services.AddTransient<HelpPageManager.IHelpPageService, HelpPageService>();
 
             services.AddAdminServices();
             services.RegisterLeafCore();

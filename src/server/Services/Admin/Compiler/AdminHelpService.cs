@@ -7,6 +7,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
+using System.Linq;
 using Dapper;
 using Model.Admin.Compiler;
 using Model.Authorization;
@@ -24,10 +25,12 @@ namespace Services.Admin.Compiler
 
         static class Sql
         {
-            public const string Get    = "adm.sp_GetHelpPageAndContent";
-            public const string Create = "adm.sp_CreateHelpPageAndContent";
-            public const string Update = "adm.sp_UpdateHelpPageAndContent";
-            public const string Delete = "adm.sp_DeleteHelpPageAndContent";
+            public const string GetHelpPages    = "adm.sp_GetHelpPages";
+            public const string GetHelpPageCategories = "adm.sp_GetHelpPageCategories";
+            public const string GetHelpPageContent = "adm.sp_GetHelpPageContent";
+            public const string Create = "adm.sp_CreateHelpPage";
+            public const string Update = "adm.sp_UpdateHelpPage";
+            public const string Delete = "adm.sp_DeleteHelpPage";
         }
 
         public AdminHelpService(
@@ -38,20 +41,68 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<AdminHelpPage> GetAsync(Guid id)
+        public async Task<IEnumerable<AdminHelpPageTitle>> GetHelpPagesAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-
-                var grid = await cn.QueryMultipleAsync(
-                    Sql.Get,
-                    new { id },
+                var pages = await cn.QueryAsync<AdminHelpPageTitle>(
+                    Sql.GetHelpPages,
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return AdminHelpReader.Read(grid);
+                return pages.Select(p => new AdminHelpPageTitle
+                {
+                    Id = p.Id,
+                    CategoryId = p.CategoryId,
+                    Title = p.Title
+                });
+            }
+        }
+
+        public async Task<IEnumerable<AdminHelpPageCategory>> GetHelpPageCategoriesAsync()
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+                var cats = await cn.QueryAsync<AdminHelpPageCategory>(
+                    Sql.GetHelpPageCategories,
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return cats.Select(c => new AdminHelpPageCategory
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                });
+            }
+        }
+
+        public async Task<IEnumerable<AdminHelpPageContent>> GetHelpPageContentAsync(Guid pageId)
+        {
+            using (var cn = new SqlConnection(opts.ConnectionString))
+            {
+                await cn.OpenAsync();
+                var content = await cn.QueryAsync<AdminHelpPageContent>(
+                    Sql.GetHelpPageContent,
+                    new { pageId },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: opts.DefaultTimeout
+                );
+
+                return content.Select(c => new AdminHelpPageContent
+                {
+                    Id = c.Id,
+                    PageId = c.PageId,
+                    OrderId = c.OrderId,
+                    Type = c.Type,
+                    TextContent = c.TextContent,
+                    ImageId = c.ImageId,
+                    ImageContent = c.ImageContent,
+                    ImageSize = c.ImageSize
+                });
             }
         }
 
@@ -85,20 +136,20 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<Guid?> DeleteAsync(Guid id)
+        public async Task<AdminHelpPage> DeleteAsync(Guid pageId)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
 
-                var deleted = await cn.QueryFirstOrDefaultAsync<Guid?>(
+                var grid = await cn.QueryMultipleAsync(
                     Sql.Delete,
-                    new { id },
+                    new { pageId },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return deleted;
+                return AdminHelpReader.Read(grid);
             }
         }
     }
@@ -121,13 +172,15 @@ namespace Services.Admin.Compiler
 
     class HelpPageRecord
     {
+        public Guid? Id { get; set; }
+        public Guid? CategoryId { get; set; }
         public string Title { get; set; }
 
         public AdminHelpPage Content(AdminHelpPageCategory category = null, IEnumerable<AdminHelpPageContent> content = null)
         {
             return new AdminHelpPage
             {
-                Title = Title,
+                Title = new AdminHelpPageTitle { Id = Id, CategoryId = CategoryId, Title = Title },
                 Category = category,
                 Content = content ?? new List<AdminHelpPageContent>()
             };

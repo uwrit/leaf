@@ -11,17 +11,17 @@ namespace API.DTO.Admin.Compiler
 {
     public class AdminHelpPageDTO
     {
-        public string Title { get; set; }
+        public AdminHelpPageTitle Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
 
         public AdminHelpPageDTO() { }
 
-        public AdminHelpPageDTO(AdminHelpPage p)
+        public AdminHelpPageDTO(AdminHelpPage page)
         {
-            Title = p.Title;
-            Category = p.Category;
-            Content = p.Content;
+            Title = page.Title;
+            Category = page.Category;
+            Content = page.Content;
         }
     }
 
@@ -36,6 +36,62 @@ namespace API.DTO.Admin.Compiler
                 Category = dto.Category,
                 Content = dto.Content
             };
+        }
+    }
+
+    public class AdminHelpPageTitleDTO
+    {
+        public Guid? Id { get; set; }
+        public Guid? CategoryId { get; set; }
+        public string Title { get; set; }
+
+        public AdminHelpPageTitleDTO() { }
+
+        public AdminHelpPageTitleDTO(AdminHelpPageTitle title)
+        {
+            Id = title.Id;
+            CategoryId = title.CategoryId;
+            Title = title.Title;
+        }
+    }
+
+    public class AdminHelpPageCategoryDTO
+    {
+        public Guid? Id { get; set; }
+        public string Name { get; set; }
+
+        public AdminHelpPageCategoryDTO() { }
+
+        public AdminHelpPageCategoryDTO(AdminHelpPageCategory cat)
+        {
+            Id = cat.Id;
+            Name = cat.Name;
+        }
+    }
+
+    public class AdminHelpPageContentDTO
+    {
+        public Guid? Id { get; set; }
+        public Guid? PageId { get; set; }
+        public int OrderId { get; set; }
+        public string Type { get; set; }
+        public string TextContent { get; set; }
+        public string ImageId { get; set; }
+        public byte[] ImageContent { get; set; }
+        public int ImageSize { get; set; }
+
+        public AdminHelpPageContentDTO() { }
+
+        public AdminHelpPageContentDTO(AdminHelpPageContent con)
+        {
+            Id = con.Id;
+            PageId = con.PageId;
+            OrderId = con.OrderId;
+            Type = con.Type;
+            TextContent = con.TextContent;
+            ImageId = con.ImageId;
+            ImageContent = con.ImageContent;
+            ImageSize = con.ImageSize;
         }
     }
 }

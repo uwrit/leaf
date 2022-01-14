@@ -13,28 +13,30 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Model.Help;
+using Model.Compiler;
 using Model.Error;
 
 namespace API.Controllers
 {
     [Authorize(Policy = TokenType.Access)]
-    [Route("api/help")]
+    [Route("api/helppages")]
     public class HelpController : Controller
     {
-        readonly ILogger<HelpController> log;
-        public HelpController(ILogger<HelpController> logger)
+        readonly ILogger<HelpController> logger;
+        readonly HelpPageManager manager;
+
+        public HelpController(ILogger<HelpController> logger, HelpPageManager manager)
         {
-            log = logger;
+            this.logger = logger;
+            this.manager = manager;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<HelpPageDTO>>> GetHelpPages(
-            [FromServices] HelpPage helpPage)
+        public async Task<ActionResult<IEnumerable<HelpPageDTO>>> GetHelpPages()
         {
             try
             {
-                var pages = await helpPage.GetAllPagesAsync();
+                var pages = await manager.GetHelpPagesAsync();
                 return Ok(pages.Select(p => new HelpPageDTO(p)));
             }
             catch (LeafRPCException le)
@@ -43,19 +45,18 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Failed to fetch help pages. Error:{Error}", e.ToString());
+                logger.LogError("Failed to fetch help pages. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        [HttpGet("category")]
-        public async Task<ActionResult<IEnumerable<HelpPageCategoryDTO>>> GetHelpPageCategories(
-            [FromServices] HelpPage helpPage)
+        [HttpGet("categories")]
+        public async Task<ActionResult<IEnumerable<HelpPageCategoryDTO>>> GetHelpPageCategories()
         {
             try
             {
-                var cat = await helpPage.GetHelpPageCategoriesAsync();
-                return Ok(cat.Select(c => new HelpPageCategoryDTO(c)));
+                var cats = await manager.GetHelpPageCategoriesAsync();
+                return Ok(cats.Select(c => new HelpPageCategoryDTO(c)));
             }
             catch (LeafRPCException le)
             {
@@ -63,19 +64,17 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Failed to fetch help page categories. Error:{Error}", e.ToString());
+                logger.LogError("Failed to fetch help page categories. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         [HttpGet("{pageid}/content")]
-        public async Task<ActionResult<IEnumerable<HelpPageContentDTO>>> GetHelpPageContent(
-            Guid pageid,
-            [FromServices] HelpPage helpPage)
+        public async Task<ActionResult<IEnumerable<HelpPageContentDTO>>> GetHelpPageContent(Guid pageId)
         {
             try
             {
-                var content = await helpPage.GetPageContentAsync(pageid);
+                var content = await manager.GetHelpPageContentAsync(pageId);
                 return Ok(content.Select(c => new HelpPageContentDTO(c)));
             }
             catch (LeafRPCException le)
@@ -84,7 +83,7 @@ namespace API.Controllers
             }
             catch (Exception e)
             {
-                log.LogError("Failed to fetch help page content. PageId:{PageId} Error:{Error}", pageid, e.ToString());
+                logger.LogError("Failed to fetch help page content. PageId:{PageId} Error:{Error}", pageId, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

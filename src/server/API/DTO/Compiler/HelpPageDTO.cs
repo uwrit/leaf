@@ -4,7 +4,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using Model.Compiler;
+
 namespace API.DTO.Compiler
 {
     public class HelpPageDTO
@@ -15,7 +17,7 @@ namespace API.DTO.Compiler
 
         public HelpPageDTO() { }
 
-        public HelpPageDTO(HelpPageSql page)
+        public HelpPageDTO(HelpPage page)
         {
             Id = page.Id;
             CategoryId = page.CategoryId;
@@ -30,10 +32,10 @@ namespace API.DTO.Compiler
 
         public HelpPageCategoryDTO() { }
 
-        public HelpPageCategoryDTO(HelpPageCategorySql c)
+        public HelpPageCategoryDTO(HelpPageCategory cat)
         {
-            Id = c.Id;
-            Category = c.Category;
+            Id = cat.Id;
+            Name = cat.Name;
         }
     }
 
@@ -50,19 +52,16 @@ namespace API.DTO.Compiler
 
         public HelpPageContentDTO() { }
 
-        public HelpPageContentDTO(HelpPageContentSql content)
+        public HelpPageContentDTO(HelpPageContent con)
         {
-            Id = content.Id;
-            PageId = content.PageId;
-            OrderId = content.OrderId;
-            Type = content.Type;
-            TextContent = content.TextContent;
-            ImageId = content.ImageId;
-            ImageContent = content.ImageContent;
-            ImageSize = content.ImageSize;
+            Id = con.Id;
+            PageId = con.PageId;
+            OrderId = con.OrderId;
+            Type = con.Type;
+            TextContent = con.TextContent;
+            ImageId = con.ImageId;
+            ImageContent = con.ImageContent;
+            ImageSize = con.ImageSize;
         }
     }
 }
-
-//using System.Collections.ObjectModel;
-

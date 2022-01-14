@@ -19,7 +19,7 @@ namespace Services.Tables
             private set;
         }
 
-        public const string Type  = "adm.HelpContentTableZ";
+        public const string Type  = "adm.HelpContentTable";
         const string title        = "Title";
         const string category     = "Category";
         const string pageId       = "PageId";
@@ -60,8 +60,8 @@ namespace Services.Tables
             foreach (var r in p.Content)
             {
                 var row = table.NewRow();
-                row[title]        = p.Title;
-                row[category]     = p.Category.Category;
+                row[title]        = p.Title.Title;
+                row[category]     = p.Category.Name;
                 row[orderId]      = r.OrderId;
                 row[type]         = r.Type;
                 row[textContent]  = r.TextContent;

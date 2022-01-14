@@ -9,7 +9,6 @@ using Model.Compiler;
 using Model.Cohort;
 using Model.Search;
 using Model.Import;
-using Model.Help;
 using Model.Notification;
 using Model.Admin.Compiler;
 using Model.Admin.Network;
@@ -40,7 +39,7 @@ namespace Model
             services.AddTransient<DatasetQueryProvider>();
             services.AddTransient<DataImporter>();
             services.AddTransient<NotificationManager>();
-            services.AddTransient<HelpPage>();
+            services.AddTransient<HelpPageManager>();
 
             services.AddTransient<AdminConceptSqlSetManager>();
             services.AddTransient<AdminSpecializationManager>();

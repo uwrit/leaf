@@ -21,8 +21,7 @@ namespace API.Controllers.Admin
 {
     [Authorize(Policy = Role.Admin)]
     [Produces("application/json")]
-    [Route("api/admin/help")]
-    // TODO: change to this [Route("api/admin/helppages")]
+    [Route("api/admin/helppages")]
     public class AdminHelpController : Controller
     {
         readonly ILogger<AdminHelpController> logger;
@@ -36,39 +35,55 @@ namespace API.Controllers.Admin
             this.manager = manager;
         }
 
-        // TODO: write method GetAll to return all pages, categories
-        // Gets all help page titles and categories and its content.
+        // Get all help pages.
         [HttpGet]
-        public async Task<ActionResult<AdminHelpPageDTO>> Get(Guid id)
+        public async Task<ActionResult<IEnumerable<AdminHelpPageTitleDTO>>> GetHelpPages()
         {
             try
             {
-                var page = await manager.GetAsync(id);
-                return Ok(new AdminHelpPageDTO(page));
+                var pages = await manager.GetHelpPagesAsync();
+                return Ok(pages.Select(p => new AdminHelpPageTitleDTO(p)));
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to get help page. Id:{id} Error:{Error}", id, e.ToString());
+                logger.LogError("Failed to get help pages. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        // Gets a single help page and its content.
-        [HttpGet("{id}")]
-        public async Task<ActionResult<AdminHelpPageDTO>> GetOne(Guid id)
+        // Get help page categories.
+        [HttpGet("categories")]
+        public async Task<ActionResult<IEnumerable<AdminHelpPageCategoryDTO>>> GetHelpPageCategories()
         {
             try
             {
-                var page = await manager.GetAsync(id);
-                return Ok(new AdminHelpPageDTO(page));
+                var cats = await manager.GetHelpPageCategoriesAsync();
+                return Ok(cats.Select(c => new AdminHelpPageCategoryDTO(c)));
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to get help page. Id:{id} Error:{Error}", id, e.ToString());
+                logger.LogError("Failed to get help page categories. Error:{Error}", e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
+        // Get a single help page and its content.
+        [HttpGet("{pageid}/content")]
+        public async Task<ActionResult<IEnumerable<AdminHelpPageContentDTO>>> GetHelpPageContent(Guid pageId)
+        {
+            try
+            {
+                var content = await manager.GetHelpPageContentAsync(pageId);
+                return Ok(content.Select(c => new AdminHelpPageContentDTO(c)));
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Failed to get help page content. PageId:{pageId} Error:{Error}", pageId, e.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        // Create help page.
         [HttpPost]
         public async Task<ActionResult<AdminHelpPageDTO>> Create([FromBody] AdminHelpPageDTO p)
         {
@@ -94,7 +109,8 @@ namespace API.Controllers.Admin
             }
         }
 
-        [HttpPut("{id}")]
+        // Update help page.
+        [HttpPut("{pageid}")]
         public async Task<ActionResult<AdminHelpPageDTO>> Update([FromBody] AdminHelpPageDTO p)
         {
             try
@@ -119,18 +135,14 @@ namespace API.Controllers.Admin
             }
         }
 
-        // TODO : return deleted page, return type adminhelpdto?
-       [HttpDelete("{id}")]
-        public async Task<ActionResult<Guid?>> Delete(Guid id)
+        // Delete help page.
+        [HttpDelete("{pageid}")]
+        public async Task<ActionResult<AdminHelpPageDTO>> Delete(Guid pageId)
         {
             try
             {
-                var deleted = await manager.DeleteAsync(id);
-                if (!deleted.HasValue)
-                {
-                    return NotFound();
-                }
-                return Ok();
+                var deleted = await manager.DeleteAsync(pageId);
+                return Ok(new AdminHelpPageDTO(deleted));
             }
             catch (LeafRPCException le)
             {
@@ -138,7 +150,7 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to delete help page. Id:{Id} Error:{Error}", id, e.ToString());
+                logger.LogError("Failed to delete help page. PageId:{PageId} Error:{Error}", pageId, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
