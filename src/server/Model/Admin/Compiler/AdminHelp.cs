@@ -8,14 +8,14 @@ using System.Collections.Generic;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminHelpPage
+    public class AdminHelpPageAndContent
     {
-        public AdminHelpPageTitle Title { get; set; }
+        public string Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
     }
 
-    public class AdminHelpPageTitle
+    public class AdminHelpPage
     {
         public Guid? Id { get; set; }
         public Guid? CategoryId { get; set; }

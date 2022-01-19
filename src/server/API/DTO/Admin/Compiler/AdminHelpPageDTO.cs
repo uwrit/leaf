@@ -9,28 +9,28 @@ using Model.Admin.Compiler;
 
 namespace API.DTO.Admin.Compiler
 {
-    public class AdminHelpPageDTO
+    public class AdminHelpPageAndContentDTO
     {
-        public AdminHelpPageTitle Title { get; set; }
+        public string Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
 
-        public AdminHelpPageDTO() { }
+        public AdminHelpPageAndContentDTO() { }
 
-        public AdminHelpPageDTO(AdminHelpPage page)
+        public AdminHelpPageAndContentDTO(AdminHelpPageAndContent pc)
         {
-            Title = page.Title;
-            Category = page.Category;
-            Content = page.Content;
+            Title = pc.Title;
+            Category = pc.Category;
+            Content = pc.Content;
         }
     }
 
     public static class AdminHelpPageExtensions
     {
-        public static AdminHelpPage HelpPage(this AdminHelpPageDTO dto)
+        public static AdminHelpPageAndContent HelpPage(this AdminHelpPageAndContentDTO dto)
         {
             if (dto == null) return null;
-            return new AdminHelpPage
+            return new AdminHelpPageAndContent
             {
                 Title = dto.Title,
                 Category = dto.Category,
@@ -39,19 +39,19 @@ namespace API.DTO.Admin.Compiler
         }
     }
 
-    public class AdminHelpPageTitleDTO
+    public class AdminHelpPageDTO
     {
         public Guid? Id { get; set; }
         public Guid? CategoryId { get; set; }
         public string Title { get; set; }
 
-        public AdminHelpPageTitleDTO() { }
+        public AdminHelpPageDTO() { }
 
-        public AdminHelpPageTitleDTO(AdminHelpPageTitle title)
+        public AdminHelpPageDTO(AdminHelpPage page)
         {
-            Id = title.Id;
-            CategoryId = title.CategoryId;
-            Title = title.Title;
+            Id = page.Id;
+            CategoryId = page.CategoryId;
+            Title = page.Title;
         }
     }
 

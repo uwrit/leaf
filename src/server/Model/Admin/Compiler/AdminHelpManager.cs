@@ -18,12 +18,12 @@ namespace Model.Admin.Compiler
     {
         public interface IAdminHelpPageService
         {
-            Task<IEnumerable<AdminHelpPageTitle>> GetHelpPagesAsync();
+            Task<IEnumerable<AdminHelpPage>> GetHelpPagesAsync();
             Task<IEnumerable<AdminHelpPageCategory>> GetHelpPageCategoriesAsync();
             Task<IEnumerable<AdminHelpPageContent>> GetHelpPageContentAsync(Guid pageId);
-            Task<AdminHelpPage> CreateAsync(AdminHelpPage page);
-            Task<AdminHelpPage> UpdateAsync(AdminHelpPage page);
-            Task<AdminHelpPage> DeleteAsync(Guid pageId);
+            Task<AdminHelpPageAndContent> CreateAsync(AdminHelpPageAndContent pc);
+            Task<AdminHelpPageAndContent> UpdateAsync(AdminHelpPageAndContent pc);
+            Task<AdminHelpPageAndContent> DeleteAsync(Guid pageId);
         }
 
         readonly ILogger<AdminHelpManager> log;
@@ -37,7 +37,7 @@ namespace Model.Admin.Compiler
             this.svc = svc;
         }
 
-        public async Task<IEnumerable<AdminHelpPageTitle>> GetHelpPagesAsync()
+        public async Task<IEnumerable<AdminHelpPage>> GetHelpPagesAsync()
         {
             log.LogInformation("Getting help pages.");
             try
@@ -83,41 +83,41 @@ namespace Model.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPage> CreateAsync(AdminHelpPage page)
+        public async Task<AdminHelpPageAndContent> CreateAsync(AdminHelpPageAndContent pc)
         {
-            ThrowIfInvalid(page);
+            ThrowIfInvalid(pc);
             try
             {
-                var created = await svc.CreateAsync(page);
+                var created = await svc.CreateAsync(pc);
                 log.LogInformation("Created help page. Page:{@Page}", created);
                 return created;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", page, de.ErrorCode, de.Message);
+                log.LogError("Failed to create help page. Page:{@Page} Code:{Code} Error:{Error}", pc, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
         }
 
-        public async Task<AdminHelpPage> UpdateAsync(AdminHelpPage page)
+        public async Task<AdminHelpPageAndContent> UpdateAsync(AdminHelpPageAndContent pc)
         {
-            ThrowIfInvalid(page);
+            ThrowIfInvalid(pc);
             try
             {
-                var updated = await svc.UpdateAsync(page);
+                var updated = await svc.UpdateAsync(pc);
                 log.LogInformation("Updated help page. Page:{@Page}", updated);
                 return updated;
             }
             catch (DbException de)
             {
-                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", page, de.ErrorCode, de.Message);
+                log.LogError("Failed to update help page. Page:{@Page} Code:{Code} Error:{Error}", pc, de.ErrorCode, de.Message);
                 de.MapThrow();
                 throw;
             }
         }
 
-        public async Task<AdminHelpPage> DeleteAsync(Guid pageId)
+        public async Task<AdminHelpPageAndContent> DeleteAsync(Guid pageId)
         {
             Ensure.NotNullOrWhitespace(pageId.ToString(), nameof(pageId));
             try
@@ -136,9 +136,9 @@ namespace Model.Admin.Compiler
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void ThrowIfInvalid(AdminHelpPage page)
+        void ThrowIfInvalid(AdminHelpPageAndContent pc)
         {
-            Ensure.NotNull(page, nameof(page));
+            Ensure.NotNull(pc, nameof(pc));
         }
     }
 }

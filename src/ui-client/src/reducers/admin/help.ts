@@ -11,7 +11,7 @@ import { AdminHelpAction } from '../../actions/admin/helpPage';
 export const adminHelpContentUnsaved = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
         help: {
-            ...state.help,
+            ...state.helpPage,
             unsaved: action.unsaved
         }
     });
@@ -20,7 +20,7 @@ export const adminHelpContentUnsaved = (state: AdminState, action: AdminHelpActi
 export const isAdminHelpContentNew = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
         help: {
-            ...state.help,
+            ...state.helpPage,
             isNew: action.isNew
         }
     });
@@ -29,7 +29,7 @@ export const isAdminHelpContentNew = (state: AdminState, action: AdminHelpAction
 export const setCurrentAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
         help: {
-            ...state.help,
+            ...state.helpPage,
             currentContent: action.currentContent
         }
     });
@@ -38,7 +38,7 @@ export const setCurrentAdminHelpContent = (state: AdminState, action: AdminHelpA
 export const setAdminHelpContent = (state: AdminState, action: AdminHelpAction): AdminState => {
     return Object.assign({}, state, {
         help: {
-            ...state.help,
+            ...state.helpPage,
             content: action.content,
             state: action.contentLoadState
         }

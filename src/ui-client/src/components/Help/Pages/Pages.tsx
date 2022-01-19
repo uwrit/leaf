@@ -45,7 +45,7 @@ export class Pages extends React.Component<Props, State> {
         return (
             <Col className={c} xs="4">
                 <div className={`${c}-category`}>
-                    <b>{category.category.toUpperCase()}</b>
+                    <b>{category.name.toUpperCase()}</b>
                 </div>
 
                 {category.id === tempHelpPage.categoryId && <div style={{color: "#FF0000"}}>{tempHelpPage.title}</div>}
@@ -75,7 +75,8 @@ export class Pages extends React.Component<Props, State> {
     private handleHelpPageTitleClick = (page: HelpPage) => {
         const { dispatch, isAdmin } = this.props;
 
-        isAdmin ? dispatch(getAdminHelpPageContent(page)) : dispatch(fetchSingleHelpPageContent(page));
+        dispatch(fetchSingleHelpPageContent(page))
+        // isAdmin ? dispatch(getAdminHelpPageContent(page)) : dispatch(fetchSingleHelpPageContent(page));
     };
 
     private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };

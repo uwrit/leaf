@@ -28,7 +28,7 @@ export class Categories extends React.Component<Props> {
         const cats = [ ...categories.values() ];
 
         // Getting first value from filter array since there will only be one match.
-        const existingCat = cats.filter(c => c.category.toLowerCase() === newCategory.toLowerCase())[0];
+        const existingCat = cats.filter(c => c.name.toLowerCase() === newCategory.toLowerCase())[0];
         const tempCatId = existingCat ? existingCat.id : '';
         const tempPage = { id: '', categoryId: tempCatId, title: newTitle } as HelpPageDTO;
 

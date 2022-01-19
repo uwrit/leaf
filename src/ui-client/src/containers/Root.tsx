@@ -37,7 +37,7 @@ const beginState: AppState = {
     dataImport: defaultImportState(),
     datasets: defaultDatasetsState(),
     generalUi: defaultGeneralUiState(),
-    help: defaultHelpPagesState(),
+    helpPage: defaultHelpPagesState(),
     map: defaultMapState(),
     panelFilters: defaultPanelFiltersState(),
     panels: defaultPanelState(),

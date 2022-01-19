@@ -38,7 +38,7 @@ export interface HelpPageContentAction {
 export const loadHelpPagesAndCategoriesIfNeeded = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        if (state.help.state === HelpPageLoadState.NOT_LOADED) {
+        if (state.helpPage.state === HelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
@@ -47,6 +47,8 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                  */
                 const categories = await fetchHelpPageCategories(getState());
                 const pages = await fetchHelpPages(getState());
+
+                console.log(categories, pages);
 
                 dispatch(setHelpPagesAndCategories(categories, pages));
 

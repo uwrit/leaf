@@ -23,7 +23,7 @@ const makeRequest = async (state: AppState, requestString: string) => {
  * Fetch help pages.
  */
 export const fetchHelpPages = async (state: AppState) => {
-    const pages = await makeRequest(state, 'api/help');
+    const pages = await makeRequest(state, 'api/helppages');
     return pages.data as HelpPageDTO[];
 };
 
@@ -31,14 +31,14 @@ export const fetchHelpPages = async (state: AppState) => {
  * Fetch help page categories.
  */
 export const fetchHelpPageCategories = async (state: AppState) => {
-    const cat = await makeRequest(state, 'api/help/category');
-    return cat.data as HelpPageCategoryDTO[];
+    const cats = await makeRequest(state, 'api/helppages/categories');
+    return cats.data as HelpPageCategoryDTO[];
 };
 
 /*
  * Fetch help page content.
  */
 export const fetchHelpPageContent = async (state: AppState, pageId: string) => {
-    const content = await makeRequest(state, `api/help/${pageId}/content`);
+    const content = await makeRequest(state, `api/helppages/${pageId}/content`);
     return content.data as HelpPageContentDTO[];
 };

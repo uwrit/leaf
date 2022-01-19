@@ -157,17 +157,17 @@ GO
 
 
 -- SP to get help page title, category, and content
-DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPage]
+DROP PROCEDURE IF EXISTS [adm].[sp_GetHelpPageAndContent]
 GO
 
-CREATE PROCEDURE [adm].[sp_GetHelpPage]
+CREATE PROCEDURE [adm].[sp_GetHelpPageAndContent]
     @pageId UNIQUEIDENTIFIER
 AS
 BEGIN
     IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
     
-    SELECT Id, CategoryId, Title
+    SELECT Title
     FROM app.HelpPage
     WHERE Id = @pageId
     
@@ -228,7 +228,7 @@ BEGIN
     SELECT PageId = @pageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
-    EXEC adm.sp_GetHelpPage @pageId
+    EXEC adm.sp_GetHelpPageAndContent @pageId
 END
 GO
 
@@ -285,7 +285,7 @@ BEGIN
     SELECT PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM @content
 
-    EXEC adm.sp_GetHelpPage @pageId
+    EXEC adm.sp_GetHelpPageAndContent @pageId
 END
 GO
 
@@ -304,7 +304,7 @@ BEGIN
     IF (NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId))
         THROW 70404, N'Could not find page and/or does not exist.', 1;
 
-    EXEC adm.sp_GetHelpPage @pageId
+    EXEC adm.sp_GetHelpPageAndContent @pageId
 
     DELETE FROM app.HelpPageContent
     WHERE PageId = @pageId

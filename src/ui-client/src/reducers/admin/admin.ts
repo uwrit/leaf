@@ -164,7 +164,7 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             data: new Map()
         },
-        help: {
+        helpPage: {
             currentContent: {
                 title: "",
                 category: "",

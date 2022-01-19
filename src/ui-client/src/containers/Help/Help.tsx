@@ -19,7 +19,7 @@ import { UserContext } from '../../models/Auth';
 import { HelpPage } from '../../models/Help/Help';
 import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
 import { AppState } from '../../models/state/AppState';
-import { AdminHelpState } from '../../models/state/AdminState';
+import { AdminHelpPageState } from '../../models/state/AdminState';
 import { HelpPageState, HelpPageLoadState } from '../../models/state/HelpState';
 import { generate as generateId } from 'shortid';
 import './Help.css';
@@ -27,9 +27,9 @@ import './Help.css';
 interface OwnProps { }
 
 interface StateProps {
-    helpPages: HelpPageState;
+    helpPage: HelpPageState;
     user: UserContext;
-    adminHelp: AdminHelpState;
+    adminHelp: AdminHelpPageState;
 }
 
 interface DispatchProps {
@@ -58,7 +58,7 @@ export class Help extends React.PureComponent<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, helpPages, user, adminHelp } = this.props;
+        const { dispatch, helpPage, user, adminHelp } = this.props;
         const { show, category, title } = this.state;
         
         if (adminHelp.state === HelpPageLoadState.LOADED) {
@@ -67,19 +67,19 @@ export class Help extends React.PureComponent<Props, State> {
                     dispatch={dispatch}    
                     content={adminHelp.content}
                     currentContent={adminHelp.currentContent}
-                    currentPage={helpPages.currentSelectedPage}
+                    currentPage={helpPage.currentSelectedPage}
                     isNew={adminHelp.isNew}
                     unsaved={adminHelp.unsaved}
                 />
             );
         };
 
-        if (helpPages.content.state === HelpPageLoadState.LOADED) {
+        if (helpPage.content.state === HelpPageLoadState.LOADED) {
             return (
                 <div className={`${c}-content`}>
                     <Content
-                        content={helpPages.content.content}
-                        currentPage={helpPages.currentSelectedPage}
+                        content={helpPage.content.content}
+                        currentPage={helpPage.currentSelectedPage}
                         dispatch={dispatch}
                     />
                 </div>
@@ -89,7 +89,7 @@ export class Help extends React.PureComponent<Props, State> {
         return (
             <div className={c}>
                 <div className={`${c}-display`}>
-                    {user.isAdmin &&
+                    {/* {user.isAdmin &&
                         <div>
                             <Dropdown className={`${c}-create-dropdown-container`} isOpen={show} toggle={this.handleShow}>
                                 <DropdownToggle caret className="leaf-button-addnew">
@@ -110,13 +110,13 @@ export class Help extends React.PureComponent<Props, State> {
                                 </DropdownMenu>
                             </Dropdown>
                         </div>
-                    }
+                    } */}
 
                     <HelpSearch />
                     
-                    {(helpPages.state === HelpPageLoadState.LOADED) &&
+                    {(helpPage.state === HelpPageLoadState.LOADED) &&
                         <Categories
-                            categories={helpPages.categories}
+                            categories={helpPage.categories}
                             dispatch={dispatch}
                             isAdmin={user.isAdmin}
                             newCategory={category}
@@ -178,9 +178,9 @@ export class Help extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return {
-        helpPages: state.help,
+        helpPage: state.helpPage,
         user: state.auth.userContext!,
-        adminHelp: state.admin!.help
+        adminHelp: state.admin!.helpPage
     };
 };
 

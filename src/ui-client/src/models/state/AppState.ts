@@ -73,7 +73,7 @@ export interface AppState {
     dataImport: ImportState;
     datasets: DatasetsState;
     generalUi: GeneralUiState;
-    help: HelpPageState;
+    helpPage: HelpPageState;
     map: MapState;
     panelFilters: PanelFilter[];
     panels: Panel[];

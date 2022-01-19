@@ -20,6 +20,13 @@ import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
 import { HelpPageLoadState } from './HelpState';
 
+export enum AdminHelpPageLoadState {
+    NOT_LOADED = 1,
+    LOADING = 2,
+    LOADED = 3,
+    ERROR = 4
+}
+
 export enum AdminPanelLoadState {
     NOT_LOADED = 1,
     LOADING = 2,
@@ -110,13 +117,23 @@ export interface AdminUserQueryState {
     users: LeafUser[];
 }
 
-export interface AdminHelpState {
+export interface AdminHelpPageState {
     currentContent: AdminHelpContent;
     content: AdminHelpContent;
     state: HelpPageLoadState;
+
+    // categories: AdminHelpCategoryMap;
+    // currentSelectedPage: AdminHelpPage;
+    // content: AdminHelpPageContentState;
+    // state: AdminHelpPageLoadState;
     isNew: boolean;
     unsaved: boolean;
 }
+
+// export interface AdminHelpPageContentState {
+//     content: AdminHelpPageContent[];
+//     state: AdminHelpPageLoadState;
+// }
 
 export default interface AdminState {
     activePane: AdminPanelPane;
@@ -126,7 +143,7 @@ export default interface AdminState {
     datasets: AdminDatasetState;
     datasetQueryCategories: AdminDatasetQueryCategoryState;
     globalPanelFilters: AdminGlobalPanelFilterState;
-    help: AdminHelpState;
+    helpPage: AdminHelpPageState;
     networkAndIdentity: AdminNetworkAndIdentityState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;
