@@ -177,54 +177,9 @@ export class HelpEditor extends React.Component<Props> {
         const { dispatch, currentContent, isNew, currentPage } = this.props;
 
         if (isNew) {
-            // const createContent = currentContent.content.map(c => {
-            //     const createdContent = {
-            //         title: currentContent.title,
-            //         category: currentContent.category,
-            //         orderId: c.orderId,
-            //         type: c.type,
-            //         textContent: c.textContent,
-            //         imageId: c.imageId,
-            //         imageContent: c.imageContent,
-            //         imageSize: c.imageSize
-            //     } as CreateHelpPageDTO;
-            //     return createdContent;
-            // });
-
-            const d = currentContent.content.slice();
-            d.forEach(c => c.id = '');
-            // doesnt work if id is defined.
-            const createContent = {
-                title: currentContent.title,
-                category: currentContent.category,
-                // content: currentContent.content
-                content: d
-            } as AdminHelpPageAndContent;
-            dispatch(createAdminHelpPageContent(createContent));
+            dispatch(createAdminHelpPageContent(currentContent));
         } else {
-            // const updateContent = currentContent.content.map(c => {
-            //     const updatedContent = {
-            //         title: currentContent.title,
-            //         category: currentContent.category,
-            //         pageId: currentPage.id,
-            //         orderId: c.orderId,
-            //         type: c.type,
-            //         textContent: c.textContent,
-            //         imageId: c.imageId,
-            //         imageContent: c.imageContent,
-            //         imageSize: c.imageSize
-            //     } as UpdateHelpPageContentDTO;
-            //     return updatedContent;
-            // });
-            const d = currentContent.content.slice();
-            d.forEach(c => c.id = '');
-            const updateContent = {
-                title: currentContent.title,
-                category: currentContent.category,
-                // content: currentContent.content
-                content: d
-            } as AdminHelpPageAndContent;
-            dispatch(updateAdminHelpPageContent(currentPage.id, updateContent));
+            dispatch(updateAdminHelpPageContent(currentPage.id, currentContent));
         };
     };
 

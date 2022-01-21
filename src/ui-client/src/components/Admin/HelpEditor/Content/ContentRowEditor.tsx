@@ -57,15 +57,12 @@ export class ContentRowEditor extends React.Component<Props, State> {
     // TODO:
     //      1. need better error codes (eg: title already exists vs. check log files)
     //          - check all errors during save and throw to user
-    //      2. review api actions, name uniformity, types check (single type for api calls)
-    //          - check for admin/non-admin api calls
-    //          - add getallhelppages for admin api call
-    //      3. notify users why last row wont delete?
+    //      2. notify users why last row wont delete?
     //          - remove delete function on last row?
-    //      4. create new page, dont save, able to go to other tabs
+    //      3. create new page, dont save, able to go to other tabs
     //          - reevaluate
     //          - follow concept create rule: alert page isn't saved
-    //      5. update category feature needed.
+    //      4. update category feature needed.
     //          - edit category for multiple pages (dropdown)
     //          - single page category update, add dropdown
 
@@ -89,8 +86,9 @@ export class ContentRowEditor extends React.Component<Props, State> {
         const { selected } = this.state;
         const imageRow = "image";
         const textRow = "text";
+        const contentType = contentRow.type.toLowerCase();
 
-        if (contentRow.type === textRow) {
+        if (contentType === textRow) {
             if (!selected) {
                 return (
                     <div className={`${c}-markdown`}>
@@ -115,7 +113,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
                     </div>
                 );
             }
-        } else if (contentRow.type === imageRow) {
+        } else if (contentType === imageRow) {
             return (
                 <div className={`${c}-markdown`}>
                     {this.getEditButtons()}

@@ -146,7 +146,6 @@ export class AdminHelp extends React.PureComponent<Props, State> {
 
         dispatch(setCurrentAdminHelpPageAndContent(newContent));
         dispatch(setAdminHelpPageAndContent(newContent, AdminHelpPageLoadState.LOADED));
-        // dispatch(setCurrentSelectedAdminHelpPage({ id: '', categoryId: '', title: '' } as AdminHelpPage));
         dispatch(setCurrentSelectedAdminHelpPage({} as AdminHelpPage));
         dispatch(isAdminHelpPageNew(true));
         dispatch(isAdminHelpPageUnsaved(true));
