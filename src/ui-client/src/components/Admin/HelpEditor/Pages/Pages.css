@@ -5,10 +5,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.categories {
-    padding: 50px 100px 0px;
+.admin-pages-category {
+    font-size: 14px;
 }
 
-/* .categories button {
+.admin-pages-page {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.admin-pages-page button {
     display: contents;
-} */
+}
+
+.admin-pages-all {
+    margin-bottom: 25px;
+}

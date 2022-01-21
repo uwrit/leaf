@@ -3,44 +3,44 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
 
 .admin-help {
-    background-color: rgb(240,240,240);
-    font-family: "Source Serif Pro";
-    padding-top: 20px;
-}
-
-.admin-help-buttons {
-    margin-left: 15% !important;
-}
-
-.admin-help-back-arrow {
-    color: rgb(0, 130, 177);
-    cursor: pointer;
-    height: 50px;
-    margin-left: -25%;
-    width: 50px;
-}
-
-.admin-help-back-arrow:hover {
-    opacity: 0.7;
-}
-
-.admin-help-edit-button {
-    font-family: Roboto;
-    margin-bottom: 10px;
-    margin-right: 20px;
-    min-width: 100px;
-}
-
-.admin-help-edit-button:hover {
-    opacity: 0.7;
-}
-
-.admin-help-content-text {
-    height: calc(100vh - 130px);
+    background-color: white;
+    height: calc(100vh - 55px);
     overflow-x: hidden;
     overflow-y: auto;
-    padding-bottom: 250px;
 }
+
+.admin-help-display {
+    margin: 10px 50px 10px 50px;
+}
+
+.admin-help-create-dropdown-container {
+    float: right;
+    font-family: Roboto;
+    margin-top: 10px;
+}
+
+.admin-help-create-dropdown-container > button {
+    font-size: 1.1rem;
+}
+
+.admin-help-create-dropdown-container .dropdown-menu {
+    font-size: 1.1rem !important;
+    width: 400px;
+}
+
+.admin-help-create-button-item {
+    margin: 5px;
+}
+
+.admin-help-create-button-item > button {
+    font-size: 1.2rem !important;
+    margin-top: 10px;
+}
+
+/* .admin-help-content {
+    background-color: rgb(240,240,240);
+    height: calc(100vh - 55px);
+} */

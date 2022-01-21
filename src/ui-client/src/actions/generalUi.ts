@@ -22,6 +22,7 @@ import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
 import { loadAdminPanelDataIfNeeded } from './admin/admin';
 import { loadHelpPagesAndCategoriesIfNeeded } from './helpPage';
+import { loadAdminHelpPagesAndCategoriesIfNeeded } from './admin/helpPage';
 import { getDemographicsIfNeeded } from './cohort/count';
 import { CohortStateType } from '../models/state/CohortState';
 import { getAllMetdata } from '../services/dataImport';
@@ -73,6 +74,7 @@ export const handleSidebarTabClick = (route: Routes) => {
         const admin = state.admin;
         const currentRoute = state.generalUi.currentRoute;
         const cohortCountState = state.cohort.count.state;
+        const isAdmin = state.auth.userContext!.isAdmin;
 
         if (route === currentRoute) {
             return;
@@ -93,7 +95,7 @@ export const handleSidebarTabClick = (route: Routes) => {
             dispatch(setRoute(route));
         } else if (route === Routes.Help) {
             dispatch(setRoute(route));
-            dispatch(loadHelpPagesAndCategoriesIfNeeded());
+            isAdmin ? dispatch(loadAdminHelpPagesAndCategoriesIfNeeded()) : dispatch(loadHelpPagesAndCategoriesIfNeeded());
         } else if (route === Routes.AdminPanel) {
             dispatch(setRoute(route));
             dispatch(loadAdminPanelDataIfNeeded());

@@ -7,14 +7,14 @@
 
 import React from 'react';
 import { Button, Col } from 'reactstrap';
-import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
-import { HelpPageCategory } from '../../../models/Help/Help';
-import { HelpPage } from '../../../models/Help/Help';
+import { getAdminHelpPageContent } from '../../../../actions/admin/helpPage';
+import { AdminHelpPage, AdminHelpPageCategoryExt } from '../../../../models/admin/Help';
 import './Pages.css';
 
 
 interface Props {
-    category: HelpPageCategory;
+    category: AdminHelpPageCategoryExt;
+    tempHelpPage: AdminHelpPage;
     dispatch: any;
 }
 
@@ -23,12 +23,12 @@ interface State {
 }
 
 export class Pages extends React.Component<Props, State> {
-    private className = "pages"
+    private className = "admin-pages"
     state = { show: false };
 
     public render() {
         const c = this.className;
-        const { category } = this.props;
+        const { category, tempHelpPage } = this.props;
         const { show } = this.state;
 
         const pages = category.categoryPages;
@@ -44,6 +44,8 @@ export class Pages extends React.Component<Props, State> {
                 <div className={`${c}-category`}>
                     <b>{category.name.toUpperCase()}</b>
                 </div>
+
+                {category.id === tempHelpPage.categoryId && <div style={{color: "#FF0000"}}>{tempHelpPage.title}</div>}
 
                 {slicedPages.map(p =>
                     <div key={p.id} className={`${c}-page`}>
@@ -67,10 +69,10 @@ export class Pages extends React.Component<Props, State> {
         );
     };
 
-    private handleHelpPageTitleClick = (page: HelpPage) => {
-        const { dispatch } = this.props;
-        dispatch(fetchSingleHelpPageContent(page))
-    };
-
     private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };
+
+    private handleHelpPageTitleClick = (page: AdminHelpPage) => {
+        const { dispatch, category } = this.props;
+        dispatch(getAdminHelpPageContent(page, category));
+    };
 };

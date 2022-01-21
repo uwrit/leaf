@@ -3,319 +3,167 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
+ */ 
 
 import React from 'react';
-import { Button, Col, Row } from 'reactstrap';
-import { IoIosArrowRoundBack } from 'react-icons/io';
-import { showConfirmationModal } from '../../actions/generalUi';
-import { adminHelpContentUnsaved, confirmLeavingAdminHelpContent,
-         createAdminHelpPageContent, deleteHelpPageAndContent,
-         resetAdminHelpContent, setCurrentAdminHelpContent, updateAdminHelpPageContent } from '../../actions/admin/helpPage';
-import { ContentRowEditor } from '../../components/Admin/HelpEditor/ContentRowEditor';
-import { TextEditor } from '../../components/Admin/HelpEditor/TextEditor';
-import { AdminHelpContent, ContentRow } from '../../models/admin/Help';
-import { HelpPage } from '../../models/Help/Help';
-import { ConfirmationModalState } from '../../models/state/GeneralUiState';
+import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
+import { connect } from 'react-redux';
+import { exampleText }  from '../../components/Admin/HelpEditor/ExampleText';
+import { Categories } from '../../components/Admin/HelpEditor/Categories/Categories';
+import { HelpSearch } from '../../components/Help/Search/HelpSearch';
+import { AppState } from '../../models/state/AppState';
+import { AdminHelpPageLoadState, AdminHelpPageState } from '../../models/state/AdminState';
 import { generate as generateId } from 'shortid';
-import './AdminHelp.css';
 
-interface Props {
-    dispatch: any;
-    content: AdminHelpContent;
-    currentContent: AdminHelpContent;
-    currentPage: HelpPage;
-    isNew: boolean;
-    unsaved: boolean;
+import './AdminHelp.css';
+import { AdminHelpPageAndContent, AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../models/admin/Help';
+import { setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage, isAdminHelpPageNew, isAdminHelpPageUnsaved} from '../../actions/admin/helpPage';
+import { HelpEditor } from '../../components/Admin/HelpEditor/HelpEditor';
+
+interface OwnProps { }
+
+interface StateProps {
+    adminHelp: AdminHelpPageState;
 }
 
-export class AdminHelp extends React.Component<Props> {
-    private className = "admin-help"
+interface DispatchProps {
+    dispatch: any;
+}
+
+interface State {
+    show: boolean;
+    category: string;
+    title: string;
+}
+
+type Props = StateProps & OwnProps & DispatchProps;
+
+export class AdminHelp extends React.PureComponent<Props, State> {
+    private className = "admin-help";
+
+    constructor(props: Props) {
+        super(props);   
+        this.state = {
+            show: false,
+            category: '',
+            title: ''
+        }
+    }
 
     public render() {
         const c = this.className;
-        const { dispatch, currentContent, unsaved } = this.props;
+        const { dispatch, adminHelp } = this.props;
+        const { show, category, title } = this.state;
+        
+        if (adminHelp.content.contentState === AdminHelpPageLoadState.LOADED) {
+            return (
+                <HelpEditor
+                    dispatch={dispatch}
+                    content={adminHelp.content.page}
+                    currentContent={adminHelp.currentContent}
+                    currentPage={adminHelp.currentSelectedPage}
+                    isNew={adminHelp.isNew}
+                    unsaved={adminHelp.unsaved}
+                />
+            );
+        };
 
         return (
             <div className={c}>
-                <Row className={`${c}-buttons`}>
-                    <Col>
-                        <IoIosArrowRoundBack
-                            className={`${c}-back-arrow`}
-                            onClick={this.handleContentGoBackClick}>
-                        </IoIosArrowRoundBack>
-                    </Col>
+                <div className={`${c}-display`}>
+                    <div>
+                        <Dropdown className={`${c}-create-dropdown-container`} isOpen={show} toggle={this.handleShow}>
+                            <DropdownToggle caret className="leaf-button-addnew">
+                                New Help Page
+                            </DropdownToggle>
+                            <DropdownMenu right>
+                                <div className={`${c}-create-button-item`}>
+                                    Title <Input value={title} onChange={this.handleTitleChange} />
+                                </div>
+                                <div className={`${c}-create-button-item`}>
+                                    Category <Input value={category} onChange={this.handleCategoryChange} />
+                                </div>
+                                <div className={`${c}-create-button-item`}>
+                                    <Button className="leaf-button-addnew" onClick={this.handleCreateNewPage}>
+                                        <span>+ Create</span>
+                                    </Button>
+                                </div>
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
 
-                    <Col>
-                        <Button className={`${c}-edit-button`} color="secondary" disabled={!unsaved} onClick={this.handleUndoChanges}>
-                            Undo Changes
-                        </Button>
-
-                        <Button className={`${c}-edit-button`} color="success" disabled={!unsaved} onClick={this.handleSaveChanges}>
-                            Save
-                        </Button>
-
-                        <Button className={`${c}-edit-button`} color="danger" onClick={this.handleDeleteContent}>
-                            Delete
-                        </Button>
-                    </Col>
-                </Row>
-
-                <div className={`${c}-content-text`}>
-                    <TextEditor
-                        text={currentContent.title}
-                        textHandler={this.handleTextChange}
-                    />
-
-                    {currentContent.content.map((cr,i) =>
-                        <ContentRowEditor
-                            key={cr.id}
+                    <HelpSearch />
+                    
+                    {(adminHelp.helpState === AdminHelpPageLoadState.LOADED) &&
+                        <Categories
+                            categories={adminHelp.categories}
+                            newCategory={category}
+                            newTitle={title}
                             dispatch={dispatch}
-                            contentRow={cr}
-                            index={i}
-                            contentHandler={this.handleContentChange}
-                            newSectionHandler={this.handleNewSection}
-                            imageSizeHandler={this.handleImageSizeChange}
-                            deleteRowHandler={this.handleDeleteRow}
                         />
-                    )}
+                    }
                 </div>
             </div>
         );
     };
 
-    private isLastContentRow = (): boolean => {
-        const { currentContent } = this.props;
-        const contentLength = currentContent.content.length;
-        
-        if (contentLength === 1) { return true };
-        
-        return false;
+    private handleShow = () => {
+        const { show } = this.state;
+        this.setState({ show: !show, category: '', title: '' });
     };
 
-    private handleTextChange = (val: string, propName: string) => {
-        const { dispatch, currentContent } = this.props;
-        const newContent = Object.assign({}, currentContent, { [propName]: val }) as AdminHelpContent;
-        
-        dispatch(setCurrentAdminHelpContent(newContent));
-        dispatch(adminHelpContentUnsaved(true));
+    private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.currentTarget.value;
+        this.setState({ category: val });
     };
 
-    private handleContentChange = (val: string, index: number) => {
-        const { dispatch, currentContent } = this.props;
-        // Make copy of current content to edit
-        const contentCopy = currentContent.content.slice();
-
-        // TODO: dont feel comfortable with filter, is there a better way?
-        const textContentRows = contentCopy.filter(c => c.type === "text").length;
-
-        // Find content row via index to edit
-        const contentRow = contentCopy.find((_, i) => i === index);
-
-        if (val) {
-            const updatedContentRow = Object.assign({}, contentRow, { textContent: val }) as ContentRow;
-            contentCopy.splice(index, 1, updatedContentRow);
-        } else if (!val && textContentRows === 1) {
-            const updatedContentRow = Object.assign({}, contentRow, { textContent: '' }) as ContentRow;
-            contentCopy.splice(index, 1, updatedContentRow);
-        } else {
-            contentCopy.splice(index, 1);
-        };
-
-        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
-        dispatch(setCurrentAdminHelpContent(newContent));
-
-        dispatch(adminHelpContentUnsaved(true));
+    private handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.currentTarget.value;
+        this.setState({ title: val });
     };
 
-    private handleImageSizeChange = (val: number, index: number) => {
-        const { dispatch, currentContent } = this.props;
-        // Make copy of current content to edit
-        const contentCopy = currentContent.content.slice();
-        // Find content row via index to edit
-        const contentRow = contentCopy.find((_, i) => i === index);
-        const isLastContentRow = this.isLastContentRow();
-
-        if (val) {
-            const updatedContentRow = Object.assign({}, contentRow, { imageSize: val }) as ContentRow;
-            contentCopy.splice(index, 1, updatedContentRow);
-        } else if (!val && !isLastContentRow) {
-            contentCopy.splice(index, 1)
-        }
-
-        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
-        dispatch(setCurrentAdminHelpContent(newContent));
-
-        dispatch(adminHelpContentUnsaved(true));
-    };
-
-    private handleDeleteRow = (index: number) => {
-        const { dispatch, currentContent } = this.props;
-        const contentCopy = currentContent.content.slice();
-        const isLastContentRow = this.isLastContentRow();
-        
-        if (!isLastContentRow) {
-            contentCopy.splice(index, 1);
-            dispatch(adminHelpContentUnsaved(true));
-        }
-
-        const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
-        dispatch(setCurrentAdminHelpContent(newContent));
-    };
-
-    private handleUndoChanges = () => {
-        const { dispatch, content, isNew, unsaved } = this.props;
-
-        if (isNew && unsaved) {
-            dispatch(confirmLeavingAdminHelpContent());
-        } else {
-            dispatch(setCurrentAdminHelpContent(content));
-            dispatch(adminHelpContentUnsaved(false));
-        };
-    };
-
-    private handleSaveChanges = () => {
-        const { dispatch, currentContent, isNew, currentPage } = this.props;
-
-        if (isNew) {
-            // const createContent = currentContent.content.map(c => {
-            //     const createdContent = {
-            //         title: currentContent.title,
-            //         category: currentContent.category,
-            //         orderId: c.orderId,
-            //         type: c.type,
-            //         textContent: c.textContent,
-            //         imageId: c.imageId,
-            //         imageContent: c.imageContent,
-            //         imageSize: c.imageSize
-            //     } as CreateHelpPageDTO;
-            //     return createdContent;
-            // });
-
-            const d = currentContent.content.slice();
-            d.forEach(c => c.id = '');
-            // doesnt work if id is defined.
-            const createContent = {
-                title: currentContent.title,
-                category: currentContent.category,
-                // content: currentContent.content
-                content: d
-            } as AdminHelpContent;
-            dispatch(createAdminHelpPageContent(createContent));
-        } else {
-            // const updateContent = currentContent.content.map(c => {
-            //     const updatedContent = {
-            //         title: currentContent.title,
-            //         category: currentContent.category,
-            //         pageId: currentPage.id,
-            //         orderId: c.orderId,
-            //         type: c.type,
-            //         textContent: c.textContent,
-            //         imageId: c.imageId,
-            //         imageContent: c.imageContent,
-            //         imageSize: c.imageSize
-            //     } as UpdateHelpPageContentDTO;
-            //     return updatedContent;
-            // });
-            const d = currentContent.content.slice();
-            d.forEach(c => c.id = '');
-            const updateContent = {
-                title: currentContent.title,
-                category: currentContent.category,
-                // content: currentContent.content
-                content: d
-            } as AdminHelpContent;
-            dispatch(updateAdminHelpPageContent(updateContent, currentPage.id));
-        };
-    };
-
-    private handleContentGoBackClick = () => {
-        const { dispatch, unsaved } = this.props;
-        unsaved ? dispatch(confirmLeavingAdminHelpContent()) : dispatch(resetAdminHelpContent());
-    };
-
-    private handleDeleteContent = () => {
-        const { dispatch, currentPage, currentContent, isNew } = this.props;
-
-        const confirm: ConfirmationModalState = {
-            body: `Are you sure you want to delete the page, "${currentContent.title}"? This will take effect immediately and can't be undone.`,
-            header: 'Delete Page',
-            onClickNo: () => null,
-            onClickYes: () => {
-                isNew
-                    ? dispatch(resetAdminHelpContent())
-                    : dispatch(deleteHelpPageAndContent(currentPage));
-            },
-            show: true,
-            noButtonText: `No`,
-            yesButtonText: `Yes, Delete Page`
-        };
-        dispatch(showConfirmationModal(confirm));
-    };
-
-    private handleNewSection = (index: number, pageId: string, isTypeText: boolean, e?: React.ChangeEvent<HTMLInputElement>) => {    
-        const { dispatch, currentContent } = this.props;
-        // Make copy of current content to edit
-        const contentCopy = currentContent.content.slice();
+    private handleCreateNewPage = () => {
+        const { dispatch } = this.props;
+        const { category, title, show } = this.state;
         const uniqueId = generateId();
-        const isLastContentRow = this.isLastContentRow();
-        const isLastTextRowEmpty: boolean = (!contentCopy[0].textContent && contentCopy[0].type === "text");
+
+        const contentRow = Object.assign({}, {
+            id: uniqueId,
+            pageId: '',
+            orderId: 0,
+            type: 'text',
+            textContent: exampleText,
+            imageId: '',
+            imageContent: '',
+            imageSize: 0
+        }) as AdminHelpPageContent;
+
+        const newContent = Object.assign({}, {
+            title: title ? title : ' Example Title',
+            category: { id: '', name: category ? category : 'Example Category' } as AdminHelpPageCategory,
+            content: [ contentRow ]
+        }) as AdminHelpPageAndContent;
+
+        dispatch(setCurrentAdminHelpPageAndContent(newContent));
+        dispatch(setAdminHelpPageAndContent(newContent, AdminHelpPageLoadState.LOADED));
+        // dispatch(setCurrentSelectedAdminHelpPage({ id: '', categoryId: '', title: '' } as AdminHelpPage));
+        dispatch(setCurrentSelectedAdminHelpPage({} as AdminHelpPage));
+        dispatch(isAdminHelpPageNew(true));
+        dispatch(isAdminHelpPageUnsaved(true));
         
-        if (isLastContentRow && isLastTextRowEmpty) {
-            contentCopy.splice(0, 1);
-        };
-
-        if (isTypeText) {
-            const con = Object.assign({}, {
-                id: uniqueId,
-                pageId: pageId,
-                orderId: 0,
-                type: 'text',
-                textContent: 'New Section Added.',
-                imageId: '',
-                imageContent: '',
-                imageSize: 0
-            }) as ContentRow;
-
-            // Add new text section at index
-            contentCopy.splice(index, 0, con);
-            // Order the content rows by their index
-            contentCopy.forEach((c,i) => c.orderId = i);
-            
-            const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
-            dispatch(setCurrentAdminHelpContent(newContent));
-        } else {
-            const image = e!.currentTarget.files!.item(0)!;
-            const imageId = image.name;
-            const reader = new FileReader();
-            reader.readAsDataURL(image);
-
-            reader.onload = () => {
-                const imageString = reader.result!.toString().split(',')[1];
-                const con = Object.assign({}, {
-                    id: uniqueId,
-                    pageId: pageId,
-                    orderId: 0,
-                    type: 'image',
-                    textContent: '',
-                    imageId: imageId,
-                    imageContent: imageString,
-                    imageSize: 50 // Set initial image size to 50%.
-                }) as ContentRow;
-
-                // Add new image section at index
-                contentCopy.splice(index, 0, con);
-                // Order the content rows by their index
-                contentCopy.forEach((c,i) => c.orderId = i);
-
-                const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpContent;
-                dispatch(setCurrentAdminHelpContent(newContent));
-            };
-            
-            // Removes input value so that onChange function runs again.
-            // Otherwise, nothing happens on onChange because value exists.
-            e!.currentTarget.value = '';
-        };
-        dispatch(adminHelpContentUnsaved(true));
+        //  Clear the values so that when user clicks the "go back arrow" from content after clicking "+ Create", category/title are reset.
+        this.setState({ show: !show, category: '', title: '' });
     };
-}
+};
+
+const mapStateToProps = (state: AppState): StateProps => {
+    return {
+        adminHelp: state.admin!.help
+    };
+};
+
+const mapDispatchToProps = (dispatch: any): DispatchProps => {
+    return { dispatch };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(AdminHelp)

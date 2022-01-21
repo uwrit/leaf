@@ -6,44 +6,65 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { AdminHelpContentDTO } from '../../models/admin/Help';
+import { AdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContentDTO, AdminHelpPageAndContentDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*
- * Gets help page category, title, and content.
+ * Gets help pages.
  */
-export const getAdminHelpPageAndContent = async (state: AppState, pageId: string) => {
+export const fetchAdminHelpPages = async (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.get(`api/admin/help/${pageId}`);
-    return resp.data as AdminHelpContentDTO;
+    const resp = await http.get(`api/admin/helppages`);
+    return resp.data as AdminHelpPageDTO[];
 };
 
 /*
- * Creates help page title and content, and category if it doesn't exist.
+ * Gets help page categories.
  */
-export const createAdminHelpPageAndContent = async (state: AppState, page: AdminHelpContentDTO) => {
+export const fetchAdminHelpPageCategories = async (state: AppState) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.post('api/admin/help', page);
-    return resp.data as AdminHelpContentDTO;
+    const resp = await http.get(`api/admin/helppages/categories`);
+    return resp.data as AdminHelpPageCategoryDTO[];
 };
 
 /*
- * Updates help page category, title, and content.
+ * Gets help page content.
  */
-export const updateAdminHelpPageAndContent = async (state: AppState, page: AdminHelpContentDTO, pageId: string) => {
+export const fetchAdminHelpPageContent = async (state: AppState, pageId: string) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/help/${pageId}`, page);
-    return resp.data as AdminHelpContentDTO;
+    const resp = await http.get(`api/admin/helppages/${pageId}/content`);
+    return resp.data as AdminHelpPageContentDTO[];
 };
 
 /*
- * Deletes help page category, title, and content.
+ * Creates help page and content, and category if it doesn't exist.
  */
-export const deleteAdminHelpPageAndContent = async (state: AppState, pageId: string) => {
+export const createAdminHelpPage = async (state: AppState, pageAndContent: AdminHelpPageAndContentDTO) => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    return http.delete(`api/admin/help/${pageId}`);
+    const resp = await http.post('api/admin/helppages', pageAndContent);
+    return resp.data as AdminHelpPageAndContentDTO;
+};
+
+/*
+ * Updates help page, category, and content.
+ */
+export const updateAdminHelpPage = async (state: AppState, pageId: string, pageAndContent: AdminHelpPageAndContentDTO) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.put(`api/admin/helppages/${pageId}`, pageAndContent);
+    return resp.data as AdminHelpPageAndContentDTO;
+};
+
+/*
+ * Deletes help page and content, and category if no pages under category.
+ */
+export const deleteAdminHelpPage = async (state: AppState, pageId: string) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const resp = await http.delete(`api/admin/helppages/${pageId}`);
+    return resp.data as AdminHelpPageAndContentDTO;
 };

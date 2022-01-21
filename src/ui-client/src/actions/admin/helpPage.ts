@@ -7,46 +7,85 @@
 
 import { AppState } from '../../models/state/AppState';
 import { showInfoModal, setNoClickModalState, setSideNotificationState, showConfirmationModal } from '../generalUi';
-import { setCurrentHelpPage, setHelpPagesAndCategories } from '../helpPage';
-import { AdminHelpContent, AdminHelpContentDTO } from '../../models/admin/Help';
-import { HelpPage } from '../../models/Help/Help';
 import { ConfirmationModalState, InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { HelpPageLoadState } from '../../models/state/HelpState';
-import { fetchHelpPageCategories, fetchHelpPages } from '../../services/helpPagesApi';
-import { createAdminHelpPageAndContent, deleteAdminHelpPageAndContent, getAdminHelpPageAndContent, updateAdminHelpPageAndContent } from '../../services/admin/helpPagesApi';
+import { AdminHelpPage, AdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageCategoryExt, AdminHelpPageAndContent } from '../../models/admin/Help';
+import { fetchAdminHelpPages, fetchAdminHelpPageCategories, fetchAdminHelpPageContent,
+         createAdminHelpPage, updateAdminHelpPage, deleteAdminHelpPage } from '../../services/admin/helpPagesApi';
+import { AdminHelpPageLoadState } from '../../models/state/AdminState';
 
-export const IS_ADMIN_HELP_CONTENT_NEW = 'IS_ADMIN_HELP_CONTENT_NEW';
-export const SAVE_ADMIN_HELP_CONTENT = 'SAVE_ADMIN_HELP_CONTENT';
-export const SET_ADMIN_HELP_CONTENT = 'SET_ADMIN_HELP_CONTENT';
-export const SET_CURRENT_ADMIN_HELP_CONTENT = 'SET_CURRENT_ADMIN_HELP_CONTENT';
+export const SET_ADMIN_HELP_PAGES_AND_CATEGORIES = 'SET_ADMIN_HELP_PAGES_AND_CATEGORIES';
+export const SET_ADMIN_HELP_PAGE_AND_CONTENT = 'SET_ADMIN_HELP_PAGE_AND_CONTENT';
+export const SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT = 'SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT';
+export const SET_CURRENT_SELECTED_ADMIN_HELP_PAGE = 'SET_CURRENT_SELECTED_ADMIN_HELP_PAGE';
+export const SET_ADMIN_HELP_PAGE_LOAD_STATE = 'SET_ADMIN_HELP_PAGE_LOAD_STATE';
+export const IS_ADMIN_HELP_PAGE_NEW = 'IS_ADMIN_HELP_PAGE_NEW';
+export const IS_ADMIN_HELP_PAGE_UNSAVED = 'IS_ADMIN_HELP_PAGE_UNSAVED';
 
-export interface AdminHelpAction {
-    currentContent?: AdminHelpContentDTO;
-    content?: AdminHelpContentDTO;
-    contentLoadState?: HelpPageLoadState;
+export interface AdminHelpPageAction {
+    categories?: AdminHelpPageCategoryDTO[];
+    currentContent?: AdminHelpPageAndContent,
+    currentSelectedPage?: AdminHelpPage,
+    pages?: AdminHelpPageDTO[];
+    helpState?: AdminHelpPageLoadState;
     isNew?: boolean;
     unsaved?: boolean;
     type: string;
 }
 
+export interface AdminHelpPageContentAction {
+    page?: AdminHelpPageAndContent;
+    contentState?: AdminHelpPageLoadState;
+    type: string;
+}
+
 // Asynchronous
+/*
+ * Get help pages and categories if it isn't loaded.
+ */
+export const loadAdminHelpPagesAndCategoriesIfNeeded = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        if (state.admin!.help.helpState === AdminHelpPageLoadState.NOT_LOADED) {
+            try {
+                dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working}));
+
+                const categories = await fetchAdminHelpPageCategories(state);
+                const pages = await fetchAdminHelpPages(state);
+                
+                dispatch(setAdminHelpPagesAndCategories(categories, pages));
+                dispatch(setAdminHelpPageLoadState(AdminHelpPageLoadState.LOADED));
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            } catch (err) {
+                const info: InformationModalState = {
+                    body: "Leaf encountered an error while attempting to load Help pages. Please check the Leaf log files for more information.",
+                    header: "Error Loading Help Pages",
+                    show: true
+                };
+                dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+                dispatch(showInfoModal(info));
+            }
+        }
+    };
+};
+
 /*
  * Get admin help page content.
  */
-export const getAdminHelpPageContent = (page: HelpPage) => {
+export const getAdminHelpPageContent = (page: AdminHelpPage, category: AdminHelpPageCategoryExt) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Loading Page", state: NotificationStates.Working }));
 
-            dispatch(setCurrentHelpPage(page));
+            dispatch(setCurrentSelectedAdminHelpPage(page));
 
-            const content = await getAdminHelpPageAndContent(state, page.id);
+            const contentRows = await fetchAdminHelpPageContent(state, page.id);
 
-            dispatch(setCurrentAdminHelpContent(content));
-            dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+            const pageAndContent = { title: page.title, category: { id: category.id, name: category.name }, content: contentRows } as AdminHelpPageAndContent;
+            dispatch(setCurrentAdminHelpPageAndContent(pageAndContent));
+            dispatch(setAdminHelpPageAndContent(pageAndContent, AdminHelpPageLoadState.LOADED));
 
-            dispatch(adminHelpContentUnsaved(false));
+            // dispatch(isAdminHelpPageUnsaved(false));
 
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         } catch (err) {
@@ -64,25 +103,24 @@ export const getAdminHelpPageContent = (page: HelpPage) => {
 /*
  * Create admin help page content.
  */
-export const createAdminHelpPageContent = (page: AdminHelpContent) => {
+export const createAdminHelpPageContent = (pageAndContent: AdminHelpPageAndContent) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Creating Page", state: NotificationStates.Working }));
             
             // Create help page.
-            const created = await createAdminHelpPageAndContent(state, page);
+            const created = await createAdminHelpPage(state, pageAndContent);
 
-            dispatch(setCurrentAdminHelpContent(created));
-            dispatch(setAdminHelpContent(created, HelpPageLoadState.LOADED));
+            dispatch(setCurrentAdminHelpPageAndContent(created));
+            dispatch(setAdminHelpPageAndContent(created, AdminHelpPageLoadState.LOADED));
 
             const pageId = created.content[0].pageId;
             dispatch(reloadContent(pageId));
 
-            dispatch(isAdminHelpContentNew(false));
-            dispatch(adminHelpContentUnsaved(false));
+            dispatch(isAdminHelpPageNew(false));
+            dispatch(isAdminHelpPageUnsaved(false));
             
-            // dispatch(createAdminHelpPage(page));
             dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Page Created' }));
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         } catch (err) {
@@ -100,21 +138,22 @@ export const createAdminHelpPageContent = (page: AdminHelpContent) => {
 /*
  * Update admin help page content.
  */
-export const updateAdminHelpPageContent = (page: AdminHelpContent, pageId: string) => {
+export const updateAdminHelpPageContent = (pageId: string, pageAndContent: AdminHelpPageAndContent) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
 
-            const content = await updateAdminHelpPageAndContent(state, page, pageId);
+            const updated = await updateAdminHelpPage(state, pageId, pageAndContent);
 
-            dispatch(setCurrentAdminHelpContent(content));
-            dispatch(setAdminHelpContent(content, HelpPageLoadState.LOADED));
+            dispatch(setCurrentAdminHelpPageAndContent(updated));
+            dispatch(setAdminHelpPageAndContent(updated, AdminHelpPageLoadState.LOADED));
+            
             
             dispatch(reloadContent());
-            dispatch(adminHelpContentUnsaved(false));
+            dispatch(isAdminHelpPageUnsaved(false));
 
-            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Page Saved' }));
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Page Updated' }));
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         } catch (err) {
             const info: InformationModalState = {
@@ -128,31 +167,7 @@ export const updateAdminHelpPageContent = (page: AdminHelpContent, pageId: strin
     };
 };
 
-export const reloadContent = (pageId?: string) => {
-    return async (dispatch: any, getState: () => AppState) => {
-        const state = getState();
-        try {
-            const categories = await fetchHelpPageCategories(state);
-            const pages = await fetchHelpPages(state);
-            
-            dispatch(setHelpPagesAndCategories(categories, pages));
-
-            if (pageId) {
-                const page = pages.find(p => p.id === pageId)!;
-                dispatch(setCurrentHelpPage(page));
-            };
-        } catch (err) {
-            const info: InformationModalState = {
-                body: "Leaf encountered an error while attempting to load Admin data. Please check the Leaf log files for more information.",
-                header: "Error Loading Admin Data",
-                show: true
-            };
-            dispatch(showInfoModal(info));
-        };
-    };
-};
-
-export const deleteHelpPageAndContent = (page: HelpPage) => {
+export const deleteHelpPageAndContent = (page: AdminHelpPage) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
@@ -160,18 +175,19 @@ export const deleteHelpPageAndContent = (page: HelpPage) => {
             dispatch(resetAdminHelpContent());
 
             // Delete help page.
-            await deleteAdminHelpPageAndContent(state, page.id);
+            // const deleted = await deleteAdminHelpPage(state, page.id);
+            await deleteAdminHelpPage(state, page.id);
             
             // Fetch updated categories and pages after page delete.
-            const categories = await fetchHelpPageCategories(state);
-            const pages = await fetchHelpPages(state);
+            const categories = await fetchAdminHelpPageCategories(state);
+            const pages = await fetchAdminHelpPages(state);
             
             // Set new categories and pages.
-            dispatch(setHelpPagesAndCategories(categories, pages));
+            dispatch(setAdminHelpPagesAndCategories(categories, pages));
         
             const info: InformationModalState = {
                 body: `"${page.title}" page deleted.`,
-                header: "Deleting Page",
+                header: "Delete Page",
                 show: true
             };
             dispatch(showInfoModal(info));
@@ -186,23 +202,47 @@ export const deleteHelpPageAndContent = (page: HelpPage) => {
     };
 };
 
+export const reloadContent = (pageId?: string) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        try {
+            const categories = await fetchAdminHelpPageCategories(state);
+            const pages = await fetchAdminHelpPages(state);
+            
+            dispatch(setAdminHelpPagesAndCategories(categories, pages));
+
+            if (pageId) {
+                const page = pages.find(p => p.id === pageId)!;
+                dispatch(setCurrentSelectedAdminHelpPage(page));
+            };
+        } catch (err) {
+            const info: InformationModalState = {
+                body: "Leaf encountered an error while attempting to load Admin data. Please check the Leaf log files for more information.",
+                header: "Error Loading Admin Data",
+                show: true
+            };
+            dispatch(showInfoModal(info));
+        };
+    };
+};
+
 export const resetAdminHelpContent = () => {
     return (dispatch: any) => {
         try {
             // Is content being created set to false.
-            dispatch(isAdminHelpContentNew(false));
+            dispatch(isAdminHelpPageNew(false));
 
             // Content unsaved set to false
-            dispatch(adminHelpContentUnsaved(false));
+            dispatch(isAdminHelpPageUnsaved(false));
 
             // Set current help page to empty.
-            dispatch(setCurrentHelpPage({} as HelpPage));
+            dispatch(setCurrentSelectedAdminHelpPage({} as AdminHelpPage));
 
             // Set current admin help content to empty.
-            dispatch(setCurrentAdminHelpContent({} as AdminHelpContentDTO));
+            dispatch(setCurrentAdminHelpPageAndContent({} as AdminHelpPageAndContent));
 
             // Set admin help content to empty and load state to NOT_LOADED.
-            dispatch(setAdminHelpContent({} as AdminHelpContentDTO, HelpPageLoadState.NOT_LOADED));
+            dispatch(setAdminHelpPageAndContent({} as AdminHelpPageAndContent, AdminHelpPageLoadState.NOT_LOADED));
         } catch (err) {
             console.log(err);
         };
@@ -229,31 +269,53 @@ export const confirmLeavingAdminHelpContent = () => {
 };
 
 // Synchronous
-export const setCurrentAdminHelpContent = (currentContent: AdminHelpContentDTO): AdminHelpAction => {
+export const setAdminHelpPagesAndCategories = (categories: AdminHelpPageCategoryDTO[], pages: AdminHelpPageDTO[]): AdminHelpPageAction => {
     return {
-        currentContent,
-        type: SET_CURRENT_ADMIN_HELP_CONTENT
+        categories: categories,
+        pages: pages,
+        type: SET_ADMIN_HELP_PAGES_AND_CATEGORIES
     };
 };
 
-export const setAdminHelpContent = (content: AdminHelpContentDTO, contentLoadState: HelpPageLoadState): AdminHelpAction => {
+export const setAdminHelpPageAndContent = (page: AdminHelpPageAndContent, contentState: AdminHelpPageLoadState): AdminHelpPageContentAction => {
     return {
-        content,
-        contentLoadState,
-        type: SET_ADMIN_HELP_CONTENT
+        page: page,
+        contentState: contentState,
+        type: SET_ADMIN_HELP_PAGE_AND_CONTENT
     };
 };
 
-export const isAdminHelpContentNew = (isNew: boolean): AdminHelpAction => {
+export const setCurrentAdminHelpPageAndContent = (currentContent: AdminHelpPageAndContent): AdminHelpPageAction => {
+    return {
+        currentContent: currentContent,
+        type: SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT
+    };
+};
+
+export const setCurrentSelectedAdminHelpPage = (currentPage: AdminHelpPage): AdminHelpPageAction => {
+    return {
+        currentSelectedPage: currentPage,
+        type: SET_CURRENT_SELECTED_ADMIN_HELP_PAGE
+    };
+};
+ 
+export const setAdminHelpPageLoadState = (loadState: AdminHelpPageLoadState): AdminHelpPageAction => {
+    return {
+        helpState: loadState,
+        type: SET_ADMIN_HELP_PAGE_LOAD_STATE
+    };
+};
+
+export const isAdminHelpPageNew = (isNew: boolean): AdminHelpPageAction => {
     return {
         isNew: isNew,
-        type: IS_ADMIN_HELP_CONTENT_NEW
+        type: IS_ADMIN_HELP_PAGE_NEW
     };
 };
 
-export const adminHelpContentUnsaved = (unsaved: boolean): AdminHelpAction => {
+export const isAdminHelpPageUnsaved = (unsaved: boolean): AdminHelpPageAction => {
     return {
         unsaved: unsaved,
-        type: SAVE_ADMIN_HELP_CONTENT
+        type: IS_ADMIN_HELP_PAGE_UNSAVED
     };
 };

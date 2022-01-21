@@ -12,6 +12,7 @@ import { FindPatients } from '../components/FindPatients/FindPatients';
 import LeafMap from '../containers/Map/LeafMap';
 import PatientList from '../containers/PatientList/PatientList';
 import Help from '../containers/Help/Help';
+import AdminHelp from '../containers/Admin/AdminHelp';
 import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AppConfig } from '../models/Auth';
@@ -111,13 +112,13 @@ const admin = (): RouteConfig => {
     };
 };
 
-const help = (): RouteConfig => { 
+const help = (isAdmin: boolean): RouteConfig => { 
     return {
         display: 'Help',
         icon: <MdHelp />,
         index: Routes.Help,
-        path: '/help',
-        render: () => <Help />
+        path: '/helppages',
+        render: () => (isAdmin ? <AdminHelp/> : <Help />)
     };
 };
 
@@ -129,7 +130,7 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
     if (client.visualize.enabled)   { routes.push(visualize()); }
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
-    if (client.helpPages.enabled)   { routes.push(help()); }
+    if (client.helpPages.enabled)   { routes.push(help(userContext.isAdmin)); }
 
     return routes;
 };

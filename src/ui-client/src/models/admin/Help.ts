@@ -28,38 +28,19 @@ export interface AdminHelpPageContentDTO {
 }
 
 export type categoryId = string;
-export type AdminHelpCategoryMap = Map<categoryId, AdminHelpPageCategory>;
+export type AdminHelpCategoryMap = Map<categoryId, AdminHelpPageCategoryExt>;
 
 export interface AdminHelpPage extends AdminHelpPageDTO { }
-export interface AdminHelpPageCategory extends AdminHelpPageCategoryDTO {
-    categoryPages: AdminHelpPageDTO[];
+export interface AdminHelpPageCategory extends AdminHelpPageCategoryDTO {}
+export interface AdminHelpPageCategoryExt extends AdminHelpPageCategory {
+    categoryPages: AdminHelpPage[];
 }
 export interface AdminHelpPageContent extends AdminHelpPageContentDTO { }
 
 export interface AdminHelpPageAndContentDTO {
-    title: AdminHelpPage;
+    title: string;
     category: AdminHelpPageCategory;
     content: AdminHelpPageContent[];
 }
 
 export interface AdminHelpPageAndContent extends AdminHelpPageAndContentDTO {}
-
-/////////////////
-export interface ContentRow {
-    id: string;
-    pageId: string;
-    orderId: number;
-    type: string;
-    textContent: string;
-    imageId: string;
-    imageContent: string;
-    imageSize: number;
-}
-
-export interface AdminHelpContentDTO {
-    title: string;
-    category: string;
-    content: ContentRow[];
-}
-
-export interface AdminHelpContent extends AdminHelpContentDTO {}

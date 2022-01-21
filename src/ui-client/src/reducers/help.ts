@@ -21,7 +21,7 @@ export const defaultHelpPagesState = (): HelpPageState => {
         categories: new Map<categoryId, HelpPageCategory>(),
         currentSelectedPage: Object.assign({}) as HelpPage,
         content: {
-            content: [],
+            rows: [],
             state: HelpPageLoadState.NOT_LOADED
         },
         state: HelpPageLoadState.NOT_LOADED,
@@ -50,7 +50,7 @@ const mapCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]):
 
 const setHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     const mappedCategories = mapCategories(action.categories!, action.pages!);
-
+    
     return Object.assign({}, state, {
         categories: mappedCategories
     });
@@ -72,7 +72,7 @@ const setHelpPageContent = (state: HelpPageState, action: HelpPageContentAction)
     return Object.assign({}, state, {
         content: {
             ...state.content,
-            content: (action.state === HelpPageLoadState.LOADED) ? action.content : undefined,
+            rows: (action.state === HelpPageLoadState.LOADED) ? action.rows : undefined,
             state: action.state,
         }
     });

@@ -1,0 +1,46 @@
+/* Copyright (c) 2020, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+.help-editor {
+    background-color: rgb(240,240,240);
+    font-family: "Source Serif Pro";
+    padding-top: 20px;
+}
+
+.help-editor-buttons {
+    margin-left: 15% !important;
+}
+
+.help-editor-back-arrow {
+    color: rgb(0, 130, 177);
+    cursor: pointer;
+    height: 50px;
+    margin-left: -25%;
+    width: 50px;
+}
+
+.help-editor-back-arrow:hover {
+    opacity: 0.7;
+}
+
+.help-editor-edit-button {
+    font-family: Roboto;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    min-width: 100px;
+}
+
+.help-editor-edit-button:hover {
+    opacity: 0.7;
+}
+
+.help-editor-content-text {
+    height: calc(100vh - 130px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-bottom: 250px;
+}

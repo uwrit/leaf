@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import AdminState, { AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
+import AdminState, { AdminHelpPageLoadState, AdminPanelLoadState, AdminPanelPane } from "../../models/state/AdminState";
 import {
     SET_ADMIN_PANEL_PANE,
     SET_ADMIN_PANEL_LOAD_STATE,
@@ -97,11 +97,15 @@ import {
     SET_ADMIN_QUERY_USER_SEARCH_TERM
 } from "../../actions/admin/userQuery";
 import {
-    IS_ADMIN_HELP_CONTENT_NEW,
-    SAVE_ADMIN_HELP_CONTENT,
-    SET_ADMIN_HELP_CONTENT,
-    SET_CURRENT_ADMIN_HELP_CONTENT,
-    AdminHelpAction
+    SET_ADMIN_HELP_PAGES_AND_CATEGORIES,
+    SET_ADMIN_HELP_PAGE_AND_CONTENT,
+    SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT,
+    SET_CURRENT_SELECTED_ADMIN_HELP_PAGE,
+    SET_ADMIN_HELP_PAGE_LOAD_STATE,
+    IS_ADMIN_HELP_PAGE_NEW,
+    IS_ADMIN_HELP_PAGE_UNSAVED,
+    AdminHelpPageAction,
+    AdminHelpPageContentAction
 } from "../../actions/admin/helpPage";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
@@ -116,8 +120,8 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-import { adminHelpContentUnsaved, isAdminHelpContentNew, setAdminHelpContent, setCurrentAdminHelpContent } from "./help";
-import { HelpPageLoadState } from "../../models/state/HelpState";
+import { AdminHelpPage, AdminHelpPageAndContent, AdminHelpPageCategoryExt, categoryId } from '../../models/admin/Help'
+import { setAdminHelpPagesAndCategories, setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage, setAdminHelpPageLoadState, isAdminHelpPageNew, isAdminHelpPageUnsaved } from "./help";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -164,18 +168,15 @@ export const defaultAdminState = (): AdminState => {
             changed: false,
             data: new Map()
         },
-        helpPage: {
-            currentContent: {
-                title: "",
-                category: "",
-                content: []    
-            },
+        help: {
+            categories: new Map<categoryId, AdminHelpPageCategoryExt>(),
             content: {
-                title: "",
-                category: "",
-                content: []
+                page: Object.assign({}) as AdminHelpPageAndContent,
+                contentState: AdminHelpPageLoadState.NOT_LOADED
             },
-            state: HelpPageLoadState.NOT_LOADED,
+            currentContent: Object.assign({}) as AdminHelpPageAndContent,
+            currentSelectedPage: Object.assign({}) as AdminHelpPage,
+            helpState: AdminHelpPageLoadState.NOT_LOADED,
             isNew: false,
             unsaved: false
         },
@@ -221,7 +222,7 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
     });
 }; 
 
-type AdminAction = AdminHelpAction | AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
+type AdminAction = AdminHelpPageAction | AdminHelpPageContentAction | AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
 export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
@@ -353,14 +354,20 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminNetworkCertModalShown(state, action);
 
         // Help
-        case SET_CURRENT_ADMIN_HELP_CONTENT:
-            return setCurrentAdminHelpContent(state, action);
-        case SET_ADMIN_HELP_CONTENT:
-            return setAdminHelpContent(state, action);
-        case IS_ADMIN_HELP_CONTENT_NEW:
-            return isAdminHelpContentNew(state, action);
-        case SAVE_ADMIN_HELP_CONTENT:
-            return adminHelpContentUnsaved(state, action);
+        case SET_ADMIN_HELP_PAGES_AND_CATEGORIES:
+            return setAdminHelpPagesAndCategories(state, action);
+        case SET_ADMIN_HELP_PAGE_AND_CONTENT:
+            return setAdminHelpPageAndContent(state, action)
+        case SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT:
+            return setCurrentAdminHelpPageAndContent(state, action);
+        case SET_CURRENT_SELECTED_ADMIN_HELP_PAGE:
+            return setCurrentSelectedAdminHelpPage(state, action);
+        case SET_ADMIN_HELP_PAGE_LOAD_STATE:
+            return setAdminHelpPageLoadState(state, action);
+        case IS_ADMIN_HELP_PAGE_NEW:
+            return isAdminHelpPageNew(state, action);
+        case IS_ADMIN_HELP_PAGE_UNSAVED:
+            return isAdminHelpPageUnsaved(state, action);
 
         // User Queries
         case SET_ADMIN_QUERIES:

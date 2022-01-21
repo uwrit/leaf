@@ -26,29 +26,27 @@ export interface HelpPageAction {
 }
 
 export interface HelpPageContentAction {
-    content?: HelpPageContentDTO[];
+    rows?: HelpPageContentDTO[];
     state?: HelpPageLoadState;
     type: string;
 }
 
 // Async actions
 /*
- * Fetch help pages and categories if it hasn't already been loaded.
+ * Fetch help pages and categories if it isn't loaded.
  */
 export const loadHelpPagesAndCategoriesIfNeeded = () => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
-        if (state.helpPage.state === HelpPageLoadState.NOT_LOADED) {
+        if (state.help.state === HelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
 
                 /*
                  * Fetch help pages and categories.
                  */
-                const categories = await fetchHelpPageCategories(getState());
-                const pages = await fetchHelpPages(getState());
-
-                console.log(categories, pages);
+                const categories = await fetchHelpPageCategories(state);
+                const pages = await fetchHelpPages(state);
 
                 dispatch(setHelpPagesAndCategories(categories, pages));
 
@@ -138,9 +136,9 @@ export const setHelpPageLoadState = (state: HelpPageLoadState): HelpPageAction =
     };
 };
 
-export const setHelpPageContent = (state: HelpPageLoadState, content?: HelpPageContentDTO[]): HelpPageContentAction => {
+export const setHelpPageContent = (state: HelpPageLoadState, rows?: HelpPageContentDTO[]): HelpPageContentAction => {
     return {
-        content,
+        rows,
         state,
         type: SET_HELP_PAGE_CONTENT
     };

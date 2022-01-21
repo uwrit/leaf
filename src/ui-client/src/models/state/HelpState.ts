@@ -15,7 +15,7 @@ export enum HelpPageLoadState {
 }
 
 export interface HelpPageContentState {
-    content: HelpPageContent[];
+    rows: HelpPageContent[];
     state: HelpPageLoadState;
 }
 

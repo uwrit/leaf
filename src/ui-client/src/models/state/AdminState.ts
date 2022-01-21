@@ -11,14 +11,13 @@ import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
-import { AdminHelpContent } from '../admin/Help';
+import { AdminHelpCategoryMap, AdminHelpPage, AdminHelpPageAndContent } from '../admin/Help';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
 import { GlobalPanelFilter } from '../admin/GlobalPanelFilter';
 import { LeafUser } from '../admin/LeafUser';
 import { SavedQueryRef } from '../Query';
-import { HelpPageLoadState } from './HelpState';
 
 export enum AdminHelpPageLoadState {
     NOT_LOADED = 1,
@@ -118,22 +117,19 @@ export interface AdminUserQueryState {
 }
 
 export interface AdminHelpPageState {
-    currentContent: AdminHelpContent;
-    content: AdminHelpContent;
-    state: HelpPageLoadState;
-
-    // categories: AdminHelpCategoryMap;
-    // currentSelectedPage: AdminHelpPage;
-    // content: AdminHelpPageContentState;
-    // state: AdminHelpPageLoadState;
+    categories: AdminHelpCategoryMap;
+    content: AdminHelpPageContentState;
+    currentContent: AdminHelpPageAndContent;
+    currentSelectedPage: AdminHelpPage;
+    helpState: AdminHelpPageLoadState;
     isNew: boolean;
-    unsaved: boolean;
+    unsaved: boolean;    
 }
 
-// export interface AdminHelpPageContentState {
-//     content: AdminHelpPageContent[];
-//     state: AdminHelpPageLoadState;
-// }
+export interface AdminHelpPageContentState {
+    page: AdminHelpPageAndContent;
+    contentState: AdminHelpPageLoadState;
+}
 
 export default interface AdminState {
     activePane: AdminPanelPane;
@@ -143,7 +139,7 @@ export default interface AdminState {
     datasets: AdminDatasetState;
     datasetQueryCategories: AdminDatasetQueryCategoryState;
     globalPanelFilters: AdminGlobalPanelFilterState;
-    helpPage: AdminHelpPageState;
+    help: AdminHelpPageState;
     networkAndIdentity: AdminNetworkAndIdentityState;
     panelFilters: AdminPanelFilterState;
     sqlSets: AdminPanelSqlSetState;

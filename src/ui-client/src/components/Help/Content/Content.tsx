@@ -13,7 +13,7 @@ import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
 import './Content.css';
 
 interface Props {
-    content: HelpPageContent[];
+    contentRows: HelpPageContent[];
     currentPage: HelpPage;
     dispatch: any;
 }
@@ -23,7 +23,7 @@ export class Content extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { content, currentPage } = this.props;
+        const { contentRows, currentPage } = this.props;
 
         return (
             <div className={`${c}-container`}>
@@ -37,7 +37,7 @@ export class Content extends React.Component<Props> {
                         {currentPage.title}
                     </div>
 
-                    {content.map(c => this.getContent(c))}
+                    {contentRows.map(cr => this.getContent(cr))}
                 </div>
             </div>
         );
@@ -48,23 +48,23 @@ export class Content extends React.Component<Props> {
         dispatch(resetHelpPageContent());
     };
 
-    private getContent = (content: HelpPageContent) => {
+    private getContent = (row: HelpPageContent) => {
         const c = this.className;
 
-        if (content.textContent) {
+        if (row.textContent) {
             return (
-                <div className={`${c}-text`} key={content.id}>
+                <div className={`${c}-text`} key={row.id}>
                     {/* linkTarget allows for links to open in new tab. */}
-                    <ReactMarkdown children={content.textContent} linkTarget={"_blank"} />
+                    <ReactMarkdown children={row.textContent} linkTarget={"_blank"} />
                 </div>
             );
-        } else if (content.imageContent) {
+        } else if (row.imageContent) {
             return (
-                <div className={`${c}-image`} key={content.id}>
+                <div className={`${c}-image`} key={row.id}>
                     <img
-                        alt={content.imageId}
-                        src={`data:image;base64,${content.imageContent}`}
-                        style={{maxWidth: `${content.imageSize}%`}}
+                        alt={row.imageId}
+                        src={`data:image;base64,${row.imageContent}`}
+                        style={{maxWidth: `${row.imageSize}%`}}
                     />
                 </div>
             );

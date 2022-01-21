@@ -9,14 +9,14 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import TextareaAutosize from 'react-textarea-autosize';
 import { Col, Input, Row } from 'reactstrap';
-import { ContentRow } from '../../../models/admin/Help';
+import { AdminHelpPageContent } from '../../../../models/admin/Help';
 import { FaFileDownload, FaFileUpload, FaRegWindowClose, FaSortAlphaDown, FaSortAlphaUp } from 'react-icons/fa';
 import { generate as generateId } from 'shortid';
 import './ContentRowEditor.css';
 
 interface Props {
     dispatch: any;
-    contentRow: ContentRow;
+    contentRow: AdminHelpPageContent;
     index: number;
     contentHandler: (val: string, index: number) => void;
     newSectionHandler: (index: number, pageId: string, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
