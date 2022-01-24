@@ -181,7 +181,7 @@ namespace Model.Compiler
 
         ConditionValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.Condition;
             Fields = ShapedDatasetSchemaExtractor.Extract<ConditionDatasetRecord>();
         }
     }
@@ -194,7 +194,7 @@ namespace Model.Compiler
 
         ProcedureValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.Procedure;
             Fields = ShapedDatasetSchemaExtractor.Extract<ProcedureDatasetRecord>();
         }
     }
@@ -207,7 +207,7 @@ namespace Model.Compiler
 
         ImmunizationValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.Immunization;
             Fields = ShapedDatasetSchemaExtractor.Extract<ImmunizationDatasetRecord>();
         }
     }
@@ -220,7 +220,7 @@ namespace Model.Compiler
 
         AllergyValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.Allergy;
             Fields = ShapedDatasetSchemaExtractor.Extract<AllergyDatasetRecord>();
         }
     }
@@ -233,7 +233,7 @@ namespace Model.Compiler
 
         MedicationRequestValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.MedicationRequest;
             Fields = ShapedDatasetSchemaExtractor.Extract<MedicationRequestDatasetRecord>();
         }
     }
@@ -246,7 +246,7 @@ namespace Model.Compiler
 
         MedicationAdministrationValidationSchema()
         {
-            Shape = Shape.Demographic;
+            Shape = Shape.MedicationAdministration;
             Fields = ShapedDatasetSchemaExtractor.Extract<MedicationAdministrationDatasetRecord>();
         }
     }

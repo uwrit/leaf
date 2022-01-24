@@ -153,6 +153,7 @@ namespace Model.Compiler.Common
 
                 if (panel.PanelType == PanelType.Sequence && subpanel.Index > 0)
                 {
+                    // TODO(ndobb) DIALECT
                     var offset = new Expression($"{Dialect.Syntax.DATEADD}({Dialect.Time.MONTH}, {-6}, {start})");
                     where.Add(Date >= offset);
                 }
@@ -220,6 +221,7 @@ namespace Model.Compiler.Common
                 ? defaultTime.AddHours(23).AddMinutes(59).AddSeconds(59)
                 : defaultTime;
 
+            // TODO(ndobb) DIALECT
             if (filter.DateIncrementType == DateIncrementType.Now)
             {
                 return new Expression(Dialect.Syntax.NOW);
@@ -231,6 +233,8 @@ namespace Model.Compiler.Common
             }
 
             var incrType = filter.DateIncrementType.ToString().ToUpper();
+
+            // TODO(ndobb) DIALECT
             return new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {filter.Increment}, {Dialect.Syntax.NOW})");
         }
     }

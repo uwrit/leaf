@@ -24,7 +24,7 @@ namespace Model.Compiler.Common
             var having = new List<IEvaluatableAggregate>();
             var anchor = j1;
 
-            /*
+            /**
              * Add the first subpanel's HAVING clause (if any) separately.
              */ 
             if (first.SubPanel.HasCountFilter)
@@ -32,7 +32,7 @@ namespace Model.Compiler.Common
                 having.Add(GetHaving(j1));
             }
 
-            /*
+            /**
              * Create join logic for each subsequent subpanel Set.
              */
             foreach (var sp in sps.Skip(1))
@@ -51,12 +51,12 @@ namespace Model.Compiler.Common
                 }
             }
 
-            /*
+            /**
              * Set PersonId to first joined Set's.
              */
             PersonId = j1.PersonId;
 
-            /*
+            /**
              * Compose.
              */ 
             Select  = new[] { PersonId };
@@ -83,7 +83,7 @@ namespace Model.Compiler.Common
 
         JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet currSub)
         {
-            /*
+            /**
              * Get offset expressions.
              */
             var seq = currSub.SubPanel.JoinSequence;
@@ -91,7 +91,7 @@ namespace Model.Compiler.Common
             var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
             var forwOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
 
-            /*
+            /**
              * Get Join.
              */
             var type = currSub.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
@@ -99,7 +99,7 @@ namespace Model.Compiler.Common
 
             switch (seq.SequenceType)
             {
-                /*
+                /**
                  * Same Encounter.
                  */
                 case SequenceType.Encounter:
@@ -110,7 +110,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /*
+                /**
                  * Same Event.
                  */
                 case SequenceType.Event:
@@ -122,7 +122,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /*
+                /**
                  * Plus/Minus a time increment.
                  */
                 case SequenceType.PlusMinus:
@@ -134,7 +134,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /*
+                /**
                  * Within a following time increment.
                  */
                 case SequenceType.WithinFollowing:
@@ -146,7 +146,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /*
+                /**
                  * Anytime after.
                  */
                 case SequenceType.AnytimeFollowing:
