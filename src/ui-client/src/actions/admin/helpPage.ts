@@ -175,6 +175,8 @@ export const deleteHelpPageAndContent = (page: AdminHelpPage) => {
             dispatch(resetAdminHelpContent());
 
             // Delete help page.
+            
+            // TODO
             // const deleted = await deleteAdminHelpPage(state, page.id);
             await deleteAdminHelpPage(state, page.id);
             

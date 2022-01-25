@@ -11,11 +11,14 @@ import { getAdminHelpPageContent } from '../../../../actions/admin/helpPage';
 import { AdminHelpPage, AdminHelpPageCategoryExt } from '../../../../models/admin/Help';
 import './Pages.css';
 
+import { Dropdown, DropdownToggle, DropdownItem, DropdownMenu } from 'reactstrap';
 
 interface Props {
     category: AdminHelpPageCategoryExt;
     tempHelpPage: AdminHelpPage;
     dispatch: any;
+
+    // cats: AdminHelpPageCategoryExt[];
 }
 
 interface State {
@@ -43,6 +46,19 @@ export class Pages extends React.Component<Props, State> {
             <Col className={c} xs="4">
                 <div className={`${c}-category`}>
                     <b>{category.name.toUpperCase()}</b>
+
+                    {/*  */}
+                    {/* <Dropdown isOpen={true}>
+                        <DropdownToggle caret>
+                            {category.name}
+                        </DropdownToggle>
+                        <DropdownMenu>
+                            {this.props.cats.map((c, i) => 
+                                <DropdownItem>{c.name}</DropdownItem>
+                            )}
+                        </DropdownMenu>
+                    </Dropdown> */}
+                    {/*  */}
                 </div>
 
                 {category.id === tempHelpPage.categoryId && <div style={{color: "#FF0000"}}>{tempHelpPage.title}</div>}

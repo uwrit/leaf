@@ -91,6 +91,13 @@ export const handleSidebarTabClick = (route: Routes) => {
                 show: true
             };
             dispatch(showInfoModal(info));
+        } else if (currentRoute === Routes.Help && admin && admin.help.unsaved) {
+            const info: InformationModalState = {
+                body: "Please save or undo your current changes first.",
+                header: "Save or Undo Changes",
+                show: true
+            };
+            dispatch(showInfoModal(info));
         } else if (route === Routes.FindPatients) {
             dispatch(setRoute(route));
         } else if (route === Routes.Help) {

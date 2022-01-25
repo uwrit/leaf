@@ -14,7 +14,8 @@ const mapCategories = (categories: AdminHelpPageCategoryDTO[], pages: AdminHelpP
 
     for (let c of categories) {
         const categoryPages = pages.filter(p => p.categoryId === c.id);
-        // pages should be AdminHelpPage, NOT AdminHelpPageDTO
+        
+        // TODO: pages should be AdminHelpPage, NOT AdminHelpPageDTO
         const updatedCategory = Object.assign({ ...c, categoryPages }) as AdminHelpPageCategoryExt;
     
         // If pages for the category exist, then proceed; else, no need to for category without pages.

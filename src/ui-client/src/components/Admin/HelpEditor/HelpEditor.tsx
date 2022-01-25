@@ -16,8 +16,10 @@ import { AdminHelpPage, AdminHelpPageContent, AdminHelpPageAndContent } from '..
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { ContentRowEditor } from './Content/ContentRowEditor';
 import { TextEditor } from './Content/TextEditor';
-import { generate as generateId } from 'shortid';
 import './HelpEditor.css';
+
+import { Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Input } from 'reactstrap';
+import { AdminHelpPageCategoryExt } from '../../../models/admin/Help';
 
 interface Props {
     dispatch: any;
@@ -26,6 +28,8 @@ interface Props {
     currentPage: AdminHelpPage;
     isNew: boolean;
     unsaved: boolean;
+
+    categories: AdminHelpPageCategoryExt[];
 }
 
 export class HelpEditor extends React.Component<Props> {
@@ -34,6 +38,8 @@ export class HelpEditor extends React.Component<Props> {
     public render() {
         const c = this.className;
         const { dispatch, currentContent, unsaved } = this.props;
+
+        const isLastRow = this.isLastContentRow();
 
         return (
             <div className={c}>
@@ -66,12 +72,27 @@ export class HelpEditor extends React.Component<Props> {
                         textHandler={this.handleTitleChange}
                     />
 
+                    {/*  */}
+                    <Dropdown isOpen={true}>
+                        <DropdownToggle caret>
+                            {this.props.categories.find(c => c.id === this.props.currentPage.categoryId)!.name}
+                        </DropdownToggle>
+                        <DropdownMenu>
+                            {this.props.categories.map((c, i) =>
+                                <DropdownItem>{c.name}</DropdownItem>
+                            )}
+                            <div><Input/></div>
+                        </DropdownMenu>
+                    </Dropdown>
+                    {/*  */}
+
                     {currentContent.content.map((cr,i) =>
                         <ContentRowEditor
                             key={cr.id}
                             dispatch={dispatch}
                             contentRow={cr}
                             index={i}
+                            isLastRow={isLastRow}
                             contentHandler={this.handleContentChange}
                             newSectionHandler={this.handleNewSection}
                             imageSizeHandler={this.handleImageSizeChange}
@@ -151,12 +172,9 @@ export class HelpEditor extends React.Component<Props> {
     private handleDeleteRow = (index: number) => {
         const { dispatch, currentContent } = this.props;
         const contentCopy = currentContent.content.slice();
-        const isLastContentRow = this.isLastContentRow();
         
-        if (!isLastContentRow) {
-            contentCopy.splice(index, 1);
-            dispatch(isAdminHelpPageUnsaved(true));
-        }
+        contentCopy.splice(index, 1);
+        dispatch(isAdminHelpPageUnsaved(true));
 
         const newContent = Object.assign({}, currentContent, { content: contentCopy }) as AdminHelpPageAndContent;
         dispatch(setCurrentAdminHelpPageAndContent(newContent));
@@ -211,7 +229,6 @@ export class HelpEditor extends React.Component<Props> {
         const { dispatch, currentContent } = this.props;
         // Make copy of current content to edit
         const contentCopy = currentContent.content.slice();
-        const uniqueId = generateId();
         const isLastContentRow = this.isLastContentRow();
         const isLastTextRowEmpty: boolean = (!contentCopy[0].textContent && contentCopy[0].type === "text");
         
@@ -221,7 +238,7 @@ export class HelpEditor extends React.Component<Props> {
 
         if (isTypeText) {
             const con = Object.assign({}, {
-                id: uniqueId,
+                id: '',
                 pageId: pageId,
                 orderId: 0,
                 type: 'text',
@@ -247,7 +264,7 @@ export class HelpEditor extends React.Component<Props> {
             reader.onload = () => {
                 const imageString = reader.result!.toString().split(',')[1];
                 const con = Object.assign({}, {
-                    id: uniqueId,
+                    id: '',
                     pageId: pageId,
                     orderId: 0,
                     type: 'image',

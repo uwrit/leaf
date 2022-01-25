@@ -18,6 +18,7 @@ interface Props {
     dispatch: any;
     contentRow: AdminHelpPageContent;
     index: number;
+    isLastRow: boolean;
     contentHandler: (val: string, index: number) => void;
     newSectionHandler: (index: number, pageId: string, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
     imageSizeHandler: (val: number, index: number) => void;
@@ -55,16 +56,12 @@ export class ContentRowEditor extends React.Component<Props, State> {
     };
 
     // TODO:
-    //      1. need better error codes (eg: title already exists vs. check log files)
-    //          - check all errors during save and throw to user
-    //      2. notify users why last row wont delete?
-    //          - remove delete function on last row?
-    //      3. create new page, dont save, able to go to other tabs
-    //          - reevaluate
-    //          - follow concept create rule: alert page isn't saved
-    //      4. update category feature needed.
+    //      1. update category feature needed.
     //          - edit category for multiple pages (dropdown)
     //          - single page category update, add dropdown
+    //      2. what happens with delete response? (line 179 action)
+    //      3. css files (contentRowEditor, content), help reducer mappedCategories
+    //      4. check admin vs. non-admin workflow
 
     public render() {
         const c = this.className;
@@ -132,12 +129,14 @@ export class ContentRowEditor extends React.Component<Props, State> {
 
     private getEditButtons = () => {
         const c = this.className;
+        const { contentRow, isLastRow } = this.props;
         const editButton = `${c}-markdown-edit-button`;
         const imageUploadStyle = { display: "none" };
-        const { contentRow } = this.props;
+        const isLastRowClassname = (isLastRow && !contentRow.imageContent) ? 'is-last-row' : '';
+
         return (
-            <div className={`${c}-markdown-edit-buttons`}>
-                <FaRegWindowClose className={editButton} onClick={this.deleteRow} />
+            <div className={`${c}-markdown-edit-buttons ${isLastRowClassname}`}>
+                {!isLastRow && <FaRegWindowClose className={editButton} onClick={this.deleteRow} />}
                 <FaSortAlphaUp className={editButton} onClick={this.handleNewSection.bind(null, true, true)}/>
                 <label htmlFor={`${contentRow.id}-above`} className={editButton}>
                     <FaFileUpload className={editButton} />

@@ -8,17 +8,16 @@
 import React from 'react';
 import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { connect } from 'react-redux';
+import { setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage,
+        isAdminHelpPageNew, isAdminHelpPageUnsaved } from '../../actions/admin/helpPage';
 import { exampleText }  from '../../components/Admin/HelpEditor/ExampleText';
 import { Categories } from '../../components/Admin/HelpEditor/Categories/Categories';
-import { HelpSearch } from '../../components/Help/Search/HelpSearch';
-import { AppState } from '../../models/state/AppState';
-import { AdminHelpPageLoadState, AdminHelpPageState } from '../../models/state/AdminState';
-import { generate as generateId } from 'shortid';
-
-import './AdminHelp.css';
-import { AdminHelpPageAndContent, AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../models/admin/Help';
-import { setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage, isAdminHelpPageNew, isAdminHelpPageUnsaved} from '../../actions/admin/helpPage';
 import { HelpEditor } from '../../components/Admin/HelpEditor/HelpEditor';
+import { HelpSearch } from '../../components/Help/Search/HelpSearch';
+import { AdminHelpPageAndContent, AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../models/admin/Help';
+import { AdminHelpPageLoadState, AdminHelpPageState } from '../../models/state/AdminState';
+import { AppState } from '../../models/state/AppState';
+import './AdminHelp.css';
 
 interface OwnProps { }
 
@@ -64,6 +63,8 @@ export class AdminHelp extends React.PureComponent<Props, State> {
                     currentPage={adminHelp.currentSelectedPage}
                     isNew={adminHelp.isNew}
                     unsaved={adminHelp.unsaved}
+
+                    categories={[ ...adminHelp.categories.values() ]}
                 />
             );
         };
@@ -125,10 +126,9 @@ export class AdminHelp extends React.PureComponent<Props, State> {
     private handleCreateNewPage = () => {
         const { dispatch } = this.props;
         const { category, title, show } = this.state;
-        const uniqueId = generateId();
 
         const contentRow = Object.assign({}, {
-            id: uniqueId,
+            id: '',
             pageId: '',
             orderId: 0,
             type: 'text',

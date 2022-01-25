@@ -70,6 +70,10 @@
     width: 70px;
 }
 
+.content-row-editor-markdown:hover .content-row-editor-markdown-edit-buttons.is-last-row {
+    height: 200px;
+}
+
 .content-row-editor-markdown-edit-button {
     cursor: pointer;
     height: 20px;
