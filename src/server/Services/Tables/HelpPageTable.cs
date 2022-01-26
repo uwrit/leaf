@@ -30,10 +30,10 @@ namespace Services.Tables
         const string imageContent = "ImageContent";
         const string imageSize    = "ImageSize";
 
-        HelpPageTable(AdminHelpPageAndContent pc)
+        HelpPageTable(AdminHelpPage page)
         {
             var table = Schema();
-            Fill(table, pc);
+            Fill(table, page);
             Value = table;
         }
 
@@ -55,13 +55,13 @@ namespace Services.Tables
             return dt;
         }
 
-        void Fill(DataTable table, AdminHelpPageAndContent pc)
+        void Fill(DataTable table, AdminHelpPage page)
         {
-            foreach (var r in pc.Content)
+            foreach (var r in page.Content)
             {
                 var row = table.NewRow();
-                row[title]        = pc.Title;
-                row[category]     = pc.Category.Name;
+                row[title]        = page.Title;
+                row[category]     = page.Category.Name;
                 row[orderId]      = r.OrderId;
                 row[type]         = r.Type;
                 row[textContent]  = r.TextContent;
@@ -69,19 +69,19 @@ namespace Services.Tables
                 row[imageContent] = r.ImageContent;
                 row[imageSize]    = r.ImageSize;
 
-                if (r.PageId != null)
+                if (page.Id != null)
                 {
-                    row[pageId] = r.PageId;
+                    row[pageId] = page.Id;
                 };
 
                 table.Rows.Add(row);
             }
         }
 
-        public static DataTable From(AdminHelpPageAndContent pc)
+        public static DataTable From(AdminHelpPage p)
         {
-            var pageAndContent = pc ?? new AdminHelpPageAndContent();
-            return new HelpPageTable(pageAndContent).Value;
+            var page = p ?? new AdminHelpPage();
+            return new HelpPageTable(page).Value;
         }
     }
 }

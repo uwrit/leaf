@@ -19,8 +19,9 @@ interface Props {
     contentRow: AdminHelpPageContent;
     index: number;
     isLastRow: boolean;
+    pageId: string;
     contentHandler: (val: string, index: number) => void;
-    newSectionHandler: (index: number, pageId: string, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
+    newSectionHandler: (index: number, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
     imageSizeHandler: (val: number, index: number) => void;
     deleteRowHandler: (index: number) => void;
 }
@@ -59,9 +60,8 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //      1. update category feature needed.
     //          - edit category for multiple pages (dropdown)
     //          - single page category update, add dropdown
-    //      2. what happens with delete response? (line 179 action)
-    //      3. css files (contentRowEditor, content), help reducer mappedCategories
-    //      4. check admin vs. non-admin workflow
+    //      2. css files (contentRowEditor, content), help reducer mappedCategories
+    //      3. check admin vs. non-admin workflow
 
     public render() {
         const c = this.className;
@@ -166,10 +166,9 @@ export class ContentRowEditor extends React.Component<Props, State> {
     };    
 
     private handleNewSection = (isAbove: boolean, isTypeText: boolean, evt?: any) => {
-        const { contentRow, index, newSectionHandler } = this.props;
-        const pageId = contentRow.pageId;
+        const { index, newSectionHandler } = this.props;
         const updatedIndex = isAbove ? index : index+1;
-        newSectionHandler(updatedIndex, pageId, isTypeText, evt);
+        newSectionHandler(updatedIndex, isTypeText, evt);
         this.setState({ selected: false });
     };
 

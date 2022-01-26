@@ -97,15 +97,13 @@ import {
     SET_ADMIN_QUERY_USER_SEARCH_TERM
 } from "../../actions/admin/userQuery";
 import {
-    SET_ADMIN_HELP_PAGES_AND_CATEGORIES,
-    SET_ADMIN_HELP_PAGE_AND_CONTENT,
-    SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT,
-    SET_CURRENT_SELECTED_ADMIN_HELP_PAGE,
-    SET_ADMIN_HELP_PAGE_LOAD_STATE,
     IS_ADMIN_HELP_PAGE_NEW,
     IS_ADMIN_HELP_PAGE_UNSAVED,
-    AdminHelpPageAction,
-    AdminHelpPageContentAction
+    SET_ADMIN_HELP_PAGE,
+    SET_ADMIN_HELP_PAGE_LOAD_STATE,
+    SET_ADMIN_HELP_PAGES_AND_CATEGORIES,
+    SET_CURRENT_ADMIN_HELP_PAGE,
+    AdminHelpPageAction
 } from "../../actions/admin/helpPage";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
 import { setAdminSqlConfiguration } from "./configuration";
@@ -120,8 +118,8 @@ import { PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChanges, setAdminPanelFiltersUnchanged } from "./panelFilter";
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
-import { AdminHelpPage, AdminHelpPageAndContent, AdminHelpPageCategoryExt, categoryId } from '../../models/admin/Help'
-import { setAdminHelpPagesAndCategories, setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage, setAdminHelpPageLoadState, isAdminHelpPageNew, isAdminHelpPageUnsaved } from "./help";
+import { AdminHelpPage, AdminHelpCategoryPageCache, categoryId } from '../../models/admin/Help'
+import { setAdminHelpPagesAndCategories, setAdminHelpPage, setCurrentAdminHelpPage, setAdminHelpPageLoadState, isAdminHelpPageNew, isAdminHelpPageUnsaved } from "./help";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -169,15 +167,11 @@ export const defaultAdminState = (): AdminState => {
             data: new Map()
         },
         help: {
-            categories: new Map<categoryId, AdminHelpPageCategoryExt>(),
-            content: {
-                page: Object.assign({}) as AdminHelpPageAndContent,
-                contentState: AdminHelpPageLoadState.NOT_LOADED
-            },
-            currentContent: Object.assign({}) as AdminHelpPageAndContent,
-            currentSelectedPage: Object.assign({}) as AdminHelpPage,
+            categories: new Map<categoryId, AdminHelpCategoryPageCache>(),
+            currentPage: Object.assign({}) as AdminHelpPage,
             helpState: AdminHelpPageLoadState.NOT_LOADED,
             isNew: false,
+            page: Object.assign({}) as AdminHelpPage,
             unsaved: false
         },
         networkAndIdentity: {
@@ -222,7 +216,7 @@ const setAdminPanelPane = (state: AdminState, action: AdminPanelAction): AdminSt
     });
 }; 
 
-type AdminAction = AdminHelpPageAction | AdminHelpPageContentAction | AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
+type AdminAction = AdminHelpPageAction | AdminPanelAction | AdminConceptAction | AdminConfigurationAction | AdminSqlSetAction | AdminSpecializationGroupAction | AdminSpecializationAction;
 
 export const admin = (state: AdminState = defaultAdminState(), action: AdminAction): AdminState => {
     switch (action.type) {
@@ -356,12 +350,10 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
         // Help
         case SET_ADMIN_HELP_PAGES_AND_CATEGORIES:
             return setAdminHelpPagesAndCategories(state, action);
-        case SET_ADMIN_HELP_PAGE_AND_CONTENT:
-            return setAdminHelpPageAndContent(state, action)
-        case SET_CURRENT_ADMIN_HELP_PAGE_AND_CONTENT:
-            return setCurrentAdminHelpPageAndContent(state, action);
-        case SET_CURRENT_SELECTED_ADMIN_HELP_PAGE:
-            return setCurrentSelectedAdminHelpPage(state, action);
+        case SET_ADMIN_HELP_PAGE:
+            return setAdminHelpPage(state, action)
+        case SET_CURRENT_ADMIN_HELP_PAGE:
+            return setCurrentAdminHelpPage(state, action);
         case SET_ADMIN_HELP_PAGE_LOAD_STATE:
             return setAdminHelpPageLoadState(state, action);
         case IS_ADMIN_HELP_PAGE_NEW:

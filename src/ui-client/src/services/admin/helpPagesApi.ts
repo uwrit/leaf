@@ -6,23 +6,24 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { AdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContentDTO, AdminHelpPageAndContentDTO } from '../../models/admin/Help';
+import { PartialAdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContent,
+        AdminHelpPageContentDTO, AdminHelpPage, AdminHelpPageDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*
  * Gets help pages.
  */
-export const fetchAdminHelpPages = async (state: AppState) => {
+export const fetchPartialAdminHelpPages = async (state: AppState): Promise<PartialAdminHelpPageDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/helppages`);
-    return resp.data as AdminHelpPageDTO[];
+    return resp.data as PartialAdminHelpPageDTO[];
 };
 
 /*
  * Gets help page categories.
  */
-export const fetchAdminHelpPageCategories = async (state: AppState) => {
+export const fetchAdminHelpPageCategories = async (state: AppState): Promise<AdminHelpPageCategoryDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/helppages/categories`);
@@ -32,7 +33,7 @@ export const fetchAdminHelpPageCategories = async (state: AppState) => {
 /*
  * Gets help page content.
  */
-export const fetchAdminHelpPageContent = async (state: AppState, pageId: string) => {
+export const fetchAdminHelpPageContent = async (state: AppState, pageId: string): Promise<AdminHelpPageContentDTO[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`api/admin/helppages/${pageId}/content`);
@@ -42,29 +43,33 @@ export const fetchAdminHelpPageContent = async (state: AppState, pageId: string)
 /*
  * Creates help page and content, and category if it doesn't exist.
  */
-export const createAdminHelpPage = async (state: AppState, pageAndContent: AdminHelpPageAndContentDTO) => {
+export const createAdminHelpPage = async (state: AppState, p: AdminHelpPage): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.post('api/admin/helppages', pageAndContent);
-    return resp.data as AdminHelpPageAndContentDTO;
+    p.content.forEach(c => c.id = ''); // Set content row id to empty b/c shortId is not a Guid.
+    const page = { id: p.id, title: p.title, category: p.category, content: p.content } as AdminHelpPageDTO;
+    const resp = await http.post('api/admin/helppages', page);
+    return resp.data as AdminHelpPageDTO;
 };
 
 /*
  * Updates help page, category, and content.
  */
-export const updateAdminHelpPage = async (state: AppState, pageId: string, pageAndContent: AdminHelpPageAndContentDTO) => {
+export const updateAdminHelpPage = async (state: AppState, p: AdminHelpPage): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/helppages/${pageId}`, pageAndContent);
-    return resp.data as AdminHelpPageAndContentDTO;
+    p.content.forEach(c => c.id = ''); // Set content row id to empty b/c shortId is not a Guid.
+    const page = { id: p.id, title: p.title, category: p.category, content: p.content } as AdminHelpPageDTO;
+    const resp = await http.put(`api/admin/helppages/${p.id}`, page);
+    return resp.data as AdminHelpPageDTO;
 };
 
 /*
  * Deletes help page and content, and category if no pages under category.
  */
-export const deleteAdminHelpPage = async (state: AppState, pageId: string) => {
+export const deleteAdminHelpPage = async (state: AppState, pageId: string): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.delete(`api/admin/helppages/${pageId}`);
-    return resp.data as AdminHelpPageAndContentDTO;
+    return resp.data as AdminHelpPageDTO;
 };

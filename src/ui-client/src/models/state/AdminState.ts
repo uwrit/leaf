@@ -11,7 +11,7 @@ import { PanelFilter } from '../admin/PanelFilter';
 import { AdminConfiguration } from '../admin/Configuration';
 import { Panel } from '../panel/Panel';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../admin/Dataset';
-import { AdminHelpCategoryMap, AdminHelpPage, AdminHelpPageAndContent } from '../admin/Help';
+import { AdminHelpCategoryMap, AdminHelpPage } from '../admin/Help';
 import { AdminPanelPatientListColumnTemplate } from '../patientList/Column';
 import { NetworkIdentity } from '../NetworkResponder';
 import { NetworkEndpoint, Certificate } from '../admin/Network';
@@ -118,17 +118,11 @@ export interface AdminUserQueryState {
 
 export interface AdminHelpPageState {
     categories: AdminHelpCategoryMap;
-    content: AdminHelpPageContentState;
-    currentContent: AdminHelpPageAndContent;
-    currentSelectedPage: AdminHelpPage;
+    currentPage: AdminHelpPage;
     helpState: AdminHelpPageLoadState;
     isNew: boolean;
-    unsaved: boolean;    
-}
-
-export interface AdminHelpPageContentState {
-    page: AdminHelpPageAndContent;
-    contentState: AdminHelpPageLoadState;
+    page: AdminHelpPage;
+    unsaved: boolean;
 }
 
 export default interface AdminState {

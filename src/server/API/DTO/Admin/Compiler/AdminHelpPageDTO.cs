@@ -9,29 +9,32 @@ using Model.Admin.Compiler;
 
 namespace API.DTO.Admin.Compiler
 {
-    public class AdminHelpPageAndContentDTO
+    public class AdminHelpPageDTO
     {
+        public Guid? Id { get; set; }
         public string Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
 
-        public AdminHelpPageAndContentDTO() { }
+        public AdminHelpPageDTO() { }
 
-        public AdminHelpPageAndContentDTO(AdminHelpPageAndContent pc)
+        public AdminHelpPageDTO(AdminHelpPage page)
         {
-            Title = pc.Title;
-            Category = pc.Category;
-            Content = pc.Content;
+            Id = page.Id;
+            Title = page.Title;
+            Category = page.Category;
+            Content = page.Content;
         }
     }
 
     public static class AdminHelpPageExtensions
     {
-        public static AdminHelpPageAndContent HelpPage(this AdminHelpPageAndContentDTO dto)
+        public static AdminHelpPage HelpPage(this AdminHelpPageDTO dto)
         {
             if (dto == null) return null;
-            return new AdminHelpPageAndContent
+            return new AdminHelpPage
             {
+                Id = dto.Id,
                 Title = dto.Title,
                 Category = dto.Category,
                 Content = dto.Content
@@ -39,15 +42,15 @@ namespace API.DTO.Admin.Compiler
         }
     }
 
-    public class AdminHelpPageDTO
+    public class PartialAdminHelpPageDTO
     {
         public Guid? Id { get; set; }
         public Guid? CategoryId { get; set; }
         public string Title { get; set; }
 
-        public AdminHelpPageDTO() { }
+        public PartialAdminHelpPageDTO() { }
 
-        public AdminHelpPageDTO(AdminHelpPage page)
+        public PartialAdminHelpPageDTO(PartialAdminHelpPage page)
         {
             Id = page.Id;
             CategoryId = page.CategoryId;
@@ -72,7 +75,6 @@ namespace API.DTO.Admin.Compiler
     public class AdminHelpPageContentDTO
     {
         public Guid? Id { get; set; }
-        public Guid? PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
@@ -85,7 +87,6 @@ namespace API.DTO.Admin.Compiler
         public AdminHelpPageContentDTO(AdminHelpPageContent con)
         {
             Id = con.Id;
-            PageId = con.PageId;
             OrderId = con.OrderId;
             Type = con.Type;
             TextContent = con.TextContent;

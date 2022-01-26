@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { HelpCategoryMap } from '../../../models/Help/Help';
+import { HelpCategoryMap } from '../../../models/help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 

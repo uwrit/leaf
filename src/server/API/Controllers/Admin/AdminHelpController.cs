@@ -37,12 +37,12 @@ namespace API.Controllers.Admin
 
         // Get all help pages.
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<AdminHelpPageDTO>>> GetHelpPages()
+        public async Task<ActionResult<IEnumerable<PartialAdminHelpPageDTO>>> GetHelpPages()
         {
             try
             {
                 var pages = await manager.GetHelpPagesAsync();
-                return Ok(pages.Select(p => new AdminHelpPageDTO(p)));
+                return Ok(pages.Select(p => new PartialAdminHelpPageDTO(p)));
             }
             catch (Exception e)
             {
@@ -85,18 +85,18 @@ namespace API.Controllers.Admin
 
         // Create help page.
         [HttpPost]
-        public async Task<ActionResult<AdminHelpPageAndContentDTO>> Create([FromBody] AdminHelpPageAndContentDTO pc)
+        public async Task<ActionResult<AdminHelpPageDTO>> Create([FromBody] AdminHelpPageDTO p)
         {
             try
             {
-                var pageAndContent = pc.HelpPage();
-                var created = await manager.CreateAsync(pageAndContent);
-                return Ok(new AdminHelpPageAndContentDTO(created));
+                var page = p.HelpPage();
+                var created = await manager.CreateAsync(page);
+                return Ok(new AdminHelpPageDTO(created));
             }
             catch (ArgumentException ae)
             {
-                logger.LogError("Invalid create help page. Page:{@Page} Error:{Error}", pc, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageAndContentDTO)} is missing or incomplete."));
+                logger.LogError("Invalid create help page. Page:{@Page} Error:{Error}", p, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageDTO)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -104,25 +104,25 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to create help page. Page:{@Page} Error:{Error}", pc, e.ToString());
+                logger.LogError("Failed to create help page. Page:{@Page} Error:{Error}", p, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         // Update help page.
         [HttpPut("{pageid}")]
-        public async Task<ActionResult<AdminHelpPageAndContentDTO>> Update([FromBody] AdminHelpPageAndContentDTO pc)
+        public async Task<ActionResult<AdminHelpPageDTO>> Update([FromBody] AdminHelpPageDTO p)
         {
             try
             {
-                var pageAndContent = pc.HelpPage();
-                var updated = await manager.UpdateAsync(pageAndContent);
-                return Ok(new AdminHelpPageAndContentDTO(updated));
+                var page = p.HelpPage();
+                var updated = await manager.UpdateAsync(page);
+                return Ok(new AdminHelpPageDTO(updated));
             }
             catch (ArgumentException ae)
             {
-                logger.LogError("Invalid update help page. Page:{@Page} Error:{Error}", pc, ae.Message);
-                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageAndContentDTO)} is missing or incomplete."));
+                logger.LogError("Invalid update help page. Page:{@Page} Error:{Error}", p, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageDTO)} is missing or incomplete."));
             }
             catch (LeafRPCException le)
             {
@@ -130,19 +130,19 @@ namespace API.Controllers.Admin
             }
             catch (Exception e)
             {
-                logger.LogError("Failed to update help page. Page:{@Page} Error:{Error}", pc, e.ToString());
+                logger.LogError("Failed to update help page. Page:{@Page} Error:{Error}", p, e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
         // Delete help page.
         [HttpDelete("{pageid}")]
-        public async Task<ActionResult<AdminHelpPageAndContentDTO>> Delete(Guid pageId)
+        public async Task<ActionResult<AdminHelpPageDTO>> Delete(Guid pageId)
         {
             try
             {
                 var deleted = await manager.DeleteAsync(pageId);
-                return Ok(new AdminHelpPageAndContentDTO(deleted));
+                return Ok(new AdminHelpPageDTO(deleted));
             }
             catch (LeafRPCException le)
             {

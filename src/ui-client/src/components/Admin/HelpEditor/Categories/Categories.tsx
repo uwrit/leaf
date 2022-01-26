@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Row, Col } from 'reactstrap';
-import { AdminHelpCategoryMap, AdminHelpPage } from '../../../../models/admin/Help';
+import { AdminHelpCategoryMap, PartialAdminHelpPage } from '../../../../models/admin/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
@@ -29,7 +29,7 @@ export class Categories extends React.Component<Props> {
         // Getting first value from filter array since there will only be one match.
         const existingCat = cats.filter(c => c.name.toLowerCase() === newCategory.toLowerCase())[0];
         const tempCatId = existingCat ? existingCat.id : '';
-        const tempPage = { id: '', categoryId: tempCatId, title: newTitle } as AdminHelpPage;
+        const tempPage = { id: '', categoryId: tempCatId, title: newTitle } as PartialAdminHelpPage;
 
         return (
             <Row className={c}>

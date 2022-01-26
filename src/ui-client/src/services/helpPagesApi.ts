@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { HelpPageContentDTO, HelpPageDTO, HelpPageCategoryDTO } from '../models/Help/Help';
+import { HelpPageContentDTO, HelpPageDTO, HelpPageCategoryDTO } from '../models/help/Help';
 import { HttpFactory } from './HttpFactory';
 
 /*

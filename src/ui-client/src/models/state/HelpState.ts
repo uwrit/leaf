@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { HelpCategoryMap, HelpPage, HelpPageContent } from "../Help/Help";
+import { HelpCategoryMap, HelpPage, HelpPageContent } from "../help/Help";
 
 export enum HelpPageLoadState {
     NOT_LOADED = 1,

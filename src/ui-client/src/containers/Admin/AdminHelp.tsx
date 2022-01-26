@@ -8,15 +8,15 @@
 import React from 'react';
 import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { connect } from 'react-redux';
-import { setAdminHelpPageAndContent, setCurrentAdminHelpPageAndContent, setCurrentSelectedAdminHelpPage,
-        isAdminHelpPageNew, isAdminHelpPageUnsaved } from '../../actions/admin/helpPage';
+import { setAdminHelpPage, setCurrentAdminHelpPage, isAdminHelpPageNew, isAdminHelpPageUnsaved } from '../../actions/admin/helpPage';
 import { exampleText }  from '../../components/Admin/HelpEditor/ExampleText';
 import { Categories } from '../../components/Admin/HelpEditor/Categories/Categories';
 import { HelpEditor } from '../../components/Admin/HelpEditor/HelpEditor';
 import { HelpSearch } from '../../components/Help/Search/HelpSearch';
-import { AdminHelpPageAndContent, AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../models/admin/Help';
+import { AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../models/admin/Help';
 import { AdminHelpPageLoadState, AdminHelpPageState } from '../../models/state/AdminState';
 import { AppState } from '../../models/state/AppState';
+import { generate as generateId } from 'shortid';
 import './AdminHelp.css';
 
 interface OwnProps { }
@@ -47,24 +47,24 @@ export class AdminHelp extends React.PureComponent<Props, State> {
             category: '',
             title: ''
         }
-    }
+    };
 
     public render() {
         const c = this.className;
         const { dispatch, adminHelp } = this.props;
         const { show, category, title } = this.state;
+        const categories = [ ...adminHelp.categories.values() ];
         
-        if (adminHelp.content.contentState === AdminHelpPageLoadState.LOADED) {
+        if (adminHelp.page.contentState === AdminHelpPageLoadState.LOADED) {
             return (
                 <HelpEditor
                     dispatch={dispatch}
-                    content={adminHelp.content.page}
-                    currentContent={adminHelp.currentContent}
-                    currentPage={adminHelp.currentSelectedPage}
+                    page={adminHelp.page}
+                    currentPage={adminHelp.currentPage}
                     isNew={adminHelp.isNew}
                     unsaved={adminHelp.unsaved}
 
-                    categories={[ ...adminHelp.categories.values() ]}
+                    categories={categories}
                 />
             );
         };
@@ -126,10 +126,10 @@ export class AdminHelp extends React.PureComponent<Props, State> {
     private handleCreateNewPage = () => {
         const { dispatch } = this.props;
         const { category, title, show } = this.state;
+        const uniqueId = generateId();
 
         const contentRow = Object.assign({}, {
-            id: '',
-            pageId: '',
+            id: uniqueId,
             orderId: 0,
             type: 'text',
             textContent: exampleText,
@@ -139,18 +139,20 @@ export class AdminHelp extends React.PureComponent<Props, State> {
         }) as AdminHelpPageContent;
 
         const newContent = Object.assign({}, {
+            id: '',
             title: title ? title : ' Example Title',
             category: { id: '', name: category ? category : 'Example Category' } as AdminHelpPageCategory,
-            content: [ contentRow ]
-        }) as AdminHelpPageAndContent;
+            content: [ contentRow ],
+            contentState: AdminHelpPageLoadState.LOADED
+        }) as AdminHelpPage;
 
-        dispatch(setCurrentAdminHelpPageAndContent(newContent));
-        dispatch(setAdminHelpPageAndContent(newContent, AdminHelpPageLoadState.LOADED));
-        dispatch(setCurrentSelectedAdminHelpPage({} as AdminHelpPage));
+        dispatch(setCurrentAdminHelpPage(newContent));
+        dispatch(setAdminHelpPage(newContent));
         dispatch(isAdminHelpPageNew(true));
         dispatch(isAdminHelpPageUnsaved(true));
         
-        //  Clear the values so that when user clicks the "go back arrow" from content after clicking "+ Create", category/title are reset.
+        // Clear the values so that when user clicks the "go back arrow"
+        // from content after clicking "+ Create", category/title are reset.
         this.setState({ show: !show, category: '', title: '' });
     };
 };

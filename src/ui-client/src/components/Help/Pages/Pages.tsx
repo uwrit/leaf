@@ -8,8 +8,8 @@
 import React from 'react';
 import { Button, Col } from 'reactstrap';
 import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
-import { HelpPageCategory } from '../../../models/Help/Help';
-import { HelpPage } from '../../../models/Help/Help';
+import { HelpPageCategory } from '../../../models/help/Help';
+import { HelpPage } from '../../../models/help/Help';
 import './Pages.css';
 
 

@@ -85,7 +85,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
 
-    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    SELECT Id, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @pageId;
 END
@@ -149,7 +149,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
 
-    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    SELECT Id, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @pageId
 END
@@ -167,7 +167,7 @@ BEGIN
     IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
         THROW 70404, N'Could not find page and/or does not exist.', 1;
     
-    SELECT Title
+    SELECT Id, Title
     FROM app.HelpPage
     WHERE Id = @pageId
     
@@ -175,7 +175,7 @@ BEGIN
     FROM app.HelpPageCategory
     WHERE Id = (SELECT CategoryId FROM app.HelpPage WHERE Id = @pageId)
 
-    SELECT Id, PageId, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
+    SELECT Id, OrderId, Type, TextContent, ImageId, ImageContent, ImageSize
     FROM app.HelpPageContent
     WHERE PageId = @pageId
 END
@@ -256,13 +256,12 @@ BEGIN
     DECLARE @orderId INT
     SET @orderId = (SELECT TOP(1) OrderId FROM @content)
 
+    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category))
+        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @category
+
     DECLARE @categoryId UNIQUEIDENTIFIER
     SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
 
-    IF NOT EXISTS(SELECT 1 FROM app.HelpPage WHERE Id = @pageId)
-        THROW 70404, N'Could not find page and/or does not exist.', 1;
-    IF NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category)
-        THROW 70404, N'Could not find category and/or does not exist.', 1;
     IF (app.fn_NullOrWhitespace(@title) = 1)
         THROW 70400, N'Title is required.', 1;
     IF (app.fn_NullOrWhitespace(@category) = 1)

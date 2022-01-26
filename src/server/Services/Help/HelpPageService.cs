@@ -85,7 +85,6 @@ namespace Services.Help
                 return content.Select(c => new HelpPageContent
                 {
                     Id = c.Id,
-                    PageId = c.PageId,
                     OrderId = c.OrderId,
                     Type = c.Type,
                     TextContent = c.TextContent,

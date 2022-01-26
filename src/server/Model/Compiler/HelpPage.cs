@@ -24,7 +24,6 @@ namespace Model.Compiler
     public class HelpPageContent
     {
         public Guid Id { get; set; }
-        public Guid PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }

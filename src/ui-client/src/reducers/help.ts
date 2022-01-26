@@ -13,7 +13,7 @@ import {
     HelpPageAction,
     HelpPageContentAction,
 } from '../actions/helpPage';
-import { categoryId, HelpCategoryMap, HelpPage, HelpPageCategory, HelpPageCategoryDTO, HelpPageDTO } from '../models/Help/Help';
+import { categoryId, HelpCategoryMap, HelpPage, HelpPageCategory, HelpPageCategoryDTO, HelpPageDTO } from '../models/help/Help';
 import { HelpPageLoadState, HelpPageState } from '../models/state/HelpState';
 
 export const defaultHelpPagesState = (): HelpPageState => {

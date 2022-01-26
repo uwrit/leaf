@@ -8,7 +8,7 @@
 import { AppState } from '../models/state/AppState';
 import { showInfoModal, setNoClickModalState } from "./generalUi";
 import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
-import { HelpPage, HelpPageDTO, HelpPageCategoryDTO, HelpPageContentDTO } from '../models/Help/Help';
+import { HelpPage, HelpPageDTO, HelpPageCategoryDTO, HelpPageContentDTO } from '../models/help/Help';
 import { HelpPageLoadState } from '../models/state/HelpState';
 import { fetchHelpPages, fetchHelpPageCategories, fetchHelpPageContent } from '../services/helpPagesApi';
 

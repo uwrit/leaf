@@ -41,18 +41,18 @@ namespace Services.Admin.Compiler
             user = userContext;
         }
 
-        public async Task<IEnumerable<AdminHelpPage>> GetHelpPagesAsync()
+        public async Task<IEnumerable<PartialAdminHelpPage>> GetHelpPagesAsync()
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 await cn.OpenAsync();
-                var pages = await cn.QueryAsync<AdminHelpPage>(
+                var pages = await cn.QueryAsync<PartialAdminHelpPage>(
                     Sql.GetHelpPages,
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
 
-                return pages.Select(p => new AdminHelpPage
+                return pages.Select(p => new PartialAdminHelpPage
                 {
                     Id = p.Id,
                     CategoryId = p.CategoryId,
@@ -95,7 +95,6 @@ namespace Services.Admin.Compiler
                 return content.Select(c => new AdminHelpPageContent
                 {
                     Id = c.Id,
-                    PageId = c.PageId,
                     OrderId = c.OrderId,
                     Type = c.Type,
                     TextContent = c.TextContent,
@@ -106,13 +105,13 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageAndContent> CreateAsync(AdminHelpPageAndContent pc)
+        public async Task<AdminHelpPage> CreateAsync(AdminHelpPage p)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Create,
-                    new { content = HelpPageTable.From(pc) },
+                    new { content = HelpPageTable.From(p) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -121,13 +120,13 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageAndContent> UpdateAsync(AdminHelpPageAndContent pc)
+        public async Task<AdminHelpPage> UpdateAsync(AdminHelpPage p)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
                 var grid = await cn.QueryMultipleAsync(
                     Sql.Update,
-                    new { content = HelpPageTable.From(pc) },
+                    new { content = HelpPageTable.From(p) },
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout
                 );
@@ -136,7 +135,7 @@ namespace Services.Admin.Compiler
             }
         }
 
-        public async Task<AdminHelpPageAndContent> DeleteAsync(Guid pageId)
+        public async Task<AdminHelpPage> DeleteAsync(Guid pageId)
         {
             using (var cn = new SqlConnection(opts.ConnectionString))
             {
@@ -156,7 +155,7 @@ namespace Services.Admin.Compiler
 
     static class AdminHelpReader
     {
-        public static AdminHelpPageAndContent Read(SqlMapper.GridReader grid)
+        public static AdminHelpPage Read(SqlMapper.GridReader grid)
         {
             // TODO: check if i can do ReadSingle for title
             var page = grid.ReadFirstOrDefault<HelpPageRecord>();
@@ -172,12 +171,14 @@ namespace Services.Admin.Compiler
 
     class HelpPageRecord
     {
+        public Guid? Id { get; set; }
         public string Title { get; set; }
 
-        public AdminHelpPageAndContent Content(AdminHelpPageCategory category = null, IEnumerable<AdminHelpPageContent> content = null)
+        public AdminHelpPage Content(AdminHelpPageCategory category = null, IEnumerable<AdminHelpPageContent> content = null)
         {
-            return new AdminHelpPageAndContent
+            return new AdminHelpPage
             {
+                Id = Id,
                 Title = Title,
                 Category = category,
                 Content = content ?? new List<AdminHelpPageContent>()

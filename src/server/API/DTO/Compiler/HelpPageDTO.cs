@@ -42,7 +42,6 @@ namespace API.DTO.Compiler
     public class HelpPageContentDTO
     {
         public Guid Id { get; set; }
-        public Guid PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }
@@ -55,7 +54,6 @@ namespace API.DTO.Compiler
         public HelpPageContentDTO(HelpPageContent con)
         {
             Id = con.Id;
-            PageId = con.PageId;
             OrderId = con.OrderId;
             Type = con.Type;
             TextContent = con.TextContent;

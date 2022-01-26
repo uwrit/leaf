@@ -5,7 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export interface AdminHelpPageDTO {
+import { AdminHelpPageLoadState } from '../state/AdminState';
+
+export interface PartialAdminHelpPageDTO {
     id: string;
     categoryId: string;
     title: string;
@@ -18,7 +20,6 @@ export interface AdminHelpPageCategoryDTO {
 
 export interface AdminHelpPageContentDTO {
     id: string;
-    pageId: string;
     orderId: number;
     type: string;
     textContent: string;
@@ -27,20 +28,21 @@ export interface AdminHelpPageContentDTO {
     imageSize: number;
 }
 
-export type categoryId = string;
-export type AdminHelpCategoryMap = Map<categoryId, AdminHelpPageCategoryExt>;
-
-export interface AdminHelpPage extends AdminHelpPageDTO { }
-export interface AdminHelpPageCategory extends AdminHelpPageCategoryDTO {}
-export interface AdminHelpPageCategoryExt extends AdminHelpPageCategory {
-    categoryPages: AdminHelpPage[];
-}
-export interface AdminHelpPageContent extends AdminHelpPageContentDTO { }
-
-export interface AdminHelpPageAndContentDTO {
+export interface AdminHelpPageDTO {
+    id: string;
     title: string;
     category: AdminHelpPageCategory;
     content: AdminHelpPageContent[];
 }
 
-export interface AdminHelpPageAndContent extends AdminHelpPageAndContentDTO {}
+export interface AdminHelpPage extends AdminHelpPageDTO {
+    contentState: AdminHelpPageLoadState;
+}
+export type categoryId = string;
+export type AdminHelpCategoryMap = Map<categoryId, AdminHelpCategoryPageCache>;
+export interface PartialAdminHelpPage extends PartialAdminHelpPageDTO { }
+export interface AdminHelpPageCategory extends AdminHelpPageCategoryDTO {}
+export interface AdminHelpCategoryPageCache extends AdminHelpPageCategory {
+    pages: PartialAdminHelpPage[];
+}
+export interface AdminHelpPageContent extends AdminHelpPageContentDTO { }

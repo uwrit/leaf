@@ -9,7 +9,7 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { resetHelpPageContent } from '../../../actions/helpPage';
-import { HelpPage, HelpPageContent } from '../../../models/Help/Help';
+import { HelpPage, HelpPageContent } from '../../../models/help/Help';
 import './Content.css';
 
 interface Props {

@@ -8,14 +8,15 @@ using System.Collections.Generic;
 
 namespace Model.Admin.Compiler
 {
-    public class AdminHelpPageAndContent
+    public class AdminHelpPage
     {
+        public Guid? Id { get; set; }
         public string Title { get; set; }
         public AdminHelpPageCategory Category { get; set; }
         public IEnumerable<AdminHelpPageContent> Content { get; set; }
     }
 
-    public class AdminHelpPage
+    public class PartialAdminHelpPage
     {
         public Guid? Id { get; set; }
         public Guid? CategoryId { get; set; }
@@ -31,7 +32,6 @@ namespace Model.Admin.Compiler
     public class AdminHelpPageContent
     {
         public Guid? Id { get; set; }
-        public Guid? PageId { get; set; }
         public int OrderId { get; set; }
         public string Type { get; set; }
         public string TextContent { get; set; }

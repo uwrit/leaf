@@ -13,7 +13,7 @@ import './TextEditor.css';
 
 interface Props {
     text: string;
-    textHandler: (val: string, propName: string) => void;
+    textHandler: (val: string) => void;
 }
 
 interface State {
@@ -94,8 +94,7 @@ export class TextEditor extends React.Component<Props, State> {
 
     private handleChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
         const { textHandler } = this.props;
-        const propName = 'title';
         const newVal = e.currentTarget.value;
-        textHandler(newVal, propName);
+        textHandler(newVal);
     };
 }

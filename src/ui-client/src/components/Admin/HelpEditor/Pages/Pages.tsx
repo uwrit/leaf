@@ -8,14 +8,14 @@
 import React from 'react';
 import { Button, Col } from 'reactstrap';
 import { getAdminHelpPageContent } from '../../../../actions/admin/helpPage';
-import { AdminHelpPage, AdminHelpPageCategoryExt } from '../../../../models/admin/Help';
+import { AdminHelpCategoryPageCache, PartialAdminHelpPage } from '../../../../models/admin/Help';
 import './Pages.css';
 
 import { Dropdown, DropdownToggle, DropdownItem, DropdownMenu } from 'reactstrap';
 
 interface Props {
-    category: AdminHelpPageCategoryExt;
-    tempHelpPage: AdminHelpPage;
+    category: AdminHelpCategoryPageCache;
+    tempHelpPage: PartialAdminHelpPage;
     dispatch: any;
 
     // cats: AdminHelpPageCategoryExt[];
@@ -34,7 +34,7 @@ export class Pages extends React.Component<Props, State> {
         const { category, tempHelpPage } = this.props;
         const { show } = this.state;
 
-        const pages = category.categoryPages;
+        const pages = category.pages;
         const numberOfPages = pages.length;
         const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
@@ -87,7 +87,7 @@ export class Pages extends React.Component<Props, State> {
 
     private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };
 
-    private handleHelpPageTitleClick = (page: AdminHelpPage) => {
+    private handleHelpPageTitleClick = (page: PartialAdminHelpPage) => {
         const { dispatch, category } = this.props;
         dispatch(getAdminHelpPageContent(page, category));
     };

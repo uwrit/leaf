@@ -5,20 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-import AdminState, { AdminHelpPageLoadState } from '../../models/state/AdminState';
-import { categoryId, AdminHelpCategoryMap, AdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageCategoryExt} from '../../models/admin/Help';
-import { AdminHelpPageAction, AdminHelpPageContentAction } from '../../actions/admin/helpPage';
+import { AdminHelpPageAction } from '../../actions/admin/helpPage';
+import { AdminHelpCategoryMap, AdminHelpCategoryPageCache, AdminHelpPageCategory, categoryId, PartialAdminHelpPage } from '../../models/admin/Help';
+import AdminState from '../../models/state/AdminState';
 
-const mapCategories = (categories: AdminHelpPageCategoryDTO[], pages: AdminHelpPageDTO[]): AdminHelpCategoryMap => {
-    const mappedCategories = new Map<categoryId, AdminHelpPageCategoryExt>();
+const mapCategories = (categories: AdminHelpPageCategory[], partialPages: PartialAdminHelpPage[]): AdminHelpCategoryMap => {
+    const mappedCategories = new Map<categoryId, AdminHelpCategoryPageCache>();
 
     for (let c of categories) {
-        const categoryPages = pages.filter(p => p.categoryId === c.id);
-        
-        // TODO: pages should be AdminHelpPage, NOT AdminHelpPageDTO
-        const updatedCategory = Object.assign({ ...c, categoryPages }) as AdminHelpPageCategoryExt;
+        const categoryPages = partialPages.filter(p => p.categoryId === c.id);
+        const updatedCategory = Object.assign({ ...c, pages: categoryPages }) as AdminHelpCategoryPageCache;
     
-        // If pages for the category exist, then proceed; else, no need to for category without pages.
+        // If pages for the category exist, then proceed; else, no need to display categories without pages.
         if (categoryPages.length) {
             if (mappedCategories.has(c.id)) {
                 mappedCategories.set(c.id, updatedCategory);
@@ -33,7 +31,7 @@ const mapCategories = (categories: AdminHelpPageCategoryDTO[], pages: AdminHelpP
 
 export const setAdminHelpPagesAndCategories = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     const mappedCategories = mapCategories(action.categories!, action.pages!);
-
+    
     return Object.assign({}, state, {
         help: {
             ...state.help,
@@ -42,33 +40,20 @@ export const setAdminHelpPagesAndCategories = (state: AdminState, action: AdminH
     });
 };
 
-export const setAdminHelpPageAndContent = (state: AdminState, action: AdminHelpPageContentAction): AdminState => {
+export const setAdminHelpPage = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     return Object.assign({}, state, {
         help: {
             ...state.help,
-            content: {
-                ...state.help.content,
-                page: (action.contentState === AdminHelpPageLoadState.LOADED) ? action.page : undefined,
-                contentState: action.contentState
-            }
+            page: action.page
         }
     });
 };
 
-export const setCurrentAdminHelpPageAndContent = (state: AdminState, action: AdminHelpPageAction): AdminState => {
+export const setCurrentAdminHelpPage = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     return Object.assign({}, state, {
         help: {
             ...state.help,
-            currentContent: action.currentContent
-        }
-    });
-};
-
-export const setCurrentSelectedAdminHelpPage = (state: AdminState, action: AdminHelpPageAction): AdminState => {
-    return Object.assign({}, state, {
-        help: {
-            ...state.help,
-            currentSelectedPage: action.currentSelectedPage
+            currentPage: action.currentPage
         }
     });
 };
