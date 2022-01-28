@@ -8,13 +8,12 @@
 import React from 'react';
 import { Button, Col } from 'reactstrap';
 import { fetchSingleHelpPageContent } from '../../../actions/helpPage';
-import { HelpPageCategory } from '../../../models/help/Help';
-import { HelpPage } from '../../../models/help/Help';
+import { HelpCategoryPageCache } from '../../../models/help/Help';
+import { PartialHelpPage } from '../../../models/help/Help';
 import './Pages.css';
 
-
 interface Props {
-    category: HelpPageCategory;
+    category: HelpCategoryPageCache;
     dispatch: any;
 }
 
@@ -31,7 +30,7 @@ export class Pages extends React.Component<Props, State> {
         const { category } = this.props;
         const { show } = this.state;
 
-        const pages = category.categoryPages;
+        const pages = category.pages;
         const numberOfPages = pages.length;
         const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
@@ -47,13 +46,13 @@ export class Pages extends React.Component<Props, State> {
 
                 {slicedPages.map(p =>
                     <div key={p.id} className={`${c}-page`}>
-                        <Button color="link" onClick={() => this.handleHelpPageTitleClick(p)}>
+                        <Button color="link" onClick={this.handleHelpPageTitleClick.bind(null, p)}>
                             {p.title}
                         </Button>
                     </div>
                 )}
 
-                <div className={`${c}-all`}>
+                <div className={`${c}-show-all`}>
                     <Button color="link" onClick={this.handleSeeAllPagesClick}>
                         {numberOfPagesGreaterThanFive &&
                             (show
@@ -67,9 +66,9 @@ export class Pages extends React.Component<Props, State> {
         );
     };
 
-    private handleHelpPageTitleClick = (page: HelpPage) => {
-        const { dispatch } = this.props;
-        dispatch(fetchSingleHelpPageContent(page))
+    private handleHelpPageTitleClick = (page: PartialHelpPage) => {
+        const { dispatch, category } = this.props;
+        dispatch(fetchSingleHelpPageContent(page, category));
     };
 
     private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };

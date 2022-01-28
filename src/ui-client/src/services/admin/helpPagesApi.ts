@@ -6,8 +6,8 @@
  */ 
 
 import { AppState } from '../../models/state/AppState';
-import { PartialAdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContent,
-        AdminHelpPageContentDTO, AdminHelpPage, AdminHelpPageDTO } from '../../models/admin/Help';
+import { PartialAdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContentDTO,
+        AdminHelpPage, AdminHelpPageDTO } from '../../models/admin/Help';
 import { HttpFactory } from '../HttpFactory';
 
 /*

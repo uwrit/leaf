@@ -58,13 +58,12 @@ export class AdminHelp extends React.PureComponent<Props, State> {
         if (adminHelp.page.contentState === AdminHelpPageLoadState.LOADED) {
             return (
                 <HelpEditor
-                    dispatch={dispatch}
-                    page={adminHelp.page}
+                    categories={categories}
                     currentPage={adminHelp.currentPage}
                     isNew={adminHelp.isNew}
+                    page={adminHelp.page}
                     unsaved={adminHelp.unsaved}
-
-                    categories={categories}
+                    dispatch={dispatch}
                 />
             );
         };
@@ -97,7 +96,7 @@ export class AdminHelp extends React.PureComponent<Props, State> {
                     
                     {(adminHelp.helpState === AdminHelpPageLoadState.LOADED) &&
                         <Categories
-                            categories={adminHelp.categories}
+                            categories={categories}
                             newCategory={category}
                             newTitle={title}
                             dispatch={dispatch}

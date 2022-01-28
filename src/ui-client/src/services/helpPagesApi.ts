@@ -6,7 +6,7 @@
  */ 
 
 import { AppState } from '../models/state/AppState';
-import { HelpPageContentDTO, HelpPageDTO, HelpPageCategoryDTO } from '../models/help/Help';
+import { HelpPageCategoryDTO, HelpPageContentDTO, PartialHelpPageDTO } from '../models/help/Help';
 import { HttpFactory } from './HttpFactory';
 
 /*
@@ -22,15 +22,15 @@ const makeRequest = async (state: AppState, requestString: string) => {
 /*
  * Fetch help pages.
  */
-export const fetchHelpPages = async (state: AppState) => {
+export const fetchPartialHelpPages = async (state: AppState): Promise<PartialHelpPageDTO[]> => {
     const pages = await makeRequest(state, 'api/helppages');
-    return pages.data as HelpPageDTO[];
+    return pages.data as PartialHelpPageDTO[];
 };
 
 /*
  * Fetch help page categories.
  */
-export const fetchHelpPageCategories = async (state: AppState) => {
+export const fetchHelpPageCategories = async (state: AppState): Promise<HelpPageCategoryDTO[]> => {
     const cats = await makeRequest(state, 'api/helppages/categories');
     return cats.data as HelpPageCategoryDTO[];
 };
@@ -38,7 +38,7 @@ export const fetchHelpPageCategories = async (state: AppState) => {
 /*
  * Fetch help page content.
  */
-export const fetchHelpPageContent = async (state: AppState, pageId: string) => {
+export const fetchHelpPageContent = async (state: AppState, pageId: string): Promise<HelpPageContentDTO[]> => {
     const content = await makeRequest(state, `api/helppages/${pageId}/content`);
     return content.data as HelpPageContentDTO[];
 };

@@ -171,7 +171,7 @@ namespace Services.Admin.Compiler
 
     class HelpPageRecord
     {
-        public Guid? Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
 
         public AdminHelpPage Content(AdminHelpPageCategory category = null, IEnumerable<AdminHelpPageContent> content = null)

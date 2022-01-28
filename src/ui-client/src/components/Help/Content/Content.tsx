@@ -13,9 +13,8 @@ import { HelpPage, HelpPageContent } from '../../../models/help/Help';
 import './Content.css';
 
 interface Props {
-    contentRows: HelpPageContent[];
-    currentPage: HelpPage;
     dispatch: any;
+    page: HelpPage;
 }
 
 export class Content extends React.Component<Props> {
@@ -23,7 +22,7 @@ export class Content extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { contentRows, currentPage } = this.props;
+        const { page } = this.props;
 
         return (
             <div className={`${c}-container`}>
@@ -34,10 +33,10 @@ export class Content extends React.Component<Props> {
 
                 <div className={`${c}-display`}>
                     <div className={`${c}-title`}>
-                        {currentPage.title}
+                        {page.title}
                     </div>
 
-                    {contentRows.map(cr => this.getContent(cr))}
+                    {page.content.map(cr => this.getContent(cr))}
                 </div>
             </div>
         );
@@ -50,15 +49,18 @@ export class Content extends React.Component<Props> {
 
     private getContent = (row: HelpPageContent) => {
         const c = this.className;
+        const imageRow = "image";
+        const textRow = "text";
+        const contentType = row.type.toLowerCase();
 
-        if (row.textContent) {
+        if (contentType === textRow) {
             return (
                 <div className={`${c}-text`} key={row.id}>
                     {/* linkTarget allows for links to open in new tab. */}
                     <ReactMarkdown children={row.textContent} linkTarget={"_blank"} />
                 </div>
             );
-        } else if (row.imageContent) {
+        } else if (contentType === imageRow) {
             return (
                 <div className={`${c}-image`} key={row.id}>
                     <img

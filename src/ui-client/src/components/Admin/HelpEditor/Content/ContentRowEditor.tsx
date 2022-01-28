@@ -19,11 +19,10 @@ interface Props {
     contentRow: AdminHelpPageContent;
     index: number;
     isLastRow: boolean;
-    pageId: string;
     contentHandler: (val: string, index: number) => void;
-    newSectionHandler: (index: number, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
-    imageSizeHandler: (val: number, index: number) => void;
     deleteRowHandler: (index: number) => void;
+    imageSizeHandler: (val: number, index: number) => void;
+    newSectionHandler: (index: number, isTypeText: boolean, evt?: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 interface State {
@@ -59,9 +58,10 @@ export class ContentRowEditor extends React.Component<Props, State> {
     // TODO:
     //      1. update category feature needed.
     //          - edit category for multiple pages (dropdown)
+    //              - TODO
     //          - single page category update, add dropdown
-    //      2. css files (contentRowEditor, content), help reducer mappedCategories
-    //      3. check admin vs. non-admin workflow
+    //              - DONE; add css
+    //      2. check admin workflow
 
     public render() {
         const c = this.className;

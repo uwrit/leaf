@@ -6,34 +6,30 @@
  */
 
 import React from 'react';
-import { Button, Col, Row } from 'reactstrap';
+import { Button, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input, Row } from 'reactstrap';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { showConfirmationModal } from '../../../actions/generalUi';
 import { createAdminHelpPageContent, confirmLeavingAdminHelpContent,
         deleteHelpPageAndContent, resetAdminHelpContent, updateAdminHelpPageContent,
         isAdminHelpPageUnsaved, setCurrentAdminHelpPage } from '../../../actions/admin/helpPage';
-import { AdminHelpPage, AdminHelpPageContent } from '../../../models/admin/Help';
+import { AdminHelpCategoryPageCache, AdminHelpPage, AdminHelpPageCategory, AdminHelpPageContent } from '../../../models/admin/Help';
 import { ConfirmationModalState } from '../../../models/state/GeneralUiState';
 import { ContentRowEditor } from './Content/ContentRowEditor';
 import { TextEditor } from './Content/TextEditor';
 import { generate as generateId } from 'shortid';
 import './HelpEditor.css';
 
-import { Dropdown, DropdownToggle, DropdownItem, DropdownMenu, Input } from 'reactstrap';
-import { AdminHelpPageCategory, AdminHelpCategoryPageCache } from '../../../models/admin/Help';
-
 interface Props {
-    dispatch: any;
-    page: AdminHelpPage;
+    categories: AdminHelpCategoryPageCache[];
     currentPage: AdminHelpPage;
     isNew: boolean;
+    page: AdminHelpPage;
     unsaved: boolean;
-
-    categories: AdminHelpCategoryPageCache[];
+    dispatch: any;
 }
 
 interface State {
-    category: string;
+    inputCategory: string;
     show: boolean;
 }
 
@@ -43,7 +39,7 @@ export class HelpEditor extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);   
         this.state = {
-            category: '',
+            inputCategory: '',
             show: false
         }
     };
@@ -51,11 +47,12 @@ export class HelpEditor extends React.Component<Props, State> {
     public render() {
         const c = this.className;
         const { dispatch, categories, currentPage, unsaved } = this.props;
-        const { category, show } = this.state;
+        const { inputCategory, show } = this.state;
         const isLastRow = this.isLastContentRow();
-
-        const currentCategory = currentPage.category.name;
-
+        const currentCategory = currentPage.category;
+        // Filter out current page category so it doesn't appear as an option in category dropdown.
+        const newCatsList = categories.filter(c => c.id !== currentPage.category.id);
+        
         return (
             <div className={c}>
                 <Row className={`${c}-buttons`}>
@@ -82,28 +79,29 @@ export class HelpEditor extends React.Component<Props, State> {
                 </Row>
 
                 <div className={`${c}-content-text`}>
+                    {/* Display/Edit Title */}
                     <TextEditor
                         text={currentPage.title}
                         textHandler={this.handleTitleChange}
                     />
 
-                    {/*  */}
+                    {/* Display/Edit Category */}
                     <Dropdown isOpen={show} toggle={this.handleShow}>
                         <DropdownToggle caret>
-                            {currentCategory}
+                            {currentCategory.name}
                         </DropdownToggle>
                         <DropdownMenu>
                             <div>
-                                <Input value={category} placeholder='New Category' onChange={this.handleCategoryChange} />
+                                <Input value={inputCategory} placeholder='New Category' onChange={this.handleCategoryChange} />
                             </div>
                             
-                            {categories.map((c, i) =>
-                                <DropdownItem key={i} onClick={this.handleCategoryClick}>{c.name}</DropdownItem>
+                            {newCatsList.map((c, i) =>
+                                <DropdownItem key={i} onClick={this.handleCategoryClick.bind(null, c.id)}>{c.name}</DropdownItem>
                             )}
                         </DropdownMenu>
                     </Dropdown>
-                    {/*  */}
 
+                    {/* Display/Edit Content */}
                     {currentPage.content.map((cr,i) =>
                         <ContentRowEditor
                             key={cr.id}
@@ -111,11 +109,10 @@ export class HelpEditor extends React.Component<Props, State> {
                             contentRow={cr}
                             index={i}
                             isLastRow={isLastRow}
-                            pageId={currentPage.id}
                             contentHandler={this.handleContentChange}
-                            newSectionHandler={this.handleNewSection}
-                            imageSizeHandler={this.handleImageSizeChange}
                             deleteRowHandler={this.handleDeleteRow}
+                            imageSizeHandler={this.handleImageSizeChange}
+                            newSectionHandler={this.handleNewSection}
                         />
                     )}
                 </div>
@@ -125,14 +122,14 @@ export class HelpEditor extends React.Component<Props, State> {
 
     private handleShow = () => {
         const { show } = this.state;
-        this.setState({ show: !show, category: '' });
+        this.setState({ inputCategory: '', show: !show });
     };
 
     private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.currentTarget.value;
-        this.setState({ category: val });
-        
         const { dispatch, currentPage } = this.props;
+
+        const val = e.currentTarget.value;
+        this.setState({ inputCategory: val });
         
         const newCategory = { id: '', name: val } as AdminHelpPageCategory;
         const updatedPage = Object.assign({}, currentPage, { category: newCategory }) as AdminHelpPage;
@@ -141,18 +138,16 @@ export class HelpEditor extends React.Component<Props, State> {
         dispatch(isAdminHelpPageUnsaved(true));
     };
 
-    private handleCategoryClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    private handleCategoryClick = (clickedCatId: string, e: React.MouseEvent<HTMLButtonElement>) => {
         const { dispatch, currentPage } = this.props;
 
-        const category = e.currentTarget.textContent;
-        const newCategory = { id: '', name: category } as AdminHelpPageCategory;
+        const clickedCategory = e.currentTarget.textContent;
+        const newCategory = { id: clickedCatId, name: clickedCategory } as AdminHelpPageCategory;
         const updatedPage = Object.assign({}, currentPage, { category: newCategory }) as AdminHelpPage;
         
         dispatch(setCurrentAdminHelpPage(updatedPage));
         dispatch(isAdminHelpPageUnsaved(true));
     };
-
-    // // // // // // // // // // //
 
     private isLastContentRow = (): boolean => {
         const { currentPage } = this.props;
@@ -177,7 +172,7 @@ export class HelpEditor extends React.Component<Props, State> {
         const contentCopy = currentPage.content.slice();
 
         // TODO: dont feel comfortable with filter, is there a better way?
-        const textContentRows = contentCopy.filter(c => c.type === "text").length;
+        const textContentRows = contentCopy.filter(c => c.type.toLowerCase() === "text").length;
 
         // Find content row via index to edit
         const contentRow = contentCopy.find((_, i) => i === index);

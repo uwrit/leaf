@@ -18,8 +18,8 @@ namespace Model.Admin.Compiler
 
     public class PartialAdminHelpPage
     {
-        public Guid? Id { get; set; }
-        public Guid? CategoryId { get; set; }
+        public Guid Id { get; set; }
+        public Guid CategoryId { get; set; }
         public string Title { get; set; }
     }
 

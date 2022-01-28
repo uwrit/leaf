@@ -32,14 +32,14 @@ export class Help extends React.PureComponent<Props> {
     public render() {
         const c = this.className;
         const { dispatch, help } = this.props;
+        const categories = [ ...help.categories.values() ];
 
-        if (help.content.state === HelpPageLoadState.LOADED) {
+        if (help.page.contentState === HelpPageLoadState.LOADED) {
             return (
                 <div className={`${c}-content`}>
                     <Content
-                        contentRows={help.content.rows}
-                        currentPage={help.currentSelectedPage}
                         dispatch={dispatch}
+                        page={help.page}
                     />
                 </div>
             );
@@ -52,7 +52,7 @@ export class Help extends React.PureComponent<Props> {
                     
                     {(help.state === HelpPageLoadState.LOADED) &&
                         <Categories
-                            categories={help.categories}
+                            categories={categories}
                             dispatch={dispatch}
                         />
                     }

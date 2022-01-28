@@ -15,17 +15,10 @@ const mapCategories = (categories: AdminHelpPageCategory[], partialPages: Partia
     for (let c of categories) {
         const categoryPages = partialPages.filter(p => p.categoryId === c.id);
         const updatedCategory = Object.assign({ ...c, pages: categoryPages }) as AdminHelpCategoryPageCache;
-    
-        // If pages for the category exist, then proceed; else, no need to display categories without pages.
-        if (categoryPages.length) {
-            if (mappedCategories.has(c.id)) {
-                mappedCategories.set(c.id, updatedCategory);
-            } else {
-                mappedCategories.set(c.id, updatedCategory);
-            }
-        };
+        
+        mappedCategories.set(c.id, updatedCategory);
     };
-
+    
     return mappedCategories;
 };
 

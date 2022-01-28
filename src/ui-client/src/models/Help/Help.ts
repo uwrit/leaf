@@ -5,7 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-export interface HelpPageDTO {
+import { HelpPageLoadState } from '../state/HelpState';
+
+export interface PartialHelpPageDTO {
     id: string;
     categoryId: string;
     title: string;
@@ -18,7 +20,6 @@ export interface HelpPageCategoryDTO {
 
 export interface HelpPageContentDTO {
     id: string;
-    pageId: string;
     orderId: number;
     type: string;
     textContent: string;
@@ -27,11 +28,19 @@ export interface HelpPageContentDTO {
     imageSize: number;
 }
 
-export type categoryId = string;
-export type HelpCategoryMap = Map<categoryId, HelpPageCategory>;
+export interface HelpPage {
+    id: string;
+    title: string;
+    category: HelpPageCategory;
+    content: HelpPageContent[];
+    contentState: HelpPageLoadState;
+}
 
-export interface HelpPage extends HelpPageDTO { }
-export interface HelpPageCategory extends HelpPageCategoryDTO {
-    categoryPages: HelpPageDTO[];
+export type categoryId = string;
+export type HelpCategoryMap = Map<categoryId, HelpCategoryPageCache>;
+export interface PartialHelpPage extends PartialHelpPageDTO { }
+export interface HelpPageCategory extends HelpPageCategoryDTO {}
+export interface HelpCategoryPageCache extends HelpPageCategory {
+    pages: PartialHelpPage[];
 }
 export interface HelpPageContent extends HelpPageContentDTO { }

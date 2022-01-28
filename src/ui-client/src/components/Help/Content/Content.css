@@ -44,10 +44,8 @@
     max-width: 100%;
 }
 
-/* CSS for code inside markdown text */
+/* CSS for `code` inside markdown text */
 .content-text code {
-    /* background-color: beige; */
-    /* color: red; */
     white-space: pre-wrap;
 }
 

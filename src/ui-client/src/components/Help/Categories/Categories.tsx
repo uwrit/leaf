@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { Row } from 'reactstrap';
-import { HelpCategoryMap } from '../../../models/help/Help';
+import { HelpCategoryPageCache } from '../../../models/help/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
-    categories: HelpCategoryMap;
+    categories: HelpCategoryPageCache[];
     dispatch: any;
 }
 
@@ -22,11 +22,12 @@ export class Categories extends React.Component<Props> {
     public render() {
         const c = this.className;
         const { categories, dispatch } = this.props;
-        const cats = [ ...categories.values() ];
+        // Filter categories to get only categories that have pages.
+        const newCatsList = categories.filter(c => c.pages.length);
 
         return (
             <Row className={c}>
-                {cats.map(c =>
+                {newCatsList.map(c =>
                     <Pages
                         key={c.id}
                         category={c}

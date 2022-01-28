@@ -8,25 +8,18 @@
 import { AppState } from '../models/state/AppState';
 import { showInfoModal, setNoClickModalState } from "./generalUi";
 import { InformationModalState, NotificationStates } from "../models/state/GeneralUiState";
-import { HelpPage, HelpPageDTO, HelpPageCategoryDTO, HelpPageContentDTO } from '../models/help/Help';
+import { HelpCategoryPageCache, HelpPage, HelpPageCategory, PartialHelpPage } from '../models/help/Help';
 import { HelpPageLoadState } from '../models/state/HelpState';
-import { fetchHelpPages, fetchHelpPageCategories, fetchHelpPageContent } from '../services/helpPagesApi';
+import { fetchHelpPageCategories, fetchHelpPageContent, fetchPartialHelpPages } from '../services/helpPagesApi';
 
+export const SET_HELP_PAGE = 'SET_HELP_PAGE';
 export const SET_HELP_PAGES_AND_CATEGORIES = 'SET_HELP_PAGES_AND_CATEGORIES';
-export const SET_CURRENT_HELP_PAGE = 'SET_CURRENT_HELP_PAGE';
 export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
-export const SET_HELP_PAGE_CONTENT = 'SET_HELP_PAGE_CONTENT';
 
 export interface HelpPageAction {
-    categories?: HelpPageCategoryDTO[];
-    currentSelectedPage?: HelpPage;
-    pages?: HelpPageDTO[];
-    state?: HelpPageLoadState;
-    type: string;
-}
-
-export interface HelpPageContentAction {
-    rows?: HelpPageContentDTO[];
+    categories?: HelpPageCategory[];
+    page?: HelpPage;
+    pages?: PartialHelpPage[];
     state?: HelpPageLoadState;
     type: string;
 }
@@ -46,13 +39,9 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                  * Fetch help pages and categories.
                  */
                 const categories = await fetchHelpPageCategories(state);
-                const pages = await fetchHelpPages(state);
+                const pages = await fetchPartialHelpPages(state);
 
                 dispatch(setHelpPagesAndCategories(categories, pages));
-
-                /*
-                 * Finish.
-                 */
                 dispatch(setHelpPageLoadState(HelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -71,19 +60,23 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
 /*
  * Fetch a single help page and its content.
  */
-export const fetchSingleHelpPageContent = (page: HelpPage) => {
+export const fetchSingleHelpPageContent = (p: PartialHelpPage, category: HelpCategoryPageCache) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working }));
-
-            dispatch(setCurrentHelpPage(page));
             
             // Fetch help page content.
-            const content = await fetchHelpPageContent(state, page.id);
+            const contentRows = await fetchHelpPageContent(state, p.id);
+            const page = {
+                id: p.id,
+                title: p.title,
+                category: { id: category.id, name: category.name },
+                content: contentRows,
+                contentState: HelpPageLoadState.LOADED
+            } as HelpPage;
             
-            dispatch(setHelpPageContent(HelpPageLoadState.LOADED, content));
-            
+            dispatch(setHelpPage(page));
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         } catch (err) {
             const info: InformationModalState = {
@@ -103,10 +96,8 @@ export const fetchSingleHelpPageContent = (page: HelpPage) => {
 export const resetHelpPageContent = () => {
     return (dispatch: any) => {
         try {
-            // Set page content load state to NOT_LOADED.
-            dispatch(setHelpPageContent(HelpPageLoadState.NOT_LOADED));
-            // Set current help page to empty.
-            dispatch(setCurrentHelpPage({} as HelpPage));
+            // Set help page to empty.
+            dispatch(setHelpPage({} as HelpPage));
         } catch (err) {
             console.log(err);
         }
@@ -114,32 +105,24 @@ export const resetHelpPageContent = () => {
 };
 
 // Synchronous actions
-export const setHelpPagesAndCategories = (categories: HelpPageCategoryDTO[], pages: HelpPageDTO[]): HelpPageAction => {
+export const setHelpPagesAndCategories = (categories: HelpPageCategory[], pages: PartialHelpPage[]): HelpPageAction => {
     return {
-        categories,
-        pages,
+        categories: categories,
+        pages: pages,
         type: SET_HELP_PAGES_AND_CATEGORIES
     };
 };
 
-export const setCurrentHelpPage = (currentSelectedPage: HelpPage): HelpPageAction => {
+export const setHelpPage = (page: HelpPage): HelpPageAction => {
     return {
-        currentSelectedPage,
-        type: SET_CURRENT_HELP_PAGE
+        page: page,
+        type: SET_HELP_PAGE
     };
 };
 
 export const setHelpPageLoadState = (state: HelpPageLoadState): HelpPageAction => {
     return {
-        state,
+        state: state,
         type: SET_HELP_PAGE_LOAD_STATE
-    };
-};
-
-export const setHelpPageContent = (state: HelpPageLoadState, rows?: HelpPageContentDTO[]): HelpPageContentAction => {
-    return {
-        rows,
-        state,
-        type: SET_HELP_PAGE_CONTENT
     };
 };

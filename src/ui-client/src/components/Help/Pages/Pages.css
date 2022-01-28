@@ -18,6 +18,7 @@
     display: contents;
 }
 
-.pages-all {
+.pages-show-all {
     margin-bottom: 25px;
+    margin-left: -10px;
 }

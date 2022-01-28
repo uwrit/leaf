@@ -44,8 +44,8 @@ namespace API.DTO.Admin.Compiler
 
     public class PartialAdminHelpPageDTO
     {
-        public Guid? Id { get; set; }
-        public Guid? CategoryId { get; set; }
+        public Guid Id { get; set; }
+        public Guid CategoryId { get; set; }
         public string Title { get; set; }
 
         public PartialAdminHelpPageDTO() { }
