@@ -15,15 +15,18 @@ namespace Model.Cohort
     public abstract class PatientCohortService : CohortCounter.IPatientCohortService
     {
         protected readonly ISqlCompiler compiler;
+        protected readonly ISqlProviderQueryExecutor executor;
         protected readonly ClinDbOptions clinDbOptions;
         protected readonly ILogger<PatientCohortService> log;
 
         protected PatientCohortService(
             ISqlCompiler compiler,
+            ISqlProviderQueryExecutor executor,
             IOptions<ClinDbOptions> clinOpts,
             ILogger<PatientCohortService> logger)
         {
             this.compiler = compiler;
+            this.executor = executor;
             clinDbOptions = clinOpts.Value;
             log = logger;
         }

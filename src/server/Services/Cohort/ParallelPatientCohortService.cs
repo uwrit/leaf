@@ -6,9 +6,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -26,9 +24,10 @@ namespace Services.Cohort
 
         public ParallelPatientCohortService(
             ISqlCompiler compiler,
+            ISqlProviderQueryExecutor executor,
             PatientCountAggregator patientCountAggregator,
             IOptions<ClinDbOptions> clinOpts,
-            ILogger<PatientCohortService> logger) : base(compiler, clinOpts, logger)
+            ILogger<PatientCohortService> logger) : base(compiler, executor, clinOpts, logger)
         {
             this.patientCountAggregator = patientCountAggregator;
             this.clinDbOpts = clinOpts.Value;
@@ -74,24 +73,12 @@ namespace Services.Cohort
 
         async Task<PartialPatientCountContext> GetPartialContext(LeafQuery query, CancellationToken token)
         {
-            var partialIds = new HashSet<string>();
-            using (var cn = new SqlConnection(clinDbOptions.ConnectionString))
-            {
-                await cn.OpenAsync();
+            var partialIds = await executor.ExecuteCohortQueryAsync(
+                clinDbOptions.ConnectionString,
+                query.SqlStatement,
+                clinDbOptions.DefaultTimeout,
+                token);
 
-                using (var cmd = new SqlCommand(query.SqlStatement, cn))
-                {
-                    cmd.CommandTimeout = clinDbOptions.DefaultTimeout;
-
-                    using (var reader = await cmd.ExecuteReaderAsync(token))
-                    {
-                        while (reader.Read())
-                        {
-                            partialIds.Add(reader[0].ToString());
-                        }
-                    }
-                }
-            }
             return new PartialPatientCountContext
             {
                 PatientIds = partialIds,

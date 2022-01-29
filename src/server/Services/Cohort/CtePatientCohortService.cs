@@ -20,8 +20,9 @@ namespace Services.Cohort
     {
         public CtePatientCohortService(
             ISqlCompiler compiler,
+            ISqlProviderQueryExecutor executor,
             IOptions<ClinDbOptions> clinOpts,
-            ILogger<PatientCohortService> logger) : base(compiler, clinOpts, logger)
+            ILogger<PatientCohortService> logger) : base(compiler, executor, clinOpts, logger)
         {
         }
 
@@ -40,24 +41,12 @@ namespace Services.Cohort
 
         async Task<HashSet<string>> GetPatientSetAsync(ISqlStatement query, CancellationToken token)
         {
-            var patientIds = new HashSet<string>();
-            using (var cn = new SqlConnection(clinDbOptions.ConnectionString))
-            {
-                await cn.OpenAsync();
+            var patientIds = await executor.ExecuteCohortQueryAsync(
+                clinDbOptions.ConnectionString,
+                query.SqlStatement,
+                clinDbOptions.DefaultTimeout,
+                token);
 
-                using (var cmd = new SqlCommand(query.SqlStatement, cn))
-                {
-                    cmd.CommandTimeout = clinDbOptions.DefaultTimeout;
-
-                    using (var reader = await cmd.ExecuteReaderAsync(token))
-                    {
-                        while (reader.Read())
-                        {
-                            patientIds.Add(reader[0].ToString());
-                        }
-                    }
-                }
-            }
             return patientIds;
         }
 
