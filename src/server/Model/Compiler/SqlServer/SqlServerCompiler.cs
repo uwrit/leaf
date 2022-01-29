@@ -18,15 +18,18 @@ namespace Model.Compiler.SqlServer
     public class SqlServerCompiler : ISqlCompiler
     {
         readonly IUserContext user;
+        readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
         readonly CohortOptions cohortOptions;
 
         public SqlServerCompiler(
             IUserContext userContext,
+            ISqlDialect dialect,
             IOptions<CompilerOptions> compilerOptions,
             IOptions<CohortOptions> cohortOptions)
         {
             this.user = userContext;
+            this.dialect = dialect;
             this.compilerOptions = compilerOptions.Value;
             this.cohortOptions = cohortOptions.Value;
         }
@@ -43,10 +46,10 @@ namespace Model.Compiler.SqlServer
             switch (panel.PanelType)
             {
                 case PanelType.Patient:
-                    sql = new SubPanelSqlSet(panel, compilerOptions).ToString();
+                    sql = new SubPanelSqlSet(panel, compilerOptions, dialect).ToString();
                     break;
                 case PanelType.Sequence:
-                    sql = new PanelSequentialSqlSet(panel, compilerOptions).ToString();
+                    sql = new PanelSequentialSqlSet(panel, compilerOptions, dialect).ToString();
                     break;
                 default:
                     return string.Empty;
@@ -57,14 +60,14 @@ namespace Model.Compiler.SqlServer
 
         public string BuildDatasetEncounterFilterSql(Panel panel)
         {
-            var sql = new DatasetJoinedSqlSet(panel, compilerOptions).ToString();
+            var sql = new DatasetJoinedSqlSet(panel, compilerOptions, dialect).ToString();
             ValidateSql(sql);
             return sql;
         }
 
         public ISqlStatement BuildCteSql(IEnumerable<Panel> panels)
         {
-            var parameters = BuildContextParameterSql();
+            var parameters = compilerOptions.AddVariables ? BuildContextParameterSql() : "";
             var contexts = panels.Select((p, i) =>
             {
                 return new CteCohortQueryContext
@@ -81,12 +84,12 @@ namespace Model.Compiler.SqlServer
 
             foreach (var context in inclusions.Skip(1))
             {
-                query.Append($" {SqlCommon.Syntax.INTERSECT} {context.CompiledQuery}");
+                query.Append($" INTERSECT {context.CompiledQuery}");
             }
 
             foreach (var context in exclusions)
             {
-                query.Append($" {SqlCommon.Syntax.EXCEPT} {context.CompiledQuery}");
+                query.Append($" {dialect.Except()} {context.CompiledQuery}");
             }
 
             return new CteCohortQuery(parameters, query.ToString());
@@ -94,10 +97,11 @@ namespace Model.Compiler.SqlServer
 
         public string BuildContextParameterSql()
         {
-            Func<bool,int> toInt = (bool x) => Convert.ToInt32(x);
-            var identified = $"{SqlCommon.Syntax.DECLARE} @IsIdentified {SqlCommon.Types.BIT} = {toInt(user.Identified)}";
-            var research   = $"{SqlCommon.Syntax.DECLARE} @IsResearch   {SqlCommon.Types.BIT} = {toInt(user.SessionType == SessionType.Research)}";
-            var qi         = $"{SqlCommon.Syntax.DECLARE} @IsQI         {SqlCommon.Types.BIT} = {toInt(user.SessionType == SessionType.QualityImprovement)}";
+            static int toInt(bool x) => Convert.ToInt32(x);
+            var identified = dialect.DeclareParam("IsIdentified", ColumnType.Boolean, toInt(user.Identified));
+            var research   = dialect.DeclareParam("IsResearch", ColumnType.Boolean, toInt(user.SessionType == SessionType.Research));
+            var qi         = dialect.DeclareParam("IsQI", ColumnType.Boolean, toInt(user.SessionType == SessionType.QualityImprovement));
+
             return $"{identified}; {research}; {qi};";
         }
 
@@ -105,7 +109,7 @@ namespace Model.Compiler.SqlServer
         {
             var internals = BuildPanelSql(panel);
             var alias = $"P{panel.Index}";
-            return $"{SqlCommon.Syntax.SELECT} {alias}.{compilerOptions.FieldPersonId} {SqlCommon.Syntax.FROM} ( {internals} ) {SqlCommon.Syntax.AS} {alias}";
+            return $"SELECT {alias}.{compilerOptions.FieldPersonId} FROM ( {internals} ) AS {alias}";
         }
 
         void ValidateSql(string input)

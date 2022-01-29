@@ -31,10 +31,10 @@ namespace Model.Compiler.Common
             Select = new ISelectable[]
             {
                 new ExpressedColumn(
-                    new Expression(dialect.Convert(ColumnType.STRING, last.PersonId)),
+                    new Expression(dialect.Convert(ColumnType.String, last.PersonId)),
                     DatasetColumns.PersonId),
                 new ExpressedColumn(
-                    new Expression(dialect.Convert(ColumnType.STRING, last.EncounterId)),
+                    new Expression(dialect.Convert(ColumnType.String, last.EncounterId)),
                     EncounterColumns.EncounterId),
                 new ExpressedColumn(last.Date, ConceptColumns.DateField),
                 join.Salt

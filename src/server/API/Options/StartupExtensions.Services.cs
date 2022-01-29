@@ -198,7 +198,7 @@ namespace API.Options
                     break;
             }
 
-            // SQL dialect & query executor
+            // Target clinical RDBMS
             switch (clinDbOpts.Rdbms)
             {
                 case ClinDbOptions.RdbmsType.SqlServer:

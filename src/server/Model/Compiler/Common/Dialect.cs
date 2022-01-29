@@ -15,15 +15,17 @@ namespace Model.Compiler.Common
         public string ToSqlType(ColumnType type);
         public string ToSqlTime(DateIncrementType incrType);
         public string Convert(ColumnType targetType, object value);
+        public string Except();
+        public string DeclareParam(string name, ColumnType type, object value);
     }
 
     public enum ColumnType
     {
-        STRING = 1,
-        INTEGER = 2,
-        DECIMAL = 3,
-        DATE = 4,
-        BOOLEAN = 5
+        String = 1,
+        Integer = 2,
+        Decimal = 3,
+        Date = 4,
+        Boolean = 5
     }
 
     public abstract class BaseSqlDialect
@@ -48,16 +50,18 @@ namespace Model.Compiler.Common
         public string Now() => "GETDATE()";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATEADD({ToSqlTime(incrType)}, {interval}, {date})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({ToSqlType(targetType)}, {value})";
+        public string Except() => "EXCEPT";
+        public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE @{name} {ToSqlType(type)} = {value}";
 
         public string ToSqlType(ColumnType type)
         {
             return type switch
             {
-                ColumnType.STRING  => "NVARCHAR(100)",
-                ColumnType.INTEGER => "INT",
-                ColumnType.DECIMAL => "DECIMAL(18,3)",
-                ColumnType.DATE    => "DATETIME",
-                ColumnType.BOOLEAN => "BIT",
+                ColumnType.String  => "NVARCHAR(100)",
+                ColumnType.Integer => "INT",
+                ColumnType.Decimal => "DECIMAL(18,3)",
+                ColumnType.Date    => "DATETIME",
+                ColumnType.Boolean => "BIT",
                 _ => "NVARCHAR(100)",
             };
         }
@@ -68,16 +72,18 @@ namespace Model.Compiler.Common
         public string Now() => "NOW()";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATETIME_ADD({date}, INTERVAL {interval} {ToSqlTime(incrType)})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({value}, {ToSqlType(targetType)})";
+        public string Except() => throw new NotImplementedException();
+        public string DeclareParam(string name, ColumnType type, object value) => $"SET @{name} := {value}";
 
         public string ToSqlType(ColumnType type)
         {
             return type switch
             {
-                ColumnType.STRING  => "VARCHAR(100)",
-                ColumnType.INTEGER => "MEDIUMINT",
-                ColumnType.DECIMAL => "FLOAT",
-                ColumnType.DATE    => "DATETIME",
-                ColumnType.BOOLEAN => "MEDIUMINT",
+                ColumnType.String  => "VARCHAR(100)",
+                ColumnType.Integer => "MEDIUMINT",
+                ColumnType.Decimal => "FLOAT",
+                ColumnType.Date    => "DATETIME",
+                ColumnType.Boolean => "MEDIUMINT",
                 _ => "VARCHAR(100)",
             };
         }
@@ -93,16 +99,18 @@ namespace Model.Compiler.Common
         public string Now() => "SYSDATE";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Except() => "MINUS";
+        public string DeclareParam(string name, ColumnType type, object value) => $"{name} {ToSqlType(type)} := {value}";
 
         public string ToSqlType(ColumnType type)
         {
             return type switch
             {
-                ColumnType.STRING  => "NVARCHAR2(100)",
-                ColumnType.INTEGER => "INTEGER",
-                ColumnType.DECIMAL => "FLOAT",
-                ColumnType.DATE    => "DATE",
-                ColumnType.BOOLEAN => "BOOLEAN",
+                ColumnType.String  => "NVARCHAR2(100)",
+                ColumnType.Integer => "INTEGER",
+                ColumnType.Decimal => "FLOAT",
+                ColumnType.Date    => "DATE",
+                ColumnType.Boolean => "BOOLEAN",
                 _ => "NVARCHAR2(100)",
             };
         }
@@ -113,16 +121,18 @@ namespace Model.Compiler.Common
         public string Now() => "NOW()";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Except() => "EXCEPT";
+        public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE {name} {ToSqlType(type)} = {value}";
 
         public string ToSqlType(ColumnType type)
         {
             return type switch
             {
-                ColumnType.STRING  => "TEXT",
-                ColumnType.INTEGER => "INTEGER",
-                ColumnType.DECIMAL => "NUMERIC(18,3)",
-                ColumnType.DATE    => "TIMESTAMP",
-                ColumnType.BOOLEAN => "BIT",
+                ColumnType.String  => "TEXT",
+                ColumnType.Integer => "INTEGER",
+                ColumnType.Decimal => "NUMERIC(18,3)",
+                ColumnType.Date    => "TIMESTAMP",
+                ColumnType.Boolean => "BIT",
                 _ => "TEXT",
             };
         }
@@ -132,6 +142,8 @@ namespace Model.Compiler.Common
     {
         public string Now() => "CURRENT_DATETIME()";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Except() => throw new NotImplementedException();
+        public string DeclareParam(string name, ColumnType type, object value) => throw new NotImplementedException();
 
         public string DateAdd(DateIncrementType incrType, int interval, object date)
         {
@@ -146,11 +158,11 @@ namespace Model.Compiler.Common
         {
             return type switch
             {
-                ColumnType.STRING  => "STRING",
-                ColumnType.INTEGER => "INT64",
-                ColumnType.DECIMAL => "FLOAT64",
-                ColumnType.DATE    => "DATETIME",
-                ColumnType.BOOLEAN => "BOOL",
+                ColumnType.String  => "STRING",
+                ColumnType.Integer => "INT64",
+                ColumnType.Decimal => "FLOAT64",
+                ColumnType.Date    => "DATETIME",
+                ColumnType.Boolean => "BOOL",
                 _ => "STRING",
             };
         }

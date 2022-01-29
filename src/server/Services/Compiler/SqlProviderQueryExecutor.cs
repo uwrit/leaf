@@ -40,8 +40,10 @@ namespace Services.Compiler
         public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new SqlConnection(connStr);
-            var cmd = new SqlCommand(query, conn);
-            cmd.CommandTimeout = timeout;
+            var cmd = new SqlCommand(query, conn)
+            {
+                CommandTimeout = timeout
+            };
 
             return await ExecuteCohortQueryAsync(conn, cmd, token);
         }
@@ -55,8 +57,10 @@ namespace Services.Compiler
         public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new MySql.Data.MySqlClient.MySqlConnection(connStr);
-            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn);
-            cmd.CommandTimeout = timeout;
+            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn)
+            {
+                CommandTimeout = timeout
+            };
 
             return await ExecuteCohortQueryAsync(conn, cmd, token);
         }
@@ -78,8 +82,10 @@ namespace Services.Compiler
         public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new Npgsql.NpgsqlConnection(connStr);
-            var cmd = new Npgsql.NpgsqlCommand(query, conn);
-            cmd.CommandTimeout = timeout;
+            var cmd = new Npgsql.NpgsqlCommand(query, conn)
+            {
+                CommandTimeout = timeout
+            };
 
             return await ExecuteCohortQueryAsync(conn, cmd, token);
         }
@@ -93,8 +99,10 @@ namespace Services.Compiler
         public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new System.Data.OracleClient.OracleConnection(connStr);
-            var cmd = new System.Data.OracleClient.OracleCommand(query, conn);
-            cmd.CommandTimeout = timeout;
+            var cmd = new System.Data.OracleClient.OracleCommand(query, conn)
+            {
+                CommandTimeout = timeout
+            };
 
             return await ExecuteCohortQueryAsync(conn, cmd, token);
         }

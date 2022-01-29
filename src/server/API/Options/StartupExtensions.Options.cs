@@ -452,7 +452,22 @@ namespace API.Options
                 opts.SharedDbServer = clinDbOpts.Rdbms ==
                     ClinDbOptions.RdbmsType.SqlServer
                     && appDbTarget.Server.Equals(clinDbTarget.Server, StringComparison.InvariantCultureIgnoreCase);
+
+                // BigQuery doesn't support "@var" style variables
+                opts.AddVariables = clinDbOpts.Rdbms != ClinDbOptions.RdbmsType.BigQuery;
             });
+
+            // Check RDMBS and query strategy validity
+            if (clinDbOpts.Cohort.QueryStrategy == ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE)
+            {
+                if (clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.BigQuery
+                    || clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.MySql
+                    || clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.MariaDb)
+                {
+                    throw new LeafConfigurationException($"{clinDbOpts.Rdbms} cannot be used with the CTE query strategy. Change 'CTE' to 'PARALLEL'.");
+                }
+            }
+
             return services;
         }
 

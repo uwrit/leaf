@@ -40,10 +40,10 @@ namespace Model.Compiler.Common
             var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
 
             var personId = new ExpressedColumn(
-                new Expression(Dialect.Convert(ColumnType.STRING, PersonId)),
+                new Expression(Dialect.Convert(ColumnType.String, PersonId)),
                 DatasetColumns.PersonId);
             var encounterId = new ExpressedColumn(
-                new Expression(Dialect.Convert(ColumnType.STRING, EncounterId)),
+                new Expression(Dialect.Convert(ColumnType.String, EncounterId)),
                 EncounterColumns.EncounterId);
 
             cols.Add(personId);
