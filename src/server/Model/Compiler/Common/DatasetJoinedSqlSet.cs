@@ -15,10 +15,13 @@ namespace Model.Compiler.Common
         public Column Salt { get; protected set; }
         readonly string queryParamPlaceholder = "___queryid___";
 
-        public DatasetJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
+        public DatasetJoinedSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect) : base(panel, compilerOptions, dialect)
         {
             var sp = GetCachedCohortSubPanel(compilerOptions);
-            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions);
+            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions, dialect);
             var join  = new DatasetJoinedSequentialSqlSet(cache);
             var first = From.First() as JoinedSequentialSqlSet;
             var last  = From.Last() as JoinedSequentialSqlSet;
@@ -69,7 +72,7 @@ namespace Model.Compiler.Common
         public DatasetJoinedSequentialSqlSet(DatasetCachedPanelItemSqlSet set)
         {
             Set = set;
-            Alias = $"{Dialect.Alias.Sequence}C";
+            Alias = $"{SqlCommon.Alias.Sequence}C";
             PersonId = new Column(set.PersonId, this);
             Salt = new Column(set.Salt, this);
         }
@@ -82,7 +85,12 @@ namespace Model.Compiler.Common
         internal SubPanel SubPanel { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
 
-        public DatasetCachedPanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
+        public DatasetCachedPanelItemSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect) : base(panel, subpanel, panelitem, comp, dialect)
         {
             Panel = panel;
             SubPanel = subpanel;

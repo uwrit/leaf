@@ -17,8 +17,14 @@ namespace Model.Compiler.Common
         internal SubPanel SubPanel { get; set; }
         internal PanelItem PanelItem { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
+        internal ISqlDialect Dialect { get; set; }
 
-        public ConceptDatasetSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
+        public ConceptDatasetSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect) : base(panel, subpanel, panelitem, comp, dialect)
         {
             Panel = panel;
             SubPanel = subpanel;
@@ -30,12 +36,15 @@ namespace Model.Compiler.Common
         internal override void SetSelect()
         {
             // Ensure personId and encounterId are always strings
-            static Expression toNvarchar(Column x) => new Expression($"CONVERT(NVARCHAR(100), {x})");
-
             var cols = new List<ExpressedColumn>();
-            var personId = new ExpressedColumn(toNvarchar(PersonId), DatasetColumns.PersonId);
-            var encounterId = new ExpressedColumn(toNvarchar(EncounterId), EncounterColumns.EncounterId);
             var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
+
+            var personId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.STRING, PersonId)),
+                DatasetColumns.PersonId);
+            var encounterId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.STRING, EncounterId)),
+                EncounterColumns.EncounterId);
 
             cols.Add(personId);
             cols.Add(encounterId);

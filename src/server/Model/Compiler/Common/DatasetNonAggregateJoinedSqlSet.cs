@@ -14,24 +14,28 @@ namespace Model.Compiler.Common
         public Column Salt { get; protected set; }
         readonly string queryParamPlaceholder = "___queryid___";
 
-        public DatasetNonAggregateJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
+        public DatasetNonAggregateJoinedSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect) : base(panel, compilerOptions, dialect)
         {
             var sp = GetCachedCohortSubPanel(compilerOptions);
-            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions);
+            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions, dialect);
             var join = new DatasetJoinedSequentialSqlSet(cache);
             var first = From.First() as JoinedSequentialSqlSet;
             var last = From.Last() as JoinedSequentialSqlSet;
-
-            // Ensure personId and encounterId are always strings
-            static Expression toNvarchar(Column x) => new Expression($"CONVERT(NVARCHAR(100), {x})");
 
             first.On = new[] { join.PersonId == first.PersonId };
             first.Type = JoinType.Inner;
 
             Select = new ISelectable[]
             {
-                new ExpressedColumn(toNvarchar(last.PersonId), DatasetColumns.PersonId),
-                new ExpressedColumn(toNvarchar(last.EncounterId), EncounterColumns.EncounterId),
+                new ExpressedColumn(
+                    new Expression(dialect.Convert(ColumnType.STRING, last.PersonId)),
+                    DatasetColumns.PersonId),
+                new ExpressedColumn(
+                    new Expression(dialect.Convert(ColumnType.STRING, last.EncounterId)),
+                    EncounterColumns.EncounterId),
                 new ExpressedColumn(last.Date, ConceptColumns.DateField),
                 join.Salt
             };

@@ -8,7 +8,155 @@ using System.Collections.Generic;
 
 namespace Model.Compiler.Common
 {
-    static class Dialect
+    public interface ISqlDialect
+    {
+        public string DateAdd(DateIncrementType incrType, int interval, object date);
+        public string Now();
+        public string ToSqlType(ColumnType type);
+        public string ToSqlTime(DateIncrementType incrType);
+        public string Convert(ColumnType targetType, object value);
+    }
+
+    public enum ColumnType
+    {
+        STRING = 1,
+        INTEGER = 2,
+        DECIMAL = 3,
+        DATE = 4,
+        BOOLEAN = 5
+    }
+
+    public abstract class BaseSqlDialect
+    {
+        public virtual string ToSqlTime(DateIncrementType incrType)
+        {
+            return incrType switch
+            {
+                DateIncrementType.Minute => "MINUTE",
+                DateIncrementType.Hour   => "HOUR",
+                DateIncrementType.Day    => "DAY",
+                DateIncrementType.Week   => "WEEK",
+                DateIncrementType.Month  => "MONTH",
+                DateIncrementType.Year   => "YEAR",
+                _ => ""
+            };
+        }
+    }
+
+    public class TSqlDialect : BaseSqlDialect, ISqlDialect
+    {
+        public string Now() => "GETDATE()";
+        public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATEADD({ToSqlTime(incrType)}, {interval}, {date})";
+        public string Convert(ColumnType targetType, object value) => $"CONVERT({ToSqlType(targetType)}, {value})";
+
+        public string ToSqlType(ColumnType type)
+        {
+            return type switch
+            {
+                ColumnType.STRING  => "NVARCHAR(100)",
+                ColumnType.INTEGER => "INT",
+                ColumnType.DECIMAL => "DECIMAL(18,3)",
+                ColumnType.DATE    => "DATETIME",
+                ColumnType.BOOLEAN => "BIT",
+                _ => "NVARCHAR(100)",
+            };
+        }
+    }
+
+    public class MySqlDialect : BaseSqlDialect, ISqlDialect
+    {
+        public string Now() => "NOW()";
+        public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATETIME_ADD({date}, INTERVAL {interval} {ToSqlTime(incrType)})";
+        public string Convert(ColumnType targetType, object value) => $"CONVERT({value}, {ToSqlType(targetType)})";
+
+        public string ToSqlType(ColumnType type)
+        {
+            return type switch
+            {
+                ColumnType.STRING  => "VARCHAR(100)",
+                ColumnType.INTEGER => "MEDIUMINT",
+                ColumnType.DECIMAL => "FLOAT",
+                ColumnType.DATE    => "DATETIME",
+                ColumnType.BOOLEAN => "MEDIUMINT",
+                _ => "VARCHAR(100)",
+            };
+        }
+    }
+
+    public class MariaDbDialect : MySqlDialect
+    {
+        
+    }
+
+    public class PlSqlDialect : BaseSqlDialect, ISqlDialect
+    {
+        public string Now() => "SYSDATE";
+        public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+
+        public string ToSqlType(ColumnType type)
+        {
+            return type switch
+            {
+                ColumnType.STRING  => "NVARCHAR2(100)",
+                ColumnType.INTEGER => "INTEGER",
+                ColumnType.DECIMAL => "FLOAT",
+                ColumnType.DATE    => "DATE",
+                ColumnType.BOOLEAN => "BOOLEAN",
+                _ => "NVARCHAR2(100)",
+            };
+        }
+    }
+
+    public class PostgreSqlDialect : BaseSqlDialect, ISqlDialect
+    {
+        public string Now() => "NOW()";
+        public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+
+        public string ToSqlType(ColumnType type)
+        {
+            return type switch
+            {
+                ColumnType.STRING  => "TEXT",
+                ColumnType.INTEGER => "INTEGER",
+                ColumnType.DECIMAL => "NUMERIC(18,3)",
+                ColumnType.DATE    => "TIMESTAMP",
+                ColumnType.BOOLEAN => "BIT",
+                _ => "TEXT",
+            };
+        }
+    }
+
+    public class BigQuerySqlDialect : BaseSqlDialect, ISqlDialect
+    {
+        public string Now() => "CURRENT_DATETIME()";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+
+        public string DateAdd(DateIncrementType incrType, int interval, object date)
+        {
+            if (interval < 0)
+            {
+                return $"DATETIME_SUB({date}, INTERVAL {Math.Abs(interval)} {ToSqlTime(incrType)})";
+            }
+            return $"DATETIME_ADD({date}, INTERVAL {interval} {ToSqlTime(incrType)})";
+        }
+
+        public string ToSqlType(ColumnType type)
+        {
+            return type switch
+            {
+                ColumnType.STRING  => "STRING",
+                ColumnType.INTEGER => "INT64",
+                ColumnType.DECIMAL => "FLOAT64",
+                ColumnType.DATE    => "DATETIME",
+                ColumnType.BOOLEAN => "BOOL",
+                _ => "STRING",
+            };
+        }
+    }
+
+    static class SqlCommon
     {
         public static class Field
         {
@@ -22,55 +170,10 @@ namespace Model.Compiler.Common
             public const string Sequence = "_T";
         }
 
-        public static class Time
-        {
-            public const string SECOND = "SECOND";
-            public const string MINUTE = "MINUTE";
-            public const string HOUR = "HOUR";
-            public const string DAY = "DAY";
-            public const string WEEK = "WEEK";
-            public const string MONTH = "MONTH";
-            public const string YEAR = "YEAR";
-        }
-
         public static class Syntax
         {
-            public const string SELECT = "SELECT";
-            public const string FROM = "FROM";
-            public const string WHERE = "WHERE";
-            public const string GROUP_BY = "GROUP BY";
-            public const string HAVING = "HAVING";
-            public const string ORDER_BY = "ORDER BY";
-            public const string COUNT = "COUNT";
-            public const string AND = "AND";
-            public const string NOT = "NOT";
-            public const string MIN = "MIN";
-            public const string MAX = "MAX";
-            public const string IN = "IN";
-            public const string AS = "AS";
-            public const string UNION_ALL = "UNION ALL";
-            public const string BETWEEN = "BETWEEN";
-            public const string SINGLE_QUOTE = "'";
-            public const string WILDCARD = "%";
-            public const string LIKE = "LIKE";
-            public const string OR = "OR";
-            public const string LEFT_JOIN = "LEFT JOIN";
-            public const string INNER_JOIN = "INNER JOIN ";
-            public const string ON = "ON";
-            public const string DATEADD = "DATEADD";
-            public const string IS_NULL = "IS NULL";
-            public const string EXISTS = "EXISTS";
-            public const string NOW = "GETDATE()";
-            public const string INTERSECT = "INTERSECT";
-            public const string EXCEPT = "EXCEPT";
-            public const string DISTINCT = "DISTINCT";
-            public const string DECLARE = "DECLARE";
-        }
-
-        public static class Types
-        {
-            public const string BIT = "BIT";
-            public const string NVARCHAR = "NVARCHAR";
+            public const string Count = "COUNT";
+            public const string Distinct = "DISTINCT";
         }
 
         public static readonly string[] IllegalCommands = { "UPDATE ", "TRUNCATE ", "EXEC ", "DROP ", "INSERT ", "CREATE ", "DELETE ", "MERGE ", "SET " };

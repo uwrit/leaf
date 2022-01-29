@@ -24,7 +24,7 @@ namespace Model.Compiler.SqlServer
         public ConceptDatasetExecutionContext BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
         {
             var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions).ToString();
-            new SqlValidator(Dialect.IllegalCommands).Validate(query);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(query);
 
             var exeContext = new ConceptDatasetExecutionContext(compilerContext.QueryContext, compilerContext.QueryContext.QueryId);
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, compilerContext.QueryContext.QueryId);

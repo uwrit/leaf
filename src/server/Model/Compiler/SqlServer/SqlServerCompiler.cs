@@ -81,12 +81,12 @@ namespace Model.Compiler.SqlServer
 
             foreach (var context in inclusions.Skip(1))
             {
-                query.Append($" {Dialect.Syntax.INTERSECT} {context.CompiledQuery}");
+                query.Append($" {SqlCommon.Syntax.INTERSECT} {context.CompiledQuery}");
             }
 
             foreach (var context in exclusions)
             {
-                query.Append($" {Dialect.Syntax.EXCEPT} {context.CompiledQuery}");
+                query.Append($" {SqlCommon.Syntax.EXCEPT} {context.CompiledQuery}");
             }
 
             return new CteCohortQuery(parameters, query.ToString());
@@ -95,9 +95,9 @@ namespace Model.Compiler.SqlServer
         public string BuildContextParameterSql()
         {
             Func<bool,int> toInt = (bool x) => Convert.ToInt32(x);
-            var identified = $"{Dialect.Syntax.DECLARE} @IsIdentified {Dialect.Types.BIT} = {toInt(user.Identified)}";
-            var research   = $"{Dialect.Syntax.DECLARE} @IsResearch   {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.Research)}";
-            var qi         = $"{Dialect.Syntax.DECLARE} @IsQI         {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.QualityImprovement)}";
+            var identified = $"{SqlCommon.Syntax.DECLARE} @IsIdentified {SqlCommon.Types.BIT} = {toInt(user.Identified)}";
+            var research   = $"{SqlCommon.Syntax.DECLARE} @IsResearch   {SqlCommon.Types.BIT} = {toInt(user.SessionType == SessionType.Research)}";
+            var qi         = $"{SqlCommon.Syntax.DECLARE} @IsQI         {SqlCommon.Types.BIT} = {toInt(user.SessionType == SessionType.QualityImprovement)}";
             return $"{identified}; {research}; {qi};";
         }
 
@@ -105,12 +105,12 @@ namespace Model.Compiler.SqlServer
         {
             var internals = BuildPanelSql(panel);
             var alias = $"P{panel.Index}";
-            return $"{Dialect.Syntax.SELECT} {alias}.{compilerOptions.FieldPersonId} {Dialect.Syntax.FROM} ( {internals} ) {Dialect.Syntax.AS} {alias}";
+            return $"{SqlCommon.Syntax.SELECT} {alias}.{compilerOptions.FieldPersonId} {SqlCommon.Syntax.FROM} ( {internals} ) {SqlCommon.Syntax.AS} {alias}";
         }
 
         void ValidateSql(string input)
         {
-            new SqlValidator(Dialect.IllegalCommands).Validate(input);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(input);
         }
     }
 }

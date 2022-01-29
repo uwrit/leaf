@@ -14,10 +14,14 @@ namespace Model.Compiler.SqlServer
     public class ConceptDatasetSqlCompiler : IConceptDatasetSqlCompiler
     {
         readonly CompilerOptions compilerOptions;
+        readonly ISqlDialect dialect;
 
-        public ConceptDatasetSqlCompiler(IOptions<CompilerOptions> compOpts)
+        public ConceptDatasetSqlCompiler(
+            IOptions<CompilerOptions> compOpts,
+            ISqlDialect dialect)
         {
-            this.compilerOptions = compOpts.Value;
+            compilerOptions = compOpts.Value;
+            this.dialect = dialect;
         }
 
         public ConceptDatasetExecutionContext BuildConceptDatasetSql(PanelDatasetCompilerContext ctx)
@@ -26,8 +30,8 @@ namespace Model.Compiler.SqlServer
             var sp = p.SubPanels.First();
             var pi = sp.PanelItems.First();
             var cohortSql = new CachedCohortSqlSet(compilerOptions).ToString();
-            var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions).ToString();
-            new SqlValidator(Dialect.IllegalCommands).Validate(conceptSql);
+            var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions, dialect).ToString();
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(conceptSql);
 
             var exeContext = new ConceptDatasetExecutionContext(ctx.QueryContext, ctx.QueryContext.QueryId);
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);

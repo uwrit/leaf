@@ -12,7 +12,12 @@ namespace Model.Compiler.Common
 {
     class PanelItemSequentialSqlSet : PanelItemSqlSet
     {
-        public PanelItemSequentialSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
+        public PanelItemSequentialSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect) : base(panel, subpanel, panelitem, comp, dialect)
         {
 
         }
@@ -36,6 +41,7 @@ namespace Model.Compiler.Common
 
     class PanelItemSqlSet : NamedSet
     {
+        readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
         readonly Panel panel;
         readonly SubPanel subpanel;
@@ -49,14 +55,20 @@ namespace Model.Compiler.Common
         internal AutoAliasedColumn Date;
         internal AutoAliasedColumn Number;
 
-        new string Alias => $"{Dialect.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
+        new string Alias => $"{SqlCommon.Alias.Person}{panel.Index}{subpanel.Index}{panelitem.Index}";
 
-        public PanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp)
+        public PanelItemSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect)
         {
             this.panel = panel;
             this.subpanel = subpanel;
             this.panelitem = panelitem;
             this.compilerOptions = comp;
+            this.dialect = dialect;
             base.Alias = Alias;
             concept = panelitem.Concept;
 
@@ -135,7 +147,7 @@ namespace Model.Compiler.Common
         {
             if (subpanel.HasCountFilter)
             {
-                var uniqueDates = new Expression($"{Dialect.Syntax.COUNT}({Dialect.Syntax.DISTINCT} {Date})");
+                var uniqueDates = new Expression($"{SqlCommon.Syntax.Count}({SqlCommon.Syntax.Distinct} {Date})");
                 
                 Having = new List<IEvaluatableAggregate>
                 {
@@ -153,8 +165,7 @@ namespace Model.Compiler.Common
 
                 if (panel.PanelType == PanelType.Sequence && subpanel.Index > 0)
                 {
-                    // TODO(ndobb) DIALECT
-                    var offset = new Expression($"{Dialect.Syntax.DATEADD}({Dialect.Time.MONTH}, {-6}, {start})");
+                    var offset = new Expression(dialect.DateAdd(DateIncrementType.Month, -6, start));
                     where.Add(Date >= offset);
                 }
                 else
@@ -221,10 +232,9 @@ namespace Model.Compiler.Common
                 ? defaultTime.AddHours(23).AddMinutes(59).AddSeconds(59)
                 : defaultTime;
 
-            // TODO(ndobb) DIALECT
             if (filter.DateIncrementType == DateIncrementType.Now)
             {
-                return new Expression(Dialect.Syntax.NOW);
+                return new Expression(dialect.Now());
             }
             if (filter.DateIncrementType == DateIncrementType.Specific)
             {
@@ -232,10 +242,7 @@ namespace Model.Compiler.Common
                 return new QuotedExpression(date.ToString(timeFormat));
             }
 
-            var incrType = filter.DateIncrementType.ToString().ToUpper();
-
-            // TODO(ndobb) DIALECT
-            return new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {filter.Increment}, {Dialect.Syntax.NOW})");
+            return new Expression(dialect.DateAdd(filter.DateIncrementType, filter.Increment, dialect.Now()));
         }
     }
 }

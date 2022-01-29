@@ -16,7 +16,7 @@ namespace Tests
 {
     public class DemographicSqlCompilerTests
     {
-        static readonly DatabaseExtractor extractor = new DatabaseExtractor();
+        static readonly ConnectionStringParser extractor = new ConnectionStringParser();
 
         [Fact]
         public void Should_Correctly_Represent_Demographic_Shape()
@@ -110,7 +110,7 @@ namespace Tests
             {
                 ConnectionString = @"Server=fake;Database=LeafDB;Trusted_Connection=True"
             };
-            return Options.Create(new CompilerOptions { AppDb = extractor.ExtractDatabase(dbOpts) });
+            return Options.Create(new CompilerOptions { AppDb = extractor.Parse(dbOpts) });
         }
 
         static ISqlCompiler GetSqlCompiler()

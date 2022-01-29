@@ -15,6 +15,8 @@ namespace Model.Options
         public string AppDb { get; set; }
         public string ClinDb { get; set; }
 
+        public bool SharedDbServer { get; set; }
+
         public bool DefaultEqual()
         {
             return AppDb == null && ClinDb == null;

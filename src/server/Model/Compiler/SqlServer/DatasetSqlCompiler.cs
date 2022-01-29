@@ -33,7 +33,7 @@ namespace Model.Compiler.SqlServer
 
             var cohort = CteCohortInternals(compilerContext);
 
-            new SqlValidator(Dialect.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
             var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
 
             var filter = CteFilterInternals(compilerContext);
@@ -149,7 +149,7 @@ namespace Model.Compiler.SqlServer
             // both present
             if (early.HasValue && late.HasValue)
             {
-                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} {SqlCommon.Syntax.BETWEEN} {earlyParamName} {SqlCommon.Syntax.AND} {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -165,7 +165,7 @@ namespace Model.Compiler.SqlServer
             if (early.HasValue && !late.HasValue)
             {
                 var now = DateTime.Now;
-                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} {SqlCommon.Syntax.BETWEEN} {earlyParamName} {SqlCommon.Syntax.AND} {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,

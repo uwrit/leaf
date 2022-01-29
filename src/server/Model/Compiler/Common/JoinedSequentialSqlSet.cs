@@ -32,7 +32,7 @@ namespace Model.Compiler.Common
 
         void SetAlias(SubPanelSequentialSqlSet set)
         {
-            Alias = $"{Dialect.Alias.Sequence}{set.SubPanel.Index}";
+            Alias = $"{SqlCommon.Alias.Sequence}{set.SubPanel.Index}";
         }
 
         void InheritColumns(SubPanelSequentialSqlSet set)

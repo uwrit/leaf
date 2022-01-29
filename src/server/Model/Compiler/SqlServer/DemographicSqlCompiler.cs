@@ -33,7 +33,7 @@ namespace Model.Compiler.SqlServer
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
 
             var cohort = CteCohortInternals(context.QueryContext);
-            new SqlValidator(Dialect.IllegalCommands).Validate(context.DemographicQuery);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
             var dataset = CteDemographicInternals(context.DemographicQuery);
 
             var filter = CteFilterInternals(context, restrictPhi);
@@ -67,14 +67,15 @@ namespace Model.Compiler.SqlServer
                 return $"SELECT * FROM dataset";
             }
 
-            bool include(SchemaFieldSelector field) => field.Required || !field.Phi || field.Mask;
+            static bool include(SchemaFieldSelector field) => field.Required || !field.Phi || field.Mask;
 
             var restricted = schema.Fields.Where(include);
-            executionContext.FieldSelectors = restricted;
             var fields = string.Join(", ", restricted.Select(f => f.Name));
+            executionContext.FieldSelectors = restricted;
             return $"SELECT {fields} FROM dataset";
         }
 
+        // TODO(ndobb) Check Syntax
         string SelectFromCTE()
         {
             return $"SELECT Exported, Salt, filter.* FROM filter INNER JOIN cohort on filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";

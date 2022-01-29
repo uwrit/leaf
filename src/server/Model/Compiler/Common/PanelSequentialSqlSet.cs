@@ -13,18 +13,24 @@ namespace Model.Compiler.Common
 {
     public class PanelSequentialSqlSet : JoinedSet
     {
+        ISqlDialect dialect;
+
         public Column PersonId { get; protected set; }
 
-        public PanelSequentialSqlSet(Panel panel, CompilerOptions compilerOptions)
+        public PanelSequentialSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect)
         {
-            var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions));
+            this.dialect = dialect;
+            var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions, dialect));
             var first = sps.First();
             var j1 = new JoinedSequentialSqlSet(first);
             var joins = new List<IJoinable>() { j1 };
             var having = new List<IEvaluatableAggregate>();
             var anchor = j1;
 
-            /**
+            /*
              * Add the first subpanel's HAVING clause (if any) separately.
              */ 
             if (first.SubPanel.HasCountFilter)
@@ -32,7 +38,7 @@ namespace Model.Compiler.Common
                 having.Add(GetHaving(j1));
             }
 
-            /**
+            /*
              * Create join logic for each subsequent subpanel Set.
              */
             foreach (var sp in sps.Skip(1))
@@ -51,12 +57,12 @@ namespace Model.Compiler.Common
                 }
             }
 
-            /**
+            /*
              * Set PersonId to first joined Set's.
              */
             PersonId = j1.PersonId;
 
-            /**
+            /*
              * Compose.
              */ 
             Select  = new[] { PersonId };
@@ -68,7 +74,7 @@ namespace Model.Compiler.Common
         IEvaluatableAggregate GetHaving(JoinedSequentialSqlSet join)
         {
             var sub = (join.Set as SubPanelSequentialSqlSet).SubPanel;
-            var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {join.Date})");
+            var uniqueDates = new Expression($"{SqlCommon.Syntax.Count} ({SqlCommon.Syntax.Distinct} {join.Date})");
 
             if (sub.IncludeSubPanel)
             {
@@ -83,15 +89,14 @@ namespace Model.Compiler.Common
 
         JoinedSequentialSqlSet GetJoin(JoinedSequentialSqlSet prev, SubPanelSequentialSqlSet currSub)
         {
-            /**
+            /*
              * Get offset expressions.
              */
             var seq = currSub.SubPanel.JoinSequence;
-            var incrType = seq.DateIncrementType.ToString().ToUpper();
-            var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
-            var forwOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
+            var backOffset = new Expression(dialect.DateAdd(seq.DateIncrementType, -seq.Increment, prev.Date));
+            var forwOffset = new Expression(dialect.DateAdd(seq.DateIncrementType, seq.Increment, prev.Date));
 
-            /**
+            /*
              * Get Join.
              */
             var type = currSub.SubPanel.IncludeSubPanel ? JoinType.Inner : JoinType.Left;
@@ -99,7 +104,7 @@ namespace Model.Compiler.Common
 
             switch (seq.SequenceType)
             {
-                /**
+                /*
                  * Same Encounter.
                  */
                 case SequenceType.Encounter:
@@ -110,7 +115,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /**
+                /*
                  * Same Event.
                  */
                 case SequenceType.Event:
@@ -122,7 +127,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /**
+                /*
                  * Plus/Minus a time increment.
                  */
                 case SequenceType.PlusMinus:
@@ -134,7 +139,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /**
+                /*
                  * Within a following time increment.
                  */
                 case SequenceType.WithinFollowing:
@@ -146,7 +151,7 @@ namespace Model.Compiler.Common
                         };
                     return curr;
 
-                /**
+                /*
                  * Anytime after.
                  */
                 case SequenceType.AnytimeFollowing:

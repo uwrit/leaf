@@ -409,6 +409,7 @@ namespace API.Options
             {
                 opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
+                opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));
 
                 if (opts.Cohort.QueryStrategy == ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel)
@@ -429,8 +430,13 @@ namespace API.Options
                 }
             });
 
-            var extractor = new DatabaseExtractor();
+            var extractor = new ConnectionStringParser();
             var sp = services.BuildServiceProvider();
+
+            var clinDbOpts = sp.GetService<IOptions<ClinDbOptions>>().Value;
+            var appDbOpts = sp.GetService<IOptions<AppDbOptions>>().Value;
+            var clinDbTarget = extractor.Parse(clinDbOpts);
+            var appDbTarget = extractor.Parse(appDbOpts);
 
             // SQL Compiler Options
             config.TryBind<CompilerOptions>(Config.Compiler.Section, out var compilerOptions);
@@ -440,8 +446,12 @@ namespace API.Options
                 opts.FieldPersonId = compilerOptions.FieldPersonId;
                 opts.FieldEncounterId = compilerOptions.FieldEncounterId;
 
-                opts.AppDb = extractor.ExtractDatabase(sp.GetService<IOptions<AppDbOptions>>().Value);
-                opts.ClinDb = extractor.ExtractDatabase(sp.GetService<IOptions<ClinDbOptions>>().Value);
+                opts.AppDb = appDbTarget.Database;
+                opts.ClinDb = clinDbTarget.Database;
+
+                opts.SharedDbServer = clinDbOpts.Rdbms ==
+                    ClinDbOptions.RdbmsType.SqlServer
+                    && appDbTarget.Server.Equals(clinDbTarget.Server, StringComparison.InvariantCultureIgnoreCase);
             });
             return services;
         }
