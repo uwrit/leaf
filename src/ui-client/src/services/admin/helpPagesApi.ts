@@ -11,7 +11,7 @@ import { PartialAdminHelpPageDTO, AdminHelpPageCategoryDTO, AdminHelpPageContent
 import { HttpFactory } from '../HttpFactory';
 
 /*
- * Gets help pages.
+ * Get help pages.
  */
 export const fetchPartialAdminHelpPages = async (state: AppState): Promise<PartialAdminHelpPageDTO[]> => {
     const { token } = state.session.context!;
@@ -21,7 +21,7 @@ export const fetchPartialAdminHelpPages = async (state: AppState): Promise<Parti
 };
 
 /*
- * Gets help page categories.
+ * Get help page categories.
  */
 export const fetchAdminHelpPageCategories = async (state: AppState): Promise<AdminHelpPageCategoryDTO[]> => {
     const { token } = state.session.context!;
@@ -31,7 +31,7 @@ export const fetchAdminHelpPageCategories = async (state: AppState): Promise<Adm
 };
 
 /*
- * Gets help page content.
+ * Get help page content.
  */
 export const fetchAdminHelpPageContent = async (state: AppState, pageId: string): Promise<AdminHelpPageContentDTO[]> => {
     const { token } = state.session.context!;
@@ -41,7 +41,7 @@ export const fetchAdminHelpPageContent = async (state: AppState, pageId: string)
 };
 
 /*
- * Creates help page and content, and category if it doesn't exist.
+ * Create help page and content, and category if it doesn't exist.
  */
 export const createAdminHelpPage = async (state: AppState, p: AdminHelpPage): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;
@@ -53,7 +53,7 @@ export const createAdminHelpPage = async (state: AppState, p: AdminHelpPage): Pr
 };
 
 /*
- * Updates help page, category, and content.
+ * Update help page, category, and content.
  */
 export const updateAdminHelpPage = async (state: AppState, p: AdminHelpPage): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;
@@ -65,7 +65,19 @@ export const updateAdminHelpPage = async (state: AppState, p: AdminHelpPage): Pr
 };
 
 /*
- * Deletes help page and content, and category if no pages under category.
+ * Update help page category.
+ */
+export const updateAdminHelpPageCategory = async (state: AppState, catId: string, c: AdminHelpPageCategoryDTO): Promise<AdminHelpPageCategoryDTO> => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+
+    // const cat = { id: c.id, name: c.name } as AdminHelpPageCategoryDTO;
+    const resp = await http.put(`api/admin/helppages/categories/${catId}`, c);
+    return resp.data as AdminHelpPageCategoryDTO;
+};
+
+/*
+ * Delete help page and content, and category if no pages under category.
  */
 export const deleteAdminHelpPage = async (state: AppState, pageId: string): Promise<AdminHelpPageDTO> => {
     const { token } = state.session.context!;

@@ -23,6 +23,7 @@ namespace Model.Admin.Compiler
             Task<IEnumerable<AdminHelpPageContent>> GetHelpPageContentAsync(Guid pageId);
             Task<AdminHelpPage> CreateAsync(AdminHelpPage p);
             Task<AdminHelpPage> UpdateAsync(AdminHelpPage p);
+            Task<AdminHelpPageCategory> UpdateCategoryAsync(Guid categoryId, AdminHelpPageCategory c);
             Task<AdminHelpPage> DeleteAsync(Guid pageId);
         }
 
@@ -117,6 +118,24 @@ namespace Model.Admin.Compiler
             }
         }
 
+        public async Task<AdminHelpPageCategory> UpdateCategoryAsync(Guid categoryId, AdminHelpPageCategory c)
+        {
+            Ensure.NotNullOrWhitespace(categoryId.ToString(), nameof(categoryId));
+            ThrowIfCategoryInvalid(c);
+            try
+            {
+                var updated = await svc.UpdateCategoryAsync(categoryId, c);
+                log.LogInformation("Updated help page category. Category:{@Category}", updated);
+                return updated;
+            }
+            catch (DbException de)
+            {
+                log.LogError("Failed to update help page category. Category:{@Category} Code:{Code} Error:{Error}", c, de.ErrorCode, de.Message);
+                de.MapThrow();
+                throw;
+            }
+        }
+
         public async Task<AdminHelpPage> DeleteAsync(Guid pageId)
         {
             Ensure.NotNullOrWhitespace(pageId.ToString(), nameof(pageId));
@@ -133,6 +152,12 @@ namespace Model.Admin.Compiler
                 throw;
             }
             
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void ThrowIfCategoryInvalid(AdminHelpPageCategory c)
+        {
+            Ensure.NotNull(c, nameof(c));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

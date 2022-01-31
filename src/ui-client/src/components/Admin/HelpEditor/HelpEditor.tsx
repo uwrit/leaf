@@ -41,7 +41,7 @@ export class HelpEditor extends React.Component<Props, State> {
         this.state = {
             inputCategory: '',
             show: false
-        }
+        };
     };
 
     public render() {
@@ -96,7 +96,7 @@ export class HelpEditor extends React.Component<Props, State> {
                             </div>
                             
                             {newCatsList.map((c, i) =>
-                                <DropdownItem key={i} onClick={this.handleCategoryClick.bind(null, c.id)}>{c.name}</DropdownItem>
+                                <DropdownItem key={i} onClick={this.handleCategoryClick.bind(null, c)}>{c.name}</DropdownItem>
                             )}
                         </DropdownMenu>
                     </Dropdown>
@@ -127,23 +127,19 @@ export class HelpEditor extends React.Component<Props, State> {
 
     private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { dispatch, currentPage } = this.props;
-
         const val = e.currentTarget.value;
-        this.setState({ inputCategory: val });
-        
         const newCategory = { id: '', name: val } as AdminHelpPageCategory;
         const updatedPage = Object.assign({}, currentPage, { category: newCategory }) as AdminHelpPage;
         
+        this.setState({ inputCategory: val });
         dispatch(setCurrentAdminHelpPage(updatedPage));
         dispatch(isAdminHelpPageUnsaved(true));
     };
 
-    private handleCategoryClick = (clickedCatId: string, e: React.MouseEvent<HTMLButtonElement>) => {
+    private handleCategoryClick = (clickedCat: AdminHelpCategoryPageCache) => {
         const { dispatch, currentPage } = this.props;
-
-        const clickedCategory = e.currentTarget.textContent;
-        const newCategory = { id: clickedCatId, name: clickedCategory } as AdminHelpPageCategory;
-        const updatedPage = Object.assign({}, currentPage, { category: newCategory }) as AdminHelpPage;
+        const updatedCategory = { id: clickedCat.id, name: clickedCat.name } as AdminHelpPageCategory;
+        const updatedPage = Object.assign({}, currentPage, { category: updatedCategory }) as AdminHelpPage;
         
         dispatch(setCurrentAdminHelpPage(updatedPage));
         dispatch(isAdminHelpPageUnsaved(true));
@@ -169,6 +165,7 @@ export class HelpEditor extends React.Component<Props, State> {
     private handleContentChange = (val: string, index: number) => {
         const { dispatch, currentPage } = this.props;
         // Make copy of current content to edit
+        // dont need to make a copy, right? also, when do you make copy? w/o copy, keeps rerendering?
         const contentCopy = currentPage.content.slice();
 
         // TODO: dont feel comfortable with filter, is there a better way?

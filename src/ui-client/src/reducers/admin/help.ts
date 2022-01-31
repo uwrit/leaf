@@ -13,22 +13,32 @@ const mapCategories = (categories: AdminHelpPageCategory[], partialPages: Partia
     const mappedCategories = new Map<categoryId, AdminHelpCategoryPageCache>();
 
     for (let c of categories) {
-        const categoryPages = partialPages.filter(p => p.categoryId === c.id);
-        const updatedCategory = Object.assign({ ...c, pages: categoryPages }) as AdminHelpCategoryPageCache;
+        const catPartialPages = partialPages.filter(p => p.categoryId === c.id);
+        const updatedCatPageCache = Object.assign({ ...c, partialPages: catPartialPages }) as AdminHelpCategoryPageCache;
         
-        mappedCategories.set(c.id, updatedCategory);
+        mappedCategories.set(c.id, updatedCatPageCache);
     };
-    
+
     return mappedCategories;
 };
 
 export const setAdminHelpPagesAndCategories = (state: AdminState, action: AdminHelpPageAction): AdminState => {
-    const mappedCategories = mapCategories(action.categories!, action.pages!);
+    const mappedCategories = mapCategories(action.categories!, action.partialPages!);
     
     return Object.assign({}, state, {
         help: {
             ...state.help,
             categories: mappedCategories
+        }
+    });
+};
+
+export const updateAdminHelpPagesAndCategories = (state: AdminState, action: AdminHelpPageAction): AdminState => {
+    
+    return Object.assign({}, state, {
+        help: {
+            ...state.help,
+            categories: action.categoryMap
         }
     });
 };

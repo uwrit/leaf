@@ -41,6 +41,6 @@ export type HelpCategoryMap = Map<categoryId, HelpCategoryPageCache>;
 export interface PartialHelpPage extends PartialHelpPageDTO { }
 export interface HelpPageCategory extends HelpPageCategoryDTO {}
 export interface HelpCategoryPageCache extends HelpPageCategory {
-    pages: PartialHelpPage[];
+    partialPages: PartialHelpPage[];
 }
 export interface HelpPageContent extends HelpPageContentDTO { }

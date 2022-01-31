@@ -100,7 +100,7 @@ GO
 
 CREATE TYPE [adm].[HelpContentTable] AS TABLE(
     [Title] [NVARCHAR](400) NOT NULL,
-    [Category] [NVARCHAR](255) NOT NULL,
+    [CategoryName] [NVARCHAR](255) NOT NULL,
     [PageId] [UNIQUEIDENTIFIER] NULL,
 	[OrderId] [INT] NOT NULL,
 	[Type] [NVARCHAR](255) NOT NULL,
@@ -193,23 +193,23 @@ BEGIN
     DECLARE @title NVARCHAR(400)
     SET @title = (SELECT TOP(1) Title FROM @content)
 
-    DECLARE @category NVARCHAR(255)
-    SET @category = (SELECT TOP(1) Category FROM @content)
+    DECLARE @categoryName NVARCHAR(255)
+    SET @categoryName = (SELECT TOP(1) CategoryName FROM @content)
 
     DECLARE @orderId INT
     SET @orderId = (SELECT TOP(1) OrderId FROM @content)
 
-    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category))
-        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @category
+    IF (@categoryName IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @categoryName))
+        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @categoryName
 
     DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
+    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @categoryName)
         
     IF (app.fn_NullOrWhitespace(@title) = 1)
         THROW 70400, N'Title is required.', 1;
         
-    IF (app.fn_NullOrWhitespace(@category) = 1)
-        THROW 70400, N'Category is required.', 1;
+    IF (app.fn_NullOrWhitespace(@categoryName) = 1)
+        THROW 70400, N'Category name is required.', 1;
 
     IF EXISTS(SELECT 1 FROM app.HelpPage WHERE Title = @title AND CategoryId = @categoryId)
         THROW 70409, N'Page title and category already exist.', 1;
@@ -241,8 +241,8 @@ CREATE PROCEDURE [adm].[sp_UpdateHelpPage]
     @content adm.HelpContentTable READONLY
 AS
 BEGIN
-    DECLARE @category NVARCHAR(255)
-    SET @category = (SELECT TOP(1) Category FROM @content)
+    DECLARE @categoryName NVARCHAR(255)
+    SET @categoryName = (SELECT TOP(1) CategoryName FROM @content)
 
     DECLARE @pageId UNIQUEIDENTIFIER
     SET @pageId = (SELECT TOP(1) PageId FROM @content)
@@ -256,16 +256,16 @@ BEGIN
     DECLARE @orderId INT
     SET @orderId = (SELECT TOP(1) OrderId FROM @content)
 
-    IF (@category IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @category))
-        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @category
+    IF (@categoryName IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @categoryName))
+        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @categoryName
 
     DECLARE @categoryId UNIQUEIDENTIFIER
-    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
+    SET @categoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @categoryName)
 
     IF (app.fn_NullOrWhitespace(@title) = 1)
         THROW 70400, N'Title is required.', 1;
-    IF (app.fn_NullOrWhitespace(@category) = 1)
-        THROW 70400, N'Category is required.', 1;
+    IF (app.fn_NullOrWhitespace(@categoryName) = 1)
+        THROW 70400, N'Category name is required.', 1;
     IF (app.fn_NullOrWhitespace(@orderId) = 1)
         THROW 70400, N'Page order number is required.', 1;
     IF (app.fn_NullOrWhitespace(@type) = 1)
@@ -274,7 +274,7 @@ BEGIN
     UPDATE app.HelpPage
     SET
         Title = @title,
-        CategoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @category)
+        CategoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @categoryName)
     WHERE Id = @pageId
 
     DELETE FROM app.HelpPageContent
@@ -316,5 +316,47 @@ BEGIN
         DELETE FROM app.HelpPageCategory
         WHERE Id = @categoryId
     END;
+END
+GO
+
+
+/* */
+-- SP to update category for help pages
+DROP PROCEDURE IF EXISTS [adm].[sp_UpdateHelpPageCategory]
+GO
+
+CREATE PROCEDURE [adm].[sp_UpdateHelpPageCategory]
+    @prevCategoryId UNIQUEIDENTIFIER,
+    @newCategoryId UNIQUEIDENTIFIER = NULL,
+    @newCategoryName NVARCHAR(255)
+AS
+BEGIN
+    IF (app.fn_NullOrWhitespace(@newCategoryName) = 1)
+        THROW 70400, N'Category name is required.', 1;
+
+    IF (@newCategoryId IS NULL AND @newCategoryName IS NOT NULL AND EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @newCategoryName))
+        THROW 70409, N'Category already exists.', 1;
+
+    IF (@newCategoryName IS NOT NULL AND NOT EXISTS(SELECT 1 FROM app.HelpPageCategory WHERE Name = @newCategoryName))
+        INSERT INTO app.HelpPageCategory (Name) SELECT Name = @newCategoryName
+
+    SET @newCategoryId = (SELECT Id FROM app.HelpPageCategory WHERE Name = @newCategoryName)
+
+    IF (@newCategoryId IS NOT NULL)
+    BEGIN;
+        UPDATE app.HelpPage
+        SET CategoryId = @newCategoryId
+        WHERE CategoryId = @prevCategoryId
+    END;
+
+    IF ((SELECT COUNT(*) FROM app.HelpPage WHERE CategoryId = @prevCategoryId) = 0)
+    BEGIN;
+        DELETE FROM app.HelpPageCategory
+        WHERE Id = @prevCategoryId
+    END;
+
+    SELECT Id, Name
+    FROM app.HelpPageCategory
+    WHERE Id = @newCategoryId
 END
 GO

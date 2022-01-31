@@ -135,6 +135,31 @@ namespace API.Controllers.Admin
             }
         }
 
+        // Update category for help pages.
+        [HttpPut("categories/{categoryid}")]
+        public async Task<ActionResult<AdminHelpPageCategoryDTO>> UpdateCategory(Guid categoryId, [FromBody] AdminHelpPageCategory c)
+        {
+            try
+            {
+                var updated = await manager.UpdateCategoryAsync(categoryId, c);
+                return Ok(new AdminHelpPageCategoryDTO(updated));
+            }
+            catch (ArgumentException ae)
+            {
+                logger.LogError("Invalid update help page category. CategoryId:{@CategoryId} NewCategory:{@NewCategory} Error:{Error}", categoryId, c, ae.Message);
+                return BadRequest(CRUDError.From($"{nameof(AdminHelpPageCategoryDTO)} is missing or incomplete."));
+            }
+            catch (LeafRPCException le)
+            {
+                return StatusCode(le.StatusCode, CRUDError.From(le.Message));
+            }
+            catch (Exception e)
+            {
+                logger.LogError("Failed to update help page category. CategoryId:{@CategoryId} NewCategory:{@NewCategory} Error:{Error}", categoryId, c, e.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         // Delete help page.
         [HttpDelete("{pageid}")]
         public async Task<ActionResult<AdminHelpPageDTO>> Delete(Guid pageId)

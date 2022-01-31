@@ -23,7 +23,7 @@ export class Categories extends React.Component<Props> {
         const c = this.className;
         const { categories, dispatch } = this.props;
         // Filter categories to get only categories that have pages.
-        const newCatsList = categories.filter(c => c.pages.length);
+        const newCatsList = categories.filter(c => c.partialPages.length);
 
         return (
             <Row className={c}>

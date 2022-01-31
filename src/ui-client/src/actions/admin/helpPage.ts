@@ -8,7 +8,7 @@
 import { AppState } from '../../models/state/AppState';
 import { showInfoModal, setNoClickModalState, setSideNotificationState, showConfirmationModal } from '../generalUi';
 import { ConfirmationModalState, InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { AdminHelpPage, PartialAdminHelpPage, AdminHelpPageCategory, AdminHelpCategoryPageCache } from '../../models/admin/Help';
+import { AdminHelpPage, PartialAdminHelpPage, AdminHelpPageCategory, AdminHelpCategoryPageCache, AdminHelpCategoryMap } from '../../models/admin/Help';
 import { fetchPartialAdminHelpPages, fetchAdminHelpPageCategories, fetchAdminHelpPageContent,
          createAdminHelpPage, updateAdminHelpPage, deleteAdminHelpPage } from '../../services/admin/helpPagesApi';
 import { AdminHelpPageLoadState } from '../../models/state/AdminState';
@@ -20,13 +20,16 @@ export const SET_ADMIN_HELP_PAGE_LOAD_STATE = 'SET_ADMIN_HELP_PAGE_LOAD_STATE';
 export const SET_ADMIN_HELP_PAGES_AND_CATEGORIES = 'SET_ADMIN_HELP_PAGES_AND_CATEGORIES';
 export const SET_CURRENT_ADMIN_HELP_PAGE = 'SET_CURRENT_ADMIN_HELP_PAGE';
 
+export const UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES = 'UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES';
+
 export interface AdminHelpPageAction {
     categories?: AdminHelpPageCategory[];
+    categoryMap?: AdminHelpCategoryMap;
     currentPage?: AdminHelpPage;
     helpState?: AdminHelpPageLoadState;
     isNew?: boolean;
     page?: AdminHelpPage;
-    pages?: PartialAdminHelpPage[];
+    partialPages?: PartialAdminHelpPage[];
     unsaved?: boolean;
     type: string;
 }
@@ -43,9 +46,9 @@ export const loadAdminHelpPagesAndCategoriesIfNeeded = () => {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working}));
 
                 const categories = await fetchAdminHelpPageCategories(state);
-                const pages = await fetchPartialAdminHelpPages(state);
+                const partialPages = await fetchPartialAdminHelpPages(state);
 
-                dispatch(setAdminHelpPagesAndCategories(categories as AdminHelpPageCategory[], pages as PartialAdminHelpPage[]));
+                dispatch(setAdminHelpPagesAndCategories(categories as AdminHelpPageCategory[], partialPages as PartialAdminHelpPage[]));
                 dispatch(setAdminHelpPageLoadState(AdminHelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -252,11 +255,18 @@ export const confirmLeavingAdminHelpContent = () => {
 };
 
 // Synchronous
-export const setAdminHelpPagesAndCategories = (categories: AdminHelpPageCategory[], pages: PartialAdminHelpPage[]): AdminHelpPageAction => {
+export const setAdminHelpPagesAndCategories = (categories: AdminHelpPageCategory[], partialPages: PartialAdminHelpPage[]): AdminHelpPageAction => {
     return {
         categories: categories,
-        pages: pages,
+        partialPages: partialPages,
         type: SET_ADMIN_HELP_PAGES_AND_CATEGORIES
+    };
+};
+
+export const updateAdminHelpPagesAndCategories = (categoryMap: AdminHelpCategoryMap): AdminHelpPageAction => {
+    return {
+        categoryMap: categoryMap,
+        type: UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES
     };
 };
 

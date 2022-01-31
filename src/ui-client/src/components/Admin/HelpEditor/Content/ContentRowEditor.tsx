@@ -62,6 +62,7 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //          - single page category update, add dropdown
     //              - DONE; add css
     //      2. check admin workflow
+    //      3. helpeditor line 168, pages line 122?
 
     public render() {
         const c = this.className;

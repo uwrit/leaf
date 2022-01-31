@@ -26,17 +26,17 @@ const mapCategories = (categories: HelpPageCategory[], partialPages: PartialHelp
     const mappedCategories = new Map<categoryId, HelpCategoryPageCache>();
 
     for (let c of categories) {
-        const categoryPages = partialPages.filter(p => p.categoryId === c.id);
-        const updatedCategory = Object.assign({ ...c, pages: categoryPages }) as HelpCategoryPageCache;
+        const catPartialPages = partialPages.filter(p => p.categoryId === c.id);
+        const updatedCatPageCache = Object.assign({ ...c, partialPages: catPartialPages }) as HelpCategoryPageCache;
         
-        mappedCategories.set(c.id, updatedCategory);    
+        mappedCategories.set(c.id, updatedCatPageCache);    
     };
 
     return mappedCategories;
 };
 
 const setHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
-    const mappedCategories = mapCategories(action.categories!, action.pages!);
+    const mappedCategories = mapCategories(action.categories!, action.partialPages!);
     
     return Object.assign({}, state, {
         categories: mappedCategories

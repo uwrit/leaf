@@ -30,13 +30,13 @@ export class Pages extends React.Component<Props, State> {
         const { category } = this.props;
         const { show } = this.state;
 
-        const pages = category.pages;
-        const numberOfPages = pages.length;
+        const partialPages = category.partialPages;
+        const numberOfPages = partialPages.length;
         const numberOfPagesGreaterThanFive = (numberOfPages > 5) ? true : false;
         const start = 0;
         const defaultEnd = 5; // Maximum of 5 help pages will show by default.
         const end = show ? numberOfPages : defaultEnd;
-        const slicedPages = pages.slice(start, end);
+        const slicedPartialPages = partialPages.slice(start, end);
 
         return (
             <Col className={c} xs="4">
@@ -44,7 +44,7 @@ export class Pages extends React.Component<Props, State> {
                     <b>{category.name.toUpperCase()}</b>
                 </div>
 
-                {slicedPages.map(p =>
+                {slicedPartialPages.map(p =>
                     <div key={p.id} className={`${c}-page`}>
                         <Button color="link" onClick={this.handleHelpPageTitleClick.bind(null, p)}>
                             {p.title}

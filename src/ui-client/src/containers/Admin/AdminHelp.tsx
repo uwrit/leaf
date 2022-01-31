@@ -96,7 +96,7 @@ export class AdminHelp extends React.PureComponent<Props, State> {
                     
                     {(adminHelp.helpState === AdminHelpPageLoadState.LOADED) &&
                         <Categories
-                            categories={categories}
+                            categoryMap={adminHelp.categories}
                             newCategory={category}
                             newTitle={title}
                             dispatch={dispatch}

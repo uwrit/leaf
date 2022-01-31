@@ -21,7 +21,7 @@ namespace Services.Tables
 
         public const string Type  = "adm.HelpContentTable";
         const string title        = "Title";
-        const string category     = "Category";
+        const string categoryName = "CategoryName";
         const string pageId       = "PageId";
         const string orderId      = "OrderId";
         const string type         = "Type";
@@ -43,7 +43,7 @@ namespace Services.Tables
             var cols = dt.Columns;
 
             cols.Add(new DataColumn(title, typeof(string)));
-            cols.Add(new DataColumn(category, typeof(string)));
+            cols.Add(new DataColumn(categoryName, typeof(string)));
             cols.Add(new DataColumn(pageId, typeof(Guid)));
             cols.Add(new DataColumn(orderId, typeof(int)));
             cols.Add(new DataColumn(type, typeof(string)));
@@ -61,7 +61,7 @@ namespace Services.Tables
             {
                 var row = table.NewRow();
                 row[title]        = page.Title;
-                row[category]     = page.Category.Name;
+                row[categoryName] = page.Category.Name;
                 row[orderId]      = r.OrderId;
                 row[type]         = r.Type;
                 row[textContent]  = r.TextContent;

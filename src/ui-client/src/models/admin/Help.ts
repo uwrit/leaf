@@ -43,6 +43,6 @@ export type AdminHelpCategoryMap = Map<categoryId, AdminHelpCategoryPageCache>;
 export interface PartialAdminHelpPage extends PartialAdminHelpPageDTO { }
 export interface AdminHelpPageCategory extends AdminHelpPageCategoryDTO {}
 export interface AdminHelpCategoryPageCache extends AdminHelpPageCategory {
-    pages: PartialAdminHelpPage[];
+    partialPages: PartialAdminHelpPage[];
 }
 export interface AdminHelpPageContent extends AdminHelpPageContentDTO { }

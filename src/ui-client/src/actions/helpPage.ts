@@ -19,7 +19,7 @@ export const SET_HELP_PAGE_LOAD_STATE = 'SET_HELP_PAGE_LOAD_STATE';
 export interface HelpPageAction {
     categories?: HelpPageCategory[];
     page?: HelpPage;
-    pages?: PartialHelpPage[];
+    partialPages?: PartialHelpPage[];
     state?: HelpPageLoadState;
     type: string;
 }
@@ -39,9 +39,9 @@ export const loadHelpPagesAndCategoriesIfNeeded = () => {
                  * Fetch help pages and categories.
                  */
                 const categories = await fetchHelpPageCategories(state);
-                const pages = await fetchPartialHelpPages(state);
+                const partialPages = await fetchPartialHelpPages(state);
 
-                dispatch(setHelpPagesAndCategories(categories, pages));
+                dispatch(setHelpPagesAndCategories(categories, partialPages));
                 dispatch(setHelpPageLoadState(HelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -105,10 +105,10 @@ export const resetHelpPageContent = () => {
 };
 
 // Synchronous actions
-export const setHelpPagesAndCategories = (categories: HelpPageCategory[], pages: PartialHelpPage[]): HelpPageAction => {
+export const setHelpPagesAndCategories = (categories: HelpPageCategory[], partialPages: PartialHelpPage[]): HelpPageAction => {
     return {
         categories: categories,
-        pages: pages,
+        partialPages: partialPages,
         type: SET_HELP_PAGES_AND_CATEGORIES
     };
 };
