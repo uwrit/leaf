@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 
 namespace Model.Compiler.SqlServer

@@ -41,7 +41,7 @@ namespace Model.Cohort
         readonly DeidentificationOptions deidentOpts;
         readonly ILogger<DemographicProvider> log;
 
-        public DemographicProvider(
+        public DemographicProvider (
             IUserContext user,
             DemographicCompilerValidationContextProvider contextProvider,
             IOptions<ClientOptions> clientOpts,

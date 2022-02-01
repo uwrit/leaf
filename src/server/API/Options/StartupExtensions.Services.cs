@@ -22,7 +22,7 @@ using Model.Authentication;
 using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Compiler.SqlServer;
 using Model.Export;
 using Model.Network;
@@ -102,6 +102,7 @@ namespace API.Options
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
+            services.AddTransient<ICachedCohortFetcher, CachedCohortFetcher>();
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
             services.AddTransient<DemographicProvider.IDemographicsExecutor, DemographicsExecutor>();
@@ -204,26 +205,32 @@ namespace API.Options
                 case ClinDbOptions.RdbmsType.SqlServer:
                     services.AddTransient<ISqlDialect, TSqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, SqlServerQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
                     break;
                 case ClinDbOptions.RdbmsType.MySql:
                     services.AddTransient<ISqlDialect, MySqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, MySqlQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, MySqlCachedCohortPreparer>();
                     break;
                 case ClinDbOptions.RdbmsType.MariaDb:
                     services.AddTransient<ISqlDialect, MariaDbDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, MariaDbQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, MariaDbCachedCohortPreparer>();
                     break;
                 case ClinDbOptions.RdbmsType.PostgreSql:
                     services.AddTransient<ISqlDialect, PostgreSqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, PostgreSqlQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, PostgreSqlCachedCohortPreparer>();
                     break;
                 case ClinDbOptions.RdbmsType.Oracle:
                     services.AddTransient<ISqlDialect, PlSqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, OracleQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, OracleCachedCohortPreparer>();
                     break;
                 case ClinDbOptions.RdbmsType.BigQuery:
                     services.AddTransient<ISqlDialect, BigQuerySqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, BigQueryQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, BigQuerySqlCachedCohortPreparer>();
                     break;
             }
 

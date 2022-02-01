@@ -10,7 +10,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Model.Extensions;
 using Model.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Authorization;
 
 namespace Model.Compiler.SqlServer
@@ -84,7 +84,7 @@ namespace Model.Compiler.SqlServer
 
             foreach (var context in inclusions.Skip(1))
             {
-                query.Append($" INTERSECT {context.CompiledQuery}");
+                query.Append($" {dialect.Intersect()} {context.CompiledQuery}");
             }
 
             foreach (var context in exclusions)

@@ -6,7 +6,7 @@
 using System;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public class EventIdColumn : Column
     {

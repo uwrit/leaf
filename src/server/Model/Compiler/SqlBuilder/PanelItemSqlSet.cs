@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Model.Options;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     class PanelItemSequentialSqlSet : PanelItemSqlSet
     {

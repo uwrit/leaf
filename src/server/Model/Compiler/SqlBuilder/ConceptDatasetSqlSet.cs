@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Composure;
 using Model.Options;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     class ConceptDatasetSqlSet : PanelItemSqlSet
     {

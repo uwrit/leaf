@@ -8,7 +8,7 @@ using System.Linq;
 using Model.Options;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public class SubPanelSqlSet : UnionedSet
     {

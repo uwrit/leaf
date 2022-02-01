@@ -6,16 +6,17 @@
 using System;
 using System.Collections.Generic;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public interface ISqlDialect
     {
-        public string DateAdd(DateIncrementType incrType, int interval, object date);
         public string Now();
+        public string Intersect();
+        public string Except();
+        public string DateAdd(DateIncrementType incrType, int interval, object date);
         public string ToSqlType(ColumnType type);
         public string ToSqlTime(DateIncrementType incrType);
         public string Convert(ColumnType targetType, object value);
-        public string Except();
         public string DeclareParam(string name, ColumnType type, object value);
     }
 
@@ -25,7 +26,8 @@ namespace Model.Compiler.Common
         Integer = 2,
         Decimal = 3,
         Date = 4,
-        Boolean = 5
+        Boolean = 5,
+        Guid = 6
     }
 
     public abstract class BaseSqlDialect
@@ -48,9 +50,10 @@ namespace Model.Compiler.Common
     public class TSqlDialect : BaseSqlDialect, ISqlDialect
     {
         public string Now() => "GETDATE()";
+        public string Intersect() => "INTERSECT";
+        public string Except() => "EXCEPT";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATEADD({ToSqlTime(incrType)}, {interval}, {date})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({ToSqlType(targetType)}, {value})";
-        public string Except() => "EXCEPT";
         public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE @{name} {ToSqlType(type)} = {value}";
 
         public string ToSqlType(ColumnType type)
@@ -62,6 +65,7 @@ namespace Model.Compiler.Common
                 ColumnType.Decimal => "DECIMAL(18,3)",
                 ColumnType.Date    => "DATETIME",
                 ColumnType.Boolean => "BIT",
+                ColumnType.Guid    => "UNIQUEIDENTIFIER",
                 _ => "NVARCHAR(100)",
             };
         }
@@ -70,9 +74,10 @@ namespace Model.Compiler.Common
     public class MySqlDialect : BaseSqlDialect, ISqlDialect
     {
         public string Now() => "NOW()";
+        public string Intersect() => "INTERSECT";
+        public string Except() => throw new NotImplementedException();
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATETIME_ADD({date}, INTERVAL {interval} {ToSqlTime(incrType)})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({value}, {ToSqlType(targetType)})";
-        public string Except() => throw new NotImplementedException();
         public string DeclareParam(string name, ColumnType type, object value) => $"SET @{name} := {value}";
 
         public string ToSqlType(ColumnType type)
@@ -84,6 +89,7 @@ namespace Model.Compiler.Common
                 ColumnType.Decimal => "FLOAT",
                 ColumnType.Date    => "DATETIME",
                 ColumnType.Boolean => "MEDIUMINT",
+                ColumnType.Guid    => "CHAR(36)",
                 _ => "VARCHAR(100)",
             };
         }
@@ -97,9 +103,10 @@ namespace Model.Compiler.Common
     public class PlSqlDialect : BaseSqlDialect, ISqlDialect
     {
         public string Now() => "SYSDATE";
+        public string Intersect() => "INTERSECT";
+        public string Except() => "MINUS";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
-        public string Except() => "MINUS";
         public string DeclareParam(string name, ColumnType type, object value) => $"{name} {ToSqlType(type)} := {value}";
 
         public string ToSqlType(ColumnType type)
@@ -111,6 +118,7 @@ namespace Model.Compiler.Common
                 ColumnType.Decimal => "FLOAT",
                 ColumnType.Date    => "DATE",
                 ColumnType.Boolean => "BOOLEAN",
+                ColumnType.Guid    => "CHAR(36)",
                 _ => "NVARCHAR2(100)",
             };
         }
@@ -119,9 +127,10 @@ namespace Model.Compiler.Common
     public class PostgreSqlDialect : BaseSqlDialect, ISqlDialect
     {
         public string Now() => "NOW()";
+        public string Intersect() => "INTERSECT";
+        public string Except() => "EXCEPT";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
-        public string Except() => "EXCEPT";
         public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE {name} {ToSqlType(type)} = {value}";
 
         public string ToSqlType(ColumnType type)
@@ -133,6 +142,7 @@ namespace Model.Compiler.Common
                 ColumnType.Decimal => "NUMERIC(18,3)",
                 ColumnType.Date    => "TIMESTAMP",
                 ColumnType.Boolean => "BIT",
+                ColumnType.Guid    => "UUID",
                 _ => "TEXT",
             };
         }
@@ -141,8 +151,9 @@ namespace Model.Compiler.Common
     public class BigQuerySqlDialect : BaseSqlDialect, ISqlDialect
     {
         public string Now() => "CURRENT_DATETIME()";
-        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Intersect() => throw new NotImplementedException();
         public string Except() => throw new NotImplementedException();
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
         public string DeclareParam(string name, ColumnType type, object value) => throw new NotImplementedException();
 
         public string DateAdd(DateIncrementType incrType, int interval, object date)
@@ -163,6 +174,7 @@ namespace Model.Compiler.Common
                 ColumnType.Decimal => "FLOAT64",
                 ColumnType.Date    => "DATETIME",
                 ColumnType.Boolean => "BOOL",
+                ColumnType.Guid    => "STRING",
                 _ => "STRING",
             };
         }

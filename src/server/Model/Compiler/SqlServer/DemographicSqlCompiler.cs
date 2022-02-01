@@ -5,7 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Linq;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using Model.Cohort;
@@ -16,6 +16,7 @@ namespace Model.Compiler.SqlServer
     {
         readonly ISqlCompiler compiler;
         readonly CompilerOptions compilerOptions;
+
         readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DemographicExecutionContext executionContext;
@@ -31,7 +32,6 @@ namespace Model.Compiler.SqlServer
         public DemographicExecutionContext BuildDemographicSql(DemographicCompilerContext context, bool restrictPhi)
         {
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
-
             var cohort = CteCohortInternals(context.QueryContext);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
             var dataset = CteDemographicInternals(context.DemographicQuery);
@@ -49,6 +49,7 @@ namespace Model.Compiler.SqlServer
             return $"{parameters} WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
         }
 
+        // Currently hard-coded to assume cohort comes from AppDB
         string CteCohortInternals(QueryContext context)
         {
             executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, context.QueryId);

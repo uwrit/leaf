@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Model.Compiler;
 using Model.Compiler.SqlServer;
 using Model.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Tests.Mock.Models.Compiler;
 using Xunit;
 using System;
