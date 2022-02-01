@@ -101,9 +101,9 @@ import {
     IS_ADMIN_HELP_PAGE_UNSAVED,
     SET_ADMIN_HELP_PAGE,
     SET_ADMIN_HELP_PAGE_LOAD_STATE,
-    SET_ADMIN_HELP_PAGES_AND_CATEGORIES,
+    SET_ADMIN_HELP_CATEGORY_MAP,
     SET_CURRENT_ADMIN_HELP_PAGE,
-    UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES,
+    UPDATE_ADMIN_HELP_CATEGORY_MAP,
     AdminHelpPageAction
 } from "../../actions/admin/helpPage";
 import { setAdminConcept, setAdminPanelConceptLoadState, generateDummyPanel, setExampleSql, deleteAdminConceptFromCache, setAdminCurrentUserConcept, createAdminConcept, removeUnsavedAdminConcept, resetAdminConceptCache } from './concept';
@@ -120,7 +120,7 @@ import { setAdminPanelFilters, deleteAdminPanelFilter, undoAdminPanelFilterChang
 import { setAdminGlobalPanelFilters, deleteAdminGlobalPanelFilter, undoAdminGlobalPanelFilterChanges, setAdminGlobalPanelFiltersUnchanged } from "./globalPanelFilter";
 import { setAdminUserQueries, setAdminUserFetchingQueries, setAdminUserFetchingUsers, setAdminQueryUsers, setAdminQuerySearchTerm } from "./userQuery";
 import { AdminHelpPage, AdminHelpCategoryPageCache, categoryId } from '../../models/admin/Help'
-import { setAdminHelpPagesAndCategories, setAdminHelpPage, setCurrentAdminHelpPage, setAdminHelpPageLoadState, isAdminHelpPageNew, isAdminHelpPageUnsaved, updateAdminHelpPagesAndCategories } from "./help";
+import { setAdminHelpCategoryMap, setAdminHelpPage, setCurrentAdminHelpPage, setAdminHelpPageLoadState, isAdminHelpPageNew, isAdminHelpPageUnsaved, updateAdminHelpCategoryMap } from "./help";
 
 export const defaultAdminState = (): AdminState => {
     return {
@@ -349,8 +349,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return setAdminNetworkCertModalShown(state, action);
 
         // Help
-        case SET_ADMIN_HELP_PAGES_AND_CATEGORIES:
-            return setAdminHelpPagesAndCategories(state, action);
+        case SET_ADMIN_HELP_CATEGORY_MAP:
+            return setAdminHelpCategoryMap(state, action);
         case SET_ADMIN_HELP_PAGE:
             return setAdminHelpPage(state, action)
         case SET_CURRENT_ADMIN_HELP_PAGE:
@@ -361,8 +361,8 @@ export const admin = (state: AdminState = defaultAdminState(), action: AdminActi
             return isAdminHelpPageNew(state, action);
         case IS_ADMIN_HELP_PAGE_UNSAVED:
             return isAdminHelpPageUnsaved(state, action);
-        case UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES:
-            return updateAdminHelpPagesAndCategories(state, action);
+        case UPDATE_ADMIN_HELP_CATEGORY_MAP:
+            return updateAdminHelpCategoryMap(state, action);
 
         // User Queries
         case SET_ADMIN_QUERIES:

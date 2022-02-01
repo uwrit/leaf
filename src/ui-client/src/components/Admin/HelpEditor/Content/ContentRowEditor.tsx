@@ -57,12 +57,13 @@ export class ContentRowEditor extends React.Component<Props, State> {
 
     // TODO:
     //      1. update category feature needed.
+    //          - TODO: if input is empty, revert changes
     //          - edit category for multiple pages (dropdown)
-    //              - TODO
+    //              - DONE; add css
     //          - single page category update, add dropdown
     //              - DONE; add css
-    //      2. check admin workflow
-    //      3. helpeditor line 168, pages line 122?
+    //      2. check admin workflow - verify update category SP
+    //      3. helpeditor line 168?
 
     public render() {
         const c = this.className;

@@ -30,8 +30,8 @@ interface DispatchProps {
 }
 
 interface State {
-    show: boolean;
     category: string;
+    show: boolean;
     title: string;
 }
 
@@ -43,8 +43,8 @@ export class AdminHelp extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);   
         this.state = {
-            show: false,
             category: '',
+            show: false,
             title: ''
         }
     };
@@ -78,10 +78,10 @@ export class AdminHelp extends React.PureComponent<Props, State> {
                             </DropdownToggle>
                             <DropdownMenu right>
                                 <div className={`${c}-create-button-item`}>
-                                    Title <Input value={title} onChange={this.handleTitleChange} />
+                                    Title <Input name='title' value={title} onChange={this.handleChange} />
                                 </div>
                                 <div className={`${c}-create-button-item`}>
-                                    Category <Input value={category} onChange={this.handleCategoryChange} />
+                                    Category <Input name='category' value={category} onChange={this.handleChange} />
                                 </div>
                                 <div className={`${c}-create-button-item`}>
                                     <Button className="leaf-button-addnew" onClick={this.handleCreateNewPage}>
@@ -108,23 +108,18 @@ export class AdminHelp extends React.PureComponent<Props, State> {
     };
 
     private handleShow = () => {
-        const { show } = this.state;
-        this.setState({ show: !show, category: '', title: '' });
+        this.setState(prevState => ({ category: '', show: !prevState.show, title: '' }));
     };
 
-    private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    private handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const key = e.currentTarget.name;
         const val = e.currentTarget.value;
-        this.setState({ category: val });
-    };
-
-    private handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.currentTarget.value;
-        this.setState({ title: val });
+        this.setState({ ...this.state, [ key ]: val });
     };
 
     private handleCreateNewPage = () => {
         const { dispatch } = this.props;
-        const { category, title, show } = this.state;
+        const { category, show, title } = this.state;
         const uniqueId = generateId();
 
         const contentRow = Object.assign({}, {
@@ -152,7 +147,7 @@ export class AdminHelp extends React.PureComponent<Props, State> {
         
         // Clear the values so that when user clicks the "go back arrow"
         // from content after clicking "+ Create", category/title are reset.
-        this.setState({ show: !show, category: '', title: '' });
+        this.setState(prevState => ({ category: '', show: !prevState.show, title: '' }));
     };
 };
 

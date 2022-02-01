@@ -23,7 +23,13 @@ interface State {
 
 export class Pages extends React.Component<Props, State> {
     private className = "pages"
-    state = { show: false };
+    
+    constructor(props: Props) {
+        super(props);   
+        this.state = {
+            show: false
+        };
+    };
 
     public render() {
         const c = this.className;
@@ -67,9 +73,11 @@ export class Pages extends React.Component<Props, State> {
     };
 
     private handleHelpPageTitleClick = (page: PartialHelpPage) => {
-        const { dispatch, category } = this.props;
+        const { category, dispatch } = this.props;
         dispatch(fetchSingleHelpPageContent(page, category));
     };
 
-    private handleSeeAllPagesClick = () => { this.setState({ show: !this.state.show }) };
+    private handleSeeAllPagesClick = () => {
+        this.setState(prevState => ({ show: !prevState.show }));
+    };
 };

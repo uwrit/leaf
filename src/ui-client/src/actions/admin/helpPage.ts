@@ -10,17 +10,16 @@ import { showInfoModal, setNoClickModalState, setSideNotificationState, showConf
 import { ConfirmationModalState, InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { AdminHelpPage, PartialAdminHelpPage, AdminHelpPageCategory, AdminHelpCategoryPageCache, AdminHelpCategoryMap } from '../../models/admin/Help';
 import { fetchPartialAdminHelpPages, fetchAdminHelpPageCategories, fetchAdminHelpPageContent,
-         createAdminHelpPage, updateAdminHelpPage, deleteAdminHelpPage } from '../../services/admin/helpPagesApi';
+         createAdminHelpPage, updateAdminHelpPage, updateAdminHelpPageCategory, deleteAdminHelpPage } from '../../services/admin/helpPagesApi';
 import { AdminHelpPageLoadState } from '../../models/state/AdminState';
 
 export const IS_ADMIN_HELP_PAGE_NEW = 'IS_ADMIN_HELP_PAGE_NEW';
 export const IS_ADMIN_HELP_PAGE_UNSAVED = 'IS_ADMIN_HELP_PAGE_UNSAVED';
 export const SET_ADMIN_HELP_PAGE = 'SET_ADMIN_HELP_PAGE';
 export const SET_ADMIN_HELP_PAGE_LOAD_STATE = 'SET_ADMIN_HELP_PAGE_LOAD_STATE';
-export const SET_ADMIN_HELP_PAGES_AND_CATEGORIES = 'SET_ADMIN_HELP_PAGES_AND_CATEGORIES';
+export const SET_ADMIN_HELP_CATEGORY_MAP = 'SET_ADMIN_HELP_CATEGORY_MAP';
 export const SET_CURRENT_ADMIN_HELP_PAGE = 'SET_CURRENT_ADMIN_HELP_PAGE';
-
-export const UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES = 'UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES';
+export const UPDATE_ADMIN_HELP_CATEGORY_MAP = 'UPDATE_ADMIN_HELP_CATEGORY_MAP';
 
 export interface AdminHelpPageAction {
     categories?: AdminHelpPageCategory[];
@@ -44,11 +43,9 @@ export const loadAdminHelpPagesAndCategoriesIfNeeded = () => {
         if (state.admin!.help.helpState === AdminHelpPageLoadState.NOT_LOADED) {
             try {
                 dispatch(setNoClickModalState({ message: "Loading", state: NotificationStates.Working}));
-
                 const categories = await fetchAdminHelpPageCategories(state);
                 const partialPages = await fetchPartialAdminHelpPages(state);
-
-                dispatch(setAdminHelpPagesAndCategories(categories as AdminHelpPageCategory[], partialPages as PartialAdminHelpPage[]));
+                dispatch(setAdminHelpCategoryMap(categories as AdminHelpPageCategory[], partialPages as PartialAdminHelpPage[]));
                 dispatch(setAdminHelpPageLoadState(AdminHelpPageLoadState.LOADED));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
             } catch (err) {
@@ -72,7 +69,6 @@ export const getAdminHelpPageContent = (p: PartialAdminHelpPage, category: Admin
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Loading Page", state: NotificationStates.Working }));
-            
             const contentRows = await fetchAdminHelpPageContent(state, p.id);
             const page = {
                 id: p.id,
@@ -81,7 +77,6 @@ export const getAdminHelpPageContent = (p: PartialAdminHelpPage, category: Admin
                 content: contentRows,
                 contentState: AdminHelpPageLoadState.LOADED
             } as AdminHelpPage;
-            
             dispatch(setCurrentAdminHelpPage(page));
             dispatch(setAdminHelpPage(page));
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
@@ -105,13 +100,11 @@ export const createAdminHelpPageContent = (p: AdminHelpPage) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Creating Page", state: NotificationStates.Working }));
-            
             const created = await createAdminHelpPage(state, p);
             const page = {
                 ...created,
                 contentState: AdminHelpPageLoadState.LOADED
             } as AdminHelpPage;
-
             dispatch(setCurrentAdminHelpPage(page));
             dispatch(setAdminHelpPage(page));
             dispatch(reloadContent());
@@ -139,7 +132,6 @@ export const updateAdminHelpPageContent = (p: AdminHelpPage) => {
         const state = getState();
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
-
             const updated = await updateAdminHelpPage(state, p);
             const page = {
                 ...updated,
@@ -163,22 +155,38 @@ export const updateAdminHelpPageContent = (p: AdminHelpPage) => {
     };
 };
 
+/*
+ * Update admin help page category.
+ */
+export const updateAdminHelpPagesAndCategory = (catId: string, c: AdminHelpPageCategory) => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        try {
+            dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
+            await updateAdminHelpPageCategory(state, catId, c);
+            dispatch(reloadContent());
+            dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Changes Saved' }));
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+        } catch (err) {
+            const info: InformationModalState = {
+                body: "Leaf encountered an error while attempting to update Admin data. Please check the Leaf log files for more information.",
+                header: "Error Updating Admin Data",
+                show: true
+            };
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+            dispatch(showInfoModal(info));
+        };
+    };
+};
+
 export const deleteHelpPageAndContent = (pageId: string, title: string) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
         try {
             // First reset admin content.
             dispatch(resetAdminHelpContent());
-
             await deleteAdminHelpPage(state, pageId);
-            
-            // Fetch updated categories and pages after page delete.
-            const categories = await fetchAdminHelpPageCategories(state);
-            const pages = await fetchPartialAdminHelpPages(state);
-            
-            // Set new categories and pages.
-            dispatch(setAdminHelpPagesAndCategories(categories, pages));
-        
+            dispatch(reloadContent());
             const info: InformationModalState = {
                 body: `"${title}" page deleted.`,
                 header: "Delete Page",
@@ -202,8 +210,7 @@ export const reloadContent = () => {
         try {
             const categories = await fetchAdminHelpPageCategories(state);
             const pages = await fetchPartialAdminHelpPages(state);
-            
-            dispatch(setAdminHelpPagesAndCategories(categories, pages));
+            dispatch(setAdminHelpCategoryMap(categories, pages));
         } catch (err) {
             const info: InformationModalState = {
                 body: "Leaf encountered an error while attempting to load Admin data. Please check the Leaf log files for more information.",
@@ -220,13 +227,10 @@ export const resetAdminHelpContent = () => {
         try {
             // Is content being created set to false.
             dispatch(isAdminHelpPageNew(false));
-
             // Content unsaved set to false
             dispatch(isAdminHelpPageUnsaved(false));
-
             // Set current admin help page to empty.
             dispatch(setCurrentAdminHelpPage({} as AdminHelpPage));
-
             // Set admin help page to empty.
             dispatch(setAdminHelpPage({} as AdminHelpPage));
         } catch (err) {
@@ -255,18 +259,18 @@ export const confirmLeavingAdminHelpContent = () => {
 };
 
 // Synchronous
-export const setAdminHelpPagesAndCategories = (categories: AdminHelpPageCategory[], partialPages: PartialAdminHelpPage[]): AdminHelpPageAction => {
+export const setAdminHelpCategoryMap = (categories: AdminHelpPageCategory[], partialPages: PartialAdminHelpPage[]): AdminHelpPageAction => {
     return {
         categories: categories,
         partialPages: partialPages,
-        type: SET_ADMIN_HELP_PAGES_AND_CATEGORIES
+        type: SET_ADMIN_HELP_CATEGORY_MAP
     };
 };
 
-export const updateAdminHelpPagesAndCategories = (categoryMap: AdminHelpCategoryMap): AdminHelpPageAction => {
+export const updateAdminHelpCategoryMap = (categoryMap: AdminHelpCategoryMap): AdminHelpPageAction => {
     return {
         categoryMap: categoryMap,
-        type: UPDATE_ADMIN_HELP_PAGES_AND_CATEGORIES
+        type: UPDATE_ADMIN_HELP_CATEGORY_MAP
     };
 };
 

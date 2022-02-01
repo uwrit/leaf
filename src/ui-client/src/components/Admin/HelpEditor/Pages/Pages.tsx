@@ -6,13 +6,10 @@
  */ 
 
 import React from 'react';
-import { Button, Col } from 'reactstrap';
-import { getAdminHelpPageContent, updateAdminHelpPagesAndCategories } from '../../../../actions/admin/helpPage';
-import { AdminHelpCategoryMap, AdminHelpCategoryPageCache, PartialAdminHelpPage } from '../../../../models/admin/Help';
+import { Button, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
+import { getAdminHelpPageContent, updateAdminHelpCategoryMap, updateAdminHelpPagesAndCategory } from '../../../../actions/admin/helpPage';
+import { AdminHelpPageCategory, AdminHelpCategoryMap, AdminHelpCategoryPageCache, PartialAdminHelpPage } from '../../../../models/admin/Help';
 import './Pages.css';
-
-import { Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
-import { generate as generateId } from 'shortid';
 
 interface Props {
     categoryMap: AdminHelpCategoryMap;
@@ -22,27 +19,27 @@ interface Props {
 }
 
 interface State {
+    catUnsaved: boolean;
     inputCategory: string;
     showAllPages: boolean;
-    showCats: boolean;
 }
 
 export class Pages extends React.Component<Props, State> {
     private className = "admin-pages"
 
     constructor(props: Props) {
-        super(props);   
+        super(props);
         this.state = {
+            catUnsaved: false,
             inputCategory: '',
-            showAllPages: false,
-            showCats: false
+            showAllPages: false
         };
     };
 
     public render() {
         const c = this.className;
         const { currentCategory, categoryMap, tempPartialHelpPage } = this.props;
-        const { inputCategory, showAllPages, showCats } = this.state;
+        const { inputCategory, showAllPages, catUnsaved } = this.state;
 
         const partialPages = currentCategory.partialPages;
         const numberOfPages = partialPages.length;
@@ -58,16 +55,13 @@ export class Pages extends React.Component<Props, State> {
         return (
             <Col className={c} xs="4">
                 <div className={`${c}-category`}>
-                    <b>{currentCategory.name.toUpperCase()}</b>
-
-                    {/*  */}
-                    <Dropdown isOpen={showCats} toggle={this.handleShowCats}>
+                    <Dropdown isOpen={catUnsaved} toggle={this.handleSaveCat}>
                         <DropdownToggle caret>
-                            {currentCategory.name}
+                            {currentCategory.name.toUpperCase()}
                         </DropdownToggle>
                         <DropdownMenu>
                             <div>
-                                <Input value={inputCategory} placeholder='New Category' onChange={this.handleCategoryChange.bind(null, currentCategory)} />
+                                <Input value={inputCategory} placeholder='New Category' onChange={this.handleCategoryChange.bind(null, currentCategory)}/>
                             </div>
 
                             {newCatsList.map((c, i) => 
@@ -75,7 +69,6 @@ export class Pages extends React.Component<Props, State> {
                             )}
                         </DropdownMenu>
                     </Dropdown>
-                    {/*  */}
                 </div>
 
                 {currentCategory.id === tempPartialHelpPage.categoryId && <div style={{color: "#FF0000"}}>{tempPartialHelpPage.title}</div>}
@@ -102,9 +95,16 @@ export class Pages extends React.Component<Props, State> {
         );
     };
 
-    private handleShowCats = () => {
-        const { showCats } = this.state;
-        this.setState({ inputCategory: '', showCats: !showCats });
+    private handleSaveCat = () => {
+        const { currentCategory, dispatch } = this.props;
+
+        this.setState(function (prevState) {
+            const newCat = { id: '', name: prevState.inputCategory } as AdminHelpPageCategory;
+            if (prevState.catUnsaved && prevState.inputCategory) {
+                dispatch(updateAdminHelpPagesAndCategory(currentCategory.id, newCat));
+            };
+            return { catUnsaved: !prevState.catUnsaved, inputCategory: '' };
+        });
     };
 
     private handleCategoryChange = (currentCat: AdminHelpCategoryPageCache, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -114,31 +114,22 @@ export class Pages extends React.Component<Props, State> {
         
         this.setState({ inputCategory: val });
         categoryMap.set(currentCat.id, updatedInputCatPageCache);
-        dispatch(updateAdminHelpPagesAndCategories(categoryMap));
+        dispatch(updateAdminHelpCategoryMap(categoryMap));
     };
 
     private handleCategoryClick = (clickedCat: AdminHelpCategoryPageCache, currentCat: AdminHelpCategoryPageCache) => {
-        const { categoryMap, dispatch } = this.props;
-        // dont need to make a copy, right? also, when do you make copy? w/o copy, keeps rerendering?
-        const currentCatPartialPagesCopy = currentCat.partialPages.slice();
-        currentCatPartialPagesCopy.forEach(p => p.categoryId = clickedCat.id);
-
-        const updatedCurrentCatPageCache = Object.assign({}, currentCat, { partialPages: [] }) as AdminHelpCategoryPageCache;
-        const updatedClickedCatPageCache = Object.assign({},
-            clickedCat,
-            { partialPages: [ ...clickedCat.partialPages, ...currentCatPartialPagesCopy ] }
-        ) as AdminHelpCategoryPageCache;
-        categoryMap.set(clickedCat.id, updatedClickedCatPageCache);
-        categoryMap.set(currentCat.id, updatedCurrentCatPageCache);
-
-        dispatch(updateAdminHelpPagesAndCategories(categoryMap));
+        const { dispatch } = this.props;
+        const newCat = { id: clickedCat.id, name: clickedCat.name } as AdminHelpPageCategory;
+        dispatch(updateAdminHelpPagesAndCategory(currentCat.id, newCat));
     };
 
     // // // // //
-    private handleSeeAllPagesClick = () => { this.setState({ showAllPages: !this.state.showAllPages }) };
+    private handleSeeAllPagesClick = () => {
+        this.setState(prevState => ({ showAllPages: !prevState.showAllPages }));
+    };
 
     private handleHelpPageTitleClick = (page: PartialAdminHelpPage) => {
-        const { dispatch, currentCategory } = this.props;
+        const { currentCategory, dispatch } = this.props;
         dispatch(getAdminHelpPageContent(page, currentCategory));
     };
 };

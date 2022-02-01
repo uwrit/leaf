@@ -14,7 +14,7 @@
     margin-bottom: 10px;
 }
 
-.pages-page button {
+.pages-page > button {
     display: contents;
 }
 

@@ -7,7 +7,7 @@
 
 import {
     SET_HELP_PAGE,
-    SET_HELP_PAGES_AND_CATEGORIES,
+    SET_HELP_CATEGORY_MAP,
     SET_HELP_PAGE_LOAD_STATE,
     HelpPageAction
 } from '../actions/helpPage';
@@ -24,20 +24,16 @@ export const defaultHelpPageState = (): HelpPageState => {
 
 const mapCategories = (categories: HelpPageCategory[], partialPages: PartialHelpPage[]): HelpCategoryMap => {
     const mappedCategories = new Map<categoryId, HelpCategoryPageCache>();
-
     for (let c of categories) {
         const catPartialPages = partialPages.filter(p => p.categoryId === c.id);
         const updatedCatPageCache = Object.assign({ ...c, partialPages: catPartialPages }) as HelpCategoryPageCache;
-        
         mappedCategories.set(c.id, updatedCatPageCache);    
     };
-
     return mappedCategories;
 };
 
-const setHelpPagesAndCategories = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
+const setHelpCategoryMap = (state: HelpPageState, action: HelpPageAction): HelpPageState => {
     const mappedCategories = mapCategories(action.categories!, action.partialPages!);
-    
     return Object.assign({}, state, {
         categories: mappedCategories
     });
@@ -57,8 +53,8 @@ const setHelpPageLoadState = (state: HelpPageState, action: HelpPageAction): Hel
 
 export const help = (state: HelpPageState = defaultHelpPageState(), action: HelpPageAction): HelpPageState => {
     switch (action.type) {
-        case SET_HELP_PAGES_AND_CATEGORIES:
-            return setHelpPagesAndCategories(state, action);
+        case SET_HELP_CATEGORY_MAP:
+            return setHelpCategoryMap(state, action);
         case SET_HELP_PAGE:
             return setHelpPage(state, action);
         case SET_HELP_PAGE_LOAD_STATE:

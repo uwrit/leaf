@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Row, Col } from 'reactstrap';
-import { AdminHelpCategoryMap, AdminHelpCategoryPageCache, PartialAdminHelpPage } from '../../../../models/admin/Help';
+import { AdminHelpCategoryMap, PartialAdminHelpPage } from '../../../../models/admin/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 

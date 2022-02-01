@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.help-editor {
+.help-editor-container {
     background-color: rgb(240,240,240);
     font-family: "Source Serif Pro";
     padding-top: 20px;
@@ -38,9 +38,14 @@
     opacity: 0.7;
 }
 
-.help-editor-content-text {
+.help-editor-page {
     height: calc(100vh - 130px);
     overflow-x: hidden;
     overflow-y: auto;
     padding-bottom: 250px;
+}
+
+.help-editor-page-category {
+    margin-bottom: 10px;
+    margin-left: 20%;
 }

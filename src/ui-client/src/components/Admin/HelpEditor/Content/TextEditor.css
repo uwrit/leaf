@@ -20,7 +20,8 @@
 
 .text-editor-row-text {
     cursor: pointer;
-    padding-left: 5px;
+    margin-bottom: 10px;
+    padding-left: 3px;
 }
 
 .text-editor-row:hover {

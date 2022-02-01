@@ -54,7 +54,7 @@ export class HelpEditor extends React.Component<Props, State> {
         const newCatsList = categories.filter(c => c.id !== currentPage.category.id);
         
         return (
-            <div className={c}>
+            <div className={`${c}-container`}>
                 <Row className={`${c}-buttons`}>
                     <Col>
                         <IoIosArrowRoundBack
@@ -78,29 +78,31 @@ export class HelpEditor extends React.Component<Props, State> {
                     </Col>
                 </Row>
 
-                <div className={`${c}-content-text`}>
+                <div className={`${c}-page`}>
+                    {/* Display/Edit Category */}
+                    <div className={`${c}-page-category`}>
+                        <Dropdown isOpen={show} toggle={this.handleShow}>
+                            <DropdownToggle caret>
+                                {currentCategory.name.toUpperCase()}
+                            </DropdownToggle>
+                            <DropdownMenu>
+                                <div>
+                                    <Input value={inputCategory} placeholder='New Category' onChange={this.handleCategoryChange} />
+                                </div>
+                                
+                                {newCatsList.map((c, i) =>
+                                    <DropdownItem key={i} onClick={this.handleCategoryClick.bind(null, c)}>{c.name}</DropdownItem>
+                                )}
+                            </DropdownMenu>
+                        </Dropdown>
+                    </div>
+
                     {/* Display/Edit Title */}
                     <TextEditor
                         text={currentPage.title}
                         textHandler={this.handleTitleChange}
                     />
-
-                    {/* Display/Edit Category */}
-                    <Dropdown isOpen={show} toggle={this.handleShow}>
-                        <DropdownToggle caret>
-                            {currentCategory.name}
-                        </DropdownToggle>
-                        <DropdownMenu>
-                            <div>
-                                <Input value={inputCategory} placeholder='New Category' onChange={this.handleCategoryChange} />
-                            </div>
-                            
-                            {newCatsList.map((c, i) =>
-                                <DropdownItem key={i} onClick={this.handleCategoryClick.bind(null, c)}>{c.name}</DropdownItem>
-                            )}
-                        </DropdownMenu>
-                    </Dropdown>
-
+                    
                     {/* Display/Edit Content */}
                     {currentPage.content.map((cr,i) =>
                         <ContentRowEditor
@@ -121,8 +123,7 @@ export class HelpEditor extends React.Component<Props, State> {
     };
 
     private handleShow = () => {
-        const { show } = this.state;
-        this.setState({ inputCategory: '', show: !show });
+        this.setState(prevState => ({ inputCategory: '', show: !prevState.show }));
     };
 
     private handleCategoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {

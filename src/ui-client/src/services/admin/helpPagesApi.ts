@@ -70,8 +70,6 @@ export const updateAdminHelpPage = async (state: AppState, p: AdminHelpPage): Pr
 export const updateAdminHelpPageCategory = async (state: AppState, catId: string, c: AdminHelpPageCategoryDTO): Promise<AdminHelpPageCategoryDTO> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
-
-    // const cat = { id: c.id, name: c.name } as AdminHelpPageCategoryDTO;
     const resp = await http.put(`api/admin/helppages/categories/${catId}`, c);
     return resp.data as AdminHelpPageCategoryDTO;
 };

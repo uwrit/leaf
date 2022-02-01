@@ -6,25 +6,22 @@
  */
 
 import { AdminHelpPageAction } from '../../actions/admin/helpPage';
-import { AdminHelpCategoryMap, AdminHelpCategoryPageCache, AdminHelpPageCategory, categoryId, PartialAdminHelpPage } from '../../models/admin/Help';
+import { AdminHelpCategoryMap, AdminHelpCategoryPageCache, AdminHelpPageCategory,
+        categoryId, PartialAdminHelpPage } from '../../models/admin/Help';
 import AdminState from '../../models/state/AdminState';
 
 const mapCategories = (categories: AdminHelpPageCategory[], partialPages: PartialAdminHelpPage[]): AdminHelpCategoryMap => {
     const mappedCategories = new Map<categoryId, AdminHelpCategoryPageCache>();
-
     for (let c of categories) {
         const catPartialPages = partialPages.filter(p => p.categoryId === c.id);
-        const updatedCatPageCache = Object.assign({ ...c, partialPages: catPartialPages }) as AdminHelpCategoryPageCache;
-        
+        const updatedCatPageCache = Object.assign({ ...c, partialPages: catPartialPages }) as AdminHelpCategoryPageCache;  
         mappedCategories.set(c.id, updatedCatPageCache);
     };
-
     return mappedCategories;
 };
 
-export const setAdminHelpPagesAndCategories = (state: AdminState, action: AdminHelpPageAction): AdminState => {
+export const setAdminHelpCategoryMap = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     const mappedCategories = mapCategories(action.categories!, action.partialPages!);
-    
     return Object.assign({}, state, {
         help: {
             ...state.help,
@@ -33,8 +30,7 @@ export const setAdminHelpPagesAndCategories = (state: AdminState, action: AdminH
     });
 };
 
-export const updateAdminHelpPagesAndCategories = (state: AdminState, action: AdminHelpPageAction): AdminState => {
-    
+export const updateAdminHelpCategoryMap = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     return Object.assign({}, state, {
         help: {
             ...state.help,

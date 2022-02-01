@@ -5,16 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-.admin-pages-category {
-    font-size: 14px;
-}
+.admin-pages-category {}
 
 .admin-pages-page {
     margin-top: 10px;
     margin-bottom: 10px;
 }
 
-.admin-pages-page button {
+.admin-pages-page > button {
     display: contents;
 }
 
