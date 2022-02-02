@@ -7,13 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Model.Anonymization;
-using Model.Authorization;
 
 namespace Model.Cohort
 {
     public interface ICachedCohortFetcher
     {
-        public Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId);
+        public Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId, bool exportedOnly);
     }
 
     public class CachedCohortRecord : ISalt

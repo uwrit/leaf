@@ -21,6 +21,7 @@ CREATE PROCEDURE [app].[sp_GetCohortById]
     @id [uniqueidentifier],
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
+    @exportedOnly bit,
 	@admin bit = 0
 AS
 BEGIN
@@ -46,6 +47,7 @@ BEGIN
 		INSERT INTO @result (QueryId, PersonId, Exported, Salt)
 		SELECT C.QueryId, C.PersonId, C.Exported, C.Salt
 		FROM app.Cohort AS C
+        WHERE (@exportedOnly = 0 OR Exported = 1)
 	ELSE
 		BEGIN
 			-- permission filter
@@ -71,7 +73,8 @@ BEGIN
 		    FROM app.Cohort AS C
                  INNER JOIN app.Query AS Q ON C.QueryId = Q.Id
 			WHERE (Q.[Owner] = @user OR Q.Id IN (SELECT Id FROM permitted))
-				  AND Q.Id = @id;
+				  AND Q.Id = @id
+                  AND (@exportedOnly = 0 OR Exported = 1);
 		END
 
     -- did not pass filter

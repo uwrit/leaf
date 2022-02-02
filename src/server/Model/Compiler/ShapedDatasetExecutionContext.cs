@@ -14,6 +14,8 @@ namespace Model.Compiler
         public string QueryPrelude { get; internal set; }
         public string CompiledQuery { get; internal set; }
 
+        public string FullQuery => $"{QueryPrelude}; {CompiledQuery}";
+
         readonly List<QueryParameter> parameters;
         public IEnumerable<QueryParameter> Parameters => parameters;
 

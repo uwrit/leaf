@@ -24,12 +24,19 @@ namespace Model.Compiler
             get;
         }
 
+        public object this[string colName]
+        {
+            get;
+        }
+
         public Task CloseAsync();
 
         public bool Read();
         public IReadOnlyCollection<DbColumn> GetColumnSchema();
+        public int GetOrdinal(string colName);
         public string GetNullableString(int index);
         public string GetNullableString(int? index);
+        public Guid GetGuid(int index);
         public Guid? GetNullableGuid(int index);
         public Guid? GetNullableGuid(int? index);
         public DateTime? GetNullableDateTime(int index);

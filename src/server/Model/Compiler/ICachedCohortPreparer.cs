@@ -18,7 +18,7 @@ namespace Model.Compiler
     {
         public string FieldInternalPersonId { get; set; }
         public string TempTableName { get; set; }
-        public Task<string> Prepare(Guid queryId);
+        public Task<string> Prepare(Guid queryId, bool exportedOnly);
         public string CohortToCte();
     }
 
@@ -29,6 +29,7 @@ namespace Model.Compiler
         readonly internal ICachedCohortFetcher cohortFetcher;
         readonly internal CompilerOptions compilerOpts;
         readonly internal int batchSize = 1000;
+        internal bool exportedOnly;
 
         internal string InsertDelimited(CachedCohortRecord rec, string delimeter = "'")
         {
@@ -51,25 +52,42 @@ namespace Model.Compiler
             this.compilerOpts = compilerOpts;
         }
 
-        public virtual async Task<string> Prepare(Guid queryId) => ""; // no-op
+        public virtual async Task<string> Prepare(Guid queryId, bool exportedOnly) => ""; // no-op
 
         public virtual string CohortToCte()
         {
-            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {TempTableName}";
+            return
+                $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt " +
+                $"FROM {TempTableName} ";
         }
     }
 
     public class SharedServerCacheCohort : BaseCachedCohortPreparer
     {
-        public SharedServerCacheCohort(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public SharedServerCacheCohort(
+            ICachedCohortFetcher cohortFetcher,
+            CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
+
+        public override async Task<string> Prepare(Guid queryId, bool exportedOnly)
+        {
+            this.exportedOnly = exportedOnly;
+            return "";
+        }
 
         public override string CohortToCte()
         {
-            return
-                @$"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt
-                   FROM {compilerOpts.AppDb}.app.Cohort
-                   WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam}";
+            var output = new StringBuilder();
+            output.Append($"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt ");
+            output.Append($"FROM {compilerOpts.AppDb}.app.Cohort ");
+            output.Append($"WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} ");
+
+            if (exportedOnly)
+            {
+                output.Append(" AND Exported = 1");
+            }
+
+            return output.ToString();
         }
     }
 
@@ -81,10 +99,10 @@ namespace Model.Compiler
         public SqlServerCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId)
+        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId);
+            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
             output.Append(@$"CREATE TABLE #{TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -116,10 +134,10 @@ namespace Model.Compiler
         public MySqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId)
+        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId);
+            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -153,10 +171,10 @@ namespace Model.Compiler
         public OracleCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId)
+        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId);
+            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
             output.Append(@$"CREATE TEMPORARY TABLE ORA${TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -192,10 +210,10 @@ namespace Model.Compiler
         public PostgreSqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId)
+        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId);
+            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -222,10 +240,10 @@ namespace Model.Compiler
         public BigQuerySqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId)
+        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId);
+            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},

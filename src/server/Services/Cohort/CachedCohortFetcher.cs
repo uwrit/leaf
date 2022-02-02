@@ -30,7 +30,7 @@ namespace Services.Cohort
             this.user = user;
         }
 
-        public async Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId)
+        public async Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId, bool exportedOnly)
         {
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
@@ -42,6 +42,7 @@ namespace Services.Cohort
                         id = queryId,
                         user = user.UUID,
                         groups = GroupMembership.From(user),
+                        exportedOnly,
                         admin = user.IsAdmin
                     },
                     commandType: CommandType.StoredProcedure,

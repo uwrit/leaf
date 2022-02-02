@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,24 +15,26 @@ using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Options;
-using Services.Extensions;
 
 namespace Services.Cohort
 {
     public class DatasetExecutor : DatasetProvider.IDatasetExecutor
     {
         readonly IUserContext user;
+        readonly ISqlProviderQueryExecutor queryExecutor;
         readonly ILogger<DatasetExecutor> log;
         readonly ClinDbOptions dbOpts;
         readonly DeidentificationOptions deidentOpts;
 
         public DatasetExecutor(
-            IUserContext userContext,
+            IUserContext user,
+            ISqlProviderQueryExecutor queryExecutor,
             ILogger<DatasetExecutor> log,
             IOptions<ClinDbOptions> dbOpts,
             IOptions<DeidentificationOptions> deidentOpts)
         {
-            this.user = userContext;
+            this.user = user;
+            this.queryExecutor = queryExecutor;
             this.log = log;
             this.dbOpts = dbOpts.Value;
             this.deidentOpts = deidentOpts.Value;
@@ -41,32 +42,25 @@ namespace Services.Cohort
 
         public async Task<Dataset> ExecuteDatasetAsync(DatasetExecutionContext context, CancellationToken token)
         {
-            var sql = context.CompiledQuery;
-            var parameters = context.SqlParameters();
+            var connStr = dbOpts.ConnectionString;
+            var timeout = dbOpts.DefaultTimeout;
+            var parameters = context.Parameters;
+            var sql = context.FullQuery;
             var pepper = context.QueryContext.Pepper;
             var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 
-            using (var cn = new SqlConnection(dbOpts.ConnectionString))
-            {
-                await cn.OpenAsync();
+            var reader = await queryExecutor.ExecuteReaderAsync(connStr, sql, timeout, token, parameters);
+            var dbSchema = GetShapedSchema(context, reader);
+            var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
+            var data = marshaller.Marshal(reader, deidentify, deidentOpts);
+            var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
 
-                using (var cmd = new SqlCommand(sql, cn))
-                {
-                    cmd.Parameters.AddRange(parameters);
-                    using (var reader = await cmd.ExecuteReaderAsync(token))
-                    {
-                        var dbSchema = GetShapedSchema(context, reader);
-                        var marshaller = DatasetMarshaller.For(context, dbSchema, pepper);
-                        var data = marshaller.Marshal(reader, deidentify, deidentOpts);
-                        var resultSchema = ShapedDatasetSchema.From(dbSchema, context);
+            await reader.CloseAsync();
 
-                        return new Dataset(resultSchema, data);
-                    }
-                }
-            }
+            return new Dataset(resultSchema, data);
         }
 
-        DatasetResultSchema GetShapedSchema(DatasetExecutionContext context, SqlDataReader reader)
+        DatasetResultSchema GetShapedSchema(DatasetExecutionContext context, ILeafDbDataReader reader)
         {
             var shape = context.Shape;
             var actualSchema = GetResultSchema(shape, reader);
@@ -87,7 +81,7 @@ namespace Services.Cohort
         }
 
         // NOTE(ndobb) potentially check conversions here or above to get raw type into error message, abstruse message if switch falls through LeafType
-        DatasetResultSchema GetResultSchema(Shape shape, SqlDataReader reader)
+        DatasetResultSchema GetResultSchema(Shape shape, ILeafDbDataReader reader)
         {
             var columns = reader.GetColumnSchema();
             var fields = columns.Select(c => new SchemaField(c)).ToArray();
@@ -107,7 +101,7 @@ namespace Services.Cohort
             _schema = schema;
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
                 .Where(f => _schema.Fields.Any(sf => sf.Name == f.Name) && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
@@ -139,7 +133,7 @@ namespace Services.Cohort
             return (rec) => rec.ToDatumSet();
         }
 
-        DynamicDatasetRecord GetRecord(SqlDataReader reader, IEnumerable<SchemaFieldSelector> fields)
+        DynamicDatasetRecord GetRecord(ILeafDbDataReader reader, IEnumerable<SchemaFieldSelector> fields)
         {
             var dyn = new DynamicDatasetRecord
             {
@@ -167,7 +161,7 @@ namespace Services.Cohort
             Plan = new ConceptMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -195,7 +189,7 @@ namespace Services.Cohort
             return (rec) => rec.ToConceptDataset();
         }
 
-        ConceptDatasetRecord GetRecord(SqlDataReader reader)
+        ConceptDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var rec = new ConceptDatasetRecord
             {
@@ -219,7 +213,7 @@ namespace Services.Cohort
             Plan = new ObservationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -247,7 +241,7 @@ namespace Services.Cohort
             return (rec) => rec.ToObservation();
         }
 
-        ObservationDatasetRecord GetRecord(SqlDataReader reader)
+        ObservationDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var rec = new ObservationDatasetRecord
             {
@@ -278,7 +272,7 @@ namespace Services.Cohort
             Plan = new MedicationAdministrationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -306,7 +300,7 @@ namespace Services.Cohort
             return (rec) => rec.ToMedicationAdministration();
         }
 
-        MedicationAdministrationDatasetRecord GetRecord(SqlDataReader reader)
+        MedicationAdministrationDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new MedicationAdministrationDatasetRecord
             {
@@ -335,7 +329,7 @@ namespace Services.Cohort
             Plan = new MedicationRequestMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -363,7 +357,7 @@ namespace Services.Cohort
             return (rec) => rec.ToMedicationRequest();
         }
 
-        MedicationRequestDatasetRecord GetRecord(SqlDataReader reader)
+        MedicationRequestDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new MedicationRequestDatasetRecord
             {
@@ -393,7 +387,7 @@ namespace Services.Cohort
             Plan = new AllergyMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -421,7 +415,7 @@ namespace Services.Cohort
             return (rec) => rec.ToAllergy();
         }
 
-        AllergyDatasetRecord GetRecord(SqlDataReader reader)
+        AllergyDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new AllergyDatasetRecord
             {
@@ -449,7 +443,7 @@ namespace Services.Cohort
             Plan = new ImmunizationMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -477,7 +471,7 @@ namespace Services.Cohort
             return (rec) => rec.ToImmunization();
         }
 
-        ImmunizationDatasetRecord GetRecord(SqlDataReader reader)
+        ImmunizationDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new ImmunizationDatasetRecord
             {
@@ -506,7 +500,7 @@ namespace Services.Cohort
             Plan = new ProcedureMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -534,7 +528,7 @@ namespace Services.Cohort
             return (rec) => rec.ToProcedure();
         }
 
-        ProcedureDatasetRecord GetRecord(SqlDataReader reader)
+        ProcedureDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new ProcedureDatasetRecord
             {
@@ -561,7 +555,7 @@ namespace Services.Cohort
             Plan = new ConditionMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -589,7 +583,7 @@ namespace Services.Cohort
             return (rec) => rec.ToCondition();
         }
 
-        ConditionDatasetRecord GetRecord(SqlDataReader reader)
+        ConditionDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var d = new ConditionDatasetRecord
             {
@@ -618,7 +612,7 @@ namespace Services.Cohort
             Plan = new EncounterMarshalPlan(schema);
         }
 
-        public override IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, opts);
@@ -646,7 +640,7 @@ namespace Services.Cohort
             return (rec) => rec.ToEncounter();
         }
 
-        EncounterDatasetRecord GetRecord(SqlDataReader reader)
+        EncounterDatasetRecord GetRecord(ILeafDbDataReader reader)
         {
             var enc = new EncounterDatasetRecord
             {

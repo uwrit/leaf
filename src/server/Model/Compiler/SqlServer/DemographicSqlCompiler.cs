@@ -32,7 +32,7 @@ namespace Model.Compiler.SqlServer
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
 
             var parameters = compiler.BuildContextParameterSql();
-            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId);
+            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, false);
             var cohortCte = CteCohortInternals(context.QueryContext);
             var datasetCte = CteDemographicInternals(context.DemographicQuery);
             var filterCte = CteFilterInternals(context, restrictPhi);

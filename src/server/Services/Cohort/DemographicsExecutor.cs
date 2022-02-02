@@ -46,7 +46,7 @@ namespace Services.Cohort
             var connStr = dbOpts.ConnectionString;
             var timeout = dbOpts.DefaultTimeout;
             var parameters = context.Parameters;
-            var sql = context.CompiledQuery;
+            var sql = context.FullQuery;
             var pepper = context.QueryContext.Pepper;
             var deidentify = deidentOpts.Patient.Enabled && user.Anonymize();
 

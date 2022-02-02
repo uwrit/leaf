@@ -12,7 +12,7 @@ namespace Model.Compiler
         public QueryContext QueryContext { get; set; }
         public virtual Shape Shape { get; }
 
-        public const string QueryIdParam = "@queryid";
+        public const string QueryIdParam = "queryid";
     }
 
     public sealed class DatasetCompilerContext : ShapedDatasetCompilerContext

@@ -8,39 +8,46 @@ using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Model.Compiler.SqlServer
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
         readonly ISqlCompiler compiler;
+        readonly ISqlDialect dialect;
+        readonly ICachedCohortPreparer cachedCohortPreparer;
         readonly CompilerOptions compilerOptions;
-        readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DatasetExecutionContext executionContext;
 
         public DatasetSqlCompiler(
             ISqlCompiler compiler,
-            IOptions<CompilerOptions> compOpts)
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer,
+            IOptions<CompilerOptions> compilerOptions)
         {
             this.compiler = compiler;
-            this.compilerOptions = compOpts.Value;
+            this.dialect = dialect;
+            this.cachedCohortPreparer = cachedCohortPreparer;
+            this.compilerOptions = compilerOptions.Value;
         }
 
-        public DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext compilerContext)
+        public async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
         {
-            executionContext = new DatasetExecutionContext(compilerContext.Shape, compilerContext.QueryContext, compilerContext.DatasetQuery.Id.Value);
+            executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
-            var cohort = CteCohortInternals(compilerContext);
-
-            new SqlValidator(SqlCommon.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
-            var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
-
-            var filter = CteFilterInternals(compilerContext);
-            var select = SelectFromCTE(compilerContext);
             var parameters = compiler.BuildContextParameterSql();
-            executionContext.DatasetQuery = compilerContext.DatasetQuery;
-            executionContext.CompiledQuery = Compose(parameters, cohort, dataset, filter, select);
+            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
+            var cohortCte = CteCohortInternals(context);
+            var datasetCte = CteDatasetInternals(context.DatasetQuery);
+            var filterCte = CteFilterInternals(context);
+            var select = SelectFromCTE(context);
+
+            executionContext.QueryPrelude = prelude;
+            executionContext.DatasetQuery = context.DatasetQuery;
+            executionContext.CompiledQuery = Compose(parameters, cohortCte, datasetCte, filterCte, select);
 
             return executionContext;
         }
@@ -57,11 +64,10 @@ namespace Model.Compiler.SqlServer
             // If joining to a given panel to filter by encounter.
             if (ctx.JoinToPanel)
             {
-                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions).ToString();
+                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions, dialect).ToString();
             }
 
-            // Else return standard cached cohort.
-            return $"SELECT {fieldInternalPersonId} = PersonId, Salt FROM {compilerOptions.AppDb}.app.Cohort WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} AND Exported = 1";
+            return cachedCohortPreparer.CohortToCte();
         }
 
         string CteDatasetInternals(IDatasetQuery datasetQuery) => datasetQuery.SqlStatement;
@@ -89,14 +95,14 @@ namespace Model.Compiler.SqlServer
             {
                 return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{DatasetColumns.PersonId} AND filter.{EncounterColumns.EncounterId} = cohort.{EncounterColumns.EncounterId}";
             }
-            return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
+            return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{cachedCohortPreparer.FieldInternalPersonId}";
         }
     }
 
     abstract class DatasetDateFilterProvider
     {
-        const string earlyParamName = "@early";
-        const string lateParamName = "@late";
+        const string earlyParamName = "early";
+        const string lateParamName = "late";
 
         protected abstract string TargetDateField { get; }
 
@@ -149,7 +155,7 @@ namespace Model.Compiler.SqlServer
             // both present
             if (early.HasValue && late.HasValue)
             {
-                var clause = $"{TargetDateField} {SqlCommon.Syntax.BETWEEN} {earlyParamName} {SqlCommon.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} BETWEEN {earlyParamName} AND {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -165,7 +171,7 @@ namespace Model.Compiler.SqlServer
             if (early.HasValue && !late.HasValue)
             {
                 var now = DateTime.Now;
-                var clause = $"{TargetDateField} {SqlCommon.Syntax.BETWEEN} {earlyParamName} {SqlCommon.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} BETWEEN {earlyParamName} AND {lateParamName}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,

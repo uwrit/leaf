@@ -30,7 +30,11 @@ namespace Services.Compiler
             get => reader[i];
         }
 
-        
+        public object this[string colName]
+        {
+            get => reader[colName];
+        }
+
         public async Task CloseAsync()
         {
             if (!reader.IsClosed)
@@ -46,7 +50,9 @@ namespace Services.Compiler
         public bool Read()                                     => reader.Read();
         public IReadOnlyCollection<DbColumn> GetColumnSchema() => reader.GetColumnSchema();
 
+        public int GetOrdinal(string colName)           => reader.GetOrdinal(colName);
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
+        public Guid GetGuid(int index)                  => Guid.Parse(reader.GetString(index));
         public Guid? GetNullableGuid(int index)         => reader.IsDBNull(index) ? null : reader.GetGuid(index);
         public DateTime? GetNullableDateTime(int index) => reader.IsDBNull(index) ? null : reader.GetDateTime(index);
         public bool GetBoolean(int index)               => reader.GetBoolean(index);
@@ -104,19 +110,27 @@ namespace Services.Compiler
         }
 
         readonly BigQueryResults results;
+        Dictionary<string, int?> colByOrdinal;
         BigQueryRow row;
         int rowIndex;
         int totalRows;
+        IEnumerable<BigQueryDbColumn> schema;
 
         public object this[int i]
         {
             get => row[i];
         }
 
+        public object this[string colName]
+        {
+            get => row[colName];
+        }
+
         public BigQueryWrappedDbReader(BigQueryResults results)
         {
             this.results = results;
             this.totalRows = Convert.ToInt32(results.TotalRows);
+            GetColumnSchema();
         }
 
         public bool Read()
@@ -137,17 +151,31 @@ namespace Services.Compiler
 
         public IReadOnlyCollection<DbColumn> GetColumnSchema()
         {
-            var cols = results.Schema.Fields.Select((f, i) => new BigQueryDbColumn(f, i));
-            return new ReadOnlyCollection<BigQueryDbColumn>(cols.ToArray());
+            if (schema == null)
+            {
+                schema = results.Schema.Fields.Select((f, i) => new BigQueryDbColumn(f, i));
+                colByOrdinal = schema.ToDictionary(c => c.ColumnName, c => c.ColumnOrdinal);
+            }
+            return new ReadOnlyCollection<BigQueryDbColumn>(schema.ToArray());
         }
 
         public string GetNullableString(int index)      => row[index] is string @val ? @val : null;
         public Guid? GetNullableGuid(int index)         => row[index] is Guid @val ? @val : null;
         public DateTime? GetNullableDateTime(int index) => row[index] is DateTime @val ? @val : null;
+        public Guid GetGuid(int index)                  => Guid.Parse(row[index].ToString());
         public bool GetBoolean(int index)               => (bool)row[index];
         public bool? GetNullableBoolean(int index)      => row[index] is bool @val ? @val : null;
         public int? GetNullableInt(int index)           => row[index] is int @val ? @val : null;
         public object GetNullableObject(int index)      => row[index] ?? null;
+
+        public int GetOrdinal(string colName)
+        {
+            int? ordinal;
+            var found = colByOrdinal.TryGetValue(colName, out ordinal);
+
+            if (found) return (int)ordinal;
+            return -1;
+        }
 
         public string GetNullableString(int? index)
         {
