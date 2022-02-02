@@ -41,11 +41,15 @@ namespace Services.Cohort
 
         async Task<HashSet<string>> GetPatientSetAsync(ISqlStatement query, CancellationToken token)
         {
-            var patientIds = await executor.ExecuteCohortQueryAsync(
-                clinDbOptions.ConnectionString,
-                query.SqlStatement,
-                clinDbOptions.DefaultTimeout,
-                token);
+            var patientIds = new HashSet<string>();
+            var reader = await executor.ExecuteReaderAsync(clinDbOptions.ConnectionString, query.SqlStatement, clinDbOptions.DefaultTimeout, token);
+
+            while (reader.Read())
+            {
+                patientIds.Add(reader[0].ToString());
+            }
+
+            await reader.CloseAsync();
 
             return patientIds;
         }

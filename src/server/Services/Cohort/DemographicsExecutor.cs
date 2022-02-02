@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
@@ -63,7 +64,7 @@ namespace Services.Cohort
             }
         }
 
-        DatasetResultSchema GetShapedSchema(DemographicExecutionContext context, SqlDataReader reader)
+        DatasetResultSchema GetShapedSchema(DemographicExecutionContext context, DbDataReader reader)
         {
             var shape = context.Shape;
             var actualSchema = GetResultSchema(shape, reader);
@@ -83,7 +84,7 @@ namespace Services.Cohort
             return validationSchema.GetShapedSchema(actualSchema);
         }
 
-        DatasetResultSchema GetResultSchema(Shape shape, SqlDataReader reader)
+        DatasetResultSchema GetResultSchema(Shape shape, DbDataReader reader)
         {
             var columns = reader.GetColumnSchema();
             var fields = columns.Select(c => new SchemaField(c)).ToArray();
@@ -102,7 +103,7 @@ namespace Services.Cohort
             Pepper = pepper;
         }
 
-        public PatientDemographicContext Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts)
+        public PatientDemographicContext Marshal(DbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
             var exported = new List<PatientDemographic>();
             var cohort = new List<PatientDemographic>();
@@ -146,7 +147,7 @@ namespace Services.Cohort
             };
         }
 
-        PatientDemographicRecord GetCohortRecord(SqlDataReader reader)
+        PatientDemographicRecord GetCohortRecord(DbDataReader reader)
         {
             var rec = new PatientDemographicRecord
             {

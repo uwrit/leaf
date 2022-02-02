@@ -4,8 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,55 +12,37 @@ using Google.Cloud.BigQuery.V2;
 
 namespace Services.Compiler
 {
-    public abstract class BaseSqlProviderQueryExecutor
-    {
-        internal async Task<HashSet<string>> ExecuteCohortQueryAsync(DbConnection conn, DbCommand cmd, CancellationToken token)
-        {
-            var output = new HashSet<string>();
-            await conn.OpenAsync();
-            using (var reader = await cmd.ExecuteReaderAsync(token))
-            {
-                while (reader.Read())
-                {
-                    output.Add(reader[0].ToString());
-                }
-            }
-            await conn.CloseAsync();
-            return output;
-        }
-    }
-
     /**
      * SQL Server
      */
-    public class SqlServerQueryExecutor : BaseSqlProviderQueryExecutor, ISqlProviderQueryExecutor
+    public class SqlServerQueryExecutor : ISqlProviderQueryExecutor
     {
-        public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
+        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new SqlConnection(connStr);
-            var cmd = new SqlCommand(query, conn)
-            {
-                CommandTimeout = timeout
-            };
+            await conn.OpenAsync();
 
-            return await ExecuteCohortQueryAsync(conn, cmd, token);
+            var cmd = new SqlCommand(query, conn) { CommandTimeout = timeout };
+            var reader = await cmd.ExecuteReaderAsync(token);
+
+            return new WrappedDbDataReader(conn, reader);
         }
     }
 
     /**
      * MySQL
      */
-    public class MySqlQueryExecutor : BaseSqlProviderQueryExecutor, ISqlProviderQueryExecutor
+    public class MySqlQueryExecutor : ISqlProviderQueryExecutor
     {
-        public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
+        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new MySql.Data.MySqlClient.MySqlConnection(connStr);
-            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn)
-            {
-                CommandTimeout = timeout
-            };
+            await conn.OpenAsync();
 
-            return await ExecuteCohortQueryAsync(conn, cmd, token);
+            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn) { CommandTimeout = timeout };
+            var reader = await cmd.ExecuteReaderAsync(token);
+
+            return new WrappedDbDataReader(conn, reader);
         }
     }
 
@@ -77,34 +57,34 @@ namespace Services.Compiler
     /**
      * PostgreSQL
      */
-    public class PostgreSqlQueryExecutor : BaseSqlProviderQueryExecutor, ISqlProviderQueryExecutor
+    public class PostgreSqlQueryExecutor : ISqlProviderQueryExecutor
     {
-        public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
+        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new Npgsql.NpgsqlConnection(connStr);
-            var cmd = new Npgsql.NpgsqlCommand(query, conn)
-            {
-                CommandTimeout = timeout
-            };
+            await conn.OpenAsync();
 
-            return await ExecuteCohortQueryAsync(conn, cmd, token);
+            var cmd = new Npgsql.NpgsqlCommand(query, conn) { CommandTimeout = timeout };
+            var reader = await cmd.ExecuteReaderAsync(token);
+
+            return new WrappedDbDataReader(conn, reader);
         }
     }
 
     /**
      * Oracle
      */
-    public class OracleQueryExecutor : BaseSqlProviderQueryExecutor, ISqlProviderQueryExecutor
+    public class OracleQueryExecutor : ISqlProviderQueryExecutor
     {
-        public async Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token)
+        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
         {
             var conn = new System.Data.OracleClient.OracleConnection(connStr);
-            var cmd = new System.Data.OracleClient.OracleCommand(query, conn)
-            {
-                CommandTimeout = timeout
-            };
+            await conn.OpenAsync();
 
-            return await ExecuteCohortQueryAsync(conn, cmd, token);
+            var cmd = new System.Data.OracleClient.OracleCommand(query, conn) { CommandTimeout = timeout };
+            var reader = await cmd.ExecuteReaderAsync(token);
+
+            return new WrappedDbDataReader(conn, reader);
         }
     }
 
@@ -113,6 +93,7 @@ namespace Services.Compiler
      */
     public class BigQueryQueryExecutor : ISqlProviderQueryExecutor
     {
+        /*
         public async Task<HashSet<string>> ExecuteCohortQueryAsync(string projectId, string query, int timeout, CancellationToken token)
         {
             var output = new HashSet<string>();
@@ -125,6 +106,15 @@ namespace Services.Compiler
             }
 
             return output;
+        }
+        */
+
+        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string projectId, string query, int timeout, CancellationToken token)
+        {
+            var client = await BigQueryClient.CreateAsync(projectId);
+            var results = await client.ExecuteQueryAsync(query, parameters: null);
+
+            return new BigQueryWrappedDbReader(results);
         }
     }
 }
