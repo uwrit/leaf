@@ -65,16 +65,6 @@ export const updateAdminHelpPage = async (state: AppState, p: AdminHelpPage): Pr
 };
 
 /*
- * Update help page category.
- */
-export const updateAdminHelpPageCategory = async (state: AppState, catId: string, c: AdminHelpPageCategoryDTO): Promise<AdminHelpPageCategoryDTO> => {
-    const { token } = state.session.context!;
-    const http = HttpFactory.authenticated(token);
-    const resp = await http.put(`api/admin/helppages/categories/${catId}`, c);
-    return resp.data as AdminHelpPageCategoryDTO;
-};
-
-/*
  * Delete help page and content, and category if no pages under category.
  */
 export const deleteAdminHelpPage = async (state: AppState, pageId: string): Promise<AdminHelpPageDTO> => {

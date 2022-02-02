@@ -6,8 +6,8 @@
  */ 
 
 import React from 'react';
-import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { connect } from 'react-redux';
+import { Button, Dropdown, DropdownMenu, DropdownToggle, Input } from 'reactstrap';
 import { setAdminHelpPage, setCurrentAdminHelpPage, isAdminHelpPageNew, isAdminHelpPageUnsaved } from '../../actions/admin/helpPage';
 import { exampleText }  from '../../components/Admin/HelpEditor/ExampleText';
 import { Categories } from '../../components/Admin/HelpEditor/Categories/Categories';
@@ -96,7 +96,7 @@ export class AdminHelp extends React.PureComponent<Props, State> {
                     
                     {(adminHelp.helpState === AdminHelpPageLoadState.LOADED) &&
                         <Categories
-                            categoryMap={adminHelp.categories}
+                            categories={categories}
                             newCategory={category}
                             newTitle={title}
                             dispatch={dispatch}

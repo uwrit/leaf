@@ -166,12 +166,9 @@ export class HelpEditor extends React.Component<Props, State> {
     private handleContentChange = (val: string, index: number) => {
         const { dispatch, currentPage } = this.props;
         // Make copy of current content to edit
-        // dont need to make a copy, right? also, when do you make copy? w/o copy, keeps rerendering?
         const contentCopy = currentPage.content.slice();
-
         // TODO: dont feel comfortable with filter, is there a better way?
         const textContentRows = contentCopy.filter(c => c.type.toLowerCase() === "text").length;
-
         // Find content row via index to edit
         const contentRow = contentCopy.find((_, i) => i === index);
 

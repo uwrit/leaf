@@ -30,7 +30,6 @@ namespace Services.Admin.Compiler
             public const string GetHelpPageContent = "adm.sp_GetHelpPageContent";
             public const string Create = "adm.sp_CreateHelpPage";
             public const string Update = "adm.sp_UpdateHelpPage";
-            public const string UpdateCategory = "adm.sp_UpdateHelpPageCategory";
             public const string Delete = "adm.sp_DeleteHelpPage";
         }
 
@@ -133,22 +132,6 @@ namespace Services.Admin.Compiler
                 );
 
                 return AdminHelpReader.Read(grid);
-            }
-        }
-
-        public async Task<AdminHelpPageCategory> UpdateCategoryAsync(Guid categoryId, AdminHelpPageCategory c)
-        {
-            using (var cn = new SqlConnection(opts.ConnectionString))
-            {
-                await cn.OpenAsync();
-                var updatedCat = await cn.QuerySingleAsync<AdminHelpPageCategory>(
-                    Sql.UpdateCategory,
-                    new { prevCategoryId = categoryId, newCategoryId = c.Id, newCategoryName = c.Name },
-                    commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
-                );
-
-                return updatedCat;
             }
         }
 

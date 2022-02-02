@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { Row, Col } from 'reactstrap';
-import { AdminHelpCategoryMap, PartialAdminHelpPage } from '../../../../models/admin/Help';
+import { AdminHelpCategoryPageCache, PartialAdminHelpPage } from '../../../../models/admin/Help';
 import { Pages } from '../Pages/Pages';
 import './Categories.css';
 
 interface Props {
-    categoryMap: AdminHelpCategoryMap;
+    categories: AdminHelpCategoryPageCache[];
     newCategory: string;
     newTitle: string;
     dispatch: any;
@@ -23,8 +23,7 @@ export class Categories extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { categoryMap, dispatch, newCategory, newTitle } = this.props;
-        const categories = [ ...categoryMap.values() ];
+        const { categories, dispatch, newCategory, newTitle } = this.props;
         // Filter categories to get only categories that have pages.
         const newCatsList = categories.filter(c => c.partialPages.length);
         // Filter from all categories including categories without pages.
@@ -43,7 +42,6 @@ export class Categories extends React.Component<Props> {
                 {newCatsList.map(c =>
                     <Pages
                         key={c.id}
-                        categoryMap={categoryMap}
                         currentCategory={c}
                         tempPartialHelpPage={tempPartialPage}
                         dispatch={dispatch}

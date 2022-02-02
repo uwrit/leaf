@@ -30,15 +30,6 @@ export const setAdminHelpCategoryMap = (state: AdminState, action: AdminHelpPage
     });
 };
 
-export const updateAdminHelpCategoryMap = (state: AdminState, action: AdminHelpPageAction): AdminState => {
-    return Object.assign({}, state, {
-        help: {
-            ...state.help,
-            categories: action.categoryMap
-        }
-    });
-};
-
 export const setAdminHelpPage = (state: AdminState, action: AdminHelpPageAction): AdminState => {
     return Object.assign({}, state, {
         help: {
