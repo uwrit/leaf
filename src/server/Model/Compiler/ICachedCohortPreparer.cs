@@ -20,6 +20,8 @@ namespace Model.Compiler
         public string TempTableName { get; set; }
         public Task<string> Prepare(Guid queryId, bool exportedOnly);
         public string CohortToCte();
+        public string CohortToCteFrom();
+        public string CohortToCteWhere();
     }
 
     public abstract class BaseCachedCohortPreparer : ICachedCohortPreparer
@@ -30,6 +32,12 @@ namespace Model.Compiler
         readonly internal CompilerOptions compilerOpts;
         readonly internal int batchSize = 1000;
         internal bool exportedOnly;
+
+        public BaseCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        {
+            this.cohortFetcher = cohortFetcher;
+            this.compilerOpts = compilerOpts;
+        }
 
         internal string InsertDelimited(CachedCohortRecord rec, string delimeter = "'")
         {
@@ -46,19 +54,17 @@ namespace Model.Compiler
             }
         }
 
-        public BaseCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
-        {
-            this.cohortFetcher = cohortFetcher;
-            this.compilerOpts = compilerOpts;
-        }
-
         public virtual async Task<string> Prepare(Guid queryId, bool exportedOnly) => ""; // no-op
+
+        public virtual string CohortToCteFrom() => TempTableName;
+
+        public virtual string CohortToCteWhere() => null;
 
         public virtual string CohortToCte()
         {
             return
                 $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt " +
-                $"FROM {TempTableName} ";
+                $"FROM {CohortToCteFrom()}";
         }
     }
 
@@ -75,12 +81,12 @@ namespace Model.Compiler
             return "";
         }
 
-        public override string CohortToCte()
+        public override string CohortToCteFrom() => $"{compilerOpts.AppDb}.app.Cohort";
+
+        public override string CohortToCteWhere()
         {
             var output = new StringBuilder();
-            output.Append($"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt ");
-            output.Append($"FROM {compilerOpts.AppDb}.app.Cohort ");
-            output.Append($"WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} ");
+            output.Append($"QueryId = {ShapedDatasetCompilerContext.QueryIdParam}");
 
             if (exportedOnly)
             {
@@ -88,6 +94,11 @@ namespace Model.Compiler
             }
 
             return output.ToString();
+        }
+
+        public override string CohortToCte()
+        {
+            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()} WHERE {CohortToCteWhere()}";
         }
     }
 
@@ -120,10 +131,9 @@ namespace Model.Compiler
             return output.ToString();
         }
 
-        public override string CohortToCte()
-        {
-            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM #{TempTableName}";
-        }
+        public override string CohortToCteFrom() => $"#{TempTableName}";
+
+        public override string CohortToCte() => $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()}";
     }
 
     // MySQL
@@ -196,9 +206,11 @@ namespace Model.Compiler
             return output.ToString();
         }
 
+        public override string CohortToCteFrom() => $"ORA${TempTableName}";
+
         public override string CohortToCte()
         {
-            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM ORA${TempTableName}";
+            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()}";
         }
     }
 

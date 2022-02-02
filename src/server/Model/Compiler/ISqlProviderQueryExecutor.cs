@@ -29,8 +29,8 @@ namespace Model.Compiler
             get;
         }
 
+        public void Close();
         public Task CloseAsync();
-
         public bool Read();
         public IReadOnlyCollection<DbColumn> GetColumnSchema();
         public int GetOrdinal(string colName);

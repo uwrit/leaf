@@ -73,7 +73,7 @@ namespace API.Options
 
             services.AddHostedService<BackgroundServerStateSynchronizer>();
 
-            services.AddTransient<ISqlCompiler, SqlServerCompiler>();
+            services.AddTransient<IPanelSqlCompiler, PanelSqlCompiler>();
 
             services.AddTransient<NetworkEndpointProvider.INetworkEndpointReader, NetworkEndpointReader>();
 

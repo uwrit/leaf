@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Model.Compiler
 {
-    public interface ISqlCompiler
+    public interface IPanelSqlCompiler
     {
         string BuildPanelSql(Panel panel);
         ISqlStatement BuildCteSql(IEnumerable<Panel> panels);

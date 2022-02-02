@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Model.Compiler.SqlBuilder;
 using Model.Options;
@@ -14,22 +15,27 @@ namespace Model.Compiler.PanelSqlCompiler
     {
         readonly CompilerOptions compilerOptions;
         readonly ISqlDialect dialect;
+        readonly ICachedCohortPreparer cachedCohortPreparer;
 
         public PanelDatasetSqlCompiler(
             IOptions<CompilerOptions> compilerOptions,
-            ISqlDialect dialect)
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer)
         {
             this.compilerOptions = compilerOptions.Value;
             this.dialect = dialect;
+            this.cachedCohortPreparer = cachedCohortPreparer;
         }
 
-        public ConceptDatasetExecutionContext BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
+        public async Task<ConceptDatasetExecutionContext> BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
         {
-            var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions, dialect).ToString();
+            var prelude = await cachedCohortPreparer.Prepare(compilerContext.QueryContext.QueryId, true);
+            var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions, dialect, cachedCohortPreparer).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(query);
 
             var exeContext = new ConceptDatasetExecutionContext(compilerContext.QueryContext, compilerContext.QueryContext.QueryId);
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, compilerContext.QueryContext.QueryId);
+            exeContext.QueryPrelude = prelude;
             exeContext.CompiledQuery = query;
 
             return exeContext;

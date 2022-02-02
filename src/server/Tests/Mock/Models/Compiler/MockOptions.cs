@@ -6,13 +6,18 @@
 using System;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
+using Model.Compiler;
 using Model.Compiler.PanelSqlCompiler;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 
 namespace Tests.Mock.Models.Compiler
 {
     public static class MockOptions
     {
+        static readonly ISqlDialect dialect = new TSqlDialect();
+        static readonly IOptions<CompilerOptions> opts = GenerateOmopOptions();
+
         public static IOptions<CompilerOptions> GenerateOmopOptions()
         {
             return Options.Create(new CompilerOptions
@@ -28,12 +33,11 @@ namespace Tests.Mock.Models.Compiler
             return Options.Create(new CohortOptions());
         }
 
-        public static SqlServerCompiler GenerateSqlServerCompiler()
+        public static PanelSqlCompiler GenerateSqlServerCompiler()
         {
             IOptions<CompilerOptions> compilerOptions = GenerateOmopOptions();
-            IOptions<CohortOptions> cohortOptions = GenerateCohortOptions();
 
-            return new SqlServerCompiler(new MockUser(), compilerOptions, cohortOptions);
+            return new PanelSqlCompiler(new MockUser(), dialect, compilerOptions);
         }
 
         class MockUser : IUserContext

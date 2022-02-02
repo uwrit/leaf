@@ -19,7 +19,7 @@ namespace Services.Cohort
     public class CtePatientCohortService : PatientCohortService
     {
         public CtePatientCohortService(
-            ISqlCompiler compiler,
+            IPanelSqlCompiler compiler,
             ISqlProviderQueryExecutor executor,
             IOptions<ClinDbOptions> clinOpts,
             ILogger<PatientCohortService> logger) : base(compiler, executor, clinOpts, logger)

@@ -13,13 +13,13 @@ namespace Model.Compiler.PanelSqlCompiler
 {
     public class DemographicSqlCompiler : IDemographicSqlCompiler
     {
-        readonly ISqlCompiler compiler;
+        readonly IPanelSqlCompiler compiler;
         readonly ICachedCohortPreparer cachedCohortPreparer;
 
         DemographicExecutionContext executionContext;
 
         public DemographicSqlCompiler(
-            ISqlCompiler compiler,
+            IPanelSqlCompiler compiler,
             ICachedCohortPreparer cachedCohortPreparer)
         {
             this.compiler = compiler;

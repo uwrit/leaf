@@ -13,7 +13,12 @@ namespace Services.Startup
     {
         public ParsedConnectionString Parse(IConnectionString dbOptions)
         {
-            var conn = new SqlConnection(dbOptions.ConnectionString);
+            return Parse(dbOptions.ConnectionString);
+        }
+
+        public ParsedConnectionString Parse(string connStr)
+        {
+            var conn = new SqlConnection(connStr);
 
             return new ParsedConnectionString
             {

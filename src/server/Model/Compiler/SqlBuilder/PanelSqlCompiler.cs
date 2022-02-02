@@ -15,18 +15,18 @@ using Model.Authorization;
 
 namespace Model.Compiler.PanelSqlCompiler
 {
-    public class SqlServerCompiler : ISqlCompiler
+    public class PanelSqlCompiler : IPanelSqlCompiler
     {
         readonly IUserContext user;
         readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
 
-        public SqlServerCompiler(
-            IUserContext userContext,
+        public PanelSqlCompiler(
+            IUserContext user,
             ISqlDialect dialect,
             IOptions<CompilerOptions> compilerOptions)
         {
-            this.user = userContext;
+            this.user = user;
             this.dialect = dialect;
             this.compilerOptions = compilerOptions.Value;
         }
@@ -51,13 +51,6 @@ namespace Model.Compiler.PanelSqlCompiler
                 default:
                     return string.Empty;
             }
-            ValidateSql(sql);
-            return sql;
-        }
-
-        public string BuildDatasetEncounterFilterSql(Panel panel)
-        {
-            var sql = new DatasetJoinedSqlSet(panel, compilerOptions, dialect).ToString();
             ValidateSql(sql);
             return sql;
         }

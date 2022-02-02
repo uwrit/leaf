@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Compiler.PanelSqlCompiler;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Services.Startup;
 using Xunit;
@@ -17,110 +18,76 @@ namespace Tests
     public class DatasetSqlCompilerTests
     {
         static readonly ConnectionStringParser extractor = new ConnectionStringParser();
+        static readonly ISqlDialect dialect = new TSqlDialect();
+        static readonly IOptions<CompilerOptions> opts = GetCompilerOptions();
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, opts.Value);
+        static readonly DatasetSqlCompiler datasetSqlCompiler = new DatasetSqlCompiler(GetSqlCompiler(), dialect, cachedCohortPreparer, opts);
 
         [Fact]
-        public void Should_Correctly_Represent_Observation_Shape()
+        public async void Should_Correctly_Represent_Observation_Shape()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Equal(Shape.Observation, executionCtx.Shape);
         }
 
         [Fact]
-        public void Should_Correctly_Represent_Encounter_Shape()
+        public async void Should_Correctly_Represent_Encounter_Shape()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Equal(Shape.Encounter, executionCtx.Shape);
         }
 
         [Fact]
-        public void Should_Correctly_Reference_AppDb()
+        public async void Should_Correctly_Reference_AppDb()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains("LeafDB", executionCtx.CompiledQuery);
         }
 
         [Fact]
-        public void Should_Correctly_Reference_QueryId_Parameter()
+        public async void Should_Correctly_Reference_QueryId_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ShapedDatasetCompilerContext.QueryIdParam, executionCtx.CompiledQuery);
             Assert.Contains(executionCtx.Parameters, p => p.Name == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
         }
 
         [Fact]
-        public void Observation_Should_Correctly_Reference_LateBound_Parameter()
+        public async void Observation_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "late");
         }
 
         [Fact]
-        public void Encounter_Should_Correctly_Reference_LateBound_Parameter()
+        public async void Encounter_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
+            Assert.Contains(executionCtx.Parameters, p => p.Name == "late");
         }
 
         [Fact]
-        public void Observation_Should_Correctly_Reference_EarlyBound_And_LateBound_Parameter()
+        public async void Should_Throw_If_Sql_Contains_Illegal_Command()
         {
-            var compilerCtx = GetObservationCompilerContext(early: true);
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compilerCtx = GetObservationCompilerContext();
 
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
-
-            Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@early");
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
-        }
-
-        [Fact]
-        public void Encounter_Should_Correctly_Reference_EarlyBound_And_LateBound_Parameter()
-        {
-            var compilerCtx = GetEncounterCompilerContext(early: true, late: true);
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
-
-            var executionCtx = compiler.BuildDatasetSql(compilerCtx);
-
-            Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@early");
-            Assert.Contains(executionCtx.Parameters, p => p.Name == "@late");
-        }
-
-        [Fact]
-        public void Should_Throw_If_Sql_Contains_Illegal_Command()
-        {
-            var compilerCtx = GetEncounterCompilerContext();
             compilerCtx.DatasetQuery.SqlStatement = "DROP TABLE encounter";
-            var compiler = new DatasetSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
 
-            Assert.Throws<LeafCompilerException>(() => compiler.BuildDatasetSql(compilerCtx));
+            await Assert.ThrowsAsync<LeafCompilerException>(async () => await datasetSqlCompiler.BuildDatasetSql(compilerCtx));
         }
 
         static DatasetCompilerContext GetObservationCompilerContext(bool early = false, bool late = false)
@@ -191,15 +158,13 @@ namespace Tests
             {
                 ConnectionString = @"Server=fake;Database=LeafDB;Trusted_Connection=True"
             };
-            return Options.Create(new CompilerOptions { AppDb = extractor.Parse(dbOpts) });
+            return Options.Create(new CompilerOptions { AppDb = extractor.Parse(dbOpts.ConnectionString).Database });
         }
 
-        static ISqlCompiler GetSqlCompiler()
+        static IPanelSqlCompiler GetSqlCompiler()
         {
-            var compOpts = GetCompilerOptions();
             var user = new MockUser();
-            var cohortOpts = Options.Create(new CohortOptions());
-            return new SqlServerCompiler(user, compOpts, cohortOpts);
+            return new PanelSqlCompiler(user, dialect, opts);
         }
 
         class MockUser : IUserContext

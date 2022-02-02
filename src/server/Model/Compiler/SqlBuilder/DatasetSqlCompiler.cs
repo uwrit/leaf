@@ -14,7 +14,7 @@ namespace Model.Compiler.PanelSqlCompiler
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
-        readonly ISqlCompiler compiler;
+        readonly IPanelSqlCompiler compiler;
         readonly ISqlDialect dialect;
         readonly ICachedCohortPreparer cachedCohortPreparer;
         readonly CompilerOptions compilerOptions;
@@ -22,7 +22,7 @@ namespace Model.Compiler.PanelSqlCompiler
         DatasetExecutionContext executionContext;
 
         public DatasetSqlCompiler(
-            ISqlCompiler compiler,
+            IPanelSqlCompiler compiler,
             ISqlDialect dialect,
             ICachedCohortPreparer cachedCohortPreparer,
             IOptions<CompilerOptions> compilerOptions)
@@ -64,7 +64,7 @@ namespace Model.Compiler.PanelSqlCompiler
             // If joining to a given panel to filter by encounter.
             if (ctx.JoinToPanel)
             {
-                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions, dialect).ToString();
+                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions, dialect, cachedCohortPreparer).ToString();
             }
 
             return cachedCohortPreparer.CohortToCte();

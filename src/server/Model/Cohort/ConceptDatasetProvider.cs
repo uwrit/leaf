@@ -54,7 +54,7 @@ namespace Model.Cohort
                 log.LogError("ConceptDatasetCompilerContext error. State:{State}", validationContext.State);
                 return result;
             }
-            var exeContext = conceptDatasetSqlCompiler.BuildConceptDatasetSql(validationContext.Context);
+            var exeContext = await conceptDatasetSqlCompiler.BuildConceptDatasetSql(validationContext.Context);
             log.LogInformation("Compiled ConceptDataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);

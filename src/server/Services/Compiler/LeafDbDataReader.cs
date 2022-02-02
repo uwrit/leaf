@@ -35,6 +35,18 @@ namespace Services.Compiler
             get => reader[colName];
         }
 
+        public void Close()
+        {
+            if (!reader.IsClosed)
+            {
+                reader.Close();
+            }
+            if (conn.State == System.Data.ConnectionState.Open)
+            {
+                conn.Close();
+            }
+        }
+
         public async Task CloseAsync()
         {
             if (!reader.IsClosed)
@@ -99,16 +111,6 @@ namespace Services.Compiler
 
     public class BigQueryWrappedDbReader : ILeafDbDataReader
     {
-        public class BigQueryDbColumn : DbColumn
-        {
-            public BigQueryDbColumn(Google.Apis.Bigquery.v2.Data.TableFieldSchema field, int index)
-            {
-                ColumnName = field.Name;
-                DataTypeName = field.Type;
-                ColumnOrdinal = index;
-            }
-        }
-
         readonly BigQueryResults results;
         Dictionary<string, int?> colByOrdinal;
         BigQueryRow row;
@@ -144,6 +146,11 @@ namespace Services.Compiler
             return false;
         }
 
+        public void Close()
+        {
+            // noop
+        }
+
         public async Task CloseAsync()
         {
             // noop
@@ -170,9 +177,7 @@ namespace Services.Compiler
 
         public int GetOrdinal(string colName)
         {
-            int? ordinal;
-            var found = colByOrdinal.TryGetValue(colName, out ordinal);
-
+            var found = colByOrdinal.TryGetValue(colName, out var ordinal);
             if (found) return (int)ordinal;
             return -1;
         }
@@ -211,6 +216,16 @@ namespace Services.Compiler
         {
             if (index.HasValue) return GetNullableObject(index.Value);
             return null;
+        }
+
+        public class BigQueryDbColumn : DbColumn
+        {
+            public BigQueryDbColumn(Google.Apis.Bigquery.v2.Data.TableFieldSchema field, int index)
+            {
+                ColumnName = field.Name;
+                DataTypeName = field.Type;
+                ColumnOrdinal = index;
+            }
         }
     }
 }

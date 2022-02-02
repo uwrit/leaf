@@ -14,13 +14,17 @@ namespace Model.Compiler.SqlBuilder
     {
         public Column Salt { get; protected set; }
         readonly string queryParamPlaceholder = "___queryid___";
+        readonly ICachedCohortPreparer cachedCohortPreparer;
 
         public DatasetJoinedSqlSet(
             Panel panel,
             CompilerOptions compilerOptions,
-            ISqlDialect dialect) : base(panel, compilerOptions, dialect)
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer) : base(panel, compilerOptions, dialect)
         {
-            var sp = GetCachedCohortSubPanel(compilerOptions);
+            this.cachedCohortPreparer = cachedCohortPreparer;
+
+            var sp = GetCachedCohortSubPanel();
             var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions, dialect);
             var join  = new DatasetJoinedSequentialSqlSet(cache);
             var first = From.First() as JoinedSequentialSqlSet;
@@ -45,7 +49,7 @@ namespace Model.Compiler.SqlBuilder
                 .Replace(queryParamPlaceholder, ShapedDatasetCompilerContext.QueryIdParam);
         }
 
-        SubPanel GetCachedCohortSubPanel(CompilerOptions compilerOptions)
+        SubPanel GetCachedCohortSubPanel()
         {
             return new SubPanel
             {
@@ -55,8 +59,8 @@ namespace Model.Compiler.SqlBuilder
                     {
                         Concept = new Concept
                         {
-                            SqlSetFrom = $"{compilerOptions.AppDb}.app.Cohort",
-                            SqlSetWhere = $"{compilerOptions.Alias}.QueryId = {queryParamPlaceholder} AND {compilerOptions.Alias}.Exported = 1"
+                            SqlSetFrom = cachedCohortPreparer.CohortToCteFrom(),
+                            SqlSetWhere = cachedCohortPreparer.CohortToCteWhere()
                         }
                     }
                 }

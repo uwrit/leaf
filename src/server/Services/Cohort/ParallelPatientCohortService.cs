@@ -23,7 +23,7 @@ namespace Services.Cohort
         readonly ClinDbOptions clinDbOpts;
 
         public ParallelPatientCohortService(
-            ISqlCompiler compiler,
+            IPanelSqlCompiler compiler,
             ISqlProviderQueryExecutor executor,
             PatientCountAggregator patientCountAggregator,
             IOptions<ClinDbOptions> clinOpts,
