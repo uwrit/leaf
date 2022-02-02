@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {

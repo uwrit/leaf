@@ -23,7 +23,7 @@ using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Compiler.SqlBuilder;
-using Model.Compiler.SqlServer;
+using Model.Compiler.PanelSqlCompiler;
 using Model.Export;
 using Model.Network;
 using Model.Options;

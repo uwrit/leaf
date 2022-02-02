@@ -13,25 +13,22 @@ using Model.Options;
 using Model.Compiler.SqlBuilder;
 using Model.Authorization;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class SqlServerCompiler : ISqlCompiler
     {
         readonly IUserContext user;
         readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
-        readonly CohortOptions cohortOptions;
 
         public SqlServerCompiler(
             IUserContext userContext,
             ISqlDialect dialect,
-            IOptions<CompilerOptions> compilerOptions,
-            IOptions<CohortOptions> cohortOptions)
+            IOptions<CompilerOptions> compilerOptions)
         {
             this.user = userContext;
             this.dialect = dialect;
             this.compilerOptions = compilerOptions.Value;
-            this.cohortOptions = cohortOptions.Value;
         }
 
         /// <summary>

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
+using Model.Compiler.PanelSqlCompiler;
 using Model.Options;
 using Model.Compiler.SqlBuilder;
 using Tests.Mock.Models.Compiler;

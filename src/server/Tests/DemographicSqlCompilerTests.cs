@@ -7,7 +7,7 @@ using System;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
+using Model.Compiler.PanelSqlCompiler;
 using Model.Options;
 using Services.Startup;
 using Xunit;

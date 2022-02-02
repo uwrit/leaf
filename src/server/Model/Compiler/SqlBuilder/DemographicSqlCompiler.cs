@@ -9,7 +9,7 @@ using Model.Compiler.SqlBuilder;
 using Model.Cohort;
 using System.Threading.Tasks;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class DemographicSqlCompiler : IDemographicSqlCompiler
     {

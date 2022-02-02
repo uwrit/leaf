@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using Model.Compiler.SqlBuilder;
 using Model.Options;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class ConceptDatasetSqlCompiler : IConceptDatasetSqlCompiler
     {

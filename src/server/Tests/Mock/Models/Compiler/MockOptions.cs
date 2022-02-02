@@ -6,7 +6,7 @@
 using System;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Compiler.SqlServer;
+using Model.Compiler.PanelSqlCompiler;
 using Model.Options;
 
 namespace Tests.Mock.Models.Compiler

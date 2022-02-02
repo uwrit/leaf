@@ -22,12 +22,12 @@ namespace Model.Cohort
         protected PatientCohortService(
             ISqlCompiler compiler,
             ISqlProviderQueryExecutor executor,
-            IOptions<ClinDbOptions> clinOpts,
+            IOptions<ClinDbOptions> clinDbOptions,
             ILogger<PatientCohortService> logger)
         {
             this.compiler = compiler;
             this.executor = executor;
-            clinDbOptions = clinOpts.Value;
+            this.clinDbOptions = clinDbOptions.Value;
             log = logger;
         }
 
