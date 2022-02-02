@@ -13,8 +13,8 @@ namespace Model.Compiler
 {
     public interface ISqlProviderQueryExecutor
     {
-        // public Task<HashSet<string>> ExecuteCohortQueryAsync(string connStr, string query, int timeout, CancellationToken token);
         public Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token);
+        public Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token, IEnumerable<QueryParameter> parameters);
     }
 
     public interface ILeafDbDataReader

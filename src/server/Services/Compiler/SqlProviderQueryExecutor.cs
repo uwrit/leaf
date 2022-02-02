@@ -4,6 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,17 +14,50 @@ using Google.Cloud.BigQuery.V2;
 
 namespace Services.Compiler
 {
+    public abstract class BaseQueryExecutor : ISqlProviderQueryExecutor
+    {
+        public Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token)
+        {
+            return ExecuteReaderAsync(connStr, query, timeout, token, new QueryParameter[] { });
+        }
+
+        public virtual Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
+        {
+            return null;
+        }
+    }
+
     /**
      * SQL Server
      */
-    public class SqlServerQueryExecutor : ISqlProviderQueryExecutor
+    public class SqlServerQueryExecutor : BaseQueryExecutor
     {
-        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
+        public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
         {
+            // Open connection
             var conn = new SqlConnection(connStr);
             await conn.OpenAsync();
 
-            var cmd = new SqlCommand(query, conn) { CommandTimeout = timeout };
+            // Create command
+            var cmd = new SqlCommand(query, conn);
+            cmd.CommandTimeout = timeout;
+            cmd.Parameters.AddRange(parameters.Select(p => new SqlParameter(p.Name, p.Value)).ToArray());
+
+            // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
 
             return new WrappedDbDataReader(conn, reader);
@@ -32,14 +67,25 @@ namespace Services.Compiler
     /**
      * MySQL
      */
-    public class MySqlQueryExecutor : ISqlProviderQueryExecutor
+    public class MySqlQueryExecutor : BaseQueryExecutor
     {
-        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
+        public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
         {
+            // Open connection
             var conn = new MySql.Data.MySqlClient.MySqlConnection(connStr);
             await conn.OpenAsync();
 
-            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn) { CommandTimeout = timeout };
+            // Create command
+            var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn);
+            cmd.CommandTimeout = timeout;
+            cmd.Parameters.AddRange(parameters.Select(p => new MySql.Data.MySqlClient.MySqlParameter(p.Name, p.Value)).ToArray());
+
+            // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
 
             return new WrappedDbDataReader(conn, reader);
@@ -57,14 +103,25 @@ namespace Services.Compiler
     /**
      * PostgreSQL
      */
-    public class PostgreSqlQueryExecutor : ISqlProviderQueryExecutor
+    public class PostgreSqlQueryExecutor : BaseQueryExecutor
     {
-        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
+        public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
         {
+            // Open connection
             var conn = new Npgsql.NpgsqlConnection(connStr);
             await conn.OpenAsync();
 
-            var cmd = new Npgsql.NpgsqlCommand(query, conn) { CommandTimeout = timeout };
+            // Create command
+            var cmd = new Npgsql.NpgsqlCommand(query, conn);
+            cmd.CommandTimeout = timeout;
+            cmd.Parameters.AddRange(parameters.Select(p => new Npgsql.NpgsqlParameter(p.Name, p.Value)).ToArray());
+
+            // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
 
             return new WrappedDbDataReader(conn, reader);
@@ -74,14 +131,24 @@ namespace Services.Compiler
     /**
      * Oracle
      */
-    public class OracleQueryExecutor : ISqlProviderQueryExecutor
+    public class OracleQueryExecutor : BaseQueryExecutor
     {
-        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token)
+        public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string connStr,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
         {
+            // Open connection
             var conn = new System.Data.OracleClient.OracleConnection(connStr);
             await conn.OpenAsync();
 
+            // Create command
             var cmd = new System.Data.OracleClient.OracleCommand(query, conn) { CommandTimeout = timeout };
+            cmd.Parameters.AddRange(parameters.Select(p => new System.Data.OracleClient.OracleParameter(p.Name, p.Value)).ToArray());
+
+            // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
 
             return new WrappedDbDataReader(conn, reader);
@@ -91,28 +158,19 @@ namespace Services.Compiler
     /**
      * Google BigQuery
      */
-    public class BigQueryQueryExecutor : ISqlProviderQueryExecutor
+    public class BigQueryQueryExecutor : BaseQueryExecutor
     {
-        /*
-        public async Task<HashSet<string>> ExecuteCohortQueryAsync(string projectId, string query, int timeout, CancellationToken token)
-        {
-            var output = new HashSet<string>();
-            var client = await BigQueryClient.CreateAsync(projectId);
-            var results = await client.ExecuteQueryAsync(query, parameters: null);
-
-            foreach (var row in results)
-            {
-                output.Add(row[0].ToString());
-            }
-
-            return output;
-        }
-        */
-
-        public async Task<ILeafDbDataReader> ExecuteReaderAsync(string projectId, string query, int timeout, CancellationToken token)
+        public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
+            string projectId,
+            string query,
+            int timeout,
+            CancellationToken token,
+            IEnumerable<QueryParameter> parameters)
         {
             var client = await BigQueryClient.CreateAsync(projectId);
             var results = await client.ExecuteQueryAsync(query, parameters: null);
+
+            // TODO(ndobb) handle parameters
 
             return new BigQueryWrappedDbReader(results);
         }

@@ -22,6 +22,7 @@ namespace Services.Compiler
         public WrappedDbDataReader(DbConnection conn, DbDataReader reader)
         {
             this.reader = reader;
+            this.conn = conn;
         }
 
         public object this[int i]
@@ -29,8 +30,20 @@ namespace Services.Compiler
             get => reader[i];
         }
 
+        
+        public async Task CloseAsync()
+        {
+            if (!reader.IsClosed)
+            {
+                await reader.CloseAsync();
+            }
+            if (conn.State == System.Data.ConnectionState.Open)
+            {
+                await conn.CloseAsync();
+            }
+        }
+
         public bool Read()                                     => reader.Read();
-        public Task CloseAsync()                               => conn.CloseAsync();
         public IReadOnlyCollection<DbColumn> GetColumnSchema() => reader.GetColumnSchema();
 
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
@@ -116,7 +129,10 @@ namespace Services.Compiler
             return false;
         }
 
-        public Task CloseAsync() => null; // noop
+        public async Task CloseAsync()
+        {
+            // noop
+        }
 
         public IReadOnlyCollection<DbColumn> GetColumnSchema()
         {
@@ -124,11 +140,11 @@ namespace Services.Compiler
             return new ReadOnlyCollection<BigQueryDbColumn>(cols.ToArray());
         }
 
-        public string GetNullableString(int index)      => (row[index] is string @val) ? @val : null;
-        public Guid? GetNullableGuid(int index)         => (row[index] is Guid @val) ? @val : null;
-        public DateTime? GetNullableDateTime(int index) => (row[index] is DateTime @val) ? @val : null;
-        public bool? GetNullableBoolean(int index)      => (row[index] is bool @val) ? @val : null;
-        public int? GetNullableInt(int index)           => (row[index] is int @val) ? @val : null;
+        public string GetNullableString(int index)      => row[index] is string @val ? @val : null;
+        public Guid? GetNullableGuid(int index)         => row[index] is Guid @val ? @val : null;
+        public DateTime? GetNullableDateTime(int index) => row[index] is DateTime @val ? @val : null;
+        public bool? GetNullableBoolean(int index)      => row[index] is bool @val ? @val : null;
+        public int? GetNullableInt(int index)           => row[index] is int @val ? @val : null;
         public object GetNullableObject(int index)      => row[index] ?? null;
 
         public string GetNullableString(int? index)

@@ -6,8 +6,6 @@
 using System;
 using System.Linq;
 using Model.Compiler.SqlBuilder;
-using Model.Options;
-using Microsoft.Extensions.Options;
 using Model.Cohort;
 using System.Threading.Tasks;
 
@@ -17,18 +15,15 @@ namespace Model.Compiler.SqlServer
     {
         readonly ISqlCompiler compiler;
         readonly ICachedCohortPreparer cachedCohortPreparer;
-        readonly CompilerOptions compilerOptions;
 
         DemographicExecutionContext executionContext;
 
         public DemographicSqlCompiler(
             ISqlCompiler compiler,
-            ICachedCohortPreparer cachedCohortPreparer,
-            IOptions<CompilerOptions> compilerOptions)
+            ICachedCohortPreparer cachedCohortPreparer)
         {
             this.compiler = compiler;
             this.cachedCohortPreparer = cachedCohortPreparer;
-            this.compilerOptions = compilerOptions.Value;
         }
 
         public async Task<DemographicExecutionContext> BuildDemographicSql(DemographicCompilerContext context, bool restrictPhi)
