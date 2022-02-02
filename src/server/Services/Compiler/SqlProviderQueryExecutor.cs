@@ -30,10 +30,7 @@ namespace Services.Compiler
             string query,
             int timeout,
             CancellationToken token,
-            IEnumerable<QueryParameter> parameters)
-        {
-            return null;
-        }
+            IEnumerable<QueryParameter> parameters) => null;
     }
 
     /**
@@ -41,6 +38,27 @@ namespace Services.Compiler
      */
     public class SqlServerQueryExecutor : BaseQueryExecutor
     {
+        System.Data.DbType ToSqlType(object val)
+        {
+            return val switch
+            {
+                Type _ when val is string  => System.Data.DbType.String,
+                Type _ when val is decimal => System.Data.DbType.Decimal,
+                Type _ when val is double  => System.Data.DbType.Decimal,
+                Type _ when val is int     => System.Data.DbType.Int32,
+                Type _ when val is Guid    => System.Data.DbType.Guid,
+                _ => System.Data.DbType.String,
+            };
+        }
+
+        SqlParameter ToSqlParameter(QueryParameter q)
+        {
+            var parameter = new SqlParameter($"@{q.Name}", ToSqlType(q.Value));
+            parameter.Value = q.Value;
+
+            return parameter;
+        }
+
         public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
             string connStr,
             string query,
@@ -55,7 +73,7 @@ namespace Services.Compiler
             // Create command
             var cmd = new SqlCommand(query, conn);
             cmd.CommandTimeout = timeout;
-            cmd.Parameters.AddRange(parameters.Select(p => new SqlParameter(p.Name, p.Value)).ToArray());
+            cmd.Parameters.AddRange(parameters.Select(p => ToSqlParameter(p)).ToArray());
 
             // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
@@ -69,6 +87,27 @@ namespace Services.Compiler
      */
     public class MySqlQueryExecutor : BaseQueryExecutor
     {
+        MySql.Data.MySqlClient.MySqlDbType ToSqlType(object val)
+        {
+            return val switch
+            {
+                Type _ when val is string  => MySql.Data.MySqlClient.MySqlDbType.String,
+                Type _ when val is decimal => MySql.Data.MySqlClient.MySqlDbType.Decimal,
+                Type _ when val is double  => MySql.Data.MySqlClient.MySqlDbType.Decimal,
+                Type _ when val is int     => MySql.Data.MySqlClient.MySqlDbType.Int32,
+                Type _ when val is Guid    => MySql.Data.MySqlClient.MySqlDbType.Guid,
+                _ => MySql.Data.MySqlClient.MySqlDbType.String,
+            };
+        }
+
+        MySql.Data.MySqlClient.MySqlParameter ToSqlParameter(QueryParameter q)
+        {
+            var parameter = new MySql.Data.MySqlClient.MySqlParameter($"?{q.Name}", ToSqlType(q.Value));
+            parameter.Value = q.Value;
+
+            return parameter;
+        }
+
         public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
             string connStr,
             string query,
@@ -83,7 +122,7 @@ namespace Services.Compiler
             // Create command
             var cmd = new MySql.Data.MySqlClient.MySqlCommand(query, conn);
             cmd.CommandTimeout = timeout;
-            cmd.Parameters.AddRange(parameters.Select(p => new MySql.Data.MySqlClient.MySqlParameter(p.Name, p.Value)).ToArray());
+            cmd.Parameters.AddRange(parameters.Select(p => ToSqlParameter(p)).ToArray());
 
             // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
@@ -105,6 +144,27 @@ namespace Services.Compiler
      */
     public class PostgreSqlQueryExecutor : BaseQueryExecutor
     {
+        NpgsqlTypes.NpgsqlDbType ToSqlType(object val)
+        {
+            return val switch
+            {
+                Type _ when val is string  => NpgsqlTypes.NpgsqlDbType.Char,
+                Type _ when val is decimal => NpgsqlTypes.NpgsqlDbType.Numeric,
+                Type _ when val is double  => NpgsqlTypes.NpgsqlDbType.Numeric,
+                Type _ when val is int     => NpgsqlTypes.NpgsqlDbType.Numeric,
+                Type _ when val is Guid    => NpgsqlTypes.NpgsqlDbType.Char,
+                _ => NpgsqlTypes.NpgsqlDbType.Char,
+            };
+        }
+
+        Npgsql.NpgsqlParameter ToSqlParameter(QueryParameter q)
+        {
+            var parameter = new Npgsql.NpgsqlParameter($"@{q.Name}", ToSqlType(q.Value));
+            parameter.Value = q.Value;
+
+            return parameter;
+        }
+
         public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
             string connStr,
             string query,
@@ -119,7 +179,7 @@ namespace Services.Compiler
             // Create command
             var cmd = new Npgsql.NpgsqlCommand(query, conn);
             cmd.CommandTimeout = timeout;
-            cmd.Parameters.AddRange(parameters.Select(p => new Npgsql.NpgsqlParameter(p.Name, p.Value)).ToArray());
+            cmd.Parameters.AddRange(parameters.Select(p => ToSqlParameter(p)).ToArray());
 
             // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
@@ -133,6 +193,27 @@ namespace Services.Compiler
      */
     public class OracleQueryExecutor : BaseQueryExecutor
     {
+        System.Data.OracleClient.OracleType ToSqlType(object val)
+        {
+            return val switch
+            {
+                Type _ when val is string  => System.Data.OracleClient.OracleType.NVarChar,
+                Type _ when val is decimal => System.Data.OracleClient.OracleType.Float,
+                Type _ when val is double  => System.Data.OracleClient.OracleType.Double,
+                Type _ when val is int     => System.Data.OracleClient.OracleType.Int32,
+                Type _ when val is Guid    => System.Data.OracleClient.OracleType.NVarChar,
+                _ => System.Data.OracleClient.OracleType.NVarChar,
+            };
+        }
+
+        System.Data.OracleClient.OracleParameter ToSqlParameter(QueryParameter q)
+        {
+            var parameter = new System.Data.OracleClient.OracleParameter($":{q.Name}", ToSqlType(q.Value));
+            parameter.Value = q.Value;
+
+            return parameter;
+        }
+
         public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
             string connStr,
             string query,
@@ -146,7 +227,7 @@ namespace Services.Compiler
 
             // Create command
             var cmd = new System.Data.OracleClient.OracleCommand(query, conn) { CommandTimeout = timeout };
-            cmd.Parameters.AddRange(parameters.Select(p => new System.Data.OracleClient.OracleParameter(p.Name, p.Value)).ToArray());
+            cmd.Parameters.AddRange(parameters.Select(p => ToSqlParameter(p)).ToArray());
 
             // Execute reader
             var reader = await cmd.ExecuteReaderAsync(token);
@@ -160,6 +241,24 @@ namespace Services.Compiler
      */
     public class BigQueryQueryExecutor : BaseQueryExecutor
     {
+        BigQueryDbType ToSqlType(object val)
+        {
+            return val switch
+            {
+                Type _ when val is string  => BigQueryDbType.String,
+                Type _ when val is decimal => BigQueryDbType.Numeric,
+                Type _ when val is double  => BigQueryDbType.Numeric,
+                Type _ when val is int     => BigQueryDbType.Int64,
+                Type _ when val is Guid    => BigQueryDbType.String,
+                _ => BigQueryDbType.String
+            };
+        }
+
+        BigQueryParameter ToSqlParameter(QueryParameter q)
+        {
+            return new BigQueryParameter(q.Name, ToSqlType(q.Value), q.Value);
+        }
+
         public override async Task<ILeafDbDataReader> ExecuteReaderAsync(
             string projectId,
             string query,
@@ -168,10 +267,8 @@ namespace Services.Compiler
             IEnumerable<QueryParameter> parameters)
         {
             var client = await BigQueryClient.CreateAsync(projectId);
-            var results = await client.ExecuteQueryAsync(query, parameters: null);
-
-            // TODO(ndobb) handle parameters
-
+            var results = await client.ExecuteQueryAsync(query, parameters: parameters.Select(p => ToSqlParameter(p)));
+            
             return new BigQueryWrappedDbReader(results);
         }
     }

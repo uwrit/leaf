@@ -34,6 +34,7 @@ namespace Model.Compiler
         public Guid? GetNullableGuid(int? index);
         public DateTime? GetNullableDateTime(int index);
         public DateTime? GetNullableDateTime(int? index);
+        public bool GetBoolean(int index);
         public bool? GetNullableBoolean(int index);
         public bool? GetNullableBoolean(int? index);
         public int? GetNullableInt(int index);

@@ -49,6 +49,7 @@ namespace Services.Compiler
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
         public Guid? GetNullableGuid(int index)         => reader.IsDBNull(index) ? null : reader.GetGuid(index);
         public DateTime? GetNullableDateTime(int index) => reader.IsDBNull(index) ? null : reader.GetDateTime(index);
+        public bool GetBoolean(int index)               => reader.GetBoolean(index);
         public bool? GetNullableBoolean(int index)      => reader.IsDBNull(index) ? null : reader.GetBoolean(index);
         public int? GetNullableInt(int index)           => reader.IsDBNull(index) ? null : reader.GetInt32(index);
         public object GetNullableObject(int index)      => reader.IsDBNull(index) ? null : reader.GetValue(index);
@@ -143,6 +144,7 @@ namespace Services.Compiler
         public string GetNullableString(int index)      => row[index] is string @val ? @val : null;
         public Guid? GetNullableGuid(int index)         => row[index] is Guid @val ? @val : null;
         public DateTime? GetNullableDateTime(int index) => row[index] is DateTime @val ? @val : null;
+        public bool GetBoolean(int index)               => (bool)row[index];
         public bool? GetNullableBoolean(int index)      => row[index] is bool @val ? @val : null;
         public int? GetNullableInt(int index)           => row[index] is int @val ? @val : null;
         public object GetNullableObject(int index)      => row[index] ?? null;
