@@ -82,15 +82,8 @@ namespace Model.Compiler.SqlServer
 
             var query = new StringBuilder(inclusions.First().CompiledQuery);
 
-            foreach (var context in inclusions.Skip(1))
-            {
-                query.Append($" {dialect.Intersect()} {context.CompiledQuery}");
-            }
-
-            foreach (var context in exclusions)
-            {
-                query.Append($" {dialect.Except()} {context.CompiledQuery}");
-            }
+            foreach (var context in inclusions.Skip(1)) query.Append($" {dialect.Intersect()} {context.CompiledQuery}");
+            foreach (var context in exclusions)         query.Append($" {dialect.Except()} {context.CompiledQuery}");
 
             return new CteCohortQuery(parameters, query.ToString());
         }

@@ -11,6 +11,7 @@ namespace Model.Compiler
     public abstract class ShapedDatasetExecutionContext
     {
         public Shape Shape { get; }
+        public string QueryPrelude { get; internal set; }
         public string CompiledQuery { get; internal set; }
 
         readonly List<QueryParameter> parameters;

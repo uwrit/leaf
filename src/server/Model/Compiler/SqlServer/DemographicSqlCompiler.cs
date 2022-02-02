@@ -9,37 +9,42 @@ using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using Model.Cohort;
+using System.Threading.Tasks;
 
 namespace Model.Compiler.SqlServer
 {
     public class DemographicSqlCompiler : IDemographicSqlCompiler
     {
         readonly ISqlCompiler compiler;
+        readonly ICachedCohortPreparer cachedCohortPreparer;
         readonly CompilerOptions compilerOptions;
-
-        readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DemographicExecutionContext executionContext;
 
         public DemographicSqlCompiler(
             ISqlCompiler compiler,
-            IOptions<CompilerOptions> compOpts)
+            ICachedCohortPreparer cachedCohortPreparer,
+            IOptions<CompilerOptions> compilerOptions)
         {
             this.compiler = compiler;
-            this.compilerOptions = compOpts.Value;
+            this.cachedCohortPreparer = cachedCohortPreparer;
+            this.compilerOptions = compilerOptions.Value;
         }
 
-        public DemographicExecutionContext BuildDemographicSql(DemographicCompilerContext context, bool restrictPhi)
+        public async Task<DemographicExecutionContext> BuildDemographicSql(DemographicCompilerContext context, bool restrictPhi)
         {
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
-            var cohort = CteCohortInternals(context.QueryContext);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
-            var dataset = CteDemographicInternals(context.DemographicQuery);
 
-            var filter = CteFilterInternals(context, restrictPhi);
-            var select = SelectFromCTE();
             var parameters = compiler.BuildContextParameterSql();
-            executionContext.CompiledQuery = Compose(parameters, cohort, dataset, filter, select);
+            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId);
+            var cohortCte = CteCohortInternals(context.QueryContext);
+            var datasetCte = CteDemographicInternals(context.DemographicQuery);
+            var filterCte = CteFilterInternals(context, restrictPhi);
+            var select = SelectFromCTE();
+
+            executionContext.QueryPrelude = prelude;
+            executionContext.CompiledQuery = Compose(parameters, cohortCte, datasetCte, filterCte, select);
 
             return executionContext;
         }
@@ -49,11 +54,10 @@ namespace Model.Compiler.SqlServer
             return $"{parameters} WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
         }
 
-        // Currently hard-coded to assume cohort comes from AppDB
         string CteCohortInternals(QueryContext context)
         {
             executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, context.QueryId);
-            return $"SELECT {fieldInternalPersonId} = PersonId, Exported, Salt FROM {compilerOptions.AppDb}.app.Cohort WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam}";
+            return cachedCohortPreparer.CohortToCte();
         }
 
         string CteDemographicInternals(DemographicQuery demographicQuery) => demographicQuery.SqlStatement;
@@ -76,10 +80,11 @@ namespace Model.Compiler.SqlServer
             return $"SELECT {fields} FROM dataset";
         }
 
-        // TODO(ndobb) Check Syntax
         string SelectFromCTE()
         {
-            return $"SELECT Exported, Salt, filter.* FROM filter INNER JOIN cohort on filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
+            return
+                @$"SELECT Exported, Salt, filter.*
+                   FROM filter INNER JOIN cohort on filter.{DatasetColumns.PersonId} = cohort.{cachedCohortPreparer.FieldInternalPersonId}";
         }
     }
 }
