@@ -205,7 +205,15 @@ namespace API.Options
                 case ClinDbOptions.RdbmsType.SqlServer:
                     services.AddTransient<ISqlDialect, TSqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, SqlServerQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
+
+                    if (compilerOpts.SharedDbServer)
+                    {
+                        services.AddTransient<ICachedCohortPreparer, SharedSqlServerCachedCohortPreparer>();
+                    }
+                    else
+                    {
+                        services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
+                    }
                     break;
                 case ClinDbOptions.RdbmsType.MySql:
                     services.AddTransient<ISqlDialect, MySqlDialect>();
@@ -231,17 +239,6 @@ namespace API.Options
                     services.AddTransient<ISqlDialect, BigQuerySqlDialect>();
                     services.AddTransient<ISqlProviderQueryExecutor, BigQueryQueryExecutor>();
                     services.AddTransient<ICachedCohortPreparer, BigQuerySqlCachedCohortPreparer>();
-                    break;
-            }
-
-            // Cached cohort query handler
-            switch (compilerOpts.SharedDbServer)
-            {
-                case true:
-                    // TODO
-                    break;
-                case false:
-                    // TODO
                     break;
             }
 

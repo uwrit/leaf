@@ -74,7 +74,10 @@ namespace Services.Cohort
         async Task<PartialPatientCountContext> GetPartialContext(LeafQuery query, CancellationToken token)
         {
             var partialIds = new HashSet<string>();
-            var reader = await executor.ExecuteReaderAsync(clinDbOptions.ConnectionString, query.SqlStatement, clinDbOptions.DefaultTimeout, token);
+            var connStr = clinDbOptions.ConnectionString;
+            var sql = query.SqlStatement;
+            var timeout = clinDbOptions.DefaultTimeout;
+            var reader = await executor.ExecuteReaderAsync(connStr, sql, timeout, token);
 
             while (reader.Read())
             {

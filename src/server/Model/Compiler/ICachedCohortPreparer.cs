@@ -62,9 +62,9 @@ namespace Model.Compiler
         }
     }
 
-    public class SharedServerCacheCohort : BaseCachedCohortPreparer
+    public class SharedSqlServerCachedCohortPreparer : BaseCachedCohortPreparer
     {
-        public SharedServerCacheCohort(
+        public SharedSqlServerCachedCohortPreparer(
             ICachedCohortFetcher cohortFetcher,
             CompilerOptions compilerOpts)
             : base(cohortFetcher, compilerOpts) { }

@@ -15,15 +15,19 @@ namespace Model.Compiler.SqlServer
     public class PanelDatasetSqlCompiler : IPanelDatasetSqlCompiler
     {
         readonly CompilerOptions compilerOptions;
+        readonly ISqlDialect dialect;
 
-        public PanelDatasetSqlCompiler(IOptions<CompilerOptions> compOpts)
+        public PanelDatasetSqlCompiler(
+            IOptions<CompilerOptions> compilerOptions,
+            ISqlDialect dialect)
         {
-            this.compilerOptions = compOpts.Value;
+            this.compilerOptions = compilerOptions.Value;
+            this.dialect = dialect;
         }
 
         public ConceptDatasetExecutionContext BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
         {
-            var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions).ToString();
+            var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions, dialect).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(query);
 
             var exeContext = new ConceptDatasetExecutionContext(compilerContext.QueryContext, compilerContext.QueryContext.QueryId);
