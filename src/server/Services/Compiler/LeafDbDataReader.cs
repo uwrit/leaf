@@ -64,7 +64,7 @@ namespace Services.Compiler
 
         public int GetOrdinal(string colName)           => reader.GetOrdinal(colName);
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
-        public Guid GetGuid(int index)                  => Guid.Parse(reader.GetString(index));
+        public Guid GetGuid(int index)                  => reader.GetGuid(index);
         public Guid? GetNullableGuid(int index)         => reader.IsDBNull(index) ? null : reader.GetGuid(index);
         public DateTime? GetNullableDateTime(int index) => reader.IsDBNull(index) ? null : reader.GetDateTime(index);
         public bool GetBoolean(int index)               => reader.GetBoolean(index);

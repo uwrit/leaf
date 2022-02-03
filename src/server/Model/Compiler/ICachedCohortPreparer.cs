@@ -11,6 +11,7 @@ using System.Linq;
 using Model.Cohort;
 using Model.Options;
 using Model.Compiler.SqlBuilder;
+using Microsoft.Extensions.Options;
 
 namespace Model.Compiler
 {
@@ -33,15 +34,21 @@ namespace Model.Compiler
         readonly internal int batchSize = 1000;
         internal bool exportedOnly;
 
-        public BaseCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public BaseCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
         {
             this.cohortFetcher = cohortFetcher;
-            this.compilerOpts = compilerOpts;
+            this.compilerOpts = compilerOpts.Value;
         }
 
         internal string InsertDelimited(CachedCohortRecord rec, string delimeter = "'")
         {
-            return $"{delimeter}{rec.PersonId}{delimeter}, {rec.Exported}, {delimeter}{rec.Salt}{delimeter}";
+            var personId = rec.PersonId;
+            var exported = rec.Exported ? 1 : 0;
+            var salt = rec.Salt.ToString();
+
+            return $"{delimeter}{personId}{delimeter}, {exported}, {delimeter}{salt}{delimeter}";
         }
 
         internal IEnumerable<IEnumerable<T>> Batch<T>(IEnumerable<T> vals, int batchSize)
@@ -72,7 +79,7 @@ namespace Model.Compiler
     {
         public SharedSqlServerCachedCohortPreparer(
             ICachedCohortFetcher cohortFetcher,
-            CompilerOptions compilerOpts)
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public override async Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -86,7 +93,7 @@ namespace Model.Compiler
         public override string CohortToCteWhere()
         {
             var output = new StringBuilder();
-            output.Append($"QueryId = {ShapedDatasetCompilerContext.QueryIdParam}");
+            output.Append($"QueryId = @{ShapedDatasetCompilerContext.QueryIdParam}");
 
             if (exportedOnly)
             {
@@ -107,7 +114,9 @@ namespace Model.Compiler
     {
         readonly ISqlDialect dialect = new TSqlDialect();
 
-        public SqlServerCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public SqlServerCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -118,7 +127,7 @@ namespace Model.Compiler
             output.Append(@$"CREATE TABLE #{TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)};"
+                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
 
             foreach (var recs in Batch(cohort, batchSize))
@@ -141,7 +150,9 @@ namespace Model.Compiler
     {
         readonly ISqlDialect dialect = new MySqlDialect();
 
-        public MySqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public MySqlCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -152,7 +163,7 @@ namespace Model.Compiler
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)};"
+                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
 
             foreach (var recs in Batch(cohort, batchSize))
@@ -169,7 +180,9 @@ namespace Model.Compiler
     // MariaDB
     public class MariaDbCachedCohortPreparer : MySqlCachedCohortPreparer
     {
-        public MariaDbCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public MariaDbCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
     }
 
@@ -178,7 +191,9 @@ namespace Model.Compiler
     {
         readonly ISqlDialect dialect = new PlSqlDialect();
 
-        public OracleCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public OracleCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -189,7 +204,7 @@ namespace Model.Compiler
             output.Append(@$"CREATE TEMPORARY TABLE ORA${TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)};"
+                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
 
             output.Append(" INSERT ALL ");
@@ -219,7 +234,9 @@ namespace Model.Compiler
     {
         readonly ISqlDialect dialect = new PostgreSqlDialect();
 
-        public PostgreSqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public PostgreSqlCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -230,7 +247,7 @@ namespace Model.Compiler
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)};"
+                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
 
             foreach (var recs in Batch(cohort, batchSize))
@@ -249,7 +266,9 @@ namespace Model.Compiler
     {
         readonly ISqlDialect dialect = new BigQuerySqlDialect();
 
-        public BigQuerySqlCachedCohortPreparer(ICachedCohortFetcher cohortFetcher, CompilerOptions compilerOpts)
+        public BigQuerySqlCachedCohortPreparer(
+            ICachedCohortFetcher cohortFetcher,
+            IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, compilerOpts) { }
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
@@ -260,7 +279,7 @@ namespace Model.Compiler
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)};"
+                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
 
             foreach (var recs in Batch(cohort, batchSize))

@@ -12,6 +12,6 @@ namespace Model.Compiler
     {
         string BuildPanelSql(Panel panel);
         ISqlStatement BuildCteSql(IEnumerable<Panel> panels);
-        string BuildContextParameterSql();
+        IEnumerable<QueryParameter> BuildContextQueryParameters();
     }
 }

@@ -96,14 +96,13 @@ namespace Services.Cohort
         IReadOnlyCollection<LeafQuery> GetLeafQueries(IEnumerable<Panel> panels)
         {
             var queries = new List<LeafQuery>();
-            var parameters = compiler.BuildContextParameterSql();
 
             foreach (var p in panels)
             {
                 var q = new LeafQuery
                 {
                     IsInclusionCriteria = p.IncludePanel,
-                    SqlStatement = $"{parameters} {compiler.BuildPanelSql(p)}"
+                    SqlStatement = compiler.BuildPanelSql(p)
                 };
 
                 queries.Add(q);

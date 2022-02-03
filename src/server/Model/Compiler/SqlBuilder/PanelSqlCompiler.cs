@@ -57,7 +57,6 @@ namespace Model.Compiler.PanelSqlCompiler
 
         public ISqlStatement BuildCteSql(IEnumerable<Panel> panels)
         {
-            var parameters = compilerOptions.AddVariables ? BuildContextParameterSql() : "";
             var contexts = panels.Select((p, i) =>
             {
                 return new CteCohortQueryContext
@@ -75,17 +74,18 @@ namespace Model.Compiler.PanelSqlCompiler
             foreach (var context in inclusions.Skip(1)) query.Append($" {dialect.Intersect()} {context.CompiledQuery}");
             foreach (var context in exclusions)         query.Append($" {dialect.Except()} {context.CompiledQuery}");
 
-            return new CteCohortQuery(parameters, query.ToString());
+            return new CteCohortQuery(query.ToString());
         }
 
-        public string BuildContextParameterSql()
+        public IEnumerable<QueryParameter> BuildContextQueryParameters()
         {
-            static int toInt(bool x) => Convert.ToInt32(x);
-            var identified = dialect.DeclareParam("IsIdentified", ColumnType.Boolean, toInt(user.Identified));
-            var research   = dialect.DeclareParam("IsResearch", ColumnType.Boolean, toInt(user.SessionType == SessionType.Research));
-            var qi         = dialect.DeclareParam("IsQI", ColumnType.Boolean, toInt(user.SessionType == SessionType.QualityImprovement));
+            var parameters = new List<QueryParameter>();
 
-            return $"{identified}; {research}; {qi};";
+            parameters.Add(new QueryParameter("IsIdentified", user.Identified));
+            parameters.Add(new QueryParameter("IsResearch", user.SessionType == SessionType.Research));
+            parameters.Add(new QueryParameter("IsQI", user.SessionType == SessionType.QualityImprovement));
+
+            return parameters;
         }
 
         string BuildWrappedPanelSql(Panel panel)

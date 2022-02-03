@@ -31,27 +31,35 @@ namespace Model.Compiler.PanelSqlCompiler
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
 
-            var parameters = compiler.BuildContextParameterSql();
             var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, false);
             var cohortCte = CteCohortInternals(context.QueryContext);
             var datasetCte = CteDemographicInternals(context.DemographicQuery);
             var filterCte = CteFilterInternals(context, restrictPhi);
             var select = SelectFromCTE();
 
+            AddParameters(context.QueryContext.QueryId);
             executionContext.QueryPrelude = prelude;
-            executionContext.CompiledQuery = Compose(parameters, cohortCte, datasetCte, filterCte, select);
+            executionContext.CompiledQuery = Compose(cohortCte, datasetCte, filterCte, select);
 
             return executionContext;
         }
 
-        string Compose(string parameters, string cohort, string dataset, string filter, string select)
+        void AddParameters(Guid queryId)
         {
-            return $"{parameters} WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
+            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryId);
+            foreach (var param in compiler.BuildContextQueryParameters())
+            {
+                executionContext.AddParameter(param);
+            }
+        }
+
+        string Compose(string cohort, string dataset, string filter, string select)
+        {
+            return $"WITH cohort as ( {cohort} ), dataset as ( {dataset} ), filter as ( {filter} ) {select}";
         }
 
         string CteCohortInternals(QueryContext context)
         {
-            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, context.QueryId);
             return cachedCohortPreparer.CohortToCte();
         }
 

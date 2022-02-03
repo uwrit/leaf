@@ -38,29 +38,36 @@ namespace Model.Compiler.PanelSqlCompiler
             executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
-            var parameters = compiler.BuildContextParameterSql();
             var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
             var cohortCte = CteCohortInternals(context);
             var datasetCte = CteDatasetInternals(context.DatasetQuery);
             var filterCte = CteFilterInternals(context);
             var select = SelectFromCTE(context);
 
+            AddParameters(context.QueryContext.QueryId);
             executionContext.QueryPrelude = prelude;
             executionContext.DatasetQuery = context.DatasetQuery;
-            executionContext.CompiledQuery = Compose(parameters, cohortCte, datasetCte, filterCte, select);
+            executionContext.CompiledQuery = Compose(cohortCte, datasetCte, filterCte, select);
 
             return executionContext;
         }
 
-        string Compose(string parameters, string cohort, string dataset, string filter, string select)
+        void AddParameters(Guid queryId)
         {
-            return $"{parameters} WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
+            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryId);
+            foreach (var param in compiler.BuildContextQueryParameters())
+            {
+                executionContext.AddParameter(param);
+            }
+        }
+
+        string Compose(string cohort, string dataset, string filter, string select)
+        {
+            return $"WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
         }
 
         string CteCohortInternals(DatasetCompilerContext ctx)
         {
-            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
-
             // If joining to a given panel to filter by encounter.
             if (ctx.JoinToPanel)
             {
@@ -82,7 +89,7 @@ namespace Model.Compiler.PanelSqlCompiler
                 return $"SELECT * FROM dataset";
             }
 
-            var dateFilter = provider.GetDateFilter(compilerContext);
+            var dateFilter = provider.GetDateFilter(compilerContext, dialect);
             executionContext.AddParameters(dateFilter.Parameters);
             return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
         }
@@ -135,16 +142,19 @@ namespace Model.Compiler.PanelSqlCompiler
             }
         }
 
-        public DatasetDateFilter GetDateFilter(DatasetCompilerContext compilerContext)
+        public DatasetDateFilter GetDateFilter(DatasetCompilerContext compilerContext, ISqlDialect dialect)
         {
             var early = compilerContext.EarlyBound;
             var late = compilerContext.LateBound;
+
+            var earlyEmbedded = dialect.ToSqlParamName(earlyParamName);
+            var lateEmbedded = dialect.ToSqlParamName(lateParamName);
 
             // neither
             if (!early.HasValue && !late.HasValue)
             {
                 var now = DateTime.Now;
-                var clause = $"{TargetDateField} <= {lateParamName}";
+                var clause = $"{TargetDateField} <= {lateEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -155,7 +165,7 @@ namespace Model.Compiler.PanelSqlCompiler
             // both present
             if (early.HasValue && late.HasValue)
             {
-                var clause = $"{TargetDateField} BETWEEN {earlyParamName} AND {lateParamName}";
+                var clause = $"{TargetDateField} BETWEEN {earlyEmbedded} AND {lateEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -171,7 +181,7 @@ namespace Model.Compiler.PanelSqlCompiler
             if (early.HasValue && !late.HasValue)
             {
                 var now = DateTime.Now;
-                var clause = $"{TargetDateField} BETWEEN {earlyParamName} AND {lateParamName}";
+                var clause = $"{TargetDateField} BETWEEN {earlyEmbedded} AND {lateEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,

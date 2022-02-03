@@ -16,6 +16,7 @@ namespace Model.Compiler.SqlBuilder
         public string DateAdd(DateIncrementType incrType, int interval, object date);
         public string ToSqlType(ColumnType type);
         public string ToSqlTime(DateIncrementType incrType);
+        public string ToSqlParamName(string name);
         public string Convert(ColumnType targetType, object value);
         public string DeclareParam(string name, ColumnType type, object value);
     }
@@ -55,6 +56,7 @@ namespace Model.Compiler.SqlBuilder
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATEADD({ToSqlTime(incrType)}, {interval}, {date})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({ToSqlType(targetType)}, {value})";
         public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE @{name} {ToSqlType(type)} = {value}";
+        public string ToSqlParamName(string name) => $"@{name}";
 
         public string ToSqlType(ColumnType type)
         {
@@ -79,6 +81,7 @@ namespace Model.Compiler.SqlBuilder
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"DATETIME_ADD({date}, INTERVAL {interval} {ToSqlTime(incrType)})";
         public string Convert(ColumnType targetType, object value) => $"CONVERT({value}, {ToSqlType(targetType)})";
         public string DeclareParam(string name, ColumnType type, object value) => $"SET @{name} := {value}";
+        public string ToSqlParamName(string name) => $"?{name}";
 
         public string ToSqlType(ColumnType type)
         {
@@ -108,6 +111,7 @@ namespace Model.Compiler.SqlBuilder
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
         public string DeclareParam(string name, ColumnType type, object value) => $"{name} {ToSqlType(type)} := {value}";
+        public string ToSqlParamName(string name) => $"@{name}";
 
         public string ToSqlType(ColumnType type)
         {
@@ -132,6 +136,7 @@ namespace Model.Compiler.SqlBuilder
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
         public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE {name} {ToSqlType(type)} = {value}";
+        public string ToSqlParamName(string name) => $":{name}";
 
         public string ToSqlType(ColumnType type)
         {
@@ -155,6 +160,7 @@ namespace Model.Compiler.SqlBuilder
         public string Except() => throw new NotImplementedException();
         public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
         public string DeclareParam(string name, ColumnType type, object value) => throw new NotImplementedException();
+        public string ToSqlParamName(string name) => $"@{name}";
 
         public string DateAdd(DateIncrementType incrType, int interval, object date)
         {
