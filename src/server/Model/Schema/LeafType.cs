@@ -4,7 +4,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Data.Common;
+using System.Collections.Generic;
 
 namespace Model.Schema
 {
@@ -57,6 +59,7 @@ namespace Model.Schema
             public const string TimeStamp = "timestamp";
             public const string Time = "time";
             public const string Year = "year";
+            public const string Guid = "guid";
         }
 
         public static class PostgreSql
@@ -123,9 +126,54 @@ namespace Model.Schema
             public const string Float = "float";
         }
 
+        static readonly HashSet<Type> NumericTypes = new HashSet<Type>
+        {
+            typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(double)
+        };
+
+        static readonly HashSet<Type> StringTypes = new HashSet<Type>
+        {
+            typeof(string)
+        };
+
+        static readonly HashSet<Type> DateTypes = new HashSet<Type>
+        {
+            typeof(DateTime), typeof(DateTimeOffset)
+        };
+
+        static readonly HashSet<Type> BooleanTypes = new HashSet<Type>
+        {
+            typeof(bool)
+        };
+
+        static readonly HashSet<Type> GuidTypes = new HashSet<Type>
+        {
+            typeof(Guid)
+        };
+
         public static LeafType LeafDataType(this DbColumn dbColumn)
         {
-            switch (dbColumn.DataTypeName)
+            if (!string.IsNullOrEmpty(dbColumn.DataTypeName))
+            {
+                return LeafDataType(dbColumn.DataTypeName);
+            }
+            return LeafDataType(dbColumn.DataType);
+        }
+
+        static LeafType LeafDataType(Type type)
+        {
+            if (NumericTypes.Contains(type)) return LeafType.Numeric;
+            if (DateTypes.Contains(type))    return LeafType.DateTime;
+            if (StringTypes.Contains(type))  return LeafType.String;
+            if (BooleanTypes.Contains(type)) return LeafType.Bool;
+            if (GuidTypes.Contains(type))    return LeafType.Guid;
+
+            return LeafType.None;
+        }
+
+        public static LeafType LeafDataType(string dataTypeName)
+        {
+            switch (dataTypeName.ToLower())
             {
                 case SqlServer.Varchar:
                 case SqlServer.Nvarchar:
@@ -163,6 +211,7 @@ namespace Model.Schema
                     return LeafType.Bool;
 
                 case SqlServer.UniqueIdentifier:
+                case MySql.Guid:
                 case PostgreSql.Uuid:
                     return LeafType.Guid;
 

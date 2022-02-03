@@ -16,7 +16,6 @@ namespace Model.Options
         public string ClinDb { get; set; }
 
         public bool SharedDbServer { get; set; }
-        public bool AddVariables { get; set; }
 
         public bool DefaultEqual()
         {

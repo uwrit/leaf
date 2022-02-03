@@ -407,7 +407,8 @@ namespace API.Options
             // Clin Db Connection
             services.Configure<ClinDbOptions>(opts =>
             {
-                opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
+                //opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
+                opts.ConnectionString = "Server='localhost';Port=3306;Database='mimic4';Uid='root';Pwd='Jefferson407!';";
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
                 opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));
@@ -435,8 +436,6 @@ namespace API.Options
 
             var clinDbOpts = sp.GetService<IOptions<ClinDbOptions>>().Value;
             var appDbOpts = sp.GetService<IOptions<AppDbOptions>>().Value;
-            var clinDbTarget = extractor.Parse(clinDbOpts);
-            var appDbTarget = extractor.Parse(appDbOpts);
 
             // SQL Compiler Options
             config.TryBind<CompilerOptions>(Config.Compiler.Section, out var compilerOptions);
@@ -446,15 +445,14 @@ namespace API.Options
                 opts.FieldPersonId = compilerOptions.FieldPersonId;
                 opts.FieldEncounterId = compilerOptions.FieldEncounterId;
 
-                opts.AppDb = appDbTarget.Database;
-                opts.ClinDb = clinDbTarget.Database;
-
-                opts.SharedDbServer = clinDbOpts.Rdbms ==
-                    ClinDbOptions.RdbmsType.SqlServer
-                    && appDbTarget.Server.Equals(clinDbTarget.Server, StringComparison.InvariantCultureIgnoreCase);
-
-                // BigQuery doesn't support "@var" style variables
-                opts.AddVariables = clinDbOpts.Rdbms != ClinDbOptions.RdbmsType.BigQuery;
+                if (clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.SqlServer)
+                {
+                    var clinDbTarget = extractor.Parse(clinDbOpts);
+                    var appDbTarget = extractor.Parse(appDbOpts);
+                    opts.AppDb = appDbTarget.Database;
+                    opts.ClinDb = clinDbTarget.Database;
+                    opts.SharedDbServer = appDbTarget.Server.Equals(clinDbTarget.Server, StringComparison.InvariantCultureIgnoreCase);
+                }
             });
 
             // Check RDMBS and query strategy validity

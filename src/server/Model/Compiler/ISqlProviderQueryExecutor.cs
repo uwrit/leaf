@@ -13,8 +13,8 @@ namespace Model.Compiler
 {
     public interface ISqlProviderQueryExecutor
     {
-        public Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token);
-        public Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token, IEnumerable<QueryParameter> parameters);
+        Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token);
+        Task<ILeafDbDataReader> ExecuteReaderAsync(string connStr, string query, int timeout, CancellationToken token, IEnumerable<QueryParameter> parameters);
     }
 
     public interface ILeafDbDataReader
@@ -29,24 +29,28 @@ namespace Model.Compiler
             get;
         }
 
-        public void Close();
-        public Task CloseAsync();
-        public bool Read();
-        public IReadOnlyCollection<DbColumn> GetColumnSchema();
-        public int GetOrdinal(string colName);
-        public string GetNullableString(int index);
-        public string GetNullableString(int? index);
-        public Guid GetGuid(int index);
-        public Guid? GetNullableGuid(int index);
-        public Guid? GetNullableGuid(int? index);
-        public DateTime? GetNullableDateTime(int index);
-        public DateTime? GetNullableDateTime(int? index);
-        public bool GetBoolean(int index);
-        public bool? GetNullableBoolean(int index);
-        public bool? GetNullableBoolean(int? index);
-        public int? GetNullableInt(int index);
-        public int? GetNullableInt(int? index);
-        public object GetNullableObject(int index);
-        public object GetNullableObject(int? index);
+        void Close();
+        Task CloseAsync();
+        bool Read();
+        IEnumerable<DbColumn> GetColumnSchema();
+        int GetOrdinal(string colName);
+        string GetNullableString(int index);
+        string GetNullableString(int? index);
+        Guid GetGuid(int index);
+        Guid? GetNullableGuid(int index);
+        Guid? GetNullableGuid(int? index);
+        DateTime? GetNullableDateTime(int index);
+        DateTime? GetNullableDateTime(int? index);
+        bool GetBoolean(int index);
+        bool GetCoercibleBoolean(int index);
+        bool GetCoercibleBoolean(int? index);
+        bool? GetNullableCoercibleBoolean(int index);
+        bool? GetNullableCoercibleBoolean(int? index);
+        bool? GetNullableBoolean(int index);
+        bool? GetNullableBoolean(int? index);
+        int? GetNullableInt(int index);
+        int? GetNullableInt(int? index);
+        object GetNullableObject(int index);
+        object GetNullableObject(int? index);
     }
 }

@@ -39,6 +39,7 @@ namespace Model.Compiler.PanelSqlCompiler
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
             var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
+            var epilogue = cachedCohortPreparer.Complete();
             var cohortCte = CteCohortInternals(context);
             var datasetCte = CteDatasetInternals(context.DatasetQuery);
             var filterCte = CteFilterInternals(context);
@@ -46,6 +47,7 @@ namespace Model.Compiler.PanelSqlCompiler
 
             AddParameters(context.QueryContext.QueryId);
             executionContext.QueryPrelude = prelude;
+            executionContext.QueryEpilogue = epilogue;
             executionContext.DatasetQuery = context.DatasetQuery;
             executionContext.CompiledQuery = Compose(cohortCte, datasetCte, filterCte, select);
 
@@ -63,7 +65,11 @@ namespace Model.Compiler.PanelSqlCompiler
 
         string Compose(string cohort, string dataset, string filter, string select)
         {
-            return $"WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
+            return
+                @$"WITH cohort AS ( {cohort} )
+                , dataset AS ( {dataset} )
+                , filter AS ( {filter} )
+                {select}";
         }
 
         string CteCohortInternals(DatasetCompilerContext ctx)

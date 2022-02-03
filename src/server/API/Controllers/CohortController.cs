@@ -70,7 +70,7 @@ namespace API.Controllers
             {
                 return StatusCode(lde.StatusCode);
             }
-            catch (LeafCompilerException)
+            catch (LeafCompilerException ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }

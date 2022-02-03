@@ -12,9 +12,10 @@ namespace Model.Compiler
     {
         public Shape Shape { get; }
         public string QueryPrelude { get; internal set; }
+        public string QueryEpilogue { get; internal set; }
         public string CompiledQuery { get; internal set; }
 
-        public string FullQuery => $"{QueryPrelude}; {CompiledQuery}";
+        public string FullQuery => $"{QueryPrelude} {CompiledQuery} {QueryEpilogue}";
 
         readonly List<QueryParameter> parameters;
         public IEnumerable<QueryParameter> Parameters => parameters;

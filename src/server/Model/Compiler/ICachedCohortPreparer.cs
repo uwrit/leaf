@@ -17,12 +17,13 @@ namespace Model.Compiler
 {
     public interface ICachedCohortPreparer
     {
-        public string FieldInternalPersonId { get; set; }
-        public string TempTableName { get; set; }
-        public Task<string> Prepare(Guid queryId, bool exportedOnly);
-        public string CohortToCte();
-        public string CohortToCteFrom();
-        public string CohortToCteWhere();
+        string FieldInternalPersonId { get; set; }
+        string TempTableName { get; set; }
+        Task<string> Prepare(Guid queryId, bool exportedOnly);
+        string Complete();
+        string CohortToCte();
+        string CohortToCteFrom();
+        string CohortToCteWhere();
     }
 
     public abstract class BaseCachedCohortPreparer : ICachedCohortPreparer
@@ -70,9 +71,11 @@ namespace Model.Compiler
         public virtual string CohortToCte()
         {
             return
-                $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt " +
+                $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt " +
                 $"FROM {CohortToCteFrom()}";
         }
+
+        public virtual string Complete() => string.Empty;
     }
 
     public class SharedSqlServerCachedCohortPreparer : BaseCachedCohortPreparer
@@ -105,7 +108,7 @@ namespace Model.Compiler
 
         public override string CohortToCte()
         {
-            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()} WHERE {CohortToCteWhere()}";
+            return $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt FROM {CohortToCteFrom()} WHERE {CohortToCteWhere()}";
         }
     }
 
@@ -129,6 +132,7 @@ namespace Model.Compiler
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
                 Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
+            output.AppendLine();
 
             foreach (var recs in Batch(cohort, batchSize))
             {
@@ -142,7 +146,9 @@ namespace Model.Compiler
 
         public override string CohortToCteFrom() => $"#{TempTableName}";
 
-        public override string CohortToCte() => $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()}";
+        public override string CohortToCte() => $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt FROM {CohortToCteFrom()}";
+
+        public override string Complete() => $"DROP TABLE #{TempTableName}";
     }
 
     // MySQL
@@ -160,12 +166,19 @@ namespace Model.Compiler
             var output = new StringBuilder();
             var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
 
+            // Create temp table
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
                 Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
+            output.AppendLine();
 
+            // Add Index
+            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
+            output.AppendLine();
+
+            // Insert rows
             foreach (var recs in Batch(cohort, batchSize))
             {
                 output.Append($"INSERT INTO {TempTableName} (PersonId, Exported, Salt)");
@@ -175,6 +188,8 @@ namespace Model.Compiler
 
             return output.ToString();
         }
+
+        public override string Complete() => $"; DROP TABLE IF EXISTS {TempTableName}";
     }
 
     // MariaDB
@@ -206,8 +221,10 @@ namespace Model.Compiler
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
                 Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
+            output.AppendLine();
 
             output.Append(" INSERT ALL ");
+            output.AppendLine();
 
             foreach (var rec in cohort)
             {
@@ -225,7 +242,7 @@ namespace Model.Compiler
 
         public override string CohortToCte()
         {
-            return $"SELECT {FieldInternalPersonId} = PersonId, Exported, Salt FROM {CohortToCteFrom()}";
+            return $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt FROM {CohortToCteFrom()}";
         }
     }
 
@@ -249,6 +266,7 @@ namespace Model.Compiler
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
                 Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
+            output.AppendLine();
 
             foreach (var recs in Batch(cohort, batchSize))
             {
@@ -281,6 +299,7 @@ namespace Model.Compiler
                 Exported {dialect.ToSqlType(ColumnType.Boolean)},
                 Salt     {dialect.ToSqlType(ColumnType.Guid)});"
             );
+            output.AppendLine();
 
             foreach (var recs in Batch(cohort, batchSize))
             {

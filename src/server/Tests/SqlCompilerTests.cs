@@ -17,7 +17,7 @@ namespace Tests
     public class SqlCompilerTests
     {
         static readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
-        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, Options);
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, MockOptions.GenerateOmopOptions());
         static readonly ISqlDialect dialect = new TSqlDialect();
 
         #region Helpers

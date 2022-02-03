@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using Google.Cloud.BigQuery.V2;
 using Model.Compiler;
-using System.Collections.ObjectModel;
 
 namespace Services.Compiler
 {
@@ -18,11 +17,13 @@ namespace Services.Compiler
     {
         readonly DbConnection conn;
         readonly DbDataReader reader;
+        IEnumerable<LeafDbColumn> schema;
 
         public WrappedDbDataReader(DbConnection conn, DbDataReader reader)
         {
             this.reader = reader;
             this.conn = conn;
+            GetColumnSchema();
         }
 
         public object this[int i]
@@ -59,9 +60,16 @@ namespace Services.Compiler
             }
         }
 
-        public bool Read()                                     => reader.Read();
-        public IReadOnlyCollection<DbColumn> GetColumnSchema() => reader.GetColumnSchema();
+        public IEnumerable<DbColumn> GetColumnSchema()
+        {
+            if (schema == null)
+            {
+                schema = reader.GetColumnSchema().Select((c,i) => new LeafDbColumn(c, i));
+            }
+            return schema;
+        }
 
+        public bool Read()                              => reader.Read();
         public int GetOrdinal(string colName)           => reader.GetOrdinal(colName);
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
         public Guid GetGuid(int index)                  => reader.GetGuid(index);
@@ -71,6 +79,46 @@ namespace Services.Compiler
         public bool? GetNullableBoolean(int index)      => reader.IsDBNull(index) ? null : reader.GetBoolean(index);
         public int? GetNullableInt(int index)           => reader.IsDBNull(index) ? null : reader.GetInt32(index);
         public object GetNullableObject(int index)      => reader.IsDBNull(index) ? null : reader.GetValue(index);
+
+        public bool GetCoercibleBoolean(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(int))
+            {
+                var val = reader.GetInt32(index);
+                if (val == 0 || val == 1)
+                {
+                    return Convert.ToBoolean(val);
+                }
+                return false;
+            }
+            return reader.GetBoolean(index);
+        }
+
+        public bool GetCoercibleBoolean(int? index)
+        {
+            if (index.HasValue) return GetCoercibleBoolean((int)index);
+            return false;
+        }
+
+        public bool? GetNullableCoercibleBoolean(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(int))
+            {
+                var val = reader.GetInt32(index);
+                if (val == 0 || val == 1)
+                {
+                    return Convert.ToBoolean(val);
+                }
+                return null;
+            }
+            return GetNullableBoolean(index);
+        }
+
+        public bool? GetNullableCoercibleBoolean(int? index)
+        {
+            if (index.HasValue) return GetNullableBoolean(index);
+            return null;
+        }
 
         public string GetNullableString(int? index)
         {
@@ -106,6 +154,17 @@ namespace Services.Compiler
         {
             if (index.HasValue) return GetNullableObject(index.Value);
             return null;
+        }
+
+        public class LeafDbColumn : DbColumn
+        {
+            public LeafDbColumn(DbColumn col, int index)
+            {
+                ColumnName = col.ColumnName;
+                DataType = col.DataType;
+                DataTypeName = col.DataTypeName;
+                ColumnOrdinal = index;
+            }
         }
     }
 
@@ -156,14 +215,14 @@ namespace Services.Compiler
             // noop
         }
 
-        public IReadOnlyCollection<DbColumn> GetColumnSchema()
+        public IEnumerable<DbColumn> GetColumnSchema()
         {
             if (schema == null)
             {
                 schema = results.Schema.Fields.Select((f, i) => new BigQueryDbColumn(f, i));
                 colByOrdinal = schema.ToDictionary(c => c.ColumnName, c => c.ColumnOrdinal);
             }
-            return new ReadOnlyCollection<BigQueryDbColumn>(schema.ToArray());
+            return schema;
         }
 
         public string GetNullableString(int index)      => row[index] is string @val ? @val : null;
@@ -180,6 +239,46 @@ namespace Services.Compiler
             var found = colByOrdinal.TryGetValue(colName, out var ordinal);
             if (found) return (int)ordinal;
             return -1;
+        }
+
+        public bool GetCoercibleBoolean(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(int))
+            {
+                var val = (int)row[index];
+                if (val == 0 || val == 1)
+                {
+                    return Convert.ToBoolean(val);
+                }
+                return false;
+            }
+            return (bool)row[index];
+        }
+
+        public bool GetCoercibleBoolean(int? index)
+        {
+            if (index.HasValue) return GetCoercibleBoolean((int)index);
+            return false;
+        }
+
+        public bool? GetNullableCoercibleBoolean(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(int))
+            {
+                var val = (int)row[index];
+                if (val == 0 || val == 1)
+                {
+                    return Convert.ToBoolean(val);
+                }
+                return null;
+            }
+            return GetNullableBoolean(index);
+        }
+
+        public bool? GetNullableCoercibleBoolean(int? index)
+        {
+            if (index.HasValue) return GetNullableBoolean(index);
+            return null;
         }
 
         public string GetNullableString(int? index)
@@ -223,6 +322,7 @@ namespace Services.Compiler
             public BigQueryDbColumn(Google.Apis.Bigquery.v2.Data.TableFieldSchema field, int index)
             {
                 ColumnName = field.Name;
+                DataType = field.GetType();
                 DataTypeName = field.Type;
                 ColumnOrdinal = index;
             }

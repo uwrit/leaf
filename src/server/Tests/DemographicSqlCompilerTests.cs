@@ -20,7 +20,7 @@ namespace Tests
         static readonly ConnectionStringParser extractor = new ConnectionStringParser();
         static readonly ISqlDialect dialect = new TSqlDialect();
         static readonly IOptions<CompilerOptions> opts = GetCompilerOptions();
-        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, opts.Value);
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, GetCompilerOptions());
 
         [Fact]
         public async void Should_Correctly_Represent_Demographic_Shape()
