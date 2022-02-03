@@ -88,16 +88,21 @@ namespace Model.Compiler.PanelSqlCompiler
         string CteFilterInternals(DatasetCompilerContext compilerContext)
         {
             var provider = DatasetDateFilterProvider.For(compilerContext);
+            var noFilter = $"SELECT * FROM dataset";
             
             // Dynamic datasets may have no datefield
             if (!provider.CanFilter)
             {
-                return $"SELECT * FROM dataset";
+                return noFilter;
             }
 
             var dateFilter = provider.GetDateFilter(compilerContext, dialect);
-            executionContext.AddParameters(dateFilter.Parameters);
-            return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
+            if (dateFilter != null)
+            {
+                executionContext.AddParameters(dateFilter.Parameters);
+                return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
+            }
+            return noFilter;
         }
 
         string SelectFromCTE(DatasetCompilerContext ctx)
@@ -156,18 +161,6 @@ namespace Model.Compiler.PanelSqlCompiler
             var earlyEmbedded = dialect.ToSqlParamName(earlyParamName);
             var lateEmbedded = dialect.ToSqlParamName(lateParamName);
 
-            // neither
-            if (!early.HasValue && !late.HasValue)
-            {
-                var now = DateTime.Now;
-                var clause = $"{TargetDateField} <= {lateEmbedded}";
-                return new DatasetDateFilter
-                {
-                    Clause = clause,
-                    Parameters = new QueryParameter[] { new QueryParameter(lateParamName, now) }
-                };
-            }
-
             // both present
             if (early.HasValue && late.HasValue)
             {
@@ -184,23 +177,21 @@ namespace Model.Compiler.PanelSqlCompiler
             }
 
             // early only
-            if (early.HasValue && !late.HasValue)
+            else if (early.HasValue && !late.HasValue)
             {
-                var now = DateTime.Now;
-                var clause = $"{TargetDateField} BETWEEN {earlyEmbedded} AND {lateEmbedded}";
+                var clause = $"{TargetDateField} >= {earlyEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
                     Parameters = new QueryParameter[]
                     {
                         new QueryParameter(earlyParamName, early.Value),
-                        new QueryParameter(lateParamName, now)
                     }
                 };
             }
 
             // late only
-            else
+            else if (!early.HasValue && late.HasValue)
             {
                 var clause = $"{TargetDateField} <= {lateParamName}";
                 return new DatasetDateFilter
@@ -209,6 +200,8 @@ namespace Model.Compiler.PanelSqlCompiler
                     Parameters = new QueryParameter[] { new QueryParameter(lateParamName, late.Value) }
                 };
             }
+
+            return null;
         }
     }
 

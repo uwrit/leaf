@@ -148,7 +148,7 @@ namespace Services.Cohort
             var rec = new PatientDemographicRecord
             {
                 Exported = reader.GetBoolean(Plan.Exported.Index),
-                MaybeSalt = reader.GetNullableGuid(Plan.Salt.Index),
+                MaybeSalt = reader.GetNullableCoercibleGuid(Plan.Salt.Index),
                 PersonId = reader.GetNullableString(Plan.PersonId?.Index),
                 AddressPostalCode = reader.GetNullableString(Plan.AddressPostalCode?.Index),
                 AddressState = reader.GetNullableString(Plan.AddressState?.Index),

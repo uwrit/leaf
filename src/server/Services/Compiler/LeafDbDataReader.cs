@@ -80,6 +80,31 @@ namespace Services.Compiler
         public int? GetNullableInt(int index)           => reader.IsDBNull(index) ? null : reader.GetInt32(index);
         public object GetNullableObject(int index)      => reader.IsDBNull(index) ? null : reader.GetValue(index);
 
+        public Guid GetCoercibleGuid(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(string))
+            {
+                var val = reader.GetString(index);
+                return Guid.Parse(val);
+            }
+            return reader.GetGuid(index);
+        }
+
+        public Guid? GetNullableCoercibleGuid(int index)
+        {
+            if (schema.ElementAt(index).DataType == typeof(string))
+            {
+                var strVal = reader.GetString(index);
+                var success = Guid.TryParse(strVal, out Guid guid);
+                if (success)
+                {
+                    return guid;
+                }
+                return null;
+            }
+            return reader.GetGuid(index);
+        }
+
         public bool GetCoercibleBoolean(int index)
         {
             if (schema.ElementAt(index).DataType == typeof(int))
@@ -239,6 +264,22 @@ namespace Services.Compiler
             var found = colByOrdinal.TryGetValue(colName, out var ordinal);
             if (found) return (int)ordinal;
             return -1;
+        }
+
+        public Guid GetCoercibleGuid(int index)
+        {
+            return GetGuid(index);
+        }
+
+        public Guid? GetNullableCoercibleGuid(int index)
+        {
+            var strVal = row[index].ToString();
+            var success = Guid.TryParse(strVal, out Guid guid);
+            if (success)
+            {
+                return guid;
+            }
+            return null;
         }
 
         public bool GetCoercibleBoolean(int index)

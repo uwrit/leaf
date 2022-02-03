@@ -81,6 +81,60 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet("{queryid}/dataset")]
+        public async Task<ActionResult<DatasetDTO>> Dataset(
+            string queryid,
+            [FromQuery] string datasetid,
+            [FromQuery] Shape shape,
+            [FromQuery] long? early,
+            [FromQuery] long? late,
+            [FromQuery] int? panelIdx,
+            [FromServices] DatasetProvider provider,
+            CancellationToken cancelToken)
+        {
+            try
+            {
+                var queryref = new QueryRef(queryid);
+                var datasetref = new DatasetQueryRef(datasetid, shape);
+
+                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late, panelIdx);
+
+                switch (result.Context.State)
+                {
+                    case CompilerContextState.DatasetShapeMismatch:
+                        return BadRequest(new CompilerErrorDTO(result.Context.State));
+                    case CompilerContextState.DatasetNotFound:
+                    case CompilerContextState.QueryNotFound:
+                        return NotFound(new CompilerErrorDTO(result.Context.State));
+                }
+
+                return Ok(new DatasetDTO(result.Dataset));
+            }
+            catch (FormatException fe)
+            {
+                log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
+                return BadRequest();
+            }
+            catch (OperationCanceledException)
+            {
+                log.LogInformation("Request cancelled. QueryID:{QueryID} DatasetId:{DatasetId}", queryid, datasetid);
+                return NoContent();
+            }
+            catch (LeafRPCException lde)
+            {
+                return StatusCode(lde.StatusCode);
+            }
+            catch (LeafCompilerException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+            catch (Exception ex)
+            {
+                log.LogError("Failed to fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
         [HttpGet("{queryid}/conceptdataset")]
         public async Task<ActionResult<DatasetDTO>> ConceptPanelDataset(
             string queryid,
@@ -158,60 +212,6 @@ namespace API.Controllers
             catch (Exception ex)
             {
                 log.LogError("Failed to fetch panel dataset. QueryID:{QueryID} PanelIndex:{PanelIdx} Error:{Error}", queryid, panelIdx, ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
-        [HttpGet("{queryid}/dataset")]
-        public async Task<ActionResult<DatasetDTO>> Dataset(
-            string queryid,
-            [FromQuery] string datasetid,
-            [FromQuery] Shape shape,
-            [FromQuery] long? early,
-            [FromQuery] long? late,
-            [FromQuery] int? panelIdx,
-            [FromServices] DatasetProvider provider,
-            CancellationToken cancelToken)
-        {
-            try
-            {
-                var queryref = new QueryRef(queryid);
-                var datasetref = new DatasetQueryRef(datasetid, shape);
-
-                var result = await provider.GetDatasetAsync(queryref, datasetref, cancelToken, early, late, panelIdx);
-
-                switch (result.Context.State)
-                {
-                    case CompilerContextState.DatasetShapeMismatch:
-                        return BadRequest(new CompilerErrorDTO(result.Context.State));
-                    case CompilerContextState.DatasetNotFound:
-                    case CompilerContextState.QueryNotFound:
-                        return NotFound(new CompilerErrorDTO(result.Context.State));
-                }
-
-                return Ok(new DatasetDTO(result.Dataset));
-            }
-            catch (FormatException fe)
-            {
-                log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (OperationCanceledException)
-            {
-                log.LogInformation("Request cancelled. QueryID:{QueryID} DatasetId:{DatasetId}", queryid, datasetid);
-                return NoContent();
-            }
-            catch (LeafRPCException lde)
-            {
-                return StatusCode(lde.StatusCode);
-            }
-            catch (LeafCompilerException)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed to fetch dataset. QueryID:{QueryID} DatasetID:{DatasetID} Error:{Error}", queryid, datasetid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

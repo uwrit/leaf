@@ -39,13 +39,14 @@ using Services.Admin.Notification;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
+using Services.Compiler;
+using Services.Compiler.SqlBuilder;
 using Services.Export;
 using Services.Network;
 using Services.Search;
 using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
-using Services.Compiler;
 
 namespace API.Options
 {

@@ -37,6 +37,8 @@ namespace Model.Compiler
         string GetNullableString(int index);
         string GetNullableString(int? index);
         Guid GetGuid(int index);
+        Guid? GetNullableCoercibleGuid(int index);
+        Guid GetCoercibleGuid(int index);
         Guid? GetNullableGuid(int index);
         Guid? GetNullableGuid(int? index);
         DateTime? GetNullableDateTime(int index);

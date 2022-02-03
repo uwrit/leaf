@@ -407,8 +407,7 @@ namespace API.Options
             // Clin Db Connection
             services.Configure<ClinDbOptions>(opts =>
             {
-                //opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
-                opts.ConnectionString = "Server='localhost';Port=3306;Database='mimic4';Uid='root';Pwd='Jefferson407!';";
+                opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
                 opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));

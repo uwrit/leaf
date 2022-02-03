@@ -40,15 +40,13 @@ namespace Services.Compiler
     {
         System.Data.DbType ToSqlType(object val)
         {
-            return val switch
-            {
-                Type _ when val is string  => System.Data.DbType.String,
-                Type _ when val is decimal => System.Data.DbType.Decimal,
-                Type _ when val is double  => System.Data.DbType.Decimal,
-                Type _ when val is int     => System.Data.DbType.Int32,
-                Type _ when val is Guid    => System.Data.DbType.Guid,
-                _ => System.Data.DbType.String,
-            };
+            if (val is string)  return System.Data.DbType.String;
+            if (val is decimal) return System.Data.DbType.Decimal;
+            if (val is double)  return System.Data.DbType.Double;
+            if (val is int)     return System.Data.DbType.Int32;
+            if (val is bool)    return System.Data.DbType.Boolean;
+            if (val is Guid)    return System.Data.DbType.Guid;
+            return System.Data.DbType.String;
         }
 
         SqlParameter ToSqlParameter(QueryParameter q)
@@ -89,15 +87,13 @@ namespace Services.Compiler
     {
         MySql.Data.MySqlClient.MySqlDbType ToSqlType(object val)
         {
-            return val switch
-            {
-                Type _ when val is string  => MySql.Data.MySqlClient.MySqlDbType.String,
-                Type _ when val is decimal => MySql.Data.MySqlClient.MySqlDbType.Decimal,
-                Type _ when val is double  => MySql.Data.MySqlClient.MySqlDbType.Decimal,
-                Type _ when val is int     => MySql.Data.MySqlClient.MySqlDbType.Int32,
-                Type _ when val is Guid    => MySql.Data.MySqlClient.MySqlDbType.Guid,
-                _ => MySql.Data.MySqlClient.MySqlDbType.String,
-            };
+            if (val is string)  return MySql.Data.MySqlClient.MySqlDbType.String;
+            if (val is decimal) return MySql.Data.MySqlClient.MySqlDbType.Decimal;
+            if (val is double)  return MySql.Data.MySqlClient.MySqlDbType.Double;
+            if (val is int)     return MySql.Data.MySqlClient.MySqlDbType.Int32;
+            if (val is bool)    return MySql.Data.MySqlClient.MySqlDbType.Bit;
+            if (val is Guid)    return MySql.Data.MySqlClient.MySqlDbType.Guid;
+            return MySql.Data.MySqlClient.MySqlDbType.String;
         }
 
         MySql.Data.MySqlClient.MySqlParameter ToSqlParameter(QueryParameter q)
@@ -146,15 +142,13 @@ namespace Services.Compiler
     {
         NpgsqlTypes.NpgsqlDbType ToSqlType(object val)
         {
-            return val switch
-            {
-                Type _ when val is string  => NpgsqlTypes.NpgsqlDbType.Char,
-                Type _ when val is decimal => NpgsqlTypes.NpgsqlDbType.Numeric,
-                Type _ when val is double  => NpgsqlTypes.NpgsqlDbType.Numeric,
-                Type _ when val is int     => NpgsqlTypes.NpgsqlDbType.Numeric,
-                Type _ when val is Guid    => NpgsqlTypes.NpgsqlDbType.Char,
-                _ => NpgsqlTypes.NpgsqlDbType.Char,
-            };
+            if (val is string)  return NpgsqlTypes.NpgsqlDbType.Char;
+            if (val is decimal) return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is double)  return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is int)     return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is bool)    return NpgsqlTypes.NpgsqlDbType.Boolean;
+            if (val is Guid)    return NpgsqlTypes.NpgsqlDbType.Uuid;
+            return NpgsqlTypes.NpgsqlDbType.Char;
         }
 
         Npgsql.NpgsqlParameter ToSqlParameter(QueryParameter q)
@@ -195,15 +189,13 @@ namespace Services.Compiler
     {
         System.Data.OracleClient.OracleType ToSqlType(object val)
         {
-            return val switch
-            {
-                Type _ when val is string  => System.Data.OracleClient.OracleType.NVarChar,
-                Type _ when val is decimal => System.Data.OracleClient.OracleType.Float,
-                Type _ when val is double  => System.Data.OracleClient.OracleType.Double,
-                Type _ when val is int     => System.Data.OracleClient.OracleType.Int32,
-                Type _ when val is Guid    => System.Data.OracleClient.OracleType.NVarChar,
-                _ => System.Data.OracleClient.OracleType.NVarChar,
-            };
+            if (val is string)  return System.Data.OracleClient.OracleType.NVarChar;
+            if (val is decimal) return System.Data.OracleClient.OracleType.Float;
+            if (val is double)  return System.Data.OracleClient.OracleType.Double;
+            if (val is int)     return System.Data.OracleClient.OracleType.Int32;
+            if (val is bool)    return System.Data.OracleClient.OracleType.Int32;
+            if (val is Guid)    return System.Data.OracleClient.OracleType.NVarChar;
+            return System.Data.OracleClient.OracleType.NVarChar;
         }
 
         System.Data.OracleClient.OracleParameter ToSqlParameter(QueryParameter q)
@@ -243,15 +235,13 @@ namespace Services.Compiler
     {
         BigQueryDbType ToSqlType(object val)
         {
-            return val switch
-            {
-                Type _ when val is string  => BigQueryDbType.String,
-                Type _ when val is decimal => BigQueryDbType.Numeric,
-                Type _ when val is double  => BigQueryDbType.Numeric,
-                Type _ when val is int     => BigQueryDbType.Int64,
-                Type _ when val is Guid    => BigQueryDbType.String,
-                _ => BigQueryDbType.String
-            };
+            if (val is string)  return BigQueryDbType.String;
+            if (val is decimal) return BigQueryDbType.Numeric;
+            if (val is double)  return BigQueryDbType.Numeric;
+            if (val is int)     return BigQueryDbType.Int64;
+            if (val is bool)    return BigQueryDbType.Bool;
+            if (val is Guid)    return BigQueryDbType.String;
+            return BigQueryDbType.String;
         }
 
         BigQueryParameter ToSqlParameter(QueryParameter q)
