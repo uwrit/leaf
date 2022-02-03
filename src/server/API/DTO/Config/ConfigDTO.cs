@@ -14,7 +14,7 @@ namespace API.DTO.Config
         public AttestationConfigDTO Attestation { get; set; }
         public CohortConfigDTO Cohort { get; set; }
         public ClientOptionsDTO Client { get;set; }
-        public string Version { get; set; }
+        public VersionConfigDTO Version { get; set; }
     }
 
     public class AuthenticationConfigDTO
@@ -88,5 +88,11 @@ namespace API.DTO.Config
             public string Email { get; set; }
             public string URI { get; set; }
         }
+    }
+
+    public class VersionConfigDTO
+    {
+        public string Server { get; set; }
+        public string Db { get; set; }
     }
 }

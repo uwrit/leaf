@@ -77,7 +77,6 @@ class App extends React.Component<Props> {
         this.handleServerStateRefresh();
         dispatch(getIdToken());
         dispatch(refreshServerState());
-        console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 

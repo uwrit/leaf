@@ -91,6 +91,49 @@ END
 
 GO
 
+/*
+ * [app].[sp_GetServerStateAndNotifications]
+ */
+IF OBJECT_ID('app.sp_GetServerStateAndNotifications', 'P') IS NOT NULL
+    DROP PROCEDURE [app].[sp_GetServerStateAndNotifications];
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2021/11/2
+-- Description: Gets app and db state and notifications, first deleting old notifications
+-- =======================================
+ALTER PROCEDURE [app].[sp_GetServerStateAndNotifications]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- Delete stale messages
+    DELETE FROM app.Notification
+    WHERE Until < GETDATE()
+
+    -- Set IsUp = 1 if downtime has passed
+    UPDATE app.ServerState
+    SET IsUp = 1
+      , DowntimeFrom    = NULL
+      , DowntimeUntil   = NULL
+      , DowntimeMessage = NULL
+    WHERE DowntimeUntil < GETDATE()
+
+    -- Server state
+    SELECT IsUp, DowntimeMessage, DowntimeFrom, DowntimeUntil
+    FROM app.ServerState
+
+    -- Notifications
+    SELECT Id, [Message]
+    FROM app.Notification
+
+    -- DB Version
+    SELECT [Version]
+    FROM ref.Version
+
+END
+GO
 
 
 

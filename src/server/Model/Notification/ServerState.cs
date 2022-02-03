@@ -15,11 +15,17 @@ namespace Model.Notification
         public DateTime DowntimeFrom { get; set; }
         public DateTime DowntimeUntil { get; set; }
         public IEnumerable<UserNotification> Notifications;
+        public Database Db = new Database();
     }
 
     public class UserNotification
     {
         public Guid Id { get; set; }
         public string Message { get; set; }
+    }
+
+    public class Database
+    {
+        public Version Version { get; set; }
     }
 }
