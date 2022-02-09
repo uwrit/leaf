@@ -104,7 +104,7 @@
 .dynamic-timeline-small-multiples-container:hover .recharts-layer.recharts-line path,
 .dynamic-timeline-small-multiples-container:hover .recharts-line-dots circle {
     filter: none;
-    stroke-opacity: 0.3;
+    stroke-opacity: 0.6;
 }
 
 .dynamic-timeline-small-multiples-container .recharts-surface:hover .recharts-layer.recharts-line path,

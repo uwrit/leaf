@@ -4,7 +4,7 @@ export const config: DashboardConfig =
 {
     main: {
         title: "UW Memory and Brain Wellness Dashboard",
-        cohortId: "d3f1423e-f36b-1410-81bf-0018c8508655", /* Saved Leaf cohort ID */
+        cohortId: "0c41433e-f36b-1410-81c3-0018c8508655", /* Saved Leaf cohort ID */ 
         datasetIds: [
             "d6f1423e-f36b-1410-81bf-0018c8508655", /* weight           */
             "d9f1423e-f36b-1410-81bf-0018c8508655", /* PHQ9             */
@@ -27,9 +27,9 @@ export const config: DashboardConfig =
                 type: "row",
                 content: [
                     {
-                        color: [143, 31, 177],
-                        icon: "checklist",
-                        type: "checklist",
+                        color: [143, 31, 177], // purple / pink
+                        icon: "checklist",    
+                        type: "checklist",     
                         title: "Quality Care Checklists",
                         width: 44,
                         datasets: [

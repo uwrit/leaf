@@ -24,7 +24,7 @@ class Cohort extends React.Component<Props> {
         return (
             <div className={`${c}-container`}>
                 {[ ...(cohort!.patients as any).keys() ].map((patId) => {
-                    return <Link key={patId} to={`/${dashboardId}/patients/${patId}`}>{patId}</Link>
+                    return <Link key={patId} to={`/${dashboardId}/patients/${patId}`}>Patient {patId}</Link>
                 })}
             </div>
         );

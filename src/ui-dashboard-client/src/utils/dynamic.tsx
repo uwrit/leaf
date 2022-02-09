@@ -17,10 +17,10 @@ export const renderDynamicComponent = (
         key?: string | number)
     : JSX.Element | null => {
     switch (content.type) {
-        case "row":       return <DynamicRow key={key} config={content as WidgetRowConfig} patient={patient} metadata={metadata} />;
-        case "list":      return <DynamicList key={key} config={content as WidgetListConfig} patient={patient} metadata={metadata} />;
+        case "row":       return <DynamicRow       key={key} config={content as WidgetRowConfig} patient={patient} metadata={metadata} />;
+        case "list":      return <DynamicList      key={key} config={content as WidgetListConfig} patient={patient} metadata={metadata} />;
         case "checklist": return <DynamicChecklist key={key} config={content as WidgetChecklistConfig} patient={patient} metadata={metadata} />;
-        case "timeline":  return <DynamicTimeline key={key} config={content as WidgetTimelineConfig} patient={patient} metadata={metadata} />;;
+        case "timeline":  return <DynamicTimeline  key={key} config={content as WidgetTimelineConfig} patient={patient} metadata={metadata} />;;
         default:
             return null;
     }
@@ -32,7 +32,7 @@ export const getDynamicColor = (rgb?: RgbValues, transparent?: number): string =
     if (typeof(rgb) === 'undefined') { vals = defaultColor; } 
     else { vals = rgb.slice(); }
 
-    if (typeof(transparent) != 'undefined') { vals.push(transparent); }
+    if (typeof(transparent) !== 'undefined') { vals.push(transparent); }
     return `rgb(${vals.join(',')}`;
 };
 
