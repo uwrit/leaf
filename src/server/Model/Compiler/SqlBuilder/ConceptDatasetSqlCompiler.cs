@@ -5,32 +5,43 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class ConceptDatasetSqlCompiler : IConceptDatasetSqlCompiler
     {
         readonly CompilerOptions compilerOptions;
+        readonly ISqlDialect dialect;
+        readonly ICachedCohortPreparer cachedCohortPreparer;
 
-        public ConceptDatasetSqlCompiler(IOptions<CompilerOptions> compOpts)
+        public ConceptDatasetSqlCompiler(
+            IOptions<CompilerOptions> compilerOptions,
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer)
         {
-            this.compilerOptions = compOpts.Value;
+            this.compilerOptions = compilerOptions.Value;
+            this.dialect = dialect;
+            this.cachedCohortPreparer = cachedCohortPreparer;
         }
 
-        public ConceptDatasetExecutionContext BuildConceptDatasetSql(PanelDatasetCompilerContext ctx)
+        public async Task<ConceptDatasetExecutionContext> BuildConceptDatasetSql(PanelDatasetCompilerContext ctx)
         {
             var p = ctx.Panel;
             var sp = p.SubPanels.First();
             var pi = sp.PanelItems.First();
-            var cohortSql = new CachedCohortSqlSet(compilerOptions).ToString();
-            var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions).ToString();
-            new SqlValidator(Dialect.IllegalCommands).Validate(conceptSql);
+
+            var prelude = await cachedCohortPreparer.Prepare(ctx.QueryContext.QueryId, true);
+            var cohortSql = cachedCohortPreparer.CohortToCte();
+            var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions, dialect).ToString();
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(conceptSql);
 
             var exeContext = new ConceptDatasetExecutionContext(ctx.QueryContext, ctx.QueryContext.QueryId);
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
+            exeContext.QueryPrelude = prelude;
             exeContext.CompiledQuery = Compose(cohortSql, conceptSql);
 
             return exeContext;

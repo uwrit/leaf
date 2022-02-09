@@ -9,15 +9,21 @@ using System.Collections.Generic;
 using Model.Options;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public class PanelSequentialSqlSet : JoinedSet
     {
+        ISqlDialect dialect;
+
         public Column PersonId { get; protected set; }
 
-        public PanelSequentialSqlSet(Panel panel, CompilerOptions compilerOptions)
+        public PanelSequentialSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect)
         {
-            var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions));
+            this.dialect = dialect;
+            var sps = panel.SubPanels.Select(sp => new SubPanelSequentialSqlSet(panel, sp, compilerOptions, dialect));
             var first = sps.First();
             var j1 = new JoinedSequentialSqlSet(first);
             var joins = new List<IJoinable>() { j1 };
@@ -68,7 +74,7 @@ namespace Model.Compiler.Common
         IEvaluatableAggregate GetHaving(JoinedSequentialSqlSet join)
         {
             var sub = (join.Set as SubPanelSequentialSqlSet).SubPanel;
-            var uniqueDates = new Expression($"{Dialect.Syntax.COUNT} ({Dialect.Syntax.DISTINCT} {join.Date})");
+            var uniqueDates = new Expression($"{SqlCommon.Syntax.Count} ({SqlCommon.Syntax.Distinct} {join.Date})");
 
             if (sub.IncludeSubPanel)
             {
@@ -87,9 +93,8 @@ namespace Model.Compiler.Common
              * Get offset expressions.
              */
             var seq = currSub.SubPanel.JoinSequence;
-            var incrType = seq.DateIncrementType.ToString().ToUpper();
-            var backOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, -{seq.Increment}, {prev.Date})");
-            var forwOffset = new Expression($"{Dialect.Syntax.DATEADD}({incrType}, {seq.Increment}, {prev.Date})");
+            var backOffset = new Expression(dialect.DateAdd(seq.DateIncrementType, -seq.Increment, prev.Date));
+            var forwOffset = new Expression(dialect.DateAdd(seq.DateIncrementType, seq.Increment, prev.Date));
 
             /*
              * Get Join.

@@ -409,6 +409,7 @@ namespace API.Options
             {
                 opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
+                opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));
 
                 if (opts.Cohort.QueryStrategy == ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel)
@@ -429,8 +430,11 @@ namespace API.Options
                 }
             });
 
-            var extractor = new DatabaseExtractor();
+            var extractor = new ConnectionStringParser();
             var sp = services.BuildServiceProvider();
+
+            var clinDbOpts = sp.GetService<IOptions<ClinDbOptions>>().Value;
+            var appDbOpts = sp.GetService<IOptions<AppDbOptions>>().Value;
 
             // SQL Compiler Options
             config.TryBind<CompilerOptions>(Config.Compiler.Section, out var compilerOptions);
@@ -440,9 +444,27 @@ namespace API.Options
                 opts.FieldPersonId = compilerOptions.FieldPersonId;
                 opts.FieldEncounterId = compilerOptions.FieldEncounterId;
 
-                opts.AppDb = extractor.ExtractDatabase(sp.GetService<IOptions<AppDbOptions>>().Value);
-                opts.ClinDb = extractor.ExtractDatabase(sp.GetService<IOptions<ClinDbOptions>>().Value);
+                if (clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.SqlServer)
+                {
+                    var clinDbTarget = extractor.Parse(clinDbOpts);
+                    var appDbTarget = extractor.Parse(appDbOpts);
+                    opts.AppDb = appDbTarget.Database;
+                    opts.ClinDb = clinDbTarget.Database;
+                    opts.SharedDbServer = appDbTarget.Server.Equals(clinDbTarget.Server, StringComparison.InvariantCultureIgnoreCase);
+                }
             });
+
+            // Check RDMBS and query strategy validity
+            if (clinDbOpts.Cohort.QueryStrategy == ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE)
+            {
+                if (clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.BigQuery
+                    || clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.MySql
+                    || clinDbOpts.Rdbms == ClinDbOptions.RdbmsType.MariaDb)
+                {
+                    throw new LeafConfigurationException($"{clinDbOpts.Rdbms} cannot be used with the CTE query strategy. Change 'CTE' to 'PARALLEL'.");
+                }
+            }
+
             return services;
         }
 

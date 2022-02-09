@@ -53,7 +53,7 @@ namespace Model.Cohort
                 log.LogError("PanelDatasetCompilerContext error. State:{State}", validationContext.State);
                 return result;
             }
-            var exeContext = sqlCompiler.BuildPanelDatasetSql(validationContext.Context);
+            var exeContext = await sqlCompiler.BuildPanelDatasetSql(validationContext.Context);
             log.LogInformation("Compiled PanelDataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);

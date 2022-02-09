@@ -102,7 +102,10 @@ export const fetchDataset = async (
     }
     if (typeof panelIndex !== 'undefined') {
         params.panelIdx = panelIndex
-    } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
+    } else if (dataset.isEncounterBased 
+        && dates 
+        && dates.start.dateIncrementType !== DateIncrementType.NONE 
+        && dates.end.dateIncrementType !== DateIncrementType.NONE) {
         params.early = deriveDateTicks(dates.start);
         params.late = deriveDateTicks(dates.end);
     }

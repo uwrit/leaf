@@ -4,7 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
 
 namespace Model.Compiler
 {
@@ -15,11 +14,8 @@ namespace Model.Compiler
 
         public string GrabSql { get; private set; }
 
-        public string Parameters { get; private set; }
-
-        public CteCohortQuery(string parameters, string grab)
+        public CteCohortQuery(string grab)
         {
-            Parameters = parameters;
             GrabSql = grab;
         }
 
@@ -27,7 +23,7 @@ namespace Model.Compiler
         {
             get
             {
-                return $"{Parameters} {CtePrefix} {GrabSql} {CteSuffix}";
+                return $"{CtePrefix} {GrabSql} {CteSuffix}";
             }
         }
     }
@@ -36,6 +32,6 @@ namespace Model.Compiler
     {
         public new const string CteSuffix = ") SELECT COUNT(DISTINCT personId) AS cnt FROM wrapper";
 
-        public CteCohortCount(string parameters, string grab) : base(parameters, grab) { }
+        public CteCohortCount(string grab) : base(grab) { }
     }
 }

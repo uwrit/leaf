@@ -6,15 +6,31 @@
 using System;
 using Model.Options;
 using System.Data.SqlClient;
-using Microsoft.Extensions.Options;
 
 namespace Services.Startup
 {
-    public class DatabaseExtractor
+    public class ConnectionStringParser
     {
-        public string ExtractDatabase(IConnectionString dbOptions)
+        public ParsedConnectionString Parse(IConnectionString dbOptions)
         {
-            return new SqlConnection(dbOptions.ConnectionString).Database;
+            return Parse(dbOptions.ConnectionString);
         }
+
+        public ParsedConnectionString Parse(string connStr)
+        {
+            var conn = new SqlConnection(connStr);
+
+            return new ParsedConnectionString
+            {
+                Server = conn.DataSource,
+                Database = conn.Database
+            };
+        }
+    }
+
+    public class ParsedConnectionString
+    {
+        public string Server { get; set; }
+        public string Database { get; set; }
     }
 }

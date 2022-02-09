@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Model.Extensions;
 using Model.Cohort;
+using Model.Schema;
 
 namespace Model.Compiler
 {
@@ -20,6 +21,11 @@ namespace Model.Compiler
     // Represents the final shape of a ShapedDataset data pull from the database, including Salt and Exported where involved.
     public abstract class ValidationSchema : Schema<SchemaFieldSelector>
     {
+        readonly static IEnumerable<(LeafType, LeafType)> Coercible = new HashSet<(LeafType, LeafType)>
+        {
+            (LeafType.Numeric, LeafType.Bool)
+        };
+
         public virtual SchemaValidationResult Validate(DatasetResultSchema actualSchema)
         {
             
@@ -37,7 +43,7 @@ namespace Model.Compiler
                 }
 
                 // type mismatch on recognized field --> error
-                if (actualField != null && !actualField.Matches(field))
+                if (actualField != null && !actualField.Matches(field) && !Coercible.Contains((actualField.Type, field.Type)))
                 {
                     result.State = SchemaValidationState.Error;
                     result.AddMessage($"'{field.Name}' expected type '{field.Type}' but received '{actualField.Type}'");

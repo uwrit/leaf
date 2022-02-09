@@ -5,11 +5,9 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
 using Model.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Tests.Mock.Models.Compiler;
 using Xunit;
 using System;
@@ -18,8 +16,9 @@ namespace Tests
 {
     public class SqlCompilerTests
     {
-        readonly SqlServerCompiler Compiler = MockOptions.GenerateSqlServerCompiler();
-        readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
+        static readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, MockOptions.GenerateOmopOptions());
+        static readonly ISqlDialect dialect = new TSqlDialect();
 
         #region Helpers
         int GetIndex(string text, string searchText) => text.IndexOf(searchText, StringComparison.InvariantCultureIgnoreCase);
@@ -49,7 +48,7 @@ namespace Tests
         public void Person_Level_Query_Returns_Single_Column()
         {
             var panel = MockPanel.Panel();
-            var ob = new SubPanelSqlSet(panel, Options);
+            var ob = new SubPanelSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
             var cols = GetColumns(sql);
             var col = StripSetAlias(cols[0]).Trim();
@@ -69,7 +68,7 @@ namespace Tests
              */
             pi.Concept.SqlSetWhere = null;
             panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
-            var ob = new SubPanelSqlSet(panel, Options);
+            var ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.DoesNotContain("WHERE", ob.ToString());
 
@@ -77,7 +76,7 @@ namespace Tests
              * One WHERE clause
              */
             pi.Concept.SqlSetWhere = "1 = 1";
-            ob = new SubPanelSqlSet(panel, Options);
+            ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.Contains("WHERE 1 = 1", ob.ToString());
 
@@ -86,7 +85,7 @@ namespace Tests
              */
             pi.Concept.SqlFieldNumeric = "Num";
             pi.NumericFilter = new NumericFilter { Filter = new[] { 5.0M }, FilterType = NumericFilterType.EqualTo };
-            ob = new SubPanelSqlSet(panel, Options);
+            ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.Contains("WHERE 1 = 1 AND Num = 5.0", ob.ToString());
         }
@@ -108,7 +107,7 @@ namespace Tests
             /*
              * One specialization
              */
-            var ob = new SubPanelSqlSet(panel, Options);
+            var ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.Contains("WHERE 2 = 2", ob.ToString());
 
@@ -116,14 +115,14 @@ namespace Tests
              * Two specializations
              */
             specs.Add(new ConceptSpecialization { Id = Guid.NewGuid(), SpecializationGroupId = 2, SqlSetWhere = "'A' = 'A'" });
-            ob = new SubPanelSqlSet(panel, Options);
+            ob = new SubPanelSqlSet(panel, Options, dialect);
             Assert.Contains("WHERE 2 = 2 AND 'A' = 'A'", ob.ToString());
 
             /*
              * Two specializations with a normal WHERE clause
              */
             pi.Concept.SqlSetWhere = "1 = 1";
-            ob = new SubPanelSqlSet(panel, Options);
+            ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.Contains("WHERE 1 = 1 AND 2 = 2 AND 'A' = 'A'", ob.ToString());
         }
@@ -137,7 +136,7 @@ namespace Tests
             pi.Concept.SqlSetWhere = "@.X != @.Y";
             panel.SubPanels.ElementAt(0).PanelItems = new[] { pi };
 
-            var ob = new SubPanelSqlSet(panel, Options);
+            var ob = new SubPanelSqlSet(panel, Options, dialect);
             Assert.Contains($"{expectedAlias}.X != {expectedAlias}.Y", ob.ToString());
         }
 
@@ -154,7 +153,7 @@ namespace Tests
                 JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
-            var ob = new PanelSequentialSqlSet(panel, Options);
+            var ob = new PanelSequentialSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
             var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
             var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -192,7 +191,7 @@ namespace Tests
                 JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Event }
             });
 
-            var ob = new PanelSequentialSqlSet(panel, Options);
+            var ob = new PanelSequentialSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
             var expectedAlias1 = "_S000";
             var expectedAlias2 = "_S010";
@@ -217,7 +216,7 @@ namespace Tests
         {
             var panel = MockPanel.Panel();
             panel.SubPanels.ElementAt(0).PanelItems = new List<PanelItem>() { MockPanel.EdEnc(), MockPanel.HmcEnc() };
-            var ob = new SubPanelSqlSet(panel, Options);
+            var ob = new SubPanelSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
 
             Assert.Contains("UNION ALL", sql);
@@ -236,7 +235,7 @@ namespace Tests
                 JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
-            var ob = new PanelSequentialSqlSet(panel, Options);
+            var ob = new PanelSequentialSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
             var cols = GetColumns(sql);
             var col = StripSetAlias(cols[0]);
@@ -258,7 +257,7 @@ namespace Tests
                 JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
-            var ob = new PanelSequentialSqlSet(panel, Options);
+            var ob = new PanelSequentialSqlSet(panel, Options, dialect);
             var sql = ob.ToString();
             var colsStr = GetContentBetween(sql, "(SELECT", "FROM Encounter");
             var cols = colsStr.Trim().Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -279,7 +278,7 @@ namespace Tests
                 JoinSequence = new SubPanelJoinSequence { SequenceType = SequenceType.Encounter }
             });
 
-            var ob = new DatasetJoinedSqlSet(panel, Options);
+            var ob = new DatasetJoinedSqlSet(panel, Options, dialect, cachedCohortPreparer);
             var sql = ob.ToString();
 
             Assert.Equal(sql, sql);

@@ -100,7 +100,11 @@ namespace API.Controllers
                         URI = clientOptions.Help.URI
                     }
                 },
-                Version = versionOptions.Version.ToString()
+                Version = new VersionConfigDTO
+                {
+                    Server = versionOptions.Version.ToString(),
+                    Db = serverStateCache.GetServerState().Db.Version.ToString()
+                }
             };
 
             return Ok(config);

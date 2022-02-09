@@ -22,7 +22,8 @@ using Model.Authentication;
 using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
+using Model.Compiler.SqlBuilder;
+using Model.Compiler.PanelSqlCompiler;
 using Model.Export;
 using Model.Network;
 using Model.Options;
@@ -38,6 +39,8 @@ using Services.Admin.Notification;
 using Services.Authentication;
 using Services.Authorization;
 using Services.Cohort;
+using Services.Compiler;
+using Services.Compiler.SqlBuilder;
 using Services.Export;
 using Services.Network;
 using Services.Search;
@@ -71,7 +74,7 @@ namespace API.Options
 
             services.AddHostedService<BackgroundServerStateSynchronizer>();
 
-            services.AddTransient<ISqlCompiler, SqlServerCompiler>();
+            services.AddTransient<IPanelSqlCompiler, PanelSqlCompiler>();
 
             services.AddTransient<NetworkEndpointProvider.INetworkEndpointReader, NetworkEndpointReader>();
 
@@ -100,6 +103,7 @@ namespace API.Options
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightResourceReader, PreflightResourceReader>();
             services.AddTransient<CohortCounter.ICohortCacheService, CohortCacheService>();
+            services.AddTransient<ICachedCohortFetcher, CachedCohortFetcher>();
             services.AddTransient<IDemographicSqlCompiler, DemographicSqlCompiler>();
             services.AddTransient<DemographicCompilerValidationContextProvider.ICompilerContextProvider, DemographicCompilerContextProvider>();
             services.AddTransient<DemographicProvider.IDemographicsExecutor, DemographicsExecutor>();
@@ -181,9 +185,11 @@ namespace API.Options
         static IServiceCollection AddCohortQueryExecutionService(this IServiceCollection services)
         {
             var sp = services.BuildServiceProvider();
-            var opts = sp.GetRequiredService<IOptions<ClinDbOptions>>().Value;
+            var clinDbOpts = sp.GetRequiredService<IOptions<ClinDbOptions>>().Value;
+            var compilerOpts = sp.GetRequiredService<IOptions<CompilerOptions>>().Value;
 
-            switch (opts.Cohort.QueryStrategy)
+            // Query strategy
+            switch (clinDbOpts.Cohort.QueryStrategy)
             {
                 case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE:
                     services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
@@ -191,6 +197,49 @@ namespace API.Options
 
                 case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel:
                     services.AddTransient<CohortCounter.IPatientCohortService, ParallelPatientCohortService>();
+                    break;
+            }
+
+            // Target clinical RDBMS
+            switch (clinDbOpts.Rdbms)
+            {
+                case ClinDbOptions.RdbmsType.SqlServer:
+                    services.AddTransient<ISqlDialect, TSqlDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, SqlServerQueryExecutor>();
+
+                    if (compilerOpts.SharedDbServer)
+                    {
+                        services.AddTransient<ICachedCohortPreparer, SharedSqlServerCachedCohortPreparer>();
+                    }
+                    else
+                    {
+                        services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
+                    }
+                    break;
+                case ClinDbOptions.RdbmsType.MySql:
+                    services.AddTransient<ISqlDialect, MySqlDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, MySqlQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, MySqlCachedCohortPreparer>();
+                    break;
+                case ClinDbOptions.RdbmsType.MariaDb:
+                    services.AddTransient<ISqlDialect, MariaDbDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, MariaDbQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, MariaDbCachedCohortPreparer>();
+                    break;
+                case ClinDbOptions.RdbmsType.PostgreSql:
+                    services.AddTransient<ISqlDialect, PostgreSqlDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, PostgreSqlQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, PostgreSqlCachedCohortPreparer>();
+                    break;
+                case ClinDbOptions.RdbmsType.Oracle:
+                    services.AddTransient<ISqlDialect, PlSqlDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, OracleQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, OracleCachedCohortPreparer>();
+                    break;
+                case ClinDbOptions.RdbmsType.BigQuery:
+                    services.AddTransient<ISqlDialect, BigQuerySqlDialect>();
+                    services.AddTransient<ISqlProviderQueryExecutor, BigQueryQueryExecutor>();
+                    services.AddTransient<ICachedCohortPreparer, BigQuerySqlCachedCohortPreparer>();
                     break;
             }
 

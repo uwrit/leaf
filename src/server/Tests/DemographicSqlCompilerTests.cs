@@ -7,7 +7,8 @@ using System;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
-using Model.Compiler.SqlServer;
+using Model.Compiler.PanelSqlCompiler;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Services.Startup;
 using Xunit;
@@ -16,73 +17,76 @@ namespace Tests
 {
     public class DemographicSqlCompilerTests
     {
-        static readonly DatabaseExtractor extractor = new DatabaseExtractor();
+        static readonly ConnectionStringParser extractor = new ConnectionStringParser();
+        static readonly ISqlDialect dialect = new TSqlDialect();
+        static readonly IOptions<CompilerOptions> opts = GetCompilerOptions();
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, GetCompilerOptions());
 
         [Fact]
-        public void Should_Correctly_Represent_Demographic_Shape()
+        public async void Should_Correctly_Represent_Demographic_Shape()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, false);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, false);
 
             Assert.Equal(Shape.Demographic, executionCtx.Shape);
         }
 
         [Fact]
-        public void Should_Correctly_Reference_AppDb()
+        public async void Should_Correctly_Reference_AppDb()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, true);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, true);
 
             Assert.Contains("LeafDB", executionCtx.CompiledQuery);
         }
 
         [Fact]
-        public void Should_Correctly_Reference_QueryId_Parameter()
+        public async void Should_Correctly_Reference_QueryId_Parameter()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, false);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, false);
 
             Assert.Contains(ShapedDatasetCompilerContext.QueryIdParam, executionCtx.CompiledQuery);
             Assert.Contains(executionCtx.Parameters, p => p.Name == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
         }
 
         [Fact]
-        public void Should_Correctly_Restrict_Phi_Fields()
+        public async void Should_Correctly_Restrict_Phi_Fields()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, true);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, true);
 
             Assert.Contains(executionCtx.FieldSelectors, f => f.Name == DemographicColumns.BirthDate);
             Assert.DoesNotContain(executionCtx.FieldSelectors, f => f.Name == DemographicColumns.Name);
         }
 
         [Fact]
-        public void Should_Correctly_Include_Phi_Fields()
+        public async void Should_Correctly_Include_Phi_Fields()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, false);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, false);
 
             Assert.Contains(executionCtx.FieldSelectors, f => f.Name == DemographicColumns.Mrn);
             Assert.Contains(executionCtx.FieldSelectors, f => f.Name == DemographicColumns.Name);
         }
 
         [Fact]
-        public void Should_Omit_Additional_Record_Fields()
+        public async void Should_Omit_Additional_Record_Fields()
         {
             var compilerCtx = GetCompilerContext();
-            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), GetCompilerOptions());
+            var compiler = new DemographicSqlCompiler(GetSqlCompiler(), cachedCohortPreparer);
 
-            var executionCtx = compiler.BuildDemographicSql(compilerCtx, false);
+            var executionCtx = await compiler.BuildDemographicSql(compilerCtx, false);
 
             Assert.DoesNotContain(executionCtx.FieldSelectors, f => f.Name == DemographicColumns.Exported);
             Assert.DoesNotContain(executionCtx.FieldSelectors, f => f.Name == DatasetColumns.Salt);
@@ -110,15 +114,13 @@ namespace Tests
             {
                 ConnectionString = @"Server=fake;Database=LeafDB;Trusted_Connection=True"
             };
-            return Options.Create(new CompilerOptions { AppDb = extractor.ExtractDatabase(dbOpts) });
+            return Options.Create(new CompilerOptions { AppDb = extractor.Parse(dbOpts).Database });
         }
 
-        static ISqlCompiler GetSqlCompiler()
+        static IPanelSqlCompiler GetSqlCompiler()
         {
-            var compOpts = GetCompilerOptions();
             var user = new MockUser();
-            var cohortOpts = Options.Create(new CohortOptions());
-            return new SqlServerCompiler(user, compOpts, cohortOpts);
+            return new PanelSqlCompiler(user, dialect, opts);
         }
 
         class MockUser : IUserContext

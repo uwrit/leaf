@@ -89,7 +89,7 @@ namespace Model.Cohort
 
             cancel.ThrowIfCancellationRequested();
 
-            var exeContext = compiler.BuildDatasetSql(validationContext.Context);
+            var exeContext = await compiler.BuildDatasetSql(validationContext.Context);
             log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);

@@ -8,14 +8,17 @@ using System.Linq;
 using Model.Options;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public class SubPanelSqlSet : UnionedSet
     {
-        public SubPanelSqlSet(Panel panel, CompilerOptions compilerOptions)
+        public SubPanelSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect)
         {
             var first = panel.SubPanels.First();
-            var union = first.PanelItems.Select(pi => new PanelItemSqlSet(panel, first, pi, compilerOptions));
+            var union = first.PanelItems.Select(pi => new PanelItemSqlSet(panel, first, pi, compilerOptions, dialect));
             Add(union);
             UnionType = UnionType.All;
         }
@@ -33,9 +36,13 @@ namespace Model.Compiler.Common
 
         SubPanelSequentialSqlSet() { }
 
-        public SubPanelSequentialSqlSet(Panel panel, SubPanel subpanel, CompilerOptions compilerOptions)
+        public SubPanelSequentialSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect)
         {
-            var union = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions));
+            var union = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions, dialect));
             this.Panel = panel;
             this.SubPanel = subpanel;
 
