@@ -13,6 +13,7 @@ namespace Model.Cohort
     public interface ICachedCohortFetcher
     {
         public Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId, bool exportedOnly);
+        public Task<CachedCohortRecord> FetchPatientByCohortAsync(Guid queryId, string personId);
     }
 
     public class CachedCohortRecord : ISalt

@@ -26,21 +26,21 @@ import { PatientListDatasetDTO, PatientListDatasetQueryDTO, PatientListDatasetSh
 };
 
 /**
- * Fetch a dataset, which may or may not have date boundaries.
+ * Fetch a single patient dataset, which may or may not have date boundaries.
  */
 export const fetchDataset = async (
         state: AppState, 
+        patientid: string,
         queryId: string, 
         datasetid: string, 
-        shape: PatientListDatasetShape,
-        dates?: DateBoundary
+        shape: PatientListDatasetShape
     ): Promise<PatientListDatasetDTO> => {
 
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const params: any = { datasetid, shape };
 
-    const result = await http.get(`${baseUrl}/api/cohort/${queryId}/dataset`, { params });
+    const result = await http.get(`${baseUrl}/api/cohort/${queryId}/patients/${patientid}/dataset`, { params });
     return result.data as PatientListDatasetDTO
 };
 

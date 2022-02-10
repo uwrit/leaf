@@ -29,7 +29,8 @@ namespace Model.Compiler.PanelSqlCompiler
 
         public async Task<ConceptDatasetExecutionContext> BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
         {
-            var prelude = await cachedCohortPreparer.Prepare(compilerContext.QueryContext.QueryId, true);
+            await cachedCohortPreparer.SetQueryCohort(compilerContext.QueryContext.QueryId, true);
+            var prelude = await cachedCohortPreparer.Prepare();
             var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions, dialect, cachedCohortPreparer).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(query);
 

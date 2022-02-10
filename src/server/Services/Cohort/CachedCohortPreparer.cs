@@ -11,8 +11,8 @@ using System.Linq;
 using Model.Cohort;
 using Model.Options;
 using Model.Compiler.SqlBuilder;
-using Microsoft.Extensions.Options;
 using Model.Compiler;
+using Microsoft.Extensions.Options;
 
 namespace Services.Cohort
 {
@@ -20,11 +20,17 @@ namespace Services.Cohort
     {
         public string FieldInternalPersonId { get; set; } = "__personId__";
         public string TempTableName { get; set; } = "__cohort__";
+
         readonly internal ICachedCohortFetcher cohortFetcher;
         readonly internal ISqlDialect dialect;
         readonly internal CompilerOptions compilerOpts;
         readonly internal int batchSize = 1000;
+
+        internal Guid queryId;
         internal bool exportedOnly;
+        internal string personId;
+        internal bool querySinglePatient;
+        internal Func<Task<IEnumerable<CachedCohortRecord>>> GetCohort;
 
         public BaseCachedCohortPreparer(
             ICachedCohortFetcher cohortFetcher,
@@ -36,15 +42,28 @@ namespace Services.Cohort
             this.compilerOpts = compilerOpts.Value;
         }
 
-        internal virtual string PersonIdTransformHandler(string personId) => personId;
+        internal virtual string PersonIdTransformHandler(string patientId) => patientId;
         internal virtual string ExportedTransformHandler(bool exported) => exported ? "1" : "0";
         internal virtual string SaltTransformHandler(Guid salt) => salt.ToString();
+
+        readonly string[] invalidChars = new string[] { "'", " ", "`" };
+        internal void ValidatePatientId(string patientId)
+        {
+            var validCharsOnly = !invalidChars.Any(c => patientId.Contains(c));
+
+            if (!validCharsOnly || patientId.Length == 0)
+            {
+                throw new LeafCompilerException("PatientId contains illegal characters or is an empty string");
+            }
+        }
 
         internal virtual string InsertDelimitedRow(CachedCohortRecord rec, string delim = "'")
         {
             var personId = PersonIdTransformHandler(rec.PersonId);
             var exported = ExportedTransformHandler(rec.Exported);
             var salt = SaltTransformHandler(rec.Salt);
+
+            ValidatePatientId(personId);
 
             return $"{delim}{personId}{delim}, {exported}, {delim}{salt}{delim}";
         }
@@ -59,7 +78,34 @@ namespace Services.Cohort
             }
         }
 
-        public virtual async Task<string> Prepare(Guid queryId, bool exportedOnly) => ""; // no-op
+        internal async Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync()
+        {
+            return await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+        }
+
+        internal async Task<IEnumerable<CachedCohortRecord>> FetchPatientInCohortAsync()
+        {
+            var patient = await cohortFetcher.FetchPatientByCohortAsync(queryId, personId);
+            return new CachedCohortRecord[] { patient };
+        }
+
+        public async Task SetQueryCohort(Guid queryId, bool exportedOnly)
+        {
+            this.queryId = queryId;
+            this.exportedOnly = exportedOnly;
+            GetCohort = () => FetchCohortAsync();
+        }
+
+        public async Task SetQuerySinglePatient(Guid queryId, string personId)
+        {
+            this.queryId = queryId;
+            this.querySinglePatient = true;
+            ValidatePatientId(personId);
+            this.personId = personId;
+            GetCohort = () => FetchPatientInCohortAsync();
+        }
+
+        public virtual async Task<string> Prepare() => string.Empty; // no-op
 
         public virtual string CohortToCteFrom() => TempTableName;
 
@@ -83,10 +129,15 @@ namespace Services.Cohort
             IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, dialect, compilerOpts) { }
 
-        public override async Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async Task SetQuerySinglePatient(Guid queryId, string personId)
         {
-            this.exportedOnly = exportedOnly;
-            return "";
+            this.queryId = queryId;
+
+            var patient = await cohortFetcher.FetchPatientByCohortAsync(queryId, personId);
+            if (patient == null) throw new LeafCompilerException("Patient does not exist in cohort or is not exported.");
+            ValidatePatientId(patient.PersonId);
+
+            this.personId = patient.PersonId;
         }
 
         public override string CohortToCteFrom() => $"{compilerOpts.AppDb}.app.Cohort";
@@ -99,6 +150,11 @@ namespace Services.Cohort
             if (exportedOnly)
             {
                 output.Append(" AND Exported = 1");
+            }
+
+            if (querySinglePatient)
+            {
+                output.Append($" AND PersonId = '{personId}'");
             }
 
             return output.ToString();
@@ -119,10 +175,10 @@ namespace Services.Cohort
             IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, dialect, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async override Task<string> Prepare()
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = await GetCohort();
 
             output.Append(@$"CREATE TABLE #{TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -157,10 +213,10 @@ namespace Services.Cohort
             IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, dialect, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async override Task<string> Prepare()
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = await GetCohort();
 
             // Create temp table
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
@@ -207,10 +263,10 @@ namespace Services.Cohort
             IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, dialect, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async override Task<string> Prepare()
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = await GetCohort();
 
             output.Append(@$"CREATE TEMPORARY TABLE ORA${TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},
@@ -253,10 +309,10 @@ namespace Services.Cohort
 
         internal override string ExportedTransformHandler(bool exported) => exported ? "TRUE" : "FALSE";
 
-        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async override Task<string> Prepare()
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = await GetCohort();
 
             // Create temp table
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
@@ -293,10 +349,10 @@ namespace Services.Cohort
             IOptions<CompilerOptions> compilerOpts)
             : base(cohortFetcher, dialect, compilerOpts) { }
 
-        public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
+        public async override Task<string> Prepare()
         {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = await GetCohort();
 
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
                 PersonId {dialect.ToSqlType(ColumnType.String)},

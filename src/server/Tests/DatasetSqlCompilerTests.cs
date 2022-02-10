@@ -10,6 +10,8 @@ using Model.Compiler;
 using Model.Compiler.PanelSqlCompiler;
 using Model.Compiler.SqlBuilder;
 using Model.Options;
+using Services.Cohort;
+using Services.Compiler.SqlBuilder;
 using Services.Startup;
 using Xunit;
 
@@ -20,14 +22,14 @@ namespace Tests
         static readonly ConnectionStringParser extractor = new ConnectionStringParser();
         static readonly ISqlDialect dialect = new TSqlDialect();
         static readonly IOptions<CompilerOptions> opts = GetCompilerOptions();
-        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, GetCompilerOptions());
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, dialect, GetCompilerOptions());
         static readonly DatasetSqlCompiler datasetSqlCompiler = new DatasetSqlCompiler(GetSqlCompiler(), dialect, cachedCohortPreparer, opts);
 
         [Fact]
         public async void Should_Correctly_Represent_Observation_Shape()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Equal(Shape.Observation, executionCtx.Shape);
         }
@@ -36,7 +38,7 @@ namespace Tests
         public async void Should_Correctly_Represent_Encounter_Shape()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Equal(Shape.Encounter, executionCtx.Shape);
         }
@@ -45,7 +47,7 @@ namespace Tests
         public async void Should_Correctly_Reference_AppDb()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Contains("LeafDB", executionCtx.CompiledQuery);
         }
@@ -54,7 +56,7 @@ namespace Tests
         public async void Should_Correctly_Reference_QueryId_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Contains(ShapedDatasetCompilerContext.QueryIdParam, executionCtx.CompiledQuery);
             Assert.Contains(executionCtx.Parameters, p => p.Name == ShapedDatasetCompilerContext.QueryIdParam && p.Value.Equals(compilerCtx.QueryContext.QueryId));
@@ -64,7 +66,7 @@ namespace Tests
         public async void Observation_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetObservationCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
             Assert.Contains(executionCtx.Parameters, p => p.Name == "late");
@@ -74,7 +76,7 @@ namespace Tests
         public async void Encounter_Should_Correctly_Reference_LateBound_Parameter()
         {
             var compilerCtx = GetEncounterCompilerContext();
-            var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
+            var executionCtx = await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx);
 
             Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);
             Assert.Contains(executionCtx.Parameters, p => p.Name == "late");
@@ -87,7 +89,7 @@ namespace Tests
 
             compilerCtx.DatasetQuery.SqlStatement = "DROP TABLE encounter";
 
-            await Assert.ThrowsAsync<LeafCompilerException>(async () => await datasetSqlCompiler.BuildDatasetSql(compilerCtx));
+            await Assert.ThrowsAsync<LeafCompilerException>(async () => await datasetSqlCompiler.BuildCohortDatasetSql(compilerCtx));
         }
 
         static DatasetCompilerContext GetObservationCompilerContext(bool early = false, bool late = false)

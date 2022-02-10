@@ -10,6 +10,8 @@ using Model.Compiler;
 using Model.Compiler.PanelSqlCompiler;
 using Model.Compiler.SqlBuilder;
 using Model.Options;
+using Services.Cohort;
+using Services.Compiler.SqlBuilder;
 using Services.Startup;
 using Xunit;
 
@@ -20,7 +22,7 @@ namespace Tests
         static readonly ConnectionStringParser extractor = new ConnectionStringParser();
         static readonly ISqlDialect dialect = new TSqlDialect();
         static readonly IOptions<CompilerOptions> opts = GetCompilerOptions();
-        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, GetCompilerOptions());
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, dialect, GetCompilerOptions());
 
         [Fact]
         public async void Should_Correctly_Represent_Demographic_Shape()

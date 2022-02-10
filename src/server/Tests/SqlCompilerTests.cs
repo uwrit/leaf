@@ -11,13 +11,15 @@ using Model.Compiler.SqlBuilder;
 using Tests.Mock.Models.Compiler;
 using Xunit;
 using System;
+using Services.Compiler.SqlBuilder;
+using Services.Cohort;
 
 namespace Tests
 {
     public class SqlCompilerTests
     {
         static readonly CompilerOptions Options = MockOptions.GenerateOmopOptions().Value;
-        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, MockOptions.GenerateOmopOptions());
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, dialect, MockOptions.GenerateOmopOptions());
         static readonly ISqlDialect dialect = new TSqlDialect();
 
         #region Helpers

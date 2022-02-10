@@ -20,6 +20,7 @@ namespace Services.Cohort
     public class CachedCohortFetcher : ICachedCohortFetcher
     {
         const string queryGetCohort = "app.sp_GetCohortById";
+        const string queryGetPatientbyCohort = "app.sp_GetPatientInCohortById";
 
         readonly AppDbOptions dbOptions;
         readonly IUserContext user;
@@ -50,6 +51,29 @@ namespace Services.Cohort
                 );
 
                 return cohort;
+            }
+        }
+
+        public async Task<CachedCohortRecord> FetchPatientByCohortAsync(Guid queryid, string personid)
+        {
+            using (var cn = new SqlConnection(dbOptions.ConnectionString))
+            {
+                await cn.OpenAsync();
+
+                var patient = await cn.QueryFirstAsync<CachedCohortRecord>(
+                    queryGetPatientbyCohort,
+                    new {
+                        queryid,
+                        personid,
+                        user = user.UUID,
+                        groups = GroupMembership.From(user),
+                        admin = user.IsAdmin
+                    },
+                    commandType: CommandType.StoredProcedure,
+                    commandTimeout: dbOptions.DefaultTimeout
+                );
+
+                return patient;
             }
         }
     }

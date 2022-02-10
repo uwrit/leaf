@@ -10,6 +10,7 @@ namespace Model.Compiler
 {
     public interface IDatasetSqlCompiler
     {
-        Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context);
+        Task<DatasetExecutionContext> BuildCohortDatasetSql(DatasetCompilerContext context);
+        Task<DatasetExecutionContext> BuildSinglePatientDatasetSql(DatasetCompilerContext context, string patientId);
     }
 }

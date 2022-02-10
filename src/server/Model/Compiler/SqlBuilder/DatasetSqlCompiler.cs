@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Model.Compiler.PanelSqlCompiler
+namespace Model.Compiler
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
@@ -33,12 +33,24 @@ namespace Model.Compiler.PanelSqlCompiler
             this.compilerOptions = compilerOptions.Value;
         }
 
-        public async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
+        public async Task<DatasetExecutionContext> BuildCohortDatasetSql(DatasetCompilerContext context)
+        {
+            await cachedCohortPreparer.SetQueryCohort(context.QueryContext.QueryId, true);
+            return await BuildDatasetSql(context);
+        }
+
+        public async Task<DatasetExecutionContext> BuildSinglePatientDatasetSql(DatasetCompilerContext context, string patientId)
+        {
+            await cachedCohortPreparer.SetQuerySinglePatient(context.QueryContext.QueryId, patientId);
+            return await BuildDatasetSql(context);
+        }
+
+        async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
         {
             executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
-            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
+            var prelude = await cachedCohortPreparer.Prepare();
             var epilogue = cachedCohortPreparer.Complete();
             var cohortCte = CteCohortInternals(context);
             var datasetCte = CteDatasetInternals(context.DatasetQuery);
@@ -54,7 +66,7 @@ namespace Model.Compiler.PanelSqlCompiler
             return executionContext;
         }
 
-        void AddParameters(Guid queryId)
+        internal virtual void AddParameters(Guid queryId)
         {
             executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryId);
             foreach (var param in compiler.BuildContextQueryParameters())
@@ -63,7 +75,7 @@ namespace Model.Compiler.PanelSqlCompiler
             }
         }
 
-        string Compose(string cohort, string dataset, string filter, string select)
+        internal virtual string Compose(string cohort, string dataset, string filter, string select)
         {
             return
                 @$"WITH cohort AS ( {cohort} )

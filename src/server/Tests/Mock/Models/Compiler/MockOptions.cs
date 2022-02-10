@@ -6,10 +6,10 @@
 using System;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Compiler;
 using Model.Compiler.PanelSqlCompiler;
 using Model.Compiler.SqlBuilder;
 using Model.Options;
+using Services.Compiler.SqlBuilder;
 
 namespace Tests.Mock.Models.Compiler
 {
