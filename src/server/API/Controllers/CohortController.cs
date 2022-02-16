@@ -138,7 +138,7 @@ namespace API.Controllers
         [HttpGet("{queryid}/patients/{patientId}/dataset")]
         public async Task<ActionResult<DatasetDTO>> PatientDataset(
             string queryid,
-            string patientId,
+            string patientid,
             [FromQuery] string datasetid,
             [FromQuery] Shape shape,
             [FromQuery] long? early,
@@ -151,7 +151,7 @@ namespace API.Controllers
                 var queryref = new QueryRef(queryid);
                 var datasetref = new DatasetQueryRef(datasetid, shape);
 
-                var result = await provider.GetSinglePatientDatasetAsync(patientId, queryref, datasetref, cancelToken, early, late);
+                var result = await provider.GetSinglePatientDatasetAsync(patientid, queryref, datasetref, cancelToken, early, late);
 
                 switch (result.Context.State)
                 {
@@ -171,7 +171,7 @@ namespace API.Controllers
             }
             catch (OperationCanceledException)
             {
-                log.LogInformation("Request cancelled. PatientId:{PatientId} QueryID:{QueryId} DatasetId:{DatasetId}", patientId, queryid, datasetid);
+                log.LogInformation("Request cancelled. PatientId:{PatientId} QueryID:{QueryId} DatasetId:{DatasetId}", patientid, queryid, datasetid);
                 return NoContent();
             }
             catch (LeafRPCException lde)
@@ -184,7 +184,7 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                log.LogError("Failed to fetch dataset. PatientId:{patientId} QueryId:{QueryId} DatasetId:{DatasetId} Error:{Error}", patientId, queryid, datasetid, ex.ToString());
+                log.LogError("Failed to fetch dataset. PatientId:{patientId} QueryId:{QueryId} DatasetId:{DatasetId} Error:{Error}", patientid, queryid, datasetid, ex.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }

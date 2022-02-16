@@ -30,7 +30,7 @@ import { PatientListDatasetDTO, PatientListDatasetQueryDTO, PatientListDatasetSh
  */
 export const fetchDataset = async (
         state: AppState, 
-        patientid: string,
+        //patientid: string,
         queryId: string, 
         datasetid: string, 
         shape: PatientListDatasetShape
@@ -40,7 +40,8 @@ export const fetchDataset = async (
     const http = HttpFactory.authenticated(token);
     const params: any = { datasetid, shape };
 
-    const result = await http.get(`${baseUrl}/api/cohort/${queryId}/patients/${patientid}/dataset`, { params });
+    const result = await http.get(`${baseUrl}/api/cohort/${queryId}/dataset`, { params });
+    // const result = await http.get(`${baseUrl}/api/cohort/${queryId}/patients/${patientid}/dataset`, { params });
     return result.data as PatientListDatasetDTO
 };
 

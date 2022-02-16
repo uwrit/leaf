@@ -108,6 +108,7 @@ class Visualize extends React.Component<Props, State> {
         if (cohort.networkCohorts.size === 1 && cohort.count.value > cacheLimit) {
             return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
+
         /**
          * Show a loading spinner if no responders have completed yet.
          */
