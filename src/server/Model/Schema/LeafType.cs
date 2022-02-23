@@ -128,7 +128,7 @@ namespace Model.Schema
 
         static readonly HashSet<Type> NumericTypes = new HashSet<Type>
         {
-            typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(double)
+            typeof(short), typeof(int), typeof(long), typeof(decimal), typeof(double), typeof(float)
         };
 
         static readonly HashSet<Type> StringTypes = new HashSet<Type>

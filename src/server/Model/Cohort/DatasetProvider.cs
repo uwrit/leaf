@@ -110,10 +110,6 @@ namespace Model.Cohort
             {
                 throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Noise is enabled");
             }
-            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
-            {
-                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Low Cell Size Masking is enabled");
-            }
         }
 
         public class Result

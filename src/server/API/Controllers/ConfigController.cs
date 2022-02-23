@@ -70,6 +70,7 @@ namespace API.Controllers
                 {
                     CacheLimit = cohortOptions.RowLimit,
                     ExportLimit = cohortOptions.ExportLimit,
+                    LowCellMaskingThreshold = deidentOptions.Cohort.LowCellSizeMasking.Threshold,
                     DeidentificationEnabled = deidentOptions.Patient.Enabled
                 },
                 Client = new ClientOptionsDTO

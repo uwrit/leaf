@@ -45,6 +45,7 @@ namespace API.DTO.Config
     {
         public int CacheLimit { get; set; }
         public int ExportLimit { get; set; }
+        public int LowCellMaskingThreshold { get; set; }
         public bool DeidentificationEnabled { get; set; }
     }
 

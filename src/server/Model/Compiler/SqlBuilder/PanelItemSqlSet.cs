@@ -95,11 +95,11 @@ namespace Model.Compiler.SqlBuilder
         void SetColumns()
         {
             var aliasMarker = compilerOptions.Alias;
-            PersonId = new Column(compilerOptions.FieldPersonId);
+            PersonId = new Column(compilerOptions.FieldPersonId, this);
 
             if (concept.IsEncounterBased)
             {
-                EncounterId = new Column(compilerOptions.FieldEncounterId);
+                EncounterId = new Column(compilerOptions.FieldEncounterId, this);
                 Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker, this);
             }
             if (concept.IsEventBased)

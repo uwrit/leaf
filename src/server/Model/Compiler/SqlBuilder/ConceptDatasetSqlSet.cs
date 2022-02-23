@@ -4,7 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Composure;
 using Model.Options;
@@ -37,14 +36,13 @@ namespace Model.Compiler.SqlBuilder
         {
             // Ensure personId and encounterId are always strings
             var cols = new List<ExpressedColumn>();
-            var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
-
             var personId = new ExpressedColumn(
                 new Expression(Dialect.Convert(ColumnType.String, PersonId)),
                 DatasetColumns.PersonId);
             var encounterId = new ExpressedColumn(
                 new Expression(Dialect.Convert(ColumnType.String, EncounterId)),
                 EncounterColumns.EncounterId);
+            var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
 
             cols.Add(personId);
             cols.Add(encounterId);

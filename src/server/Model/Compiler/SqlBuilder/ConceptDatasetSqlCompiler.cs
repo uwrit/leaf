@@ -35,6 +35,7 @@ namespace Model.Compiler.PanelSqlCompiler
             var pi = sp.PanelItems.First();
 
             var prelude = await cachedCohortPreparer.Prepare(ctx.QueryContext.QueryId, true);
+            var epilogue = cachedCohortPreparer.Complete();
             var cohortSql = cachedCohortPreparer.CohortToCte();
             var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions, dialect).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(conceptSql);
@@ -43,6 +44,7 @@ namespace Model.Compiler.PanelSqlCompiler
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
             exeContext.QueryPrelude = prelude;
             exeContext.CompiledQuery = Compose(cohortSql, conceptSql);
+            exeContext.QueryEpilogue = epilogue;
 
             return exeContext;
         }
