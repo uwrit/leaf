@@ -15,16 +15,29 @@ namespace API.Authentication
     public class SAML2IdentityProvider : IFederatedIdentityProvider
     {
         readonly SAML2AuthenticationOptions options;
+        readonly ILogger<SAML2IdentityProvider> logger;
 
-        public SAML2IdentityProvider(IOptions<SAML2AuthenticationOptions> options)
+        public SAML2IdentityProvider(
+            IOptions<SAML2AuthenticationOptions> options,
+            ILogger<SAML2IdentityProvider> logger
+            )
         {
             this.options = options.Value;
+            this.logger = logger;
         }
 
         public IScopedIdentity GetIdentity(HttpContext context)
         {
             var mapping = options.Headers.ScopedIdentity;
             var headers = context.Request.Headers;
+
+            logger.LogDebug($"SAML2 mapping: {mapping}");
+
+            foreach (var header in headers)
+            {
+                logger.LogDebug($"SAML2 header information: key '{header.Key}', value '{header.Value}'");
+            }
+
             if (!headers.TryGetValue(mapping, out var scoped) || string.IsNullOrWhiteSpace(scoped.ToString()))
             {
                 throw new LeafAuthenticationException($"{mapping} header not found, no scoped identity available");
