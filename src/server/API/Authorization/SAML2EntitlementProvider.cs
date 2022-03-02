@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authentication;
 using Model.Authorization;
@@ -18,20 +19,30 @@ namespace API.Authorization
     {
         readonly SAML2AuthorizationOptions options;
         readonly AuthorizationOptions authorizationOptions;
+        readonly ILogger<SAML2EntitlementProvider> logger;
 
         public SAML2EntitlementProvider(
             IOptions<SAML2AuthorizationOptions> saml,
-            IOptions<AuthorizationOptions> authorizationOptions
+            IOptions<AuthorizationOptions> authorizationOptions,
+            ILogger<SAML2EntitlementProvider> logger
         )
         {
             options = saml.Value;
             this.authorizationOptions = authorizationOptions.Value;
+            this.logger = logger;
         }
 
         public Entitlement GetEntitlement(HttpContext context, IScopedIdentity _)
         {
             var headerMapping = options.HeadersMapping.Entitlements;
             var headers = context.Request.Headers;
+
+            logger.LogInformation($"SAML2 mapping: {headerMapping}");
+
+            foreach (var header in headers)
+            {
+                logger.LogInformation($"SAML2 header information: key '{header.Key}', value '{header.Value}'");
+            }
 
             if (!headers.TryGetValue(headerMapping.Name, out var value))
             {

@@ -31,11 +31,11 @@ namespace API.Authentication
             var mapping = options.Headers.ScopedIdentity;
             var headers = context.Request.Headers;
 
-            logger.LogDebug($"SAML2 mapping: {mapping}");
+            logger.LogInformation($"SAML2 mapping: {mapping}");
 
             foreach (var header in headers)
             {
-                logger.LogDebug($"SAML2 header information: key '{header.Key}', value '{header.Value}'");
+                logger.LogInformation($"SAML2 header information: key '{header.Key}', value '{header.Value}'");
             }
 
             if (!headers.TryGetValue(mapping, out var scoped) || string.IsNullOrWhiteSpace(scoped.ToString()))
