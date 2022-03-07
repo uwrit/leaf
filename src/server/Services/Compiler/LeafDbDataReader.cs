@@ -223,8 +223,8 @@ namespace Services.Compiler
         {
             if (rowIndex < totalRows)
             {
-                rowIndex++;
                 row = results.ElementAt(rowIndex);
+                rowIndex++;
                 return true;
             }
             return false;
