@@ -135,60 +135,6 @@ namespace API.Controllers
             }
         }
 
-        [HttpGet("{queryid}/patients/{patientId}/dataset")]
-        public async Task<ActionResult<DatasetDTO>> PatientDataset(
-            string queryid,
-            string patientid,
-            [FromQuery] string datasetid,
-            [FromQuery] Shape shape,
-            [FromQuery] long? early,
-            [FromQuery] long? late,
-            [FromServices] DatasetProvider provider,
-            CancellationToken cancelToken)
-        {
-            try
-            {
-                var queryref = new QueryRef(queryid);
-                var datasetref = new DatasetQueryRef(datasetid, shape);
-
-                var result = await provider.GetSinglePatientDatasetAsync(patientid, queryref, datasetref, cancelToken, early, late);
-
-                switch (result.Context.State)
-                {
-                    case CompilerContextState.DatasetShapeMismatch:
-                        return BadRequest(new CompilerErrorDTO(result.Context.State));
-                    case CompilerContextState.DatasetNotFound:
-                    case CompilerContextState.QueryNotFound:
-                        return NotFound(new CompilerErrorDTO(result.Context.State));
-                }
-
-                return Ok(new DatasetDTO(result.Dataset));
-            }
-            catch (FormatException fe)
-            {
-                log.LogWarning("Malformed dataset identifiers. Error:{Error}", fe.Message);
-                return BadRequest();
-            }
-            catch (OperationCanceledException)
-            {
-                log.LogInformation("Request cancelled. PatientId:{PatientId} QueryID:{QueryId} DatasetId:{DatasetId}", patientid, queryid, datasetid);
-                return NoContent();
-            }
-            catch (LeafRPCException lde)
-            {
-                return StatusCode(lde.StatusCode);
-            }
-            catch (LeafCompilerException ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            catch (Exception ex)
-            {
-                log.LogError("Failed to fetch dataset. PatientId:{patientId} QueryId:{QueryId} DatasetId:{DatasetId} Error:{Error}", patientid, queryid, datasetid, ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-        }
-
         [HttpGet("{queryid}/conceptdataset")]
         public async Task<ActionResult<DatasetDTO>> ConceptPanelDataset(
             string queryid,

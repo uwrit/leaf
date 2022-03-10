@@ -125,6 +125,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                             const { ds, meta, data } = val;
                             const cols = getDatasetMetadataColumns(meta!);
                             const _data = data.map(d => ({ ...d, [cols.fieldDate!]: moment(d[cols.fieldDate!]).valueOf() }));
+                            const color = this.colors[i];
 
                             return (
                                 <LineChart key={ds.id} width={chartWidth-500} height={i !== 5 ? swimlaneHeight : swimlaneHeight * 2} margin={margins} data={_data}>
@@ -152,10 +153,10 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                                     />}
 
                                     {/* Tooltip */}
-                                    <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} />
+                                    <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, val, color)} />
 
                                     {/* Line */}
-                                    <Line type="linear" dataKey={cols.fieldValueNumeric!} stroke={this.colors[i]} dot={true} />
+                                    <Line type="linear" dataKey={cols.fieldValueNumeric!} stroke={color} dot={true} />
 
                                     {!cols.fieldValueNumeric && 
                                     _data.map(d => {
@@ -218,6 +219,26 @@ export default class DynamicTimeline extends React.Component<Props, State> {
             return { ds, meta, data, cols };
         });
     }
+
+    private renderTooltip = (val: TimelineValueSet, color: string, props: any) => {
+        const { active, payload } = props;
+        if (active && payload && payload.length) {
+            const c = `${this.className}-tooltip`;
+            const data = (payload[0] && payload[0].payload) as PatientListRowDTO;
+            
+            return (
+                <div className={c}>
+                    <div className={`${c}-body`}>
+                        <span className={`${c}-title`}>{val.ds.title}:</span>
+                        {val.cols.fieldValueNumeric &&
+                        <span className={`${c}-value`} style={{ color }}>{data[val.cols.fieldValueNumeric]}</span>}
+                    </div>
+                    <div className={`${c}-date`}>{moment(data[val.cols.fieldDate!]).format("MMM DD, YYYY")}</div>
+                </div>
+          );
+        }
+        return null;
+    };
 };
 
 /**

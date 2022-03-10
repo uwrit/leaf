@@ -13,7 +13,6 @@ namespace Model.Compiler
         string FieldInternalPersonId { get; set; }
         string TempTableName { get; set; }
         Task SetQueryCohort(Guid queryId, bool exportedOnly);
-        Task SetQuerySinglePatient(Guid queryId, string personId);
         Task<string> Prepare();
         string Complete();
         string CohortToCte();

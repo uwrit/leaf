@@ -39,12 +39,6 @@ namespace Model.Compiler
             return await BuildDatasetSql(context);
         }
 
-        public async Task<DatasetExecutionContext> BuildSinglePatientDatasetSql(DatasetCompilerContext context, string patientId)
-        {
-            await cachedCohortPreparer.SetQuerySinglePatient(context.QueryContext.QueryId, patientId);
-            return await BuildDatasetSql(context);
-        }
-
         async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
         {
             executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);

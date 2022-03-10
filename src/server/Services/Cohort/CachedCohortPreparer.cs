@@ -29,7 +29,6 @@ namespace Services.Cohort
         internal Guid queryId;
         internal bool exportedOnly;
         internal string personId;
-        internal bool querySinglePatient;
         internal Func<Task<IEnumerable<CachedCohortRecord>>> GetCohort;
 
         public BaseCachedCohortPreparer(
@@ -96,15 +95,6 @@ namespace Services.Cohort
             GetCohort = () => FetchCohortAsync();
         }
 
-        public async Task SetQuerySinglePatient(Guid queryId, string personId)
-        {
-            this.queryId = queryId;
-            this.querySinglePatient = true;
-            ValidatePatientId(personId);
-            this.personId = personId;
-            GetCohort = () => FetchPatientInCohortAsync();
-        }
-
         public virtual async Task<string> Prepare() => string.Empty; // no-op
 
         public virtual string CohortToCteFrom() => TempTableName;
@@ -150,11 +140,6 @@ namespace Services.Cohort
             if (exportedOnly)
             {
                 output.Append(" AND Exported = 1");
-            }
-
-            if (querySinglePatient)
-            {
-                output.Append($" AND PersonId = '{personId}'");
             }
 
             return output.ToString();

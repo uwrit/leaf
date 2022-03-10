@@ -214,3 +214,25 @@
 .dynamic-timeline-trend-bar-all-diff {
     width: 17%;
 }
+
+.dynamic-timeline-tooltip {
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,.24);
+    border-radius: 4px;
+    padding: 8px 15px;
+}
+
+.dynamic-timeline-tooltip-title {
+    font-size: 1.5rem;
+    margin-right: 4px;
+}
+
+.dynamic-timeline-tooltip-value {
+    font-weight: 300;
+    font-size: 3rem;
+}
+
+.dynamic-timeline-tooltip-date {
+    color: green;
+    margin-top: -2px;
+}
