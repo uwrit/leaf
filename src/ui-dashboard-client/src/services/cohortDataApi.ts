@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { CohortState } from '../models/state/CohortState';
+import { CohortData, CohortState } from '../models/state/CohortState';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../models/patientList/Dataset';
 import CohortDataWebWorker from '../providers/cohortData/cohortDataWebWorker';
@@ -15,7 +15,7 @@ const cohortDataProvider = new CohortDataWebWorker();
 export const transform = async (
         datasets: [PatientListDatasetQueryDTO, PatientListDatasetDTO], 
         demographics: DemographicRow[])
-    : Promise<CohortState> => {
+    : Promise<CohortData> => {
     const transformed = await cohortDataProvider.transform(datasets, demographics);
-    return transformed as CohortState;
+    return transformed as CohortData;
 };

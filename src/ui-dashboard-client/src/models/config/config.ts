@@ -6,9 +6,6 @@ export interface DashboardConfig {
 };
 
 export interface MainPageConfig {
-    cohortId: string;
-    content: WidgetType[];
-    datasetIds: string[];
     title: string;
 };
 

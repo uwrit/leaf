@@ -1,6 +1,6 @@
 import { DemographicRow } from "../cohortData/DemographicDTO";
 import { PatientListDatasetQueryDTO, PatientListDatasetSchema } from "../patientList/Dataset";
-import { PatientListRowDTO } from "../patientList/Patient";
+import { PatientListRow } from "../patientList/Patient";
 
 export type PatientId = string;
 export type DatasetId = string;
@@ -14,13 +14,18 @@ export enum CohortStateType {
 }
 
 export interface CohortState {
+    data: CohortData;
+    state: CohortStateType;
+}
+
+export interface CohortData {
     patients: Map<PatientId, PatientData>;
     metadata: Map<DatasetId, DatasetMetadata>;
 }
 
 export interface PatientData {
     demographics: DemographicRow;
-    datasets: Map<DatasetId, PatientListRowDTO[]>;
+    datasets: Map<DatasetId, PatientListRow[]>;
 }
 
 export interface DatasetMetadata {

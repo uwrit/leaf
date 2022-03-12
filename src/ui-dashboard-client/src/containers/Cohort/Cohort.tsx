@@ -1,21 +1,31 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { getCohortDatasets } from '../../actions/cohort';
 import { MainPageConfig } from '../../models/config/config';
-import { CohortState } from '../../models/state/CohortState';
+import { CohortState, CohortStateType } from '../../models/state/CohortState';
 
 
 interface Props {
     cohort?: CohortState;
     config: MainPageConfig;
-    dashboardId?: string;
+    cohortId?: string;
+    dispatch: any;
 }
 
 class Cohort extends React.Component<Props> {
     private className = 'cohort';
 
+    public componentDidUpdate(prevProps: Props) {
+        const { cohort, cohortId, dispatch } = this.props;
+
+        if (cohortId && (cohort?.state === CohortStateType.NOT_LOADED || cohortId !== prevProps.cohortId)) {
+            dispatch(getCohortDatasets(cohortId));
+        }
+    }
+
     public render() {
         const c = this.className;
-        const { cohort, dashboardId } = this.props;
+        const { cohort, cohortId } = this.props;
 
         if (!cohort) {
             return null;
@@ -23,8 +33,8 @@ class Cohort extends React.Component<Props> {
 
         return (
             <div className={`${c}-container`}>
-                {[ ...(cohort!.patients as any).keys() ].map((patId) => {
-                    return <Link key={patId} to={`/${dashboardId}/patients/${patId}`}>Patient {patId}</Link>
+                {[ ...(cohort!.data.patients as any).keys() ].map((patId) => {
+                    return <Link key={patId} to={`/${cohortId}/patients/${patId}`}>Patient {patId}</Link>
                 })}
             </div>
         );
@@ -33,8 +43,8 @@ class Cohort extends React.Component<Props> {
 
 const withRouter = (Cohort: any) => (props: Props) => {
     const params = useParams();
-    const { dashboardId } = params;
-    return <Cohort cohort={props.cohort} dashboardId={dashboardId} />;
+    const { cohortId } = params;
+    return <Cohort cohort={props.cohort} cohortId={cohortId} dispatch={props.dispatch} />;
 };
 
 export default withRouter(Cohort);

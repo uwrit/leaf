@@ -3,20 +3,7 @@ import { DashboardConfig } from "../models/config/config";
 export const config: DashboardConfig = 
 {
     main: {
-        title: "UW Memory and Brain Wellness Dashboard",
-        cohortId: "0c41433e-f36b-1410-81c3-0018c8508655", /* Saved Leaf cohort ID */ 
-        datasetIds: [
-            "d6f1423e-f36b-1410-81bf-0018c8508655", /* weight           */
-            "d9f1423e-f36b-1410-81bf-0018c8508655", /* PHQ9             */
-            "e0f1423e-f36b-1410-81bf-0018c8508655", /* MoCA             */
-            "e3f1423e-f36b-1410-81bf-0018c8508655", /* NPI              */
-            "e6f1423e-f36b-1410-81bf-0018c8508655", /* iADLs            */
-            "ebf1423e-f36b-1410-81bf-0018c8508655", /* Life events      */
-            "f0f1423e-f36b-1410-81bf-0018c8508655", /* Quality measures */
-            "f2f1423e-f36b-1410-81bf-0018c8508655", /* Problem list     */
-            "f4f1423e-f36b-1410-81bf-0018c8508655"  /* Medications      */
-        ],
-        content: []
+        title: "UW Memory and Brain Wellness Dashboard"
     },
     patient: {
         search: {
@@ -27,7 +14,7 @@ export const config: DashboardConfig =
                 type: "row",
                 content: [
                     {
-                        color: [143, 31, 177], // purple / pink
+                        color: [143, 31, 177],
                         icon: "checklist",    
                         type: "checklist",     
                         title: "Quality Care Checklists",
@@ -72,30 +59,52 @@ export const config: DashboardConfig =
                 export: {
                     enabled: true
                 },
-                datasets: [
+                eventDatasets: [
+                    {
+                        color: [153, 18, 194],
+                        icon: "plus",
+                        id: "ebf1423e-f36b-1410-81bf-0018c8508655"
+                    },
+                    {
+                        color: [197, 118, 14],
+                        icon: "person",
+                        id: "9803433e-f36b-1410-81c7-0018c8508655"
+                    },
+                    {
+                        color: [192, 31, 45],
+                        id: "9a03433e-f36b-1410-81c7-0018c8508655"
+                    },
+                    {
+                        color: [41, 75, 226],
+                        icon: "med",
+                        id: "a103433e-f36b-1410-81c7-0018c8508655"
+                    }
+                ],
+                numericDatasets: [
                     {
                         title: "Body weight (lbs)",
+                        color: [41, 75, 226],
                         id: "d6f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "PHQ9 score",
+                        color: [57, 181, 238],
                         id: "d9f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "MoCA score",
+                        color: [153, 18, 194],
                         id: "e0f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "NPI Severity",
+                        color: [197, 118, 14],
                         id: "e3f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {
                         title: "# Intact iADLs",
+                        color: [16, 180, 24],
                         id: "e6f1423e-f36b-1410-81bf-0018c8508655"
-                    },
-                    {
-                        title: "Latest Social / Health Change",
-                        id: "ebf1423e-f36b-1410-81bf-0018c8508655"
                     }
                 ]
             }

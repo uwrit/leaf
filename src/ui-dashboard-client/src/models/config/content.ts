@@ -10,12 +10,12 @@ export type WidgetType =
 
 export type RgbValues = [ number, number, number ];
 
-export type Icons = "checklist" | "plus" | "med";
+export type Icons = "checklist" | "plus" | "med" | "person";
 
 /**
  * Abstract config type
  */
-interface BaseWidgetConfig {
+export interface BaseWidgetConfig {
     type: WidgetIdType;
 };
 
@@ -61,12 +61,21 @@ export interface ContentChecklistDatasetConfig {
  */
  export interface WidgetTimelineConfig extends TitledWidgetConfig {
     comparison: WidgetTimelineComparisonConfig;
-    datasets: WidgetTimelineDatasetConfig[];
+    eventDatasets: WidgetTimelineEventDatasetConfig[];
+    numericDatasets: WidgetTimelineNumericDatasetConfig[];
     export: WidgetTimelineExportConfig;
 };
 
-export interface WidgetTimelineDatasetConfig {
+export interface WidgetTimelineEventDatasetConfig {
     id: string;
+    color?: RgbValues;
+    icon?: Icons;
+    title?: string;
+};
+
+export interface WidgetTimelineNumericDatasetConfig {
+    id: string;
+    color?: RgbValues;
     title: string;
 };
 

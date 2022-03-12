@@ -7,20 +7,28 @@
 
 import { 
     CohortAction,
-    SET_COHORT_DATASETS
+    SET_COHORT_DATASETS,
+    SET_COHORT_STATE
 } from '../actions/cohort';
-import { CohortState } from '../models/state/CohortState';
+import { CohortData, CohortState, CohortStateType } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
     return { 
-        metadata: new Map(),
-        patients: new Map()
+        data: {
+            metadata: new Map(),
+            patients: new Map()
+        },
+        state: CohortStateType.NOT_LOADED
     };
 }
 
-const setCohortDatasets = (state: CohortState, cohort: CohortState) => {
-    return Object.assign({}, cohort);
-}
+const setCohortDatasets = (state: CohortState, data: CohortData) => {
+    return Object.assign({}, state, { data });
+};
+
+const setCohortState = (state: CohortState, cohortStateType: CohortStateType) => {
+    return Object.assign({}, state, { state: cohortStateType });
+};
 
 const clearCohortDatasets = (state: CohortState) => {
     return Object.assign({}, state, {
@@ -29,12 +37,14 @@ const clearCohortDatasets = (state: CohortState) => {
             patients: new Map()
         }
     });
-}
+};
 
 export function cohort(state: CohortState = defaultCohortState(), action: CohortAction): CohortState {
     switch (action.type) {
         case SET_COHORT_DATASETS:
             return setCohortDatasets(state, action.cohort!);
+        case SET_COHORT_STATE:
+            return setCohortState(state, action.state!);
         default:
             return state;
     }

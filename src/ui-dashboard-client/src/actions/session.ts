@@ -12,7 +12,7 @@ import { Attestation } from '../models/Session';
 import { getSessionTokenAndContext, logoutFromServer, refreshSessionTokenAndContext } from '../services/sessionApi';
 import { AuthMechanismType } from '../models/Auth';
 import { clearCurrentUserToken, getUserTokenAndContext } from '../services/authApi';
-import { getIdToken, receiveIdToken, failureIdToken } from './auth';
+import { receiveIdToken, failureIdToken } from './auth';
 import { getCohortDatasets } from './cohort';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
@@ -86,15 +86,7 @@ export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         try {
 
-            /** 
-             * Session token
-             */
             dispatch(completeAttestation(ctx.rawDecoded["access-nonce"]));
-
-            /**
-             * Get datasets
-             */
-            dispatch(getCohortDatasets());
 
         } catch (err) {
             console.log(err);

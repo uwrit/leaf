@@ -11,7 +11,7 @@ import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../../models/
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
-import { CohortState, DatasetMetadata } from '../../models/state/CohortState';
+import { CohortData, DatasetMetadata } from '../../models/state/CohortState';
 
 const TRANSFORM = 'TRANSFORM';
 
@@ -114,7 +114,7 @@ export default class CohortDataWebWorker {
 
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { data, demographics, requestId } = payload;
-            const result: CohortState = { patients: new Map(), metadata: new Map() };
+            const result: CohortData = { patients: new Map(), metadata: new Map() };
 
             for (const row of demographics!) {
                 result.patients.set(row.personId, { demographics: row, datasets: new Map() });
@@ -137,6 +137,7 @@ export default class CohortDataWebWorker {
                             const v = row[f];
                             if (v) {
                                 row[f] = parseTimestamp(v);
+                                row.__dateunix__ = row[f].valueOf();
                             }
                         }
                     }

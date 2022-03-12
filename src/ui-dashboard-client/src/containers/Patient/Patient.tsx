@@ -1,19 +1,30 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { CohortState } from '../../models/state/CohortState';
+import { CohortState, CohortStateType } from '../../models/state/CohortState';
 import { PatientPageConfig } from '../../models/config/config';
 import PatientHeaderBar from './PatientHeaderBar/PatientHeaderBar';
 import { renderDynamicComponent } from '../../utils/dynamic';
+import { getCohortDatasets } from '../../actions/cohort';
 import './Patient.css';
 
 interface Props {
+    cohortId?: string;
     cohort?: CohortState;
     config?: PatientPageConfig;
     patientId?: string;
+    dispatch: any;
 }
 
 class Patient extends React.Component<Props> {
     private className = 'patient';
+
+    public componentDidUpdate(prevProps: Props) {
+        const { cohort, cohortId, dispatch } = this.props;
+
+        if (cohortId && (cohort?.state === CohortStateType.NOT_LOADED || cohortId !== prevProps.cohortId)) {
+            dispatch(getCohortDatasets(cohortId));
+        }
+    }
 
     public render() {
         const c = this.className;
@@ -21,7 +32,7 @@ class Patient extends React.Component<Props> {
 
         // Bail if no data
         if (!cohort || !config || !patientId) { return null; }
-        const { metadata, patients } = cohort;
+        const { metadata, patients } = cohort.data;
         const patient = patients.get(patientId);
 
         // Bail if no patient - TODO(ndobb) should be 404
@@ -42,11 +53,11 @@ class Patient extends React.Component<Props> {
 
 const withRouter = (Patient: any) => (props: Props) => {
     const params = useParams();
-    const { dashboardId, patientId } = params;
+    const { cohortId, patientId } = params;
 
-    if (!patientId || !props.cohort || !props.config) { return null; }
+    if ( !cohortId || !patientId || !props.cohort || !props.config) { return null; }
 
-    return <Patient patientId={patientId} config={props.config} cohort={props.cohort} />;
+    return <Patient patientId={patientId} cohortId={cohortId} config={props.config} cohort={props.cohort} dispatch={props.dispatch} />;
 };
 
 export default withRouter(Patient);

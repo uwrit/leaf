@@ -21,19 +21,13 @@ export interface Patient {
     multirowData: MultirowDataByDatasetKey;
 }
 
-// This is an instantiated row shown on the patient list
-export interface PatientListRow {
-    compoundId: PatientId;
-    detailRowCount: number;
-    detailValues: PatientListDetailEncounter[];
-    isOpen: boolean;
-    responderId: number;
-    values: any[];
-}
-
 export interface PatientListRowDTO {
     [key: string]: PatientId;
     encounterId: EncounterId;
+}
+
+export interface PatientListRow extends PatientListRowDTO {
+    __dateunix__: any;
 }
 
 export interface PatientListDetailEncounter {

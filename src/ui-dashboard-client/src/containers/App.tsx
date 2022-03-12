@@ -86,9 +86,9 @@ class App extends React.Component<Props> {
                 {session && session.context &&
                 <div id="main-content">
                     <Routes>
-                        <Route path="/:dashboardId" element={<Cohort cohort={state.cohort} config={config.main} />} />
-                        <Route path="/:dashboardId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} />} />
-                        <Route path="*" element={<Navigate to="/test" />} />
+                        <Route path="/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} />} />
+                        <Route path="/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />
+                        <Route path="*" element={<Navigate to="/0c41433e-f36b-1410-81c3-0018c8508655" />} />
                     </Routes>
                 </div>
                 }
