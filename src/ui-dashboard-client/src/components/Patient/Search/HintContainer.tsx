@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default class HintContainer extends React.PureComponent<Props> {
-    private className = 'patients-search-hint';
+    private className = 'patient-search';
     
     public render() {
         const { selectedHintIndex, hints, cohortId } = this.props;
@@ -32,8 +32,8 @@ export default class HintContainer extends React.PureComponent<Props> {
                                 className={`${c}-hint-item leaf-dropdown-item ${i === selectedHintIndex ? 'selected' : ''}`} 
                                 key={hint.personId}
                                 >
-                                    <span>{hint.name} </span>
-                                    <strong>{hint.mrn}</strong>
+                                    <span className={`${c}-hint-name`}>{hint.name} </span>
+                                    <span className={`${c}-hint-mrn`}>{hint.mrn}</span>
                             </div>
                         </Link>
                     );

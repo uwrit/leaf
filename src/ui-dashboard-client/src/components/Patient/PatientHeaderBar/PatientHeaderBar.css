@@ -17,6 +17,19 @@
     float: right;
 }
 
+.patient-header-bar-container-right > .patient-search-container {
+    margin-left: auto;
+}
+
+.patient-header-bar-container-right .patient-search-input {
+    transition: width 500ms;
+    width: 400px;
+}
+
+.patient-header-bar-container-right .patient-search-input:focus {
+    width: 600px;
+}
+
 .patient-header-bar-container .row,
 .patient-header-bar-container .col-md-6 {
     height: 100%;

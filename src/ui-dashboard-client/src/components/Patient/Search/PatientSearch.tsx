@@ -1,14 +1,15 @@
 import React from 'react';
-import { DropdownItem, DropdownMenu, DropdownToggle, Input, InputGroup, InputGroupButtonDropdown } from 'reactstrap';
+import { Input, InputGroup } from 'reactstrap';
 import { DemographicRow } from '../../../models/cohortData/DemographicDTO';
 import { keys } from '../../../models/Keyboard';
 import { searchPatients } from '../../../services/patientSearchApi';
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
 import HintContainer from './HintContainer';
 import './PatientSearch.css';
 
 interface Props {
     cohortId?: string;
+    nav?: NavigateFunction;
 }
 
 interface State {
@@ -20,6 +21,8 @@ interface State {
 
 class PatientSearch extends React.PureComponent<Props, State> {
     private className = 'patient-search';
+    private hintLimit = 5;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -69,14 +72,20 @@ class PatientSearch extends React.PureComponent<Props, State> {
         )
     }
 
-    private handleInputFocus = () => this.setState({ showHintsDropdown: true });
+    private handleInputFocus = async () => {
+        const { term } = this.state;
+        this.setState({ showHintsDropdown: true });
 
-    private handleInputBlur = () => {
-        setTimeout(() => this.setState({ showHintsDropdown: false }), 500);
+        const hints = await searchPatients(term, this.hintLimit);
+        this.setState({ hints });
     };
 
-    private handleArrowUpDownKeyPress = (key: number, hints: DemographicRow[]) => {
-        const { showHintsDropdown, selectedHintIndex } = this.state;
+    private handleInputBlur = () => {
+        setTimeout(() => this.setState({ showHintsDropdown: false }), 100);
+    };
+
+    private handleArrowUpDownKeyPress = (key: number) => {
+        const { showHintsDropdown, selectedHintIndex, hints } = this.state;
         if (!showHintsDropdown) { return selectedHintIndex; }
 
         const currentFocus = this.state.selectedHintIndex;
@@ -86,66 +95,32 @@ class PatientSearch extends React.PureComponent<Props, State> {
         const newFocus = key === keys.ArrowUp
             ? currentFocus === minFocus ? maxFocus : currentFocus - 1
             : currentFocus === maxFocus ? minFocus : currentFocus + 1;
-            
-        /*
-        if (hints[newFocus]) {
-            this.setState({ term: hints[newFocus]) };
-        }
-        */
+
         return newFocus;
     }
 
     private handleEnterKeyPress = () => {
-        const { cohortId } = this.props;
+        const { cohortId, nav } = this.props;
         const { selectedHintIndex, hints } = this.state;
+        const selected = hints[selectedHintIndex];
 
-        if (selectedHintIndex > -1) {
-            const patientId = hints[selectedHintIndex].personId;
-            useNavigate()(`/${cohortId}/patients/${patientId}`);
+        if (selected && nav) {
+            const patientId = selected.personId;
+            nav(`/${cohortId}/patients/${patientId}`);
         }
-
-        /*
-        if (term && term !== this.previousTerm) {
-            this.previousTerm = term;
-            const hint = conceptsSearchState.currentHints[selectedHintIndex];
-            this.setState({ selectedHintIndex: -1, showHintsDropdown: false });
-
-            // If a hint is currently focused, find its tree
-            if (hint) {
-                dispatch(fetchSearchTreeFromConceptHint(hint));
-            }
-            // Else need to check if we have an exact or approximate hint match
-            else {
-                const directMatchHint = hints.length === 1
-                    ? hints[0]
-                    : hints.find((h: AggregateConceptHintRef) => h.fullText === term);
-                if (directMatchHint) {
-                    dispatch(fetchSearchTreeFromConceptHint(directMatchHint));
-                }
-                // Else we could try getting approximate matches and choose the closest, but it may be that the user wants
-                // ALL related concepts returned based on the input, so grab the tree based on the search term
-                else {
-                    dispatch(fetchSearchTreeFromTerms(term));
-                }
-            }
-        }
-        else {
-            this.setState({ showHintsDropdown: false });
-        }
-        */
     }
 
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
-        const { selectedHintIndex, term, hints } = this.state;
+        const { selectedHintIndex, term } = this.state;
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
 
-        if (!key || !term.length) { return; }
+        if (!key) { return; }
         let newFocus = selectedHintIndex;
 
         switch (key) {
             case keys.ArrowUp: 
             case keys.ArrowDown:
-                newFocus = this.handleArrowUpDownKeyPress(key, hints);
+                newFocus = this.handleArrowUpDownKeyPress(key);
                 k.preventDefault();
                 break;
             case keys.Backspace:
@@ -176,15 +151,16 @@ class PatientSearch extends React.PureComponent<Props, State> {
 
     private handleSearchInput = async (term: string) => {
         this.setState({ term });
-        const hints = await searchPatients(term);
-        this.setState({ hints });
+        const hints = await searchPatients(term, this.hintLimit);
+        this.setState({ hints, selectedHintIndex: hints.length ? 0 : -1 });
     }
 }
 
 const withRouter = (PatientSearch: any) => (props: Props) => {
     const params = useParams();
+    const nav = useNavigate();
     const { cohortId } = params;
-    return <PatientSearch cohortId={cohortId}/>;
+    return <PatientSearch cohortId={cohortId} nav={nav} />;
 };
 
 export default withRouter(PatientSearch);

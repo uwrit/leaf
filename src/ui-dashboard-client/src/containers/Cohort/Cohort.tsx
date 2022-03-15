@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { getCohortDatasets } from '../../actions/cohort';
 import PatientSearch from '../../components/Patient/Search/PatientSearch';

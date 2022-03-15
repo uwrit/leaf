@@ -10,7 +10,7 @@ export const indexPatients = (patients: DemographicRow[]) => {
     });
 };
 
-export const searchPatients = async (searchTerm: string): Promise<DemographicRow[]> => {
-    const result = await engine.searchPatients(searchTerm) as DemographicRow[];
+export const searchPatients = async (searchTerm: string, top?: number): Promise<DemographicRow[]> => {
+    const result = await engine.searchPatients(searchTerm, top) as DemographicRow[];
     return result;
 };

@@ -118,7 +118,7 @@ export default class PatientSearchEngineWebWorker {
          */
         const searchPatients = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { searchString, top, requestId } = payload;
-            const terms = searchString!.trim().split(' ');
+            const terms = searchString!.trim().toLowerCase().split(' ');
             const termCount = terms.length;
             const firstTerm = terms[0];
             const patients = firstCharCache.get(firstTerm[0]);
@@ -134,8 +134,15 @@ export default class PatientSearchEngineWebWorker {
             // ******************
             // First term
             // ******************
+
             if (terms.length === 1) { 
-                return { requestId, result: sort(patients, top) };
+                for (const p of patients) {
+                    const hit = p.tokens.find(t => t.startsWith(firstTerm));
+                    if (hit) {
+                        output.push(p);
+                    }
+                }
+                return { requestId, result: sort(output, top) };
             }
         
             // ******************
@@ -145,8 +152,7 @@ export default class PatientSearchEngineWebWorker {
             /**
              * For patients found in term one
              */
-            for (let pi = 0; pi < patients.length; pi++) {
-                const tokens = patients[pi].tokens;
+            for (const p of patients) {
                 let hitCount = 1;
 
                 /**
@@ -159,18 +165,17 @@ export default class PatientSearchEngineWebWorker {
                     /**
                      * For each other term associated with the patient
                      */
-                    for (let j = 0; j < tokens.length; j++) {
-                        if (tokens[j].startsWith(term)) { 
+                    for (const token of p.tokens) {
+                        if (token.startsWith(term)) { 
                             hitCount++;
-                            tokens.splice(j,1);
                             break;
                         }
                     }
-                    if (!tokens.length)
+                    if (!p.tokens.length)
                         break;
                 }
                 if (hitCount === termCount) {
-                    output.push(patients[pi])
+                    output.push(p);
                 }
             }
 
@@ -200,14 +205,16 @@ export default class PatientSearchEngineWebWorker {
              */
             for (let i = 0; i < patients!.length; i++) {
                 const patient = patients![i];
-                const tokens = patient.name.toLowerCase().replace(',',' ').split(' ').concat([ patient.mrn.toLowerCase() ]);
+                const tokens: string[] = (patient.name + ' ' + patient.mrn)
+                    .replace(',',' ').split(' ')
+                    .map(t => t.trim().toLowerCase())
+                    .filter(t => t.length > 0)
                 const indexed: IndexedDemographicRow = { patient, tokens };
                 allPatients.push(indexed);
 
-                for (let j = 0; j <= tokens.length - 1; j++) {
-                    const token = tokens[j].trim();
+                for (const token of tokens) {
                     const firstChar = token[0];
-            
+
                     /**
                      * Cache the first first character for quick lookup
                      */
@@ -219,7 +226,6 @@ export default class PatientSearchEngineWebWorker {
                 }
             }
 
-            console.log("indexed!", patients, firstCharCache)
             return { requestId, result: sort(allPatients) }
         };
     };

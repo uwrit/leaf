@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import Root from './containers/Root';
 import './index.css';
 import './styles/bootstrap.min.css';
+import './styles/LeafDropdown.css';
+import './styles/LeafModal.css';
 
 ReactDOM.render(
   <React.StrictMode>

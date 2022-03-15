@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Row } from 'reactstrap';
 import { PatientData } from '../../../models/state/CohortState';
 import { PatientPageConfig } from '../../../models/config/config';
-import PatientSearch from '../../../components/Patient/Search/PatientSearch';
+import PatientSearch from '../Search/PatientSearch';
 import './PatientHeaderBar.css';
 
 interface Props {

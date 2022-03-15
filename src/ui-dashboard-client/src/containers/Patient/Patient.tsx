@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams } from 'react-router-dom';
 import { CohortState, CohortStateType } from '../../models/state/CohortState';
 import { PatientPageConfig } from '../../models/config/config';
-import PatientHeaderBar from './PatientHeaderBar/PatientHeaderBar';
+import PatientHeaderBar from '../../components/Patient/PatientHeaderBar/PatientHeaderBar';
 import { renderDynamicComponent } from '../../utils/dynamic';
 import { getCohortDatasets } from '../../actions/cohort';
 import './Patient.css';
