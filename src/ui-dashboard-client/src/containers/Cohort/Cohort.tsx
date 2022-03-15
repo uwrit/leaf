@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { getCohortDatasets } from '../../actions/cohort';
+import PatientSearch from '../../components/Patient/Search/PatientSearch';
 import { MainPageConfig } from '../../models/config/config';
 import { CohortState, CohortStateType } from '../../models/state/CohortState';
 
@@ -25,18 +27,23 @@ class Cohort extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { cohort, cohortId } = this.props;
+        const { cohort, cohortId, dispatch } = this.props;
+        const classes = [ 'leaf-modal' ]
 
-        if (!cohort) {
+        if (!cohort || !cohortId) {
             return null;
         }
 
         return (
-            <div className={`${c}-container`}>
-                {[ ...(cohort!.data.patients as any).keys() ].map((patId) => {
-                    return <Link key={patId} to={`/${cohortId}/patients/${patId}`}>Patient {patId}</Link>
-                })}
-            </div>
+            <Modal isOpen={true} className={classes.join(' ')} backdrop={true}>
+                <ModalHeader>Select Patient</ModalHeader>
+                <ModalBody>
+                    <PatientSearch />
+                </ModalBody>
+                <ModalFooter>
+                    <Button className={`leaf-button leaf-button-primary`}>Select</Button>
+                </ModalFooter>
+            </Modal>
         );
     }
 };

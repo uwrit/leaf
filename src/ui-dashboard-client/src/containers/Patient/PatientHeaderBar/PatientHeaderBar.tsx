@@ -1,14 +1,13 @@
 import React from 'react';
-import { FiCornerUpLeft } from 'react-icons/fi';
 import { Col, Row } from 'reactstrap';
 import { PatientData } from '../../../models/state/CohortState';
 import { PatientPageConfig } from '../../../models/config/config';
+import PatientSearch from '../../../components/Patient/Search/PatientSearch';
 import './PatientHeaderBar.css';
 
 interface Props {
     patient: PatientData;
-    config?: PatientPageConfig;
-    search?: boolean;
+    config: PatientPageConfig;
 }
 
 export default class PatientHeaderBar extends React.Component<Props> {
@@ -29,10 +28,9 @@ export default class PatientHeaderBar extends React.Component<Props> {
                         <div className={`${c}-gender`}><span>{d.gender}</span></div>
                     </Col>
                     <Col md={6} className={`${c}-container-right`}>
-                        <div className={`${c}-backto-dashboard`}>
-                            <FiCornerUpLeft/>
-                            <span>To Clinic Dashboard</span>
-                        </div>
+                        {config.search.enabled &&
+                        <PatientSearch />
+                        }
                     </Col>
                 </Row>
             </div>

@@ -7,8 +7,8 @@ import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/C
 import { DatasetMetadataColumns, getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import DynamicTimelineTrendBar from './TimelineTrendBar';
 import { AiOutlineCloudDownload } from "react-icons/ai"
-import './Timeline.css';
 import { getDynamicColor } from '../../../utils/dynamic';
+import './Timeline.css';
 
 interface Props {
     config: WidgetTimelineConfig;
@@ -170,7 +170,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                             {eventDatasets.reduce((accum: JSX.Element[], curr: TimelineValueSet) => {
                                 const i = accum.length;
                                 const stroke = getDynamicColor(curr.ds.color);
-                                const y = this.randRng(70, 100);
+                                const y = this.randRng(60, 100);
                                 const pairs = curr.data.map((d, j) => {
                                     return [
                                         <ReferenceLine 

@@ -12,6 +12,7 @@ import { AppState } from '../models/state/AppState';
 import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../services/cohortApi';
 import { transform } from '../services/cohortDataApi';
 import { getDependentDatasets } from '../utils/dynamic';
+import { indexPatients } from '../services/patientSearchApi';
 
 export const SET_COHORT_DATASETS = 'SET_COHORT_DATASETS';
 export const SET_COHORT_STATE = 'SET_COHORT_STATE';
@@ -49,6 +50,9 @@ export const getCohortDatasets = (cohortId: string) => {
                 dtos.push([ ref, dataDTO ]);
             }
         }
+
+        // Index patients for search
+        await indexPatients(demographics);
 
         // Clean & transform
         const transformed = await transform(dtos, demographics);
