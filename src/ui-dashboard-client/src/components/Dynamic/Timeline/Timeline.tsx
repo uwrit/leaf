@@ -244,7 +244,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                 }
             }
         }
-        return [ min, max ];
+        return [ min, new Date().valueOf() ];
     }
 
     private getValueSets = (): [ TimelineValueSet[], TimelineValueSet[] ] => {

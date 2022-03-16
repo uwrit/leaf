@@ -109,23 +109,9 @@
     font-weight: 300;
 }
 
-.patient-search-hint-item-root {
-    color: rgb(0,0,0,0.3);
-    font-size: 0.9rem;
-    font-style: italic;
-    margin-left: 8px;
-}
-
-.patient-search-hint-item-count {
-    color: rgb(0,0,0,0.5);
-    float: right;
-    font-size: 0.8rem;
-}
-
-.patient-search-hint-item-count strong {
-    color: rgb(0, 138, 0);
-    font-size: 1rem;
-    font-weight: 300;
+.patient-search-hint-item.selected > span,
+.patient-search-hint-item:hover > span {
+    font-weight: 500;
 }
 
 .patient-search-hint-item-highlight {

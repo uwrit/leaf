@@ -13,6 +13,7 @@ import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../serv
 import { transform } from '../services/cohortDataApi';
 import { getDependentDatasets } from '../utils/dynamic';
 import { indexPatients } from '../services/patientSearchApi';
+import { fetchDashboardConfigurations } from '../services/configApi';
 
 export const SET_COHORT_DATASETS = 'SET_COHORT_DATASETS';
 export const SET_COHORT_STATE = 'SET_COHORT_STATE';
@@ -32,6 +33,10 @@ export const getCohortDatasets = (cohortId: string) => {
         dispatch(setCohortState(CohortStateType.REQUESTING));
 
         const datasetIds = getDependentDatasets(state.config.patient.content);
+
+        // Get available dashboard configs
+        const configs = await fetchDashboardConfigurations(state);
+        console.log(configs);
 
         // Get metadata on all datasets
         const availableDTO = await fetchAvailableDatasets(state);

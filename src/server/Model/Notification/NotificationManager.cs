@@ -60,6 +60,7 @@ namespace Model.Notification
                         This email is to notify you that user <b>{user.Identity}</b> ({inquiry.EmailAddress}) has asked the following question: </br>
                         </br>
                         <span><b>Request Type</b>: {typeText}</span></br>
+                        <span><b>Existing Leaf query</b>: {inquiry.AssociatedQueryId.ToString() ?? "None"}</span></br>
                         </br>
                         <span>""{text}""</span>
                     </body>

@@ -14,7 +14,7 @@ import { attestAndLoadSession, refreshSession } from '../actions/session';
 import { AppState } from '../models/state/AppState';
 import { SessionContext } from '../models/Session';
 import { version } from '../../package.json'
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import Patient from './Patient/Patient';
 import { history } from '../store/configureStore';
 import Header from './Header/Header';
@@ -22,6 +22,7 @@ import Cohort from './Cohort/Cohort';
 import './App.css';
 
 interface OwnProps {
+    params?: any;
 }
 interface DispatchProps {
     dispatch: any;
@@ -53,9 +54,10 @@ class App extends React.Component<Props> {
     }
 
     public componentDidUpdate() { 
-        const { dispatch, state } = this.props;
+        const { dispatch, state, params } = this.props;
         const { auth } = state;
         if (!this.hasAttested && auth && auth.userContext) {
+            console.log(params);
             const dummyAttest = {
                 documentation: { institution: '', title: '' },
                 isIdentified: true,
@@ -88,13 +90,15 @@ class App extends React.Component<Props> {
                     <Routes>
                         <Route path="/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} />} />
                         <Route path="/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />
-                        <Route path="*" element={<Navigate to="/0c41433e-f36b-1410-81c3-0018c8508655" />} />
+                        <Route path="*" element={<div>No cohort selected!</div>} />
                     </Routes>
                 </div>
                 }
             </div>
         );
     }
+
+    // localhost:3000/0c41433e-f36b-1410-81c3-0018c8508655
 
     /*
      * Poll at short intervals to test that browser is active.
@@ -155,3 +159,4 @@ const mapDispatchToProps = (dispatch: any) => {
 
 export default connect<StateProps, DispatchProps, OwnProps, AppState>
     (mapStateToProps, mapDispatchToProps)(App);
+

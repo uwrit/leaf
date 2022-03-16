@@ -30,8 +30,8 @@ class Cohort extends React.Component<Props> {
         const { cohort, cohortId, dispatch } = this.props;
         const classes = [ 'leaf-modal' ]
 
-        if (!cohort || !cohortId) {
-            return null;
+        if (!cohortId) {
+            return <div>You haven't selected a cohort yet!</div>;
         }
 
         return (

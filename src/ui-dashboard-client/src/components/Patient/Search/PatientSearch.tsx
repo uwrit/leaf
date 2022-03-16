@@ -81,7 +81,7 @@ class PatientSearch extends React.PureComponent<Props, State> {
     };
 
     private handleInputBlur = () => {
-        setTimeout(() => this.setState({ showHintsDropdown: false }), 100);
+        setTimeout(() => this.setState({ showHintsDropdown: false }), 200);
     };
 
     private handleArrowUpDownKeyPress = (key: number) => {
@@ -152,7 +152,8 @@ class PatientSearch extends React.PureComponent<Props, State> {
     private handleSearchInput = async (term: string) => {
         this.setState({ term });
         const hints = await searchPatients(term, this.hintLimit);
-        this.setState({ hints, selectedHintIndex: hints.length ? 0 : -1 });
+        const selectedHintIndex = term.length ? hints.length ? 0 : -1 : 0;
+        this.setState({ hints, selectedHintIndex });
     }
 }
 
