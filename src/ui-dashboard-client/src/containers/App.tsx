@@ -57,7 +57,6 @@ class App extends React.Component<Props> {
         const { dispatch, state, params } = this.props;
         const { auth } = state;
         if (!this.hasAttested && auth && auth.userContext) {
-            console.log(params);
             const dummyAttest = {
                 documentation: { institution: '', title: '' },
                 isIdentified: true,
