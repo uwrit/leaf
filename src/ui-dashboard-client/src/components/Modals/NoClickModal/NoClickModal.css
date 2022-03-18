@@ -1,0 +1,49 @@
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .noclick-modal .modal-content {
+    border: 2px solid rgb(7, 192, 69);
+    border-radius: 0px !important;
+    height: 150px;
+}
+
+.noclick-modal.complete .modal-content{
+    border: 1px solid rgb(7, 192, 69) !important;
+}
+
+.noclick-modal.modal-dialog {
+    max-width: 450px !important;
+    z-index: 100;
+}
+
+.noclick-modal .loader,
+.noclick-modal .loader-fallback {
+    height: 100px;
+    margin-left: 10px;
+}
+
+.noclick-modal svg {
+    height: 120px;
+    margin-left: 10px;
+    width: 120px;
+}
+
+.noclick-modal svg circle {
+    stroke-width: 2px !important;
+}
+
+.noclick-modal path,
+.noclick-modal polyline {
+    stroke: rgb(7, 192, 69);
+}
+
+.noclick-modal-text {
+    font-size: 2rem;
+    height: 100%;
+    margin-top: 35px;
+    text-align: center;
+}

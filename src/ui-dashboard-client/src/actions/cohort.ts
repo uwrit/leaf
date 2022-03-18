@@ -64,7 +64,6 @@ export const getCohortDatasets = (cohortId: string) => {
 
         // Clean & transform
         const transformed = await transform(dtos, demographics);
-        console.log(transformed);
         dispatch(setCohortDataset(transformed));
         dispatch(setCohortState(CohortStateType.LOADED));
     };

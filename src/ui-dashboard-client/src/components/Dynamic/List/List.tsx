@@ -29,10 +29,11 @@ export default class DynamicList extends React.Component<Props> {
         return (
             <div className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%` }}>
                 <div className={`${c}-inner`} style={this.getStyle()}>
+                    {this.getTitle()}
 
                     {/* Left column */}
                     <div className={`${c}-inner-left`}>
-                        {this.getTitle()}
+                        
                     </div>
 
                     {/* Right column */}

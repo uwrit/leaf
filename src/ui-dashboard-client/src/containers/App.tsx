@@ -7,6 +7,7 @@
 
 import moment from 'moment';
 import React from 'react';
+import { findDOMNode, render } from 'react-dom';
 
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
@@ -14,7 +15,7 @@ import { attestAndLoadSession, refreshSession } from '../actions/session';
 import { AppState } from '../models/state/AppState';
 import { SessionContext } from '../models/Session';
 import { version } from '../../package.json'
-import { Navigate, Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import Patient from './Patient/Patient';
 import { history } from '../store/configureStore';
 import Header from './Header/Header';
@@ -76,6 +77,26 @@ class App extends React.Component<Props> {
         return null;
     }
 
+    private dragStartEvent = (e: React.DragEvent<HTMLDivElement>) => {
+        const data = JSON.stringify([
+            { patId: 'A', age: 20, sex: 'F' },
+            { patId: 'B', age: 50, sex: 'M' },
+        ]);
+        e.dataTransfer.setData('Test', data);
+        console.log(data);
+    }
+
+    private dropEvent = (e: React.DragEvent<HTMLDivElement>) => {
+        //const data = JSON.parse(e.dataTransfer.getData('Test'));
+        //document.documentElement.innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
+        document.children[0].innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
+        e.preventDefault();
+    }
+
+    private dragOverEvent = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+    }
+
     public render() {
         const { dispatch, state } = this.props;
         const { auth, config, session } = state;
@@ -83,9 +104,23 @@ class App extends React.Component<Props> {
 
         return (
             <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+
                 <Header dashboardName={state.config.main.title} />
                 {session && session.context &&
                 <div id="main-content">
+
+                    <div 
+                        draggable={true} 
+                        onDragStart={this.dragStartEvent}>
+                        Test Drag
+                    </div>
+
+                    <div
+                        onDragOver={this.dragOverEvent}
+                        onDrop={dropEvent}>
+                        Test Drop
+                    </div>
+
                     <Routes>
                         <Route path="/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} />} />
                         <Route path="/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />
@@ -146,6 +181,12 @@ class App extends React.Component<Props> {
             clearTimeout(inactivityTimer);
         }
     }
+}
+
+const dropEvent = (e: React.DragEvent<HTMLDivElement>) => {
+    console.log(this);
+    (this! as any).innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
+    e.preventDefault();
 }
 
 const mapStateToProps = (state: AppState) => {

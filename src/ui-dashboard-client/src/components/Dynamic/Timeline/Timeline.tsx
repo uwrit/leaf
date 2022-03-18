@@ -92,6 +92,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
             verticals.push(interval);
         }
 
+        // const tooltip = <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, val, color)} />;
+
         return (
             <div className={c}>
 
@@ -149,6 +151,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                                     />}
 
                                     {/* Tooltip */}
+                                    {/* tooltip */}
                                     <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, val, color)} />
 
                                     {/* Line */}

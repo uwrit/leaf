@@ -4,11 +4,12 @@
 
 .dynamic-checklist-inner {
     align-content: stretch;
-    border-radius: 20px;
+    border-radius: 8px;
     display: flex;
     flex-direction: row;
     height: 100%;
-    padding: 10px;
+    padding: 20px 10px 10px;
+    position: relative;
 }
 
 .dynamic-checklist-inner-left,
@@ -23,19 +24,24 @@
 
 .dynamic-checklist-title-container {
     border-radius: 8px;
-    padding: 4px 8px;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    left: 0;
+    position: absolute;
     text-align: center;
+    top: 0;
     width: max-content;
 }
 
 .dynamic-checklist-title-container svg {
-    font-size: 2rem;
-    margin: 0 8px -4px 0;
+    font-size: 1.5rem;
+    margin: 0 2px -3px 4px;
 }
 
 .dynamic-checklist-title {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
     font-weight: 200;
+    padding: 0 8px 0 2px;
 }
 
 .dynamic-checklist-dataset-selector-container {
