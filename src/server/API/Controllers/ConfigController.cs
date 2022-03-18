@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Model.Authorization;
 using Model.Dashboard;
 using Model.Notification;
 using Model.Options;
@@ -51,12 +52,16 @@ namespace API.Controllers
             this.serverStateCache = serverStateCache;
         }
 
+        [Authorize(Policy = Access.Institutional)]
+        [Authorize(Policy = TokenType.Access)]
         [HttpGet("serverstate")]
         public ServerStateDTO GetServerState()
         {
             return new ServerStateDTO(serverStateCache.GetServerState());
         }
 
+        [Authorize(Policy = Access.Institutional)]
+        [Authorize(Policy = TokenType.Access)]
         [HttpGet("dashboards")]
         public async Task<ActionResult<IEnumerable<DashboardConfiguration>>> GetDashboardConfigurations(
             [FromServices] DashboardConfigurationManager dashboardManager)
