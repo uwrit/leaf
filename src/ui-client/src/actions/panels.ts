@@ -11,6 +11,8 @@ import { NumericFilter } from '../models/panel/NumericFilter';
 import { SubPanelJoinSequence } from '../models/panel/SubPanel';
 import { Panel } from '../models/panel/Panel';
 
+export const ADD_PANEL = 'ADD_PANEL';
+export const REMOVE_PANEL = 'REMOVE_PANEL';
 export const ADD_PANEL_ITEM = 'ADD_PANEL_ITEM';
 export const REMOVE_PANEL_ITEM = 'REMOVE_PANEL_ITEM';
 export const HIDE_PANEL_ITEM = 'HIDE_PANEL_ITEM';
@@ -43,7 +45,7 @@ export interface PanelAction {
     joinSequence?: SubPanelJoinSequence;
     minCount?: number;
     subPanelIndex?: number;
-    panelIndex: number;
+    panelIndex?: number;
     panels?: Panel[];
 }
 
@@ -142,7 +144,7 @@ export const resetPanels = () => {
     }
 };
 
-export const selectSpecialization = (concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number, conceptSpecialization: ConceptSpecialization) => {
+export const selectSpecialization = (concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number, conceptSpecialization: ConceptSpecialization): PanelItemAction => {
     return {
         concept,
         panelIndex,
@@ -153,7 +155,7 @@ export const selectSpecialization = (concept: Concept, panelIndex: number, subPa
     }
 };
 
-export const deselectSpecialization = (concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number, conceptSpecializationGroup: ConceptSpecializationGroup) => {
+export const deselectSpecialization = (concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number, conceptSpecializationGroup: ConceptSpecializationGroup): PanelItemAction => {
     return {
         concept,
         panelIndex,
@@ -164,9 +166,22 @@ export const deselectSpecialization = (concept: Concept, panelIndex: number, sub
     }
 };
 
-export const setPanels = (panels: Panel[]) => {
+export const setPanels = (panels: Panel[]): PanelAction => {
     return {
         panels,
         type: SET_PANELS
+    }
+};
+
+export const addPanel = (): PanelAction => {
+    return {
+        type: ADD_PANEL
+    }
+};
+
+export const removePanel = (panelIndex: number): PanelAction => {
+    return {
+        panelIndex,
+        type: REMOVE_PANEL
     }
 };

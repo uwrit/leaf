@@ -19,7 +19,9 @@ import {
     SET_SUBPANEL_MINCOUNT,
     DESELECT_CONCEPT_SPECIALIZATION,
     SELECT_CONCEPT_SPECIALIZATION,
-    SET_PANELS
+    SET_PANELS,
+    ADD_PANEL,
+    REMOVE_PANEL
  } from '../actions/panels';
 import {
     OPEN_SAVED_QUERY,
@@ -36,46 +38,45 @@ import { SavedQuery } from '../models/Query';
 
 const ANYTIME = 'Anytime';
 
-export const defaultPanelState = (): Panel[] => {
-    const defaultPanels: Panel[] = [];
+const getDefaultPanel = (i: number): Panel => {
     const defaultDateFilter: DateBoundary = {
         display: ANYTIME,
-        end: {
-            dateIncrementType: DateIncrementType.NONE,
-            increment: 1
-        },
-        start: {
-            dateIncrementType: DateIncrementType.NONE,
-            increment: 1
-        }
-    }
+        start: { dateIncrementType: DateIncrementType.NONE, increment: 1 },
+        end:   { dateIncrementType: DateIncrementType.NONE, increment: 1 }
+    };
+
+    return {
+        dateFilter: defaultDateFilter,
+        domain: 'Panel',
+        id: generateId(),
+        includePanel: true,
+        index: i,
+        subPanels: [{
+            dateFilter: {
+                dateIncrementType: DateIncrementType.NONE,
+                increment: 0
+            },
+            id: generateId(),
+            includeSubPanel: true,
+            index: 0,
+            joinSequence: { 
+                dateIncrementType: DateIncrementType.DAY,
+                increment: 1,
+                sequenceType: SequenceType.Encounter
+            },
+            minimumCount: 1,
+            panelIndex: i,
+            panelItems: []
+        }]
+    };
+}
+
+export const defaultPanelState = (): Panel[] => {
+    const defaultPanels: Panel[] = [];
 
     // Add 3 Panels with 1 empty SubPanel each
-    for (let i: number = 0; i < 3; i++ ) {
-        defaultPanels.push({
-            dateFilter: defaultDateFilter,
-            domain: 'Panel',
-            id: generateId(),
-            includePanel: true,
-            index: i,
-            subPanels: [{
-                dateFilter: {
-                    dateIncrementType: DateIncrementType.NONE,
-                    increment: 0
-                },
-                id: generateId(),
-                includeSubPanel: true,
-                index: 0,
-                joinSequence: { 
-                    dateIncrementType: DateIncrementType.DAY,
-                    increment: 1,
-                    sequenceType: SequenceType.Encounter
-                },
-                minimumCount: 1,
-                panelIndex: i,
-                panelItems: []
-            }]
-        })
+    for (let i = 0; i < 3; i++ ) {
+        defaultPanels.push(getDefaultPanel(i));
     }
     return defaultPanels;
 };
@@ -120,7 +121,7 @@ const resetSubPanelIndexes = (panel: Panel): void => {
             panel.subPanels[i].panelItems[j].index = j;
         }
     }
-}
+};
 
 const updatePanel = (state: Panel[], action: PanelAction): Panel[] => {
     const newpanels = state.slice(0);
@@ -256,6 +257,32 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
     return newpanels;
 };
 
+const addPanel = (state: Panel[]): Panel[] => {
+    const clone = state.slice();
+
+    // Increment indices
+    for (const panel of clone) {
+        panel.index += 1;
+        panel.subPanels[0].panelIndex += 1;
+    }
+    clone.unshift(getDefaultPanel(0));
+
+    return clone;
+};
+
+const removePanel = (state: Panel[], panelIndex: number): Panel[] => {
+    const clone = state.slice();
+    clone.splice(panelIndex, 1);
+
+    // Re-index
+    for (let i = 0; i < clone.length; i++) {
+        clone[i].index += 1;
+        clone[i].subPanels[0].panelIndex += 1;
+    }
+
+    return clone;
+};
+
 export const panels = (state: Panel[] = defaultPanelState(), action: any): Panel[] => {
 
     switch (action.type) {
@@ -278,6 +305,10 @@ export const panels = (state: Panel[] = defaultPanelState(), action: any): Panel
             return ((action as SaveQueryAction).query as SavedQuery).panels!;
         case SET_PANELS:
             return action.panels;
+        case ADD_PANEL:
+            return addPanel(state);
+        case REMOVE_PANEL:
+            return removePanel(state, action.panelIndex);
         default:
             return state;
     }

@@ -21,6 +21,7 @@ import SubPanel from './SubPanel';
 import './Panel.css';
 
 export interface Props {
+    canRemove?: boolean;
     maybeHandlers?: PanelHandlers;
     isFirst: boolean;
     panel: PanelModel,

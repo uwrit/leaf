@@ -19,6 +19,7 @@ import { PanelGroup } from './PanelGroup';
 import { getPanelItemCount, panelHasErrors } from '../../../utils/panelUtils';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { CohortStateType } from '../../../models/state/CohortState';
+import { addPanel } from '../../../actions/panels';
 
 interface StateProps {
     panelFilters: PanelFilterModel[];
@@ -35,7 +36,54 @@ interface OwnProps { }
 type Props = StateProps & DispatchProps & OwnProps;
 
 class PanelGroupColumn extends React.Component<Props> {
-    public handleQueryClick = () => {
+    private className = "find-patients";
+
+    public render() {
+        const { dispatch, panels, panelFilters, queryState } = this.props;
+        const c = this.className;
+
+        return (
+            <div>
+                <div className={`${c}-toprow`}>
+                    <div id={`${c}-runquery`} className="leaf-button-main" onMouseUp={this.handleQueryClick}>
+                        <span>{this.setRunQueryButtonContent()}</span>
+                    </div>
+                    <div className={`${c}-toprow`} onClick={this.handleAddNewBoxClick}>
+                        Add New Box
+                    </div>
+                </div>
+                <PanelFilterGroup dispatch={dispatch} filters={panelFilters} />
+                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} />
+            </div>
+        );
+    }
+
+    private handleAddNewBoxClick = () => {
+        const { dispatch } = this.props;
+        dispatch(addPanel());
+    }
+
+    private setRunQueryButtonContent = () => {
+        const { queryState } = this.props;
+        const c = this.className;
+        const baseclass = `${c}-query-icon`;
+
+        switch (queryState) {
+            case CohortStateType.NOT_LOADED: {
+                return <span><MdSearch className={`${baseclass} find-patients-runquery-icon`}/>Run Query</span>;
+            }
+            case CohortStateType.REQUESTING: {
+                return <span><MdCancel className={`${baseclass} find-patients-cancelquery-icon`}/>Cancel Query</span>;
+            }
+            case CohortStateType.LOADED: {
+                return <span><MdStarBorder className={`${baseclass} find-patients-savequery-icon`}/>Save Query</span>;
+            }
+            default: 
+                return null;
+        }
+    }
+
+    private handleQueryClick = () => {
         const { queryState, dispatch, panels } = this.props;
         switch (queryState) {
             case CohortStateType.NOT_LOADED: {
@@ -78,39 +126,6 @@ class PanelGroupColumn extends React.Component<Props> {
                 return;
             }
         }
-    }
-
-    public setRunQueryButtonContent = () => {
-        const { queryState } = this.props;
-        const baseClassName = 'find-patients-query-icon';
-        switch (queryState) {
-            case CohortStateType.NOT_LOADED: {
-                return <span><MdSearch className={`${baseClassName} find-patients-runquery-icon`}/>Run Query</span>;
-            }
-            case CohortStateType.REQUESTING: {
-                return <span><MdCancel className={`${baseClassName} find-patients-cancelquery-icon`}/>Cancel Query</span>;
-            }
-            case CohortStateType.LOADED: {
-                return <span><MdStarBorder className={`${baseClassName} find-patients-savequery-icon`}/>Save Query</span>;
-            }
-            default: 
-                return null;
-        }
-    }
-
-    public render() {
-        const { dispatch, panels, panelFilters, queryState } = this.props;
-        return (
-            <div>
-                <div className="find-patients-toprow">
-                    <div id="find-patients-runquery" className="leaf-button-main" onMouseUp={this.handleQueryClick}>
-                        <span>{this.setRunQueryButtonContent()}</span>
-                    </div>
-                </div>
-                <PanelFilterGroup dispatch={dispatch} filters={panelFilters} />
-                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} />
-            </div>
-        );
     }
 }
 

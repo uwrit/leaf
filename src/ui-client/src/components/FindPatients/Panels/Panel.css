@@ -5,6 +5,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
+.panel-row {
+    margin-bottom: 10px;
+}
+
 /* Dropdowns - override bootstrap defaults */
 .panel-header > .dropdown > button,
 .subpanel-header .dropdown > button,

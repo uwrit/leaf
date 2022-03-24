@@ -38,7 +38,9 @@ import {
     SET_SUBPANEL_JOIN_SEQUENCE,
     SET_SUBPANEL_MINCOUNT,
     SELECT_CONCEPT_SPECIALIZATION,
-    DESELECT_CONCEPT_SPECIALIZATION
+    DESELECT_CONCEPT_SPECIALIZATION,
+    ADD_PANEL,
+    REMOVE_PANEL
  } from '../actions/panels';
 import { GeneralUiState, Routes, NotificationStates, MyLeafTabType, UserInquiryType } from '../models/state/GeneralUiState';
 import { OPEN_SAVED_QUERY } from '../actions/queries';
@@ -158,6 +160,8 @@ export const generalUi = (state: GeneralUiState = defaultGeneralUiState(), actio
         case SET_PANEL_FILTERS:
         case TOGGLE_PANEL_FILTER:
         case RESET_PANELS:
+        case ADD_PANEL:
+        case REMOVE_PANEL:
             return setCohortCountBoxState(state, false, false, false);
         default:
             return state;

@@ -44,19 +44,41 @@ export class PanelGroup extends React.PureComponent<Props> {
     public render() {
         const { panels, queryState } = this.props;
         const handlers = this.packageHandlers();
+        const panelsPerRow = 3;
+        const panelRows: PanelModel[][] = [];
+        
+        // Move panels into groups of 3
+        let curr: PanelModel[] = [];
+        for (let i = panels.length-1; i >= 0; i--) {
+            if (curr.length === panelsPerRow) {
+                panelRows.unshift(curr);
+                curr = [];
+            }
+            curr.unshift(panels[i]);
+        }
+        if (curr.length) {
+            panelRows.unshift(curr);
+        }
 
         return (
-            <Row>
-                {panels.map((panel: PanelModel, i: number) =>
-                    <Panel 
-                        maybeHandlers={handlers}
-                        key={panel.id} 
-                        isFirst={i === 0}
-                        panel={panel}
-                        queryState={queryState}
-                    />
-                )}
-            </Row>
+            panelRows.map((row, i) => {
+                const rowKey = row.map(p => p.id).join('');
+
+                return (
+                    <Row key={rowKey} className={'panel-row'}>
+                        {row.map((panel, j) =>
+                            <Panel 
+                                canRemove={i > 0}
+                                maybeHandlers={handlers}
+                                key={panel.id} 
+                                isFirst={i === 0 && j === 0}
+                                panel={panel}
+                                queryState={queryState}
+                            />
+                        )}
+                    </Row>
+                );
+            })
         );
     }
 
