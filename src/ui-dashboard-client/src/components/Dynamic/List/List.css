@@ -1,5 +1,6 @@
 .dynamic-list-container {
     padding: 10px;
+    position: relative;
 }
 
 .dynamic-list-inner {
@@ -7,9 +8,14 @@
     border-radius: 8px;
     display: flex;
     flex-direction: row;
-    height: 100%;
-    padding: 20px 10px 10px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 26px 10px 10px;
     position: relative;
+}
+
+.dynamic-list-inner-background {
+    z-index: 99;
 }
 
 .dynamic-list-inner-left,
@@ -31,11 +37,17 @@
     border-radius: 8px;
     border-bottom-left-radius: 0;
     border-top-right-radius: 0;
-    left: 0;
+    left: 15px;
     position: absolute;
     text-align: center;
-    top: 0;
+    top: 10px;
     width: max-content;
+    z-index: 100;
+}
+
+.dynamic-list-inner > div {
+    overflow-x: hidden;
+    width: 100%;
 }
 
 .dynamic-list-title-container svg {

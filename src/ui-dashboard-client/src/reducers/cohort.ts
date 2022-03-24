@@ -8,8 +8,11 @@
 import { 
     CohortAction,
     SET_COHORT_DATASETS,
-    SET_COHORT_STATE
+    SET_COHORT_STATE,
+    SET_SEARCH_HINTS,
+    SET_SEARCH_TERM
 } from '../actions/cohort';
+import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { CohortData, CohortState, CohortStateType } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
@@ -17,6 +20,10 @@ export function defaultCohortState(): CohortState {
         data: {
             metadata: new Map(),
             patients: new Map()
+        },
+        search: {
+            hints: [],
+            term: ''
         },
         state: CohortStateType.NOT_LOADED
     };
@@ -28,6 +35,18 @@ const setCohortDatasets = (state: CohortState, data: CohortData) => {
 
 const setCohortState = (state: CohortState, cohortStateType: CohortStateType) => {
     return Object.assign({}, state, { state: cohortStateType });
+};
+
+const setSearchTerm = (state: CohortState, term: string) => {
+    return Object.assign({}, state, { 
+        search: { ...state.search, term }
+    });
+};
+
+const setSearchHints = (state: CohortState, hints: DemographicRow[]) => {
+    return Object.assign({}, state, { 
+        search: { ...state.search, hints }
+    });
 };
 
 const clearCohortDatasets = (state: CohortState) => {
@@ -45,6 +64,10 @@ export function cohort(state: CohortState = defaultCohortState(), action: Cohort
             return setCohortDatasets(state, action.cohort!);
         case SET_COHORT_STATE:
             return setCohortState(state, action.state!);
+        case SET_SEARCH_TERM:
+            return setSearchTerm(state, action.term!);
+        case SET_SEARCH_HINTS:
+            return setSearchHints(state, action.hints!);
         default:
             return state;
     }

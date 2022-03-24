@@ -45,7 +45,9 @@ class Patient extends React.Component<Props> {
                 <PatientHeaderBar patient={patient} config={config} />
 
                 {/* Dynamically read & render content */}
-                {config.content.map((content, i) => renderDynamicComponent(content, patient, metadata, i))}
+                <div className={`${c}-content-container`}>
+                    {config.content.map((content, i) => renderDynamicComponent(content, patient, metadata, i))}
+                </div>
             </div>
         );
     }

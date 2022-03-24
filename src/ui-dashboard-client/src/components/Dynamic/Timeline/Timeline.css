@@ -1,6 +1,6 @@
 .dynamic-timeline {
     height: 100%;
-    padding: 0 20px;
+    padding: 0;
     position: relative;
     width: 100%;
 }
@@ -137,9 +137,9 @@
     border: 2px solid rgb(192, 31, 45);
     border-radius: 8px;
     background-color: white;
-    font-size: 1.1rem;
+    font-size: 1rem;
     min-width: 70px;
-    max-width: 100px;
+    max-width: 120px;
     padding: 4px;
 }
 
@@ -205,6 +205,11 @@
     font-size: 1.6rem;
 }
 
+.dynamic-timeline-trend-bar-name.non-numeric-last {
+    font-size: 1.6rem;
+    margin: -2px 0 0;
+}
+
 .dynamic-timeline-trend-bar-datediff {
     color: green;
     font-size: 1.1rem;
@@ -212,7 +217,15 @@
 }
 
 .dynamic-timeline-trend-bar-all-diff {
+    padding: 2px;
+    position: relative;
+    text-align: center;
     width: 17%;
+}
+
+.dynamic-timeline-trend-bar-all-diff-inner {
+    font-size: 1rem;
+    position: absolute;
 }
 
 .dynamic-timeline-tooltip {
@@ -225,15 +238,39 @@
 .dynamic-timeline-tooltip-title {
     font-size: 1.5rem;
     font-weight: 300;
-    margin-right: 4px;
 }
 
 .dynamic-timeline-tooltip-value {
     font-weight: 300;
     font-size: 3rem;
+    margin-left: 4px;
 }
 
 .dynamic-timeline-tooltip-date {
     color: green;
-    margin-top: -2px;
+    margin: -8px 0 4px;
+}
+
+.dynamic-timeline-tooltip-context-container {
+    max-width: 500px;
+    margin-bottom: 4px;
+}
+
+.dynamic-timeline-tooltip-context-field {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.dynamic-timeline-tooltip-context-value {
+    color: rgb(120,120,120);
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.dynamic-timeline-tooltip-context-value .highlight {
+    background-color: transparent !important;
+    border-bottom: 2px solid #ff0e50;
+    color: black;
+    font-weight: 700;
 }

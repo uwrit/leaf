@@ -1,4 +1,9 @@
 .patient-container {
     height: 100%;
+    overflow-x: hidden;
     overflow-y: auto;
+}
+
+.patient-content-container {
+    padding: 0 20px;
 }

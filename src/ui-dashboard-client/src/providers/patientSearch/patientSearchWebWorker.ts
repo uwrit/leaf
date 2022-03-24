@@ -50,7 +50,7 @@ export default class PatientSearchEngineWebWorker {
     constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([REINDEX_PATIENTS, SEARCH_PATIENTS])}
-            ${this.stripFunctionToContext(this.workerContext)}
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -111,7 +111,7 @@ export default class PatientSearchEngineWebWorker {
         };
 
         const firstCharCache: Map<string, IndexedDemographicRow[]> = new Map();
-        let allPatients: IndexedDemographicRow[] = [];
+        let allPatients: Map<string, IndexedDemographicRow> = new Map();
 
         /**
          * Search through available patients
@@ -125,7 +125,7 @@ export default class PatientSearchEngineWebWorker {
             const output: IndexedDemographicRow[] = [];
 
             if (!searchString) {
-                return { requestId, result: sort(allPatients) }; 
+                return { requestId, result: sort([ ...allPatients.values() ], top) }; 
             }
             if (!patients) {
                 return { requestId, result: [] };
@@ -153,13 +153,13 @@ export default class PatientSearchEngineWebWorker {
              * For patients found in term one
              */
             for (const p of patients) {
-                let hitCount = 1;
+                let hitCount = 0;
 
                 /**
                  * Foreach term after the first (e.g. [ 'jane', 'doe' ])
                  * filter what first loop found and remove if no hit
                  */
-                for (let i = 1; i < termCount; i++) {
+                for (let i = 0; i < termCount; i++) {
                     const term = terms[i];
 
                     /**
@@ -179,7 +179,7 @@ export default class PatientSearchEngineWebWorker {
                 }
             }
 
-            return { requestId, result: sort(output) };
+            return { requestId, result: sort(output, top) };
         };
 
         const sort = (patients: IndexedDemographicRow[], top?: number): DemographicRow[] => {
@@ -187,7 +187,7 @@ export default class PatientSearchEngineWebWorker {
             if (top) {
                 _patients = _patients.slice(0, top);
             }
-            return patients
+            return _patients
                 .map(p => p.patient)
                 .sort((a,b) => a.name > b.name ? 1 : -1);
         };
@@ -198,7 +198,7 @@ export default class PatientSearchEngineWebWorker {
         const reindexCache = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { patients, requestId } = payload;
             firstCharCache.clear();
-            allPatients = [];
+            allPatients = new Map();
         
             /**
              * Foreach patient
@@ -210,10 +210,16 @@ export default class PatientSearchEngineWebWorker {
                     .map(t => t.trim().toLowerCase())
                     .filter(t => t.length > 0)
                 const indexed: IndexedDemographicRow = { patient, tokens };
-                allPatients.push(indexed);
+                allPatients.set(patient.personId, indexed);
+                const added = new Set();
 
                 for (const token of tokens) {
                     const firstChar = token[0];
+                    if (added.has(firstChar)) {
+                        continue;
+                    } else {
+                        added.add(firstChar);
+                    }
 
                     /**
                      * Cache the first first character for quick lookup
@@ -226,7 +232,7 @@ export default class PatientSearchEngineWebWorker {
                 }
             }
 
-            return { requestId, result: sort(allPatients) }
+            return { requestId, result: sort([ ...allPatients.values() ]) }
         };
     };
 };

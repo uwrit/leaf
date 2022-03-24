@@ -84,6 +84,9 @@ export const config: DashboardConfig =
                     {
                         title: "Body weight (lbs)",
                         color: [41, 75, 226],
+                        context: {
+                            fields: []
+                        },
                         id: "d6f1423e-f36b-1410-81bf-0018c8508655"
                     },
                     {

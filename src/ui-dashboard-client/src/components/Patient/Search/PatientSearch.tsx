@@ -2,21 +2,22 @@ import React from 'react';
 import { Input, InputGroup } from 'reactstrap';
 import { DemographicRow } from '../../../models/cohortData/DemographicDTO';
 import { keys } from '../../../models/Keyboard';
-import { searchPatients } from '../../../services/patientSearchApi';
 import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
 import HintContainer from './HintContainer';
+import { searchForPatients } from '../../../actions/cohort';
 import './PatientSearch.css';
 
 interface Props {
     cohortId?: string;
+    dispatch?: any;
+    hints: DemographicRow[];
     nav?: NavigateFunction;
+    term: string
 }
 
 interface State {
-    hints: DemographicRow[];
     selectedHintIndex: number,
     showHintsDropdown: boolean,
-    term: string
 }
 
 class PatientSearch extends React.PureComponent<Props, State> {
@@ -26,18 +27,16 @@ class PatientSearch extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            hints: [],
             selectedHintIndex: -1,
-            showHintsDropdown: false,
-            term: ''
+            showHintsDropdown: false
         }
     }
 
     public componentDidUpdate() { return; }
 
     public render() {
-        const { cohortId } = this.props;
-        const { selectedHintIndex, term, hints, showHintsDropdown } = this.state;
+        const { cohortId, hints, term } = this.props;
+        const { selectedHintIndex, showHintsDropdown } = this.state;
         const c = this.className;
         
         return (
@@ -73,11 +72,9 @@ class PatientSearch extends React.PureComponent<Props, State> {
     }
 
     private handleInputFocus = async () => {
-        const { term } = this.state;
+        const { dispatch, term } = this.props;
+        dispatch(searchForPatients(term, this.hintLimit));
         this.setState({ showHintsDropdown: true });
-
-        const hints = await searchPatients(term, this.hintLimit);
-        this.setState({ hints });
     };
 
     private handleInputBlur = () => {
@@ -85,7 +82,8 @@ class PatientSearch extends React.PureComponent<Props, State> {
     };
 
     private handleArrowUpDownKeyPress = (key: number) => {
-        const { showHintsDropdown, selectedHintIndex, hints } = this.state;
+        const { hints } = this.props;
+        const { showHintsDropdown, selectedHintIndex } = this.state;
         if (!showHintsDropdown) { return selectedHintIndex; }
 
         const currentFocus = this.state.selectedHintIndex;
@@ -100,18 +98,19 @@ class PatientSearch extends React.PureComponent<Props, State> {
     }
 
     private handleEnterKeyPress = () => {
-        const { cohortId, nav } = this.props;
-        const { selectedHintIndex, hints } = this.state;
+        const { cohortId, nav, hints } = this.props;
+        const { selectedHintIndex } = this.state;
         const selected = hints[selectedHintIndex];
 
         if (selected && nav) {
             const patientId = selected.personId;
-            nav(`/${cohortId}/patients/${patientId}`);
+            nav(`/dashboard/cohort/${cohortId}/patients/${patientId}`);
         }
     }
 
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
-        const { selectedHintIndex, term } = this.state;
+        const { term } = this.props;
+        const { selectedHintIndex } = this.state;
         const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
 
         if (!key) { return; }
@@ -142,18 +141,18 @@ class PatientSearch extends React.PureComponent<Props, State> {
     }
 
     private handleSearchTextClear = () => {
-        this.setState({ term: '' });
+        const { dispatch } = this.props;
+        dispatch(searchForPatients('', this.hintLimit));
     }
 
-    private handleSearchInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    private handleSearchInputChange = async (e: React.FormEvent<HTMLInputElement>) => {
         this.handleSearchInput(e.currentTarget.value);
     }
 
-    private handleSearchInput = async (term: string) => {
-        this.setState({ term });
-        const hints = await searchPatients(term, this.hintLimit);
-        const selectedHintIndex = term.length ? hints.length ? 0 : -1 : 0;
-        this.setState({ hints, selectedHintIndex });
+    private handleSearchInput = (term: string) => {
+        const { dispatch } = this.props;
+        dispatch(searchForPatients(term, this.hintLimit));
+        this.setState({ selectedHintIndex: 0 });
     }
 }
 
@@ -161,7 +160,7 @@ const withRouter = (PatientSearch: any) => (props: Props) => {
     const params = useParams();
     const nav = useNavigate();
     const { cohortId } = params;
-    return <PatientSearch cohortId={cohortId} nav={nav} />;
+    return <PatientSearch cohortId={cohortId} nav={nav} dispatch={props.dispatch} hints={props.hints} term={props.term} />;
 };
 
 export default withRouter(PatientSearch);

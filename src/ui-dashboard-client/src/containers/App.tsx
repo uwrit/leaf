@@ -7,7 +7,6 @@
 
 import moment from 'moment';
 import React from 'react';
-import { findDOMNode, render } from 'react-dom';
 
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
@@ -77,26 +76,6 @@ class App extends React.Component<Props> {
         return null;
     }
 
-    private dragStartEvent = (e: React.DragEvent<HTMLDivElement>) => {
-        const data = JSON.stringify([
-            { patId: 'A', age: 20, sex: 'F' },
-            { patId: 'B', age: 50, sex: 'M' },
-        ]);
-        e.dataTransfer.setData('Test', data);
-        console.log(data);
-    }
-
-    private dropEvent = (e: React.DragEvent<HTMLDivElement>) => {
-        //const data = JSON.parse(e.dataTransfer.getData('Test'));
-        //document.documentElement.innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
-        document.children[0].innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
-        e.preventDefault();
-    }
-
-    private dragOverEvent = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-    }
-
     public render() {
         const { dispatch, state } = this.props;
         const { auth, config, session } = state;
@@ -108,23 +87,10 @@ class App extends React.Component<Props> {
                 <Header dashboardName={state.config.main.title} />
                 {session && session.context &&
                 <div id="main-content">
-
-                    <div 
-                        draggable={true} 
-                        onDragStart={this.dragStartEvent}>
-                        Test Drag
-                    </div>
-
-                    <div
-                        onDragOver={this.dragOverEvent}
-                        onDrop={dropEvent}>
-                        Test Drop
-                    </div>
-
                     <Routes>
-                        <Route path="/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} />} />
-                        <Route path="/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />
-                        <Route path="*" element={<div>No cohort selected!</div>} />
+                        <Route path="/dashboard/cohort/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} search={state.cohort.search} />} />
+                        <Route path="/dashboard/cohort/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />
+                        <Route path="/dashboard/cohort/*" element={<div>No cohort selected!</div>} />
                     </Routes>
                 </div>
                 }
@@ -132,7 +98,7 @@ class App extends React.Component<Props> {
         );
     }
 
-    // localhost:3000/0c41433e-f36b-1410-81c3-0018c8508655
+    // http://localhost:3000/dashboard/cohort/0c41433e-f36b-1410-81c3-0018c8508655
 
     /*
      * Poll at short intervals to test that browser is active.
@@ -181,12 +147,6 @@ class App extends React.Component<Props> {
             clearTimeout(inactivityTimer);
         }
     }
-}
-
-const dropEvent = (e: React.DragEvent<HTMLDivElement>) => {
-    console.log(this);
-    (this! as any).innerHTML = `<div>${e.dataTransfer.getData('Test')}</div>`;
-    e.preventDefault();
 }
 
 const mapStateToProps = (state: AppState) => {

@@ -15,7 +15,13 @@ export enum CohortStateType {
 
 export interface CohortState {
     data: CohortData;
+    search: CohortSearch;
     state: CohortStateType;
+}
+
+export interface CohortSearch {
+    hints: DemographicRow[];
+    term: string;
 }
 
 export interface CohortData {

@@ -19,6 +19,7 @@ using Model.Options;
 
 namespace API.Controllers
 {
+    [AllowAnonymous]
     [Produces("application/json")]
     [Route("api/config")]
     public class ConfigController : Controller
@@ -52,8 +53,6 @@ namespace API.Controllers
             this.serverStateCache = serverStateCache;
         }
 
-        [Authorize(Policy = Access.Institutional)]
-        [Authorize(Policy = TokenType.Access)]
         [HttpGet("serverstate")]
         public ServerStateDTO GetServerState()
         {
@@ -78,7 +77,6 @@ namespace API.Controllers
             }
         }
 
-        [AllowAnonymous]
         public ActionResult<ConfigDTO> Get()
         {
             var config = new ConfigDTO

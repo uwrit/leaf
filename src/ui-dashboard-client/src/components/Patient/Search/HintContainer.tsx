@@ -27,15 +27,17 @@ export default class HintContainer extends React.PureComponent<Props> {
 
                 {hints.map((hint, i) => {
                     return (
-                        <Link key={hint.personId} to={`/${cohortId}/patients/${hint.personId}`}>
-                            <div 
-                                className={`${c}-hint-item leaf-dropdown-item ${i === selectedHintIndex ? 'selected' : ''}`} 
-                                key={hint.personId}
-                                >
-                                    <span className={`${c}-hint-name`}>{hint.name} </span>
-                                    <span className={`${c}-hint-mrn`}>{hint.mrn}</span>
-                            </div>
-                        </Link>
+                        <div key={hint.personId}>
+                            <Link to={`/dashboard/cohort/${cohortId}/patients/${hint.personId}`}>
+                                <div 
+                                    className={`${c}-hint-item leaf-dropdown-item ${i === selectedHintIndex ? 'selected' : ''}`} 
+                                    key={hint.personId}
+                                    >
+                                        <span className={`${c}-hint-name`}>{hint.name} </span>
+                                        <span className={`${c}-hint-mrn`}>{hint.mrn}</span>
+                                </div>
+                            </Link>
+                        </div>
                     );
                 })}
             </div>

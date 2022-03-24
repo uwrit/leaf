@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Row } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import { WidgetChecklistConfig, ContentChecklistDatasetConfig } from '../../../models/config/content';
 import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
@@ -36,21 +36,21 @@ export default class DynamicChecklist extends React.Component<Props, State> {
         const c = this.className;
 
         return (
-            <div className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%` }}>
-                <div className={`${c}-inner`} style={this.getStyle(config)}>
+            <Container className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%` }}>
+                {this.getTitle(config)}
+                <Row className={`${c}-inner`} style={this.getStyle(config)}>
 
                     {/* Left column */}
-                    <div className={`${c}-inner-left`}>
-                        {this.getTitle(config)}
+                    <Col md={5} className={`${c}-inner-left`}>
                         {this.getDatasetsSelector(config)}
-                    </div>
+                    </Col>
 
                     {/* Right column */}
-                    <div className={`${c}-inner-right`}>
+                    <Col md={7} className={`${c}-inner-right`}>
                         {this.getChecklistItems()}
-                    </div>
-                </div>
-            </div>
+                    </Col>
+                </Row>
+            </Container>
         );
     }
 

@@ -1,6 +1,6 @@
 import moment from 'moment';
 import React from 'react';
-import { Row, Col } from 'reactstrap';
+import { Row, Col, Container } from 'reactstrap';
 import { WidgetListConfig } from '../../../models/config/content';
 import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
@@ -27,21 +27,15 @@ export default class DynamicList extends React.Component<Props> {
         if (!meta) { return null; }
 
         return (
-            <div className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%` }}>
+            <Container className={`${c}-container`} style={{ width: `${config.width ?? settings.defaultWidth}%`, color: this.getStyle().color }}>
+                {this.getTitle()}
+
                 <div className={`${c}-inner`} style={this.getStyle()}>
-                    {this.getTitle()}
-
-                    {/* Left column */}
-                    <div className={`${c}-inner-left`}>
-                        
-                    </div>
-
-                    {/* Right column */}
-                    <div className={`${c}-inner-right`}>
+                    <div className={`${c}-inner-background`}>
                         {this.getItems()}
                     </div>
                 </div>
-            </div>
+            </Container>
         );
     }
 
@@ -112,17 +106,17 @@ export default class DynamicList extends React.Component<Props> {
                     }
                     
                     return (
-                        <div key={i} className={containerClass}>
-                            <div className={valClass}>
+                        <Row key={i} className={containerClass}>
+                            <Col md={6} className={valClass}>
                                 <span>{val}</span>
-                            </div>
-                            <div className={dateClass}>
+                            </Col>
+                            <Col md={6} className={dateClass}>
                                 <span>{dateStr}</span>
                                 <span className={parenClass}> (</span>
                                 <span className={datediffClass}>{diffStr}</span>
                                 <span className={parenClass}>)</span>
-                            </div>
-                        </div>
+                            </Col>
+                        </Row>
                     );
                 })}
             </div>

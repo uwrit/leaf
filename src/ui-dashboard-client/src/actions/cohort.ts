@@ -12,17 +12,22 @@ import { AppState } from '../models/state/AppState';
 import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../services/cohortApi';
 import { transform } from '../services/cohortDataApi';
 import { getDependentDatasets } from '../utils/dynamic';
-import { indexPatients } from '../services/patientSearchApi';
+import { indexPatients, searchPatients } from '../services/patientSearchApi';
 import { fetchDashboardConfigurations } from '../services/configApi';
 import { setDashboardConfig } from './config';
+import { config }from '../test/mock';
 
 export const SET_COHORT_DATASETS = 'SET_COHORT_DATASETS';
 export const SET_COHORT_STATE = 'SET_COHORT_STATE';
+export const SET_SEARCH_TERM = 'SET_SEARCH_TERM';
+export const SET_SEARCH_HINTS = 'SET_SEARCH_HINTS';
 
 export interface CohortAction {
     cohort?: CohortData;
+    hints?: DemographicRow[];
     id?: string;
     state?: CohortStateType;
+    term?: string;
     message?: string;
     type: string;
 }
@@ -37,6 +42,8 @@ export const getCohortDatasets = (cohortId: string) => {
         const configs = await fetchDashboardConfigurations(state);
         if (configs.length) {
             dispatch(setDashboardConfig(configs[0]));
+            console.log(JSON.stringify(config));
+            console.log(JSON.stringify(configs[0]));
         }
 
         const datasetIds = getDependentDatasets(getState().config.patient.content);
@@ -69,6 +76,14 @@ export const getCohortDatasets = (cohortId: string) => {
     };
 };
 
+export const searchForPatients = (term: string, top?: number) => {
+    return async (dispatch: Dispatch<any>, getState: () => AppState) => {
+        dispatch(setSearchTerm(term));
+        const hints = await searchPatients(term, top);
+        dispatch(setSearchHints(hints));
+    }
+}
+
 // Synchronous
 export const setCohortDataset = (cohort: CohortData): CohortAction => {
     return {
@@ -83,4 +98,19 @@ export const setCohortState = (state: CohortStateType): CohortAction => {
         type: SET_COHORT_STATE
     };
 };
+
+export const setSearchTerm = (term: string): CohortAction => {
+    return {
+        term,
+        type: SET_SEARCH_TERM
+    };
+};
+
+export const setSearchHints = (hints: DemographicRow[]): CohortAction => {
+    return {
+        hints,
+        type: SET_SEARCH_HINTS
+    };
+};
+
 

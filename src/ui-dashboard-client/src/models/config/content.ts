@@ -69,6 +69,7 @@ export interface ContentChecklistDatasetConfig {
 export interface WidgetTimelineEventDatasetConfig {
     id: string;
     color?: RgbValues;
+    context?: WidgetTooltipContextConfig;
     icon?: Icons;
     title?: string;
 };
@@ -76,8 +77,13 @@ export interface WidgetTimelineEventDatasetConfig {
 export interface WidgetTimelineNumericDatasetConfig {
     id: string;
     color?: RgbValues;
+    context?: WidgetTooltipContextConfig;
     title: string;
 };
+
+interface WidgetTooltipContextConfig {
+    fields: string[];
+}
 
 interface WidgetTimelineExportConfig {
     enabled: boolean;

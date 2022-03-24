@@ -53,17 +53,6 @@ body {
     html {
         font-size: 13.0px;
     }
-    #main-content {
-        margin-left: 45px;
-    }
-    #sidebar-container,
-    #sidebar {
-        width: 45px;
-    }
-    .sidebar-tab .sidebar-beta {
-        display: none
-    }
-    .sidebar-text,
     .header-options-text {
         display: none;
     }

@@ -4,7 +4,7 @@ import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import { getCohortDatasets } from '../../actions/cohort';
 import PatientSearch from '../../components/Patient/Search/PatientSearch';
 import { MainPageConfig } from '../../models/config/config';
-import { CohortState, CohortStateType } from '../../models/state/CohortState';
+import { CohortSearch, CohortState, CohortStateType } from '../../models/state/CohortState';
 
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
     config: MainPageConfig;
     cohortId?: string;
     dispatch: any;
+    search: CohortSearch;
 }
 
 class Cohort extends React.Component<Props> {
@@ -27,7 +28,7 @@ class Cohort extends React.Component<Props> {
 
     public render() {
         const c = this.className;
-        const { cohort, cohortId, dispatch } = this.props;
+        const { cohort, cohortId, dispatch, search } = this.props;
         const classes = [ 'leaf-modal' ]
 
         if (!cohortId) {
@@ -38,7 +39,7 @@ class Cohort extends React.Component<Props> {
             <Modal isOpen={true} className={classes.join(' ')} backdrop={true}>
                 <ModalHeader>Select Patient</ModalHeader>
                 <ModalBody>
-                    <PatientSearch />
+                    <PatientSearch hints={search.hints} term={search.term} dispatch={dispatch} />
                 </ModalBody>
                 <ModalFooter>
                     <Button className={`leaf-button leaf-button-primary`}>Select</Button>
@@ -51,7 +52,7 @@ class Cohort extends React.Component<Props> {
 const withRouter = (Cohort: any) => (props: Props) => {
     const params = useParams();
     const { cohortId } = params;
-    return <Cohort cohort={props.cohort} cohortId={cohortId} dispatch={props.dispatch} />;
+    return <Cohort cohort={props.cohort} cohortId={cohortId} dispatch={props.dispatch} search={props.search} />;
 };
 
 export default withRouter(Cohort);

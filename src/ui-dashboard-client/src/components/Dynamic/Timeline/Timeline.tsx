@@ -8,6 +8,7 @@ import { DatasetMetadataColumns, getDatasetMetadataColumns } from '../../../util
 import DynamicTimelineTrendBar from './TimelineTrendBar';
 import { AiOutlineCloudDownload } from "react-icons/ai"
 import { getDynamicColor } from '../../../utils/dynamic';
+import Highlighter from "react-highlight-words";
 import './Timeline.css';
 
 interface Props {
@@ -57,6 +58,15 @@ export default class DynamicTimeline extends React.Component<Props, State> {
         window.removeEventListener('resize', this.updateChartDimensions);
     }
 
+    public shouldComponentUpdate(nextProps: Props) {
+        if (this.state.chartWidth < 1000) {
+            return true;
+        } else if (this.props.patient === nextProps.patient) {
+            return false;
+        }
+        return true;
+    }
+
     private updateChartDimensions = () => {
         const dims = this.getChartDimensions();
         this.setState({ chartHeight: dims.height, chartWidth: dims.width });
@@ -76,7 +86,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
     public render() {
         const { config } = this.props;
         const { chartWidth } = this.state;
-        const margins = { top: 0, right: 10, bottom: 0, left: 0 };
+        const margins = { top: 0, right: 0, bottom: 0, left: 0 };
         const swimlaneHeight = 70;
         const [ numericDatasets, eventDatasets ] = this.getValueSets();
         const bounds = this.getDateBounds(numericDatasets);
@@ -84,15 +94,14 @@ export default class DynamicTimeline extends React.Component<Props, State> {
         const dateunix = "__dateunix__";
 
         const verticals: number[] = [];
-        const domainDiff = Math.trunc((bounds[1] - bounds[0]) / 14);
+        const domainDiff = Math.trunc((bounds[1] - bounds[0]) / 12);
+        const maxTimeline = this.getMaxTimelineValueSet(eventDatasets);
 
         let interval = bounds[0];
         while (interval < bounds[1]) {
             interval += domainDiff;
             verticals.push(interval);
         }
-
-        // const tooltip = <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, val, color)} />;
 
         return (
             <div className={c}>
@@ -139,19 +148,18 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                                     {verticals.map((v, i) => <ReferenceLine key={`v${i}`} x={v} className={`${c}-grid-line`} />)}
 
                                     <XAxis type="number" scale="time" dataKey={dateunix} axisLine={true} tick={true} hide={true} 
-                                        domain={[ bounds[0] * 0.999, bounds[1] * 0.995]} ticks={verticals.slice(0, 11)} tickFormatter={(v) => moment(v).format('MM-DD-YYYY') }
+                                        domain={[ bounds[0] * 0.999, bounds[1] * 0.995 ]} ticks={verticals.slice(0, 11)} tickFormatter={(v) => moment(v).format('MM-DD-YYYY') }
                                         allowDataOverflow={true}
                                     />
 
                                     {/* Y-axis */}
                                     {cols.fieldValueNumeric && 
                                     <YAxis type="number" dataKey={cols.fieldValueNumeric} width={0} orientation="right"
-                                        domain={[dataMin => dataMin * 0.6, dataMax => dataMax * 1.1]}
+                                        domain={[dataMin => dataMin <= 1 ? -1 : dataMin * 0.6, dataMax => dataMax <= 1 ? 2 : dataMax * 1.1]}
                                         tick={false} allowDataOverflow={true}
                                     />}
 
                                     {/* Tooltip */}
-                                    {/* tooltip */}
                                     <Tooltip cursor={false} wrapperStyle={{ zIndex: 100 }} content={this.renderTooltip.bind(null, val, color)} />
 
                                     {/* Line */}
@@ -162,7 +170,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                         })}
 
                         {/* Event timeline on bottom */}
-                        <LineChart width={chartWidth-500} height={swimlaneHeight * 2} margin={margins}>
+                        {eventDatasets.length > 0 && 
+                        <LineChart width={chartWidth-500} height={swimlaneHeight * 2} margin={margins} data={eventDatasets[0].data}>
 
                             {/* Grid */}
                             <CartesianGrid fill={numericDatasets.length % 2 === 0 ? 'white' : 'rgb(240,242,245)'} verticalPoints={verticals} />
@@ -173,8 +182,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                             {eventDatasets.reduce((accum: JSX.Element[], curr: TimelineValueSet) => {
                                 const i = accum.length;
                                 const stroke = getDynamicColor(curr.ds.color);
-                                const y = this.randRng(60, 100);
                                 const pairs = curr.data.map((d, j) => {
+                                    const y = this.randRng(60, 100);
                                     return [
                                         <ReferenceLine 
                                             key={`line${i}_${j}_${curr.ds.id}`} 
@@ -202,7 +211,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                                 allowDataOverflow={true}
                             />
 
-                        </LineChart>
+                        </LineChart>}
                     </div>
 
                     {/* Trends box */}
@@ -210,19 +219,39 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                         {numericDatasets.map((val, i) => {
                             return (
                                 <div key={val.ds.id} style={{ height: swimlaneHeight }} className={`${c}-trend`}>
-                                    <DynamicTimelineTrendBar values={val} color={this.colors[i]} comparison={config.comparison.enabled} />
+                                    <DynamicTimelineTrendBar values={val} color={this.colors[i]} comparison={config.comparison.enabled} isNumeric={true} />
                                 </div>     
                             );
-                        })}      
-                        {/*
+                        })}   
+                        {maxTimeline && 
                         <div style={{ height: (swimlaneHeight * 2) - 30 }} className={`${c}-trend`}>
-                            <DynamicTimelineTrendBar values={val} color={this.colors[i]} comparison={config.comparison.enabled} />
-                        </div> 
-                        */}
+                            <DynamicTimelineTrendBar values={maxTimeline} color={getDynamicColor(maxTimeline.ds.color)} comparison={config.comparison.enabled} isNumeric={false} />
+                        </div>}
                     </div>
                 </div>
             </div>
         )
+    }
+
+    private getMaxTimelineValueSet = (events: TimelineValueSet[]): TimelineValueSet | null => {
+        let maxTimeline = null;
+        let max = null;
+
+        for (const ev of events) {
+            const { data, cols } = ev;
+            if (!max && data.length) { max = data[0][cols.fieldDate!] }
+
+            for (const d of data) {
+                let val = d[cols.fieldDate!] as any;
+                if (val) {
+                    if (val >= max!) { 
+                        maxTimeline = ev;
+                        max = val;
+                    }
+                }
+            }
+        }
+        return maxTimeline;
     }
 
     private randRng = (min: number, max: number): number => {
@@ -230,6 +259,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
     }
 
     private getDateBounds = (vals: TimelineValueSet[]): [number,number] => {
+        const absmin = moment().subtract(5, 'years').valueOf();
         let min = moment(new Date()).valueOf();
         let max = min;
         for (const v of vals) {
@@ -247,7 +277,11 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                 }
             }
         }
-        return [ min, new Date().valueOf() ];
+        
+        if (min < absmin) { min = absmin; }
+        max = moment().add(6, 'month').valueOf();
+
+        return [ min * 0.999, max * 0.995 ];
     }
 
     private getValueSets = (): [ TimelineValueSet[], TimelineValueSet[] ] => {
@@ -280,6 +314,22 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                         <span className={`${c}-value`} style={{ color }}>{data[val.cols.fieldValueNumeric]}</span>}
                     </div>
                     <div className={`${c}-date`}>{moment(data[val.cols.fieldDate!]).format("MMM DD, YYYY")}</div>
+                    {val.ds.context && val.ds.context.fields.map((f,i) => {
+                        if (!data[f]) { return null; }
+                        return (
+                            <div key={i} className={`${c}-context-container`}>
+                                <span className={`${c}-context-field`}>{f}:</span>
+                                <span className={`${c}-context-value`}>
+                                    <Highlighter
+                                        highlightClassName='highlight'
+                                        searchWords={data[val.cols.fieldValueString!]?.split(',')}
+                                        autoEscape={true}
+                                        textToHighlight={data[f]}>
+                                    </Highlighter>
+                                </span>
+                            </div>
+                        );
+                    })}
                 </div>
           );
         }

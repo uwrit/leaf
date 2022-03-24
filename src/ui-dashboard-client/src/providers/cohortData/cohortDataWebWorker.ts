@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../../models/patientList/Dataset';
-//import { workerContext } from './cohortDataWebWorkerContext';
+import { workerContext } from './cohortDataWebWorkerContext';
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
@@ -58,7 +58,7 @@ export default class CohortDataWebWorker {
             var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = '${personId}';
             var encounterId = '${encounterId}';
-            //${this.stripFunctionToContext(this.workerContext)}
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -126,7 +126,7 @@ export default class CohortDataWebWorker {
                 const dateFields = dataset.schema.fields.filter((field: any) => field.type === typeDate).map((field: any) => field.name);
 
                 for (const patientId of Object.keys(dataset.results)) {
-                    const rows = dataset.results[patientId];
+                    let rows = dataset.results[patientId];
                     let patient = result.patients.get(patientId)!;
 
                     // Convert strings to dates
@@ -141,7 +141,7 @@ export default class CohortDataWebWorker {
                             }
                         }
                     }
-                    rows.sort(((a: any, b: any) => a[dsRef.dateValueColumn!] - b[dsRef.dateValueColumn!]));
+                    rows = rows.sort(((a: any, b: any) => a.__dateunix__ - b.__dateunix__));
                     patient.datasets.set(dsRef.id, rows);
                     result.patients.set(patientId, patient);
                     result.metadata.set(dsRef.id, meta);
