@@ -103,7 +103,7 @@ GO
 -- Create date: 2021/11/2
 -- Description: Gets app and db state and notifications, first deleting old notifications
 -- =======================================
-ALTER PROCEDURE [app].[sp_GetServerStateAndNotifications]
+CREATE PROCEDURE [app].[sp_GetServerStateAndNotifications]
 AS
 BEGIN
     SET NOCOUNT ON
