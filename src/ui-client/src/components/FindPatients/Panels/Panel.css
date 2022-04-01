@@ -36,6 +36,13 @@
     z-index: 100;
 }
 
+.panel-header-close {
+    font-size: 1.5rem;
+    left: 90%;
+    position: absolute;
+    z-index: 100;
+}
+
 /* Panel column (bootstrap Col) */
 .panel-column {
     padding: 0 4px !important;

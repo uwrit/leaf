@@ -11,10 +11,11 @@ import CountDropdown from './CountDropdown';
 import CustomDateRangePicker from './CustomDateRangePicker';
 import DateDropdown from './DateDropdown';
 import InclusionDropdown from './InclusionDropdown';
-import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown';
 import { PanelHandlers } from './PanelGroup';
+import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown';
 
 interface Props {
+    canRemove?: boolean;
     handlers: PanelHandlers;
     isFirst: boolean;
     panel: PanelModel;
@@ -26,6 +27,7 @@ interface State {
 }
 
 export default class PanelHeader extends React.PureComponent<Props, State> {
+    private className = 'panel-header';
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -34,11 +36,13 @@ export default class PanelHeader extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const { handlers, isFirst, panel } = this.props;
+        const { canRemove, handlers, isFirst, panel } = this.props;
         const { DOMRect, showCustomDateRangeBox } = this.state;
+        const c = this.className;
 
         return (
-            <div className="panel-header" id={`panel-header-${panel.index}`}>
+            <div className={c} id={`${c}-${panel.index}`}>
+                {canRemove && <div className={`${c}-close`} onClick={handlers.handleRemovePanel.bind(null, panel.index)}>✖</div>}
                 <InclusionDropdown 
                     handlers={handlers}
                     inclusionDropdownType={INCLUSION_DROPDOWN_TYPE.PANEL}

@@ -16,8 +16,8 @@ import { CohortStateType } from '../../../models/state/CohortState';
 import Panel from './Panel';
 import { NumericFilter } from '../../../models/panel/NumericFilter';
 import { 
-    deselectSpecialization, setPanelDateFilter, setPanelInclusion, setSubPanelCount, 
-    setSubPanelInclusion, selectSpecialization, addPanelItem, setPanelItemNumericFilter, hidePanelItem, removePanelItem, setSubPanelJoinSequence
+    deselectSpecialization, setPanelDateFilter, setPanelInclusion, setSubPanelCount, removePanel,
+    setSubPanelInclusion, selectSpecialization, addPanelItem, setPanelItemNumericFilter, hidePanelItem, removePanelItem, setSubPanelJoinSequence, 
 } from '../../../actions/panels';
 
 interface Props {
@@ -33,6 +33,7 @@ export interface PanelHandlers {
     handleSubPanelCount: (panelIndex: number, subpanelIndex: number, minCount: number) => void;
     handleDeselectSpecialization: (panelItem: PanelItem, conceptSpecializationGroup: ConceptSpecializationGroup) => void;
     handleSelectSpecialization: (panelItem: PanelItem, conceptSpecialization: ConceptSpecialization) => void;
+    handleRemovePanel: (panelIndex: number) => void;
     handleAddPanelItem: (concept: Concept, subPanel: SubPanel) => void;
     handlePanelItemNumericFilter: (panelItem: PanelItem, filter: NumericFilter) => void;
     handleHidePanelItem: (panelItem: PanelItem) => void;
@@ -60,6 +61,8 @@ export class PanelGroup extends React.PureComponent<Props> {
             panelRows.unshift(curr);
         }
 
+        const origRow = panelRows.length-1;
+
         return (
             panelRows.map((row, i) => {
                 const rowKey = row.map(p => p.id).join('');
@@ -68,7 +71,7 @@ export class PanelGroup extends React.PureComponent<Props> {
                     <Row key={rowKey} className={'panel-row'}>
                         {row.map((panel, j) =>
                             <Panel 
-                                canRemove={i > 0}
+                                canRemove={i !== origRow}
                                 maybeHandlers={handlers}
                                 key={panel.id} 
                                 isFirst={i === 0 && j === 0}
@@ -90,12 +93,19 @@ export class PanelGroup extends React.PureComponent<Props> {
             handleSubPanelCount: this.handleSubPanelCount,
             handleDeselectSpecialization: this.handleDeselectSpecialization,
             handleSelectSpecialization: this.handleSelectSpecialization,
+            handleRemovePanel: this.handleRemovePanel,
             handleAddPanelItem: this.handleAddPanelItem,
             handlePanelItemNumericFilter: this.handlePanelItemNumericFilter,
             handleHidePanelItem: this.handleHidePanelItem,
             handleRemovePanelItem: this.handleRemovePanelItem,
             handleSubPanelJoinSequence: this.handleSubPanelJoinSequence
         };
+    }
+
+    private handleRemovePanel = (panelIndex: number) => {
+        const { dispatch } = this.props;
+        console.log('handleRemovePanel', panelIndex);
+        dispatch(removePanel(panelIndex));
     }
 
     private handlePanelInclusion = (panelIndex: number, include: boolean) => {

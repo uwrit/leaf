@@ -30,7 +30,7 @@ export interface Props {
 
 export default class Panel extends React.PureComponent<Props> {
     public render() {
-        const { isFirst, panel, queryState, maybeHandlers } = this.props;
+        const { isFirst, panel, queryState, maybeHandlers, canRemove } = this.props;
         const isDateFiltered = 
             panel.dateFilter.end.dateIncrementType !== DateIncrementType.NONE && 
             panel.dateFilter.start.dateIncrementType !== DateIncrementType.NONE;
@@ -60,6 +60,7 @@ export default class Panel extends React.PureComponent<Props> {
             <Col className="panel-column" md={4}>
                 <div className={classes.join(' ')}>
                     <PanelHeader 
+                        canRemove={canRemove}
                         handlers={handlers}
                         isFirst={isFirst} 
                         panel={panel} 
@@ -87,6 +88,7 @@ export default class Panel extends React.PureComponent<Props> {
             handleSubPanelCount: this.handleSubPanelCount,
             handleDeselectSpecialization: this.handleDeselectSpecialization,
             handleSelectSpecialization: this.handleSelectSpecialization,
+            handleRemovePanel: this.handleRemovePanel,
             handleAddPanelItem: this.handleAddPanelItem,
             handlePanelItemNumericFilter: this.handlePanelItemNumericFilter,
             handleHidePanelItem: this.handleHidePanelItem,
@@ -101,6 +103,7 @@ export default class Panel extends React.PureComponent<Props> {
     private handleSubPanelCount = (panelIndex: number, subpanelIndex: number, minCount: number) => null as any;
     private handleDeselectSpecialization = (panelItem: PanelItem, conceptSpecializationGroup: ConceptSpecializationGroup) => null as any;
     private handleSelectSpecialization = (panelItem: PanelItem, conceptSpecialization: ConceptSpecialization) => null as any;
+    private handleRemovePanel = (panelIndex: number) => null as any;
     private handleAddPanelItem = (concept: Concept, subPanel: SubPanelModel) => null as any;
     private handlePanelItemNumericFilter = (panelItem: PanelItem, filter: NumericFilter) => null as any;
     private handleHidePanelItem = (panelItem: PanelItem) => null as any;

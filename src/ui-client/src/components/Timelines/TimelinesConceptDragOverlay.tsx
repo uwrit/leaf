@@ -227,6 +227,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
             handleSubPanelCount: (panelIndex: number, subpanelIndex: number, minCount: number) => null as any,
             handleDeselectSpecialization: this.handleDeselectSpecialization,
             handleSelectSpecialization: this.handleSelectSpecialization,
+            handleRemovePanel: () => null as any,
             handleAddPanelItem: (concept: Concept, subPanel: SubPanel) => null as any,
             handlePanelItemNumericFilter: this.handlePanelItemNumericFilter,
             handleHidePanelItem: (panelItem: PanelItem) => null as any,

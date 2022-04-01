@@ -37,6 +37,7 @@ type Props = DndProps & OwnProps
 const conceptNodeSource = {
     beginDrag(props: Props) {
         const { handlers, panelItem } = props;
+        console.log('dragging', panelItem);
         /*
          * Hide the panel item, but keep in DOM until drop event. This is needed
          * so React-dnd can detect the drop has occurred (and thus update UI correctly),

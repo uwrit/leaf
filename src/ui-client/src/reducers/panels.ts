@@ -258,29 +258,28 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
 };
 
 const addPanel = (state: Panel[]): Panel[] => {
-    const clone = state.slice();
-
-    // Increment indices
-    for (const panel of clone) {
-        panel.index += 1;
-        panel.subPanels[0].panelIndex += 1;
-    }
+    let clone = state.slice();
     clone.unshift(getDefaultPanel(0));
+    clone = reindex(clone);
 
     return clone;
 };
 
 const removePanel = (state: Panel[], panelIndex: number): Panel[] => {
-    const clone = state.slice();
+    let clone = state.slice();
     clone.splice(panelIndex, 1);
-
-    // Re-index
-    for (let i = 0; i < clone.length; i++) {
-        clone[i].index += 1;
-        clone[i].subPanels[0].panelIndex += 1;
-    }
+    clone = reindex(clone);
+    console.log(clone);
 
     return clone;
+};
+
+const reindex = (panels: Panel[]): Panel[] => {
+    for (let i = 0; i < panels.length; i++) {
+        panels[i] = Object.assign({}, panels[i], { index: i });
+        panels[i].subPanels[0] = Object.assign({}, panels[i].subPanels[0], { panelIndex: i });
+    }
+    return panels;
 };
 
 export const panels = (state: Panel[] = defaultPanelState(), action: any): Panel[] => {
