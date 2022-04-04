@@ -108,7 +108,7 @@ namespace Services.Cohort
                 queries.Add(q);
             }
 
-            log.LogInformation("Parallel SqlStatements:{Sql}", queries);
+            log.LogInformation("Parallel SqlStatements:{Sql}", queries.Select(q => q.SqlStatement));
 
             return queries;
         }
