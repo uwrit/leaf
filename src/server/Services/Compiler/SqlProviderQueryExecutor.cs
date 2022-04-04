@@ -256,9 +256,6 @@ namespace Services.Compiler
             CancellationToken token,
             IEnumerable<QueryParameter> parameters)
         {
-            Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "/Users/nicdobbins/work/leaf/bigquery_test/key.json");
-            var val = Environment.GetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS");
-
             var client = await BigQueryClient.CreateAsync(projectId);
             var results = await client.ExecuteQueryAsync(query, parameters: parameters.Select(p => ToSqlParameter(p)));
             
