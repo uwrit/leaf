@@ -36,17 +36,17 @@ namespace Services.Cohort
             this.compilerOpts = compilerOpts.Value;
         }
 
-        internal virtual string PersonIdTransformHandler(string personId) => personId;
+        internal virtual string PersonIdTransformHandler(string personId, string delim) => $"{delim}{personId}{delim}";
         internal virtual string ExportedTransformHandler(bool exported) => exported ? "1" : "0";
-        internal virtual string SaltTransformHandler(Guid salt) => salt.ToString();
+        internal virtual string SaltTransformHandler(Guid? salt, string delim) => salt.HasValue ? $"{delim}{salt}{delim}" : "null";
 
         internal virtual string InsertDelimitedRow(CachedCohortRecord rec, string delim = "'")
         {
-            var personId = PersonIdTransformHandler(rec.PersonId);
+            var personId = PersonIdTransformHandler(rec.PersonId, delim);
             var exported = ExportedTransformHandler(rec.Exported);
-            var salt = SaltTransformHandler(rec.Salt);
+            var salt = SaltTransformHandler(rec.Salt, delim);
 
-            return $"{delim}{personId}{delim}, {exported}, {delim}{salt}{delim}";
+            return $"{personId}, {exported}, {salt}";
         }
 
         internal IEnumerable<IEnumerable<T>> Batch<T>(IEnumerable<T> vals, int batchSize)

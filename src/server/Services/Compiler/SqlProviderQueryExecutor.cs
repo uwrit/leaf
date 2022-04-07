@@ -233,6 +233,8 @@ namespace Services.Compiler
      */
     public class BigQueryQueryExecutor : BaseQueryExecutor
     {
+        BigQueryClient Client = null;
+
         BigQueryDbType ToSqlType(object val)
         {
             if (val is string)  return BigQueryDbType.String;
@@ -256,8 +258,16 @@ namespace Services.Compiler
             CancellationToken token,
             IEnumerable<QueryParameter> parameters)
         {
-            var client = await BigQueryClient.CreateAsync(projectId);
-            var results = await client.ExecuteQueryAsync(query, parameters: parameters.Select(p => ToSqlParameter(p)));
+            if (Client == null)
+            {
+                Client = await BigQueryClient.CreateAsync(projectId);
+            }
+            
+            var results = await Client.ExecuteQueryAsync(
+                query,
+                parameters: parameters.Select(p => ToSqlParameter(p)),
+                cancellationToken: token
+            );
             
             return new BigQueryWrappedDbReader(results);
         }

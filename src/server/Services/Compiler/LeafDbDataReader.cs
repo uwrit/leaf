@@ -102,7 +102,7 @@ namespace Services.Compiler
                 }
                 return null;
             }
-            return reader.GetGuid(index);
+            return GetNullableGuid(index);
         }
 
         public bool GetCoercibleBoolean(int index)
@@ -274,6 +274,11 @@ namespace Services.Compiler
         public Guid? GetNullableCoercibleGuid(int index)
         {
             var strVal = row[index].ToString();
+            if (string.IsNullOrWhiteSpace(strVal))
+            {
+                return null;
+            }
+
             var success = Guid.TryParse(strVal, out Guid guid);
             if (success)
             {
