@@ -61,7 +61,7 @@ export default class AggregateDemographics extends React.PureComponent<Props> {
                             width={colWidth}
                         />
                     </Col>
-                    <Col lg={6} md={12} className="visualization-religion-container">
+                    <Col lg={6} md={12} className="visualization-ataglance-container">
                         <SectionHeader headerText="Religious Beliefs" />
                         <Religion
                             counts={religionData} 
