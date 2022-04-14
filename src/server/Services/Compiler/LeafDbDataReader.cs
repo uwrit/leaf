@@ -195,6 +195,7 @@ namespace Services.Compiler
 
     public class BigQueryWrappedDbReader : ILeafDbDataReader
     {
+        readonly IEnumerable<BigQueryRow> rows;
         readonly BigQueryResults results;
         Dictionary<string, int?> colByOrdinal;
         BigQueryRow row;
@@ -212,10 +213,11 @@ namespace Services.Compiler
             get => row[colName];
         }
 
-        public BigQueryWrappedDbReader(BigQueryResults results)
+        public BigQueryWrappedDbReader(BigQueryResults results, IEnumerable<BigQueryRow> rows)
         {
             this.results = results;
-            this.totalRows = Convert.ToInt32(results.TotalRows);
+            this.rows = rows;
+            this.totalRows = Convert.ToInt32(rows.Count());
             GetColumnSchema();
         }
 
@@ -223,7 +225,7 @@ namespace Services.Compiler
         {
             if (rowIndex < totalRows)
             {
-                row = results.ElementAt(rowIndex);
+                row = rows.ElementAt(rowIndex);
                 rowIndex++;
                 return true;
             }

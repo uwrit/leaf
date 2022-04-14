@@ -234,6 +234,7 @@ namespace Services.Compiler
     public class BigQueryQueryExecutor : BaseQueryExecutor
     {
         BigQueryClient Client = null;
+        readonly GetQueryResultsOptions Opts = new GetQueryResultsOptions() { PageSize = 10000 };
 
         BigQueryDbType ToSqlType(object val)
         {
@@ -262,14 +263,21 @@ namespace Services.Compiler
             {
                 Client = await BigQueryClient.CreateAsync(projectId);
             }
-            
+
             var results = await Client.ExecuteQueryAsync(
                 query,
                 parameters: parameters.Select(p => ToSqlParameter(p)),
-                cancellationToken: token
+                null,
+                Opts
             );
+
+            var rows = new List<BigQueryRow>();
+            await foreach(var row in results.GetRowsAsync())
+            {
+                rows.Add(row);
+            }
             
-            return new BigQueryWrappedDbReader(results);
+            return new BigQueryWrappedDbReader(results, rows);
         }
     }
 }
