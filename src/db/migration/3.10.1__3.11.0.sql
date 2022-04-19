@@ -17,7 +17,7 @@ GO
 -- Create date: 2022/2/1
 -- Description: Retrieves a cohort by Id.
 -- =======================================
-CREATE PROCEDURE [app].[sp_GetCohortById]
+ALTER PROCEDURE [app].[sp_GetCohortById]
     @id [uniqueidentifier],
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
@@ -47,7 +47,8 @@ BEGIN
 		INSERT INTO @result (QueryId, PersonId, Exported, Salt)
 		SELECT C.QueryId, C.PersonId, C.Exported, C.Salt
 		FROM app.Cohort AS C
-        WHERE (@exportedOnly = 0 OR Exported = 1)
+        WHERE C.QueryId = @id
+              AND (@exportedOnly = 0 OR Exported = 1)
 	ELSE
 		BEGIN
 			-- permission filter
