@@ -6,6 +6,7 @@
  */ 
 
 export interface PatientCountDTO {
+    cached: boolean;
     queryId: string;
     preflight: PreflightCheckDTO;
     result: PatientCountResultDTO;

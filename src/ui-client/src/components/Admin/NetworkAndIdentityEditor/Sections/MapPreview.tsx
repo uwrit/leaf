@@ -45,7 +45,7 @@ export class MapPreview extends React.Component<Props, State> {
         const { identity, tileUrl } = this.props;
         const { ref } = this.state;
         const latLng = this.getLatLng();
-        const dummyCount = { value: 1000, plusMinus: 0, queryId: '', withinLowCellThreshold: false, sqlStatements: [] as any, state: CohortStateType.LOADED };
+        const dummyCount = { cached: false, value: 1000, plusMinus: 0, queryId: '', withinLowCellThreshold: false, sqlStatements: [] as any, state: CohortStateType.LOADED };
 
         if (!tileUrl || !latLng || !latLng.lat || !latLng.lng ) { return null; }
     

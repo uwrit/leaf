@@ -41,6 +41,7 @@ export const COHORT_DEMOGRAPHICS_ERROR = 'COHORT_DEMOGRAPHICS_ERROR';
 
 export interface CohortCountAction {
     id: number;
+    cached?: boolean;
     cancel?: CancelTokenSource;
     cohorts?: NetworkIdentity[];
     countResults?: PatientCountState;
@@ -58,6 +59,7 @@ export interface CohortCountAction {
 export const getCounts = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         let atLeastOneSucceeded = false;
+        let atleastOneCached = false;
         const state = getState();
         const runLocalOnly = panelHasLocalOnlyConcepts(state.panels, state.panelFilters);
         const cancelSource = Axios.CancelToken.source();
@@ -94,12 +96,14 @@ export const getCounts = () => {
 
                                 const countData: PatientCountState = {
                                     ...countDataDto.result,
+                                    cached: countDataDto.cached,
                                     queryId: countDataDto.queryId,
                                     sqlStatements: [ formatMultipleSql(countDataDto.result.sqlStatements) ],
                                     state: CohortStateType.LOADED
                                 }
                                 queryId = countData.queryId;
                                 atLeastOneSucceeded = true;
+                                atleastOneCached = countData.cached === true ? true : atleastOneCached;
                                 dispatch(setNetworkCohortCount(nr.id, countData));
                                 
                         },  error => {
@@ -117,7 +121,7 @@ export const getCounts = () => {
         ).then( async () => {
 
             if (getState().cohort.count.state !== CohortStateType.REQUESTING) { return; }
-            dispatch(setCohortCountFinished(atLeastOneSucceeded));
+            dispatch(setCohortCountFinished(atLeastOneSucceeded, atleastOneCached));
 
             if (atLeastOneSucceeded) {
                 const visibleDatasets = await allowAllDatasets();
@@ -201,7 +205,8 @@ export const getDemographicsIfNeeded = () => {
             state.cohort.patientList.state === CohortStateType.NOT_LOADED &&
             (
                 (state.cohort.networkCohorts.size === 1 && state.cohort.count.value <= state.auth.config!.cohort.cacheLimit) ||
-                state.cohort.networkCohorts.size > 1
+                (state.cohort.networkCohorts.size > 1) ||
+                (state.cohort.networkCohorts.size === 1 && state.cohort.count.value > state.auth.config!.cohort.lowCellMaskingThreshold)
             )
         ) {
             dispatch(getDemographics());
@@ -241,10 +246,11 @@ export const setCohortCountStarted = (responders: NetworkResponderMap, cancel: C
     };
 };
 
-export const setCohortCountFinished = (success: boolean): CohortCountAction => {
+export const setCohortCountFinished = (success: boolean, cached: boolean): CohortCountAction => {
     return {
         id: 0,
         success,
+        cached,
         type: COHORT_COUNT_FINISH
     };
 } 
