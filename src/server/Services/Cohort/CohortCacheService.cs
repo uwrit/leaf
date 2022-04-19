@@ -64,12 +64,9 @@ namespace Services.Cohort
                     int exportLimit = cohortOptions.ExportLimit;
                     var lowcell = deidentOptions.Cohort.LowCellSizeMasking;
 
-                    if (lowcell.Enabled)
+                    if (lowcell.Enabled && cohort.Count <= lowcell.Threshold)
                     {
-                        if (cohort.Count <= lowcell.Threshold)
-                        {
-                            exportLimit = 0;
-                        }
+                        exportLimit = 0;
                     }
 
                     var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(exportLimit, queryId));
