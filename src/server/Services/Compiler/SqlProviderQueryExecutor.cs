@@ -271,6 +271,7 @@ namespace Services.Compiler
                 Opts
             );
 
+            // Eagerly fetch all results in memory
             var rows = new List<BigQueryRow>();
             await foreach(var row in results.GetRowsAsync())
             {

@@ -69,6 +69,7 @@ namespace Model.Schema
             public const string Bit = "bit";
             public const string Boolean = "boolean";
             public const string Character = "character";
+            public const string CharacterVarying = "character varying";
             public const string Cidr = "cidr";
             public const string Date = "date";
             public const string Double = "double";
@@ -87,6 +88,7 @@ namespace Model.Schema
             public const string Text = "text";
             public const string Time = "time";
             public const string TimeStamp = "timestamp";
+            public const string TimeStampWithoutTimeZone = "timestamp without time zone";
             public const string Uuid = "uuid";
             public const string Xml = "xml";
         }
@@ -190,6 +192,7 @@ namespace Model.Schema
                 case Oracle.Varchar2:
                 case Oracle.Character:
                 case PostgreSql.Cidr:
+                case PostgreSql.CharacterVarying:
                 case PostgreSql.Inet:
                 case PostgreSql.MacAddr:
                 case PostgreSql.Json:
@@ -203,6 +206,7 @@ namespace Model.Schema
                 case SqlServer.DateTime2:
                 case MySql.TimeStamp:
                 case BigQuery.TimeZone:
+                case PostgreSql.TimeStampWithoutTimeZone:
                     return LeafType.DateTime;
 
                 case SqlServer.Bit:
