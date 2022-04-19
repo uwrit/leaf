@@ -17,7 +17,7 @@ GO
 -- Create date: 2022/2/1
 -- Description: Retrieves a cohort by Id.
 -- =======================================
-ALTER PROCEDURE [app].[sp_GetCohortById]
+CREATE PROCEDURE [app].[sp_GetCohortById]
     @id [uniqueidentifier],
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
