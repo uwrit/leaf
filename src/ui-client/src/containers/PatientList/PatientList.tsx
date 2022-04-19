@@ -84,6 +84,20 @@ class PatientList extends React.PureComponent<Props, State> {
         if (cohort.networkCohorts.size === 1 && cohort.count.value > cacheLimit) {
             return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
+
+        /**
+         * Block visualize when under lowcellmasking threshold
+         */
+         if (cohort.networkCohorts.size === 1 && cohort.count.value <= auth.config.cohort.lowCellMaskingThreshold) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>
+                        Sorry, your administrator has configured Leaf to not show Patient Lists for cohorts of {auth.config.cohort.lowCellMaskingThreshold} patients or less.
+                    </p>
+                </div>
+            );
+        } 
+
         /*
          * Show a loading spinner if no responders have completed yet.
          */
@@ -93,8 +107,9 @@ class PatientList extends React.PureComponent<Props, State> {
                     <LoaderIcon size={100} />
                 </div>
             );
+
         /*
-         * Show the failure .
+         * Show the failure
          */
         } else if (cohort.patientList.state === CohortStateType.IN_ERROR) {
             return (

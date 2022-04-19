@@ -28,22 +28,26 @@ namespace Services.Cohort
 
         readonly AppDbOptions dbOptions;
         readonly CohortOptions cohortOptions;
+        readonly DeidentificationOptions deidentOptions;
         readonly ILogger<PatientCohortService> logger;
 
         public CohortCacheService(
             IOptions<AppDbOptions> appDbOptions,
             IOptions<CohortOptions> cohortOptions,
+            IOptions<DeidentificationOptions> deidentOptions,
             ILogger<PatientCohortService> logger
         )
         {
             dbOptions = appDbOptions.Value;
             this.cohortOptions = cohortOptions.Value;
+            this.deidentOptions = deidentOptions.Value;
             this.logger = logger;
         }
 
-        public async Task<Guid> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user)
+        public async Task<CohortCounter.CacheCohortResult> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user)
         {
             var nonce = NonceOrThrowIfNull(user);
+            var rowCount = 0;
             using (var cn = new SqlConnection(dbOptions.ConnectionString))
             {
                 await cn.OpenAsync();
@@ -57,7 +61,19 @@ namespace Services.Cohort
 
                 if (cohort.Any() && cohort.Count <= cohortOptions.RowLimit)
                 {
-                    var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(cohortOptions.ExportLimit, queryId));
+                    int exportLimit = cohortOptions.ExportLimit;
+                    var lowcell = deidentOptions.Cohort.LowCellSizeMasking;
+
+                    if (lowcell.Enabled)
+                    {
+                        if (cohort.Count <= lowcell.Threshold)
+                        {
+                            exportLimit = 0;
+                        }
+                    }
+
+                    var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(exportLimit, queryId));
+                    rowCount = cohortTable.Rows.Count();
 
                     using (var bc = new SqlBulkCopy(cn))
                     {
@@ -67,7 +83,11 @@ namespace Services.Cohort
                     }
                 }
 
-                return queryId;
+                return new CohortCounter.CacheCohortResult()
+                {
+                    QueryId = queryId,
+                    Cached = rowCount > 0
+                };
             }
         }
 

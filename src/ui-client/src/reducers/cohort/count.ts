@@ -13,6 +13,7 @@ import { defaultVisualizationState } from './visualize';
 
 export const defaultCountState = (): PatientCountState => {
     return {
+        cached: false,
         queryId: '',
         plusMinus: 0,
         sqlStatements: [],

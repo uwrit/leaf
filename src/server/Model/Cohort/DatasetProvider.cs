@@ -106,10 +106,6 @@ namespace Model.Cohort
             {
                 throw new Exception("Patient List datasets are disabled");
             }
-            if (deidentOpts.Cohort.Noise.Enabled)
-            {
-                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Noise is enabled");
-            }
         }
 
         public class Result

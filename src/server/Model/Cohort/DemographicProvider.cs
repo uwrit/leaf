@@ -133,10 +133,6 @@ namespace Model.Cohort
             {
                 throw new Exception("Demographics cannot be returned if Cohort De-identification Noise is enabled");
             }
-            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
-            {
-                throw new Exception("Demographics cannot be returned if Cohort De-identification Low Cell Size Masking is enabled");
-            }
         }
 
         // DemographicProvider associated Result type.

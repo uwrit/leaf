@@ -49,6 +49,7 @@ export enum CustomAttestationType {
 interface CohortConfigDTO {
     cacheLimit: number;
     exportLimit: number;
+    lowCellMaskingThreshold: number;
     deidentificationEnabled: boolean;
 }
 
