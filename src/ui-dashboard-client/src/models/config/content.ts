@@ -90,7 +90,27 @@ interface WidgetTimelineExportConfig {
 };
 
 interface WidgetTimelineComparisonConfig {
-    columnText: string;
+    dimensions?: WidgetTimelineComparisonEntryConfig[];
     enabled: boolean;
     title: string;
 };
+
+export interface WidgetTimelineComparisonEntryConfig {
+    args?: WidgetTimelineComparisonArgs;
+    datasetId: string;
+    column: string;
+}
+
+interface WidgetTimelineComparisonArgs {
+    numeric?: WidgetTimelineComparisonNumericArgs;
+    string?: WidgetTimelineComparisonStringArgs;
+}
+
+interface WidgetTimelineComparisonNumericArgs {
+    pad?: number;
+}
+
+interface WidgetTimelineComparisonStringArgs {
+    matchOn?: string[];
+    pickerDisplayColumn?: string;
+}

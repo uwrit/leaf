@@ -10,7 +10,7 @@ import { CohortData, CohortStateType } from '../models/state/CohortState';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { AppState } from '../models/state/AppState';
 import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../services/cohortApi';
-import { transform } from '../services/cohortDataApi';
+import { getComparisonMeans, transform } from '../services/cohortDataApi';
 import { getDependentDatasets } from '../utils/dynamic';
 import { indexPatients, searchPatients } from '../services/patientSearchApi';
 import { fetchDashboardConfigurations } from '../services/configApi';
@@ -41,9 +41,12 @@ export const getCohortDatasets = (cohortId: string) => {
         // Get available dashboard configs
         const configs = await fetchDashboardConfigurations(state);
         if (configs.length) {
+            dispatch(setDashboardConfig(config));
+            /*
             dispatch(setDashboardConfig(configs[0]));
             console.log(JSON.stringify(config));
             console.log(JSON.stringify(configs[0]));
+            */
         }
 
         const datasetIds = getDependentDatasets(getState().config.patient.content);

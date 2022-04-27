@@ -32,7 +32,7 @@ class Patient extends React.Component<Props> {
 
         // Bail if no data
         if (!cohort || !config || !patientId) { return null; }
-        const { metadata, patients } = cohort.data;
+        const { metadata, patients, comparison } = cohort.data;
         const patient = patients.get(patientId);
 
         // Bail if no patient - TODO(ndobb) should be 404
@@ -46,7 +46,7 @@ class Patient extends React.Component<Props> {
 
                 {/* Dynamically read & render content */}
                 <div className={`${c}-content-container`}>
-                    {config.content.map((content, i) => renderDynamicComponent(content, patient, metadata, i))}
+                    {config.content.map((content, i) => renderDynamicComponent(content, cohort.data, patient, i))}
                 </div>
             </div>
         );

@@ -19,7 +19,8 @@ export function defaultCohortState(): CohortState {
     return { 
         data: {
             metadata: new Map(),
-            patients: new Map()
+            patients: new Map(),
+            comparison: new Map()
         },
         search: {
             hints: [],

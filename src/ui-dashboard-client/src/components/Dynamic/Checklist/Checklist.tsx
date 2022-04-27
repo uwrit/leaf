@@ -1,7 +1,7 @@
 import React from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import { WidgetChecklistConfig, ContentChecklistDatasetConfig } from '../../../models/config/content';
-import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
+import { CohortData, PatientData } from '../../../models/state/CohortState';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
 import DynamicChecklistItem from './ChecklistItem';
 import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
@@ -9,8 +9,8 @@ import './Checklist.css';
 
 interface Props {
     config: WidgetChecklistConfig;
+    cohort: CohortData;
     patient: PatientData;
-    metadata: Map<DatasetId, DatasetMetadata>;
 }
 
 interface State {
@@ -108,14 +108,14 @@ export default class DynamicChecklist extends React.Component<Props, State> {
      * Get checklist items for currently selected checklist
      */
     private getChecklistItems = (): JSX.Element | null => {
-        const { patient, metadata } = this.props;
+        const { patient, cohort } = this.props;
         const { selectedDatasetConfig } = this.state;
         const className = `${this.className}-item-container`;
         
         if (!selectedDatasetConfig || !patient.datasets.has(selectedDatasetConfig.id)) { return null; }
 
         const { items } = selectedDatasetConfig;
-        const meta = metadata.get(selectedDatasetConfig.id);
+        const meta = cohort.metadata.get(selectedDatasetConfig.id);
         const data = patient.datasets.get(selectedDatasetConfig.id);
         const cols = getDatasetMetadataColumns(meta!);
 

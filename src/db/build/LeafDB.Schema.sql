@@ -753,26 +753,6 @@ CREATE TABLE [app].[ConceptTokenizedIndex](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [app].[Dashboard]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-CREATE TABLE [app].[Dashboard](
-	[Id] [uniqueidentifier] NOT NULL,
-	[JsonConfig] [nvarchar](max) NOT NULL,
-	[UiDisplayName] [nvarchar](200) NOT NULL,
-	[UiDisplayDescription] [nvarchar](4000) NOT NULL,
-	[Created] [datetime] NOT NULL,
-	[CreatedBy] [nvarchar](1000) NOT NULL,
-	[Updated] [datetime] NOT NULL,
-	[UpdatedBy] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK__Dashboard] PRIMARY KEY CLUSTERED 
-(
-	[Id] ASC
-)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
-) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
-GO
 /****** Object:  Table [app].[DatasetQuery]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -1491,8 +1471,6 @@ GO
 ALTER TABLE [app].[Concept] ADD  CONSTRAINT [DF_Concept_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
 ALTER TABLE [app].[Concept] ADD  CONSTRAINT [DF_Concept_AddDateTime]  DEFAULT (getdate()) FOR [AddDateTime]
-GO
-ALTER TABLE [app].[Dashboard] ADD  CONSTRAINT [DF_Dashboard_]  DEFAULT (newid()) FOR [Id]
 GO
 ALTER TABLE [app].[DatasetQuery] ADD  CONSTRAINT [DF_DatasetQuery_Id]  DEFAULT (newsequentialid()) FOR [Id]
 GO
@@ -5307,6 +5285,92 @@ END
 
 
 GO
+/****** Object:  StoredProcedure [app].[sp_GetCohortById]    Script Date: ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2022/2/1
+-- Description: Retrieves a cohort by Id.
+-- =======================================
+CREATE PROCEDURE [app].[sp_GetCohortById]
+    @id [uniqueidentifier],
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @exportedOnly bit,
+	@admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @result TABLE (
+        QueryId UNIQUEIDENTIFIER NOT NULL,
+        PersonId nvarchar(200) NOT NULL,
+        Exported bit NOT NULL,
+        Salt UNIQUEIDENTIFIER
+    );
+
+    -- if not found
+    IF @id IS NULL
+    BEGIN
+        SELECT QueryId, PersonId, Exported, Salt
+        FROM @result;
+        RETURN;
+    END;
+
+	-- Admin can access any query
+	IF (@admin = 1)
+		INSERT INTO @result (QueryId, PersonId, Exported, Salt)
+		SELECT C.QueryId, C.PersonId, C.Exported, C.Salt
+		FROM app.Cohort AS C
+        WHERE C.QueryId = @id
+              AND (@exportedOnly = 0 OR Exported = 1)
+	ELSE
+		BEGIN
+			-- permission filter
+			WITH permitted AS (
+				-- user based constraint
+				SELECT
+					QueryId
+				FROM auth.QueryConstraint
+				WHERE QueryId = @id
+				AND ConstraintId = 1
+				AND ConstraintValue = @user
+				UNION
+				-- group base constraint
+				SELECT
+					QueryId
+				FROM auth.QueryConstraint
+				WHERE QueryId = @id
+				AND ConstraintId = 2
+				AND ConstraintValue IN (SELECT [Group] FROM @groups)
+			)
+			INSERT INTO @result (QueryId, PersonId, Exported, Salt)
+			SELECT C.QueryId, C.PersonId, C.Exported, C.Salt
+		    FROM app.Cohort AS C
+                 INNER JOIN app.Query AS Q ON C.QueryId = Q.Id
+			WHERE (Q.[Owner] = @user OR Q.Id IN (SELECT Id FROM permitted))
+				  AND Q.Id = @id
+                  AND (@exportedOnly = 0 OR Exported = 1);
+		END
+
+    -- did not pass filter
+    IF (SELECT COUNT(*) FROM @result) < 1
+		BEGIN
+			DECLARE @secmsg nvarchar(400) = @user + ' not permitted to query ' + CONVERT(NVARCHAR(100), @id);
+			THROW 70403, @secmsg, 1
+		END;
+
+    -- return
+    SELECT QueryId, PersonId, Exported, Salt
+    FROM @result;
+END
+
+
+GO
 /****** Object:  StoredProcedure [app].[sp_GetConceptById]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
@@ -5864,33 +5928,6 @@ BEGIN
     WHERE Q.UniversalId = @queryuid;
 
     EXEC [app].[sp_GetContextById] @qid, @user, @groups, @admin
-
-END
-
-GO
-/****** Object:  StoredProcedure [app].[sp_GetDashboardConfig]    Script Date: ******/
-SET ANSI_NULLS ON
-GO
-SET QUOTED_IDENTIFIER ON
-GO
-
--- =======================================
--- Author:      Nic Dobbins
--- Create date: 2021/12/3
--- Description: Gets JSON dashboard configuration
--- =======================================
-CREATE PROCEDURE [app].[sp_GetDashboardConfig]
-    @id uniqueidentifier,
-    @user auth.[User],
-    @groups auth.GroupMembership READONLY,
-    @admin bit = 0
-AS
-BEGIN
-    SET NOCOUNT ON
-
-    SELECT TOP 1 D.Id, D.JsonConfig, D.UiDisplayName, D.UiDisplayDescription
-    FROM [app].[Dashboard] AS D
-    WHERE D.Id = @id
 
 END
 
@@ -6646,6 +6683,7 @@ BEGIN
 
     EXEC app.sp_HydrateConceptsByIds @allowed;
 END
+
 
 
 
@@ -7592,6 +7630,10 @@ BEGIN
     -- Notifications
     SELECT Id, [Message]
     FROM app.Notification
+
+    -- Version
+    SELECT [Version]
+    FROM ref.Version
 
 END
 

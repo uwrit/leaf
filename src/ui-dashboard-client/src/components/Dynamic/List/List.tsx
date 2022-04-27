@@ -2,15 +2,15 @@ import moment from 'moment';
 import React from 'react';
 import { Row, Col, Container } from 'reactstrap';
 import { WidgetListConfig } from '../../../models/config/content';
-import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
+import { CohortData, PatientData } from '../../../models/state/CohortState';
 import { getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import { getDynamicColor, getDynamicIcon } from '../../../utils/dynamic';
 import './List.css';
 
 interface Props {
     config: WidgetListConfig;
+    cohort: CohortData;
     patient: PatientData;
-    metadata: Map<DatasetId, DatasetMetadata>;
 }
 
 export default class DynamicList extends React.Component<Props> {
@@ -20,9 +20,9 @@ export default class DynamicList extends React.Component<Props> {
      * Render
      */
     public render() {
-        const { config, patient, metadata } = this.props;
+        const { config, cohort } = this.props;
         const c = this.className;
-        const meta = metadata.get(config.datasetId);
+        const meta = cohort.metadata.get(config.datasetId);
 
         if (!meta) { return null; }
 
@@ -68,8 +68,8 @@ export default class DynamicList extends React.Component<Props> {
      * Get items
      */
     private getItems = (): JSX.Element | null => {
-        const { config, patient, metadata } = this.props;
-        const meta = metadata.get(config.datasetId);
+        const { config, cohort, patient } = this.props;
+        const meta = cohort.metadata.get(config.datasetId);
         const data = patient.datasets.get(config.datasetId);
         const c = this.className;
 

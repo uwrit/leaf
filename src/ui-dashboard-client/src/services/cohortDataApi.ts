@@ -5,10 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { CohortData, CohortState } from '../models/state/CohortState';
+import { CohortData } from '../models/state/CohortState';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../models/patientList/Dataset';
 import CohortDataWebWorker from '../providers/cohortData/cohortDataWebWorker';
+import { WidgetTimelineComparisonEntryConfig } from '../models/config/content';
 
 const cohortDataProvider = new CohortDataWebWorker();
 
@@ -18,4 +19,11 @@ export const transform = async (
     : Promise<CohortData> => {
     const transformed = await cohortDataProvider.transform(datasets, demographics);
     return transformed as CohortData;
+};
+
+export const getComparisonMeans = async (
+    dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string) 
+    : Promise<Map<string, Map<string, number>>> => {
+    const means = await cohortDataProvider.getCohortMean(dimensions, sourcePatId);
+    return means as Map<string, Map<string, number>>;
 };

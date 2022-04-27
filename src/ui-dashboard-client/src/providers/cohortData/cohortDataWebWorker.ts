@@ -11,9 +11,12 @@ import { workerContext } from './cohortDataWebWorkerContext';
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
-import { CohortData, DatasetMetadata } from '../../models/state/CohortState';
+import { CohortData, DatasetMetadata, PatientData } from '../../models/state/CohortState';
+import { WidgetTimelineComparisonEntryConfig } from '../../models/config/content';
+import { resourceLimits } from 'worker_threads';
 
 const TRANSFORM = 'TRANSFORM';
+const GET_COHORT_MEAN = 'GET_COHORT_MEAN';
 
 const typeString = PatientListColumnType.String;
 const typeNum = PatientListColumnType.Numeric;
@@ -22,7 +25,9 @@ const typeSparkline = PatientListColumnType.Sparkline;
 
 interface InboundMessagePartialPayload {
     data?: [PatientListDatasetQueryDTO, PatientListDatasetDTO];
+    dimensions?: WidgetTimelineComparisonEntryConfig[];
     demographics?: DemographicRow[];
+    sourcePatId?: string;
     message: string;
 }
 
@@ -51,14 +56,14 @@ export default class CohortDataWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ TRANSFORM ])}
+            ${this.addMessageTypesToContext([ TRANSFORM, GET_COHORT_MEAN ])}
             var typeString = ${PatientListColumnType.String};
             var typeNum = ${PatientListColumnType.Numeric};
             var typeDate = ${PatientListColumnType.DateTime};
             var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = '${personId}';
             var encounterId = '${encounterId}';
-            ${workerContext}
+            ${/* workerContext */ this.stripFunctionToContext(this.workerContext)}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -71,6 +76,10 @@ export default class CohortDataWebWorker {
 
     public transform = (data: [PatientListDatasetQueryDTO, PatientListDatasetDTO], demographics: DemographicRow[]) => {
         return this.postMessage({ message: TRANSFORM, data, demographics });
+    }
+
+    public getCohortMean = (dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string) => {
+        return this.postMessage({ message: GET_COHORT_MEAN, dimensions, sourcePatId });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -107,27 +116,160 @@ export default class CohortDataWebWorker {
             switch (payload.message) {
                 case TRANSFORM:
                     return transform(payload);
+                case GET_COHORT_MEAN:
+                    return getCohortMean(payload);
                 default:
                     return null;
             }
         };
 
+        let cohortData: CohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+        let datasets: Map<string, [PatientListDatasetQueryDTO, PatientListDatasetDTO]>;
+
+        const getCohortMean = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { dimensions, sourcePatId, requestId } = payload;
+            const result: Map<string, Map<string, number>> = new Map();
+            const matches = getMatchingPatients(dimensions!, sourcePatId!);
+
+            for (const dim of dimensions!) {
+                const mean = getMeanValue(matches, dim);
+                if (result.has(dim.datasetId)) {
+                    result.get(dim.datasetId)!.set(dim.column, mean);
+                } else {
+                    result.set(dim.datasetId, new Map([[ dim.column, mean ]]));
+                }
+            }
+
+            return { result, requestId };
+        };
+
+        const getMeanValue = (patIds: string[], dim: WidgetTimelineComparisonEntryConfig): number => {
+            let n = 0;
+            let sum = 0.0;
+            for (const p of patIds) {
+                const d = cohortData.patients.get(p)!;
+                const ds = d.datasets.get(dim.datasetId);
+                if (ds) {
+                    const vals = ds.filter(x => x[dim.column]);
+                    if (vals.length) {
+                        n++;
+                        sum += vals[-1] as any;
+                    }
+                }
+            }
+
+            return sum / n;
+        };
+
+        const getMatchingPatients = (dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string): string[] => {
+            const matched: Set<string> = new Set();
+            const elig = new Map(cohortData.patients);
+            const sourcePat = cohortData.patients.get(sourcePatId);
+            const all = () => [ ...cohortData.patients.keys() ];
+
+            if (!sourcePat) return all();
+            for (const dim of dimensions) {
+                
+                // Check dataset
+                const ds = datasets.get(dim.datasetId);
+                if (!ds) return all();
+
+                // Check column
+                const col = ds[1].schema.fields.find(f => f.name === dim.column);
+                if (!col) return all();
+
+                // Get matching func
+                const matcher = (col.type === typeNum
+                    ? matchNum : matchString)(dim, sourcePat);
+
+                // Check each patient
+                for (const pat of elig) {
+                    const matched = matcher(pat[1]);
+                    if (!matched) {
+                        elig.delete(pat[0]);
+                    }
+                }
+            }
+
+            return [ ...matched.keys() ];
+        };
+
+        const matchString = (dim: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
+            const defaultMatchFunc = (pat: PatientData) => true;
+            let matchOn = new Set();
+            let matchUnq = 1;
+
+            if (dim.args && dim.args.string && dim.args.string.matchOn && dim.args.string.matchOn.length > 0) {
+                matchOn = new Set(dim.args.string.matchOn);
+                matchUnq = matchOn.size;
+            } else {
+                const ds = sourcePat.datasets.get(dim.datasetId);
+                if (!ds) return defaultMatchFunc;
+
+                const val = ds.find(r => r[dim.column]);
+                if (!val) return defaultMatchFunc;
+
+                matchOn = new Set([ val[dim.column] ]);
+            }
+
+            return (pat: PatientData): boolean => {
+                const ds = pat.datasets.get(dim.datasetId);
+                if (!ds) return false;
+
+                const vals = ds.filter(r => matchOn.has(r[dim.column])).map(r => r[dim.column]);
+                if (vals.length === 0) return false;
+
+                const unq = new Set(vals).size;
+                if (unq === matchUnq) return true;
+                return false;
+            }
+        };
+
+        const matchNum = (dim: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
+            const defaultMatchFunc = (pat: PatientData) => true;
+
+            const ds = sourcePat.datasets.get(dim.datasetId);
+            if (!ds) return defaultMatchFunc;
+
+            const val = ds.find(r => r[dim.column]);
+            if (!val) return defaultMatchFunc;
+
+            let boundLow = val[dim.column] as any;
+            let boundHigh = boundLow;
+
+            if (dim.args && dim.args.numeric && dim.args.numeric.pad) {
+                boundLow -= dim.args.numeric.pad;
+                boundHigh += dim.args.numeric.pad;
+            }
+
+            return (pat: PatientData): boolean => {
+                const ds = pat.datasets.get(dim.datasetId);
+                if (!ds) return false;
+
+                const val = ds.find(r => r[dim.column] as any >= boundLow && r[dim.column] as any <= boundHigh);
+                if (!val) return false;
+                return true;
+            }
+        };
+
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { data, demographics, requestId } = payload;
-            const result: CohortData = { patients: new Map(), metadata: new Map() };
+            let cohortData = { patients: new Map(), metadata: new Map() };
+            datasets = new Map();
 
             for (const row of demographics!) {
-                result.patients.set(row.personId, { demographics: row, datasets: new Map() });
+                cohortData.patients.set(row.personId, { demographics: row, datasets: new Map() });
             };
 
             for (const pair of data!) {
                 const [ dsRef, dataset ] = pair as any;
                 const meta: DatasetMetadata = { ref: dsRef, schema: dataset.schema };
                 const dateFields = dataset.schema.fields.filter((field: any) => field.type === typeDate).map((field: any) => field.name);
+                datasets.set(dsRef.id, [ dsRef, dataset ]);
 
                 for (const patientId of Object.keys(dataset.results)) {
                     let rows = dataset.results[patientId];
-                    let patient = result.patients.get(patientId)!;
+                    let patient = cohortData.patients.get(patientId)!;
 
                     // Convert strings to dates
                     for (let j = 0; j < rows.length; j++) {
@@ -143,12 +285,13 @@ export default class CohortDataWebWorker {
                     }
                     rows = rows.sort(((a: any, b: any) => a.__dateunix__ - b.__dateunix__));
                     patient.datasets.set(dsRef.id, rows);
-                    result.patients.set(patientId, patient);
-                    result.metadata.set(dsRef.id, meta);
+                    patient.datasets.set("demographics", [ patient.demographics ]);
+                    cohortData.patients.set(patientId, patient);
+                    cohortData.metadata.set(dsRef.id, meta);
                 }
             }
 
-            return { result, requestId };
+            return { result: cohortData, requestId };
         }
 
         /**

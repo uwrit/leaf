@@ -27,6 +27,7 @@ export interface CohortSearch {
 export interface CohortData {
     patients: Map<PatientId, PatientData>;
     metadata: Map<DatasetId, DatasetMetadata>;
+    comparison: Map<DatasetId, Map<string, number>>;
 }
 
 export interface PatientData {

@@ -11,7 +11,7 @@ CREATE DATABASE [LeafDB]
  ON  PRIMARY 
 ( NAME = N'LeafDB', FILENAME = N'/var/opt/mssql/data/LeafDB.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
  LOG ON 
-( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 204800KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
+( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 335872KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
 GO
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
 begin

@@ -3,7 +3,7 @@ import React from 'react';
 import { XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, ReferenceLine, Dot, ReferenceDot } from 'recharts';
 import { WidgetTimelineConfig, WidgetTimelineNumericDatasetConfig, WidgetTimelineEventDatasetConfig } from '../../../models/config/content';
 import { PatientListRowDTO } from '../../../models/patientList/Patient';
-import { DatasetId, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
+import { CohortData, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { DatasetMetadataColumns, getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
 import DynamicTimelineTrendBar from './TimelineTrendBar';
 import { AiOutlineCloudDownload } from "react-icons/ai"
@@ -13,8 +13,8 @@ import './Timeline.css';
 
 interface Props {
     config: WidgetTimelineConfig;
+    cohort: CohortData;
     patient: PatientData;
-    metadata: Map<DatasetId, DatasetMetadata>;
 }
 
 interface State {
@@ -124,7 +124,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                         <div className={`${c}-comparison-title-outer`}>
                             <div className={`${c}-comparison-title-inner`}>{config.comparison.title}</div>
                         </div>
-                        <div className={`${c}-comparison-all-patients-text`}>{config.comparison.columnText}</div>
+                        <div className={`${c}-comparison-all-patients-text`}>All Patients</div>
                     </div>
                     }
                 </div>
@@ -285,9 +285,9 @@ export default class DynamicTimeline extends React.Component<Props, State> {
     }
 
     private getValueSets = (): [ TimelineValueSet[], TimelineValueSet[] ] => {
-        const { config, patient, metadata } = this.props;
+        const { config, patient, cohort } = this.props;
         const zip = (ds: WidgetTimelineEventDatasetConfig | WidgetTimelineNumericDatasetConfig) => {
-            const meta = metadata.get(ds.id)!;
+            const meta = cohort.metadata.get(ds.id)!;
             const data = patient.datasets.get(ds.id) ?? [];
             const cols = getDatasetMetadataColumns(meta);
 
