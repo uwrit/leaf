@@ -40,12 +40,13 @@ namespace Services.Compiler
     {
         System.Data.DbType ToSqlType(object val)
         {
-            if (val is string)  return System.Data.DbType.String;
-            if (val is decimal) return System.Data.DbType.Decimal;
-            if (val is double)  return System.Data.DbType.Double;
-            if (val is int)     return System.Data.DbType.Int32;
-            if (val is bool)    return System.Data.DbType.Boolean;
-            if (val is Guid)    return System.Data.DbType.Guid;
+            if (val is string)   return System.Data.DbType.String;
+            if (val is decimal)  return System.Data.DbType.Decimal;
+            if (val is double)   return System.Data.DbType.Double;
+            if (val is int)      return System.Data.DbType.Int32;
+            if (val is bool)     return System.Data.DbType.Boolean;
+            if (val is Guid)     return System.Data.DbType.Guid;
+            if (val is DateTime) return System.Data.DbType.DateTime;
             return System.Data.DbType.String;
         }
 
@@ -87,12 +88,13 @@ namespace Services.Compiler
     {
         MySql.Data.MySqlClient.MySqlDbType ToSqlType(object val)
         {
-            if (val is string)  return MySql.Data.MySqlClient.MySqlDbType.String;
-            if (val is decimal) return MySql.Data.MySqlClient.MySqlDbType.Decimal;
-            if (val is double)  return MySql.Data.MySqlClient.MySqlDbType.Double;
-            if (val is int)     return MySql.Data.MySqlClient.MySqlDbType.Int32;
-            if (val is bool)    return MySql.Data.MySqlClient.MySqlDbType.Bit;
-            if (val is Guid)    return MySql.Data.MySqlClient.MySqlDbType.Guid;
+            if (val is string)   return MySql.Data.MySqlClient.MySqlDbType.String;
+            if (val is decimal)  return MySql.Data.MySqlClient.MySqlDbType.Decimal;
+            if (val is double)   return MySql.Data.MySqlClient.MySqlDbType.Double;
+            if (val is int)      return MySql.Data.MySqlClient.MySqlDbType.Int32;
+            if (val is bool)     return MySql.Data.MySqlClient.MySqlDbType.Bit;
+            if (val is Guid)     return MySql.Data.MySqlClient.MySqlDbType.Guid;
+            if (val is DateTime) return MySql.Data.MySqlClient.MySqlDbType.DateTime;
             return MySql.Data.MySqlClient.MySqlDbType.String;
         }
 
@@ -142,12 +144,13 @@ namespace Services.Compiler
     {
         NpgsqlTypes.NpgsqlDbType ToSqlType(object val)
         {
-            if (val is string)  return NpgsqlTypes.NpgsqlDbType.Char;
-            if (val is decimal) return NpgsqlTypes.NpgsqlDbType.Numeric;
-            if (val is double)  return NpgsqlTypes.NpgsqlDbType.Numeric;
-            if (val is int)     return NpgsqlTypes.NpgsqlDbType.Numeric;
-            if (val is bool)    return NpgsqlTypes.NpgsqlDbType.Boolean;
-            if (val is Guid)    return NpgsqlTypes.NpgsqlDbType.Uuid;
+            if (val is string)   return NpgsqlTypes.NpgsqlDbType.Char;
+            if (val is decimal)  return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is double)   return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is int)      return NpgsqlTypes.NpgsqlDbType.Numeric;
+            if (val is bool)     return NpgsqlTypes.NpgsqlDbType.Boolean;
+            if (val is Guid)     return NpgsqlTypes.NpgsqlDbType.Uuid;
+            if (val is DateTime) return NpgsqlTypes.NpgsqlDbType.Date;
             return NpgsqlTypes.NpgsqlDbType.Char;
         }
 
@@ -189,12 +192,13 @@ namespace Services.Compiler
     {
         System.Data.OracleClient.OracleType ToSqlType(object val)
         {
-            if (val is string)  return System.Data.OracleClient.OracleType.NVarChar;
-            if (val is decimal) return System.Data.OracleClient.OracleType.Float;
-            if (val is double)  return System.Data.OracleClient.OracleType.Double;
-            if (val is int)     return System.Data.OracleClient.OracleType.Int32;
-            if (val is bool)    return System.Data.OracleClient.OracleType.Int32;
-            if (val is Guid)    return System.Data.OracleClient.OracleType.NVarChar;
+            if (val is string)   return System.Data.OracleClient.OracleType.NVarChar;
+            if (val is decimal)  return System.Data.OracleClient.OracleType.Float;
+            if (val is double)   return System.Data.OracleClient.OracleType.Double;
+            if (val is int)      return System.Data.OracleClient.OracleType.Int32;
+            if (val is bool)     return System.Data.OracleClient.OracleType.Int32;
+            if (val is Guid)     return System.Data.OracleClient.OracleType.NVarChar;
+            if (val is DateTime) return System.Data.OracleClient.OracleType.DateTime;
             return System.Data.OracleClient.OracleType.NVarChar;
         }
 
@@ -238,12 +242,13 @@ namespace Services.Compiler
 
         BigQueryDbType ToSqlType(object val)
         {
-            if (val is string)  return BigQueryDbType.String;
-            if (val is decimal) return BigQueryDbType.Numeric;
-            if (val is double)  return BigQueryDbType.Numeric;
-            if (val is int)     return BigQueryDbType.Int64;
-            if (val is bool)    return BigQueryDbType.Bool;
-            if (val is Guid)    return BigQueryDbType.String;
+            if (val is string)   return BigQueryDbType.String;
+            if (val is decimal)  return BigQueryDbType.Numeric;
+            if (val is double)   return BigQueryDbType.Numeric;
+            if (val is int)      return BigQueryDbType.Int64;
+            if (val is bool)     return BigQueryDbType.Bool;
+            if (val is Guid)     return BigQueryDbType.String;
+            if (val is DateTime) return BigQueryDbType.DateTime;
             return BigQueryDbType.String;
         }
 
