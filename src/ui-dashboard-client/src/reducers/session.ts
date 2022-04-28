@@ -11,9 +11,10 @@ import {
     SET_ACCESS_TOKEN, 
     SET_SESSION_LOAD_STATE, 
     SUBMIT_ATTESTATION, 
-    ERROR_ATTESTATION 
+    ERROR_ATTESTATION, 
+    SET_PROGRESS_MODAL_STATE
 } from '../actions/session';
-import { Attestation, SessionContext, SessionState } from '../models/Session';
+import { Attestation, ProgressModalState, SessionContext, SessionState } from '../models/Session';
 
 export function defaultSessionState(): SessionState {
     return {
@@ -21,6 +22,13 @@ export function defaultSessionState(): SessionState {
         isSubmittingAttestation: false,
         loadingDisplay: '',
         loadingProgressPercent: 0,
+        modals: {
+            progress: {
+                message: "",
+                percent: 0.0,
+                show: false
+            }
+        }
     };
 };
 
@@ -61,6 +69,12 @@ const setError = (state: SessionState, error: boolean): SessionState => {
     });
 };
 
+const setProgressModal = (state: SessionState, progress: ProgressModalState): SessionState => {
+    return Object.assign({}, state, {
+        modals: { ...state.modals, progress }
+    });
+};
+
 export const session = (state: SessionState = defaultSessionState(), action: SessionAction): SessionState => {
     switch (action.type) {
         case SUBMIT_ATTESTATION:
@@ -73,6 +87,8 @@ export const session = (state: SessionState = defaultSessionState(), action: Ses
             return setContext(state, action.context!);
         case ERROR_ATTESTATION:
             return setError(state, action.error!);
+        case SET_PROGRESS_MODAL_STATE:
+            return setProgressModal(state, action.progress!);
         default:
             return state;   
     };

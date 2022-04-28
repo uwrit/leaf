@@ -3,10 +3,11 @@ import React from 'react';
 import { IoMdArrowRoundUp as UpArrow, IoMdArrowRoundDown as DownArrow, IoMdArrowRoundForward as RightArrow } from "react-icons/io"
 import { BsPersonFill as Person } from "react-icons/bs"
 import { TimelineValueSet } from './Timeline';
+import { GiStaryu } from 'react-icons/gi';
 
 interface Props {
     color: string;
-    comparison: boolean;
+    comparison?: number;
     isNumeric: boolean;
     values: TimelineValueSet;
 }
@@ -25,7 +26,7 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
         return (
             <div className={c}>
                 <div className={`${c}-arrow`} style={{ color }}>
-                    {this.getSymbol()}
+                    {this.getPrimarySymbol()}
                 </div>
                 <div className={`${c}-text-container`}>
                     {/* Get last value if numeric */}
@@ -52,15 +53,19 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
                         }
                     </div>
                 </div>
-                {comparison && 
-                <div className={`${c}-all-diff`}>
-                    <div className={`${c}-all-diff-inner`}>
-                        coming soon!
-                    </div>
+                {this.isValid(comparison) && 
+                <div className={`${c}-diff`}>
+                    {this.getComparisonDiff()}
                 </div>
                 }
             </div>
         );
+    }
+
+    private isValid = (val?: number): boolean => {
+        if (typeof val === 'undefined') return false;
+        if (isNaN(val)) return false;
+        return true;
     }
 
     private getDateDiff = (val: Date): string => {
@@ -92,7 +97,32 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
         return [ last[cols.fieldValueString!], last[cols.fieldDate!] ];
     }
 
-    private getSymbol = (): JSX.Element => {
+    private getComparisonDiff = (): JSX.Element => {
+        const c = this.className;
+        const { comparison } = this.props;
+        const { data, cols, ds } = this.props.values;
+        let symbol = <span/>;
+        let diff = "";
+        let diffClass = "";
+
+        if (!data.length) { return <div/>; }
+
+        const last = data[data.length-1][cols.fieldValueNumeric!] as any as number;
+        diff = Math.round(Math.abs(last - comparison!)).toString();
+
+        if (last < comparison!)   { symbol = <DownArrow />;  diff = `-${diff}`; }
+        if (last > comparison!)   { symbol = <UpArrow />;    diff = `+${diff}`; }
+        if (last === comparison!) { symbol = <RightArrow />; diff = `${diff}`; diffClass = 'light'; }
+
+        return (
+            <div className={`${c}-diff-inner ${diffClass}`}>
+                {symbol}
+                <span>{diff}</span>
+            </div>
+        );
+    }
+
+    private getPrimarySymbol = (): JSX.Element => {
         const { isNumeric } = this.props;
         const { data, cols, ds } = this.props.values;
 

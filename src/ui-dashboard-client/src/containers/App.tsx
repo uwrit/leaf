@@ -20,6 +20,7 @@ import { history } from '../store/configureStore';
 import Header from './Header/Header';
 import Cohort from './Cohort/Cohort';
 import './App.css';
+import ProgressModal from '../components/Modals/ProgressModal/ProgressModal';
 
 interface OwnProps {
     params?: any;
@@ -87,6 +88,7 @@ class App extends React.Component<Props> {
                 <Header dashboardName={state.config.main.title} />
                 {session && session.context &&
                 <div id="main-content">
+                    <ProgressModal dispatch={dispatch} state={state.session.modals.progress} />
                     <Routes>
                         <Route path="/dashboard/cohort/:cohortId" element={<Cohort cohort={state.cohort} config={config.main} dispatch={dispatch} search={state.cohort.search} />} />
                         <Route path="/dashboard/cohort/:cohortId/patients/:patientId" element={<Patient cohort={state.cohort} config={config.patient} dispatch={dispatch} />} />

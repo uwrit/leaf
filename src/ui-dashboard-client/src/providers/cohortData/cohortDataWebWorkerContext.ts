@@ -7,31 +7,175 @@
 
 export const workerContext = `
 "use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2)
+        for (var i = 0, l = from.length, ar; i < l; i++) {
+            if (ar || !(i in from)) {
+                if (!ar)
+                    ar = Array.prototype.slice.call(from, 0, i);
+                ar[i] = from[i];
+            }
+        }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 // eslint-disable-next-line
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
         case TRANSFORM:
             return transform(payload);
+        case GET_COHORT_MEAN:
+            return getCohortMean(payload);
         default:
             return null;
     }
 };
+var cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+var datasets;
+var getCohortMean = function (payload) {
+    var filters = payload.filters, dimensions = payload.dimensions, sourcePatId = payload.sourcePatId, requestId = payload.requestId;
+    var result = new Map();
+    var matches = getMatchingPatients(filters, sourcePatId);
+    console.log(matches);
+    for (var _i = 0, _a = dimensions; _i < _a.length; _i++) {
+        var dim = _a[_i];
+        var mean = getMeanValue(matches, dim);
+        result.set(dim.ds.id, mean);
+    }
+    return { result: result, requestId: requestId };
+};
+var getMeanValue = function (patIds, dim) {
+    var n = 0;
+    var sum = 0.0;
+    for (var _i = 0, patIds_1 = patIds; _i < patIds_1.length; _i++) {
+        var p = patIds_1[_i];
+        var d = cohortData.patients.get(p);
+        var ds = d.datasets.get(dim.ds.id);
+        if (ds) {
+            var vals = ds.filter(function (x) { return x[dim.cols.fieldValueNumeric]; });
+            if (vals.length) {
+                n++;
+                sum += vals[vals.length - 1][dim.cols.fieldValueNumeric];
+            }
+        }
+    }
+    return sum / n;
+};
+var getMatchingPatients = function (filters, sourcePatId) {
+    var elig = new Map(cohortData.patients);
+    var sourcePat = cohortData.patients.get(sourcePatId);
+    var all = function () { return [ ...cohortData.patients.keys() ]; };
+    var matcher;
+    if (!sourcePat)
+        return all();
+    var _loop_1 = function (filter) {
+        // Check dataset
+        if (filter.datasetId === "demographics") {
+            var numCols = new Set(['age',]);
+            matcher = (numCols.has(filter.column)
+                ? matchNum : matchString)(filter, sourcePat);
+        }
+        else {
+            var ds = datasets.get(filter.datasetId);
+            if (!ds)
+                return { value: all() };
+            // Check column
+            var col = ds[1].schema.fields.find(function (f) { return f.name === filter.column; });
+            if (!col)
+                return { value: all() };
+            // Get matching func
+            matcher = (col.type === typeNum
+                ? matchNum : matchString)(filter, sourcePat);
+        }
+        // Check each patient
+        for (var _a = 0, elig_1 = elig; _a < elig_1.length; _a++) {
+            var pat = elig_1[_a];
+            var matched = matcher(pat[1]);
+            if (!matched) {
+                elig.delete(pat[0]);
+            }
+        }
+    };
+    for (var _i = 0, filters_1 = filters; _i < filters_1.length; _i++) {
+        var filter = filters_1[_i];
+        var state_1 = _loop_1(filter);
+        if (typeof state_1 === "object")
+            return state_1.value;
+    }
+    return [ ...elig.keys() ];
+};
+var matchString = function (filter, sourcePat) {
+    var defaultMatchFunc = function (pat) { return true; };
+    var matchOn = new Set();
+    var matchUnq = 1;
+    if (filter.args && filter.args.string && filter.args.string.matchOn && filter.args.string.matchOn.length > 0) {
+        matchOn = new Set(filter.args.string.matchOn);
+        matchUnq = matchOn.size;
+    }
+    else {
+        var ds = sourcePat.datasets.get(filter.datasetId);
+        if (!ds)
+            return defaultMatchFunc;
+        var val = ds.find(function (r) { return r[filter.column]; });
+        if (!val)
+            return defaultMatchFunc;
+        matchOn = new Set([val[filter.column]]);
+    }
+    return function (pat) {
+        var ds = pat.datasets.get(filter.datasetId);
+        if (!ds)
+            return false;
+        var vals = ds.filter(function (r) { return matchOn.has(r[filter.column]); }).map(function (r) { return r[filter.column]; });
+        if (vals.length === 0)
+            return false;
+        var unq = new Set(vals).size;
+        if (unq === matchUnq)
+            return true;
+        return false;
+    };
+};
+var matchNum = function (filter, sourcePat) {
+    var defaultMatchFunc = function (pat) { return true; };
+    var ds = sourcePat.datasets.get(filter.datasetId);
+    if (!ds)
+        return defaultMatchFunc;
+    var val = ds.find(function (r) { return r[filter.column]; });
+    if (!val)
+        return defaultMatchFunc;
+    var boundLow = val[filter.column];
+    var boundHigh = boundLow;
+    if (filter.args && filter.args.numeric && filter.args.numeric.pad) {
+        boundLow -= filter.args.numeric.pad;
+        boundHigh += filter.args.numeric.pad;
+    }
+    return function (pat) {
+        var ds = pat.datasets.get(filter.datasetId);
+        if (!ds)
+            return false;
+        var val = ds.find(function (r) { return r[filter.column] >= boundLow && r[filter.column] <= boundHigh; });
+        if (!val)
+            return false;
+        return true;
+    };
+};
 var transform = function (payload) {
     var data = payload.data, demographics = payload.demographics, requestId = payload.requestId;
-    var result = { patients: new Map(), metadata: new Map() };
+    cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+    datasets = new Map();
     for (var _i = 0, _a = demographics; _i < _a.length; _i++) {
         var row = _a[_i];
-        result.patients.set(row.personId, { demographics: row, datasets: new Map() });
+        cohortData.patients.set(row.personId, { id: row.personId, demographics: row, datasets: new Map() });
     }
     ;
-    var _loop_1 = function (pair) {
+    for (var _b = 0, _c = data; _b < _c.length; _b++) {
+        var pair = _c[_b];
         var _d = pair, dsRef = _d[0], dataset = _d[1];
         var meta = { ref: dsRef, schema: dataset.schema };
         var dateFields = dataset.schema.fields.filter(function (field) { return field.type === typeDate; }).map(function (field) { return field.name; });
+        datasets.set(dsRef.id, [dsRef, dataset]);
         for (var _e = 0, _f = Object.keys(dataset.results); _e < _f.length; _e++) {
             var patientId = _f[_e];
             var rows = dataset.results[patientId];
-            var patient = result.patients.get(patientId);
+            var patient = cohortData.patients.get(patientId);
             // Convert strings to dates
             for (var j = 0; j < rows.length; j++) {
                 var row = rows[j];
@@ -45,16 +189,14 @@ var transform = function (payload) {
                 }
             }
             rows = rows.sort((function (a, b) { return a.__dateunix__ - b.__dateunix__; }));
+            patient.id = patientId;
             patient.datasets.set(dsRef.id, rows);
-            result.patients.set(patientId, patient);
-            result.metadata.set(dsRef.id, meta);
+            patient.datasets.set("demographics", [patient.demographics]);
+            cohortData.patients.set(patientId, patient);
+            cohortData.metadata.set(dsRef.id, meta);
         }
-    };
-    for (var _b = 0, _c = data; _b < _c.length; _b++) {
-        var pair = _c[_b];
-        _loop_1(pair);
     }
-    return { result: result, requestId: requestId };
+    return { result: cohortData, requestId: requestId };
 };
 /**
  * Parse a string timestamp. More info at https://github.com/uwrit/leaf/issues/418

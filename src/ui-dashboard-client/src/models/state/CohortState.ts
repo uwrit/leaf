@@ -27,10 +27,11 @@ export interface CohortSearch {
 export interface CohortData {
     patients: Map<PatientId, PatientData>;
     metadata: Map<DatasetId, DatasetMetadata>;
-    comparison: Map<DatasetId, Map<string, number>>;
+    comparison: Map<DatasetId, number>;
 }
 
 export interface PatientData {
+    id: string;
     demographics: DemographicRow;
     datasets: Map<DatasetId, PatientListRow[]>;
 }

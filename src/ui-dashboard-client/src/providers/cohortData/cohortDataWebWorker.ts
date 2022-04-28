@@ -13,7 +13,8 @@ import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
 import { CohortData, DatasetMetadata, PatientData } from '../../models/state/CohortState';
 import { WidgetTimelineComparisonEntryConfig } from '../../models/config/content';
-import { resourceLimits } from 'worker_threads';
+import { TimelineValueSet } from '../../components/Dynamic/Timeline/Timeline';
+import { PatientListRow } from '../../models/patientList/Patient';
 
 const TRANSFORM = 'TRANSFORM';
 const GET_COHORT_MEAN = 'GET_COHORT_MEAN';
@@ -25,7 +26,8 @@ const typeSparkline = PatientListColumnType.Sparkline;
 
 interface InboundMessagePartialPayload {
     data?: [PatientListDatasetQueryDTO, PatientListDatasetDTO];
-    dimensions?: WidgetTimelineComparisonEntryConfig[];
+    filters?: WidgetTimelineComparisonEntryConfig[];
+    dimensions?: TimelineValueSet[];
     demographics?: DemographicRow[];
     sourcePatId?: string;
     message: string;
@@ -63,7 +65,7 @@ export default class CohortDataWebWorker {
             var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = '${personId}';
             var encounterId = '${encounterId}';
-            ${/* workerContext */ this.stripFunctionToContext(this.workerContext)}
+            ${workerContext /*this.stripFunctionToContext(this.workerContext)*/}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -78,8 +80,8 @@ export default class CohortDataWebWorker {
         return this.postMessage({ message: TRANSFORM, data, demographics });
     }
 
-    public getCohortMean = (dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string) => {
-        return this.postMessage({ message: GET_COHORT_MEAN, dimensions, sourcePatId });
+    public getCohortMean = (filters: WidgetTimelineComparisonEntryConfig[], dimensions: TimelineValueSet[], sourcePatId: string) => {
+        return this.postMessage({ message: GET_COHORT_MEAN, filters, dimensions, sourcePatId });
     }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -127,33 +129,30 @@ export default class CohortDataWebWorker {
         let datasets: Map<string, [PatientListDatasetQueryDTO, PatientListDatasetDTO]>;
 
         const getCohortMean = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { dimensions, sourcePatId, requestId } = payload;
-            const result: Map<string, Map<string, number>> = new Map();
-            const matches = getMatchingPatients(dimensions!, sourcePatId!);
+            const { filters, dimensions, sourcePatId, requestId } = payload;
+            const result: Map<string, number> = new Map();
+            const matches = getMatchingPatients(filters!, sourcePatId!);
+            console.log(matches);
 
             for (const dim of dimensions!) {
                 const mean = getMeanValue(matches, dim);
-                if (result.has(dim.datasetId)) {
-                    result.get(dim.datasetId)!.set(dim.column, mean);
-                } else {
-                    result.set(dim.datasetId, new Map([[ dim.column, mean ]]));
-                }
+                result.set(dim.ds.id, mean);
             }
 
             return { result, requestId };
         };
 
-        const getMeanValue = (patIds: string[], dim: WidgetTimelineComparisonEntryConfig): number => {
+        const getMeanValue = (patIds: string[], dim: TimelineValueSet): number => {
             let n = 0;
             let sum = 0.0;
             for (const p of patIds) {
                 const d = cohortData.patients.get(p)!;
-                const ds = d.datasets.get(dim.datasetId);
+                const ds = d.datasets.get(dim.ds.id);
                 if (ds) {
-                    const vals = ds.filter(x => x[dim.column]);
+                    const vals = ds.filter(x => x[dim.cols.fieldValueNumeric!]);
                     if (vals.length) {
                         n++;
-                        sum += vals[-1] as any;
+                        sum += vals[vals.length-1][dim.cols.fieldValueNumeric!] as any;
                     }
                 }
             }
@@ -161,26 +160,33 @@ export default class CohortDataWebWorker {
             return sum / n;
         };
 
-        const getMatchingPatients = (dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string): string[] => {
-            const matched: Set<string> = new Set();
+        const getMatchingPatients = (filters: WidgetTimelineComparisonEntryConfig[], sourcePatId: string): string[] => {
             const elig = new Map(cohortData.patients);
             const sourcePat = cohortData.patients.get(sourcePatId);
             const all = () => [ ...cohortData.patients.keys() ];
+            let matcher: (pat: PatientData) => boolean;
 
             if (!sourcePat) return all();
-            for (const dim of dimensions) {
+            for (const filter of filters) {
                 
                 // Check dataset
-                const ds = datasets.get(dim.datasetId);
-                if (!ds) return all();
+                if (filter.datasetId === "demographics") {
+                    const numCols = new Set([ 'age', ])
+                    matcher = (numCols.has(filter.column)
+                        ? matchNum : matchString)(filter, sourcePat);
+                    
+                } else {
+                    const ds = datasets.get(filter.datasetId);
+                    if (!ds) return all();
 
-                // Check column
-                const col = ds[1].schema.fields.find(f => f.name === dim.column);
-                if (!col) return all();
+                    // Check column
+                    const col = ds[1].schema.fields.find(f => f.name === filter.column);
+                    if (!col) return all();
 
-                // Get matching func
-                const matcher = (col.type === typeNum
-                    ? matchNum : matchString)(dim, sourcePat);
+                    // Get matching func
+                    matcher = (col.type === typeNum
+                        ? matchNum : matchString)(filter, sourcePat);
+                }
 
                 // Check each patient
                 for (const pat of elig) {
@@ -191,32 +197,32 @@ export default class CohortDataWebWorker {
                 }
             }
 
-            return [ ...matched.keys() ];
+            return [ ...elig.keys() ];
         };
 
-        const matchString = (dim: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
+        const matchString = (filter: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
             const defaultMatchFunc = (pat: PatientData) => true;
             let matchOn = new Set();
             let matchUnq = 1;
 
-            if (dim.args && dim.args.string && dim.args.string.matchOn && dim.args.string.matchOn.length > 0) {
-                matchOn = new Set(dim.args.string.matchOn);
+            if (filter.args && filter.args.string && filter.args.string.matchOn && filter.args.string.matchOn.length > 0) {
+                matchOn = new Set(filter.args.string.matchOn);
                 matchUnq = matchOn.size;
             } else {
-                const ds = sourcePat.datasets.get(dim.datasetId);
+                const ds = sourcePat.datasets.get(filter.datasetId);
                 if (!ds) return defaultMatchFunc;
 
-                const val = ds.find(r => r[dim.column]);
+                const val = ds.find(r => r[filter.column]);
                 if (!val) return defaultMatchFunc;
 
-                matchOn = new Set([ val[dim.column] ]);
+                matchOn = new Set([ val[filter.column] ]);
             }
 
             return (pat: PatientData): boolean => {
-                const ds = pat.datasets.get(dim.datasetId);
+                const ds = pat.datasets.get(filter.datasetId);
                 if (!ds) return false;
 
-                const vals = ds.filter(r => matchOn.has(r[dim.column])).map(r => r[dim.column]);
+                const vals = ds.filter(r => matchOn.has(r[filter.column])).map(r => r[filter.column]);
                 if (vals.length === 0) return false;
 
                 const unq = new Set(vals).size;
@@ -225,28 +231,28 @@ export default class CohortDataWebWorker {
             }
         };
 
-        const matchNum = (dim: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
+        const matchNum = (filter: WidgetTimelineComparisonEntryConfig, sourcePat: PatientData) => {
             const defaultMatchFunc = (pat: PatientData) => true;
 
-            const ds = sourcePat.datasets.get(dim.datasetId);
+            const ds = sourcePat.datasets.get(filter.datasetId);
             if (!ds) return defaultMatchFunc;
 
-            const val = ds.find(r => r[dim.column]);
+            const val = ds.find(r => r[filter.column]);
             if (!val) return defaultMatchFunc;
 
-            let boundLow = val[dim.column] as any;
+            let boundLow = val[filter.column] as any;
             let boundHigh = boundLow;
 
-            if (dim.args && dim.args.numeric && dim.args.numeric.pad) {
-                boundLow -= dim.args.numeric.pad;
-                boundHigh += dim.args.numeric.pad;
+            if (filter.args && filter.args.numeric && filter.args.numeric.pad) {
+                boundLow -= filter.args.numeric.pad;
+                boundHigh += filter.args.numeric.pad;
             }
 
             return (pat: PatientData): boolean => {
-                const ds = pat.datasets.get(dim.datasetId);
+                const ds = pat.datasets.get(filter.datasetId);
                 if (!ds) return false;
 
-                const val = ds.find(r => r[dim.column] as any >= boundLow && r[dim.column] as any <= boundHigh);
+                const val = ds.find(r => r[filter.column] as any >= boundLow && r[filter.column] as any <= boundHigh);
                 if (!val) return false;
                 return true;
             }
@@ -254,11 +260,11 @@ export default class CohortDataWebWorker {
 
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { data, demographics, requestId } = payload;
-            let cohortData = { patients: new Map(), metadata: new Map() };
+            cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
             datasets = new Map();
 
             for (const row of demographics!) {
-                cohortData.patients.set(row.personId, { demographics: row, datasets: new Map() });
+                cohortData.patients.set(row.personId, { id: row.personId, demographics: row, datasets: new Map() });
             };
 
             for (const pair of data!) {
@@ -284,8 +290,9 @@ export default class CohortDataWebWorker {
                         }
                     }
                     rows = rows.sort(((a: any, b: any) => a.__dateunix__ - b.__dateunix__));
+                    patient.id = patientId;
                     patient.datasets.set(dsRef.id, rows);
-                    patient.datasets.set("demographics", [ patient.demographics ]);
+                    patient.datasets.set("demographics", ([ patient.demographics ] as any) as PatientListRow[]);
                     cohortData.patients.set(patientId, patient);
                     cohortData.metadata.set(dsRef.id, meta);
                 }

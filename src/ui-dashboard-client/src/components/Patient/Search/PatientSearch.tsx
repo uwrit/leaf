@@ -4,7 +4,7 @@ import { DemographicRow } from '../../../models/cohortData/DemographicDTO';
 import { keys } from '../../../models/Keyboard';
 import { useParams, useNavigate, NavigateFunction } from "react-router-dom";
 import HintContainer from './HintContainer';
-import { searchForPatients } from '../../../actions/cohort';
+import { searchForPatients, setSearchTerm } from '../../../actions/cohort';
 import './PatientSearch.css';
 
 interface Props {
@@ -98,12 +98,13 @@ class PatientSearch extends React.PureComponent<Props, State> {
     }
 
     private handleEnterKeyPress = () => {
-        const { cohortId, nav, hints } = this.props;
+        const { cohortId, nav, hints, dispatch } = this.props;
         const { selectedHintIndex } = this.state;
         const selected = hints[selectedHintIndex];
 
         if (selected && nav) {
             const patientId = selected.personId;
+            dispatch(setSearchTerm(''));
             nav(`/dashboard/cohort/${cohortId}/patients/${patientId}`);
         }
     }

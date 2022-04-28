@@ -9,6 +9,7 @@ import {
     CohortAction,
     SET_COHORT_DATASETS,
     SET_COHORT_STATE,
+    SET_COMPARISON_DATASET,
     SET_SEARCH_HINTS,
     SET_SEARCH_TERM
 } from '../actions/cohort';
@@ -32,6 +33,10 @@ export function defaultCohortState(): CohortState {
 
 const setCohortDatasets = (state: CohortState, data: CohortData) => {
     return Object.assign({}, state, { data });
+};
+
+const setComparisonDataset = (state: CohortState, comparison: Map<string, number>) => {
+    return Object.assign({}, state, { data: { ...state.data, comparison: new Map(comparison) } });
 };
 
 const setCohortState = (state: CohortState, cohortStateType: CohortStateType) => {
@@ -69,6 +74,8 @@ export function cohort(state: CohortState = defaultCohortState(), action: Cohort
             return setSearchTerm(state, action.term!);
         case SET_SEARCH_HINTS:
             return setSearchHints(state, action.hints!);
+        case SET_COMPARISON_DATASET:
+            return setComparisonDataset(state, action.comparison!);
         default:
             return state;
     }

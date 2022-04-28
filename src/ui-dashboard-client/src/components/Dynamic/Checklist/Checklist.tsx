@@ -11,6 +11,7 @@ interface Props {
     config: WidgetChecklistConfig;
     cohort: CohortData;
     patient: PatientData;
+    dispatch: any;
 }
 
 interface State {

@@ -7,7 +7,7 @@
 
 import { Dispatch } from 'redux';
 import { AppState } from '../models/state/AppState';
-import { SessionContext } from '../models/Session';
+import { ProgressModalState, SessionContext } from '../models/Session';
 import { Attestation } from '../models/Session';
 import { getSessionTokenAndContext, logoutFromServer, refreshSessionTokenAndContext } from '../services/sessionApi';
 import { AuthMechanismType } from '../models/Auth';
@@ -19,6 +19,7 @@ export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
 export const COMPLETE_ATTESTATION = 'COMPLETE_ATTESTATION';
 export const SET_SESSION_LOAD_STATE = 'SET_SESSION_LOAD_STATE';
 export const SET_ACCESS_TOKEN = 'SET_ACCESS_TOKEN';
+export const SET_PROGRESS_MODAL_STATE = 'SET_PROGRESS_MODAL_STATE';
 
 export interface SessionAction {
     attestation?: Attestation;
@@ -27,6 +28,7 @@ export interface SessionAction {
     nonce?: string;
     error?: boolean;
     context?: SessionContext;
+    progress?: ProgressModalState;
     type: string;
 }
 
@@ -183,3 +185,11 @@ export const setSessionLoadState = (sessionLoadDisplay: string, sessionLoadProgr
         type: SET_SESSION_LOAD_STATE
     };
 };
+
+export const setProgressModal = (progress: ProgressModalState): SessionAction => {
+    return {
+        progress,
+        type: SET_PROGRESS_MODAL_STATE
+    };
+};
+

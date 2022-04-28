@@ -5,6 +5,7 @@ import './index.css';
 import './styles/bootstrap.min.css';
 import './styles/LeafDropdown.css';
 import './styles/LeafModal.css';
+import './styles/LeafProgressBar.css';
 
 ReactDOM.render(
   <React.StrictMode>

@@ -8,18 +8,19 @@ interface Props {
     config: WidgetRowConfig;
     cohort: CohortData;
     patient: PatientData;
+    dispatch: any;
 }
 
 export default class DynamicRow extends React.Component<Props> {
     private className = 'dynamic-row';
 
     public render() {
-        const { config, cohort, patient } = this.props;
+        const { config, cohort, patient, dispatch } = this.props;
         const c = this.className;
 
         return (
             <div className={`${c}-container`}>
-                {config.content.map((innerContent, i) => renderDynamicComponent(innerContent, cohort, patient, i))}
+                {config.content.map((innerContent, i) => renderDynamicComponent(innerContent, cohort, patient, dispatch, i))}
             </div>
         );
     }

@@ -11,6 +11,7 @@ interface Props {
     config: WidgetListConfig;
     cohort: CohortData;
     patient: PatientData;
+    dispatch: any;
 }
 
 export default class DynamicList extends React.Component<Props> {

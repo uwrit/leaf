@@ -10,6 +10,7 @@ import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../models/patientList/Dataset';
 import CohortDataWebWorker from '../providers/cohortData/cohortDataWebWorker';
 import { WidgetTimelineComparisonEntryConfig } from '../models/config/content';
+import { TimelineValueSet } from '../components/Dynamic/Timeline/Timeline';
 
 const cohortDataProvider = new CohortDataWebWorker();
 
@@ -22,8 +23,10 @@ export const transform = async (
 };
 
 export const getComparisonMeans = async (
-    dimensions: WidgetTimelineComparisonEntryConfig[], sourcePatId: string) 
-    : Promise<Map<string, Map<string, number>>> => {
-    const means = await cohortDataProvider.getCohortMean(dimensions, sourcePatId);
-    return means as Map<string, Map<string, number>>;
+    filters: WidgetTimelineComparisonEntryConfig[], 
+    dimensions: TimelineValueSet[],
+    sourcePatId: string) 
+    : Promise<Map<string, number>> => {
+    const means = await cohortDataProvider.getCohortMean(filters, dimensions, sourcePatId);
+    return means as Map<string, number>;
 };

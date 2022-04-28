@@ -2,26 +2,27 @@ import React from "react";
 import DynamicChecklist from "../components/Dynamic/Checklist/Checklist";
 import DynamicList from "../components/Dynamic/List/List";
 import DynamicRow from "../components/Dynamic/Row/Row";
-import { WidgetChecklistConfig, WidgetListConfig, WidgetRowConfig, WidgetTimelineConfig, WidgetType, Icons, BaseWidgetConfig } from "../models/config/content";
-import { CohortData, DatasetId, DatasetMetadata, PatientData } from "../models/state/CohortState";
+import DynamicTimeline from "../components/Dynamic/Timeline/Timeline";
+import { WidgetChecklistConfig, WidgetListConfig, WidgetRowConfig, WidgetTimelineConfig, WidgetType, Icons } from "../models/config/content";
+import { CohortData, PatientData } from "../models/state/CohortState";
 import { RgbValues } from "../models/config/content";
 import { VscChecklist } from "react-icons/vsc";
 import { FiPlus } from "react-icons/fi";
 import { GiMedicines } from "react-icons/gi";
-import DynamicTimeline from "../components/Dynamic/Timeline/Timeline";
-import { DashboardConfig } from "../models/config/config";
 
 export const renderDynamicComponent = (
         content: WidgetType, 
         cohort: CohortData,
         patient: PatientData,
+        dispatch: any,
         key?: string | number)
     : JSX.Element | null => {
+        const props = { cohort, patient, dispatch };
     switch (content.type) {
-        case "row":       return <DynamicRow       key={key} config={content as WidgetRowConfig} cohort={cohort} patient={patient} />;
-        case "list":      return <DynamicList      key={key} config={content as WidgetListConfig} cohort={cohort} patient={patient} />;
-        case "checklist": return <DynamicChecklist key={key} config={content as WidgetChecklistConfig} cohort={cohort} patient={patient} />;
-        case "timeline":  return <DynamicTimeline  key={key} config={content as WidgetTimelineConfig} cohort={cohort} patient={patient} />;
+        case "row":       return <DynamicRow       key={key} config={content as WidgetRowConfig}       {...props} />;
+        case "list":      return <DynamicList      key={key} config={content as WidgetListConfig}      {...props} />;
+        case "checklist": return <DynamicChecklist key={key} config={content as WidgetChecklistConfig} {...props} />;
+        case "timeline":  return <DynamicTimeline  key={key} config={content as WidgetTimelineConfig}  {...props} />;
         default:
             return null;
     }
@@ -62,8 +63,12 @@ export const getDependentDatasets = (content: WidgetType[]): string[] => {
                 ids.add((item as WidgetListConfig).datasetId);
                 break;
             case "timeline":
-                (item as WidgetTimelineConfig).eventDatasets.forEach(ds => ids.add(ds.id));
-                (item as WidgetTimelineConfig).numericDatasets.forEach(ds => ids.add(ds.id));
+                const _item = item as WidgetTimelineConfig;
+                _item.eventDatasets.forEach(ds => ids.add(ds.id));
+                _item.numericDatasets.forEach(ds => ids.add(ds.id));
+                if (_item.comparison.enabled && _item.comparison.filters) {
+                    _item.comparison.filters.forEach(ds => ids.add(ds.datasetId));
+                }
                 break;
         }
     }

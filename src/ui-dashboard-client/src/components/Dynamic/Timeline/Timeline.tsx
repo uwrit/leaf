@@ -9,11 +9,13 @@ import DynamicTimelineTrendBar from './TimelineTrendBar';
 import { AiOutlineCloudDownload } from "react-icons/ai"
 import { getDynamicColor } from '../../../utils/dynamic';
 import Highlighter from "react-highlight-words";
+import DynamicTimelineComparePicker from './TimelineComparePicker';
 import './Timeline.css';
 
 interface Props {
     config: WidgetTimelineConfig;
     cohort: CohortData;
+    dispatch: any;
     patient: PatientData;
 }
 
@@ -61,6 +63,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
     public shouldComponentUpdate(nextProps: Props) {
         if (this.state.chartWidth < 1000) {
             return true;
+        } else if (this.props.cohort.comparison !== nextProps.cohort.comparison) {
+            return true;
         } else if (this.props.patient === nextProps.patient) {
             return false;
         }
@@ -84,7 +88,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
     }
 
     public render() {
-        const { config } = this.props;
+        const { config, cohort, dispatch, patient } = this.props;
         const { chartWidth } = this.state;
         const margins = { top: 0, right: 0, bottom: 0, left: 0 };
         const swimlaneHeight = 70;
@@ -119,13 +123,10 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                     </div>}
 
                     {/* Comparison to cohort */}
-                    {config.comparison.enabled && 
-                    <div className={`${c}-comparison-container`}>
-                        <div className={`${c}-comparison-title-outer`}>
-                            <div className={`${c}-comparison-title-inner`}>{config.comparison.title}</div>
-                        </div>
-                        <div className={`${c}-comparison-all-patients-text`}>All Patients</div>
-                    </div>
+                    {config.comparison.enabled && config.comparison.filters &&
+                    <DynamicTimelineComparePicker 
+                        config={config} cohort={cohort} patientId={patient.id} dispatch={dispatch} datasets={numericDatasets}
+                    />
                     }
                 </div>
 
@@ -135,12 +136,11 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                     {/* Small multiples */}
                     <div className={`${c}-small-multiples-container`} style={{ width: chartWidth-500 }}>
                         {numericDatasets.map((val, i) => {
-                            const { ds, meta, data } = val;
-                            const cols = getDatasetMetadataColumns(meta!);
+                            const { ds, data, cols } = val;
                             const color = this.colors[i];
 
                             return (
-                                <LineChart key={ds.id} width={chartWidth-500} height={swimlaneHeight} margin={margins} data={data}>
+                                <LineChart key={ds.id} width={chartWidth-480} height={swimlaneHeight} margin={margins} data={data}>
 
                                     {/* Grid */}
                                     <CartesianGrid fill={i % 2 === 0 ? 'white' : 'rgb(240,242,245)'} verticalPoints={verticals} />
@@ -217,15 +217,20 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                     {/* Trends box */}
                     <div className={`${c}-trend-container`}>
                         {numericDatasets.map((val, i) => {
+                            cohort.comparison.get(val.ds.id)
                             return (
                                 <div key={val.ds.id} style={{ height: swimlaneHeight }} className={`${c}-trend`}>
-                                    <DynamicTimelineTrendBar values={val} color={this.colors[i]} comparison={config.comparison.enabled} isNumeric={true} />
+                                    <DynamicTimelineTrendBar 
+                                        values={val} color={this.colors[i]} comparison={cohort.comparison.get(val.ds.id)} isNumeric={true} 
+                                    />
                                 </div>     
                             );
                         })}   
                         {maxTimeline && 
                         <div style={{ height: (swimlaneHeight * 2) - 30 }} className={`${c}-trend`}>
-                            <DynamicTimelineTrendBar values={maxTimeline} color={getDynamicColor(maxTimeline.ds.color)} comparison={config.comparison.enabled} isNumeric={false} />
+                            <DynamicTimelineTrendBar 
+                                values={maxTimeline} color={getDynamicColor(maxTimeline.ds.color)} isNumeric={false} 
+                            />
                         </div>}
                     </div>
                 </div>

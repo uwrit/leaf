@@ -26,6 +26,7 @@ export interface SessionState {
     isSubmittingAttestation: boolean;
     loadingDisplay: string;
     loadingProgressPercent: number;
+    modals: Modals;
 }
 
 export interface Attestation {
@@ -50,4 +51,14 @@ export interface SessionContext {
     issueDate: Date;
     rawDecoded: DecodedAccessToken;
     token: string;
+}
+
+interface Modals {
+    progress: ProgressModalState;
+}
+
+export interface ProgressModalState {
+    message: string;
+    percent: number;
+    show: boolean;
 }

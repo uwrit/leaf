@@ -53,7 +53,7 @@ export const config: DashboardConfig =
                 title: "Clinical Course Timeline",
                 comparison: {
                     enabled: true,
-                    dimensions: [
+                    filters: [
                         { datasetId: "demographics", column: "age", args: { numeric: { pad: 5 } } },
                         { datasetId: "demographics", column: "gender" },
                         { datasetId: "f2f1423e-f36b-1410-81bf-0018c8508655", column: "prob_id", args: { string: { pickerDisplayColumn: "prob_name" } } }

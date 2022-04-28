@@ -90,7 +90,7 @@ interface WidgetTimelineExportConfig {
 };
 
 interface WidgetTimelineComparisonConfig {
-    dimensions?: WidgetTimelineComparisonEntryConfig[];
+    filters?: WidgetTimelineComparisonEntryConfig[];
     enabled: boolean;
     title: string;
 };
