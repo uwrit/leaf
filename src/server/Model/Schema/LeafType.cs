@@ -73,6 +73,7 @@ namespace Model.Schema
             public const string Cidr = "cidr";
             public const string Date = "date";
             public const string Double = "double";
+            public const string DoublePrecision = "double precision";
             public const string Inet = "inet";
             public const string Integer = "integer";
             public const string Interval = "interval";
@@ -235,6 +236,7 @@ namespace Model.Schema
                 case MySql.Year:
                 case Oracle.Long:
                 case PostgreSql.BigSerial:
+                case PostgreSql.DoublePrecision:
                 case PostgreSql.SmallSerial:
                 case PostgreSql.Serial:
                     return LeafType.Numeric;

@@ -90,7 +90,7 @@ namespace Model.Cohort
             cancel.ThrowIfCancellationRequested();
 
             var exeContext = await compiler.BuildDatasetSql(validationContext.Context);
-            log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
+            log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext.ToCleaned());
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
             log.LogInformation("Dataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
