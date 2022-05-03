@@ -170,10 +170,6 @@ namespace Services.Cohort
             );
             output.AppendLine();
 
-            // Add Index
-            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
-            output.AppendLine();
-
             // Insert rows
             foreach (var recs in Batch(cohort, batchSize))
             {
@@ -181,6 +177,10 @@ namespace Services.Cohort
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
+
+            // Add Index
+            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
+            output.AppendLine();
 
             return output.ToString();
         }
@@ -266,10 +266,6 @@ namespace Services.Cohort
             );
             output.AppendLine();
 
-            // Add Index
-            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
-            output.AppendLine();
-
             // Insert rows
             foreach (var recs in Batch(cohort, batchSize))
             {
@@ -277,6 +273,10 @@ namespace Services.Cohort
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
+
+            // Add Index
+            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
+            output.AppendLine();
 
             return output.ToString();
         }
