@@ -3,6 +3,9 @@ import { getTimelineComparisonValues } from '../../../actions/cohort';
 import { WidgetTimelineComparisonEntryConfig, WidgetTimelineConfig } from '../../../models/config/content';
 import { CohortData } from '../../../models/state/CohortState';
 import { TimelineValueSet } from './Timeline';
+import { FiPlus } from 'react-icons/fi'
+import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
+import { Col, Container, Row } from 'reactstrap';
 
 interface Props {
     config: WidgetTimelineConfig;
@@ -14,6 +17,7 @@ interface Props {
 
 interface State {
     filters: FilterConfig[];
+    showPicker: boolean;
 }
 
 interface FilterConfig extends WidgetTimelineComparisonEntryConfig {
@@ -26,7 +30,8 @@ export default class DynamicTimelineComparePicker extends React.Component<Props,
     public constructor(props: Props) {
         super(props);
         this.state = {
-            filters: []
+            filters: [],
+            showPicker: false
         }
     }
 
@@ -39,7 +44,7 @@ export default class DynamicTimelineComparePicker extends React.Component<Props,
 
     public render() {
         const { config, cohort } = this.props;
-        const { filters } = this.state;
+        const { filters, showPicker } = this.state;
         const c = this.className;
 
         return (
@@ -47,20 +52,46 @@ export default class DynamicTimelineComparePicker extends React.Component<Props,
                 <div className={`${c}-title-outer`}>
                     <div className={`${c}-title-inner`}>{config.comparison.title}</div>
                 </div>
-                <div onClick={this.handleClick} className={`${c}-all-patients-text`}>
-                    {filters.length === 0 ? 'All Patients' : `${filters.length} Filters`}
+                <div className={`${c}-filter-container`}>
+                    <div className={`${c}-add-filter`}>
+                        <FiPlus onClick={this.toggleShowPicker} />
+                    </div>
+                    <div onClick={this.handleClick} className={`${c}-all-patients-text`}>
+                        <span>Mean over all </span>
+                        <br/>
+                        {`(${filters.length} filters)`}
+                    </div>
+                    <div className={`${c}-filters-picker ${showPicker ? 'shown' : ''}`}>
+                        {this.getFilterPopup()}
+                    </div>
                 </div>
             </div>
         );
     }
 
-    public getFilterPopup = () => {
-        const { config, cohort } = this.props;
-
-        for (const x of config.comparison.filters!) {
-
-        }
+    public toggleShowPicker = () => {
+        this.setState({ showPicker: !this.state.showPicker });
     }
+
+    public getFilterPopup = () => {
+        const c = this.className;
+        const { config } = this.props;
+
+        return (
+            config.comparison.filters!.map(f => (
+                <Container className={`${c}-filter-picker-container`}>
+                    <Row>
+                        <Col md={8} className={`${c}-filter-picker-row`}>{f.column}</Col>
+                        <Col md={4} className={`${c}-filter-picker-check`}>
+                            <CheckboxSlider onClick={this.dummy} checked={false} />
+                        </Col>
+                    </Row>
+                </Container>
+            ))
+        );
+    }
+
+    public dummy = () => null;
 
     public handleClick = () => {
         const { filters } = this.state;

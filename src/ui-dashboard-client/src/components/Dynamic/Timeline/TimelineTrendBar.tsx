@@ -3,7 +3,6 @@ import React from 'react';
 import { IoMdArrowRoundUp as UpArrow, IoMdArrowRoundDown as DownArrow, IoMdArrowRoundForward as RightArrow } from "react-icons/io"
 import { BsPersonFill as Person } from "react-icons/bs"
 import { TimelineValueSet } from './Timeline';
-import { GiStaryu } from 'react-icons/gi';
 
 interface Props {
     color: string;
@@ -101,25 +100,31 @@ export default class DynamicTimelineTrendBar extends React.Component<Props> {
         const c = this.className;
         const { comparison } = this.props;
         const { data, cols, ds } = this.props.values;
-        let symbol = <span/>;
         let diff = "";
-        let diffClass = "";
 
-        if (!data.length) { return <div/>; }
+        if (!data.length || !this.isValid(comparison)) { return <div/>; }
 
         const last = data[data.length-1][cols.fieldValueNumeric!] as any as number;
         diff = Math.round(Math.abs(last - comparison!)).toString();
 
-        if (last < comparison!)   { symbol = <DownArrow />;  diff = `-${diff}`; }
-        if (last > comparison!)   { symbol = <UpArrow />;    diff = `+${diff}`; }
-        if (last === comparison!) { symbol = <RightArrow />; diff = `${diff}`; diffClass = 'light'; }
+        if (last < comparison!)  diff = `-${diff}`;
+        if (last >= comparison!) diff = `+${diff}`;
+        if (last === comparison) diff = 'same';
 
         return (
-            <div className={`${c}-diff-inner ${diffClass}`}>
-                {symbol}
-                <span>{diff}</span>
+            <div>
+                <div className={`${c}-comparison-value`}>
+                    {Math.round(comparison!)}
+                </div>
+                <div className={`${c}-comparison-diff`}>
+                    <span>(</span>
+                    <span className={`${c}-comparison-diff-inner`}>
+                        {diff}
+                    </span>
+                    <span>)</span>
+                </div>
             </div>
-        );
+        )
     }
 
     private getPrimarySymbol = (): JSX.Element => {
