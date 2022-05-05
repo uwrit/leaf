@@ -4,7 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Linq;
 using Model.Options;
 using Dapper;
 using System.Threading.Tasks;
@@ -44,10 +43,16 @@ namespace Services.Authentication
 
         ServerState Read(SqlMapper.GridReader grid)
         {
-            var state = grid.Read<ServerState>().First();
+            var state = grid.ReadFirst<ServerState>();
             state.Notifications = grid.Read<UserNotification>();
+            state.Db.Version = Version.Parse(grid.ReadFirst<VersionRecord>().Version);
 
             return state;
         }
+    }
+
+    class VersionRecord
+    {
+        public string Version { get; set; }
     }
 }

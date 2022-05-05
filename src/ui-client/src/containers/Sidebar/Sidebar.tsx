@@ -9,13 +9,13 @@ import React from 'react';
 import { handleSidebarTabClick } from '../../actions/generalUi';
 import { SidebarTab} from '../../components/Sidebar/SidebarTab';
 import { RouteConfig } from '../../config/routes';
-import { CohortStateType } from '../../models/state/CohortState';
+import { CohortStateType, PatientCountState } from '../../models/state/CohortState';
 import { Routes } from '../../models/state/GeneralUiState';
 import { AdminPanelPane } from '../../models/state/AdminState';
 import './Sidebar.css';
 
 interface Props {
-    cohortCountState: CohortStateType;
+    cohortCountState: PatientCountState;
     currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
     dispatch: any;
@@ -30,7 +30,7 @@ export default class Sidebar extends React.PureComponent<Props> {
 
     public render() {
         const { cohortCountState, currentRoute, currentAdminPane, dispatch, routes } = this.props;
-        const cohortLoaded = cohortCountState === CohortStateType.LOADED;
+        const cohortLoaded = cohortCountState.state === CohortStateType.LOADED;
         const c = 'sidebar';
         return (
             <div id={`${c}-container`}>

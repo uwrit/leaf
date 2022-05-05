@@ -7,13 +7,13 @@ using System;
 using Model.Compiler;
 using Model.Cohort;
 using API.DTO.Compiler;
-using System.Collections.Generic;
 
 namespace API.DTO.Cohort
 {
     public class CohortCountDTO
     {
         public string QueryId { get; set; }
+        public bool Cached { get; set; }
         public PreflightCheckDTO Preflight { get; set; }
         public PatientCountResultDTO Result { get; set; }
 
@@ -30,6 +30,8 @@ namespace API.DTO.Cohort
         public CohortCountDTO(PreflightResources preflight, PatientCount count) : this(preflight)
         {
             QueryId = count.QueryId.ToString();
+            Cached = count.Cached;
+
             if (count != null)
             {
                 Result = new PatientCountResultDTO

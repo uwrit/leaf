@@ -26,11 +26,10 @@ import ConfirmationModal from '../components/Modals/ConfirmationModal/Confirmati
 import NoClickModal from '../components/Modals/NoClickModal/NoClickModal';
 import { showInfoModal } from '../actions/generalUi';
 import HelpButton from '../components/HelpButton/HelpButton';
-import { CohortStateType } from '../models/state/CohortState';
+import { PatientCountState } from '../models/state/CohortState';
 import { AdminPanelPane } from '../models/state/AdminState';
 import SideNotification from '../components/SideNotification/SideNotification';
 import DataImportContainer from '../containers/DataImport/DataImport';
-import { version } from '../../package.json'
 import UserQuestionModal from './UserQuestionModal/UserQuestionModal';
 import { SavedQueryMap } from '../models/Query';
 import { sleep } from '../utils/Sleep';
@@ -47,7 +46,7 @@ interface DispatchProps {
 interface StateProps {
     auth?: AuthorizationState;
     browser?: Browser;
-    cohortCountState: CohortStateType;
+    cohortCountState: PatientCountState;
     confirmationModal: ConfirmationModalState;
     currentAdminPane: AdminPanelPane;
     currentRoute: Routes;
@@ -77,7 +76,6 @@ class App extends React.Component<Props> {
         this.handleServerStateRefresh();
         dispatch(getIdToken());
         dispatch(refreshServerState());
-        console.info(`Leaf client application running version ${version}`);
     }
 
     public componentDidUpdate() { 
@@ -198,7 +196,7 @@ const mapStateToProps = (state: AppState) => {
     return {
         auth: state.auth,
         browser: state.generalUi.browser,
-        cohortCountState: state.cohort.count.state,
+        cohortCountState: state.cohort.count,
         confirmationModal: state.generalUi.confirmationModal,
         currentAdminPane: state.admin ? state.admin!.activePane : 0, 
         currentRoute: state.generalUi.currentRoute,

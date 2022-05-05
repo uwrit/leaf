@@ -25,6 +25,7 @@ namespace API.Options
                 public const string Section = @"Db:Clin";
                 public const string Connection = @"Db:Clin:Connection";
                 public const string DefaultTimeout = @"Db:Clin:DefaultTimeout";
+                public const string RDBMS = @"Db:Clin:RDBMS";
 
                 public static class Cohort
                 {

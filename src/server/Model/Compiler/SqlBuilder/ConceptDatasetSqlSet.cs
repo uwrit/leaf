@@ -4,12 +4,11 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Composure;
 using Model.Options;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     class ConceptDatasetSqlSet : PanelItemSqlSet
     {
@@ -17,8 +16,14 @@ namespace Model.Compiler.Common
         internal SubPanel SubPanel { get; set; }
         internal PanelItem PanelItem { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
+        internal ISqlDialect Dialect { get; set; }
 
-        public ConceptDatasetSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
+        public ConceptDatasetSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect) : base(panel, subpanel, panelitem, comp, dialect)
         {
             Panel = panel;
             SubPanel = subpanel;
@@ -30,11 +35,13 @@ namespace Model.Compiler.Common
         internal override void SetSelect()
         {
             // Ensure personId and encounterId are always strings
-            static Expression toNvarchar(Column x) => new Expression($"CONVERT(NVARCHAR(100), {x})");
-
             var cols = new List<ExpressedColumn>();
-            var personId = new ExpressedColumn(toNvarchar(PersonId), DatasetColumns.PersonId);
-            var encounterId = new ExpressedColumn(toNvarchar(EncounterId), EncounterColumns.EncounterId);
+            var personId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.String, PersonId)),
+                DatasetColumns.PersonId);
+            var encounterId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.String, EncounterId)),
+                EncounterColumns.EncounterId);
             var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
 
             cols.Add(personId);

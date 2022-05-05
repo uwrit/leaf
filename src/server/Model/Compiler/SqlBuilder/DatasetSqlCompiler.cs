@@ -4,64 +4,83 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
-        readonly ISqlCompiler compiler;
+        readonly IPanelSqlCompiler compiler;
+        readonly ISqlDialect dialect;
+        readonly ICachedCohortPreparer cachedCohortPreparer;
         readonly CompilerOptions compilerOptions;
-        readonly string fieldInternalPersonId = "__personId__"; // field mangling
 
         DatasetExecutionContext executionContext;
 
         public DatasetSqlCompiler(
-            ISqlCompiler compiler,
-            IOptions<CompilerOptions> compOpts)
+            IPanelSqlCompiler compiler,
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer,
+            IOptions<CompilerOptions> compilerOptions)
         {
             this.compiler = compiler;
-            this.compilerOptions = compOpts.Value;
+            this.dialect = dialect;
+            this.cachedCohortPreparer = cachedCohortPreparer;
+            this.compilerOptions = compilerOptions.Value;
         }
 
-        public DatasetExecutionContext BuildDatasetSql(DatasetCompilerContext compilerContext)
+        public async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
         {
-            executionContext = new DatasetExecutionContext(compilerContext.Shape, compilerContext.QueryContext, compilerContext.DatasetQuery.Id.Value);
+            executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
-            var cohort = CteCohortInternals(compilerContext);
+            var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
+            var epilogue = cachedCohortPreparer.Complete();
+            var cohortCte = CteCohortInternals(context);
+            var datasetCte = CteDatasetInternals(context.DatasetQuery);
+            var filterCte = CteFilterInternals(context);
+            var select = SelectFromCTE(context);
 
-            new SqlValidator(Dialect.IllegalCommands).Validate(compilerContext.DatasetQuery.SqlStatement);
-            var dataset = CteDatasetInternals(compilerContext.DatasetQuery);
-
-            var filter = CteFilterInternals(compilerContext);
-            var select = SelectFromCTE(compilerContext);
-            var parameters = compiler.BuildContextParameterSql();
-            executionContext.DatasetQuery = compilerContext.DatasetQuery;
-            executionContext.CompiledQuery = Compose(parameters, cohort, dataset, filter, select);
+            AddParameters(context.QueryContext.QueryId);
+            executionContext.QueryPrelude = prelude;
+            executionContext.QueryEpilogue = epilogue;
+            executionContext.DatasetQuery = context.DatasetQuery;
+            executionContext.CompiledQuery = Compose(cohortCte, datasetCte, filterCte, select);
 
             return executionContext;
         }
 
-        string Compose(string parameters, string cohort, string dataset, string filter, string select)
+        void AddParameters(Guid queryId)
         {
-            return $"{parameters} WITH cohort AS ( {cohort} ), dataset AS ( {dataset} ), filter AS ( {filter} ) {select}";
+            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryId);
+            foreach (var param in compiler.BuildContextQueryParameters())
+            {
+                executionContext.AddParameter(param);
+            }
+        }
+
+        string Compose(string cohort, string dataset, string filter, string select)
+        {
+            return
+                @$"WITH cohort AS ( {cohort} )
+                , dataset AS ( {dataset} )
+                , filter AS ( {filter} )
+                {select}";
         }
 
         string CteCohortInternals(DatasetCompilerContext ctx)
         {
-            executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, ctx.QueryContext.QueryId);
-
             // If joining to a given panel to filter by encounter.
             if (ctx.JoinToPanel)
             {
-                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions).ToString();
+                return new DatasetJoinedSqlSet(ctx.Panel, compilerOptions, dialect, cachedCohortPreparer).ToString();
             }
 
-            // Else return standard cached cohort.
-            return $"SELECT {fieldInternalPersonId} = PersonId, Salt FROM {compilerOptions.AppDb}.app.Cohort WHERE QueryId = {ShapedDatasetCompilerContext.QueryIdParam} AND Exported = 1";
+            return cachedCohortPreparer.CohortToCte();
         }
 
         string CteDatasetInternals(IDatasetQuery datasetQuery) => datasetQuery.SqlStatement;
@@ -69,16 +88,21 @@ namespace Model.Compiler.SqlServer
         string CteFilterInternals(DatasetCompilerContext compilerContext)
         {
             var provider = DatasetDateFilterProvider.For(compilerContext);
+            var noFilter = $"SELECT * FROM dataset";
             
             // Dynamic datasets may have no datefield
             if (!provider.CanFilter)
             {
-                return $"SELECT * FROM dataset";
+                return noFilter;
             }
 
-            var dateFilter = provider.GetDateFilter(compilerContext);
-            executionContext.AddParameters(dateFilter.Parameters);
-            return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
+            var dateFilter = provider.GetDateFilter(compilerContext, dialect);
+            if (dateFilter != null)
+            {
+                executionContext.AddParameters(dateFilter.Parameters);
+                return $"SELECT * FROM dataset WHERE {dateFilter.Clause}";
+            }
+            return noFilter;
         }
 
         string SelectFromCTE(DatasetCompilerContext ctx)
@@ -89,14 +113,14 @@ namespace Model.Compiler.SqlServer
             {
                 return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{DatasetColumns.PersonId} AND filter.{EncounterColumns.EncounterId} = cohort.{EncounterColumns.EncounterId}";
             }
-            return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{fieldInternalPersonId}";
+            return $"{query} ON filter.{DatasetColumns.PersonId} = cohort.{cachedCohortPreparer.FieldInternalPersonId}";
         }
     }
 
     abstract class DatasetDateFilterProvider
     {
-        const string earlyParamName = "@early";
-        const string lateParamName = "@late";
+        const string earlyParamName = "early";
+        const string lateParamName = "late";
 
         protected abstract string TargetDateField { get; }
 
@@ -129,27 +153,18 @@ namespace Model.Compiler.SqlServer
             }
         }
 
-        public DatasetDateFilter GetDateFilter(DatasetCompilerContext compilerContext)
+        public DatasetDateFilter GetDateFilter(DatasetCompilerContext compilerContext, ISqlDialect dialect)
         {
             var early = compilerContext.EarlyBound;
             var late = compilerContext.LateBound;
 
-            // neither
-            if (!early.HasValue && !late.HasValue)
-            {
-                var now = DateTime.Now;
-                var clause = $"{TargetDateField} <= {lateParamName}";
-                return new DatasetDateFilter
-                {
-                    Clause = clause,
-                    Parameters = new QueryParameter[] { new QueryParameter(lateParamName, now) }
-                };
-            }
+            var earlyEmbedded = dialect.ToSqlParamName(earlyParamName);
+            var lateEmbedded = dialect.ToSqlParamName(lateParamName);
 
             // both present
             if (early.HasValue && late.HasValue)
             {
-                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} BETWEEN {earlyEmbedded} AND {lateEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
@@ -162,23 +177,21 @@ namespace Model.Compiler.SqlServer
             }
 
             // early only
-            if (early.HasValue && !late.HasValue)
+            else if (early.HasValue && !late.HasValue)
             {
-                var now = DateTime.Now;
-                var clause = $"{TargetDateField} {Dialect.Syntax.BETWEEN} {earlyParamName} {Dialect.Syntax.AND} {lateParamName}";
+                var clause = $"{TargetDateField} >= {earlyEmbedded}";
                 return new DatasetDateFilter
                 {
                     Clause = clause,
                     Parameters = new QueryParameter[]
                     {
                         new QueryParameter(earlyParamName, early.Value),
-                        new QueryParameter(lateParamName, now)
                     }
                 };
             }
 
             // late only
-            else
+            else if (!early.HasValue && late.HasValue)
             {
                 var clause = $"{TargetDateField} <= {lateParamName}";
                 return new DatasetDateFilter
@@ -187,6 +200,8 @@ namespace Model.Compiler.SqlServer
                     Parameters = new QueryParameter[] { new QueryParameter(lateParamName, late.Value) }
                 };
             }
+
+            return null;
         }
     }
 

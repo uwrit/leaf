@@ -43,7 +43,7 @@ const dates: DateBoundary[] = [
     { display: 'In Past 6 Months', abbrev: '6M', start: { increment: -6, dateIncrementType: DateIncrementType.MONTH }, end: today },
     { display: 'In Past 12 Months', abbrev: '12M', start: { increment: -12, dateIncrementType: DateIncrementType.MONTH }, end: today },
     { display: 'In Past 2 Years', abbrev: '2Y', start: { increment: -2, dateIncrementType: DateIncrementType.YEAR }, end: today },
-    { display: 'In Past 3 Years', start: { increment: -3, dateIncrementType: DateIncrementType.YEAR }, end: today }
+    { display: 'In Past 3 Years', abbrev: '3Y', start: { increment: -3, dateIncrementType: DateIncrementType.YEAR }, end: today }
 ];
 
 export default class AddDatasetButton extends React.PureComponent<Props, State> {
@@ -52,7 +52,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedDates: dates[4],
+            selectedDates: dates[0],
             showDates: false,
             showSelectorModal: false
         }

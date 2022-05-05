@@ -33,7 +33,7 @@ namespace Model.Cohort
 
         public interface ICohortCacheService
         {
-            Task<Guid> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user);
+            Task<CacheCohortResult> CreateUnsavedQueryAsync(PatientCohort cohort, IUserContext user);
         }
 
         readonly PanelConverter converter;
@@ -125,17 +125,18 @@ namespace Model.Cohort
             token.ThrowIfCancellationRequested();
 
             var cohort = new PatientCohort();
-            var qid = await CacheCohort(cohort);
+            var cached = await CacheCohort(cohort);
 
             return new Result
             {
                 ValidationContext = ctx,
                 Count = new PatientCount
                 {
-                    QueryId = qid,
+                    QueryId = cached.QueryId,
                     Value = cohort.Count,
                     PlusMinus = 0,
-                    SqlStatements = cohort.SqlStatements
+                    SqlStatements = cohort.SqlStatements,
+                    Cached = false
                 }
             };
         }
@@ -179,15 +180,16 @@ namespace Model.Cohort
 
             token.ThrowIfCancellationRequested();
 
-            var qid = await CacheCohort(cohort);
+            var cached = await CacheCohort(cohort);
             var result = new Result
             {
                 ValidationContext = ctx,
                 Count = new PatientCount
                 {
-                    QueryId = qid,
+                    QueryId = cached.QueryId,
                     Value = cohort.Count,
-                    SqlStatements = cohort.SqlStatements
+                    SqlStatements = cohort.SqlStatements,
+                    Cached = cached.Cached
                 }
             };
 
@@ -201,7 +203,7 @@ namespace Model.Cohort
             return result;
         }
 
-        async Task<Guid> CacheCohort(PatientCohort cohort)
+        async Task<CacheCohortResult> CacheCohort(PatientCohort cohort)
         {
             try
             {
@@ -221,6 +223,12 @@ namespace Model.Cohort
         {
             public PanelValidationContext ValidationContext { get; internal set; }
             public PatientCount Count { get; internal set; }
+        }
+
+        public class CacheCohortResult
+        {
+            public Guid QueryId { get; set; }
+            public bool Cached { get; set; }
         }
     }
 }

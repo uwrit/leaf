@@ -18,7 +18,8 @@ import moment from 'moment'
 /**
  * Fetch patient counts based on current panel setup.
  */
-export function fetchCount(state: AppState, nr: NetworkIdentity, panelFilters: PanelFilter[], panels: PanelDTO[], queryId: string, cancelToken: CancelTokenSource) {
+export function fetchCount(
+    state: AppState, nr: NetworkIdentity, panelFilters: PanelFilter[], panels: PanelDTO[], queryId: string, cancelToken: CancelTokenSource) {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const request = http.post(`${nr.address}/api/cohort/count`, { 
@@ -102,7 +103,10 @@ export const fetchDataset = async (
     }
     if (typeof panelIndex !== 'undefined') {
         params.panelIdx = panelIndex
-    } else if (dates && dates.start.dateIncrementType !== DateIncrementType.NONE && dates.end.dateIncrementType !== DateIncrementType.NONE) {
+    } else if (dataset.isEncounterBased 
+        && dates 
+        && dates.start.dateIncrementType !== DateIncrementType.NONE 
+        && dates.end.dateIncrementType !== DateIncrementType.NONE) {
         params.early = deriveDateTicks(dates.start);
         params.late = deriveDateTicks(dates.end);
     }

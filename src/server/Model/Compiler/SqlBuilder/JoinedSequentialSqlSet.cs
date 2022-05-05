@@ -6,7 +6,7 @@
 using System;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     class JoinedSequentialSqlSet : Join
     {
@@ -32,7 +32,7 @@ namespace Model.Compiler.Common
 
         void SetAlias(SubPanelSequentialSqlSet set)
         {
-            Alias = $"{Dialect.Alias.Sequence}{set.SubPanel.Index}";
+            Alias = $"{SqlCommon.Alias.Sequence}{set.SubPanel.Index}";
         }
 
         void InheritColumns(SubPanelSequentialSqlSet set)

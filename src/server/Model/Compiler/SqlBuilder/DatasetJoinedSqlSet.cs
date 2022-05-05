@@ -8,17 +8,24 @@ using System.Linq;
 using Model.Options;
 using Composure;
 
-namespace Model.Compiler.Common
+namespace Model.Compiler.SqlBuilder
 {
     public class DatasetJoinedSqlSet : PanelSequentialSqlSet
     {
         public Column Salt { get; protected set; }
         readonly string queryParamPlaceholder = "___queryid___";
+        readonly ICachedCohortPreparer cachedCohortPreparer;
 
-        public DatasetJoinedSqlSet(Panel panel, CompilerOptions compilerOptions) : base(panel, compilerOptions)
+        public DatasetJoinedSqlSet(
+            Panel panel,
+            CompilerOptions compilerOptions,
+            ISqlDialect dialect,
+            ICachedCohortPreparer cachedCohortPreparer) : base(panel, compilerOptions, dialect)
         {
-            var sp = GetCachedCohortSubPanel(compilerOptions);
-            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions);
+            this.cachedCohortPreparer = cachedCohortPreparer;
+
+            var sp = GetCachedCohortSubPanel();
+            var cache = new DatasetCachedPanelItemSqlSet(panel, sp, sp.PanelItems.First(), compilerOptions, dialect);
             var join  = new DatasetJoinedSequentialSqlSet(cache);
             var first = From.First() as JoinedSequentialSqlSet;
             var last  = From.Last() as JoinedSequentialSqlSet;
@@ -42,7 +49,7 @@ namespace Model.Compiler.Common
                 .Replace(queryParamPlaceholder, ShapedDatasetCompilerContext.QueryIdParam);
         }
 
-        SubPanel GetCachedCohortSubPanel(CompilerOptions compilerOptions)
+        SubPanel GetCachedCohortSubPanel()
         {
             return new SubPanel
             {
@@ -52,8 +59,8 @@ namespace Model.Compiler.Common
                     {
                         Concept = new Concept
                         {
-                            SqlSetFrom = $"{compilerOptions.AppDb}.app.Cohort",
-                            SqlSetWhere = $"{compilerOptions.Alias}.QueryId = {queryParamPlaceholder} AND {compilerOptions.Alias}.Exported = 1"
+                            SqlSetFrom = cachedCohortPreparer.CohortToCteFrom(),
+                            SqlSetWhere = cachedCohortPreparer.CohortToCteWhere()
                         }
                     }
                 }
@@ -69,7 +76,7 @@ namespace Model.Compiler.Common
         public DatasetJoinedSequentialSqlSet(DatasetCachedPanelItemSqlSet set)
         {
             Set = set;
-            Alias = $"{Dialect.Alias.Sequence}C";
+            Alias = $"{SqlCommon.Alias.Sequence}C";
             PersonId = new Column(set.PersonId, this);
             Salt = new Column(set.Salt, this);
         }
@@ -82,7 +89,12 @@ namespace Model.Compiler.Common
         internal SubPanel SubPanel { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
 
-        public DatasetCachedPanelItemSqlSet(Panel panel, SubPanel subpanel, PanelItem panelitem, CompilerOptions comp) : base(panel, subpanel, panelitem, comp)
+        public DatasetCachedPanelItemSqlSet(
+            Panel panel,
+            SubPanel subpanel,
+            PanelItem panelitem,
+            CompilerOptions comp,
+            ISqlDialect dialect) : base(panel, subpanel, panelitem, comp, dialect)
         {
             Panel = panel;
             SubPanel = subpanel;

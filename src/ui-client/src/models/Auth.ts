@@ -16,7 +16,7 @@ export interface ConfigDTO {
     attestation: AttestationOptionsDTO;
     cohort: CohortConfigDTO;
     client: ClientOptions;
-    version: string;
+    version: VersionConfigDTO;
 }
 
 interface AuthenticationConfigDTO {
@@ -36,6 +36,11 @@ interface AttestationOptionsDTO {
     type?: CustomAttestationType
 }
 
+interface VersionConfigDTO {
+    db: string;
+    server: string;
+}
+
 export enum CustomAttestationType {
     Text = 1,
     Html = 2
@@ -44,6 +49,7 @@ export enum CustomAttestationType {
 interface CohortConfigDTO {
     cacheLimit: number;
     exportLimit: number;
+    lowCellMaskingThreshold: number;
     deidentificationEnabled: boolean;
 }
 

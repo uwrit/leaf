@@ -10,25 +10,25 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Model.Extensions;
 using Model.Options;
-using Model.Compiler.Common;
+using Model.Compiler.SqlBuilder;
 using Model.Authorization;
 
-namespace Model.Compiler.SqlServer
+namespace Model.Compiler.PanelSqlCompiler
 {
-    public class SqlServerCompiler : ISqlCompiler
+    public class PanelSqlCompiler : IPanelSqlCompiler
     {
         readonly IUserContext user;
+        readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
-        readonly CohortOptions cohortOptions;
 
-        public SqlServerCompiler(
-            IUserContext userContext,
-            IOptions<CompilerOptions> compilerOptions,
-            IOptions<CohortOptions> cohortOptions)
+        public PanelSqlCompiler(
+            IUserContext user,
+            ISqlDialect dialect,
+            IOptions<CompilerOptions> compilerOptions)
         {
-            this.user = userContext;
+            this.user = user;
+            this.dialect = dialect;
             this.compilerOptions = compilerOptions.Value;
-            this.cohortOptions = cohortOptions.Value;
         }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace Model.Compiler.SqlServer
             switch (panel.PanelType)
             {
                 case PanelType.Patient:
-                    sql = new SubPanelSqlSet(panel, compilerOptions).ToString();
+                    sql = new SubPanelSqlSet(panel, compilerOptions, dialect).ToString();
                     break;
                 case PanelType.Sequence:
-                    sql = new PanelSequentialSqlSet(panel, compilerOptions).ToString();
+                    sql = new PanelSequentialSqlSet(panel, compilerOptions, dialect).ToString();
                     break;
                 default:
                     return string.Empty;
@@ -55,16 +55,8 @@ namespace Model.Compiler.SqlServer
             return sql;
         }
 
-        public string BuildDatasetEncounterFilterSql(Panel panel)
-        {
-            var sql = new DatasetJoinedSqlSet(panel, compilerOptions).ToString();
-            ValidateSql(sql);
-            return sql;
-        }
-
         public ISqlStatement BuildCteSql(IEnumerable<Panel> panels)
         {
-            var parameters = BuildContextParameterSql();
             var contexts = panels.Select((p, i) =>
             {
                 return new CteCohortQueryContext
@@ -79,38 +71,33 @@ namespace Model.Compiler.SqlServer
 
             var query = new StringBuilder(inclusions.First().CompiledQuery);
 
-            foreach (var context in inclusions.Skip(1))
-            {
-                query.Append($" {Dialect.Syntax.INTERSECT} {context.CompiledQuery}");
-            }
+            foreach (var context in inclusions.Skip(1)) query.Append($" {dialect.Intersect()} {context.CompiledQuery}");
+            foreach (var context in exclusions)         query.Append($" {dialect.Except()} {context.CompiledQuery}");
 
-            foreach (var context in exclusions)
-            {
-                query.Append($" {Dialect.Syntax.EXCEPT} {context.CompiledQuery}");
-            }
-
-            return new CteCohortQuery(parameters, query.ToString());
+            return new CteCohortQuery(query.ToString());
         }
 
-        public string BuildContextParameterSql()
+        public IEnumerable<QueryParameter> BuildContextQueryParameters()
         {
-            Func<bool,int> toInt = (bool x) => Convert.ToInt32(x);
-            var identified = $"{Dialect.Syntax.DECLARE} @IsIdentified {Dialect.Types.BIT} = {toInt(user.Identified)}";
-            var research   = $"{Dialect.Syntax.DECLARE} @IsResearch   {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.Research)}";
-            var qi         = $"{Dialect.Syntax.DECLARE} @IsQI         {Dialect.Types.BIT} = {toInt(user.SessionType == SessionType.QualityImprovement)}";
-            return $"{identified}; {research}; {qi};";
+            var parameters = new List<QueryParameter>();
+
+            parameters.Add(new QueryParameter("IsIdentified", user.Identified));
+            parameters.Add(new QueryParameter("IsResearch", user.SessionType == SessionType.Research));
+            parameters.Add(new QueryParameter("IsQI", user.SessionType == SessionType.QualityImprovement));
+
+            return parameters;
         }
 
         string BuildWrappedPanelSql(Panel panel)
         {
             var internals = BuildPanelSql(panel);
             var alias = $"P{panel.Index}";
-            return $"{Dialect.Syntax.SELECT} {alias}.{compilerOptions.FieldPersonId} {Dialect.Syntax.FROM} ( {internals} ) {Dialect.Syntax.AS} {alias}";
+            return $"SELECT {alias}.{compilerOptions.FieldPersonId} FROM ( {internals} ) AS {alias}";
         }
 
         void ValidateSql(string input)
         {
-            new SqlValidator(Dialect.IllegalCommands).Validate(input);
+            new SqlValidator(SqlCommon.IllegalCommands).Validate(input);
         }
     }
 }

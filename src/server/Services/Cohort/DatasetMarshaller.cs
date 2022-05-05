@@ -6,7 +6,6 @@
 using System;
 using Model.Compiler;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using Model.Cohort;
 using Model.Options;
 
@@ -50,6 +49,6 @@ namespace Services.Cohort
             }
         }
 
-        public abstract IEnumerable<ShapedDataset> Marshal(SqlDataReader reader, bool anonymize, DeidentificationOptions opts);
+        public abstract IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts);
     }
 }

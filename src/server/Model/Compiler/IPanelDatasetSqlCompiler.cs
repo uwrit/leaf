@@ -4,10 +4,12 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Threading.Tasks;
+
 namespace Model.Compiler
 {
     public interface IPanelDatasetSqlCompiler
     {
-        ConceptDatasetExecutionContext BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext);
+        Task<ConceptDatasetExecutionContext> BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext);
     }
 }

@@ -89,8 +89,8 @@ namespace Model.Cohort
 
             cancel.ThrowIfCancellationRequested();
 
-            var exeContext = compiler.BuildDatasetSql(validationContext.Context);
-            log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext);
+            var exeContext = await compiler.BuildDatasetSql(validationContext.Context);
+            log.LogInformation("Compiled dataset execution context. Context:{@Context}", exeContext.ToCleaned());
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
             log.LogInformation("Dataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
@@ -105,14 +105,6 @@ namespace Model.Cohort
             if (!clientOpts.PatientList.Enabled)
             {
                 throw new Exception("Patient List datasets are disabled");
-            }
-            if (deidentOpts.Cohort.Noise.Enabled)
-            {
-                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Noise is enabled");
-            }
-            if (deidentOpts.Cohort.LowCellSizeMasking.Enabled)
-            {
-                throw new Exception("Patient List datasets cannot be extracted if Cohort De-identification Low Cell Size Masking is enabled");
             }
         }
 

@@ -50,6 +50,7 @@ export interface NetworkCohortState {
  * State prop types
  */
 export interface PatientCountState {
+    cached: boolean;
     duration?: number;
     plusMinus: number;
     queryId: string;
