@@ -37,7 +37,6 @@ import NotificationModal from '../components/Modals/NotificationModal/Notificati
 import MaintainenceModal from '../components/Modals/MaintainenceModal/MaintainenceModal';
 import './App.css';
 
-
 interface OwnProps {
 }
 interface DispatchProps {
@@ -175,13 +174,19 @@ class App extends React.Component<Props> {
      * Handle user activity via mouse or key action, which resets the inactivity timeout.
      */
     private handleActivity = () => {
-        const { dispatch, auth, session } = this.props;
+        const { dispatch, auth, session, exportState } = this.props;
         if (!session.context || auth!.config!.authentication.inactivityTimeoutMinutes <= 0) { return; }
 
         if (inactivityTimer) {
             clearTimeout(inactivityTimer);
         }
         inactivityTimer = setTimeout(() => {
+
+            /* Bail if user is exporting */
+            if (exportState.isExporting) {
+                return;
+            }
+            
             dispatch(showInfoModal({ 
                 header: 'Session Inactive', 
                 body: `You've been logged out due to inactivity. Please log back in to resume your session.`, 
