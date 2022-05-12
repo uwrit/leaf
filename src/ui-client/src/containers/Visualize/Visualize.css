@@ -268,10 +268,3 @@
     line-height: 16px;
     margin: 0 5px;
 }
-
-.recharts-rectangle.Living,
-.recharts-text.Living,
-.recharts-rectangle.Deceased,
-.recharts-text.Deceased {
-    display: none;
-}
