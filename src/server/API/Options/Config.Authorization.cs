@@ -13,6 +13,7 @@ namespace API.Options
             public const string Section = @"Authorization";
             public const string Mechanism = @"Authorization:Mechanism";
             public const string AllowAllAuthenticatedUsers = @"Authorization:AllowAllAuthenticatedUsers";
+            public const string UnsecuredIsAdmin = @"Authorization:UnsecuredIsAdmin";
 
             public const string Saml2 = @"Authorization:SAML2";
             public const string ActiveDirectory = @"Authorization:ActiveDirectory";

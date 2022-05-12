@@ -22,6 +22,7 @@ namespace Model.Options
 
         public AuthorizationMechanism Mechanism { get; set; }
         public bool AllowAllAuthenticatedUsers { get; set; }
+        public bool UnsecuredIsAdmin { get; set; }
 
         static bool ValidMechanism(string mech) => ValidMechanisms.Contains(mech);
         public AuthorizationOptions WithMechanism(string value)
