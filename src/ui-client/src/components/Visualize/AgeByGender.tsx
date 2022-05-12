@@ -8,7 +8,7 @@
 import React from 'react';
 import { Bar, BarChart, LabelList, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { visualizationConfig } from '../../config/visualization';
-import { AgeByGenderBucket, AgeByGenderData } from '../../models/cohort/DemographicDTO';
+import { AgeByGenderData } from '../../models/cohort/DemographicDTO';
 
 interface Props {
     data: AgeByGenderData;
