@@ -13,11 +13,25 @@ namespace API.Authentication
 {
     public class UnsecureIdentityProvider : IFederatedIdentityProvider
     {
+        readonly AuthenticationOptions authenticationOpts;
+        readonly AuthorizationOptions authorizationOpts;
+
+        public UnsecureIdentityProvider(
+            IOptions<AuthenticationOptions> authenticationOpts,
+            IOptions<AuthorizationOptions> authorizationOpts
+        )
+        {
+            this.authenticationOpts = authenticationOpts.Value;
+            this.authorizationOpts = authorizationOpts.Value;
+        }
+
         public IScopedIdentity GetIdentity(HttpContext context)
         {
             return new UnsecureScopedIdentity
             {
-                Identity = "admin",
+                Identity = authorizationOpts.UnsecuredIsAdmin
+                    ? "admin"
+                    : "user",
                 Scope = "localhost"
             };
         }

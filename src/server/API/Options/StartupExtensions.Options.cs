@@ -559,13 +559,16 @@ namespace API.Options
         {
             var sp = services.BuildServiceProvider();
             var log = sp.GetRequiredService<ILogger<Startup>>();
+            bool? unsecuredIsAdmin = true;
             var authentication = sp.GetRequiredService<IOptions<AuthenticationOptions>>().Value;
             var authorization = new AuthorizationOptions().WithMechanism(config.GetValue<string>(Config.Authorization.Mechanism));
             config.TryGetValue(Config.Authorization.AllowAllAuthenticatedUsers, out bool allowAllAuthenticated);
+            config.TryGetValue(Config.Authorization.UnsecuredIsAdmin, out unsecuredIsAdmin);
             services.Configure<AuthorizationOptions>(opts =>
             {
                 opts.Mechanism = authorization.Mechanism;
                 opts.AllowAllAuthenticatedUsers = allowAllAuthenticated;
+                opts.UnsecuredIsAdmin = !unsecuredIsAdmin.HasValue || (bool)unsecuredIsAdmin;
             });
 
             switch (authorization.Mechanism)
