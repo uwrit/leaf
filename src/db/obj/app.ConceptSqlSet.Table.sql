@@ -17,6 +17,7 @@ CREATE TABLE [app].[ConceptSqlSet](
 	[SqlSetFrom] [nvarchar](1000) NOT NULL,
 	[SqlFieldDate] [nvarchar](1000) NULL,
 	[SqlFieldEvent] [nvarchar](400) NULL,
+    [Description] NVARCHAR(200) NULL,
 	[Created] [datetime] NOT NULL,
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
