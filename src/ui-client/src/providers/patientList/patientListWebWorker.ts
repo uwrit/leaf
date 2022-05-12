@@ -386,7 +386,7 @@ export default class PatientListWebWorker {
                 for (let j = 0; j < dateFields.length; j++) {
                     const col = dateFields[j];
                     if (patientDto[col.id]) {
-                        patientDto[col.id] = new Date(patientDto[col.id]);
+                        patientDto[col.id] = parseTimestamp(patientDto[col.id])
                     }
                 }
 

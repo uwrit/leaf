@@ -106,7 +106,7 @@ class NotificationModal extends React.PureComponent<Props, State> {
         const { dispatch, serverState } = this.props;
         const { currentIdx, checked } = this.state;
 
-        if (currentIdx + 1 == serverState.notifications.length) {
+        if (currentIdx + 1 === serverState.notifications.length) {
             dispatch(setUserNotificationsSeen(checked));
             this.setState({ currentIdx: 0 });
         } else {

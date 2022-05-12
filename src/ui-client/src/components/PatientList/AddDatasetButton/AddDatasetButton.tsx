@@ -37,13 +37,14 @@ const none: DateFilter = { dateIncrementType: DateIncrementType.NONE };
 const today: DateFilter = { dateIncrementType: DateIncrementType.NOW };
 const dates: DateBoundary[] = [
     { display: 'Anytime', start: none, end: none },
-    { display: 'In Past 48 Hours', abbrev: '48H', start: { increment: -48, dateIncrementType: DateIncrementType.HOUR }, end: today },
-    { display: 'In Past 7 Days', abbrev: '7D', start: { increment: -7, dateIncrementType: DateIncrementType.DAY }, end: today },
-    { display: 'In Past 30 Days', abbrev: '30D', start: { increment: -30, dateIncrementType: DateIncrementType.DAY }, end: today },
-    { display: 'In Past 6 Months', abbrev: '6M', start: { increment: -6, dateIncrementType: DateIncrementType.MONTH }, end: today },
+    { display: 'Custom Date Range', start: { dateIncrementType: DateIncrementType.SPECIFIC}, end: { dateIncrementType: DateIncrementType.SPECIFIC} },
+    { display: 'In Past 48 Hours',  abbrev: '48H', start: { increment: -48, dateIncrementType: DateIncrementType.HOUR }, end: today },
+    { display: 'In Past 7 Days',    abbrev: '7D',  start: { increment: -7,  dateIncrementType: DateIncrementType.DAY }, end: today },
+    { display: 'In Past 30 Days',   abbrev: '30D', start: { increment: -30, dateIncrementType: DateIncrementType.DAY }, end: today },
+    { display: 'In Past 6 Months',  abbrev: '6M',  start: { increment: -6,  dateIncrementType: DateIncrementType.MONTH }, end: today },
     { display: 'In Past 12 Months', abbrev: '12M', start: { increment: -12, dateIncrementType: DateIncrementType.MONTH }, end: today },
-    { display: 'In Past 2 Years', abbrev: '2Y', start: { increment: -2, dateIncrementType: DateIncrementType.YEAR }, end: today },
-    { display: 'In Past 3 Years', abbrev: '3Y', start: { increment: -3, dateIncrementType: DateIncrementType.YEAR }, end: today }
+    { display: 'In Past 2 Years',   abbrev: '2Y',  start: { increment: -2,  dateIncrementType: DateIncrementType.YEAR }, end: today },
+    { display: 'In Past 3 Years',   abbrev: '3Y',  start: { increment: -3,  dateIncrementType: DateIncrementType.YEAR }, end: today }
 ];
 
 export default class AddDatasetButton extends React.PureComponent<Props, State> {
@@ -164,6 +165,13 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     }
 
     private handleDateOptionClick = (opt: DateBoundary) => {
+        const customIdx = dates.findIndex(d => d.start.dateIncrementType === DateIncrementType.SPECIFIC);
+
+        if (opt.start.dateIncrementType === DateIncrementType.SPECIFIC) {
+            dates[customIdx] = opt;
+        } else {
+            dates[customIdx].display = 'Custom Date Range';
+        }
         this.setState({ selectedDates: opt, selectedEncounterPanel: undefined });
     }
 

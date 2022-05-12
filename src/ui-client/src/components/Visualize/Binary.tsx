@@ -59,7 +59,7 @@ export class Binary extends React.PureComponent<Props> {
                                 <LabelList dataKey="label" position="insideBottomRight" />
                             </Bar>
                             <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
-                                {leftBars.map((d: BinarySplit) => <Cell key={d.label} fill={d.color} />)}
+                                {leftBars.map((d: BinarySplit) => <Cell key={d.label} className={d.label} fill={d.color} />)}
                                 <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="insideRight"/>
                             </Bar>
                         </BarChart>
@@ -73,7 +73,7 @@ export class Binary extends React.PureComponent<Props> {
                                 <LabelList dataKey="label" position="insideBottomLeft" />
                             </Bar>
                             <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
-                                {rightBars.map((d: BinarySplit) => <Cell key={d.label} fill={d.color} />)}
+                                {rightBars.map((d: BinarySplit) => <Cell key={d.label} className={d.label} fill={d.color} />)}
                                 <LabelList dataKey="value" position="right" formatter={this.formatNumber} />
                             </Bar>
                         </BarChart>

@@ -34,7 +34,7 @@ export class DirectionalSlider extends React.Component<Props> {
         }
     }
 
-    public componentWillMount() {
+    public componentDidMount() {
         this.instanceName = `${this.className}-${generateId()}`;
     }
 

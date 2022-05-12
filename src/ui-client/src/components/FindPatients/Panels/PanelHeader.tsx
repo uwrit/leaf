@@ -13,6 +13,7 @@ import DateDropdown from './DateDropdown';
 import InclusionDropdown from './InclusionDropdown';
 import { INCLUSION_DROPDOWN_TYPE } from './InclusionDropdown';
 import { PanelHandlers } from './PanelGroup';
+import { DateBoundary } from '../../../models/panel/Date';
 
 interface Props {
     handlers: PanelHandlers;
@@ -52,9 +53,10 @@ export default class PanelHeader extends React.PureComponent<Props, State> {
                     panel={panel}
                 />
                 {showCustomDateRangeBox &&
-                <CustomDateRangePicker 
-                    handlers={handlers}
-                    panel={panel}
+                <CustomDateRangePicker
+                    dateFilter={panel.dateFilter}
+                    handleDateRangeSelect={this.handleCustomDateRangeSelect}
+                    index={panel.index}
                     parentDomRect={DOMRect!}
                     toggleCustomDateRangeBox={this.toggleCustomDateRangeBox}
                 />
@@ -66,6 +68,11 @@ export default class PanelHeader extends React.PureComponent<Props, State> {
                 /> 
             </div>
         );
+    }
+
+    private handleCustomDateRangeSelect = (dates: DateBoundary) => {
+        const { handlers, panel } = this.props;
+        handlers.handlePanelDateFilter(panel.index, dates);
     }
 
     private handleCustomDateSelectionClick = (e: any) => {

@@ -207,7 +207,7 @@ var addDemographics = function (payload) {
         for (let j = 0; j < dateFields.length; j++) {
             const col = dateFields[j];
             if (patientDto[col.id]) {
-                patientDto[col.id] = new Date(patientDto[col.id]);
+                patientDto[col.id] = parseTimestamp(patientDto[col.id])
             }
         }
         // Add to the patId arrays

@@ -8,12 +8,13 @@
 import React from 'react';
 import { Col, Row, Button } from 'reactstrap';
 import { getPatientListDataset } from '../../../actions/cohort/patientList';
-import { DateBoundary } from '../../../models/panel/Date';
+import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
 import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import PanelSelectorModal from '../../Modals/PanelSelectorModal/PanelSelectorModal';
+import CustomDateRangePicker from '../../FindPatients/Panels/CustomDateRangePicker';
 
 interface Props {
     className?: string;
@@ -31,22 +32,28 @@ interface Props {
 }
 
 interface State {
+    DOMRect?: DOMRect;
+    showCustomDateRangeBox: boolean;
     showEncounterPanelModal: boolean;
 }
+
+let customDateDisplay = '';
 
 export default class AddDatasetSelectors extends React.PureComponent<Props,State> {
     public constructor(props: Props) {
         super(props);
         this.state = {
-            showEncounterPanelModal: false
+            showEncounterPanelModal: false,
+            showCustomDateRangeBox: false
         }
     }
 
     public render() {
         const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates, selectedEncounterPanel } = this.props;
-        const { showEncounterPanelModal } = this.state;
+        const { showEncounterPanelModal, showCustomDateRangeBox, DOMRect } = this.state;
         const c = className ? className : 'patientlist-add-dataset';
         const selected = datasets.all.get(datasets.selected);
+        const customDateFilter = dates.find(d => d.start.dateIncrementType === DateIncrementType.SPECIFIC);
 
         return (
             <div className={c}>
@@ -81,6 +88,14 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
                             {this.getByEncounterContent(selectedEncounterPanel)}
                         </div>
                         }
+                        {showCustomDateRangeBox &&
+                        <CustomDateRangePicker
+                            dateFilter={customDateFilter}
+                            handleDateRangeSelect={this.handleCustomDateRangeSelect.bind(null)}
+                            parentDomRect={DOMRect!}
+                            toggleCustomDateRangeBox={this.toggleCustomDateRangeBox}
+                        />
+                        }
                         {!showDates &&
                         <div>This dataset cannot be filtered by dates</div>}
                     </Col>
@@ -114,14 +129,37 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
         return <div onClick={this.showEncounterPanelModal} className={`${className}-by-encounter selected`}>From Panel {selectedEncounterPanel+1}</div>;
     }
 
-    private handleDateOptionClick = (opt: DateBoundary) => {
+    private handleDateOptionClick = (opt: DateBoundary, e: any) => {
+        const { handleDateSelect, dates } = this.props;
+        const { DOMRect } = this.state;
+        
+        if (opt.start.dateIncrementType === DateIncrementType.SPECIFIC) {
+            const customDateFilter = dates.find(d => d.start.dateIncrementType === DateIncrementType.SPECIFIC);
+            this.setState({ 
+                DOMRect: e && e.target ? e.target.getBoundingClientRect() : DOMRect,
+                showCustomDateRangeBox: true
+            });
+            customDateFilter.display = customDateDisplay;
+            handleDateSelect(customDateFilter);
+        } else {
+            handleDateSelect(opt);
+        }
+    }
+
+    private handleCustomDateRangeSelect = (opt: DateBoundary) => {
         const { handleDateSelect } = this.props;
+        customDateDisplay = opt.display;
         handleDateSelect(opt);
     }
 
     private setDateOptionClass = (date: DateBoundary) => {
         const { className, selectedDates } = this.props;
         return `${className}-select-date-option ${date === selectedDates ? 'selected' : ''}`
+    }
+
+    private toggleCustomDateRangeBox = (show?: boolean) => {
+        const showCustomDateRangeBox = show !== undefined ? show : !this.state.showCustomDateRangeBox;
+        this.setState({ showCustomDateRangeBox });
     }
 
     private showEncounterPanelModal = () => this.setState({ showEncounterPanelModal: true });

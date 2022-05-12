@@ -9,15 +9,14 @@ import moment from 'moment';
 import React from 'react';
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
-import { Panel as PanelModel } from '../../../models/panel/Panel';
 import PopupBox from '../../Other/PopupBox/PopupBox';
-import { PanelHandlers } from './PanelGroup';
 import 'react-day-picker/lib/style.css';
 import './CustomDateRangePicker.css';
 
-interface Props { 
-    handlers: PanelHandlers;
-    panel: PanelModel;
+interface Props {
+    handleDateRangeSelect: (dates: DateBoundary) => any;
+    dateFilter?: DateBoundary;
+    index?: number;
     parentDomRect: DOMRect;
     toggleCustomDateRangeBox: (show?: boolean) => any;
 }
@@ -44,20 +43,21 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
     constructor(props: Props) {
         super(props);
         this.state = {
-            endDateInput: props.panel.dateFilter.end.date ? moment(props.panel.dateFilter.end.date).format(this.dateFormat) : '',
+            endDateInput: props.dateFilter && props.dateFilter.end.date ? moment(props.dateFilter.end.date).format(this.dateFormat) : '',
             endDateValid: true,
-            startDateInput: props.panel.dateFilter.start.date ? moment(props.panel.dateFilter.start.date).format(this.dateFormat) : '',
+            startDateInput: props.dateFilter && props.dateFilter.start.date ? moment(props.dateFilter.start.date).format(this.dateFormat) : '',
             startDateValid: true
         }
     }
 
     public render() {
-        const { panel, parentDomRect } = this.props;
+        const { dateFilter, parentDomRect, index } = this.props;
         const { startDateValid, endDateValid, startDateInput, endDateInput } = this.state;
         const c = this.className;
         const b = `${c}-input-container`;
         const startDateClasses = `${b} ${c}-input-container-start ${startDateValid ? '' : 'invalid'}`;
         const endDateClasses = `${b} ${c}-input-container-end ${endDateValid ? '' : 'invalid'}`;
+        const idx = index === undefined && typeof index == 'undefined' ? -1 : index;
 
         return (
             <PopupBox
@@ -70,7 +70,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
                     <div className={`${c}-body`}>
 
                         {/* Start date */}
-                        <div className={startDateClasses} id={`${c}-input-container-start${panel.index}`} onKeyDown={this.handleSearchKeydown}>
+                        <div className={startDateClasses} id={`${c}-input-container-start${idx}`} onKeyDown={this.handleSearchKeydown}>
                             <DayPickerInput
                                 formatDate={this.formatDate}
                                 format={this.dateFormat}
@@ -78,7 +78,7 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
                                 onBlur={this.closeCustomDateRangeBox}
                                 onDayChange={this.handleDateChange.bind(null, DateInputType.Start)}
                                 onDayPickerHide={this.pollForFocusOut}
-                                dayPickerProps={{ selectedDays: panel.dateFilter.start.date }}
+                                dayPickerProps={{ selectedDays: dateFilter ? dateFilter.start.date : null }}
                                 placeholder={this.dateFormat}
                             />
                         </div>
@@ -86,14 +86,14 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
                         <span>to</span>
 
                         {/* End date */}
-                        <div className={endDateClasses} id={`${c}-input-container-end${panel.index}`} onKeyDown={this.handleSearchKeydown}>
+                        <div className={endDateClasses} id={`${c}-input-container-end${idx}`} onKeyDown={this.handleSearchKeydown}>
                             <DayPickerInput
                                 format={this.dateFormat}
                                 value={endDateInput}
                                 onBlur={this.closeCustomDateRangeBox}
                                 onDayPickerHide={this.pollForFocusOut}
                                 onDayChange={this.handleDateChange.bind(null, DateInputType.End)}
-                                dayPickerProps={{ selectedDays: panel.dateFilter.end.date }}
+                                dayPickerProps={{ selectedDays: dateFilter ? dateFilter.end.date : null }}
                                 placeholder={this.dateFormat}
                             />
                         </div>
@@ -132,13 +132,13 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Updates the store with a DateBoundary object based on current input.
      */
     private setDateBoundary = (startDate: DateFilter, endDate: DateFilter) => {
-        const { panel, handlers } = this.props;
+        const { handleDateRangeSelect } = this.props;
         const dateBoundary: DateBoundary = {
             display: `${startDate.date!.toLocaleDateString()} - ${endDate.date!.toLocaleDateString()}`,
             end: { date: endDate.date, dateIncrementType: DateIncrementType.SPECIFIC },
             start: { date: startDate.date, dateIncrementType: DateIncrementType.SPECIFIC }
         };
-        handlers.handlePanelDateFilter(panel.index, dateBoundary);
+        handleDateRangeSelect(dateBoundary);
     }
 
     /*
@@ -190,11 +190,11 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Handles changes to the end date.
      */
     private handleEndDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
-        const { panel, handlers } = this.props;
+        const { handleDateRangeSelect, dateFilter } = this.props;
         const { startDateInput } = this.state;
 
         if (updateDate && date) {
-            let startDate: Date = panel.dateFilter.start.date!;
+            let startDate: Date = dateFilter ? dateFilter.start.date! : null;
 
             if (!startDate) {
                 const momentDate = moment(startDateInput);
@@ -208,11 +208,11 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ endDateValid: false });
-            handlers.handlePanelDateFilter(panel.index, this.anytime);
+            handleDateRangeSelect(this.anytime);
         }
         else {
             this.setState({ startDateValid: true });
-            handlers.handlePanelDateFilter(panel.index, this.anytime);
+            handleDateRangeSelect(this.anytime);
         }
     }
 
@@ -220,11 +220,11 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * Handles changes to the start date.
      */
     private handleStartDateChange = (updateDate: boolean, date: Date, dateInputString: string) => {
-        const { panel, handlers } = this.props;
+        const { dateFilter, handleDateRangeSelect } = this.props;
         const { endDateInput } = this.state;
 
         if (updateDate && date) {
-            let endDate: Date = panel.dateFilter.end.date!;
+            let endDate: Date = dateFilter ? dateFilter.end.date! : null;
 
             if (!endDate) {
                 const momentDate = moment(endDateInput);
@@ -238,10 +238,10 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
         }
         else if (dateInputString.length > 0) {
             this.setState({ startDateValid: false });
-            handlers.handlePanelDateFilter(panel.index, this.anytime);
+            handleDateRangeSelect(this.anytime);
         } else {
             this.setState({ startDateValid: true });
-            handlers.handlePanelDateFilter(panel.index, this.anytime);
+            handleDateRangeSelect(this.anytime);
         }
     }
 
@@ -255,8 +255,8 @@ export default class CustomDateRangePicker extends React.PureComponent<Props, St
      * the filter to 'Anytime'.
      */
     private handleClearClick = () => {
-        const { panel, handlers } = this.props;
-        handlers.handlePanelDateFilter(panel.index, this.anytime);
+        const { handleDateRangeSelect } = this.props;
+        handleDateRangeSelect(this.anytime);
         this.closeCustomDateRangeBox();
     }
 

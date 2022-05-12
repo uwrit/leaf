@@ -7,7 +7,7 @@
 
 import { generate as generateId } from 'shortid';
 import { CohortMap, NetworkCohortState } from '../../models/state/CohortState';
-import { BinarySplitPair, DemographicStatistics, NihRaceEthnicityBucket } from '../../models/cohort/DemographicDTO';
+import { BinarySplitPair, DemographicStatistics } from '../../models/cohort/DemographicDTO';
 import { NetworkResponderMap } from '../../models/NetworkResponder';
 import { workerContext } from './cohortAggregatorWebWorkerContext';
 

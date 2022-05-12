@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd';
-import { Button, Col, Modal, ModalBody, ModalFooter, Row } from 'reactstrap';
+import { Button, Col, Row } from 'reactstrap';
 import { getConceptDataset } from '../../actions/cohort/timelines';
 import { TimelinesOverlayMode } from '../../containers/Timelines/Timelines';
 import { Concept, ConceptSpecialization, ConceptSpecializationGroup } from '../../models/concept/Concept';
@@ -116,13 +116,13 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 <div className={`${c}-inner waiting`}>
                     <Row>
                         <Col sm={12} className={`${c}-title-text`}>Drag and Drop Concepts for</Col>
-                        <Col sm={6} className={`${c}-all-data ${hovered == HoverDropType.All ? 'hovered' : ''}`} 
+                        <Col sm={6} className={`${c}-all-data ${hovered === HoverDropType.All ? 'hovered' : ''}`} 
                             onDragOver={this.toggleUseAllData.bind(null, HoverDropType.All)}>
                             <div>
                                 All Data
                             </div>
                         </Col>
-                        <Col sm={6} className={`${c}-specific-data ${hovered == HoverDropType.Specific ? 'hovered' : ''}`} 
+                        <Col sm={6} className={`${c}-specific-data ${hovered === HoverDropType.Specific ? 'hovered' : ''}`} 
                             onDragOver={this.toggleUseAllData.bind(null, HoverDropType.Specific)}>
                             <div>
                                 Specific Dates or Values
@@ -246,7 +246,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
         const panel = Object.assign({}, this.state.panel, { subPanels: [{
             ...sp, panelItems: [{
                 ...pi,
-                specializations: pi.specializations.slice().filter((s) => s.specializationGroupId != conceptSpecializationGroup.id)
+                specializations: pi.specializations.slice().filter((s) => s.specializationGroupId !== conceptSpecializationGroup.id)
             }]
         }]});
         this.setState({ panel });
