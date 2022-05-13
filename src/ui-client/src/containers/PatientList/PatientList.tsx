@@ -92,7 +92,7 @@ class PatientList extends React.PureComponent<Props, State> {
             return (
                 <div className={`${c}-error`}>
                     <p>
-                        Sorry, your administrator has configured Leaf to not show Patient Lists for cohorts of {auth.config.cohort.lowCellMaskingThreshold} patients or less.
+                        Sorry, your administrator has configured Leaf to not show patient lists for cohorts of {auth.config.cohort.lowCellMaskingThreshold} patients or less.
                     </p>
                 </div>
             );

@@ -51,7 +51,7 @@ namespace Model.Compiler.PanelSqlCompiler
 
         string Compose(string cohortSql, string conceptSql)
         {
-            var select = $"SELECT DS.*, C.Salt FROM dataset AS DS INNER JOIN cohort AS C ON DS.{DatasetColumns.PersonId} = C.{DatasetColumns.PersonId}";
+            var select = $"SELECT DS.*, C.Salt FROM dataset AS DS INNER JOIN cohort AS C ON DS.{DatasetColumns.PersonId} = C.{cachedCohortPreparer.FieldInternalPersonId}";
 
             return $"WITH cohort AS ( {cohortSql} ), dataset AS ( {conceptSql} ) {select}";
         }

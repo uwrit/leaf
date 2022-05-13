@@ -16,7 +16,6 @@ namespace Model.Compiler.SqlBuilder
         internal SubPanel SubPanel { get; set; }
         internal PanelItem PanelItem { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
-        internal ISqlDialect Dialect { get; set; }
 
         public ConceptDatasetSqlSet(
             Panel panel,
@@ -37,10 +36,10 @@ namespace Model.Compiler.SqlBuilder
             // Ensure personId and encounterId are always strings
             var cols = new List<ExpressedColumn>();
             var personId = new ExpressedColumn(
-                new Expression(Dialect.Convert(ColumnType.String, PersonId)),
+                new Expression(dialect.Convert(ColumnType.String, PersonId)),
                 DatasetColumns.PersonId);
             var encounterId = new ExpressedColumn(
-                new Expression(Dialect.Convert(ColumnType.String, EncounterId)),
+                new Expression(dialect.Convert(ColumnType.String, EncounterId)),
                 EncounterColumns.EncounterId);
             var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
 
@@ -78,13 +77,13 @@ namespace Model.Compiler.SqlBuilder
                 Salt
             };
             From = $"{compilerOptions.AppDb}.app.Cohort";
-            Where = new[] { QueryId == new UnaliasedColumn(queryParamPlaceholder) & Exported == true };
+            Where = new[] { QueryId == new UnaliasedColumn("@" + queryParamPlaceholder) & Exported == true };
         }
 
         public override string ToString()
         {
             return base.ToString()
-                .Replace(queryParamPlaceholder, ShapedDatasetCompilerContext.QueryIdParam);
+                .Replace("@" + queryParamPlaceholder, ShapedDatasetCompilerContext.QueryIdParam);
         }
     }
 }

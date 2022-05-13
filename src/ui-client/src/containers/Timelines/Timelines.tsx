@@ -76,6 +76,19 @@ class Timelines extends React.Component<Props, State> {
         const hasConcepts =  timelines.configuration.panels.size > 0;
         const config = timelines.configuration;
 
+        /**
+         * Block timelines when under lowcellmasking threshold
+         */
+        if (patientCount <= auth.config.cohort.lowCellMaskingThreshold) {
+            return (
+                <div className={`${c}-error`}>
+                    <p>
+                    Sorry, your administrator has configured Leaf to not show timelines for cohorts of {auth.config.cohort.lowCellMaskingThreshold} patients or less.
+                    </p>
+                </div>
+            );
+        } 
+
         return  (
             <div className={`${c}-container scrollable-offset-by-header ${showConcepts ? 'show-concepts' : ''}`}>
 

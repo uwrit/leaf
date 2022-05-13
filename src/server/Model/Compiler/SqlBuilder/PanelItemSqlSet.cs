@@ -41,7 +41,6 @@ namespace Model.Compiler.SqlBuilder
 
     class PanelItemSqlSet : NamedSet
     {
-        readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
         readonly Panel panel;
         readonly SubPanel subpanel;
@@ -49,6 +48,7 @@ namespace Model.Compiler.SqlBuilder
         readonly Concept concept;
         readonly List<IEvaluatable> where = new List<IEvaluatable>();
 
+        internal ISqlDialect dialect;
         internal Column PersonId;
         internal Column EncounterId;
         internal EventIdColumn EventId;
