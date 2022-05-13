@@ -51,7 +51,7 @@ namespace Model.Compiler.SqlBuilder
         public override string ToString()
         {
             return base.ToString()
-                .Replace(queryParamPlaceholder, ShapedDatasetCompilerContext.QueryIdParam);
+                .Replace(queryParamPlaceholder, "@" + ShapedDatasetCompilerContext.QueryIdParam);
         }
 
         SubPanel GetCachedCohortSubPanel()
@@ -66,6 +66,7 @@ namespace Model.Compiler.SqlBuilder
                         {
                             SqlSetFrom = cachedCohortPreparer.CohortToCteFrom(),
                             SqlSetWhere = cachedCohortPreparer.CohortToCteWhere()
+                                .Replace("@" + ShapedDatasetCompilerContext.QueryIdParam, queryParamPlaceholder)
                         }
                     }
                 }

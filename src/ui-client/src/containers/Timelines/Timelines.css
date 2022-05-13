@@ -115,3 +115,24 @@
 .timelines-control-panel-step .input-group-append button {
     font-size: 1.1rem !important;
 }
+
+.timelines-error {
+    background-color: rgba(28, 170, 221, 0.05);
+    border: 2px dashed rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: black;
+    margin: 0;
+    padding: 20px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+}
+
+.timelines-error p {
+    font-size: 1.4rem;
+    font-weight: 100;
+    margin-bottom: 0;
+    text-align: center;
+}
