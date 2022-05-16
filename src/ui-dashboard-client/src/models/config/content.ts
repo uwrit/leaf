@@ -97,8 +97,10 @@ interface WidgetTimelineComparisonConfig {
 
 export interface WidgetTimelineComparisonEntryConfig {
     args?: WidgetTimelineComparisonArgs;
-    datasetId: string;
     column: string;
+    datasetId: string;
+    enabled?: boolean;
+    text?: string;
 }
 
 interface WidgetTimelineComparisonArgs {
@@ -113,4 +115,10 @@ interface WidgetTimelineComparisonNumericArgs {
 interface WidgetTimelineComparisonStringArgs {
     matchOn?: string[];
     pickerDisplayColumn?: string;
+}
+
+export interface StringPickerOption {
+    display: string;
+    enabled: boolean;
+    value: string;
 }

@@ -91,6 +91,34 @@
     top: 4px;
 }
 
+.dynamic-timeline-comparison-add-filter svg {
+    cursor: pointer;
+}
+
+.dynamic-timeline-comparison-filter-picker-container {
+    border-bottom: 1px solid rgb(230,230,230);
+    margin: 0 0 4px;
+    overflow-x: hidden;
+    padding-right: 0 !important;
+}
+
+.dynamic-timeline-comparison-filter-picker-container:last-child {
+    border-bottom: none;
+}
+
+.dynamic-timeline-comparison-filter-picker-container .input-group div {
+    line-height: 2.3;
+    margin-left: 10px;
+}
+
+.dynamic-timeline-comparison-filter-picker-container input.leaf-input {
+    flex: none;
+    margin: 0 10px 10px;
+    width: 50px !important;
+}
+
+
+
 .dynamic-timeline-comparison-filters-picker {
     background-color: white;
     border-radius: 4px;
@@ -100,18 +128,31 @@
     max-height: 500px;
     opacity: 0;
     overflow-y: auto;
-    padding: 10px;
+    padding: 35px 10px 10px;
     pointer-events: none;
     position: absolute;
     top: 0;
     transition: opacity 0.2s;
-    width: 200px;
-    z-index: 101;
+    width: 250px;
+    z-index: 110;
 }
 
 .dynamic-timeline-comparison-filters-picker.shown {
     opacity: 1;
     pointer-events: all;
+}
+
+.dynamic-timeline-comparison-filter-picker-close {
+    cursor: pointer;
+    font-size: 2rem;
+    margin: -5px 5px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dynamic-timeline-comparison-filter-picker-close:hover {
+    color: red !important;
 }
 
 .dynamic-timeline-comparison-filter-picker-row {

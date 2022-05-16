@@ -14,14 +14,17 @@ import {
     SET_SEARCH_TERM
 } from '../actions/cohort';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
-import { CohortData, CohortState, CohortStateType } from '../models/state/CohortState';
+import { CohortComparisonResult, CohortData, CohortState, CohortStateType } from '../models/state/CohortState';
 
 export function defaultCohortState(): CohortState {
     return { 
         data: {
             metadata: new Map(),
             patients: new Map(),
-            comparison: new Map()
+            comparison: {
+                values: new Map(),
+                n: 0
+            }
         },
         search: {
             hints: [],
@@ -35,8 +38,11 @@ const setCohortDatasets = (state: CohortState, data: CohortData) => {
     return Object.assign({}, state, { data });
 };
 
-const setComparisonDataset = (state: CohortState, comparison: Map<string, number>) => {
-    return Object.assign({}, state, { data: { ...state.data, comparison: new Map(comparison) } });
+const setComparisonDataset = (state: CohortState, comparison: CohortComparisonResult) => {
+    return Object.assign({}, state, { data: { 
+        ...state.data, 
+        comparison
+    } });
 };
 
 const setCohortState = (state: CohortState, cohortStateType: CohortStateType) => {

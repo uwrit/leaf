@@ -5,46 +5,52 @@ import { CohortData } from '../../../models/state/CohortState';
 import { TimelineValueSet } from './Timeline';
 import { FiPlus } from 'react-icons/fi'
 import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
-import { Col, Container, Row } from 'reactstrap';
+import { Col, Container, Input, InputGroup, Row } from 'reactstrap';
 
 interface Props {
     config: WidgetTimelineConfig;
     cohort: CohortData;
     datasets: TimelineValueSet[];
     dispatch: any;
+    filters: WidgetTimelineComparisonEntryConfig[];
+    filterClickHandler: (filters: WidgetTimelineComparisonEntryConfig[]) => any;
     patientId: string;
 }
 
 interface State {
-    filters: FilterConfig[];
     showPicker: boolean;
+    stringPickerOpts: Map<number, StringPickerOption[]>;
 }
 
-interface FilterConfig extends WidgetTimelineComparisonEntryConfig {
-    enabled: boolean;
-}
-
-export default class DynamicTimelineComparePicker extends React.Component<Props, State> {
+export default class DynamicTimelineComparePicker extends React.PureComponent<Props, State> {
     private className = 'dynamic-timeline-comparison';
 
     public constructor(props: Props) {
         super(props);
-        this.state = {
-            filters: [],
-            showPicker: false
+        const stringPickerOpts = new Map();
+
+        for (let i = 0; i < props.filters.length; i++) {
+            const f = props.filters[i];
+            if (f.args && f.args.string) {
+                const opts = this.deriveStringOptions(f);
+                stringPickerOpts.set(i, opts);
+            }
         }
+
+        this.state = {
+            showPicker: false,
+            stringPickerOpts
+        };
     }
 
     public componentDidMount() {
-        const { filters } = this.state;
-        const { dispatch, patientId, datasets } = this.props;
-
+        const { filters, dispatch, patientId, datasets } = this.props;
         dispatch(getTimelineComparisonValues(filters, datasets, patientId));
     }
 
     public render() {
-        const { config, cohort } = this.props;
-        const { filters, showPicker } = this.state;
+        const { config, filters } = this.props;
+        const { showPicker } = this.state;
         const c = this.className;
 
         return (
@@ -59,9 +65,10 @@ export default class DynamicTimelineComparePicker extends React.Component<Props,
                     <div onClick={this.handleClick} className={`${c}-all-patients-text`}>
                         <span>Mean over all </span>
                         <br/>
-                        {`(${filters.length} filters)`}
+                        {`(${filters.filter(f => f.enabled).length} filters)`}
                     </div>
                     <div className={`${c}-filters-picker ${showPicker ? 'shown' : ''}`}>
+                        <div className={`${c}-filter-picker-close`} onClick={this.toggleShowPicker}>×</div>
                         {this.getFilterPopup()}
                     </div>
                 </div>
@@ -75,28 +82,123 @@ export default class DynamicTimelineComparePicker extends React.Component<Props,
 
     public getFilterPopup = () => {
         const c = this.className;
-        const { config } = this.props;
+        const { stringPickerOpts } = this.state;
+        const { filters } = this.props;
 
         return (
-            config.comparison.filters!.map(f => (
-                <Container className={`${c}-filter-picker-container`}>
-                    <Row>
-                        <Col md={8} className={`${c}-filter-picker-row`}>{f.column}</Col>
-                        <Col md={4} className={`${c}-filter-picker-check`}>
-                            <CheckboxSlider onClick={this.dummy} checked={false} />
-                        </Col>
-                    </Row>
-                </Container>
-            ))
+            filters.map((f,i) => {
+                const enabled = typeof f.enabled !== 'undefined' && f.enabled;
+                const text = f.text ? f.text : f.column;
+                return (
+                    <Container className={`${c}-filter-picker-container`} key={f.column}>
+                        <Row>
+                            <Col md={8} className={`${c}-filter-picker-row`}>{text}</Col>
+                            <Col md={4} className={`${c}-filter-picker-check`}>
+                                <CheckboxSlider onClick={this.handleFilterClick.bind(null, i)} checked={enabled} />
+                            </Col>
+                        </Row>
+
+                        {/* Numeric padding input */}
+                        {f.args && f.args.numeric &&
+                        <Row>
+                            <InputGroup>    
+                            <div>
+                                +/-
+                            </div>
+
+                            {/* Increment */}
+                            <Input
+                                className={`${c}-number leaf-input`} 
+                                pattern={'0-9+'}
+                                onChange={this.handleFilterNumPadChange.bind(null, i)}
+                                placeholder="number" 
+                                value={isNaN(f.args.numeric.pad!) ? '' : f.args.numeric.pad} 
+                            />
+                            </InputGroup>
+                        </Row>}
+
+                        {/* String matching options */}
+                        {f.args && f.args.string && 
+                        <Row>
+                            {stringPickerOpts.get(i)!.map(opt => {
+                                return (
+                                    <Row>
+                                        <Col md={8} className={`${c}-filter-picker-row`}>{opt.display}</Col>
+                                        <Col md={4} className={`${c}-filter-picker-check`}>
+                                            <CheckboxSlider onClick={this.handleFilterClick.bind(null, i)} checked={opt.enabled} />
+                                        </Col>
+                                    </Row>
+                                )
+                            })}
+                        </Row>}
+                    </Container>
+            )})
         );
     }
 
-    public dummy = () => null;
+    private deriveStringOptions = (filter: WidgetTimelineComparisonEntryConfig): StringPickerOption[] => {
+        const { datasets } = this.props;
+        const { pickerDisplayColumn } = filter.args?.string!;
+        const data = datasets.find(ds => ds.ds.id === filter.datasetId);
+        const output: StringPickerOption[] = [];
+        const seen: Set<string> = new Set();
+        const matchLimit = 10;
 
-    public handleClick = () => {
-        const { filters } = this.state;
-        const { dispatch, patientId, datasets } = this.props;
+        if (!data) {
+            return output;
+        }
+        
+        for (const row of data.data) {
+            const value = row[filter.column];
+            if (value && !seen.has(value)) {
+                seen.add(value);
+                let display = value;
+                if (pickerDisplayColumn && row[pickerDisplayColumn]) {
+                    display = row[pickerDisplayColumn];
+                }
+                output.push({ value, display, enabled: false });
+                if (output.length >= matchLimit) {
+                    return output;
+                }
+            }
+        }
 
-        dispatch(getTimelineComparisonValues(filters, datasets, patientId));
+        return output;
+    }
+
+    private handleFilterNumPadChange = (idx: number, e: React.FormEvent<HTMLInputElement>) => {
+        const pad = parseInt(e.currentTarget.value);
+        const { filterClickHandler, filters, dispatch, datasets, patientId } = this.props;
+        const newFilters = filters.slice();
+
+        newFilters[idx] = { ...newFilters[idx], args: { numeric: { pad } } };
+        dispatch(getTimelineComparisonValues(newFilters, datasets, patientId));
+        filterClickHandler(newFilters);
+    }
+
+    private handleFilterClick = (idx: number) => {
+        const { filterClickHandler, filters, dispatch, datasets, patientId } = this.props;
+        const newFilters = filters.slice();
+
+        newFilters[idx] = { ...newFilters[idx], enabled: !newFilters[idx].enabled }
+        dispatch(getTimelineComparisonValues(newFilters, datasets, patientId));
+        filterClickHandler(newFilters);
+    };
+
+    private handleStringPickerToggle = (filterIdx: number, optIdx: number) => {
+        const { filterClickHandler, filters, dispatch, datasets, patientId } = this.props;
+        const { stringPickerOpts } = this.state;
+        const newOpts = new Map(stringPickerOpts);
+        const newFilters = filters.slice();
+        // newOpts.set(filterIdx, )
+
+        // newFilters[filterIdx] = { ...newFilters[filterIdx], args: { string: { matchOn: } } }
+        dispatch(getTimelineComparisonValues(newFilters, datasets, patientId));
+        filterClickHandler(newFilters);
+    }
+
+    private handleClick = () => {
+        const { config, dispatch, patientId, datasets } = this.props;
+        dispatch(getTimelineComparisonValues(config.comparison.filters!, datasets, patientId));
     }
 };

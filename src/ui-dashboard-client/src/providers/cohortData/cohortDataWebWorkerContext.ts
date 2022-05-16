@@ -33,13 +33,14 @@ var cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map
 var datasets;
 var getCohortMean = function (payload) {
     var filters = payload.filters, dimensions = payload.dimensions, sourcePatId = payload.sourcePatId, requestId = payload.requestId;
-    var result = new Map();
+    var result = { values: new Map(), n: 0 };
     var matches = getMatchingPatients(filters, sourcePatId);
+    result.n = matches.length;
     console.log(matches);
-    for (var _i = 0, _a = dimensions; _i < _a.length; _i++) {
-        var dim = _a[_i];
+
+    for (var dim of dimensions) {
         var mean = getMeanValue(matches, dim);
-        result.set(dim.ds.id, mean);
+        result.values.set(dim.ds.id, mean);
     }
     return { result: result, requestId: requestId };
 };
@@ -67,39 +68,37 @@ var getMatchingPatients = function (filters, sourcePatId) {
     var matcher;
     if (!sourcePat)
         return all();
-    var _loop_1 = function (filter) {
+    for (const filter of filters) {
+        if (!filter.enabled) {
+            continue;
+        }
+        
         // Check dataset
         if (filter.datasetId === "demographics") {
-            var numCols = new Set(['age',]);
+            const numCols = new Set([ 'age', ])
             matcher = (numCols.has(filter.column)
                 ? matchNum : matchString)(filter, sourcePat);
-        }
-        else {
-            var ds = datasets.get(filter.datasetId);
-            if (!ds)
-                return { value: all() };
+            
+        } else {
+            const ds = datasets.get(filter.datasetId);
+            if (!ds) return all();
+
             // Check column
-            var col = ds[1].schema.fields.find(function (f) { return f.name === filter.column; });
-            if (!col)
-                return { value: all() };
+            const col = ds[1].schema.fields.find(f => f.name === filter.column);
+            if (!col) return all();
+
             // Get matching func
             matcher = (col.type === typeNum
                 ? matchNum : matchString)(filter, sourcePat);
         }
+
         // Check each patient
-        for (var _a = 0, elig_1 = elig; _a < elig_1.length; _a++) {
-            var pat = elig_1[_a];
-            var matched = matcher(pat[1]);
+        for (const pat of elig) {
+            const matched = matcher(pat[1]);
             if (!matched) {
                 elig.delete(pat[0]);
             }
         }
-    };
-    for (var _i = 0, filters_1 = filters; _i < filters_1.length; _i++) {
-        var filter = filters_1[_i];
-        var state_1 = _loop_1(filter);
-        if (typeof state_1 === "object")
-            return state_1.value;
     }
     return [ ...elig.keys() ];
 };

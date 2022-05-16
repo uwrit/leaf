@@ -11,8 +11,8 @@ import { workerContext } from './cohortDataWebWorkerContext';
 import { personId, encounterId } from '../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListColumnType } from '../../models/patientList/Column';
 import { DemographicRow } from '../../models/cohortData/DemographicDTO';
-import { CohortData, DatasetMetadata, PatientData } from '../../models/state/CohortState';
-import { WidgetTimelineComparisonEntryConfig } from '../../models/config/content';
+import { CohortComparisonResult, CohortData, DatasetMetadata, PatientData } from '../../models/state/CohortState';
+import { StringPickerOption, WidgetTimelineComparisonEntryConfig } from '../../models/config/content';
 import { TimelineValueSet } from '../../components/Dynamic/Timeline/Timeline';
 import { PatientListRow } from '../../models/patientList/Patient';
 
@@ -65,7 +65,7 @@ export default class CohortDataWebWorker {
             var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = '${personId}';
             var encounterId = '${encounterId}';
-            ${workerContext /*this.stripFunctionToContext(this.workerContext)*/}
+            ${this.stripFunctionToContext(this.workerContext)}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -125,21 +125,37 @@ export default class CohortDataWebWorker {
             }
         };
 
-        let cohortData: CohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+        let cohortData: CohortData = { patients: new Map(), metadata: new Map(), comparison: { values: new Map(), n: 0 } };
         let datasets: Map<string, [PatientListDatasetQueryDTO, PatientListDatasetDTO]>;
 
         const getCohortMean = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { filters, dimensions, sourcePatId, requestId } = payload;
-            const result: Map<string, number> = new Map();
+            const result: CohortComparisonResult = { values: new Map(), n: 0 };
             const matches = getMatchingPatients(filters!, sourcePatId!);
+            result.n = matches.length;
             console.log(matches);
 
             for (const dim of dimensions!) {
                 const mean = getMeanValue(matches, dim);
-                result.set(dim.ds.id, mean);
+                result.values.set(dim.ds.id, mean);
             }
 
             return { result, requestId };
+        };
+
+        const getDatasetFrequencies = (filter: WidgetTimelineComparisonEntryConfig, data: PatientListDatasetDTO): StringPickerOption[] => {
+            const output: StringPickerOption[] = [];
+            const count: Map<string, Set<string>> = new Map();
+            const display: Map<string, string> = new Map();
+
+            for (const pat of cohortData.patients.values()) {
+                const ds = pat.datasets.get(filter.datasetId);
+                if (!ds) continue;
+                for (const row of ds) {
+                    
+                }
+            }
+            return output;
         };
 
         const getMeanValue = (patIds: string[], dim: TimelineValueSet): number => {
@@ -168,6 +184,9 @@ export default class CohortDataWebWorker {
 
             if (!sourcePat) return all();
             for (const filter of filters) {
+                if (!filter.enabled) {
+                    continue;
+                }
                 
                 // Check dataset
                 if (filter.datasetId === "demographics") {
@@ -260,7 +279,7 @@ export default class CohortDataWebWorker {
 
         const transform = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { data, demographics, requestId } = payload;
-            cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+            cohortData = { patients: new Map(), metadata: new Map(), comparison: { values: new Map(), n: 0 } };
             datasets = new Map();
 
             for (const row of demographics!) {

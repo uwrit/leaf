@@ -17,6 +17,7 @@ export function defaultDashboardConfigurationState(): DashboardConfig {
     };
 }
 
+
 export function config(state: DashboardConfig = defaultDashboardConfigurationState(), action: ConfigAction): DashboardConfig {
     switch (action.type) {
         case SET_DASHBOARD_CONFIG:

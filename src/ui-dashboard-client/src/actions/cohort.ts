@@ -6,7 +6,7 @@
  */ 
 
 import { Dispatch } from 'redux';
-import { CohortData, CohortStateType } from '../models/state/CohortState';
+import { CohortComparisonResult, CohortData, CohortStateType } from '../models/state/CohortState';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { AppState } from '../models/state/AppState';
 import { fetchAvailableDatasets, fetchDataset, fetchDemographics } from '../services/cohortApi';
@@ -28,7 +28,7 @@ export const SET_SEARCH_HINTS = 'SET_SEARCH_HINTS';
 
 export interface CohortAction {
     cohort?: CohortData;
-    comparison?: Map<string, number>;
+    comparison?: CohortComparisonResult;
     hints?: DemographicRow[];
     id?: string;
     state?: CohortStateType;
@@ -53,7 +53,7 @@ export const getCohortDatasets = (cohortId: string) => {
         const configs = await fetchDashboardConfigurations(state);
         if (configs.length) {
             //dispatch(setDashboardConfig(config));
-            console.log(JSON.stringify(config));
+            //console.log(JSON.stringify(config));
             
             dispatch(setDashboardConfig(configs[0]));
             console.log(JSON.stringify(configs[0]));
@@ -122,7 +122,7 @@ export const setCohortDataset = (cohort: CohortData): CohortAction => {
     };
 };
 
-export const setComparisonDataset = (comparison: Map<string, number>): CohortAction => {
+export const setComparisonDataset = (comparison: CohortComparisonResult): CohortAction => {
     return {
         comparison,
         type: SET_COMPARISON_DATASET

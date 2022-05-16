@@ -1,7 +1,7 @@
 import moment from 'moment';
 import React from 'react';
 import { XAxis, YAxis, Tooltip, CartesianGrid, LineChart, Line, ReferenceLine, Dot, ReferenceDot } from 'recharts';
-import { WidgetTimelineConfig, WidgetTimelineNumericDatasetConfig, WidgetTimelineEventDatasetConfig } from '../../../models/config/content';
+import { WidgetTimelineConfig, WidgetTimelineNumericDatasetConfig, WidgetTimelineEventDatasetConfig, WidgetTimelineComparisonEntryConfig } from '../../../models/config/content';
 import { PatientListRowDTO } from '../../../models/patientList/Patient';
 import { CohortData, DatasetMetadata, PatientData } from '../../../models/state/CohortState';
 import { DatasetMetadataColumns, getDatasetMetadataColumns } from '../../../utils/datasetMetadata';
@@ -22,6 +22,7 @@ interface Props {
 interface State {
     chartHeight: number;
     chartWidth: number;
+    filters: WidgetTimelineComparisonEntryConfig[];
 }
 
 export interface TimelineValueSet {
@@ -47,7 +48,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
         const dims = this.getChartDimensions();
         this.state = {
             chartHeight: dims.height,
-            chartWidth: dims.width
+            chartWidth: dims.width,
+            filters: this.props.config.comparison.filters!.slice(),
         }
     }
 
@@ -60,10 +62,14 @@ export default class DynamicTimeline extends React.Component<Props, State> {
         window.removeEventListener('resize', this.updateChartDimensions);
     }
 
-    public shouldComponentUpdate(nextProps: Props) {
-        if (this.state.chartWidth < 1000) {
+    public shouldComponentUpdate(nextProps: Props, nextState: State) {
+        const { filters, chartWidth } = this.state; 
+
+        if (chartWidth < 1000) {
             return true;
         } else if (this.props.cohort.comparison !== nextProps.cohort.comparison) {
+            return true;
+        } else if (filters && filters !== nextState.filters) {
             return true;
         } else if (this.props.patient === nextProps.patient) {
             return false;
@@ -89,7 +95,7 @@ export default class DynamicTimeline extends React.Component<Props, State> {
 
     public render() {
         const { config, cohort, dispatch, patient } = this.props;
-        const { chartWidth } = this.state;
+        const { chartWidth, filters } = this.state;
         const margins = { top: 0, right: 0, bottom: 0, left: 0 };
         const swimlaneHeight = 70;
         const [ numericDatasets, eventDatasets ] = this.getValueSets();
@@ -106,6 +112,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
             interval += domainDiff;
             verticals.push(interval);
         }
+
+        console.log(cohort.comparison);
 
         return (
             <div className={c}>
@@ -125,7 +133,8 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                     {/* Comparison to cohort */}
                     {config.comparison.enabled && config.comparison.filters &&
                     <DynamicTimelineComparePicker 
-                        config={config} cohort={cohort} patientId={patient.id} dispatch={dispatch} datasets={numericDatasets}
+                        config={config} cohort={cohort} patientId={patient.id} filters={filters}
+                        dispatch={dispatch} datasets={numericDatasets} filterClickHandler={this.handleFilterCheckClick}
                     />
                     }
                 </div>
@@ -217,11 +226,10 @@ export default class DynamicTimeline extends React.Component<Props, State> {
                     {/* Trends box */}
                     <div className={`${c}-trend-container`}>
                         {numericDatasets.map((val, i) => {
-                            cohort.comparison.get(val.ds.id)
                             return (
                                 <div key={val.ds.id} style={{ height: swimlaneHeight }} className={`${c}-trend`}>
                                     <DynamicTimelineTrendBar 
-                                        values={val} color={this.colors[i]} comparison={cohort.comparison.get(val.ds.id)} isNumeric={true} 
+                                        values={val} color={this.colors[i]} comparison={cohort.comparison.values.get(val.ds.id)} isNumeric={true} 
                                     />
                                 </div>     
                             );
@@ -339,6 +347,10 @@ export default class DynamicTimeline extends React.Component<Props, State> {
           );
         }
         return null;
+    };
+
+    private handleFilterCheckClick = (filters: WidgetTimelineComparisonEntryConfig[]) => {
+        this.setState({ filters });
     };
 };
 

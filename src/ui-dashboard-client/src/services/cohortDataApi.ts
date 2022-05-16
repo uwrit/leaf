@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { CohortData } from '../models/state/CohortState';
+import { CohortComparisonResult, CohortData } from '../models/state/CohortState';
 import { DemographicRow } from '../models/cohortData/DemographicDTO';
 import { PatientListDatasetDTO, PatientListDatasetQueryDTO } from '../models/patientList/Dataset';
 import CohortDataWebWorker from '../providers/cohortData/cohortDataWebWorker';
@@ -26,7 +26,7 @@ export const getComparisonMeans = async (
     filters: WidgetTimelineComparisonEntryConfig[], 
     dimensions: TimelineValueSet[],
     sourcePatId: string) 
-    : Promise<Map<string, number>> => {
-    const means = await cohortDataProvider.getCohortMean(filters, dimensions, sourcePatId);
-    return means as Map<string, number>;
+    : Promise<CohortComparisonResult> => {
+    const values = await cohortDataProvider.getCohortMean(filters, dimensions, sourcePatId) as CohortComparisonResult;
+    return values;
 };

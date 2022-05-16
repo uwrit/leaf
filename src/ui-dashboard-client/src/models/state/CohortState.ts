@@ -27,7 +27,7 @@ export interface CohortSearch {
 export interface CohortData {
     patients: Map<PatientId, PatientData>;
     metadata: Map<DatasetId, DatasetMetadata>;
-    comparison: Map<DatasetId, number>;
+    comparison: CohortComparisonResult;
 }
 
 export interface PatientData {
@@ -39,4 +39,9 @@ export interface PatientData {
 export interface DatasetMetadata {
     schema: PatientListDatasetSchema;
     ref: PatientListDatasetQueryDTO;
+}
+
+export interface CohortComparisonResult {
+    values: Map<string, number>;
+    n: number;
 }
