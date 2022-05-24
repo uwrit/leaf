@@ -1,6 +1,6 @@
 import React from 'react';
 import { getTimelineComparisonValues } from '../../../actions/cohort';
-import { WidgetTimelineComparisonEntryConfig, WidgetTimelineConfig } from '../../../models/config/content';
+import { StringPickerOption, WidgetTimelineComparisonEntryConfig, WidgetTimelineConfig } from '../../../models/config/content';
 import { CohortData } from '../../../models/state/CohortState';
 import { TimelineValueSet } from './Timeline';
 import { FiPlus } from 'react-icons/fi'
