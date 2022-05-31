@@ -63,7 +63,7 @@ namespace Services.Cohort
 
         public virtual string CohortToCteFrom() => TempTableName;
 
-        public virtual string CohortToCteWhere() => null;
+        public virtual string CohortToCteWhere() => ""; // no-op
 
         public virtual string CohortToCte()
         {

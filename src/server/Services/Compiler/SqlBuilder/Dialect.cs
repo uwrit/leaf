@@ -87,7 +87,7 @@ namespace Services.Compiler.SqlBuilder
         public string Intersect() => "INTERSECT";
         public string Except() => "MINUS";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
-        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)})";
         public string DeclareParam(string name, ColumnType type, object value) => $"{name} {ToSqlType(type)} := {value}";
         public string ToSqlParamName(string name) => $"@{name}";
 
@@ -112,7 +112,7 @@ namespace Services.Compiler.SqlBuilder
         public string Intersect() => "INTERSECT";
         public string Except() => "EXCEPT";
         public string DateAdd(DateIncrementType incrType, int interval, object date) => $"{date} + INTERVAL '{interval}' {ToSqlTime(incrType)}";
-        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)})";
         public string DeclareParam(string name, ColumnType type, object value) => $"DECLARE {name} {ToSqlType(type)} = {value}";
         public string ToSqlParamName(string name) => $":{name}";
 
@@ -136,7 +136,7 @@ namespace Services.Compiler.SqlBuilder
         public string Now() => "CURRENT_DATETIME()";
         public string Intersect() => throw new NotImplementedException();
         public string Except() => throw new NotImplementedException();
-        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)}";
+        public string Convert(ColumnType targetType, object value) => $"CAST({value} AS {ToSqlType(targetType)})";
         public string DeclareParam(string name, ColumnType type, object value) => throw new NotImplementedException();
         public string ToSqlParamName(string name) => $"@{name}";
 
