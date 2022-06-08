@@ -55,7 +55,7 @@ namespace Model.Cohort
                 return result;
             }
             var exeContext = await conceptDatasetSqlCompiler.BuildConceptDatasetSql(validationContext.Context);
-            log.LogInformation("Compiled ConceptDataset execution context. Context:{@Context}", exeContext);
+            log.LogInformation("Compiled ConceptDataset execution context. Context:{@Context}", exeContext.ToCleaned());
 
             var data = await executor.ExecuteDatasetAsync(exeContext, cancel);
             log.LogInformation("ConceptDataset complete. Patients:{Patients} Records:{Records}", data.Results.Keys.Count, data.Results.Sum(d => d.Value.Count()));
