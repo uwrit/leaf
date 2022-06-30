@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetSavedQueryByUId]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -116,7 +116,7 @@ BEGIN
 			DECLARE @secmsg nvarchar(400) = @user + ' not permitted to query ' + @uid;
 			THROW 70403, @secmsg, 1
 		END;
-    
+
     -- collect counts
     WITH counts (QueryId, Cnt) as (
         SELECT QueryId, Cnt = COUNT(*)

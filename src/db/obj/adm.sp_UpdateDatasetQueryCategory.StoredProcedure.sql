@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_UpdateDatasetQueryCategory]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -36,7 +36,7 @@ BEGIN
 
         IF EXISTS(SELECT Id FROM app.DatasetQueryCategory WHERE Id != @id AND Category = @cat)
             THROW 70409, N'DatasetQueryCategory already exists with that name.', 1;
-        
+
         UPDATE app.DatasetQueryCategory
         SET
             Category = @cat,

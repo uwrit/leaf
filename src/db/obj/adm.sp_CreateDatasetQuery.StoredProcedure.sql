@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_CreateDatasetQuery]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -32,16 +32,16 @@ BEGIN
 
     IF (@shape IS NULL)
         THROW 70400, N'DatasetQuery.Shape is required.', 1;
-    
+
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
     IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 

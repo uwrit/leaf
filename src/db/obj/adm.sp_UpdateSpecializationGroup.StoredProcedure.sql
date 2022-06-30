@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_UpdateSpecializationGroup]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -29,13 +29,13 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@sqlSetId) = 1)
         THROW 70400, N'SpecializationGroup.SqlSetId is missing.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@uiDefaultText) = 1)
         THROW 70400, N'SpecializationGroup.UiDefaultText is required.', 1;
 
     IF NOT EXISTS(SELECT 1 FROM app.ConceptSqlSet WHERE Id = @sqlSetId)
         THROW 70404, N'ConceptSqlSet is missing.', 1;
-    
+
     UPDATE app.SpecializationGroup
     SET
         SqlSetId = @sqlSetId,

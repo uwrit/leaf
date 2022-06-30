@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  UserDefinedTableType [app].[HydratedConceptTable]    Script Date: ******/
 CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
@@ -33,7 +33,7 @@ CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
 	[UiDropdownElements] [nvarchar](max) NULL,
 	[UiDropdownDefaultText] [nvarchar](400) NULL,
 	[UiNumericDefaultText] [nvarchar](50) NULL,
-	PRIMARY KEY CLUSTERED 
+	PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (IGNORE_DUP_KEY = OFF)

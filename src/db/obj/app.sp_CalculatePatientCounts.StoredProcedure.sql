@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_CalculatePatientCounts]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -49,14 +49,14 @@ BEGIN
 			@TimeLimitPerRootConcept DATETIME = DATEADD(MINUTE,@PerRootConceptAllowedRuntimeInMinutes,GETDATE()),
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
-	
-	------------------------------------------------------------------------------------------------------------------------------ 
+
+	------------------------------------------------------------------------------------------------------------------------------
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
 	WHILE @CurrentRoot <= @TotalRoots AND @CurrentDateTime < @TimeLimit
 
 	BEGIN
-		
+
 		SET @CurrentRootId = (SELECT Id FROM #roots WHERE RowNumber = @CurrentRoot)
 
 		BEGIN TRY DROP TABLE #Concepts END TRY BEGIN CATCH END CATCH
@@ -85,7 +85,7 @@ BEGIN
 		------------------------------------------------------------------------------------------------------------------------------
 		WHILE @CurrentConcept <= @TotalConcepts AND @CurrentDateTime < @TimeLimit AND @CurrentDateTime < @TimeLimitPerRootConcept
 
-		BEGIN 
+		BEGIN
 
 			SELECT @From = C.SqlSetFrom
 				 , @Where = C.SqlSetWhere
@@ -95,8 +95,8 @@ BEGIN
 			FROM #Concepts C
 			WHERE RowNumber = @CurrentConcept
 
-			BEGIN TRY 
-			
+			BEGIN TRY
+
 				-- Calculate patient counts for this concept
 				EXECUTE app.sp_CalculateConceptPatientCount
 					@PersonIdField,
@@ -114,13 +114,13 @@ BEGIN
 			SET @CurrentConcept = @CurrentConcept + 1
 			SET @CurrentDateTime = GETDATE()
 
-		END 
+		END
 		-- End ForEach concept
 
 		SET @CurrentRoot = @CurrentRoot + 1
 		SET @TimeLimitPerRootConcept = DATEADD(MINUTE,@PerRootConceptAllowedRuntimeInMinutes,GETDATE())
 
-	END 
+	END
 	-- End ForEach root concept
 END
 GO

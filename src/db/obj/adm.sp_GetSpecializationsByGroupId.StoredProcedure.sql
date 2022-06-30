@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_GetSpecializationsByGroupId]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -44,7 +44,7 @@ BEGIN
 
     IF NOT EXISTS(SELECT 1 FROM @s) AND NOT EXISTS(SELECT 1 FROM app.SpecializationGroup WHERE Id = @groupId)
         THROW 70404, N'SpecializationGroup is missing.', 1;
-    
+
     SELECT
         Id,
         SpecializationGroupId,

@@ -3,14 +3,14 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [master]
+USE [master]
 GO
 /****** Object:  Database [LeafDB]    Script Date: ******/
 CREATE DATABASE [LeafDB]
  CONTAINMENT = NONE
- ON  PRIMARY 
+ ON  PRIMARY
 ( NAME = N'LeafDB', FILENAME = N'/var/opt/mssql/data/LeafDB.mdf' , SIZE = 73728KB , MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
- LOG ON 
+ LOG ON
 ( NAME = N'LeafDB_log', FILENAME = N'/var/opt/mssql/data/LeafDB_log.ldf' , SIZE = 204800KB , MAXSIZE = 2048GB , FILEGROWTH = 65536KB )
 GO
 IF (1 = FULLTEXTSERVICEPROPERTY('IsFullTextInstalled'))
@@ -18,63 +18,63 @@ begin
 EXEC [LeafDB].[dbo].[sp_fulltext_database] @action = 'enable'
 end
 GO
-ALTER DATABASE [LeafDB] SET ANSI_NULL_DEFAULT OFF 
+ALTER DATABASE [LeafDB] SET ANSI_NULL_DEFAULT OFF
 GO
-ALTER DATABASE [LeafDB] SET ANSI_NULLS OFF 
+ALTER DATABASE [LeafDB] SET ANSI_NULLS OFF
 GO
-ALTER DATABASE [LeafDB] SET ANSI_PADDING OFF 
+ALTER DATABASE [LeafDB] SET ANSI_PADDING OFF
 GO
-ALTER DATABASE [LeafDB] SET ANSI_WARNINGS OFF 
+ALTER DATABASE [LeafDB] SET ANSI_WARNINGS OFF
 GO
-ALTER DATABASE [LeafDB] SET ARITHABORT OFF 
+ALTER DATABASE [LeafDB] SET ARITHABORT OFF
 GO
-ALTER DATABASE [LeafDB] SET AUTO_CLOSE OFF 
+ALTER DATABASE [LeafDB] SET AUTO_CLOSE OFF
 GO
-ALTER DATABASE [LeafDB] SET AUTO_SHRINK OFF 
+ALTER DATABASE [LeafDB] SET AUTO_SHRINK OFF
 GO
-ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS ON 
+ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS ON
 GO
-ALTER DATABASE [LeafDB] SET CURSOR_CLOSE_ON_COMMIT OFF 
+ALTER DATABASE [LeafDB] SET CURSOR_CLOSE_ON_COMMIT OFF
 GO
-ALTER DATABASE [LeafDB] SET CURSOR_DEFAULT  GLOBAL 
+ALTER DATABASE [LeafDB] SET CURSOR_DEFAULT  GLOBAL
 GO
-ALTER DATABASE [LeafDB] SET CONCAT_NULL_YIELDS_NULL OFF 
+ALTER DATABASE [LeafDB] SET CONCAT_NULL_YIELDS_NULL OFF
 GO
-ALTER DATABASE [LeafDB] SET NUMERIC_ROUNDABORT OFF 
+ALTER DATABASE [LeafDB] SET NUMERIC_ROUNDABORT OFF
 GO
-ALTER DATABASE [LeafDB] SET QUOTED_IDENTIFIER OFF 
+ALTER DATABASE [LeafDB] SET QUOTED_IDENTIFIER OFF
 GO
-ALTER DATABASE [LeafDB] SET RECURSIVE_TRIGGERS OFF 
+ALTER DATABASE [LeafDB] SET RECURSIVE_TRIGGERS OFF
 GO
-ALTER DATABASE [LeafDB] SET  ENABLE_BROKER 
+ALTER DATABASE [LeafDB] SET  ENABLE_BROKER
 GO
-ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF 
+ALTER DATABASE [LeafDB] SET AUTO_UPDATE_STATISTICS_ASYNC OFF
 GO
-ALTER DATABASE [LeafDB] SET DATE_CORRELATION_OPTIMIZATION OFF 
+ALTER DATABASE [LeafDB] SET DATE_CORRELATION_OPTIMIZATION OFF
 GO
-ALTER DATABASE [LeafDB] SET TRUSTWORTHY OFF 
+ALTER DATABASE [LeafDB] SET TRUSTWORTHY OFF
 GO
-ALTER DATABASE [LeafDB] SET ALLOW_SNAPSHOT_ISOLATION OFF 
+ALTER DATABASE [LeafDB] SET ALLOW_SNAPSHOT_ISOLATION OFF
 GO
-ALTER DATABASE [LeafDB] SET PARAMETERIZATION SIMPLE 
+ALTER DATABASE [LeafDB] SET PARAMETERIZATION SIMPLE
 GO
-ALTER DATABASE [LeafDB] SET READ_COMMITTED_SNAPSHOT OFF 
+ALTER DATABASE [LeafDB] SET READ_COMMITTED_SNAPSHOT OFF
 GO
-ALTER DATABASE [LeafDB] SET HONOR_BROKER_PRIORITY OFF 
+ALTER DATABASE [LeafDB] SET HONOR_BROKER_PRIORITY OFF
 GO
-ALTER DATABASE [LeafDB] SET RECOVERY FULL 
+ALTER DATABASE [LeafDB] SET RECOVERY FULL
 GO
-ALTER DATABASE [LeafDB] SET  MULTI_USER 
+ALTER DATABASE [LeafDB] SET  MULTI_USER
 GO
-ALTER DATABASE [LeafDB] SET PAGE_VERIFY CHECKSUM  
+ALTER DATABASE [LeafDB] SET PAGE_VERIFY CHECKSUM
 GO
-ALTER DATABASE [LeafDB] SET DB_CHAINING OFF 
+ALTER DATABASE [LeafDB] SET DB_CHAINING OFF
 GO
-ALTER DATABASE [LeafDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF ) 
+ALTER DATABASE [LeafDB] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF )
 GO
-ALTER DATABASE [LeafDB] SET TARGET_RECOVERY_TIME = 60 SECONDS 
+ALTER DATABASE [LeafDB] SET TARGET_RECOVERY_TIME = 60 SECONDS
 GO
-ALTER DATABASE [LeafDB] SET DELAYED_DURABILITY = DISABLED 
+ALTER DATABASE [LeafDB] SET DELAYED_DURABILITY = DISABLED
 GO
 EXEC sys.sp_db_vardecimal_storage_format N'LeafDB', N'ON'
 GO
@@ -163,7 +163,7 @@ CREATE TYPE [app].[HydratedConceptTable] AS TABLE(
 	[UiDropdownElements] [nvarchar](max) NULL,
 	[UiDropdownDefaultText] [nvarchar](400) NULL,
 	[UiNumericDefaultText] [nvarchar](50) NULL,
-	PRIMARY KEY CLUSTERED 
+	PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (IGNORE_DUP_KEY = OFF)
@@ -218,7 +218,7 @@ CREATE TYPE [app].[SqlSelectors] AS TABLE(
 	[Type] [nvarchar](20) NOT NULL,
 	[Phi] [bit] NOT NULL,
 	[Mask] [bit] NOT NULL,
-	PRIMARY KEY CLUSTERED 
+	PRIMARY KEY CLUSTERED
 (
 	[Column] ASC
 )WITH (IGNORE_DUP_KEY = OFF)
@@ -315,23 +315,23 @@ BEGIN
         )
     , permitted AS
     (
-        SELECT 
+        SELECT
             a.Base
         , a.[Current]
-        , HasConstraint = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
+        , HasConstraint = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
                 WHERE c.ConceptId = a.[Current])
                         THEN 1 ELSE 0 END
-        , UserPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 1 
+        , UserPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 1
                         AND c.ConstraintValue = @user)
                         THEN 1 ELSE 0 END
-        , GroupPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 2 
+        , GroupPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 2
                         AND c.ConstraintValue IN (SELECT g.[Group] FROM @groups g))
                         THEN 1 ELSE 0 END
         FROM @ancestry a
@@ -506,7 +506,7 @@ BEGIN
     -- totally unconstrained, bail early with allow
     IF (@totalCount = 0)
         RETURN 1;
-    
+
     DECLARE @userCount int;
     DECLARE @groupCount int;
 
@@ -733,7 +733,7 @@ CREATE TABLE [app].[Concept](
 	[AddDateTime] [datetime] NULL,
 	[PatientCountLastUpdateDateTime] [datetime] NULL,
 	[ContentLastUpdateDateTime] [datetime] NULL,
- CONSTRAINT [PK_Concept_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Concept_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -751,7 +751,7 @@ CREATE TABLE [app].[ConceptEvent](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_ConceptSqlEvent] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptSqlEvent] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -767,7 +767,7 @@ CREATE TABLE [app].[ConceptForwardIndex](
 	[WordId] [int] NOT NULL,
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[RootId] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_ConceptForwardIndex] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptForwardIndex] PRIMARY KEY CLUSTERED
 (
 	[WordId] ASC,
 	[ConceptId] ASC,
@@ -784,7 +784,7 @@ CREATE TABLE [app].[ConceptInvertedIndex](
 	[Word] [nvarchar](400) NOT NULL,
 	[WordId] [int] IDENTITY(1,1) NOT NULL,
 	[WordCount] [int] NULL,
- CONSTRAINT [PK_Concept_InvertedIndex] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Concept_InvertedIndex] PRIMARY KEY CLUSTERED
 (
 	[WordId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -808,7 +808,7 @@ CREATE TABLE [app].[ConceptSqlSet](
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
 	[EventId] [int] NULL,
- CONSTRAINT [PK_ConceptSqlSet] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptSqlSet] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -823,7 +823,7 @@ CREATE TABLE [app].[ConceptTokenizedIndex](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[JsonTokens] [nvarchar](max) NULL,
 	[Updated] [datetime] NULL,
- CONSTRAINT [PK_ConceptTokenizedIndex] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptTokenizedIndex] PRIMARY KEY CLUSTERED
 (
 	[ConceptId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -843,7 +843,7 @@ CREATE TABLE [app].[Dashboard](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK__Dashboard] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK__Dashboard] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -866,7 +866,7 @@ CREATE TABLE [app].[DatasetQuery](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -884,7 +884,7 @@ CREATE TABLE [app].[DatasetQueryCategory](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -898,7 +898,7 @@ GO
 CREATE TABLE [app].[DatasetQueryTag](
 	[DatasetQueryId] [uniqueidentifier] NOT NULL,
 	[Tag] [nvarchar](100) NOT NULL,
- CONSTRAINT [PK_DatasetQueryTag] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_DatasetQueryTag] PRIMARY KEY CLUSTERED
 (
 	[DatasetQueryId] ASC,
 	[Tag] ASC
@@ -916,7 +916,7 @@ CREATE TABLE [app].[DemographicQuery](
 	[Shape] [int] NOT NULL,
 	[LastChanged] [datetime] NOT NULL,
 	[ChangedBy] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_DemographicQuery] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_DemographicQuery] PRIMARY KEY CLUSTERED
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -934,7 +934,7 @@ CREATE TABLE [app].[DynamicDatasetQuery](
 	[SqlFieldValueNumeric] [nvarchar](1000) NULL,
 	[Schema] [nvarchar](max) NOT NULL,
 	[IsEncounterBased] [bit] NOT NULL,
- CONSTRAINT [PK__DynamicDatasetQuery] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK__DynamicDatasetQuery] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -951,7 +951,7 @@ CREATE TABLE [app].[GeneralEquivalenceMapping](
 	[SourceCodeType] [nvarchar](10) NOT NULL,
 	[TargetCodeType] [nvarchar](10) NOT NULL,
 	[UiDisplayTargetName] [nvarchar](400) NULL,
- CONSTRAINT [PK_GeneralEquivalenceMapping] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_GeneralEquivalenceMapping] PRIMARY KEY CLUSTERED
 (
 	[SourceCode] ASC,
 	[TargetCode] ASC,
@@ -969,7 +969,7 @@ CREATE TABLE [app].[Geometry](
 	[GeometryId] [nvarchar](20) NOT NULL,
 	[GeometryType] [nvarchar](20) NOT NULL,
 	[GeometryJson] [nvarchar](max) NULL,
- CONSTRAINT [PK_Geometry] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Geometry] PRIMARY KEY CLUSTERED
 (
 	[GeometryId] ASC,
 	[GeometryType] ASC
@@ -991,7 +991,7 @@ CREATE TABLE [app].[GlobalPanelFilter](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
- CONSTRAINT [PK_GlobalPanelFilter] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_GlobalPanelFilter] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1012,7 +1012,7 @@ CREATE TABLE [app].[Import](
 	[ValueString] [nvarchar](100) NULL,
 	[ValueNumber] [decimal](18, 3) NULL,
 	[ValueDate] [datetime] NULL,
- CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC,
 	[ImportMetadataId] ASC,
@@ -1034,7 +1034,7 @@ CREATE TABLE [app].[ImportMetadata](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
- CONSTRAINT [PK_ImportMetadata_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ImportMetadata_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1051,7 +1051,7 @@ CREATE TABLE [app].[ImportPatientMappingQuery](
 	[SqlFieldSourceId] [nvarchar](100) NOT NULL,
 	[LastChanged] [datetime] NOT NULL,
 	[ChangedBy] [nvarchar](200) NOT NULL,
- CONSTRAINT [PK_ImportPatientMappingQuery] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ImportPatientMappingQuery] PRIMARY KEY CLUSTERED
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1070,7 +1070,7 @@ CREATE TABLE [app].[Notification](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_Notification_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Notification_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1091,7 +1091,7 @@ CREATE TABLE [app].[PanelFilter](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1114,7 +1114,7 @@ CREATE TABLE [app].[Query](
 	[Updated] [datetime] NOT NULL,
 	[Ver] [int] NOT NULL,
 	[Definition] [nvarchar](max) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1128,7 +1128,7 @@ GO
 CREATE TABLE [app].[QueryDefinition](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[Definition] [nvarchar](max) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[QueryId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1147,7 +1147,7 @@ CREATE TABLE [app].[ServerState](
 	[DowntimeUntil] [datetime] NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NULL,
- CONSTRAINT [PK_ServerState] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ServerState] PRIMARY KEY CLUSTERED
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1165,7 +1165,7 @@ CREATE TABLE [app].[Specialization](
 	[UiDisplayText] [nvarchar](100) NOT NULL,
 	[SqlSetWhere] [nvarchar](1000) NOT NULL,
 	[OrderId] [int] NULL,
- CONSTRAINT [PK_Specialization] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Specialization] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1182,7 +1182,7 @@ CREATE TABLE [app].[SpecializationGroup](
 	[UiDefaultText] [nvarchar](100) NOT NULL,
 	[LastChanged] [datetime] NULL,
 	[ChangedBy] [nvarchar](1000) NULL,
- CONSTRAINT [PK_SpecializationGroup] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_SpecializationGroup] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1197,7 +1197,7 @@ CREATE TABLE [auth].[ConceptConstraint](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_ConceptConstraint_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptConstraint_1] PRIMARY KEY CLUSTERED
 (
 	[ConceptId] ASC,
 	[ConstraintId] ASC,
@@ -1213,7 +1213,7 @@ GO
 CREATE TABLE [auth].[Constraint](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Type] [nvarchar](50) NOT NULL,
- CONSTRAINT [PK_Constraint_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Constraint_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1228,7 +1228,7 @@ CREATE TABLE [auth].[DatasetQueryConstraint](
 	[DatasetQueryId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_DatasetQueryConstraint] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_DatasetQueryConstraint] PRIMARY KEY CLUSTERED
 (
 	[DatasetQueryId] ASC,
 	[ConstraintId] ASC,
@@ -1245,7 +1245,7 @@ CREATE TABLE [auth].[ImportMetadataConstraint](
 	[ImportMetadataId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_ImportMetadataConstraint] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ImportMetadataConstraint] PRIMARY KEY CLUSTERED
 (
 	[ImportMetadataId] ASC,
 	[ConstraintId] ASC,
@@ -1275,7 +1275,7 @@ CREATE TABLE [auth].[Login](
 	[Claims] [nvarchar](max) NOT NULL,
 	[Created] [datetime] NOT NULL,
 	[Updated] [datetime] NOT NULL,
- CONSTRAINT [PK_Login_Id] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Login_Id] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1290,7 +1290,7 @@ CREATE TABLE [auth].[QueryConstraint](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_QueryConstraint_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_QueryConstraint_1] PRIMARY KEY CLUSTERED
 (
 	[QueryId] ASC,
 	[ConstraintId] ASC,
@@ -1314,15 +1314,15 @@ CREATE TABLE [network].[Endpoint](
 	[Updated] [datetime] NOT NULL,
 	[IsInterrogator] [bit] NOT NULL,
 	[IsResponder] [bit] NOT NULL,
- CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
- CONSTRAINT [IX_Endpoint] UNIQUE NONCLUSTERED 
+ CONSTRAINT [IX_Endpoint] UNIQUE NONCLUSTERED
 (
 	[Name] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
- CONSTRAINT [IX_Endpoint_2] UNIQUE NONCLUSTERED 
+ CONSTRAINT [IX_Endpoint_2] UNIQUE NONCLUSTERED
 (
 	[KeyId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1343,7 +1343,7 @@ CREATE TABLE [network].[Identity](
 	[Longitude] [decimal](7, 4) NULL,
 	[PrimaryColor] [nvarchar](40) NULL,
 	[SecondaryColor] [nvarchar](40) NULL,
- CONSTRAINT [PK_NetworkIdentity] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_NetworkIdentity] PRIMARY KEY CLUSTERED
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1357,7 +1357,7 @@ GO
 CREATE TABLE [ref].[ImportType](
 	[Id] [int] NOT NULL,
 	[Variant] [nvarchar](100) NOT NULL,
- CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1371,7 +1371,7 @@ GO
 CREATE TABLE [ref].[SessionType](
 	[Id] [int] NOT NULL,
 	[Variant] [nvarchar](100) NOT NULL,
- CONSTRAINT [PK_SessionType] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_SessionType] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1386,7 +1386,7 @@ CREATE TABLE [ref].[Shape](
 	[Id] [int] NOT NULL,
 	[Variant] [nvarchar](100) NOT NULL,
 	[Schema] [nvarchar](max) NOT NULL,
-PRIMARY KEY CLUSTERED 
+PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1400,7 +1400,7 @@ GO
 CREATE TABLE [ref].[Version](
 	[Lock] [char](1) NOT NULL,
 	[Version] [nvarchar](100) NOT NULL,
- CONSTRAINT [PK_Version] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Version] PRIMARY KEY CLUSTERED
 (
 	[Lock] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
@@ -1415,7 +1415,7 @@ CREATE TABLE [rela].[ConceptSpecializationGroup](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[SpecializationGroupId] [int] NOT NULL,
 	[OrderId] [int] NULL,
- CONSTRAINT [PK_ConceptSpecializationGroup] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptSpecializationGroup] PRIMARY KEY CLUSTERED
 (
 	[ConceptId] ASC,
 	[SpecializationGroupId] ASC
@@ -1430,7 +1430,7 @@ GO
 CREATE TABLE [rela].[QueryConceptDependency](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[DependsOn] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_QueryConceptDependency_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_QueryConceptDependency_1] PRIMARY KEY CLUSTERED
 (
 	[QueryId] ASC,
 	[DependsOn] ASC
@@ -1445,7 +1445,7 @@ GO
 CREATE TABLE [rela].[QueryDependency](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[DependsOn] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_QueryDependency_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_QueryDependency_1] PRIMARY KEY CLUSTERED
 (
 	[QueryId] ASC,
 	[DependsOn] ASC
@@ -2047,16 +2047,16 @@ BEGIN
 
     IF (@shape IS NULL)
         THROW 70400, N'DatasetQuery.Shape is required.', 1;
-    
+
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
     IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 
@@ -2154,7 +2154,7 @@ BEGIN
     BEGIN TRY
         IF EXISTS(SELECT Id FROM app.DatasetQueryCategory WHERE Category = @cat)
             THROW 70409, N'DatasetQueryCategory already exists with that name.', 1;
-        
+
         INSERT INTO app.DatasetQueryCategory (Category, Created, CreatedBy, Updated, UpdatedBy)
         OUTPUT inserted.Id, inserted.Category, inserted.Created, inserted.CreatedBy, inserted.Updated, inserted.UpdatedBy
         VALUES(@cat, GETDATE(), @user, GETDATE(), @user);
@@ -2195,7 +2195,7 @@ CREATE PROCEDURE [adm].[sp_CreateDynamicDatasetQuery]
 AS
 BEGIN
     SET NOCOUNT ON
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
@@ -2204,7 +2204,7 @@ BEGIN
 
 	IF (app.fn_NullOrWhitespace(@schema) = 1)
         THROW 70400, N'DatasetQuery.Schema is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 
@@ -2270,7 +2270,7 @@ BEGIN
 		  , [SqlFieldValueString] = i2.[SqlFieldValueString]
 		  , [SqlFieldValueNumeric] = i2.[SqlFieldValueNumeric]
 		FROM @ins2 AS i2
-        
+
         SELECT
             [Id],
 			[Shape],
@@ -2333,25 +2333,25 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'NetworkEndpoint.Name is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@addr) = 1)
         THROW 70400, N'NetworkEndpoint.Address is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@iss) = 1)
         THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
 
     IF (app.fn_NullOrWhitespace(@kid) = 1)
         THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@cert) = 1)
         THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
-    
+
     IF (@isInterrogator IS NULL)
         THROW 70400, N'NetworkEndpoint.IsInterrogator is required.', 1;
 
     IF (@isResponder IS NULL)
         THROW 70400, N'NetworkEndpoint.IsResponder is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
         IF EXISTS (SELECT 1 FROM network.Endpoint WHERE Name = @name OR KeyId = @kid OR Issuer = @iss)
@@ -2395,7 +2395,7 @@ BEGIN
     BEGIN TRY
 
         INSERT INTO app.GlobalPanelFilter (SessionType, IsInclusion, SqlSetId, SqlSetWhere, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT 
+        OUTPUT
 			inserted.Id
 		  , inserted.SessionType
 		  , inserted.IsInclusion
@@ -2446,7 +2446,7 @@ BEGIN
             THROW 70409, N'PanelFilter already exists with that ConceptId and Inclusion setting.', 1;
 
         INSERT INTO app.PanelFilter (ConceptId, IsInclusion, UiDisplayText, UiDisplayDescription, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT 
+        OUTPUT
 			inserted.Id
 		  , inserted.ConceptId
 		  , inserted.IsInclusion
@@ -2484,7 +2484,7 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@groupId) = 1)
         THROW 70400, N'Specialization.SpecializationGroupId is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@uiDisplayText) = 1)
         THROW 70400, N'Specialization.UiDisplayText is required.', 1;
 
@@ -2521,7 +2521,7 @@ BEGIN
     -- validate
     IF (app.fn_NullOrWhitespace(@sqlSetId) = 1)
         THROW 70400, N'SpecializationGroup.SqlSetId is missing.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@uiDefaultText) = 1)
         THROW 70400, N'SpecializationGroup.UiDefaultText is required.', 1;
 
@@ -2775,7 +2775,7 @@ BEGIN
         SELECT Id, UiDefaultText
         FROM app.SpecializationGroup
         WHERE SqlSetId = @id;
-        
+
         ROLLBACK;
 
         IF EXISTS(SELECT 1 FROM @concepts) OR EXISTS(SELECT 1 FROM @specs)
@@ -2854,7 +2854,7 @@ BEGIN
 
     IF NOT EXISTS(SELECT 1 FROM app.DatasetQueryCategory WHERE Id = @id)
         THROW 70404, N'DatasetQueryCategory not found.', 1;
-    
+
     BEGIN TRAN;
 
     DECLARE @deps TABLE (
@@ -3117,7 +3117,7 @@ BEGIN
     SET NOCOUNT ON
 
     -- select concept
-    SELECT 
+    SELECT
         Id,
         UniversalId,
         ParentId,
@@ -3173,7 +3173,7 @@ GO
 -- Create date: 2019/4/8
 -- Description: Gets all app.ConceptEvent records.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetConceptEvents]    
+CREATE PROCEDURE [adm].[sp_GetConceptEvents]
 AS
 BEGIN
     SET NOCOUNT ON
@@ -3199,7 +3199,7 @@ GO
 -- Create date: 2019/3/7
 -- Description: Gets all app.ConceptSqlSet records.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetConceptSqlSets]    
+CREATE PROCEDURE [adm].[sp_GetConceptSqlSets]
 AS
 BEGIN
     SET NOCOUNT ON
@@ -3285,7 +3285,7 @@ GO
 -- Create date: 2019/6/5
 -- Description: Gets all DatasetQueryCategory.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetDatasetQueryCategory]    
+CREATE PROCEDURE [adm].[sp_GetDatasetQueryCategory]
 AS
 BEGIN
     SET NOCOUNT ON
@@ -3335,7 +3335,7 @@ GO
 CREATE PROCEDURE [adm].[sp_GetGlobalPanelFilters]
 AS
 BEGIN
-    
+
 	SELECT
 		Id
 	  , SessionType
@@ -3353,13 +3353,13 @@ SET QUOTED_IDENTIFIER ON
 GO
 -- =======================================
 -- Author:      Nic Dobbins
--- Create date: 2019/8/26 
+-- Create date: 2019/8/26
 -- Description: Gets all panel filters.
 -- =======================================
 CREATE PROCEDURE [adm].[sp_GetPanelFilters]
 AS
 BEGIN
-    
+
 	SELECT
 		Id
 	  , ConceptId
@@ -3466,7 +3466,7 @@ BEGIN
 
     IF NOT EXISTS(SELECT 1 FROM @s) AND NOT EXISTS(SELECT 1 FROM app.SpecializationGroup WHERE Id = @groupId)
         THROW 70404, N'SpecializationGroup is missing.', 1;
-    
+
     SELECT
         Id,
         SpecializationGroupId,
@@ -3750,7 +3750,7 @@ BEGIN
 
     IF (@id IS NULL)
         THROW 70400, N'ConceptSqlSet.Id is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@sqlSetFrom) = 1)
         THROW 70400, N'ConceptSqlSet.SqlSetFrom is required.', 1;
 
@@ -3798,16 +3798,16 @@ BEGIN
 
     IF (@shape IS NULL)
         THROW 70400, N'DatasetQuery.Shape is required.', 1;
-    
+
     IF NOT EXISTS (SELECT Id FROM ref.Shape WHERE Id = @shape)
         THROW 70404, N'DatasetQuery.Shape is not supported.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
     IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 
@@ -3919,7 +3919,7 @@ BEGIN
 
         IF EXISTS(SELECT Id FROM app.DatasetQueryCategory WHERE Id != @id AND Category = @cat)
             THROW 70409, N'DatasetQueryCategory already exists with that name.', 1;
-        
+
         UPDATE app.DatasetQueryCategory
         SET
             Category = @cat,
@@ -3956,10 +3956,10 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DemographicQuery.SqlStatement is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
-        
+
         IF EXISTS (SELECT Lock FROM app.DemographicQuery)
         BEGIN;
             UPDATE app.DemographicQuery
@@ -4020,7 +4020,7 @@ BEGIN
 
     IF (@id IS NULL)
         THROW 70400, N'DatasetQuery.Id is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
@@ -4029,7 +4029,7 @@ BEGIN
 
 	IF (app.fn_NullOrWhitespace(@schema) = 1)
         THROW 70400, N'DatasetQuery.Schema is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 
@@ -4103,7 +4103,7 @@ BEGIN
 		VALUES (@id, @isEnc, @schema, @sqlDate, @sqlValString, @sqlValNum)
 
 		UPDATE @upd1
-		SET 
+		SET
 			[IsEncounterBased] = i2.[IsEncounterBased],
 			[Schema] = i2.[Schema],
 			[SqlFieldDate] = i2.[SqlFieldDate],
@@ -4167,19 +4167,19 @@ BEGIN
 
 	IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'NetworkEndpoint.Name is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@addr) = 1)
         THROW 70400, N'NetworkEndpoint.Address is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@iss) = 1)
         THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@kid) = 1)
         THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@cert) = 1)
         THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
-    
+
     IF (@isInterrogator IS NULL)
         THROW 70400, N'NetworkEndpoint.IsInterrogator is required.', 1;
 
@@ -4427,13 +4427,13 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@sqlSetId) = 1)
         THROW 70400, N'SpecializationGroup.SqlSetId is missing.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@uiDefaultText) = 1)
         THROW 70400, N'SpecializationGroup.UiDefaultText is required.', 1;
 
     IF NOT EXISTS(SELECT 1 FROM app.ConceptSqlSet WHERE Id = @sqlSetId)
         THROW 70404, N'ConceptSqlSet is missing.', 1;
-    
+
     UPDATE app.SpecializationGroup
     SET
         SqlSetId = @sqlSetId,
@@ -4559,7 +4559,7 @@ GO
 -- Author:      Nic Dobbins
 -- Create date: 2019/5/23
 -- Description: Calculates the patient count for a given concept using
---              dynamic SQL for both the total unique patients and unique 
+--              dynamic SQL for both the total unique patients and unique
 --              count by year.
 -- =======================================
 CREATE PROCEDURE [app].[sp_CalculateConceptPatientCount]
@@ -4578,30 +4578,30 @@ BEGIN
 			@Result NVARCHAR(MAX),
 			@ParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsOUT INT OUTPUT',
 			@PatientsByYearParameterDefinition NVARCHAR(MAX)= N'@TotalPatientsByYearOUT NVARCHAR(MAX) OUTPUT'
-	
-	BEGIN 
+
+	BEGIN
 
 			-- Figure out if we need to add the db name
 			DECLARE @DbFrom NVARCHAR(100) = @TargetDatabaseName + '.' + @From
-			SET @DbFrom = 
+			SET @DbFrom =
 				CASE
 					WHEN OBJECT_ID(@DbFrom, 'U') IS NULL AND OBJECT_ID(@DbFrom, 'V') IS NULL THEN @From
 					ELSE @DbFrom
 				END
-			
-			------------------------------------------------------------------------------------------------------------------------------ 
+
+			------------------------------------------------------------------------------------------------------------------------------
 			-- Total Patient Count
 			------------------------------------------------------------------------------------------------------------------------------
-			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
-			
+			SELECT @ExecuteSql = 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
 							      SELECT @TotalPatientsOUT = (SELECT COUNT(DISTINCT _T.' + @PersonIdField + ') ' +
 															 'FROM ' + @DbFrom + ' AS _T ' +
-															  ISNULL('WHERE ' + @Where,'') + 
+															  ISNULL('WHERE ' + @Where,'') +
 															')'
 
-			BEGIN TRY 
-			
-				EXECUTE sp_executesql 
+			BEGIN TRY
+
+				EXECUTE sp_executesql
 					@ExecuteSql,
 					@ParameterDefinition,
 					@TotalPatientsOUT = @Result OUTPUT
@@ -4611,9 +4611,9 @@ BEGIN
 				  , PatientCountLastUpdateDateTime = GETDATE()
 				WHERE Id = @CurrentConceptId
 
-			END TRY 
-			
-			BEGIN CATCH 
+			END TRY
+
+			BEGIN CATCH
 
 				PRINT('Failed to run query for ' + CONVERT(NVARCHAR(50),@CurrentConceptId));
 				PRINT('Failed query: ' + @ExecuteSql);
@@ -4622,41 +4622,41 @@ BEGIN
 
 			END CATCH
 
-			------------------------------------------------------------------------------------------------------------------------------ 
+			------------------------------------------------------------------------------------------------------------------------------
 			-- Patient Count by Year
 			------------------------------------------------------------------------------------------------------------------------------
 			IF (@isEncounterBased = 1 AND TRY_CONVERT(INT, @Result) > 0)
-			
+
 				BEGIN
-				
+
 					-- Output to the @TotalPatientsByYear (JSON) parameter to log the result
-					SET @ExecuteSql = 
-								'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;  
-								 
+					SET @ExecuteSql =
+								'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;
+
 								 WITH year_calculation AS
 									  (SELECT PatientYear = CONVERT(NVARCHAR(10),YEAR(' + @Date + '))
 											, _T.' + @PersonIdField +'
-									   FROM ' + @DbFrom + ' AS _T ' + 
+									   FROM ' + @DbFrom + ' AS _T ' +
 									   ISNULL('WHERE ' + @Where,'') + ')
-									  
+
 									, year_grouping AS
 									  (SELECT PatientYear
 											, PatientCount = COUNT(DISTINCT ' + @PersonIdField + ')
 									   FROM year_calculation
 									   GROUP BY PatientYear)
-								SELECT @TotalPatientsByYearOUT = (' + 
+								SELECT @TotalPatientsByYearOUT = (' +
 										 '''['' + STUFF(
-		  										(SELECT ''{"Year":'' + PatientYear + '',"PatientCount":'' + CONVERT(NVARCHAR(20),PatientCount) + ''},'' 
+		  										(SELECT ''{"Year":'' + PatientYear + '',"PatientCount":'' + CONVERT(NVARCHAR(20),PatientCount) + ''},''
 		  										 FROM year_grouping
 												 WHERE PatientCount > 0
 												 ORDER BY PatientYear
 		  										 FOR XML PATH(''''), TYPE).value(''text()[1]'', ''varchar(MAX)''
 												 ), 1, 0, '''') +
 										'']'')'
-	
-					BEGIN TRY 
-						
-						EXECUTE sp_executesql 
+
+					BEGIN TRY
+
+						EXECUTE sp_executesql
 							@ExecuteSql,
 							@PatientsByYearParameterDefinition,
 							@TotalPatientsByYearOUT = @Result OUTPUT
@@ -4668,10 +4668,10 @@ BEGIN
 						SET UiDisplayPatientCountByYear = @Result
 						WHERE Id = @CurrentConceptId
 
-					END TRY 
-			
-					BEGIN CATCH 
-			
+					END TRY
+
+					BEGIN CATCH
+
 						PRINT('Failed to run query for ' + CONVERT(NVARCHAR(50),@CurrentConceptId));
 						PRINT('Failed query: ' + @ExecuteSql);
 						PRINT('Error: ' + ERROR_MESSAGE())
@@ -4681,7 +4681,7 @@ BEGIN
 
 				END
 
-		END 
+		END
 
 END
 GO
@@ -4729,14 +4729,14 @@ BEGIN
 			@TimeLimitPerRootConcept DATETIME = DATEADD(MINUTE,@PerRootConceptAllowedRuntimeInMinutes,GETDATE()),
 			@PerRootConceptRowLimit INT = 50000,
 			@CurrentDateTime DATETIME = GETDATE()
-	
-	------------------------------------------------------------------------------------------------------------------------------ 
+
+	------------------------------------------------------------------------------------------------------------------------------
 	-- ForEach root concept
 	------------------------------------------------------------------------------------------------------------------------------
 	WHILE @CurrentRoot <= @TotalRoots AND @CurrentDateTime < @TimeLimit
 
 	BEGIN
-		
+
 		SET @CurrentRootId = (SELECT Id FROM #roots WHERE RowNumber = @CurrentRoot)
 
 		BEGIN TRY DROP TABLE #Concepts END TRY BEGIN CATCH END CATCH
@@ -4765,7 +4765,7 @@ BEGIN
 		------------------------------------------------------------------------------------------------------------------------------
 		WHILE @CurrentConcept <= @TotalConcepts AND @CurrentDateTime < @TimeLimit AND @CurrentDateTime < @TimeLimitPerRootConcept
 
-		BEGIN 
+		BEGIN
 
 			SELECT @From = C.SqlSetFrom
 				 , @Where = C.SqlSetWhere
@@ -4775,8 +4775,8 @@ BEGIN
 			FROM #Concepts C
 			WHERE RowNumber = @CurrentConcept
 
-			BEGIN TRY 
-			
+			BEGIN TRY
+
 				-- Calculate patient counts for this concept
 				EXECUTE app.sp_CalculateConceptPatientCount
 					@PersonIdField,
@@ -4794,13 +4794,13 @@ BEGIN
 			SET @CurrentConcept = @CurrentConcept + 1
 			SET @CurrentDateTime = GETDATE()
 
-		END 
+		END
 		-- End ForEach concept
 
 		SET @CurrentRoot = @CurrentRoot + 1
 		SET @TimeLimitPerRootConcept = DATEADD(MINUTE,@PerRootConceptAllowedRuntimeInMinutes,GETDATE())
 
-	END 
+	END
 	-- End ForEach root concept
 END
 GO
@@ -4944,7 +4944,7 @@ BEGIN
 
     -- Ensure an Atomic Operation as there are many steps here
     BEGIN TRAN;
-    
+
     -- convert Nonce into queryid IF AND ONLY IF the user owns the query
     SELECT
         @qid = Id,
@@ -4977,7 +4977,7 @@ BEGIN
     -- delete unsaved query
     DELETE FROM app.Query
     WHERE Id = @qid;
-    
+
     COMMIT TRAN;
 
 END
@@ -5267,23 +5267,23 @@ BEGIN
         )
     , permitted AS
     (
-        SELECT 
+        SELECT
             a.Base
         , a.[Current]
-        , HasConstraint = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
+        , HasConstraint = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
                 WHERE c.ConceptId = a.[Current])
                         THEN 1 ELSE 0 END
-        , UserPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 1 
+        , UserPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 1
                         AND c.ConstraintValue = @user)
                         THEN 1 ELSE 0 END
-        , GroupPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 2 
+        , GroupPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 2
                         AND c.ConstraintValue IN (SELECT g.[Group] FROM @groups g))
                         THEN 1 ELSE 0 END
         FROM @ancestry a
@@ -5458,7 +5458,7 @@ BEGIN
     SELECT Id
     FROM app.Concept c
     WHERE c.UniversalId = @uid
-    
+
     DECLARE @allowed app.ResourceIdTable;
     INSERT INTO @allowed
     EXEC app.sp_FilterConceptsByConstraint @user, @groups, @ids, @admin = @admin;
@@ -5621,12 +5621,12 @@ BEGIN
 	/*
 	 * Find hits for initial term.
 	 */
-	; WITH cte AS 
+	; WITH cte AS
 	(
 		SELECT FI.ConceptId, FI.Word, Lvl = 0
 		FROM app.ConceptForwardIndex FI
 		WHERE (@rootId IS NULL OR FI.RootId = @rootId)
-			  AND EXISTS 
+			  AND EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptInvertedIndex II
@@ -5647,16 +5647,16 @@ BEGIN
 
 		SELECT cte2.ConceptId, Lvl = cte2.Lvl + 1
 		FROM cte2
-		WHERE EXISTS 
+		WHERE EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptForwardIndex FI
 				WHERE cte2.ConceptId = FI.ConceptId
 					  AND (@rootId IS NULL OR FI.RootId = @rootId)
-					  AND EXISTS 
+					  AND EXISTS
 							(
 								SELECT 1
-								FROM @terms T 
+								FROM @terms T
 									 INNER JOIN app.ConceptInvertedIndex II
 										ON II.Word LIKE T.Term + '%'
 								WHERE FI.WordId = II.WordId
@@ -5771,12 +5771,12 @@ BEGIN
 	/*
 	 * Find hits for initial term.
 	 */
-	; WITH cte AS 
+	; WITH cte AS
 	(
 		SELECT FI.ConceptId, FI.Word, Lvl = 0
 		FROM app.ConceptForwardIndex FI
 		WHERE (@rootId IS NULL OR FI.RootId = @rootId)
-			  AND EXISTS 
+			  AND EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptInvertedIndex II
@@ -5797,16 +5797,16 @@ BEGIN
 
 		SELECT cte2.ConceptId, Lvl = cte2.Lvl + 1
 		FROM cte2
-		WHERE EXISTS 
+		WHERE EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptForwardIndex FI
 				WHERE cte2.ConceptId = FI.ConceptId
 					  AND (@rootId IS NULL OR FI.RootId = @rootId)
-					  AND EXISTS 
+					  AND EXISTS
 							(
 								SELECT 1
-								FROM @terms T 
+								FROM @terms T
 									 INNER JOIN app.ConceptInvertedIndex II
 										ON II.Word LIKE T.Term + '%'
 								WHERE FI.WordId = II.WordId
@@ -5868,7 +5868,7 @@ BEGIN
     SELECT Id
     FROM app.Concept c
     JOIN @uids u on c.UniversalId = u.UniversalId;
-    
+
     DECLARE @allowed app.ResourceIdTable;
     INSERT INTO @allowed
     EXEC app.sp_FilterConceptsByConstraint @user, @groups, @ids, @admin = @admin;
@@ -6455,7 +6455,7 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	SELECT TOP (1) 
+	SELECT TOP (1)
 		 [TargetCode]
 		,[TargetCodeType]
 		,[UiDisplayTargetName]
@@ -6617,7 +6617,7 @@ BEGIN
         );
     END;
 
-	SELECT 
+	SELECT
 		Id
 	  , SourceId
 	  , Structure
@@ -6664,7 +6664,7 @@ BEGIN
         THROW 70403, @403msg1, 1;
 	END;
 
-	SELECT 
+	SELECT
 		Id
 	  , SourceId
 	  , Structure
@@ -6767,7 +6767,7 @@ BEGIN
         c.ParentId,
         TreeLevel = 0,
         c.UiDisplayPatientCount
-    FROM app.Concept c 
+    FROM app.Concept c
     WHERE EXISTS (SELECT 1 FROM @ids i WHERE i.Id = c.Id)
     ORDER BY c.UiDisplayPatientCount DESC
 
@@ -6775,7 +6775,7 @@ BEGIN
         @LoopCount int = 0,
         @LoopLimit int = 10,
         @RetrievedRows int = 1;
-    
+
     WHILE @LoopCount < @LoopLimit AND @RetrievedRows > 0
     BEGIN
 
@@ -6784,7 +6784,7 @@ BEGIN
             c.Id,
             c.ParentId,
             TreeLevel = @LoopCount + 1 --> NOTE CHS why make this a one based index?
-        FROM app.Concept c 
+        FROM app.Concept c
         WHERE EXISTS (SELECT 1 FROM #t t WHERE c.Id = t.ParentId AND t.TreeLevel = @LoopCount)
 
         SET @RetrievedRows = @@ROWCOUNT
@@ -6954,7 +6954,7 @@ BEGIN
 
     SELECT Id, UniversalId, IsPresent, IsAuthorized
     FROM @preflight;
-    
+
     EXEC app.sp_HydrateConceptsByIds @allowed;
 
 END
@@ -7022,7 +7022,7 @@ GO
 -- =======================================
 -- Author:      Nic Dobbins
 -- Create date: 2019/9/5
--- Description: Retrieves global panel filters 
+-- Description: Retrieves global panel filters
 --              relevant to current session context
 -- =======================================
 CREATE PROCEDURE [app].[sp_GetPreflightGlobalPanelFilters]
@@ -7040,7 +7040,7 @@ BEGIN
          INNER JOIN app.ConceptSqlSet AS CS
             ON GPF.SqlSetId = CS.Id
     WHERE (GPF.SessionType = @sessionType OR GPF.SessionType IS NULL)
-    
+
 END
 GO
 /****** Object:  StoredProcedure [app].[sp_GetPreflightImportsByIds]    Script Date: ******/
@@ -7065,7 +7065,7 @@ BEGIN
 	DECLARE @authorized TABLE (Id uniqueIdentifier)
 	DECLARE @results TABLE (Id uniqueidentifier, IsPresent bit, IsAuthorized bit)
 	INSERT INTO @results (Id, IsPresent, IsAuthorized)
-	SELECT 
+	SELECT
 		Id
 	  , IsPresent = CASE WHEN EXISTS (SELECT 1 FROM app.ImportMetadata AS IM WHERE IM.Id = IDS.Id) THEN 1 ELSE 0 END
 	  , IsAuthorized = 0
@@ -7141,7 +7141,7 @@ BEGIN
     SET NOCOUNT ON
 
 	-- Imports cannot be accessed by UID, return nothing.
-	SELECT 
+	SELECT
 		Id = CAST(NULL AS uniqueidentifier)
 	  , IsPresent = CAST(0 AS BIT)
 	  , IsAuthorized = CAST(0 AS BIT)
@@ -7475,7 +7475,7 @@ BEGIN
     FROM
         app.PanelFilter f
     JOIN app.Concept c on f.ConceptId = c.Id
-    
+
 END
 
 GO
@@ -7685,7 +7685,7 @@ BEGIN
 			DECLARE @secmsg nvarchar(400) = @user + ' not permitted to query ' + @uid;
 			THROW 70403, @secmsg, 1
 		END;
-    
+
     -- collect counts
     WITH counts (QueryId, Cnt) as (
         SELECT QueryId, Cnt = COUNT(*)
@@ -7782,7 +7782,7 @@ BEGIN
 	INSERT INTO @specializedGroups (Id)
 	SELECT sg.Id
 	FROM app.SpecializationGroup sg
-	WHERE EXISTS (SELECT 1 
+	WHERE EXISTS (SELECT 1
 				  FROM rela.ConceptSpecializationGroup csg
 					   INNER JOIN app.Concept c
 							ON csg.ConceptId = c.Id
@@ -7842,7 +7842,7 @@ BEGIN
 
 	-- Return Specializations
 	SELECT s.Id
-		 , s.SpecializationGroupId	
+		 , s.SpecializationGroupId
 		 , s.UniversalId
 		 , s.UiDisplayText
 		 , s.SqlSetWhere
@@ -7908,13 +7908,13 @@ BEGIN
 	  , ValueDate = D.ValueDate
 	FROM @data AS D
 		 INNER JOIN app.Import AS I
-			ON I.Id = D.Id 
+			ON I.Id = D.Id
 			   AND I.PersonId = D.PersonId
 			   AND I.ImportMetadataId = D.ImportMetadataId
 			   AND I.ImportMetadataId = @id
 
 	SET @changed += @@ROWCOUNT
-	
+
 	-- INSERT the remainder
 	INSERT INTO app.Import(Id, ImportMetadataId, PersonId, SourcePersonId, SourceValue, SourceModifier, ValueString, ValueNumber, ValueDate)
 	SELECT
@@ -7928,9 +7928,9 @@ BEGIN
 	  , D.ValueNumber
 	  , D.ValueDate
 	FROM @data AS D
-	WHERE NOT EXISTS (SELECT 1 
-					  FROM app.Import AS I 
-					  WHERE I.Id = D.Id 
+	WHERE NOT EXISTS (SELECT 1
+					  FROM app.Import AS I
+					  WHERE I.Id = D.Id
 						    AND I.PersonId = D.PersonId
 						    AND I.ImportMetadataId = D.ImportMetadataId
 						    AND I.ImportMetadataId = @id)
@@ -8062,7 +8062,7 @@ BEGIN
     INSERT INTO rela.QueryConceptDependency
     SELECT @queryid, Id
     FROM @conceptids;
-    
+
     -- insert dependencies into rela.QueryDependency
     INSERT INTO rela.QueryDependency
     SELECT @queryid, Id
@@ -8118,10 +8118,10 @@ BEGIN
     SELECT @queryid, ConstraintId, ConstraintValue
     FROM auth.QueryConstraint AS QC
     WHERE QueryId = @oldqueryid
-		  AND NOT EXISTS (SELECT 1 
-						  FROM auth.QueryConstraint AS NEWQC 
+		  AND NOT EXISTS (SELECT 1
+						  FROM auth.QueryConstraint AS NEWQC
 						  WHERE NEWQC.QueryId = @queryid
-								AND QC.ConstraintId = NEWQC.ConstraintId 
+								AND QC.ConstraintId = NEWQC.ConstraintId
 								AND QC.ConstraintValue = NEWQC.ConstraintValue)
 
     -- cleanup the oldqueryid
@@ -8202,7 +8202,7 @@ BEGIN
         SELECT UniversalId = NULL, Ver = NULL WHERE 1 = 0;
         RETURN;
     END;
-    
+
     IF (@owner != @user)
     BEGIN;
         DECLARE @403msg NVARCHAR(400) = N'Query ' + cast(@queryid as nvarchar(50)) + N' is not owned by ' + @user;
@@ -8222,7 +8222,7 @@ BEGIN
         ROLLBACK;
         THROW;
     END CATCH;
-    
+
     SELECT UniversalId, Ver
     FROM app.Query
     WHERE Id = @queryid
@@ -8275,7 +8275,7 @@ BEGIN
         SELECT UniversalId = NULL, Ver = NULL WHERE 1 = 0;
         RETURN;
     END;
-    
+
     IF (@owner != @user AND @admin = 0)
     BEGIN;
         DECLARE @new403msg NVARCHAR(400) = N'Query ' + cast(@queryid as nvarchar(50)) + N' is not owned by ' + @user;
@@ -8308,7 +8308,7 @@ BEGIN
             -- home node resave
             IF @ver IS NULL AND @oldver IS NOT NULL
                 SET @ver = @oldver + 1;
-                
+
             IF (@oldqid = @queryid)
             BEGIN;
                 -- check for shallow save, @oldid = @queryid, app.Query update only, bump ver, incr updated.
@@ -8322,7 +8322,7 @@ BEGIN
             END;
             ELSE
             BEGIN;
-				
+
 				-- If admin is making a change, allow it but make sure the original query owner remains so.
 				IF (@admin = 0)
 					-- delegate to resave sproc
@@ -8345,7 +8345,7 @@ BEGIN
         ROLLBACK;
         THROW;
     END CATCH;
-    
+
     SELECT UniversalId, Ver
     FROM app.Query
     WHERE Id = @queryid;
@@ -8514,8 +8514,8 @@ BEGIN
 	DECLARE @cons TABLE (ImportMetadataId uniqueidentifier, ConstraintId int, ConstraintValue nvarchar(100))
 
 	-- INSERT metadata row
-	UPDATE TOP (1) app.ImportMetadata 
-	SET 
+	UPDATE TOP (1) app.ImportMetadata
+	SET
 		SourceId = @sourceId
 	  , [Type] = @type
 	  , Structure = @structure
@@ -8562,11 +8562,11 @@ BEGIN
 	INSERT INTO @ids
 	SELECT C.Id
 	FROM app.Concept C
-	WHERE NOT EXISTS (SELECT 1 
-					  FROM app.ConceptTokenizedIndex TI 
-					  WHERE C.Id = TI.ConceptId 
+	WHERE NOT EXISTS (SELECT 1
+					  FROM app.ConceptTokenizedIndex TI
+					  WHERE C.Id = TI.ConceptId
 						    AND TI.Updated > C.ContentLastUpdateDateTime)
-	
+
 	/**
 	 * Ensure concepts have RootIds set.
 	 */
@@ -8580,9 +8580,9 @@ BEGIN
 			 , c.UiDisplayName
 		FROM app.Concept AS c
 		WHERE c.IsRoot = 1
- 
+
 		UNION ALL
- 
+
 		SELECT roots.RootId
 			 , roots.RootUiDisplayName
 			 , c2.IsRoot
@@ -8593,7 +8593,7 @@ BEGIN
 			 INNER JOIN app.Concept c2
 				ON c2.ParentId = roots.Id
 	)
- 
+
 	UPDATE app.Concept
 	SET RootId = roots.RootId
 	FROM app.Concept AS C
@@ -8616,7 +8616,7 @@ BEGIN
 		  ,rootID
 		  ,LEFT(UiDisplaySubtext,400)
 	FROM app.Concept C
-	WHERE UiDisplaySubtext IS NOT NULL 
+	WHERE UiDisplaySubtext IS NOT NULL
 		  AND EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
 	/**
@@ -8650,15 +8650,15 @@ BEGIN
 		 * Get the current left-most word (i.e. everything up to the first space " ").
 		 */
 		INSERT INTO #words
-		SELECT Word = CASE CHARINDEX(@delimeter, uiDisplayName) 
+		SELECT Word = CASE CHARINDEX(@delimeter, uiDisplayName)
 						   WHEN 0 THEN LEFT(LTRIM(RTRIM(uiDisplayName)),400)
-						   ELSE LEFT(LTRIM(RTRIM(LEFT(uiDisplayName, CHARINDEX(@delimeter, uiDisplayName)))),400) 
+						   ELSE LEFT(LTRIM(RTRIM(LEFT(uiDisplayName, CHARINDEX(@delimeter, uiDisplayName)))),400)
 					  END
 			  ,Id = c.Id
 			  ,rootId = c.rootId
 		FROM #concepts c
 
-		/** 
+		/**
 		 * Update row count.
 		 */
 		SET @updatedRows = @@ROWCOUNT
@@ -8676,8 +8676,8 @@ BEGIN
 		 */
 		UPDATE #concepts
 		SET uiDisplayName = NULLIF(LTRIM(RTRIM(RIGHT(uiDisplayName, LEN(uiDisplayName) - CHARINDEX(@delimeter, uiDisplayName) + 1))),'')
-		WHERE uiDisplayName IS NOT NULL 
-		  
+		WHERE uiDisplayName IS NOT NULL
+
 		/**
 		 * DELETE from table if no text left to process.
 		 */
@@ -8686,7 +8686,7 @@ BEGIN
 
 		/**
 		 * Increment the @loopCount.
-		 */ 
+		 */
 		SET @loopCount += 1
 
 	END
@@ -8716,7 +8716,7 @@ BEGIN
 	/**
 	 * Set the last update time on included Concepts
 	 * that were picked up here to make sure they
-	 * aren't unnecessarily rerun next time due to 
+	 * aren't unnecessarily rerun next time due to
 	 * a NULL last update time.
 	 */
 	UPDATE app.Concept
@@ -8738,7 +8738,7 @@ BEGIN
 	 */
 	INSERT INTO app.ConceptForwardIndex (WordId, Word, ConceptId, rootId)
 	SELECT II.WordId, W.Word, W.Id, W.RootId
-	FROM (SELECT DISTINCT Word, Id, RootId 
+	FROM (SELECT DISTINCT Word, Id, RootId
 		  FROM #words) W
 		  INNER JOIN app.ConceptInvertedIndex II
 			ON W.Word = II.Word
@@ -8993,5 +8993,5 @@ END
 GO
 USE [master]
 GO
-ALTER DATABASE [LeafDB] SET  READ_WRITE 
+ALTER DATABASE [LeafDB] SET  READ_WRITE
 GO

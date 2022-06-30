@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_InternalQuerySaveUpdateMove]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -52,10 +52,10 @@ BEGIN
     SELECT @queryid, ConstraintId, ConstraintValue
     FROM auth.QueryConstraint AS QC
     WHERE QueryId = @oldqueryid
-		  AND NOT EXISTS (SELECT 1 
-						  FROM auth.QueryConstraint AS NEWQC 
+		  AND NOT EXISTS (SELECT 1
+						  FROM auth.QueryConstraint AS NEWQC
 						  WHERE NEWQC.QueryId = @queryid
-								AND QC.ConstraintId = NEWQC.ConstraintId 
+								AND QC.ConstraintId = NEWQC.ConstraintId
 								AND QC.ConstraintValue = NEWQC.ConstraintValue)
 
     -- cleanup the oldqueryid

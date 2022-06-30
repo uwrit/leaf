@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_UpdateSearchIndexTables]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -24,11 +24,11 @@ BEGIN
 	INSERT INTO @ids
 	SELECT C.Id
 	FROM app.Concept C
-	WHERE NOT EXISTS (SELECT 1 
-					  FROM app.ConceptTokenizedIndex TI 
-					  WHERE C.Id = TI.ConceptId 
+	WHERE NOT EXISTS (SELECT 1
+					  FROM app.ConceptTokenizedIndex TI
+					  WHERE C.Id = TI.ConceptId
 						    AND TI.Updated > C.ContentLastUpdateDateTime)
-	
+
 	/**
 	 * Ensure concepts have RootIds set.
 	 */
@@ -42,9 +42,9 @@ BEGIN
 			 , c.UiDisplayName
 		FROM app.Concept AS c
 		WHERE c.IsRoot = 1
- 
+
 		UNION ALL
- 
+
 		SELECT roots.RootId
 			 , roots.RootUiDisplayName
 			 , c2.IsRoot
@@ -55,7 +55,7 @@ BEGIN
 			 INNER JOIN app.Concept c2
 				ON c2.ParentId = roots.Id
 	)
- 
+
 	UPDATE app.Concept
 	SET RootId = roots.RootId
 	FROM app.Concept AS C
@@ -78,7 +78,7 @@ BEGIN
 		  ,rootID
 		  ,LEFT(UiDisplaySubtext,400)
 	FROM app.Concept C
-	WHERE UiDisplaySubtext IS NOT NULL 
+	WHERE UiDisplaySubtext IS NOT NULL
 		  AND EXISTS (SELECT 1 FROM @ids ID WHERE C.Id = ID.Id)
 
 	/**
@@ -112,15 +112,15 @@ BEGIN
 		 * Get the current left-most word (i.e. everything up to the first space " ").
 		 */
 		INSERT INTO #words
-		SELECT Word = CASE CHARINDEX(@delimeter, uiDisplayName) 
+		SELECT Word = CASE CHARINDEX(@delimeter, uiDisplayName)
 						   WHEN 0 THEN LEFT(LTRIM(RTRIM(uiDisplayName)),400)
-						   ELSE LEFT(LTRIM(RTRIM(LEFT(uiDisplayName, CHARINDEX(@delimeter, uiDisplayName)))),400) 
+						   ELSE LEFT(LTRIM(RTRIM(LEFT(uiDisplayName, CHARINDEX(@delimeter, uiDisplayName)))),400)
 					  END
 			  ,Id = c.Id
 			  ,rootId = c.rootId
 		FROM #concepts c
 
-		/** 
+		/**
 		 * Update row count.
 		 */
 		SET @updatedRows = @@ROWCOUNT
@@ -138,8 +138,8 @@ BEGIN
 		 */
 		UPDATE #concepts
 		SET uiDisplayName = NULLIF(LTRIM(RTRIM(RIGHT(uiDisplayName, LEN(uiDisplayName) - CHARINDEX(@delimeter, uiDisplayName) + 1))),'')
-		WHERE uiDisplayName IS NOT NULL 
-		  
+		WHERE uiDisplayName IS NOT NULL
+
 		/**
 		 * DELETE from table if no text left to process.
 		 */
@@ -148,7 +148,7 @@ BEGIN
 
 		/**
 		 * Increment the @loopCount.
-		 */ 
+		 */
 		SET @loopCount += 1
 
 	END
@@ -178,7 +178,7 @@ BEGIN
 	/**
 	 * Set the last update time on included Concepts
 	 * that were picked up here to make sure they
-	 * aren't unnecessarily rerun next time due to 
+	 * aren't unnecessarily rerun next time due to
 	 * a NULL last update time.
 	 */
 	UPDATE app.Concept
@@ -200,7 +200,7 @@ BEGIN
 	 */
 	INSERT INTO app.ConceptForwardIndex (WordId, Word, ConceptId, rootId)
 	SELECT II.WordId, W.Word, W.Id, W.RootId
-	FROM (SELECT DISTINCT Word, Id, RootId 
+	FROM (SELECT DISTINCT Word, Id, RootId
 		  FROM #words) W
 		  INNER JOIN app.ConceptInvertedIndex II
 			ON W.Word = II.Word

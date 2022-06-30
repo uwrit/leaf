@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [auth].[DatasetQueryConstraint]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -14,7 +14,7 @@ CREATE TABLE [auth].[DatasetQueryConstraint](
 	[DatasetQueryId] [uniqueidentifier] NOT NULL,
 	[ConstraintId] [int] NOT NULL,
 	[ConstraintValue] [nvarchar](1000) NOT NULL,
- CONSTRAINT [PK_DatasetQueryConstraint] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_DatasetQueryConstraint] PRIMARY KEY CLUSTERED
 (
 	[DatasetQueryId] ASC,
 	[ConstraintId] ASC,

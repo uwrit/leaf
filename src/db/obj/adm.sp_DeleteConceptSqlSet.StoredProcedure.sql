@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_DeleteConceptSqlSet]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -58,7 +58,7 @@ BEGIN
         SELECT Id, UiDefaultText
         FROM app.SpecializationGroup
         WHERE SqlSetId = @id;
-        
+
         ROLLBACK;
 
         IF EXISTS(SELECT 1 FROM @concepts) OR EXISTS(SELECT 1 FROM @specs)

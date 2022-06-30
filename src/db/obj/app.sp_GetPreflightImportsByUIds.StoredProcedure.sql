@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetPreflightImportsByUIds]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -25,7 +25,7 @@ BEGIN
     SET NOCOUNT ON
 
 	-- Imports cannot be accessed by UID, return nothing.
-	SELECT 
+	SELECT
 		Id = CAST(NULL AS uniqueidentifier)
 	  , IsPresent = CAST(0 AS BIT)
 	  , IsAuthorized = CAST(0 AS BIT)

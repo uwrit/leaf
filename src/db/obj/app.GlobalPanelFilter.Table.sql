@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [app].[GlobalPanelFilter]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -20,7 +20,7 @@ CREATE TABLE [app].[GlobalPanelFilter](
 	[CreatedBy] [nvarchar](200) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](200) NOT NULL,
- CONSTRAINT [PK_GlobalPanelFilter] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_GlobalPanelFilter] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

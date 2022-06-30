@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [app].[ConceptForwardIndex]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -15,7 +15,7 @@ CREATE TABLE [app].[ConceptForwardIndex](
 	[WordId] [int] NOT NULL,
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[RootId] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_ConceptForwardIndex] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptForwardIndex] PRIMARY KEY CLUSTERED
 (
 	[WordId] ASC,
 	[ConceptId] ASC,

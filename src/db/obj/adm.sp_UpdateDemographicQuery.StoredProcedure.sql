@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_UpdateDemographicQuery]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -19,10 +19,10 @@ BEGIN
 
     IF (app.fn_NullOrWhitespace(@sql) = 1)
         THROW 70400, N'DemographicQuery.SqlStatement is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
-        
+
         IF EXISTS (SELECT Lock FROM app.DemographicQuery)
         BEGIN;
             UPDATE app.DemographicQuery

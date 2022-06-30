@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [app].[GeneralEquivalenceMapping]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -16,7 +16,7 @@ CREATE TABLE [app].[GeneralEquivalenceMapping](
 	[SourceCodeType] [nvarchar](10) NOT NULL,
 	[TargetCodeType] [nvarchar](10) NOT NULL,
 	[UiDisplayTargetName] [nvarchar](400) NULL,
- CONSTRAINT [PK_GeneralEquivalenceMapping] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_GeneralEquivalenceMapping] PRIMARY KEY CLUSTERED
 (
 	[SourceCode] ASC,
 	[TargetCode] ASC,

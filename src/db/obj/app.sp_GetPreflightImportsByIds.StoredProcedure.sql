@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetPreflightImportsByIds]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -27,7 +27,7 @@ BEGIN
 	DECLARE @authorized TABLE (Id uniqueIdentifier)
 	DECLARE @results TABLE (Id uniqueidentifier, IsPresent bit, IsAuthorized bit)
 	INSERT INTO @results (Id, IsPresent, IsAuthorized)
-	SELECT 
+	SELECT
 		Id
 	  , IsPresent = CASE WHEN EXISTS (SELECT 1 FROM app.ImportMetadata AS IM WHERE IM.Id = IDS.Id) THEN 1 ELSE 0 END
 	  , IsAuthorized = 0

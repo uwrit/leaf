@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_FilterConceptsByConstraint]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -66,23 +66,23 @@ BEGIN
         )
     , permitted AS
     (
-        SELECT 
+        SELECT
             a.Base
         , a.[Current]
-        , HasConstraint = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
+        , HasConstraint = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
                 WHERE c.ConceptId = a.[Current])
                         THEN 1 ELSE 0 END
-        , UserPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 1 
+        , UserPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 1
                         AND c.ConstraintValue = @user)
                         THEN 1 ELSE 0 END
-        , GroupPermitted = CASE WHEN EXISTS 
-                        (SELECT 1 FROM constrained c 
-                WHERE c.ConceptId = a.[Current] 
-                        AND c.ConstraintId = 2 
+        , GroupPermitted = CASE WHEN EXISTS
+                        (SELECT 1 FROM constrained c
+                WHERE c.ConceptId = a.[Current]
+                        AND c.ConstraintId = 2
                         AND c.ConstraintValue IN (SELECT g.[Group] FROM @groups g))
                         THEN 1 ELSE 0 END
         FROM @ancestry a

@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [rela].[ConceptSpecializationGroup]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -14,7 +14,7 @@ CREATE TABLE [rela].[ConceptSpecializationGroup](
 	[ConceptId] [uniqueidentifier] NOT NULL,
 	[SpecializationGroupId] [int] NOT NULL,
 	[OrderId] [int] NULL,
- CONSTRAINT [PK_ConceptSpecializationGroup] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ConceptSpecializationGroup] PRIMARY KEY CLUSTERED
 (
 	[ConceptId] ASC,
 	[SpecializationGroupId] ASC

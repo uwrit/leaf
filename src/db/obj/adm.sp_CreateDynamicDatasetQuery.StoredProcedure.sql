@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_CreateDynamicDatasetQuery]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -33,7 +33,7 @@ CREATE PROCEDURE [adm].[sp_CreateDynamicDatasetQuery]
 AS
 BEGIN
     SET NOCOUNT ON
-    
+
     IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'DatasetQuery.Name is required.', 1;
 
@@ -42,7 +42,7 @@ BEGIN
 
 	IF (app.fn_NullOrWhitespace(@schema) = 1)
         THROW 70400, N'DatasetQuery.Schema is required.', 1;
-    
+
     BEGIN TRAN;
     BEGIN TRY
 
@@ -108,7 +108,7 @@ BEGIN
 		  , [SqlFieldValueString] = i2.[SqlFieldValueString]
 		  , [SqlFieldValueNumeric] = i2.[SqlFieldValueNumeric]
 		FROM @ins2 AS i2
-        
+
         SELECT
             [Id],
 			[Shape],
