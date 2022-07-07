@@ -73,11 +73,11 @@ namespace Services.Compiler
         public int GetOrdinal(string colName)           => reader.GetOrdinal(colName);
         public string GetNullableString(int index)      => reader.IsDBNull(index) ? null : reader.GetString(index);
         public Guid GetGuid(int index)                  => reader.GetGuid(index);
-        public Guid? GetNullableGuid(int index)         => reader.IsDBNull(index) ? null : reader.GetGuid(index);
-        public DateTime? GetNullableDateTime(int index) => reader.IsDBNull(index) ? null : reader.GetDateTime(index);
+        public Guid? GetNullableGuid(int index)         => reader.IsDBNull(index) ? (Guid?)null : reader.GetGuid(index);
+        public DateTime? GetNullableDateTime(int index) => reader.IsDBNull(index) ? (DateTime?)null : reader.GetDateTime(index);
         public bool GetBoolean(int index)               => reader.GetBoolean(index);
-        public bool? GetNullableBoolean(int index)      => reader.IsDBNull(index) ? null : reader.GetBoolean(index);
-        public int? GetNullableInt(int index)           => reader.IsDBNull(index) ? null : reader.GetInt32(index);
+        public bool? GetNullableBoolean(int index)      => reader.IsDBNull(index) ? (bool?)null : reader.GetBoolean(index);
+        public int? GetNullableInt(int index)           => reader.IsDBNull(index) ? (int?)null : reader.GetInt32(index);
         public object GetNullableObject(int index)      => reader.IsDBNull(index) ? null : reader.GetValue(index);
 
         public Guid GetCoercibleGuid(int index)
@@ -253,12 +253,12 @@ namespace Services.Compiler
         }
 
         public string GetNullableString(int index)      => row[index] is string @val ? @val : null;
-        public Guid? GetNullableGuid(int index)         => row[index] is Guid @val ? @val : null;
-        public DateTime? GetNullableDateTime(int index) => row[index] is DateTime @val ? @val : null;
+        public Guid? GetNullableGuid(int index)         => row[index] is Guid @val ? @val : (Guid?)null;
+        public DateTime? GetNullableDateTime(int index) => row[index] is DateTime @val ? @val : (DateTime?)null;
         public Guid GetGuid(int index)                  => Guid.Parse(row[index].ToString());
         public bool GetBoolean(int index)               => (bool)row[index];
-        public bool? GetNullableBoolean(int index)      => row[index] is bool @val ? @val : null;
-        public int? GetNullableInt(int index)           => row[index] is int @val ? @val : null;
+        public bool? GetNullableBoolean(int index)      => row[index] is bool @val ? @val : (bool?)null;
+        public int? GetNullableInt(int index)           => row[index] is int @val ? @val : (int?)null;
         public object GetNullableObject(int index)      => row[index] ?? null;
 
         public int GetOrdinal(string colName)
