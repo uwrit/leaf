@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_QuerySaveUpsert]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -42,7 +42,7 @@ BEGIN
         SELECT UniversalId = NULL, Ver = NULL WHERE 1 = 0;
         RETURN;
     END;
-    
+
     IF (@owner != @user AND @admin = 0)
     BEGIN;
         DECLARE @new403msg NVARCHAR(400) = N'Query ' + cast(@queryid as nvarchar(50)) + N' is not owned by ' + @user;
@@ -75,7 +75,7 @@ BEGIN
             -- home node resave
             IF @ver IS NULL AND @oldver IS NOT NULL
                 SET @ver = @oldver + 1;
-                
+
             IF (@oldqid = @queryid)
             BEGIN;
                 -- check for shallow save, @oldid = @queryid, app.Query update only, bump ver, incr updated.
@@ -89,7 +89,7 @@ BEGIN
             END;
             ELSE
             BEGIN;
-				
+
 				-- If admin is making a change, allow it but make sure the original query owner remains so.
 				IF (@admin = 0)
 					-- delegate to resave sproc
@@ -112,7 +112,7 @@ BEGIN
         ROLLBACK;
         THROW;
     END CATCH;
-    
+
     SELECT UniversalId, Ver
     FROM app.Query
     WHERE Id = @queryid;

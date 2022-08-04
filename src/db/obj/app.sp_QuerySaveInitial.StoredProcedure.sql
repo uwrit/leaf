@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_QuerySaveInitial]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -41,7 +41,7 @@ BEGIN
         SELECT UniversalId = NULL, Ver = NULL WHERE 1 = 0;
         RETURN;
     END;
-    
+
     IF (@owner != @user)
     BEGIN;
         DECLARE @403msg NVARCHAR(400) = N'Query ' + cast(@queryid as nvarchar(50)) + N' is not owned by ' + @user;
@@ -61,7 +61,7 @@ BEGIN
         ROLLBACK;
         THROW;
     END CATCH;
-    
+
     SELECT UniversalId, Ver
     FROM app.Query
     WHERE Id = @queryid

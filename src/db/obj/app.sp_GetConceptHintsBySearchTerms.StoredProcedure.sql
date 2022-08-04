@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetConceptHintsBySearchTerms]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -35,12 +35,12 @@ BEGIN
 	/*
 	 * Find hits for initial term.
 	 */
-	; WITH cte AS 
+	; WITH cte AS
 	(
 		SELECT FI.ConceptId, FI.Word, Lvl = 0
 		FROM app.ConceptForwardIndex FI
 		WHERE (@rootId IS NULL OR FI.RootId = @rootId)
-			  AND EXISTS 
+			  AND EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptInvertedIndex II
@@ -61,16 +61,16 @@ BEGIN
 
 		SELECT cte2.ConceptId, Lvl = cte2.Lvl + 1
 		FROM cte2
-		WHERE EXISTS 
+		WHERE EXISTS
 			(
 				SELECT 1
 				FROM app.ConceptForwardIndex FI
 				WHERE cte2.ConceptId = FI.ConceptId
 					  AND (@rootId IS NULL OR FI.RootId = @rootId)
-					  AND EXISTS 
+					  AND EXISTS
 							(
 								SELECT 1
-								FROM @terms T 
+								FROM @terms T
 									 INNER JOIN app.ConceptInvertedIndex II
 										ON II.Word LIKE T.Term + '%'
 								WHERE FI.WordId = II.WordId

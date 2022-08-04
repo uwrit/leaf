@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetConceptsByUIds]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -30,7 +30,7 @@ BEGIN
     SELECT Id
     FROM app.Concept c
     JOIN @uids u on c.UniversalId = u.UniversalId;
-    
+
     DECLARE @allowed app.ResourceIdTable;
     INSERT INTO @allowed
     EXEC app.sp_FilterConceptsByConstraint @user, @groups, @ids, @admin = @admin;

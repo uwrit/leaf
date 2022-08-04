@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_UpdateEndpoint]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -34,19 +34,19 @@ BEGIN
 
 	IF (app.fn_NullOrWhitespace(@name) = 1)
         THROW 70400, N'NetworkEndpoint.Name is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@addr) = 1)
         THROW 70400, N'NetworkEndpoint.Address is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@iss) = 1)
         THROW 70400, N'NetworkEndpoint.Issuer is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@kid) = 1)
         THROW 70400, N'NetworkEndpoint.KeyId is required.', 1;
-    
+
     IF (app.fn_NullOrWhitespace(@cert) = 1)
         THROW 70400, N'NetworkEndpoint.Certificate is required.', 1;
-    
+
     IF (@isInterrogator IS NULL)
         THROW 70400, N'NetworkEndpoint.IsInterrogator is required.', 1;
 

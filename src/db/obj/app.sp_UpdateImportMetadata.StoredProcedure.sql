@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_UpdateImportMetadata]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -51,8 +51,8 @@ BEGIN
 	DECLARE @cons TABLE (ImportMetadataId uniqueidentifier, ConstraintId int, ConstraintValue nvarchar(100))
 
 	-- INSERT metadata row
-	UPDATE TOP (1) app.ImportMetadata 
-	SET 
+	UPDATE TOP (1) app.ImportMetadata
+	SET
 		SourceId = @sourceId
 	  , [Type] = @type
 	  , Structure = @structure

@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [rela].[QueryConceptDependency]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -13,7 +13,7 @@ GO
 CREATE TABLE [rela].[QueryConceptDependency](
 	[QueryId] [uniqueidentifier] NOT NULL,
 	[DependsOn] [uniqueidentifier] NOT NULL,
- CONSTRAINT [PK_QueryConceptDependency_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_QueryConceptDependency_1] PRIMARY KEY CLUSTERED
 (
 	[QueryId] ASC,
 	[DependsOn] ASC

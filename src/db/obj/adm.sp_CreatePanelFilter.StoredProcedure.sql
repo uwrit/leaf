@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_CreatePanelFilter]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -41,7 +41,7 @@ BEGIN
             THROW 70409, N'PanelFilter already exists with that ConceptId and Inclusion setting.', 1;
 
         INSERT INTO app.PanelFilter (ConceptId, IsInclusion, UiDisplayText, UiDisplayDescription, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT 
+        OUTPUT
 			inserted.Id
 		  , inserted.ConceptId
 		  , inserted.IsInclusion

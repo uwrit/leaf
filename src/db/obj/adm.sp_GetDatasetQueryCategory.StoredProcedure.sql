@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_GetDatasetQueryCategory]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -15,7 +15,7 @@ GO
 -- Create date: 2019/6/5
 -- Description: Gets all DatasetQueryCategory.
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetDatasetQueryCategory]    
+CREATE PROCEDURE [adm].[sp_GetDatasetQueryCategory]
 AS
 BEGIN
     SET NOCOUNT ON

@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_InternalQuerySaveInitial]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -48,7 +48,7 @@ BEGIN
     INSERT INTO rela.QueryConceptDependency
     SELECT @queryid, Id
     FROM @conceptids;
-    
+
     -- insert dependencies into rela.QueryDependency
     INSERT INTO rela.QueryDependency
     SELECT @queryid, Id

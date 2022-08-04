@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_HydrateConceptsByIds]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -30,7 +30,7 @@ BEGIN
 	INSERT INTO @specializedGroups (Id)
 	SELECT sg.Id
 	FROM app.SpecializationGroup sg
-	WHERE EXISTS (SELECT 1 
+	WHERE EXISTS (SELECT 1
 				  FROM rela.ConceptSpecializationGroup csg
 					   INNER JOIN app.Concept c
 							ON csg.ConceptId = c.Id
@@ -90,7 +90,7 @@ BEGIN
 
 	-- Return Specializations
 	SELECT s.Id
-		 , s.SpecializationGroupId	
+		 , s.SpecializationGroupId
 		 , s.UniversalId
 		 , s.UiDisplayText
 		 , s.SqlSetWhere

@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [network].[Endpoint]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -21,15 +21,15 @@ CREATE TABLE [network].[Endpoint](
 	[Updated] [datetime] NOT NULL,
 	[IsInterrogator] [bit] NOT NULL,
 	[IsResponder] [bit] NOT NULL,
- CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Endpoint] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
- CONSTRAINT [IX_Endpoint] UNIQUE NONCLUSTERED 
+ CONSTRAINT [IX_Endpoint] UNIQUE NONCLUSTERED
 (
 	[Name] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY],
- CONSTRAINT [IX_Endpoint_2] UNIQUE NONCLUSTERED 
+ CONSTRAINT [IX_Endpoint_2] UNIQUE NONCLUSTERED
 (
 	[KeyId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]

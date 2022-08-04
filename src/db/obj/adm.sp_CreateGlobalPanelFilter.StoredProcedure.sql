@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [adm].[sp_CreateGlobalPanelFilter]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -31,7 +31,7 @@ BEGIN
     BEGIN TRY
 
         INSERT INTO app.GlobalPanelFilter (SessionType, IsInclusion, SqlSetId, SqlSetWhere, Created, CreatedBy, Updated, UpdatedBy)
-        OUTPUT 
+        OUTPUT
 			inserted.Id
 		  , inserted.SessionType
 		  , inserted.IsInclusion

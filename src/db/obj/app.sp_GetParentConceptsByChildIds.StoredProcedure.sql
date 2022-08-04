@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_GetParentConceptsByChildIds]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -40,7 +40,7 @@ BEGIN
         c.ParentId,
         TreeLevel = 0,
         c.UiDisplayPatientCount
-    FROM app.Concept c 
+    FROM app.Concept c
     WHERE EXISTS (SELECT 1 FROM @ids i WHERE i.Id = c.Id)
     ORDER BY c.UiDisplayPatientCount DESC
 
@@ -48,7 +48,7 @@ BEGIN
         @LoopCount int = 0,
         @LoopLimit int = 10,
         @RetrievedRows int = 1;
-    
+
     WHILE @LoopCount < @LoopLimit AND @RetrievedRows > 0
     BEGIN
 
@@ -57,7 +57,7 @@ BEGIN
             c.Id,
             c.ParentId,
             TreeLevel = @LoopCount + 1 --> NOTE CHS why make this a one based index?
-        FROM app.Concept c 
+        FROM app.Concept c
         WHERE EXISTS (SELECT 1 FROM #t t WHERE c.Id = t.ParentId AND t.TreeLevel = @LoopCount)
 
         SET @RetrievedRows = @@ROWCOUNT

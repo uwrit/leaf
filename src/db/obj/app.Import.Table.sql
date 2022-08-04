@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  Table [app].[Import]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -20,7 +20,7 @@ CREATE TABLE [app].[Import](
 	[ValueString] [nvarchar](100) NULL,
 	[ValueNumber] [decimal](18, 3) NULL,
 	[ValueDate] [datetime] NULL,
- CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Import_1] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC,
 	[ImportMetadataId] ASC,

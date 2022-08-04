@@ -3,7 +3,7 @@
 -- This Source Code Form is subject to the terms of the Mozilla Public
 -- License, v. 2.0. If a copy of the MPL was not distributed with this
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
-﻿USE [LeafDB]
+USE [LeafDB]
 GO
 /****** Object:  StoredProcedure [app].[sp_ImportData]    Script Date: ******/
 SET ANSI_NULLS ON
@@ -52,13 +52,13 @@ BEGIN
 	  , ValueDate = D.ValueDate
 	FROM @data AS D
 		 INNER JOIN app.Import AS I
-			ON I.Id = D.Id 
+			ON I.Id = D.Id
 			   AND I.PersonId = D.PersonId
 			   AND I.ImportMetadataId = D.ImportMetadataId
 			   AND I.ImportMetadataId = @id
 
 	SET @changed += @@ROWCOUNT
-	
+
 	-- INSERT the remainder
 	INSERT INTO app.Import(Id, ImportMetadataId, PersonId, SourcePersonId, SourceValue, SourceModifier, ValueString, ValueNumber, ValueDate)
 	SELECT
@@ -72,9 +72,9 @@ BEGIN
 	  , D.ValueNumber
 	  , D.ValueDate
 	FROM @data AS D
-	WHERE NOT EXISTS (SELECT 1 
-					  FROM app.Import AS I 
-					  WHERE I.Id = D.Id 
+	WHERE NOT EXISTS (SELECT 1
+					  FROM app.Import AS I
+					  WHERE I.Id = D.Id
 						    AND I.PersonId = D.PersonId
 						    AND I.ImportMetadataId = D.ImportMetadataId
 						    AND I.ImportMetadataId = @id)
