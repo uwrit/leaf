@@ -73,6 +73,7 @@ namespace Model.Compiler.SqlBuilder
     {
         public Column PersonId { get; protected set; }
         public Column Salt { get; protected set; }
+        internal ISqlDialect dialect;
 
         public DatasetJoinedSequentialSqlSet(DatasetCachedPanelItemSqlSet set)
         {
