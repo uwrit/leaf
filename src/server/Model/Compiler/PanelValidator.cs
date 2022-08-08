@@ -41,7 +41,8 @@ namespace Model.Compiler
             return new PatientCountQuery
             {
                 QueryId = ctx.QueryId,
-                Panels = panels
+                Panels = panels,
+                ValidationContext = ctx
             };
         }
 

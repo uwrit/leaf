@@ -25,12 +25,14 @@ namespace Services.Cohort
         public ParallelPatientCohortService(
             IPanelSqlCompiler compiler,
             ISqlProviderQueryExecutor executor,
+            ICachedCohortPreparer cohortPreparer,
             PatientCountAggregator patientCountAggregator,
-            IOptions<ClinDbOptions> clinOpts,
-            ILogger<PatientCohortService> logger) : base(compiler, executor, clinOpts, logger)
+            IOptions<ClinDbOptions> clinDbOpts,
+            IOptions<CompilerOptions> compilerOpts,
+            ILogger<PatientCohortService> logger) : base(compiler, executor, cohortPreparer, clinDbOpts, compilerOpts, logger)
         {
             this.patientCountAggregator = patientCountAggregator;
-            this.clinDbOpts = clinOpts.Value;
+            this.clinDbOpts = clinDbOpts.Value;
         }
 
         protected override async Task<PatientCohort> GetCohortAsync(PatientCountQuery query, CancellationToken token)
@@ -40,14 +42,15 @@ namespace Services.Cohort
             return new PatientCohort
             {
                 QueryId = query.QueryId,
-                PatientIds = await GetPatientSetAsync(leafQueries, token),
+                PatientIds = await GetPatientSetAsync(leafQueries, query.DependentQueryIds, token),
                 SqlStatements = leafQueries.Select(q => q.SqlStatement),
                 Panels = query.Panels.Where(p => p.Domain == PanelDomain.Panel)
             };
         }
 
-        async Task<HashSet<string>> GetPatientSetAsync(IReadOnlyCollection<LeafQuery> queries, CancellationToken token)
+        async Task<HashSet<string>> GetPatientSetAsync(IReadOnlyCollection<LeafQuery> queries, IEnumerable<Guid> queryIds, CancellationToken token)
         {
+            var dependentCohortSql = await GetCrossServerDependentCohortSqlIfNeeded(queryIds);
             var partials = new ConcurrentBag<PartialPatientCountContext>();
             var tasks = new List<Task>();
             using (var throttler = new SemaphoreSlim(clinDbOpts.Cohort.MaxParallelThreads))
@@ -58,7 +61,7 @@ namespace Services.Cohort
                     tasks.Add(
                         Task.Run(async () =>
                         {
-                            var result = await GetPartialContext(q, token);
+                            var result = await GetPartialContext(q, dependentCohortSql, token);
                             throttler.Release();
                             partials.Add(result);
                         })
@@ -71,17 +74,17 @@ namespace Services.Cohort
             return patientCountAggregator.Aggregate(partials);
         }
 
-        async Task<PartialPatientCountContext> GetPartialContext(LeafQuery query, CancellationToken token)
+        async Task<PartialPatientCountContext> GetPartialContext(LeafQuery query, string dependentCohortSql, CancellationToken token)
         {
             var partialIds = new HashSet<string>();
             var connStr = clinDbOptions.ConnectionString;
-            var sql = query.SqlStatement;
+            var sql = dependentCohortSql + query.SqlStatement;
             var timeout = clinDbOptions.DefaultTimeout;
             var reader = await executor.ExecuteReaderAsync(connStr, sql, timeout, token);
 
             while (reader.Read())
             {
-                partialIds.Add(reader[0].ToString());
+                partialIds.Add(reader[0].ToString().Trim());
             }
 
             await reader.CloseAsync();
@@ -111,6 +114,15 @@ namespace Services.Cohort
             log.LogInformation("Parallel SqlStatements:{Sql}", queries.Select(q => q.SqlStatement));
 
             return queries;
+        }
+
+        async Task<string> GetCrossServerDependentCohortSqlIfNeeded(IEnumerable<Guid> queryIds)
+        {
+            if (!compilerOpts.SharedDbServer && queryIds.Any())
+            {
+                return await cohortPreparer.Prepare(queryIds, false);
+            }
+            return "";
         }
     }
 }

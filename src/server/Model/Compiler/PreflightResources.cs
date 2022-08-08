@@ -6,7 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Model.Tagging;
+using System.Threading.Tasks;
 using Model.Options;
 
 namespace Model.Compiler
@@ -19,6 +19,7 @@ namespace Model.Compiler
         public PreflightQueries DirectQueriesCheck { get; set; }
         public PreflightImports DirectImportsCheck { get; set; }
         public IEnumerable<GlobalPanelFilter> GlobalPanelFilters { get; set; }
+        public IEnumerable<QueryRef> AllowedDirectQueries => DirectQueriesCheck.DirectQueries(DirectQueries);
         IEnumerable<QueryRef> DirectQueries { get; set; }
         IEnumerable<ImportRef> DirectImports { get; set; }
 
@@ -29,12 +30,13 @@ namespace Model.Compiler
             GlobalPanelFilters = globalPanelFilters;
         }
 
-        public IEnumerable<Concept> Concepts(CompilerOptions opts)
+        public async Task<IEnumerable<Concept>> Concepts(CompilerOptions opts, ICachedCohortPreparer cohortPreparer)
         {
             if (Ok)
             {
-                var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => ToConcept(dq, opts));
+                var queryConcepts = DirectQueriesCheck.DirectQueries(DirectQueries).Select(dq => ToConcept(dq, opts, cohortPreparer));
                 var importConcepts = DirectImportsCheck.DirectImports(DirectImports).Select(di => ToConcept(di, opts));
+
                 return DirectConceptsCheck.Concepts
                     .Concat(queryConcepts)
                     .Concat(importConcepts);
@@ -69,15 +71,20 @@ namespace Model.Compiler
             };
         }
 
-        Concept ToConcept(QueryRef @ref, CompilerOptions opts)
+        Concept ToConcept(QueryRef @ref, CompilerOptions opts, ICachedCohortPreparer cohortPreparer)
         {
             var alias = $"{opts.Alias}C";
+
             return new Concept
             {
                 Id = @ref.Id.Value,
                 UniversalId = @ref.UniversalId,
                 RootId = Guid.Empty,
-                SqlSetFrom = $"(SELECT {alias}.PersonId AS {opts.FieldPersonId} FROM {opts.AppDb}.app.Cohort AS {alias} WHERE {alias}.QueryId = '{@ref.Id.Value}')",
+                SqlSetFrom = opts.SharedDbServer
+                    ? $"(SELECT {alias}.PersonId AS {opts.FieldPersonId} FROM {opts.AppDb}.app.Cohort AS {alias} WHERE {alias}.QueryId = '{@ref.Id.Value}')"
+                    : $@"(SELECT {cohortPreparer.FieldPersonId} AS {opts.FieldPersonId}
+                          FROM {cohortPreparer.CohortToCteFrom()} AS {alias}
+                          WHERE {alias}.{cohortPreparer.FieldQueryId} = '{@ref.Id.Value}')",
             };
         }
     }

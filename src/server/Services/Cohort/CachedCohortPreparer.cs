@@ -19,7 +19,12 @@ namespace Services.Cohort
     public abstract class BaseCachedCohortPreparer : ICachedCohortPreparer
     {
         public string FieldInternalPersonId { get; set; } = "__personId__";
+        public string FieldPersonId { get; set; } = "PersonId";
+        public string FieldExported { get; set; } = "Exported";
+        public string FieldSalt { get; set; } = "Salt";
+        public string FieldQueryId { get; set; } = "QueryId";
         public string TempTableName { get; set; } = "__cohort__";
+
         readonly internal ICachedCohortFetcher cohortFetcher;
         readonly internal ISqlDialect dialect;
         readonly internal CompilerOptions compilerOpts;
@@ -38,15 +43,16 @@ namespace Services.Cohort
 
         internal virtual string PersonIdTransformHandler(string personId, string delim) => $"{delim}{personId}{delim}";
         internal virtual string ExportedTransformHandler(bool exported) => exported ? "1" : "0";
-        internal virtual string SaltTransformHandler(Guid? salt, string delim) => salt.HasValue ? $"{delim}{salt}{delim}" : "null";
+        internal virtual string GuidTransformHandler(Guid? salt, string delim) => salt.HasValue ? $"{delim}{salt}{delim}" : "null";
 
         internal virtual string InsertDelimitedRow(CachedCohortRecord rec, string delim = "'")
         {
             var personId = PersonIdTransformHandler(rec.PersonId, delim);
             var exported = ExportedTransformHandler(rec.Exported);
-            var salt = SaltTransformHandler(rec.Salt, delim);
+            var salt = GuidTransformHandler(rec.Salt, delim);
+            var qid = GuidTransformHandler(rec.QueryId, delim);
 
-            return $"{personId}, {exported}, {salt}";
+            return $"{personId}, {exported}, {salt}, {qid}";
         }
 
         internal IEnumerable<IEnumerable<T>> Batch<T>(IEnumerable<T> vals, int batchSize)
@@ -61,6 +67,8 @@ namespace Services.Cohort
 
         public virtual async Task<string> Prepare(Guid queryId, bool exportedOnly) => ""; // no-op
 
+        public virtual async Task<string> Prepare(IEnumerable<Guid> queryId, bool exportedOnly) => ""; // no-op
+
         public virtual string CohortToCteFrom() => TempTableName;
 
         public virtual string CohortToCteWhere() => ""; // no-op
@@ -68,7 +76,7 @@ namespace Services.Cohort
         public virtual string CohortToCte()
         {
             return
-                $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt " +
+                $"SELECT {FieldPersonId} AS {FieldInternalPersonId}, {FieldExported}, {FieldSalt} " +
                 $"FROM {CohortToCteFrom()}";
         }
 
@@ -94,11 +102,11 @@ namespace Services.Cohort
         public override string CohortToCteWhere()
         {
             var output = new StringBuilder();
-            output.Append($"QueryId = @{ShapedDatasetCompilerContext.QueryIdParam}");
+            output.Append($"{FieldQueryId} = @{ShapedDatasetCompilerContext.QueryIdParam}");
 
             if (exportedOnly)
             {
-                output.Append(" AND Exported = 1");
+                output.Append($" AND {FieldExported} = 1");
             }
 
             return output.ToString();
@@ -106,7 +114,7 @@ namespace Services.Cohort
 
         public override string CohortToCte()
         {
-            return $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt FROM {CohortToCteFrom()} WHERE {CohortToCteWhere()}";
+            return $"SELECT {FieldPersonId} AS {FieldInternalPersonId}, {FieldExported}, {FieldSalt} FROM {CohortToCteFrom()} WHERE {CohortToCteWhere()}";
         }
     }
 
@@ -121,19 +129,27 @@ namespace Services.Cohort
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
+            return await Prepare(new Guid[] { queryId }, exportedOnly);
+        }
+
+        public async override Task<string> Prepare(IEnumerable<Guid> queryIds, bool exportedOnly)
+        {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = (await Task.WhenAll(queryIds
+                .Select(qid => cohortFetcher.FetchCohortAsync(qid, exportedOnly))))
+                .SelectMany(x => x);
 
             output.Append(@$"CREATE TABLE #{TempTableName} (
-                PersonId {dialect.ToSqlType(ColumnType.String)},
-                Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
+                {FieldPersonId} {dialect.ToSqlType(ColumnType.String)},
+                {FieldExported} {dialect.ToSqlType(ColumnType.Boolean)},
+                {FieldSalt}     {dialect.ToSqlType(ColumnType.Guid)}
+                {FieldQueryId}  {dialect.ToSqlType(ColumnType.Guid)});"
             );
             output.AppendLine();
 
             foreach (var recs in Batch(cohort, batchSize))
             {
-                output.Append($"INSERT INTO #{TempTableName} (PersonId, Exported, Salt)");
+                output.Append($"INSERT INTO #{TempTableName} ({FieldPersonId}, {FieldExported}, {FieldSalt}, {FieldQueryId})");
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
@@ -159,27 +175,35 @@ namespace Services.Cohort
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
+            return await Prepare(new Guid[] { queryId }, exportedOnly);
+        }
+
+        public async override Task<string> Prepare(IEnumerable<Guid> queryIds, bool exportedOnly)
+        {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = (await Task.WhenAll(queryIds
+                .Select(qid => cohortFetcher.FetchCohortAsync(qid, exportedOnly))))
+                .SelectMany(x => x);
 
             // Create temp table
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
-                PersonId {dialect.ToSqlType(ColumnType.String)},
-                Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
+                {FieldPersonId} {dialect.ToSqlType(ColumnType.String)},
+                {FieldExported} {dialect.ToSqlType(ColumnType.Boolean)},
+                {FieldSalt}     {dialect.ToSqlType(ColumnType.Guid)},
+                {FieldQueryId}  {dialect.ToSqlType(ColumnType.Guid)});"
             );
             output.AppendLine();
 
             // Insert rows
             foreach (var recs in Batch(cohort, batchSize))
             {
-                output.Append($"INSERT INTO {TempTableName} (PersonId, Exported, Salt)");
+                output.Append($"INSERT INTO {TempTableName} ({FieldPersonId}, {FieldExported}, {FieldSalt}, {FieldQueryId})");
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
 
             // Add Index
-            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
+            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} ({FieldPersonId}, {FieldQueryId});");
             output.AppendLine();
 
             return output.ToString();
@@ -209,13 +233,21 @@ namespace Services.Cohort
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
+            return await Prepare(new Guid[] { queryId }, exportedOnly);
+        }
+
+        public async override Task<string> Prepare(IEnumerable<Guid> queryIds, bool exportedOnly)
+        {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = (await Task.WhenAll(queryIds
+                .Select(qid => cohortFetcher.FetchCohortAsync(qid, exportedOnly))))
+                .SelectMany(x => x);
 
             output.Append(@$"CREATE TEMPORARY TABLE ORA${TempTableName} (
-                PersonId {dialect.ToSqlType(ColumnType.String)},
-                Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
+                {FieldPersonId} {dialect.ToSqlType(ColumnType.String)},
+                {FieldExported} {dialect.ToSqlType(ColumnType.Boolean)},
+                {FieldSalt}     {dialect.ToSqlType(ColumnType.Guid)},
+                {FieldQueryId}  {dialect.ToSqlType(ColumnType.Guid)});"
             );
             output.AppendLine();
 
@@ -224,7 +256,7 @@ namespace Services.Cohort
 
             foreach (var rec in cohort)
             {
-                output.Append($"INTO ORA${TempTableName} (PersonId, Exported, Salt)");
+                output.Append($"INTO ORA${TempTableName} ({FieldPersonId}, {FieldExported}, {FieldSalt}, {FieldQueryId})");
                 output.Append($"VALUES ({InsertDelimitedRow(rec)})");
                 output.AppendLine();
             }
@@ -238,7 +270,7 @@ namespace Services.Cohort
 
         public override string CohortToCte()
         {
-            return $"SELECT PersonId AS {FieldInternalPersonId}, Exported, Salt FROM {CohortToCteFrom()}";
+            return $"SELECT {FieldPersonId} AS {FieldInternalPersonId}, {FieldExported}, {FieldSalt} FROM {CohortToCteFrom()}";
         }
     }
 
@@ -255,27 +287,35 @@ namespace Services.Cohort
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
+            return await Prepare(new Guid[] { queryId }, exportedOnly);
+        }
+
+        public async override Task<string> Prepare(IEnumerable<Guid> queryIds, bool exportedOnly)
+        {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = (await Task.WhenAll(queryIds
+                .Select(qid => cohortFetcher.FetchCohortAsync(qid, exportedOnly))))
+                .SelectMany(x => x);
 
             // Create temp table
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
-                PersonId {dialect.ToSqlType(ColumnType.String)},
-                Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
+                {FieldPersonId} {dialect.ToSqlType(ColumnType.String)},
+                {FieldExported} {dialect.ToSqlType(ColumnType.Boolean)},
+                {FieldSalt}     {dialect.ToSqlType(ColumnType.Guid)},
+                {FieldQueryId}  {dialect.ToSqlType(ColumnType.Guid)});"
             );
             output.AppendLine();
 
             // Insert rows
             foreach (var recs in Batch(cohort, batchSize))
             {
-                output.Append($"INSERT INTO {TempTableName} (PersonId, Exported, Salt)");
+                output.Append($"INSERT INTO {TempTableName} ({FieldPersonId}, {FieldExported}, {FieldSalt}, {FieldQueryId})");
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
 
             // Add Index
-            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} (PersonId);");
+            output.Append($"CREATE INDEX IDX_TEMP1 ON {TempTableName} ({FieldPersonId}, {FieldQueryId});");
             output.AppendLine();
 
             return output.ToString();
@@ -295,19 +335,27 @@ namespace Services.Cohort
 
         public async override Task<string> Prepare(Guid queryId, bool exportedOnly)
         {
+            return await Prepare(new Guid[] { queryId }, exportedOnly);
+        }
+
+        public async override Task<string> Prepare(IEnumerable<Guid> queryIds, bool exportedOnly)
+        {
             var output = new StringBuilder();
-            var cohort = await cohortFetcher.FetchCohortAsync(queryId, exportedOnly);
+            var cohort = (await Task.WhenAll(queryIds
+                .Select(qid => cohortFetcher.FetchCohortAsync(qid, exportedOnly))))
+                .SelectMany(x => x);
 
             output.Append(@$"CREATE TEMPORARY TABLE {TempTableName} (
-                PersonId {dialect.ToSqlType(ColumnType.String)},
-                Exported {dialect.ToSqlType(ColumnType.Boolean)},
-                Salt     {dialect.ToSqlType(ColumnType.Guid)});"
+                {FieldPersonId} {dialect.ToSqlType(ColumnType.String)},
+                {FieldExported} {dialect.ToSqlType(ColumnType.Boolean)},
+                {FieldSalt}     {dialect.ToSqlType(ColumnType.Guid)},
+                {FieldQueryId}  {dialect.ToSqlType(ColumnType.Guid)});"
             );
             output.AppendLine();
 
             foreach (var recs in Batch(cohort, batchSize))
             {
-                output.Append($"INSERT INTO {TempTableName} (PersonId, Exported, Salt)");
+                output.Append($"INSERT INTO {TempTableName} ({FieldPersonId}, {FieldExported}, {FieldSalt}, {FieldQueryId})");
                 output.Append($"VALUES {string.Join(',', recs.Select(r => "(" + InsertDelimitedRow(r) + ")"))};");
                 output.AppendLine();
             }
