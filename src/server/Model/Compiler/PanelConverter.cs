@@ -15,12 +15,6 @@ using Model.Extensions;
 using Model.Options;
 using Model.Search;
 
-/*
- * This is the main point of conversion for all embeddable resources.
- * Regardless of the fact that resource references come in, only concepts are allowed out.
- * This probably means there is a substantial refactor of this implementation ahead.
- */
-
 namespace Model.Compiler
 {
     using FederatedConceptMap = Dictionary<string, Concept>;
@@ -35,16 +29,19 @@ namespace Model.Compiler
         readonly PreflightResourceChecker preflightSearch;
         readonly ILogger<PanelConverter> log;
         readonly CompilerOptions compilerOptions;
+        readonly ICachedCohortPreparer cohortPreparer;
 
         public PanelConverter(
             PreflightResourceChecker preflightSearch,
             IUserContext userContext,
             IOptions<CompilerOptions> compilerOptions,
+            ICachedCohortPreparer cohortPreparer,
             ILogger<PanelConverter> logger)
         {
-            this.preflightSearch = preflightSearch;
             user = userContext;
+            this.preflightSearch = preflightSearch;
             this.compilerOptions = compilerOptions.Value;
+            this.cohortPreparer = cohortPreparer;
             log = logger;
         }
 
@@ -108,7 +105,7 @@ namespace Model.Compiler
                 return new PanelValidationContext(query, resources);
             }
 
-            var concepts = resources.Concepts(compilerOptions);
+            var concepts = await resources.Concepts(compilerOptions, cohortPreparer);
             var crosswalk = CrosswalkImportIds(query.All(), resources.DirectImportsCheck.Results.Select(r => r.ImportRef));
             var panels = GetPanels(crosswalk, concepts);
             var merged = MergeFilters(panels, resources.GlobalPanelFilters);

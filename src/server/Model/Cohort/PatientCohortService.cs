@@ -16,18 +16,24 @@ namespace Model.Cohort
     {
         protected readonly IPanelSqlCompiler compiler;
         protected readonly ISqlProviderQueryExecutor executor;
+        protected readonly ICachedCohortPreparer cohortPreparer;
         protected readonly ClinDbOptions clinDbOptions;
+        protected readonly CompilerOptions compilerOpts;
         protected readonly ILogger<PatientCohortService> log;
 
         protected PatientCohortService(
             IPanelSqlCompiler compiler,
             ISqlProviderQueryExecutor executor,
+            ICachedCohortPreparer cohortPreparer,
             IOptions<ClinDbOptions> clinDbOptions,
+            IOptions<CompilerOptions> compilerOpts,
             ILogger<PatientCohortService> logger)
         {
             this.compiler = compiler;
             this.executor = executor;
+            this.cohortPreparer = cohortPreparer;
             this.clinDbOptions = clinDbOptions.Value;
+            this.compilerOpts = compilerOpts.Value;
             log = logger;
         }
 

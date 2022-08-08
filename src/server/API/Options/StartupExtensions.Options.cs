@@ -407,7 +407,8 @@ namespace API.Options
             // Clin Db Connection
             services.Configure<ClinDbOptions>(opts =>
             {
-                opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
+                //opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
+                opts.ConnectionString = "User ID=postgres; Password=Jefferson407!; Host=localhost";
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
                 opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));
