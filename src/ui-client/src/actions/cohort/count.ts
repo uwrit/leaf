@@ -18,7 +18,7 @@ import { aggregateStatistics } from '../../services/cohortAggregatorApi';
 import { fetchCount, fetchDemographics } from '../../services/cohortApi';
 import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
-import { getPatientListFromNewBaseDataset } from './patientList';
+import { getPatientListFromNewBaseDataset, getPatientListDataset } from './patientList';
 import { setAggregateVisualizationData, setNetworkVisualizationData } from './visualize';
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
@@ -149,6 +149,7 @@ const getDemographics = () => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
         const responders: NetworkIdentity[] = [];
+        const defaultDatasets = [ ...state.datasets.all.values() ].filter(ds => ds.isDefault);
         let atLeastOneSucceeded = false;
         state.responders.forEach((nr: NetworkIdentity) => { 
             if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED && !nr.isGateway) { 
@@ -157,7 +158,7 @@ const getDemographics = () => {
         });
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
-        Promise.all(
+        await Promise.all(
             // For each enabled responder
             responders.map((nr: NetworkIdentity, i: number) => { 
                 return new Promise( async (resolve, reject) => {
@@ -185,7 +186,8 @@ const getDemographics = () => {
                         })
                         .then(() => resolve(null));
                 })
-            })                
+            })
+        // Set cohort state to LOADED            
         ).then(() => {
             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
             if (atLeastOneSucceeded) {
@@ -194,6 +196,11 @@ const getDemographics = () => {
                 dispatch(setCohortDemographicsErrored());
             }
         });
+
+        // Auto-load any other `default` datasets
+        for (const ds of defaultDatasets) {
+            dispatch(getPatientListDataset(ds));
+        }
     };
 };
 

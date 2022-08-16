@@ -99,6 +99,7 @@ export interface PatientListDatasetQueryDTO {
     shape: PatientListDatasetShape;
     tags: string[];
     universalId?: string;
+    isDefault?: boolean;
 }
 
 export interface PatientListDatasetQuery extends PatientListDatasetQueryDTO {

@@ -57,6 +57,7 @@ export interface State {
 }
 
 class Attestation extends React.PureComponent<Props, State> {
+    private attestSkipStarted = false;
     private className = 'attestation';
     private defaultDocumentation: DocumentationApproval = {
         institution: '',
@@ -82,8 +83,9 @@ class Attestation extends React.PureComponent<Props, State> {
 
     public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { config, isSubmittingAttestation, userContext, hasAttested } = this.props;
-        if (hasAttested || isSubmittingAttestation) { return null; }
+        if (hasAttested || isSubmittingAttestation || this.attestSkipStarted) { return null; }
         if (userContext && config && !config.attestation.enabled) {
+            this.attestSkipStarted = true;
             this.setState({ 
                 sessionTypeSelected: true, 
                 documentationStatusSelected: true, 

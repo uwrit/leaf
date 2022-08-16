@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 using Model.Compiler;
 
 namespace Model.Admin.Compiler
@@ -11,6 +12,7 @@ namespace Model.Admin.Compiler
     public class AdminDemographicQuery
     {
         public string SqlStatement { get; set; }
+        public Dictionary<string, string> ColumnNames { get; set; }
         public DateTime LastChanged { get; set; }
         public string ChangedBy { get; set; }
     }

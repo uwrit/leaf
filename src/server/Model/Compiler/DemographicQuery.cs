@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
 
 namespace Model.Compiler
 {
@@ -11,5 +12,6 @@ namespace Model.Compiler
     {
         public Shape Shape => Shape.Demographic;
         public string SqlStatement { get; set; }
+        public Dictionary<string, string> ColumnNames { get; set; }
     }
 }

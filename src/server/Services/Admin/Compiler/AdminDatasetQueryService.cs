@@ -71,6 +71,7 @@ namespace Services.Admin.Compiler
                     {
                         id = query.Id,
                         uid = query.UniversalId?.ToString(),
+                        isdefault = query.IsDefault,
                         shape = query.Shape,
                         name = query.Name,
                         catid = query.CategoryId,
@@ -99,6 +100,7 @@ namespace Services.Admin.Compiler
                     new
                     {
                         id = query.Id,
+                        isdefault = query.IsDefault,
                         name = query.Name,
                         catid = query.CategoryId,
                         desc = query.Description,
@@ -223,6 +225,7 @@ namespace Services.Admin.Compiler
             public string Description { get; set; }
             public string SqlStatement { get; set; }
             public bool IsEncounterBased { get; set; }
+            public bool IsDefault { get; set; }
             public string SqlFieldDate { get; set; }
             public string SqlFieldValueString { get; set; }
             public string SqlFieldValueNumeric { get; set; }
@@ -271,6 +274,7 @@ namespace Services.Admin.Compiler
                 {
                     Id = query.Id,
                     UniversalId = DatasetQueryUrn.From(query.UniversalId),
+                    IsDefault = query.IsDefault,
                     Shape = (Shape)query.Shape,
                     Name = query.Name,
                     CategoryId = query.CategoryId,
