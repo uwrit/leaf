@@ -137,6 +137,7 @@ export function setPatientListDatasetReceived(state: CohortState, action: Cohort
     const copy = Object.assign({}, state, {
         patientList: {
             ...state.patientList,
+            state: CohortStateType.LOADED,
             configuration: {
                 ...state.patientList.configuration,
                 isFetching: false,

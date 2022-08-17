@@ -26,6 +26,7 @@ import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
 import { allowAllDatasets } from '../../services/datasetSearchApi';
 import { clearAllTimelinesData } from '../../services/timelinesApi';
 import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
+import { sleep } from '../../utils/Sleep';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -199,6 +200,13 @@ const getDemographics = () => {
 
         // Auto-load any other `default` datasets
         for (const ds of defaultDatasets) {
+            // Hack: redux `dispatch()` isn't async, so we can't await it,
+            // but we also don't want to overwhelm the server with a lot of potential parallel
+            // requests. Thus poll every half second to infer that previous dataset completed,
+            // then execute
+            while (getState().cohort.patientList.configuration.isFetching) {
+                await sleep(500);
+            }
             dispatch(getPatientListDataset(ds));
         }
     };
