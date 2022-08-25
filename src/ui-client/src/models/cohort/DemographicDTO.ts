@@ -10,6 +10,11 @@ import { PatientListRowDTO } from '../patientList/Patient';
 export interface DemographicDTO {
     patients: PatientListRowDTO[];
     statistics: DemographicStatistics;
+    columnNames: CustomColumnNames;
+}
+
+interface CustomColumnNames {
+    [key: string]: string;
 }
 
 export interface BinarySplitPair {

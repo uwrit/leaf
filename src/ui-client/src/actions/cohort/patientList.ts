@@ -14,7 +14,7 @@ import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '
 import { DateBoundary } from '../../models/panel/Date';
 import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetQuery, PatientListDatasetDefinition, PatientListDatasetShape } from '../../models/patientList/Dataset';
-import { PatientListSort } from '../../models/patientList/Configuration';
+import { PatientListSort, PatientListCustomColumnNames } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
@@ -39,9 +39,11 @@ export const PATIENTLIST_COLUMN_TOGGLE = 'PATIENTLIST_COLUMN_TOGGLE';
 export const PATIENTLIST_SET_PAGINATION = 'PATIENTLIST_SET_PAGINATION';
 export const PATIENTLIST_ISOPEN_TOGGLE = 'PATIENTLIST_ISOPEN_TOGGLE';
 export const PATIENTLIST_SET_AVAILABLE = 'PATIENTLIST_SET_AVAILABLE';
+export const PATIENTLIST_SET_CUSTOM_COLUMN_NAMES = 'PATIENTLIST_SET_CUSTOM_COLUMN_NAMES';
 
 export interface CohortPatientListAction {
     id: number;
+    customColumnNames?: PatientListCustomColumnNames;
     column?: PatientListColumn;
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
@@ -295,6 +297,14 @@ export const reorderColumns = (source: PatientListColumn, target: PatientListCol
 };
 
 // Synchronous
+export const setPatientListCustomColumnNames = (id: number, customColumnNames: PatientListCustomColumnNames): CohortPatientListAction => {
+    return {
+        id,
+        customColumnNames,
+        type: PATIENTLIST_SET_CUSTOM_COLUMN_NAMES
+    };
+};
+
 export const setPatientListSingletonReceived = (id: number, rowCount: number): CohortPatientListAction => {
     return {
         id,

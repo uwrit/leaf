@@ -20,10 +20,15 @@ export interface PatientListSort {
 export interface PatientListConfiguration {
     multirowDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
     singletonDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
+    customColumnNames: PatientListCustomColumnNames;
     displayColumns: PatientListColumn[];
     isFetching: boolean;
     fetchingDataset?: string;
     pageNumber: number;
     pageSize: number;
     sort: PatientListSort;
+}
+
+export interface PatientListCustomColumnNames {
+    [key: string]: string;
 }

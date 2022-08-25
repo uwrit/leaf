@@ -101,7 +101,8 @@ namespace Model.Cohort
             result.Demographics = new Demographic
             {
                 Patients = GetDemographicsWithSettings(ctx.Exported),
-                Statistics = GetStatisticsWithSettings(stats)
+                Statistics = GetStatisticsWithSettings(stats),
+                ColumnNames = validationContext.Context.DemographicQuery.ColumnNames
             };
 
             return result;

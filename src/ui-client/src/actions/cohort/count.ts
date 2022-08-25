@@ -18,7 +18,7 @@ import { aggregateStatistics } from '../../services/cohortAggregatorApi';
 import { fetchCount, fetchDemographics } from '../../services/cohortApi';
 import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
-import { getPatientListFromNewBaseDataset, getPatientListDataset } from './patientList';
+import { getPatientListFromNewBaseDataset, getPatientListDataset, setPatientListCustomColumnNames } from './patientList';
 import { setAggregateVisualizationData, setNetworkVisualizationData } from './visualize';
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
@@ -177,6 +177,10 @@ const getDemographics = () => {
 
                                 dispatch(setNetworkVisualizationData(nr.id, demographics.statistics));
                                 getPatientListFromNewBaseDataset(nr.id, demographics.patients, dispatch, getState);
+
+                                if (demographics.columnNames) {
+                                    dispatch(setPatientListCustomColumnNames(nr.id, demographics.columnNames));
+                                }
 
                                 const newState = getState();
                                 const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.responders) as DemographicStatistics;
