@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DragSourceConnector, DragSourceMonitor, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DragSourceConnector, DragSourceMonitor, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd-cjs'
 import { reorderColumns } from '../../actions/cohort/patientList';
 import { compose } from 'redux';
 import { PatientListColumn } from '../../models/patientList/Column';

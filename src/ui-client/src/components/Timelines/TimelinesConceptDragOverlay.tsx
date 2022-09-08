@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd';
+import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd-cjs';
 import { Button, Col, Row } from 'reactstrap';
 import { getConceptDataset } from '../../actions/cohort/timelines';
 import { TimelinesOverlayMode } from '../../containers/Timelines/Timelines';

@@ -20,7 +20,7 @@ import { setBrowser } from '../../actions/generalUi';
 import { Browser } from '../../models/state/GeneralUiState';
 import BrowserError from '../../components/Attestation/BrowserError';
 import moment from 'moment';
-import { version } from '../../../package.json'
+import pkg from '../../../package.json'
 import CustomAttestationConfirmation from '../../components/Attestation/CustomAttestationConfirmation';
 import StandardAttestationConfirmation from '../../components/Attestation/StandardAttestationConfirmation';
 import { ServerState } from '../../models/state/ServerState';
@@ -140,7 +140,7 @@ class Attestation extends React.PureComponent<Props, State> {
                         <img alt='leaf-logo' className={`${c}-leaf-logo`} src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
                         <div className={`${c}-title`}>
                             leaf
-                            <span className={`${c}-leaf-version`}>v{version}</span>
+                            <span className={`${c}-leaf-version`}>v{pkg.version}</span>
                         </div>
                     </div>
                     <div className={`${c}-iths-logo-wrapper`}>

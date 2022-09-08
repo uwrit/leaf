@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Container, Col, Row } from 'reactstrap';
-import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd-cjs'
 import { PanelFilter } from '../../../../models/admin/PanelFilter';
 import { TextArea } from '../../Section/TextArea';
 import { setAdminPanelFilter, removeAdminPanelFilter, deleteAdminPanelFilter } from '../../../../actions/admin/panelFilter';

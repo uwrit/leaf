@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { ConnectDropTarget, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd-cjs'
 import { Concept } from '../../../models/concept/Concept';
 import { Panel as PanelModel } from '../../../models/panel/Panel';
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
