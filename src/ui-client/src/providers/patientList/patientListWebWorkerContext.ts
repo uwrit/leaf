@@ -6,6 +6,7 @@
  */ 
 
 export const workerContext = `
+console.log("Patient list web worker here!");
 var patientMap = new Map();
 var singletonDatasets = new Map();
 var multirowDatasets = new Map();
@@ -709,10 +710,6 @@ var getMultirowDataCsv = function (payload) {
                         const d = vals[cols[j].id];  
                         row.push(q+valueToCsvString(d)+q);
                     }
-                }
-                for (var j = 0; j < cols.length; j++) {
-                    var d = vals[cols[j].id];
-                    row.push(q+valueToCsvString(d)+q);
                 }
                 rows.push(row.join(','));
             }
