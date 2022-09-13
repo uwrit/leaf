@@ -14,7 +14,6 @@ using Model.Admin.Compiler;
 using Model.Admin.Network;
 using Model.Admin.Query;
 using Model.Admin.User;
-using Model.Dashboard;
 
 namespace Model
 {
@@ -44,7 +43,6 @@ namespace Model
             services.AddTransient<ConceptDatasetCompilerValidationContextProvider>();
             services.AddTransient<PanelDatasetProvider>();
             services.AddTransient<PanelDatasetCompilerValidationContextProvider>();
-            services.AddTransient<DashboardConfigurationManager>();
 
             services.AddTransient<AdminServerStateManager>();
             services.AddTransient<AdminConceptSqlSetManager>();

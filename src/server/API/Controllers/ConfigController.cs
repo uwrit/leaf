@@ -4,16 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using API.DTO.Config;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Authorization;
-using Model.Dashboard;
 using Model.Notification;
 using Model.Options;
 
@@ -24,7 +18,6 @@ namespace API.Controllers
     [Route("api/config")]
     public class ConfigController : Controller
     {
-        readonly ILogger<ConfigController> logger;
         readonly AuthenticationOptions authenticationOptions;
         readonly LeafVersionOptions versionOptions;
         readonly CohortOptions cohortOptions;
@@ -34,7 +27,6 @@ namespace API.Controllers
         readonly IServerStateCache serverStateCache;
 
         public ConfigController(
-            ILogger<ConfigController> logger,
             IOptions<AuthenticationOptions> authenticationOptions,
             IOptions<LeafVersionOptions> versionOptions,
             IOptions<CohortOptions> cohortOptions,
@@ -43,7 +35,6 @@ namespace API.Controllers
             IOptions<DeidentificationOptions> deidentOptions,
             IServerStateCache serverStateCache)
         {
-            this.logger = logger;
             this.authenticationOptions = authenticationOptions.Value;
             this.versionOptions = versionOptions.Value;
             this.cohortOptions = cohortOptions.Value;
@@ -57,24 +48,6 @@ namespace API.Controllers
         public ServerStateDTO GetServerState()
         {
             return new ServerStateDTO(serverStateCache.GetServerState());
-        }
-
-        [Authorize(Policy = Access.Institutional)]
-        [Authorize(Policy = TokenType.Access)]
-        [HttpGet("dashboards")]
-        public async Task<ActionResult<IEnumerable<DashboardConfiguration>>> GetDashboardConfigurations(
-            [FromServices] DashboardConfigurationManager dashboardManager)
-        {
-            try
-            {
-                var configs = await dashboardManager.GetAllAsync();
-                return Ok(configs);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError("Failed to get dashboard configurations. Error:{Error}", ex.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
         }
 
         public ActionResult<ConfigDTO> Get()

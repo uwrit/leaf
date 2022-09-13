@@ -26,16 +26,6 @@ namespace Model.Compiler
         public bool JoinToPanel => Panel != null;
     }
 
-    public sealed class SinglePatientDatasetCompilerContext : ShapedDatasetCompilerContext
-    {
-        public string PatientID { get; set; }
-        public IDatasetQuery DatasetQuery { get; set; }
-        public DateTime? EarlyBound { get; set; }
-        public DateTime? LateBound { get; set; }
-
-        public override Shape Shape => DatasetQuery.Shape;
-    }
-
     public sealed class DemographicCompilerContext : ShapedDatasetCompilerContext
     {
         public override Shape Shape => Shape.Demographic;

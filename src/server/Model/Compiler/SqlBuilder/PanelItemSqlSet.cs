@@ -41,7 +41,6 @@ namespace Model.Compiler.SqlBuilder
 
     class PanelItemSqlSet : NamedSet
     {
-        readonly ISqlDialect dialect;
         readonly CompilerOptions compilerOptions;
         readonly Panel panel;
         readonly SubPanel subpanel;

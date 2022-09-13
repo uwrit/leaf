@@ -14,8 +14,8 @@ import { AggregateConceptHintRef } from '../../../models/concept/ConceptHint';
 import { HintContainer } from './HintContainer';
 import { keys } from '../../../models/Keyboard';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
-import './ConceptSearchBox.css';
 
+import './ConceptSearchBox.css';
 interface Props {
     conceptsState: ConceptsState;
     conceptsSearchState: ConceptsSearchState;

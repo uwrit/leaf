@@ -41,10 +41,6 @@ BEGIN
     SELECT Id, [Message]
     FROM app.Notification
 
-    -- Version
-    SELECT [Version]
-    FROM ref.Version
-
 END
 
 GO

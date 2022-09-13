@@ -10,11 +10,7 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
 namespace Model.Compiler.PanelSqlCompiler
-=======
-namespace Model.Compiler
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
 {
     public class DatasetSqlCompiler : IDatasetSqlCompiler
     {
@@ -37,27 +33,12 @@ namespace Model.Compiler
             this.compilerOptions = compilerOptions.Value;
         }
 
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
         public async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
         {
             executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
 
             var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, true);
-=======
-        public async Task<DatasetExecutionContext> BuildCohortDatasetSql(DatasetCompilerContext context)
-        {
-            await cachedCohortPreparer.SetQueryCohort(context.QueryContext.QueryId, true);
-            return await BuildDatasetSql(context);
-        }
-
-        async Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context)
-        {
-            executionContext = new DatasetExecutionContext(context.Shape, context.QueryContext, context.DatasetQuery.Id.Value);
-            new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DatasetQuery.SqlStatement);
-
-            var prelude = await cachedCohortPreparer.Prepare();
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
             var epilogue = cachedCohortPreparer.Complete();
             var cohortCte = CteCohortInternals(context);
             var datasetCte = CteDatasetInternals(context.DatasetQuery);
@@ -73,11 +54,7 @@ namespace Model.Compiler
             return executionContext;
         }
 
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
         void AddParameters(Guid queryId)
-=======
-        internal virtual void AddParameters(Guid queryId)
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
         {
             executionContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, queryId);
             foreach (var param in compiler.BuildContextQueryParameters())
@@ -86,11 +63,7 @@ namespace Model.Compiler
             }
         }
 
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
         string Compose(string cohort, string dataset, string filter, string select)
-=======
-        internal virtual string Compose(string cohort, string dataset, string filter, string select)
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetSqlCompiler.cs
         {
             return
                 @$"WITH cohort AS ( {cohort} )

@@ -39,7 +39,6 @@
     <Folder Include="Admin\Notification\" />
     <Folder Include="Compiler\" />
     <Folder Include="Compiler\SqlBuilder\" />
-    <Folder Include="Dashboard\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +49,5 @@
     <None Remove="System.Data.OracleClient" />
     <None Remove="Google.Cloud.BigQuery.V2" />
     <None Remove="Compiler\SqlBuilder\" />
-    <None Remove="Dashboard\" />
   </ItemGroup>
 </Project>

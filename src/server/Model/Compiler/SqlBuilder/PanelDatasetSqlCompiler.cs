@@ -29,13 +29,8 @@ namespace Model.Compiler.PanelSqlCompiler
 
         public async Task<ConceptDatasetExecutionContext> BuildPanelDatasetSql(PanelDatasetCompilerContext compilerContext)
         {
-<<<<<<< HEAD
             var prelude = await cachedCohortPreparer.Prepare(compilerContext.QueryContext.QueryId, true);
             var epilogue = cachedCohortPreparer.Complete();
-=======
-            await cachedCohortPreparer.SetQueryCohort(compilerContext.QueryContext.QueryId, true);
-            var prelude = await cachedCohortPreparer.Prepare();
->>>>>>> dashboard-v2
             var query = new DatasetNonAggregateJoinedSqlSet(compilerContext.Panel, compilerOptions, dialect, cachedCohortPreparer).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(query);
 
@@ -43,10 +38,7 @@ namespace Model.Compiler.PanelSqlCompiler
             exeContext.AddParameter(ShapedDatasetCompilerContext.QueryIdParam, compilerContext.QueryContext.QueryId);
             exeContext.QueryPrelude = prelude;
             exeContext.CompiledQuery = query;
-<<<<<<< HEAD
             exeContext.QueryEpilogue = epilogue;
-=======
->>>>>>> dashboard-v2
 
             return exeContext;
         }

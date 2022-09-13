@@ -29,11 +29,7 @@ namespace Model.Compiler.SqlBuilder
             var first = From.First() as JoinedSequentialSqlSet;
             var last = From.Last() as JoinedSequentialSqlSet;
 
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetNonAggregateJoinedSqlSet.cs
             first.On = new[] { join.PersonId == new Expression(dialect.Convert(ColumnType.String, first.PersonId)) };
-=======
-            first.On = new[] { join.PersonId == first.PersonId };
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetNonAggregateJoinedSqlSet.cs
             first.Type = JoinType.Inner;
 
             Select = new ISelectable[]
@@ -70,10 +66,7 @@ namespace Model.Compiler.SqlBuilder
                         {
                             SqlSetFrom = cachedCohortPreparer.CohortToCteFrom(),
                             SqlSetWhere = cachedCohortPreparer.CohortToCteWhere()
-<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/DatasetNonAggregateJoinedSqlSet.cs
                                 .Replace("@" + ShapedDatasetCompilerContext.QueryIdParam, queryParamPlaceholder)
-=======
->>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/DatasetNonAggregateJoinedSqlSet.cs
                         }
                     }
                 }

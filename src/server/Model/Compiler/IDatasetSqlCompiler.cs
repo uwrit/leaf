@@ -10,10 +10,6 @@ namespace Model.Compiler
 {
     public interface IDatasetSqlCompiler
     {
-<<<<<<< HEAD
         Task<DatasetExecutionContext> BuildDatasetSql(DatasetCompilerContext context);
-=======
-        Task<DatasetExecutionContext> BuildCohortDatasetSql(DatasetCompilerContext context);
->>>>>>> dashboard-v2
     }
 }
