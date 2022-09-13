@@ -34,8 +34,13 @@ namespace Model.Compiler.PanelSqlCompiler
             var sp = p.SubPanels.First();
             var pi = sp.PanelItems.First();
 
+<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/ConceptDatasetSqlCompiler.cs
             var prelude = await cachedCohortPreparer.Prepare(ctx.QueryContext.QueryId, true);
             var epilogue = cachedCohortPreparer.Complete();
+=======
+            await cachedCohortPreparer.SetQueryCohort(ctx.QueryContext.QueryId, true);
+            var prelude = await cachedCohortPreparer.Prepare();
+>>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/ConceptDatasetSqlCompiler.cs
             var cohortSql = cachedCohortPreparer.CohortToCte();
             var conceptSql = new ConceptDatasetSqlSet(p, sp, pi, compilerOptions, dialect).ToString();
             new SqlValidator(SqlCommon.IllegalCommands).Validate(conceptSql);

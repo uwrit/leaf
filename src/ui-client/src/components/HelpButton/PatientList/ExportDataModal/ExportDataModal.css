@@ -1,0 +1,110 @@
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .patientlist-export-modal {
+    font-family: Roboto;
+    font-weight: 300;
+}
+
+.patientlist-export-modal .modal-content {
+    border: none;
+    border-radius: 0;
+    box-shadow: rgba(0,0,0,0.5) 0px 0px 25px 0px;
+}
+
+.patientlist-export-modal .modal-header {
+    background-color: rgb(0, 75, 102);
+    border-radius: 0;
+    color: rgb(248,248,248);
+    padding: 4px 0;
+}
+
+.patientlist-export-modal .modal-title {
+    margin: 0 auto;
+}
+
+.patientlist-export-modal .modal-body > .row {
+    height: 100%;
+}
+
+.patientlist-export-modal-options {
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+
+.patientlist-export-modal-option {
+    border-left: 3px solid transparent;
+    color: rgb(70,70,70);
+    cursor: pointer;
+    padding: 4px 8px; 
+}
+
+.patientlist-export-modal-option-logo {
+    border: 1px solid rgba(28, 170, 221, 0.1);
+    margin-right: 4px;
+    width: 25px;
+}
+
+.patientlist-export-modal-option:hover,
+.patientlist-export-modal-option.selected {
+    background-color: rgba(28, 170, 221, 0.1);
+    border-left-color: #1CA8DD; 
+    cursor: pointer;
+}
+
+.patientlist-export-modal-no-options {
+    height: 100%;
+    vertical-align: middle;
+}
+
+.patientlist-export-modal-redcap-exporting-container {
+    height: 100px;
+}
+
+.patientlist-export-modal-redcap-exporting-container .leaf-button {
+    bottom: 100%;
+    position: absolute;
+}
+
+.patientlist-export-modal-redcap-exporting-inner {
+    margin-top: 5%;
+}
+
+.patientlist-export-modal-redcap-description p {
+    font-size: 1.1rem;
+}
+
+.patientlist-export-modal-redcap-progressbar-outer {
+    background-color: rgba(0,0,0,0.1);
+    height: 2px;
+    margin: 14px 0 4px;
+    width: 100%;
+}
+
+.patientlist-export-modal-redcap-progressbar-inner {
+    background-color: rgb(28,168,221);
+    height: 2px;
+    transition: width 0.3s;
+}
+
+.patientlist-export-modal-redcap-text {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.patientlist-export-modal-redcap-text a {
+    font-size: 0.9rem;
+}
+
+.patientlist-export-modal-redcap-remaining {
+    color: rgb(150,150,150);
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.patientlist-export-modal.exporting .modal-footer {
+    display: none;
+}

@@ -43,8 +43,13 @@ const dates: DateBoundary[] = [
     { display: 'In Past 30 Days',   abbrev: '30D', start: { increment: -30, dateIncrementType: DateIncrementType.DAY }, end: today },
     { display: 'In Past 6 Months',  abbrev: '6M',  start: { increment: -6,  dateIncrementType: DateIncrementType.MONTH }, end: today },
     { display: 'In Past 12 Months', abbrev: '12M', start: { increment: -12, dateIncrementType: DateIncrementType.MONTH }, end: today },
+<<<<<<< HEAD
     { display: 'In Past 2 Years',   abbrev: '2Y',  start: { increment: -2,  dateIncrementType: DateIncrementType.YEAR }, end: today },
     { display: 'In Past 3 Years',   abbrev: '3Y',  start: { increment: -3,  dateIncrementType: DateIncrementType.YEAR }, end: today }
+=======
+    { display: 'In Past 2 Years', abbrev: '2Y', start: { increment: -2, dateIncrementType: DateIncrementType.YEAR }, end: today },
+    { display: 'In Past 3 Years', abbrev: '3Y', start: { increment: -3, dateIncrementType: DateIncrementType.YEAR }, end: today }
+>>>>>>> dashboard-v2
 ];
 
 export default class AddDatasetButton extends React.PureComponent<Props, State> {

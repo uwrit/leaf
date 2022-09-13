@@ -1,0 +1,373 @@
+.dynamic-timeline {
+    height: 100%;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+/* Header */
+.dynamic-timeline-header-separator {
+    background-color: rgb(230,230,230);
+    height: 1px;
+    margin: 4px 0 6px;
+    width: 100%;
+}
+
+.dynamic-timeline-header-container {
+    padding: 10px;
+}
+
+.dynamic-timeline-header-container > div {
+    display: inline-block;
+}
+
+.dynamic-timeline-header-bubble {
+    border-radius: 8px;
+    padding: 6px 10px;
+}
+
+.dynamic-timeline-title {
+    background-color: rgb(240,240,240);
+    font-size: 1.7rem;
+    font-weight: 300;
+}
+
+.dynamic-timeline-export {
+    background-color: rgba(51, 134, 230, 0.2);
+    border: 1px solid rgba(51, 134, 230, 0.3);
+    cursor: pointer;
+    font-size: 1.3rem;
+    margin: 0 20px;
+}
+
+.dynamic-timeline-export:hover {
+    background-color: rgba(51, 134, 230, 0.3);
+}
+
+.dynamic-timeline-export svg {
+    font-size: 1.8rem;
+    margin: 0 4px -4px 0;
+}
+
+.dynamic-timeline-comparison-container {
+    float: right;
+    position: relative;
+}
+
+.dynamic-timeline-comparison-title-outer {
+    background-color: white;
+    bottom: 0;
+    right: -10px;
+    padding: 0 12px 0;
+    position: absolute;
+}
+
+.dynamic-timeline-comparison-title-inner {
+    position: relative;
+    font-size: 1.5rem;
+    font-weight: 300;
+    width: max-content;
+}
+
+.dynamic-timeline-comparison-filter-container {
+    position: absolute;
+    right: -14px;
+    top: 12px;
+    width: 120px;
+}
+
+.dynamic-timeline-comparison-all-patients-text {
+    text-align: center;
+    width: 120px;
+}
+
+.dynamic-timeline-comparison-add-filter {
+    color: green;
+    font-size: 2rem;
+    font-weight: 100;
+    left: -17px;
+    position: absolute;
+    text-align: left;
+    top: 4px;
+}
+
+.dynamic-timeline-comparison-add-filter svg {
+    cursor: pointer;
+}
+
+.dynamic-timeline-comparison-filter-picker-container {
+    border-bottom: 1px solid rgb(230,230,230);
+    margin: 0 0 4px;
+    overflow-x: hidden;
+    padding-right: 0 !important;
+}
+
+.dynamic-timeline-comparison-filter-picker-container:last-child {
+    border-bottom: none;
+}
+
+.dynamic-timeline-comparison-filter-picker-container .input-group div {
+    line-height: 2.3;
+    margin-left: 10px;
+}
+
+.dynamic-timeline-comparison-filter-picker-container input.leaf-input {
+    flex: none;
+    margin: 0 10px 10px;
+    width: 50px !important;
+}
+
+
+
+.dynamic-timeline-comparison-filters-picker {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.24);
+    left: -250px;
+    margin-top: -0px;
+    max-height: 500px;
+    opacity: 0;
+    overflow-y: auto;
+    padding: 35px 10px 10px;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transition: opacity 0.2s;
+    width: 250px;
+    z-index: 110;
+}
+
+.dynamic-timeline-comparison-filters-picker.shown {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.dynamic-timeline-comparison-filter-picker-close {
+    cursor: pointer;
+    font-size: 2rem;
+    margin: -5px 5px 0 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.dynamic-timeline-comparison-filter-picker-close:hover {
+    color: red !important;
+}
+
+.dynamic-timeline-comparison-filter-picker-row {
+    padding-left: 0 !important;
+}
+
+/* Chart */
+.dynamic-timeline-chart-container {
+    position: relative;
+}
+
+.dynamic-timeline-chart-container .recharts-xAxis.xAxis line {
+    display: none;
+}
+
+.dynamic-timeline-chart-container .recharts-layer.recharts-line path {
+    filter: drop-shadow(2px 3px 4px rgb(0,0,0,0.25));
+    stroke-width: 4px;
+    transition: opacity 0.2s;
+}
+
+.dynamic-timeline-grid-line line {
+    stroke: rgb(225,225,225);
+}
+
+.dynamic-timeline-chart-container .recharts-line-dots circle {
+    r: 5px;
+    stroke-width: 2px;
+}
+
+.dynamic-timeline-small-multiples-container:hover .recharts-layer.recharts-line path,
+.dynamic-timeline-small-multiples-container:hover .recharts-line-dots circle {
+    filter: none;
+    stroke-opacity: 0.6;
+}
+
+.dynamic-timeline-small-multiples-container .recharts-surface:hover .recharts-layer.recharts-line path,
+.dynamic-timeline-small-multiples-container .recharts-surface:hover .recharts-line-dots circle {
+    filter: drop-shadow(2px 3px 4px rgb(0,0,0,0.25));
+    r: 7px;
+    stroke-opacity: 1;
+}
+
+.dynamic-timeline-chart-event-dot circle {
+    filter: drop-shadow(2px 3px 4px rgb(0,0,0,0.25));
+    r: 8px;
+    stroke: rgb(192, 31, 45);
+    stroke-width: 3px;
+}
+
+.dynamic-timeline-chart-event-line line {
+    stroke: rgb(192, 31, 45);
+    stroke-width: 3px;
+}
+
+.dynamic-timelines-event-box {
+    filter: drop-shadow(2px 3px 4px rgb(0,0,0,0.25));
+    height: 100px;
+    text-align: center;
+    width: 100px;
+}
+
+.dynamic-timelines-event-box div {
+    border: 2px solid rgb(192, 31, 45);
+    border-radius: 8px;
+    background-color: white;
+    font-size: 1rem;
+    min-width: 70px;
+    max-width: 120px;
+    padding: 4px;
+}
+
+/* Trend box */
+.dynamic-timeline-trend-container {
+    background-color: white;
+    border: 1px solid rgb(220,220,220);
+    box-shadow: 0 2px 10px rgb(0,0,0,0.4);
+    height: 462px;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 500px;
+    z-index: 105;
+}
+
+.dynamic-timeline-trend {
+    border-bottom: 1px solid rgb(237,237,237);
+    font-size: 2rem;
+    font-weight: 300;
+}
+
+.dynamic-timeline-trend-bar {
+    display: flex;
+    height: 100%;
+}
+
+.dynamic-timeline-trend-bar > div {
+    border-right: 1px solid rgb(237,237,237);
+    height: 100%;
+}
+
+.dynamic-timeline-trend-bar-arrow {
+    position: relative;
+    width: 15%;
+}
+
+.dynamic-timeline-trend-bar-arrow svg {
+    font-size: 6rem;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.dynamic-timeline-trend-bar-text-container {
+    display: flex;
+    padding: 2px 10px;
+    width: 65%;
+}
+
+.dynamic-timeline-trend-bar-last-value > div {
+    font-size: 4.5rem;
+    line-height: 1.1;
+}
+
+.dynamic-timeline-trend-bar-name-container {
+    padding: 4px 0 0 10px;
+}
+
+.dynamic-timeline-trend-bar-name {
+    font-size: 1.6rem;
+}
+
+.dynamic-timeline-trend-bar-name.non-numeric-last {
+    font-size: 1.6rem;
+    margin: -2px 0 0;
+}
+
+.dynamic-timeline-trend-bar-datediff {
+    color: green;
+    font-size: 1.1rem;
+    margin-top: -6px;
+}
+
+.dynamic-timeline-trend-bar-diff {
+    padding: 2px;
+    position: relative;
+    display: table; 
+    width: 20%;
+}
+
+.dynamic-timeline-trend-bar-comparison-value {
+    color: rgb(192, 123, 11);
+    font-size: 2.2rem;
+    margin-top: 0px;
+    padding: 0;
+    text-align: center; 
+    width: 100%;
+}
+
+.dynamic-timeline-trend-bar-comparison-diff {
+    color: rgb(220,220,220);
+    font-size: 1.2rem;
+    margin-top: -8px;
+    text-align: center; 
+}
+
+.dynamic-timeline-trend-bar-comparison-diff-inner {
+    color: rgb(50,50,50);
+}
+
+.dynamic-timeline-tooltip {
+    background-color: white;
+    box-shadow: 0 2px 10px rgb(0,0,0,0.4);
+    border-radius: 4px;
+    padding: 8px 15px;
+}
+
+.dynamic-timeline-tooltip-title {
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+.dynamic-timeline-tooltip-value {
+    font-weight: 300;
+    font-size: 3rem;
+    margin-left: 4px;
+}
+
+.dynamic-timeline-tooltip-date {
+    color: green;
+    margin: -8px 0 4px;
+}
+
+.dynamic-timeline-tooltip-context-container {
+    max-width: 500px;
+    margin-bottom: 4px;
+}
+
+.dynamic-timeline-tooltip-context-field {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-right: 4px;
+}
+
+.dynamic-timeline-tooltip-context-value {
+    color: rgb(120,120,120);
+    font-size: 1.1rem;
+    font-style: italic;
+}
+
+.dynamic-timeline-tooltip-context-value .highlight {
+    background-color: transparent !important;
+    border-bottom: 2px solid #ff0e50;
+    color: black;
+    font-weight: 700;
+}

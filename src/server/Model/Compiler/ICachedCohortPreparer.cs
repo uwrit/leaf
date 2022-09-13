@@ -4,7 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+<<<<<<< HEAD
 using System.Collections.Generic;
+=======
+>>>>>>> dashboard-v2
 using System.Threading.Tasks;
 
 namespace Model.Compiler
@@ -12,6 +15,7 @@ namespace Model.Compiler
     public interface ICachedCohortPreparer
     {
         string FieldInternalPersonId { get; set; }
+<<<<<<< HEAD
         string FieldPersonId { get; set; }
         string FieldExported { get; set; }
         string FieldSalt { get; set; }
@@ -19,6 +23,11 @@ namespace Model.Compiler
         string TempTableName { get; set; }
         Task<string> Prepare(Guid queryId, bool exportedOnly);
         Task<string> Prepare(IEnumerable<Guid> queryId, bool exportedOnly);
+=======
+        string TempTableName { get; set; }
+        Task SetQueryCohort(Guid queryId, bool exportedOnly);
+        Task<string> Prepare();
+>>>>>>> dashboard-v2
         string Complete();
         string CohortToCte();
         string CohortToCteFrom();

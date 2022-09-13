@@ -58,7 +58,7 @@ namespace Model.Cohort
         /// <returns>A dataset result, which, if the request was valid, contains the dataset.</returns>
         /// <param name="query">Query reference value.</param>
         /// <param name="datasetQuery">Dataset query reference value.</param>
-        /// <param name="cancel">Cancelcellation token.</param>
+        /// <param name="cancel">Cancellation token.</param>
         /// <param name="early">Early time bound.</param>
         /// <param name="late">Late time bound.</param>
         /// <exception cref="LeafRPCException"/>
@@ -66,7 +66,13 @@ namespace Model.Cohort
         /// <exception cref="LeafCompilerException"/>
         /// <exception cref="ArgumentNullException"/>
         /// <exception cref="System.Data.Common.DbException"/>
-        public async Task<Result> GetDatasetAsync(QueryRef query, DatasetQueryRef datasetQuery, CancellationToken cancel, long? early = null, long? late = null, int? panelIdx = null)
+        public async Task<Result> GetDatasetAsync(
+            QueryRef query,
+            DatasetQueryRef datasetQuery,
+            CancellationToken cancel,
+            long? early = null,
+            long? late = null,
+            int? panelIdx = null)
         {
             log.LogInformation("Dataset starting. QueryRef:{QueryRef} DatasetRef:{DatasetRef}", query, datasetQuery);
             Ensure.NotNull(query, nameof(query));

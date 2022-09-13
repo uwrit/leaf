@@ -109,6 +109,7 @@ class Visualize extends React.Component<Props, State> {
             return <CohortTooLargeBox cacheLimit={cacheLimit} />
         }
 
+<<<<<<< HEAD
         /**
          * Block visualize when under lowcellmasking threshold
          */
@@ -122,6 +123,8 @@ class Visualize extends React.Component<Props, State> {
             );
         } 
 
+=======
+>>>>>>> dashboard-v2
         /**
          * Show a loading spinner if no responders have completed yet.
          */

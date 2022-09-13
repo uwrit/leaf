@@ -31,7 +31,12 @@ namespace Model.Compiler.PanelSqlCompiler
             executionContext = new DemographicExecutionContext(context.Shape, context.QueryContext);
             new SqlValidator(SqlCommon.IllegalCommands).Validate(context.DemographicQuery);
 
+<<<<<<< HEAD
             var prelude = await cachedCohortPreparer.Prepare(context.QueryContext.QueryId, false);
+=======
+            await cachedCohortPreparer.SetQueryCohort(context.QueryContext.QueryId, false);
+            var prelude = await cachedCohortPreparer.Prepare();
+>>>>>>> dashboard-v2
             var epilogue = cachedCohortPreparer.Complete();
             var cohortCte = cachedCohortPreparer.CohortToCte();
             var datasetCte = CteDemographicInternals(context.DemographicQuery);

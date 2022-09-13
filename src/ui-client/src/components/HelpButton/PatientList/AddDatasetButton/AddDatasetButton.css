@@ -1,0 +1,158 @@
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .patientlist-add-dataset-button {
+    background-color: white;
+    border: 1px dashed rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: #1CA8DD;
+    cursor: pointer;
+    margin-left: 8px;
+    margin-top: -1px;
+    min-width: 120px;
+    overflow: visible;
+    padding: 4px 8px;
+    text-align: center;
+    text-transform: capitalize;
+    transition: all 0.3s;
+    vertical-align: middle;
+}
+
+.patientlist-add-dataset-button:hover,
+.patientlist-add-dataset-select-date-option:hover,
+.patientlist-add-dataset-by-encounter:hover  {
+    background-color: rgba(28, 170, 221, 0.1);
+    border-color: #1CA8DD;
+}
+
+.patientlist-add-dataset-close {
+    color: rgb(200,200,200);
+    cursor: pointer;
+    float: right;
+}
+
+.patientlist-add-dataset-close:hover {
+    color: rgb(244, 67, 54);
+}
+
+.patientlist-add-dataset-select-container {
+    background-color: transparent;
+    display: block;
+    left: 0;
+    right: 0;
+    margin-left: 20%;
+    margin-top: 30px;
+    opacity: 1;
+    outline: none;
+    padding: 10px;
+    position: absolute;
+    transition: opacity 0.3s, margin-top 0.5s;
+    width: 1020px;
+    z-index: 101;
+}
+
+.patientlist-add-dataset-overlay {
+    background-color: rgba(0,0,0,0);
+    height: 100%;
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    transition: background-color 0.5s;
+    width: 100%;
+    z-index: 100;
+}
+
+.patientlist-add-dataset-overlay.show {
+    background-color: rgba(0,0,0,0.5);
+}
+
+/*
+ * Don't display the overlay on Edge, as there is some
+ * z-index bug which causes it to cover the modal as well.
+ */
+ .app-container.edge .patientlist-add-dataset-overlay {
+    display: none !important;
+}
+
+.patientlist-add-dataset {
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0px 2px 9px rgba(0, 0, 0, 0.24);
+    padding: 8px;
+    width: 1000px;
+}
+
+/* Small screen */
+@media only screen and (max-width: 1400px) {
+    .patientlist-add-dataset {
+        width: 800px;
+    }
+}
+
+.patientlist-add-dataset-select-col-left {
+    border-right: 1px solid rgb(240,240,240);
+    overflow: hidden;
+}
+
+.patientlist-add-dataset-select-datasets-list {
+    height: 350px;
+    overflow-y: auto;
+}
+
+.patientlist-add-dataset-select-category-name {
+    color: rgb(28,168,221);
+    font-size: 1.1rem;
+    padding-left: 2px;
+}
+
+.patientlist-add-dataset-input {
+    margin-bottom: 8px;
+}
+
+.patientlist-add-dataset-select-dataset-option,
+.patientlist-add-dataset-select-date-option,
+.patientlist-add-dataset-by-encounter {
+    border-left: 3px solid transparent;
+    color: rgb(70,70,70);
+    cursor: pointer;
+    font-size: 1.0rem;
+    min-height: 29px;
+    outline: none;
+    padding: 4px 8px; 
+}
+
+.patientlist-add-dataset-select-dataset-option:hover,
+.patientlist-add-dataset-select-date-option:hover,
+.patientlist-add-dataset-select-dataset-option.selected,
+.patientlist-add-dataset-select-date-option.selected,
+.patientlist-add-dataset-by-encounter.selected {
+    background-color: rgba(28, 170, 221, 0.1);
+    border-left-color: #1CA8DD; 
+}
+
+.patientlist-add-dataset-select-dataset-option.unsaved {
+    background-color: rgba(6, 192, 0, 0.05) !important;
+    border-left-color: rgb(6, 192, 0);
+    color: rgb(6, 192, 0);
+}
+
+.patientlist-add-dataset-select-footer {
+    border-top: 1px solid rgb(240,240,240);
+    height: 50px;
+    padding: 10px 0;
+}
+
+.patientlist-add-dataset-divider {
+    background-color: rgb(230, 230, 230);
+    height: 1px;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.patientlist-add-dataset-by-encounter {
+    cursor: pointer;
+}

@@ -1,0 +1,22 @@
+.progress-modal .modal-content {
+    border-radius: 6px !important;
+    height: 150px;
+}
+
+.progress-modal.modal-dialog {
+    max-width: 450px !important;
+    z-index: 100;
+}
+
+.progress-modal-text {
+    font-size: 2rem;
+    height: 100%;
+    margin-top: 35px;
+    text-align: center;
+}
+
+.progress-modal-bar {
+    background-color: rgb(28,168,221);
+    height: 3px;
+    transition: width 0.3s;
+}

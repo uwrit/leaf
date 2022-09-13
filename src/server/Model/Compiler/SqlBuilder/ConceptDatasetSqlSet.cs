@@ -16,6 +16,7 @@ namespace Model.Compiler.SqlBuilder
         internal SubPanel SubPanel { get; set; }
         internal PanelItem PanelItem { get; set; }
         internal CompilerOptions CompilerOptions { get; set; }
+        internal ISqlDialect Dialect { get; set; }
 
         public ConceptDatasetSqlSet(
             Panel panel,
@@ -35,13 +36,23 @@ namespace Model.Compiler.SqlBuilder
         {
             // Ensure personId and encounterId are always strings
             var cols = new List<ExpressedColumn>();
+<<<<<<< HEAD:src/server/Model/Compiler/SqlBuilder/ConceptDatasetSqlSet.cs
             var personId = new ExpressedColumn(
                 new Expression(dialect.Convert(ColumnType.String, PersonId)),
                 DatasetColumns.PersonId);
             var encounterId = new ExpressedColumn(
                 new Expression(dialect.Convert(ColumnType.String, EncounterId)),
                 EncounterColumns.EncounterId);
+=======
+>>>>>>> dashboard-v2:src/server/Model/Compiler/SqlBuilder/ConceptDatasetSqlSet.cs
             var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
+
+            var personId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.String, PersonId)),
+                DatasetColumns.PersonId);
+            var encounterId = new ExpressedColumn(
+                new Expression(Dialect.Convert(ColumnType.String, EncounterId)),
+                EncounterColumns.EncounterId);
 
             cols.Add(personId);
             cols.Add(encounterId);
