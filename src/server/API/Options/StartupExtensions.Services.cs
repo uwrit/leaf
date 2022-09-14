@@ -31,6 +31,7 @@ using Model.Search;
 using Model.Import;
 using Model.Notification;
 using Model.Obfuscation;
+using Model.Dashboard;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
@@ -47,6 +48,7 @@ using Services.Search;
 using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
+using Services.Dashboard;
 
 namespace API.Options
 {
@@ -98,6 +100,7 @@ namespace API.Options
 
             services.AddSingleton<IServerStateCache, ServerStateCache>();
             services.AddSingleton<IServerStateProvider, ServerStateService>();
+            services.AddTransient<IDashboardConfigurationFetcher, DashboardConfigurationFetcher>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
