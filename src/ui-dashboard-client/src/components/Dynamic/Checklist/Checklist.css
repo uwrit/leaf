@@ -1,0 +1,109 @@
+.dynamic-checklist-container {
+    padding: 10px;
+    position: relative;
+}
+
+.dynamic-checklist-inner {
+    align-content: stretch;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: row;
+    height: 150px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 26px 10px 10px;
+    position: relative;
+}
+
+.dynamic-checklist-inner-left,
+.dynamic-checklist-inner-right {
+    height: 100%;
+}
+
+.dynamic-checklist-inner-right {
+    flex-grow: 2;
+    padding: 0;
+}
+
+.dynamic-checklist-title-container {
+    border-radius: 8px;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    left: 0;
+    position: absolute;
+    text-align: center;
+    top: 10px;
+    width: max-content;
+}
+
+.dynamic-checklist-title-container svg {
+    font-size: 1.5rem;
+    margin: 0 2px -3px 4px;
+}
+
+.dynamic-checklist-title {
+    font-size: 1.4rem;
+    font-weight: 200;
+    padding: 0 8px 0 2px;
+}
+
+.dynamic-checklist-dataset-selector-container {
+    margin: 8px 0;
+    padding: 4px 12px;
+}
+
+.dynamic-checklist-dataset-selector {
+    border-left: 5px solid transparent;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: 300;
+    padding: 4px;
+}
+
+.dynamic-checklist-dataset-selector.selected {
+    font-weight: 500;
+}
+
+.dynamic-checklist-dataset-selector:hover {
+    border-color: rgba(0,0,0,0.1);
+}
+
+.dynamic-checklist-item-container {
+    text-align: right;
+}
+
+.dynamic-checklist-item-left,
+.dynamic-checklist-item-right {
+    display: inline-block;
+}
+
+.dynamic-checklist-item-left {
+    width: 90%;
+}
+
+.dynamic-checklist-item-right {
+    position: relative;
+    width: 10%;
+}
+
+.dynamic-checklist-item-name {
+    color: rgb(150,150,150);
+    font-size: 1.15rem;
+    font-weight: 500;
+}
+
+.dynamic-checklist-item-name.checked {
+    color: black;
+    font-weight: 300;
+}
+
+.dynamic-checklist-item svg {
+    bottom: 0;
+    color: rgb(17, 170, 17);
+    filter: drop-shadow(1px 1px 1px rgb(0 0 0 / 0.2));
+    font-size: 2rem;
+    left: 0;
+    margin: 0 0 -7px 4px;
+    position: absolute;
+    stroke-width: 3px;
+}
