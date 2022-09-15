@@ -48,6 +48,8 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
         const classes = [ `${c}-table-container`, (this.state.hidden ? 'hidden' : '') ];
         const cols = patientList ? this.props.patientList.configuration.displayColumns : [];
 
+        console.log('PatientListTable', patientList);
+
         return (    
             <div className={classes.join(' ')}>
                 <div className={`${c}-container-overlay`} /> 
@@ -63,6 +65,7 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
                             {cols.map((col: PatientListColumn) => (
                                 <Header 
                                     data={col}
+                                    renames={patientList.configuration.customColumnNames}
                                     dispatch={dispatch}
                                     key={`${col.datasetId}_${col.id}`}
                                     onClick={this.handleHeaderCellClick.bind(null, col.index)}

@@ -179,7 +179,7 @@ const getDemographics = () => {
                                 getPatientListFromNewBaseDataset(nr.id, demographics.patients, dispatch, getState);
 
                                 if (demographics.columnNames) {
-                                    dispatch(setPatientListCustomColumnNames(nr.id, demographics.columnNames));
+                                    dispatch(setPatientListCustomColumnNames(nr.id, new Map(Object.entries(demographics.columnNames))));
                                 }
 
                                 const newState = getState();
@@ -213,6 +213,7 @@ const getDemographics = () => {
             }
             dispatch(getPatientListDataset(ds));
         }
+        console.log(getState().cohort.patientList.configuration.customColumnNames);
     };
 };
 

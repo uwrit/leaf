@@ -21,7 +21,7 @@ export function defaultNetworkPatientListState(): PatientListNetworkState {
 export function defaultPatientListState(): PatientListState {
     return {
         configuration: {
-            customColumnNames: {},
+            customColumnNames: new Map(),
             displayColumns: [],
             isFetching: false,
             multirowDatasets: new Map(),

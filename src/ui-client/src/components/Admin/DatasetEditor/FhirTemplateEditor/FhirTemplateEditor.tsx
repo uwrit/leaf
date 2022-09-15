@@ -15,6 +15,7 @@ import { Constraints } from '../Constraints/Constraints';
 import { AdminDatasetQuery, DatasetQueryCategory } from '../../../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../../models/patientList/Column';
+import { DemographicsDefTemplate, personId } from '../../../../models/patientList/DatasetDefinitionTemplate';
 
 interface Props {
     categories: Map<number, DatasetQueryCategory>;
@@ -43,6 +44,16 @@ export class FhirTemplateEditor extends React.PureComponent<Props> {
                     expectedColumns={expectedColumns}
                     handleInputChange={inputChangeHandler}
                 />
+                {/* Allow Basic Demographics columns to be renamed */}
+                {dataset.id === 'demographics' && 
+                <Row>
+                    <Col md={12}>
+                        <Section header='Custom Column Names'>
+                            <div>{[ ...DemographicsDefTemplate.columns.keys() ].filter(k => k !== personId).map(k => <div>{k}</div>)}</div>
+                        </Section>
+                    </Col>
+                </Row>
+                }
                 <Row>
                     <Col md={6}>
                         <Identifiers

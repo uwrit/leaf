@@ -14,7 +14,7 @@ import { addDemographicsDataset, addDataset, getPatients, removeDataset } from '
 import { DateBoundary } from '../../models/panel/Date';
 import { PatientListColumn } from '../../models/patientList/Column';
 import { PatientListDatasetQuery, PatientListDatasetDefinition, PatientListDatasetShape } from '../../models/patientList/Dataset';
-import { PatientListSort, PatientListCustomColumnNames } from '../../models/patientList/Configuration';
+import { PatientListSort } from '../../models/patientList/Configuration';
 import { PatientListRow, PatientListRowDTO } from '../../models/patientList/Patient';
 import { allowDatasetInSearch } from '../../services/datasetSearchApi';
 import { showInfoModal, setNoClickModalState } from '../generalUi';
@@ -43,7 +43,7 @@ export const PATIENTLIST_SET_CUSTOM_COLUMN_NAMES = 'PATIENTLIST_SET_CUSTOM_COLUM
 
 export interface CohortPatientListAction {
     id: number;
-    customColumnNames?: PatientListCustomColumnNames;
+    customColumnNames?: Map<string, string>;
     column?: PatientListColumn;
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
@@ -111,7 +111,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: 
                     if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                         const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIdx);
-                        const newPl = await addDataset(getState, ds, dataset, nr.id);
+                        const newPl = await addDataset(state, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);
                         dispatch(setPatientListNetworkDatasetReceived(nr.id, dataset.id));
@@ -297,7 +297,7 @@ export const reorderColumns = (source: PatientListColumn, target: PatientListCol
 };
 
 // Synchronous
-export const setPatientListCustomColumnNames = (id: number, customColumnNames: PatientListCustomColumnNames): CohortPatientListAction => {
+export const setPatientListCustomColumnNames = (id: number, customColumnNames: Map<string, string>): CohortPatientListAction => {
     return {
         id,
         customColumnNames,
