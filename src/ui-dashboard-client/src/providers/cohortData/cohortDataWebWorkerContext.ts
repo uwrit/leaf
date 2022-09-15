@@ -6,16 +6,13 @@
  */ 
 
 export const workerContext = `
-"use strict";
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2)
-        for (var i = 0, l = from.length, ar; i < l; i++) {
-            if (ar || !(i in from)) {
-                if (!ar)
-                    ar = Array.prototype.slice.call(from, 0, i);
-                ar[i] = from[i];
-            }
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
         }
+    }
     return to.concat(ar || Array.prototype.slice.call(from));
 };
 // eslint-disable-next-line
@@ -29,7 +26,7 @@ var handleWorkMessage = function (payload) {
             return null;
     }
 };
-var cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+var cohortData = { patients: new Map(), metadata: new Map(), comparison: { values: new Map(), n: 0 } };
 var datasets;
 var getCohortMean = function (payload) {
     var filters = payload.filters, dimensions = payload.dimensions, sourcePatId = payload.sourcePatId, requestId = payload.requestId;
@@ -37,12 +34,27 @@ var getCohortMean = function (payload) {
     var matches = getMatchingPatients(filters, sourcePatId);
     result.n = matches.length;
     console.log(matches);
-
-    for (var dim of dimensions) {
+    for (var _i = 0, _a = dimensions; _i < _a.length; _i++) {
+        var dim = _a[_i];
         var mean = getMeanValue(matches, dim);
         result.values.set(dim.ds.id, mean);
     }
     return { result: result, requestId: requestId };
+};
+var getDatasetFrequencies = function (filter, data) {
+    var output = [];
+    var count = new Map();
+    var display = new Map();
+    for (var _i = 0, _a = cohortData.patients.values(); _i < _a.length; _i++) {
+        var pat = _a[_i];
+        var ds = pat.datasets.get(filter.datasetId);
+        if (!ds)
+            continue;
+        for (var _b = 0, ds_1 = ds; _b < ds_1.length; _b++) {
+            var row = ds_1[_b];
+        }
+    }
+    return output;
 };
 var getMeanValue = function (patIds, dim) {
     var n = 0;
@@ -68,37 +80,42 @@ var getMatchingPatients = function (filters, sourcePatId) {
     var matcher;
     if (!sourcePat)
         return all();
-    for (const filter of filters) {
+    var _loop_1 = function (filter) {
         if (!filter.enabled) {
-            continue;
+            return "continue";
         }
-        
         // Check dataset
         if (filter.datasetId === "demographics") {
-            const numCols = new Set([ 'age', ])
+            var numCols = new Set(['age',]);
             matcher = (numCols.has(filter.column)
                 ? matchNum : matchString)(filter, sourcePat);
-            
-        } else {
-            const ds = datasets.get(filter.datasetId);
-            if (!ds) return all();
-
+        }
+        else {
+            var ds = datasets.get(filter.datasetId);
+            if (!ds)
+                return { value: all() };
             // Check column
-            const col = ds[1].schema.fields.find(f => f.name === filter.column);
-            if (!col) return all();
-
+            var col = ds[1].schema.fields.find(function (f) { return f.name === filter.column; });
+            if (!col)
+                return { value: all() };
             // Get matching func
             matcher = (col.type === typeNum
                 ? matchNum : matchString)(filter, sourcePat);
         }
-
         // Check each patient
-        for (const pat of elig) {
-            const matched = matcher(pat[1]);
+        for (var _a = 0, elig_1 = elig; _a < elig_1.length; _a++) {
+            var pat = elig_1[_a];
+            var matched = matcher(pat[1]);
             if (!matched) {
                 elig.delete(pat[0]);
             }
         }
+    };
+    for (var _i = 0, filters_1 = filters; _i < filters_1.length; _i++) {
+        var filter = filters_1[_i];
+        var state_1 = _loop_1(filter);
+        if (typeof state_1 === "object")
+            return state_1.value;
     }
     return [ ...elig.keys() ];
 };
@@ -158,7 +175,7 @@ var matchNum = function (filter, sourcePat) {
 };
 var transform = function (payload) {
     var data = payload.data, demographics = payload.demographics, requestId = payload.requestId;
-    cohortData = { patients: new Map(), metadata: new Map(), comparison: new Map() };
+    cohortData = { patients: new Map(), metadata: new Map(), comparison: { values: new Map(), n: 0 } };
     datasets = new Map();
     for (var _i = 0, _a = demographics; _i < _a.length; _i++) {
         var row = _a[_i];
@@ -175,6 +192,7 @@ var transform = function (payload) {
             var patientId = _f[_e];
             var rows = dataset.results[patientId];
             var patient = cohortData.patients.get(patientId);
+            console.log(cohortData);
             // Convert strings to dates
             for (var j = 0; j < rows.length; j++) {
                 var row = rows[j];

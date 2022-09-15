@@ -65,7 +65,7 @@ export default class CohortDataWebWorker {
             var typeSparkline = ${PatientListColumnType.Sparkline};
             var personId = '${personId}';
             var encounterId = '${encounterId}';
-            ${this.stripFunctionToContext(this.workerContext)}
+            ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
             }`;
@@ -295,6 +295,8 @@ export default class CohortDataWebWorker {
                 for (const patientId of Object.keys(dataset.results)) {
                     let rows = dataset.results[patientId];
                     let patient = cohortData.patients.get(patientId)!;
+
+                    console.log(cohortData);
 
                     // Convert strings to dates
                     for (let j = 0; j < rows.length; j++) {
