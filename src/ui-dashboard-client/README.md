@@ -10,7 +10,7 @@ Before doing any of the below steps, first make sure you have a fully working Le
 2. Just as when building and deploying the "standard" Leaf, run `npm install` and `npm run build` to install dependencies and create a production web client build.
 3. Edit the output `/build/index.html` file, replacing all instances of `href="/static/...` with `href="/dashboard/static/...`.
 4. Deploy the `/build` folder to your server alongside your existing Leaf web client, naming it something like `leaf_dashboard`.
-5. The URL pattern users will use to access the Dashboard app is `https://<your_leaf_url.org>/dashboard/<queryId>/patients/<patient_id>`, so as such the most important step here is to make sure that Apache routes requests for `https://<your_leaf_url.org>/dashboard/*` to your `/leaf_dashboard/index.html` file. 
+5. The URL pattern users will use to access the Dashboard app is `https://<your_leaf_url.org>/dashboard/cohort/<queryId>/patients/<patient_id>`, so as such the most important step here is to make sure that Apache routes requests for `https://<your_leaf_url.org>/dashboard/*` to your `/leaf_dashboard/index.html` file. 
 
 ## API
 The web app is designed to leverage an existing Leaf API instance thus requires no unique API deployment.
@@ -225,4 +225,4 @@ Under `patient`:`content`, there are 4 different `type` widgets: `list`, `checkl
 4. In a "standard" Leaf instance, create and save a query of the group of patients of interest to you. The critical piece here is to find the `queryId` representing the cohort. This is essentially invisible to users while they are using Leaf, but can be found either by having the developer console open to the "Network" tab while saving the query (look at the API calls, which should show a long UUID like "https://leaf.org/api/query/<this_is_the_queryid>"), or by checking the `app.Query` table `Id` column.
 
 
-After doing these steps, navigate to `https://<your_leaf_url.org>/dashboard/<queryId>` and see if the app loads correctly. If not, keep the developer console open and check the network calls to see which one fails. I understand this is not a great troubleshooting method, but as earlier stated, this project is still very much in-progress. Good luck!
+After doing these steps, navigate to `https://<your_leaf_url.org>/dashboard/cohort/<queryId>` and see if the app loads correctly. If not, keep the developer console open and check the network calls to see which one fails. I understand this is not a great troubleshooting method, but as earlier stated, this project is still very much in-progress. Good luck!
