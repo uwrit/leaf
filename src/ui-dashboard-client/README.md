@@ -226,3 +226,6 @@ Under `patient`:`content`, there are 4 different `type` widgets: `list`, `checkl
 
 
 After doing these steps, navigate to `https://<your_leaf_url.org>/dashboard/cohort/<queryId>` and see if the app loads correctly. If not, keep the developer console open and check the network calls to see which one fails. I understand this is not a great troubleshooting method, but as earlier stated, this project is still very much in-progress. Good luck!
+
+# Acknowledgements
+This work was supported by the [UW Medicine Garvey Institute for Brain Health Solutions](https://psychiatry.uw.edu/research/garvey-institute-for-brain-health-solutions/).
