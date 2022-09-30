@@ -162,6 +162,21 @@
     border-left-color: rgb(61, 104, 197);
 }
 
+/* Note Search */
+.sidebar-tab-link.notesearch .sidebar-tab.selected .sidebar-icon ,
+.sidebar-tab-link.notesearch .sidebar-tab.enabled:hover .sidebar-icon  {
+    color: rgb(197, 61, 156);
+}
+
+.sidebar-tab-link.notesearch .sidebar-icon > svg {
+    transform: scaleX(1.5) scaleY(1.2);
+}
+
+.sidebar-tab-link.notesearch .sidebar-tab.selected,
+.sidebar-tab-link.notesearch .sidebar-tab.enabled.enabled:hover {
+    border-left-color: rgb(197, 61, 156);
+}
+
 /* Patient List */
 .sidebar-tab-link.patientlist .sidebar-tab.selected .sidebar-icon ,
 .sidebar-tab-link.patientlist .sidebar-tab.enabled:hover .sidebar-icon  {

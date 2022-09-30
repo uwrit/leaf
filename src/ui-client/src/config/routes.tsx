@@ -7,7 +7,8 @@
 
 import React, { Suspense } from 'react'
 import { FiBarChart2, FiMap, FiSearch, FiSliders } from 'react-icons/fi';
-import { MdPerson } from 'react-icons/md'
+import { MdPerson } from 'react-icons/md';
+import { GoNote } from 'react-icons/go';
 import { FindPatients } from '../components/FindPatients/FindPatients';
 import LeafMap from '../containers/Map/LeafMap';
 import PatientList from '../containers/PatientList/PatientList';
@@ -74,6 +75,15 @@ const timelines = (): RouteConfig => {
         render: () => <Timelines />
     };
 };
+const noteSearch = (): RouteConfig => {
+    return {
+        display: 'Note Search',
+        icon: <GoNote />,
+        index: Routes.NoteSearch,
+        path: '/notesearch',
+        render: () => <div/>
+    };
+};
 const patientList = (): RouteConfig => { 
     return {
         display: 'Patient List', 
@@ -128,6 +138,7 @@ export const getRoutes = (config: AppConfig, userContext: UserContext): RouteCon
     if (client.map.enabled)         { routes.push(map(client.map.tileURI)); }
     if (client.visualize.enabled)   { routes.push(visualize()); }
     if (client.timelines.enabled)   { routes.push(timelines()); }
+    routes.push(noteSearch());
     if (client.patientList.enabled) { routes.push(patientList()); }
     if (userContext && userContext.isAdmin) { routes.push(admin()); }
 

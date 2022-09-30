@@ -13,8 +13,9 @@ export enum Routes {
     Map = 2,
     Visualize = 3,
     Timelines = 4,
-    PatientList = 5,
-    AdminPanel = 6
+    NoteSearch = 5,
+    PatientList = 6,
+    AdminPanel = 7
 }
 
 export enum NotificationStates {
