@@ -12,7 +12,7 @@ import { PanelDTO } from '../models/panel/Panel';
 import { PanelFilter } from '../models/panel/PanelFilter';
 import { HttpFactory } from './HttpFactory';
 import { DateIncrementType, DateFilter, DateBoundary } from '../models/panel/Date';
-import { PatientListDatasetQueryDTO, PatientListDatasetDTO, PatientListDatasetQuery } from '../models/patientList/Dataset';
+import { PatientListDatasetQuery, PatientListDatasetDTO } from '../models/patientList/Dataset';
 import moment from 'moment'
 
 /**
@@ -115,11 +115,11 @@ export const fetchDataset = async (
     return result.data as PatientListDatasetDTO
 };
 
-export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQueryDTO[]> => {
+export const fetchAvailableDatasets = async (state: AppState): Promise<PatientListDatasetQuery[]> => {
     const { token } = state.session.context!;
     const http = HttpFactory.authenticated(token);
     const resp = await http.get(`/api/dataset`);
-    const ds = resp.data as PatientListDatasetQueryDTO[];
+    const ds = resp.data as PatientListDatasetQuery[];
     return ds;
 };
 

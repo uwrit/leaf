@@ -101,15 +101,18 @@ import {
     setTimelinesPanelIndexId,
     removeTimelinesConceptDataset
 } from './timelines';
+import { SET_NOTE_DATASET_CHECKED, NoteSearchAction, SET_NOTE_DATASETS } from '../../actions/cohort/noteSearch';
+import { setNoteDatasetChecked, setNoteDatasets, defaultNoteSearchState } from './noteSearch';
 
 export const defaultCohortState = (): CohortState => {
     return {
         count: defaultCountState(),
         networkCohorts: new Map<number, NetworkCohortState>(),
+        noteSearch: defaultNoteSearchState(),
         patientList: defaultPatientListState(),
         timelines: defaultTimelinesState(),
         visualization: defaultVisualizationState()
-    } as CohortState;
+    };
 };
 
 const registerCohorts = (state: CohortState, action: CohortCountAction): CohortState => {
@@ -271,7 +274,7 @@ const errorCohortDemographics = (state: CohortState, action: CohortCountAction):
     };
 };
 
-type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction;
+type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction | NoteSearchAction;
 
 export const cohort = (state: CohortState = defaultCohortState(), action: CohortAction): CohortState => {
     switch (action.type) {
@@ -339,6 +342,12 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setTimelinesNetworkPanelDataset(state, CohortStateType.NOT_IMPLEMENTED, action);
         case TIMELINES_INDEX_DATASET_NETWORK_ERROR:
             return setTimelinesNetworkPanelDataset(state, CohortStateType.IN_ERROR, action);            
+
+        // Note Search
+        case SET_NOTE_DATASET_CHECKED:
+            return setNoteDatasetChecked(state, action);
+        case SET_NOTE_DATASETS:
+            return setNoteDatasets(state, action);
 
         // Patient List
         case SET_PATIENT_LIST_DISPLAY:

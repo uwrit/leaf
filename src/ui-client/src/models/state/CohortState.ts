@@ -11,8 +11,10 @@ import { PatientListRow } from '../patientList/Patient';
 import { DemographicStatistics } from '../cohort/DemographicDTO';
 import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
-import { PanelItem } from '../panel/PanelItem';
-import { Concept, ConceptId } from '../concept/Concept';
+import { ConceptId } from '../concept/Concept';
+import { NoteSearchDatasetQuery } from '../patientList/Dataset';
+import { Note } from '../cohort/NoteSearch';
+import { DateBoundary } from '../panel/Date';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -29,6 +31,7 @@ export interface CohortState {
     cancel?: CancelTokenSource;
     count: PatientCountState;
     networkCohorts: CohortMap;
+    noteSearch: NoteSearchState;
     patientList: PatientListState;
     timelines: TimelinesState;
     visualization: VisualizationState;
@@ -98,4 +101,11 @@ export interface TimelinesNetworkState {
 export interface VisualizationState {
     demographics: DemographicStatistics;
     state: CohortStateType;
+}
+
+export interface NoteSearchState {
+    datasets: Map<string, NoteSearchDatasetQuery>;
+    dateFilter: DateBoundary;
+    matched: Note[];
+    terms: string[];
 }

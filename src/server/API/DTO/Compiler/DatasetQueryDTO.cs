@@ -14,6 +14,7 @@ namespace API.DTO.Compiler
         public string Id { get; set; }
         public string UniversalId { get; set; }
         public bool IsEncounterBased { get; set; }
+        public bool IsText { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
@@ -25,6 +26,7 @@ namespace API.DTO.Compiler
             Id = dq.Id.Value.ToString();
             UniversalId = dq.UniversalId?.ToString();
             IsEncounterBased = dq.IsEncounterBased;
+            IsText = dq.IsText;
             Shape = dq.Shape;
             Name = dq.Name;
             Category = dq.Category;

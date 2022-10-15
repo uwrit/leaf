@@ -10,15 +10,16 @@ import { FiBarChart2, FiMap, FiSearch, FiSliders } from 'react-icons/fi';
 import { MdPerson } from 'react-icons/md';
 import { GoNote } from 'react-icons/go';
 import { FindPatients } from '../components/FindPatients/FindPatients';
-import LeafMap from '../containers/Map/LeafMap';
-import PatientList from '../containers/PatientList/PatientList';
-import Visualize from '../containers/Visualize/Visualize';
 import { Routes } from '../models/state/GeneralUiState';
 import { UserContext, AppConfig } from '../models/Auth';
 import { MdSecurity } from 'react-icons/md';
 import { AdminPanelPane } from '../models/state/AdminState';
 import { checkIfAdminPanelUnsavedAndSetPane } from '../actions/admin/admin';
+import LeafMap from '../containers/Map/LeafMap';
+import PatientList from '../containers/PatientList/PatientList';
+import Visualize from '../containers/Visualize/Visualize';
 import Timelines from '../containers/Timelines/Timelines';
+import NoteSearch from '../containers/NoteSearch/NoteSearch';
 
 export interface RouteConfig {
     display: string;
@@ -81,7 +82,7 @@ const noteSearch = (): RouteConfig => {
         icon: <GoNote />,
         index: Routes.NoteSearch,
         path: '/notesearch',
-        render: () => <div/>
+        render: () => <NoteSearch />
     };
 };
 const patientList = (): RouteConfig => { 

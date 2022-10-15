@@ -282,6 +282,11 @@ var reindexCacheCache = function (datasets) {
      */
     for (var i = 0; i < all.length; i++) {
         var ds = all[i];
+
+        if (ds.isText) {
+            continue;
+        }
+
         var tokens = ds.name.toLowerCase().split(' ').concat(ds.tags.map(t => t.toLowerCase()));
         if (ds.category) {
             tokens = tokens.concat(ds.category.toLowerCase().split(' '));

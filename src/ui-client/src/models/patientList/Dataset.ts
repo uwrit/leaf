@@ -96,6 +96,7 @@ export interface PatientListDatasetQueryDTO {
     description?: string;
     name: string;
     isEncounterBased: boolean;
+    isText?: boolean;
     shape: PatientListDatasetShape;
     tags: string[];
     universalId?: string;
@@ -103,6 +104,11 @@ export interface PatientListDatasetQueryDTO {
 
 export interface PatientListDatasetQuery extends PatientListDatasetQueryDTO {
     unsaved?: boolean;
+}
+
+export interface NoteSearchDatasetQuery extends PatientListDatasetQueryDTO {
+    checked: boolean;
+    status: CohortStateType;
 }
 
 /*

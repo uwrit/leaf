@@ -22,6 +22,7 @@ namespace Model.Admin.Compiler
         public string SqlStatement { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<Constraint> Constraints { get; set; }
+        public bool IsText { get; set; }
 
         // Dynamic-only fields
         public bool IsEncounterBased { get; set; }

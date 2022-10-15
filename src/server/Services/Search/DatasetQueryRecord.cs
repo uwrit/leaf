@@ -16,6 +16,7 @@ namespace Services.Search
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }
         public bool IsEncounterBased { get; set; }
+        public bool IsText { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
@@ -32,6 +33,7 @@ namespace Services.Search
                 Id = Id,
                 UniversalId = DatasetQueryUrn.From(UniversalId),
                 IsEncounterBased = IsEncounterBased,
+                IsText = IsText,
                 Shape = Shape,
                 Name = Name,
                 Category = Category,
@@ -65,6 +67,7 @@ namespace Services.Search
             SqlFieldValueString = dq.SqlFieldValueString;
             SqlFieldValueNumeric = dq.SqlFieldValueNumeric;
             IsEncounterBased = dq.IsEncounterBased;
+            IsText = dq.IsText;
             Schema = DynamicDatasetSchemaFieldSerde.Serialize(dq.Schema);
         }
 
@@ -82,6 +85,7 @@ namespace Services.Search
                 SqlFieldValueString = SqlFieldValueString,
                 SqlFieldValueNumeric = SqlFieldValueNumeric,
                 IsEncounterBased = IsEncounterBased,
+                IsText = IsText,
                 Schema = DynamicDatasetSchemaFieldSerde.Deserialize(Schema)
             };
         }

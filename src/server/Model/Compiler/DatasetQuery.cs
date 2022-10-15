@@ -16,6 +16,7 @@ namespace Model.Compiler
         Guid? Id { get; set; }
         Urn UniversalId { get; set; }
         bool IsEncounterBased { get; set; }
+        bool IsText { get; set; }
         Shape Shape { get; set; }
         string Name { get; set; }
         string Category { get; set; }
@@ -66,6 +67,7 @@ namespace Model.Compiler
         public string Category { get; set; }
         public string Description { get; set; }
         public bool IsEncounterBased { get; set; }
+        public bool IsText { get; set; }
         public string SqlStatement { get; set; }
         public ICollection<string> Tags { get; set; }
 

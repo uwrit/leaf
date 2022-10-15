@@ -1,0 +1,36 @@
+.note-search-header {
+    background-color: rgb(250, 250, 250);
+    box-shadow: rgba(0, 0, 0, 0.2) 2px 4px 10px 0px;
+    height: 100px;
+    margin: 0 !important;
+    padding: 10px;
+    width: 100%;
+}
+
+.note-search-header .dropdown > button {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #1CA8DD !important;
+    font-size: 1.1rem;
+    font-weight: 300;
+    transition: none;
+}
+
+.note-search-header .dropdown > button:hover {
+    text-decoration: underline;
+}
+
+.note-search-header-note-type-selector {
+    width: 300px;
+}
+
+.note-search-header-note-type {
+    cursor: pointer;
+    padding: 4px 20px;
+    transition: background-color 0.2s;
+}
+
+.note-search-header-note-type:hover {
+    background-color: rgba(28,168,221,0.2) !important;
+}
