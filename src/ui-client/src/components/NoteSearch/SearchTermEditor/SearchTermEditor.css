@@ -1,0 +1,39 @@
+/* Copyright (c) 2022, UW Medicine Research IT, University of Washington
+ * Developed by Nic Dobbins and Cliff Spital, CRIO Sean Mooney
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */ 
+
+ .note-search-term-editor-container {
+    
+ }
+
+ .note-search-term-editor-term {
+    background-color: rgba(28, 168, 221, 0.05);
+    border: 1px solid rgba(28, 168, 221, 0.1);
+    border-radius: 4px;
+    color: rgb(28, 168, 221);
+    cursor: pointer;
+    display: inline-block;
+    font-family: Roboto;
+    font-size: 1.1rem;
+    margin: 4px;
+    padding: 2px 4px;
+    transition: background-color 0.2s;
+ }
+
+ .note-search-term-editor-term:active ,
+ .note-search-term-editor-term:hover {
+    background-color: rgba(28, 168, 221, 0.1);
+    border-color:rgba(28, 168, 221, 0.2);
+}
+
+.note-search-term-editor-term:hover > span {
+    color: #E57373;
+}
+
+.note-search-term-editor-term > span {
+    color: rgb(200,200,200);
+    margin-left: 6px;
+}

@@ -24,7 +24,7 @@ export function defaultNoteSearchState(): NoteSearchState {
                 increment: 1
             }
         },
-        matched: [],
+        results: [],
         terms: []
     };
 }
@@ -60,6 +60,24 @@ export function setNoteDatasetChecked(state: CohortState, action: NoteSearchActi
         noteSearch: {
             ...state.noteSearch,
             datasets
+        }
+    });
+};
+
+export function setNoteSearchTerms(state: CohortState, action: NoteSearchAction): CohortState {
+    return Object.assign({}, state, {
+        noteSearch: {
+            ...state.noteSearch,
+            terms: action.searchTerms.slice()
+        }
+    });
+};
+
+export function setNoteSearchResults(state: CohortState, action: NoteSearchAction): CohortState {
+    return Object.assign({}, state, {
+        noteSearch: {
+            ...state.noteSearch,
+            results: action.searchResults.slice()
         }
     });
 };

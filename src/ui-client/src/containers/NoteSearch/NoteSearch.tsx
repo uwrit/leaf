@@ -7,10 +7,10 @@
 
 import { connect } from 'react-redux';
 import React from 'react';
-import { NoteSearchHeader } from '../../components/NoteSearch/NoteSearchHeader';
+import { NoteSearchHeader } from '../../components/NoteSearch/NoteSearchHeader/NoteSearchHeader';
 import { AppState } from '../../models/state/AppState';
 import { NoteSearchState } from '../../models/state/CohortState';
-import { NoteSearchResults } from '../../components/NoteSearch/NoteSearchResults';
+import { NoteSearchResults } from '../../components/NoteSearch/NoteSearchResults/NoteSearchResults';
 import './NoteSearch.css';
 
 interface StateProps {

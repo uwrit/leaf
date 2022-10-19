@@ -106,6 +106,11 @@ export interface VisualizationState {
 export interface NoteSearchState {
     datasets: Map<string, NoteSearchDatasetQuery>;
     dateFilter: DateBoundary;
-    matched: Note[];
+    results: NoteSearchResult[];
     terms: string[];
 }
+
+export interface NoteSearchResult {
+    note: Note;
+}
+

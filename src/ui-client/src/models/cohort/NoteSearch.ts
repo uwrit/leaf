@@ -8,8 +8,10 @@
 
 export interface NoteDTO {
     responderId: number;
+    date: string | Date;
     id: string;
     text: string;
+    type: string;
 }
 
 export interface Note extends NoteDTO {

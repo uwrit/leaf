@@ -1,0 +1,46 @@
+.note-search-results {
+    height: calc(100vh - 55px - 84px);
+    overflow-x: hidden;
+    padding: 30px 20% !important;
+}
+
+.note-search-results-result {
+    border: 1px solid rgb(230,230,230);
+    border-radius: 8px;
+    box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    overflow-y: auto;
+    margin: 10px 0;
+    transition: all .2s;
+}
+
+.note-search-results-result:hover {
+    box-shadow: rgba(17, 17, 26, 0.1) 0px 4px 16px, rgba(17, 17, 26, 0.1) 0px 8px 24px, rgba(17, 17, 26, 0.1) 0px 16px 56px;
+}
+
+.note-search-results-result-header {
+    border-bottom: 1px solid rgb(230,230,230);
+    font-size: 1.5rem;
+    padding: 10px;
+    width: 100%;
+}
+
+.note-search-results-result-type {
+
+}
+
+.note-search-results-result-date {
+    float: right;
+}
+
+.note-search-results-result-body {
+    padding: 10px;
+    width: 100%;
+}
+
+.note-search-results-result-body > textarea {
+    border: none;
+    color: rgba(0,0,0,0.8);
+    pointer-events: none;
+    resize: none;
+    width: 100%;
+}

@@ -7,26 +7,27 @@
 
 import NoteSearchWebWorker from '../providers/noteSearch/noteSearchWebWorker';
 import { Note } from '../models/cohort/NoteSearch';
+import { NoteSearchResult } from '../models/state/CohortState';
 
 const engine = new NoteSearchWebWorker();
 
-export const ingestNotes = (notes: Note[]) => {
+export const indexNotes = (notes: Note[]) => {
     return new Promise( async (resolve, reject) => {
-        await engine.ingest(notes);
+        await engine.index(notes);
         resolve();
     });
 };
 
-export const flushNotes = (notes: Note[]) => {
+export const flushNotes = () => {
     return new Promise( async (resolve, reject) => {
         await engine.flush();
         resolve();
     });
 };
 
-export const searchNotes = (terms: string[]) => {
+export const searchNotes = (terms: string[]): Promise<NoteSearchResult[]> => {
     return new Promise( async (resolve, reject) => {
-        const results = await engine.search(terms);
+        const results = await engine.search(terms) as NoteSearchResult[];
         resolve(results);
     });
 };

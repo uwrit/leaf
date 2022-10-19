@@ -7,9 +7,10 @@
 
 import { generate as generateId } from 'shortid';
 import { Note } from '../../models/cohort/NoteSearch';
+import { NoteSearchResult } from '../../models/state/CohortState';
 
 const SEARCH = 'SEARCH';
-const INGEST = 'INGEST';
+const INDEX = 'INDEX';
 const FLUSH = 'FLUSH';
 
 interface InboundMessagePartialPayload {
@@ -36,6 +37,16 @@ interface PromiseResolver {
     resolve: any;
 }
 
+interface TestIndexedNote {
+    lines: TestIndexedNoteLine[];
+    note: Note;
+}
+
+interface TestIndexedNoteLine {
+    index: number;
+    text: string;
+}
+
 export default class NoteSearchWebWorker {
     private worker: Worker;
     private reject: any;
@@ -43,7 +54,7 @@ export default class NoteSearchWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([ INGEST, FLUSH, SEARCH ])}
+            ${this.addMessageTypesToContext([ INDEX, FLUSH, SEARCH ])}
             ${this.stripFunctionToContext(this.workerContext)}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -59,8 +70,8 @@ export default class NoteSearchWebWorker {
         return this.postMessage({ message: SEARCH, terms });
     }
 
-    public ingest = (notes: Note[]) => {
-        return this.postMessage({ message: INGEST, notes });
+    public index = (notes: Note[]) => {
+        return this.postMessage({ message: INDEX, notes });
     }
 
     public flush = () => {
@@ -96,15 +107,63 @@ export default class NoteSearchWebWorker {
 
     private workerContext = () => {
 
+        let index: TestIndexedNote[] = [];
+
         // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload): any => {
             switch (payload.message) {
-                case INGEST:
+                case INDEX:
+                    return indexNotes(payload);
                 case FLUSH:
+                    return flushNotes(payload);
                 case SEARCH:
+                    return search(payload);
                 default:
                     return null;
             }
+        };
+
+        const indexNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+
+            // Dumb, not really indexing, just storing, as an example
+            for (let i = 0; i < payload.notes!.length; i++) {
+                const note = payload.notes[i];
+                const lines = note.text.split('\n').map((n, i) => ({ index: i, text: n }));
+                index.push({ note, lines });
+            }
+            console.log(index);
+
+            return { requestId }
+        };
+
+        const flushNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+
+            index = [];
+            return { requestId }
+        };
+
+        const search = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, terms } = payload;
+            const result: NoteSearchResult[] = [];
+
+            // Dumb, brute force approach as an example
+            for (let i = 0; i < index.length; i++) {
+                const note = index[i];
+                for (let j = 0; j < note.lines.length; j++) {
+                    const line = note.lines[j];
+                    for (let k = 0; k < terms.length; k++) {
+                        const term = terms[k];
+                        if (line.text.indexOf(term) > -1) {
+                            result.push({ note: note.note });
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            return { requestId, result }
         };
     }
 }
