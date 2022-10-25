@@ -23,6 +23,14 @@ export class HelpSearch extends React.Component<Props, State> {
         const c = this.className;
         const { searchValue } = this.state;
 
+        const s = new Map<number, string[]>();
+        s.set(2, ['test', 'hello']);
+        s.set(1, ['world']);
+
+        // console.log([...s.entries()].sort());
+        const ss = Array.from(s.keys()).sort();
+        console.log(ss);
+
         return (
             // <div className={c}>
             //     <Input

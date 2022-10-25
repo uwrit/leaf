@@ -60,7 +60,6 @@ export class ContentRowEditor extends React.Component<Props, State> {
     //          - DONE; add css
     //      2. check admin workflow
     //          - ensure SPs delete category not in use
-    //      3. helpeditor line 166: index already exists
 
     public render() {
         const c = this.className;
