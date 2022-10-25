@@ -13,7 +13,7 @@ export interface DemographicDTO {
     columnNames: CustomColumnNames;
 }
 
-interface CustomColumnNames {
+export interface CustomColumnNames {
     [key: string]: string;
 }
 

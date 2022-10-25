@@ -14,12 +14,12 @@ namespace Services.Search
     {
         public static Dictionary<string, string> Deserialize(string json)
         {
-            return string.IsNullOrWhiteSpace(json) ? new Dictionary<string, string>() : JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+            return string.IsNullOrWhiteSpace(json) ? new Dictionary<string, string> { } : JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
         }
 
-        public static string Serialize(Dictionary<string, string> keyValues)
+        public static string Serialize(Dictionary<string, string> values)
         {
-            return keyValues == null ? null : JsonConvert.SerializeObject(keyValues);
+            return values == null ? null : JsonConvert.SerializeObject(values);
         }
     }
 }

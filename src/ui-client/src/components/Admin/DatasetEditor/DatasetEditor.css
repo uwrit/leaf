@@ -329,3 +329,11 @@
     padding: 4px 8px;
     position: absolute;
 }
+
+.dataset-editor-main .custom-columns label {
+    display: none;
+}
+
+.dataset-editor-main .custom-columns .form-group {
+    margin-bottom: 0;
+}

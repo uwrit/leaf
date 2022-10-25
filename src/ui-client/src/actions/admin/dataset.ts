@@ -1,4 +1,4 @@
-import { AdminDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery, AdminDemographicQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
@@ -74,7 +74,7 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
 /*
  * Saves the current demographics dataset.
  */
-export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
+export const saveAdminDemographicsDataset = (dataset: AdminDemographicQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
 

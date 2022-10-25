@@ -16,6 +16,7 @@ import { PatientListDatasetShape } from '../../../../models/patientList/Dataset'
 import { AdminPanelPatientListColumnTemplate } from '../../../../models/patientList/Column';
 import { Tagger } from '../Tagger/Tagger';
 import { DynamicDatasetProps } from '../DynamicDatasetProps/DynamicDatasetProps';
+import { ClassificationProps } from '../ClassificationProps/ClassificationProps';
 
 interface Props {
     categories: Map<number, DatasetQueryCategory>;
@@ -44,6 +45,7 @@ export class DynamicEditor extends React.PureComponent<Props> {
                     expectedColumns={expectedColumns}
                     handleInputChange={inputChangeHandler}
                 />
+                <ClassificationProps {...this.props} />
                 <DynamicDatasetProps {...this.props} />
                 <Row>
                     <Col md={6}>

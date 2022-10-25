@@ -14,7 +14,7 @@ import DatasetContainer from '../../PatientList/AddDatasetSelectors/DatasetConta
 import { DefTemplates, personId, encounterId } from '../../../models/patientList/DatasetDefinitionTemplate';
 import { PatientListDatasetShape, PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 import { fetchAdminDatasetIfNeeded, setAdminDataset, setAdminDatasetShape, revertAdminDatasetChanges, saveAdminDataset, saveAdminDemographicsDataset, deleteAdminDataset } from '../../../actions/admin/dataset';
-import { AdminDatasetQuery } from '../../../models/admin/Dataset';
+import { AdminDatasetQuery, AdminDemographicQuery } from '../../../models/admin/Dataset';
 import LoaderIcon from '../../Other/LoaderIcon/LoaderIcon';
 import { showInfoModal, showConfirmationModal } from '../../../actions/generalUi';
 import { DatasetsState } from '../../../models/state/AppState';
@@ -294,7 +294,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
          */
         if (!errors && !missingCols.length) {
             if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
-                dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                dispatch(saveAdminDemographicsDataset(datasets.currentDataset! as AdminDemographicQuery))
             } else {
                 dispatch(saveAdminDataset(datasets.currentDataset!));
             }
@@ -312,7 +312,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 onClickNo: () => null as any,
                 onClickYes: () => { 
                     if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
-                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset! as AdminDemographicQuery))
                     } else {
                         dispatch(saveAdminDataset(datasets.currentDataset!));
                     }
@@ -339,7 +339,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
                 onClickNo: () => null as any,
                 onClickYes: () => { 
                     if (datasets.currentDataset!.shape === PatientListDatasetShape.Demographics) {
-                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset!))
+                        dispatch(saveAdminDemographicsDataset(datasets.currentDataset! as AdminDemographicQuery))
                     } else {
                         dispatch(saveAdminDataset(datasets.currentDataset!));
                     }
@@ -366,6 +366,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             ...userDs,
             ...newAdminDs,
             isEncounterBased: false,
+            isDefault: false,
             category: newAdminDs.categoryId ? datasetQueryCategories.categories.get(newAdminDs.categoryId)!.category : ''
         };
 

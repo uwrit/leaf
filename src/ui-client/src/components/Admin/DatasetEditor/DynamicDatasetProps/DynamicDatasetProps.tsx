@@ -43,8 +43,7 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
                 else if (f.type === PatientListColumnType.Numeric) numCols.push(f.name);
                 else if (f.type === PatientListColumnType.DateTime)   dateCols.push(f.name);
             }
-        })
-
+        });
 
         return (
             <Section header='Dynamic Properties'>

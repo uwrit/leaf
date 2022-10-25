@@ -138,6 +138,7 @@ export const defaultAdminState = (): AdminState => {
             datasets: new Map(),
             demographicsDataset: { 
                 id: '',
+                columnNames: new Map(),
                 constraints: [],
                 isEncounterBased: false,
                 name: 'Basic Demographics',
