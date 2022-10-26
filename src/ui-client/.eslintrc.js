@@ -17,11 +17,10 @@ module.exports = {
         "node": true
     },
     "extends": [
-        "plugin:@typescript-eslint/recommended",
+        //"plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "plugin:react/recommended",
-        "prettier",
-        "prettier/@typescript-eslint"
+        //"plugin:react/recommended",
+        "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -33,21 +32,20 @@ module.exports = {
         "eslint-plugin-prefer-arrow",
         "eslint-plugin-import",
         "eslint-plugin-react",
-        "@typescript-eslint",
-        "@typescript-eslint/tslint"
+        "@typescript-eslint"
     ],
     "rules": {
-        "@typescript-eslint/adjacent-overload-signatures": "error",
+        "@typescript-eslint/adjacent-overload-signatures": "off",
         "@typescript-eslint/array-type": [
-            "error",
+            "off",
             {
                 "default": "array-simple"
             }
         ],
-        "@typescript-eslint/await-thenable": "error",
-        "@typescript-eslint/ban-ts-comment": "error",
+        "@typescript-eslint/await-thenable": "off",
+        "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/ban-types": [
-            "error",
+            "off",
             {
                 "types": {
                     "Object": {
@@ -71,18 +69,19 @@ module.exports = {
                 }
             }
         ],
-        "@typescript-eslint/consistent-type-assertions": "error",
-        "@typescript-eslint/consistent-type-definitions": "error",
-        "@typescript-eslint/dot-notation": "error",
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/consistent-type-definitions": "off",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
         "@typescript-eslint/explicit-member-accessibility": [
-            "error",
+            "off",
             {
                 "accessibility": "explicit"
             }
         ],
-        "@typescript-eslint/explicit-module-boundary-types": "warn",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/indent": [
-            "error",
+            "off",
             4,
             {
                 "FunctionDeclaration": {
@@ -93,105 +92,87 @@ module.exports = {
                 }
             }
         ],
-        "@typescript-eslint/member-ordering": "error",
-        "@typescript-eslint/naming-convention": "error",
-        "@typescript-eslint/no-array-constructor": "error",
-        "@typescript-eslint/no-empty-function": "error",
+        "@typescript-eslint/member-ordering": "off",
+        "@typescript-eslint/naming-convention": "off",
+        "@typescript-eslint/no-array-constructor": "off",
+        "@typescript-eslint/no-empty-function": "off",
         "@typescript-eslint/no-empty-interface": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-extra-non-null-assertion": "error",
-        "@typescript-eslint/no-extra-semi": "error",
-        "@typescript-eslint/no-floating-promises": "error",
-        "@typescript-eslint/no-for-in-array": "error",
-        "@typescript-eslint/no-implied-eval": "error",
-        "@typescript-eslint/no-inferrable-types": "error",
-        "@typescript-eslint/no-misused-new": "error",
-        "@typescript-eslint/no-misused-promises": "error",
-        "@typescript-eslint/no-namespace": "error",
-        "@typescript-eslint/no-non-null-asserted-optional-chain": "error",
-        "@typescript-eslint/no-non-null-assertion": "warn",
+        "@typescript-eslint/no-extra-non-null-assertion": "off",
+        "@typescript-eslint/no-extra-semi": "off",
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/no-for-in-array": "off",
+        "@typescript-eslint/no-implied-eval": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/no-misused-new": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-namespace": "off",
+        "@typescript-eslint/no-non-null-asserted-optional-chain": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/no-parameter-properties": "off",
         "@typescript-eslint/no-shadow": [
-            "error",
+            "off",
             {
                 "hoist": "all"
             }
         ],
-        "@typescript-eslint/no-this-alias": "error",
-        "@typescript-eslint/no-unnecessary-type-assertion": "error",
-        "@typescript-eslint/no-unsafe-assignment": "error",
-        "@typescript-eslint/no-unsafe-call": "error",
-        "@typescript-eslint/no-unsafe-member-access": "error",
-        "@typescript-eslint/no-unsafe-return": "error",
+        "@typescript-eslint/no-this-alias": "off",
+        "@typescript-eslint/no-unnecessary-type-assertion": "off",
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-return": "off",
         "@typescript-eslint/no-unused-expressions": "off",
-        "@typescript-eslint/no-unused-vars": "warn",
+        "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/no-use-before-define": "off",
-        "@typescript-eslint/no-var-requires": "error",
-        "@typescript-eslint/prefer-as-const": "error",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/prefer-as-const": "off",
         "@typescript-eslint/prefer-for-of": "off",
-        "@typescript-eslint/prefer-function-type": "error",
-        "@typescript-eslint/prefer-namespace-keyword": "error",
-        "@typescript-eslint/prefer-regexp-exec": "error",
-        "@typescript-eslint/quotes": [
-            "error",
-            "single",
-            {
-                "avoidEscape": true
-            }
-        ],
-        "@typescript-eslint/require-await": "error",
-        "@typescript-eslint/restrict-plus-operands": "error",
-        "@typescript-eslint/restrict-template-expressions": "error",
+        "@typescript-eslint/prefer-function-type": "off",
+        "@typescript-eslint/prefer-namespace-keyword": "off",
+        "@typescript-eslint/prefer-regexp-exec": "off",
+        "@typescript-eslint/require-await": "off",
+        "@typescript-eslint/restrict-plus-operands": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
         "@typescript-eslint/semi": [
-            "error",
+            "off",
             "always"
         ],
         "@typescript-eslint/triple-slash-reference": [
-            "error",
+            "off",
             {
                 "path": "always",
                 "types": "prefer-import",
                 "lib": "always"
             }
         ],
-        "@typescript-eslint/tslint/config": [
-            "error",
-            {
-                "rules": {
-                    "import-spacing": true,
-                    "jsx-no-string-ref": true,
-                    "object-literal-sort-keys": true,
-                    "whitespace": true
-                }
-            }
-        ],
-        "@typescript-eslint/type-annotation-spacing": "error",
-        "@typescript-eslint/unbound-method": "error",
-        "@typescript-eslint/unified-signatures": "error",
-        "arrow-body-style": "error",
+        "@typescript-eslint/type-annotation-spacing": "off",
+        "@typescript-eslint/unbound-method": "off",
+        "@typescript-eslint/unified-signatures": "off",
+        "arrow-body-style": "off",
         "arrow-parens": [
-            "error",
+            "off",
             "always"
         ],
         "brace-style": [
-            "error",
+            "off",
             "1tbs"
         ],
         "comma-dangle": [
-            "error",
+            "off",
             "always-multiline"
         ],
         "complexity": "off",
-        "constructor-super": "error",
-        "curly": "error",
-        "eol-last": "error",
+        "constructor-super": "off",
+        "curly": "off",
+        "eol-last": "off",
         "eqeqeq": [
-            "error",
+            "off",
             "smart"
         ],
-        "guard-for-in": "error",
+        "guard-for-in": "off",
         "id-blacklist": [
-            "error",
+            "off",
             "any",
             "Number",
             "number",
@@ -202,85 +183,84 @@ module.exports = {
             "Undefined",
             "undefined"
         ],
-        "id-match": "error",
-        "import/order": "error",
-        "jsdoc/check-alignment": "error",
-        "jsdoc/check-indentation": "error",
-        "jsdoc/newline-after-description": "error",
+        "id-match": "off",
+        "jsdoc/check-alignment": "off",
+        "jsdoc/check-indentation": "off",
+        "jsdoc/newline-after-description": "off",
         "max-classes-per-file": [
-            "error",
+            "off",
             1
         ],
         "max-len": [
-            "error",
+            "off",
             {
                 "code": 120
             }
         ],
-        "new-parens": "error",
+        "new-parens": "off",
         "no-array-constructor": "off",
-        "no-bitwise": "error",
-        "no-caller": "error",
-        "no-cond-assign": "error",
+        "no-bitwise": "off",
+        "no-caller": "off",
+        "no-cond-assign": "off",
         "no-console": "off",
-        "no-debugger": "error",
-        "no-empty": "error",
+        "no-debugger": "off",
+        "no-empty": "off",
         "no-empty-function": "off",
-        "no-eval": "error",
+        "no-eval": "off",
         "no-extra-semi": "off",
         "no-fallthrough": "off",
         "no-implied-eval": "off",
         "no-invalid-this": "off",
-        "no-multiple-empty-lines": "error",
-        "no-new-wrappers": "error",
-        "no-throw-literal": "error",
-        "no-trailing-spaces": "error",
-        "no-undef-init": "error",
-        "no-underscore-dangle": "error",
-        "no-unsafe-finally": "error",
-        "no-unused-labels": "error",
+        "no-multiple-empty-lines": "off",
+        "no-new-wrappers": "off",
+        "no-throw-literal": "off",
+        "no-trailing-spaces": "off",
+        "no-undef-init": "off",
+        "no-underscore-dangle": "off",
+        "no-unsafe-finally": "off",
+        "no-unused-labels": "off",
         "no-unused-vars": "off",
-        "no-var": "error",
-        "object-shorthand": "error",
+        "no-var": "off",
+        "object-shorthand": "off",
         "one-var": [
-            "error",
+            "off",
             "never"
         ],
-        "prefer-arrow/prefer-arrow-functions": "error",
-        "prefer-const": "error",
+        "prefer-arrow/prefer-arrow-functions": "off",
+        "prefer-const": "off",
         "quote-props": [
-            "error",
+            "off",
             "consistent-as-needed"
         ],
-        "radix": "error",
-        "react/display-name": "error",
-        "react/jsx-boolean-value": "error",
-        "react/jsx-key": "error",
-        "react/jsx-no-bind": "error",
-        "react/jsx-no-comment-textnodes": "error",
-        "react/jsx-no-duplicate-props": "error",
-        "react/jsx-no-target-blank": "error",
-        "react/jsx-no-undef": "error",
-        "react/jsx-uses-react": "error",
-        "react/jsx-uses-vars": "error",
-        "react/no-children-prop": "error",
-        "react/no-danger-with-children": "error",
-        "react/no-deprecated": "error",
-        "react/no-direct-mutation-state": "error",
-        "react/no-find-dom-node": "error",
-        "react/no-is-mounted": "error",
-        "react/no-render-return-value": "error",
-        "react/no-string-refs": "error",
-        "react/no-unescaped-entities": "error",
-        "react/no-unknown-property": "error",
+        "radix": "off",
+        "react/display-name": "off",
+        "react/jsx-boolean-value": "off",
+        "react/jsx-key": "off",
+        "react/jsx-no-bind": "off",
+        "react/jsx-no-comment-textnodes": "off",
+        "react/jsx-no-duplicate-props": "off",
+        "react/jsx-no-target-blank": "off",
+        "react/jsx-no-undef": "off",
+        "react/jsx-uses-react": "off",
+        "react/jsx-uses-vars": "off",
+        "react/no-children-prop": "off",
+        "react/no-danger-with-children": "off",
+        "react/no-deprecated": "off",
+        "react/no-direct-mutation-state": "off",
+        "react/no-find-dom-node": "off",
+        "react/no-is-mounted": "off",
+        "react/no-render-return-value": "off",
+        "react/no-string-refs": "off",
+        "react/no-unescaped-entities": "off",
+        "react/no-unknown-property": "off",
         "react/no-unsafe": "off",
-        "react/prop-types": "error",
-        "react/react-in-jsx-scope": "error",
-        "react/require-render-return": "error",
-        "react/self-closing-comp": "error",
+        "react/prop-types": "off",
+        "react/react-in-jsx-scope": "off",
+        "react/require-render-return": "off",
+        "react/self-closing-comp": "off",
         "require-await": "off",
         "space-before-function-paren": [
-            "error",
+            "off",
             {
                 "anonymous": "never",
                 "asyncArrow": "always",
@@ -288,7 +268,7 @@ module.exports = {
             }
         ],
         "spaced-comment": [
-            "error",
+            "off",
             "always",
             {
                 "markers": [
@@ -296,7 +276,7 @@ module.exports = {
                 ]
             }
         ],
-        "use-isnan": "error",
+        "use-isnan": "off",
         "valid-typeof": "off"
     }
 };

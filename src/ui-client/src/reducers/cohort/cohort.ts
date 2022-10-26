@@ -30,7 +30,8 @@ import {
     PATIENT_LIST_DATASET_RECEIVED,
     PATIENT_LIST_NETWORK_DATASET_RECEIVED,
     PATIENT_LIST_DATASET_REQUESTED,
-    PATIENT_LIST_DATASET_NOT_IMPLEMENTED
+    PATIENT_LIST_DATASET_NOT_IMPLEMENTED,
+    PATIENTLIST_SET_CUSTOM_COLUMN_NAMES
 } from '../../actions/cohort/patientList';
 import { 
     CohortVisualizationAction,
@@ -83,7 +84,8 @@ import {
     setNetworkPatientListDatasetReceived,
     setPatientListDatasetReceived,
     setPatientListDatasetRequested,
-    setNetworkPatientListDatasetNotImplemented
+    setNetworkPatientListDatasetNotImplemented,
+    setCustomColumnNames
 } from './patientList';
 import { defaultVisualizationState, setAggregateCohortVisualization, setNetworkCohortVisualization } from './visualize';
 import {
@@ -361,6 +363,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNetworkPatientListDatasetFailure(state, action);
         case PATIENT_LIST_DATASET_NOT_IMPLEMENTED:
             return setNetworkPatientListDatasetNotImplemented(state, action);
+        case PATIENTLIST_SET_CUSTOM_COLUMN_NAMES:
+            return setCustomColumnNames(state, action);
 
         // Enabled/disabling responders after data loaded
         case ENABLE_RESPONDER:

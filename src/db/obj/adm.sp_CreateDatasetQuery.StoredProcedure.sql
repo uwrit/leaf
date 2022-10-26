@@ -19,6 +19,7 @@ GO
 CREATE PROCEDURE [adm].[sp_CreateDatasetQuery]
     @uid app.UniversalId,
     @shape int,
+    @isdefault bit,
     @name nvarchar(200),
     @catid int,
     @desc nvarchar(max),
@@ -51,6 +52,7 @@ BEGIN
         DECLARE @ins TABLE (
             Id uniqueidentifier,
             UniversalId nvarchar(200) null,
+            IsDefault bit not null,
             Shape int not null,
             [Name] nvarchar(200) not null,
             CategoryId int null,
@@ -66,6 +68,7 @@ BEGIN
         OUTPUT
             inserted.Id,
             inserted.UniversalId,
+            inserted.IsDefault,
             inserted.Shape,
             inserted.Name,
             inserted.CategoryId,
@@ -84,6 +87,7 @@ BEGIN
         SELECT
             Id,
             UniversalId,
+            IsDefault,
             Shape,
             [Name],
             CategoryId,
@@ -114,4 +118,5 @@ BEGIN
     END CATCH;
 
 END
+
 GO

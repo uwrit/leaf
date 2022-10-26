@@ -18,7 +18,7 @@ import { aggregateStatistics } from '../../services/cohortAggregatorApi';
 import { fetchCount, fetchDemographics } from '../../services/cohortApi';
 import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
-import { getPatientListFromNewBaseDataset } from './patientList';
+import { getPatientListFromNewBaseDataset, getPatientListDataset, setPatientListCustomColumnNames } from './patientList';
 import { setAggregateVisualizationData, setNetworkVisualizationData } from './visualize';
 import { showInfoModal } from '../generalUi';
 import { InformationModalState } from '../../models/state/GeneralUiState';
@@ -26,6 +26,7 @@ import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
 import { allowAllDatasets } from '../../services/datasetSearchApi';
 import { clearAllTimelinesData } from '../../services/timelinesApi';
 import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
+import { sleep } from '../../utils/Sleep';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -149,6 +150,7 @@ const getDemographics = () => {
         const state = getState();
         const cancelSource = Axios.CancelToken.source();
         const responders: NetworkIdentity[] = [];
+        const defaultDatasets = [ ...state.datasets.all.values() ].filter(ds => ds.isDefault);
         let atLeastOneSucceeded = false;
         state.responders.forEach((nr: NetworkIdentity) => { 
             if (state.cohort.networkCohorts.get(nr.id)!.count.state === CohortStateType.LOADED && !nr.isGateway) { 
@@ -157,7 +159,7 @@ const getDemographics = () => {
         });
         dispatch(setCohortDemographicsStarted(state.responders, cancelSource));
 
-        Promise.all(
+        await Promise.all(
             // For each enabled responder
             responders.map((nr: NetworkIdentity, i: number) => { 
                 return new Promise( async (resolve, reject) => {
@@ -176,6 +178,10 @@ const getDemographics = () => {
                                 dispatch(setNetworkVisualizationData(nr.id, demographics.statistics));
                                 getPatientListFromNewBaseDataset(nr.id, demographics.patients, dispatch, getState);
 
+                                if (demographics.columnNames) {
+                                    dispatch(setPatientListCustomColumnNames(nr.id, new Map(Object.entries(demographics.columnNames))));
+                                }
+
                                 const newState = getState();
                                 const aggregate = await aggregateStatistics(newState.cohort.networkCohorts, newState.responders) as DemographicStatistics;
                                 dispatch(setAggregateVisualizationData(aggregate));
@@ -185,7 +191,8 @@ const getDemographics = () => {
                         })
                         .then(() => resolve(null));
                 })
-            })                
+            })
+        // Set cohort state to LOADED            
         ).then(() => {
             if (getState().cohort.count.state !== CohortStateType.LOADED) { return; }
             if (atLeastOneSucceeded) {
@@ -194,6 +201,18 @@ const getDemographics = () => {
                 dispatch(setCohortDemographicsErrored());
             }
         });
+
+        // Auto-load any other `default` datasets
+        for (const ds of defaultDatasets) {
+            // Hack: redux `dispatch()` isn't async, so we can't await it,
+            // but we also don't want to overwhelm the server with a lot of potential parallel
+            // requests. Thus poll every half second to infer that previous dataset completed,
+            // then execute
+            while (getState().cohort.patientList.configuration.isFetching) {
+                await sleep(500);
+            }
+            dispatch(getPatientListDataset(ds));
+        }
     };
 };
 

@@ -233,10 +233,11 @@ export const refreshSession = () => {
 /*
  * Get server state.
  */
-export const refreshServerState = () => {
+export const refreshServerStateLoop = () => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
         const serverState = await getServerState();
         dispatch(setServerState(serverState));
+        setTimeout(() => dispatch(refreshServerStateLoop()), 60000)
     };
 };
 

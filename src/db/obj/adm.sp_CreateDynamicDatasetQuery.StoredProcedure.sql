@@ -23,6 +23,7 @@ CREATE PROCEDURE [adm].[sp_CreateDynamicDatasetQuery]
     @desc nvarchar(max),
     @sql nvarchar(4000),
 	@isEnc bit,
+    @isDefault bit,
 	@schema nvarchar(max),
 	@sqlDate nvarchar(1000) = NULL,
 	@sqlValString nvarchar(1000) = NULL,
@@ -55,6 +56,7 @@ BEGIN
             [SqlStatement] nvarchar(4000) not null,
 			[Schema] nvarchar(max) null,
 			[IsEncounterBased] bit null,
+            [IsDefault] bit null,
 			[SqlFieldDate] nvarchar(1000) null,
 			[SqlFieldValueString] nvarchar(1000) null,
 			[SqlFieldValueNumeric] nvarchar(1000) null,
@@ -73,11 +75,12 @@ BEGIN
 			[SqlFieldValueNumeric] nvarchar(1000) null
         );
 
-		INSERT INTO app.DatasetQuery ([Shape], [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+		INSERT INTO app.DatasetQuery ([Shape], [Name], IsDefault, CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
         OUTPUT
             inserted.Id,
 			inserted.Shape,
             inserted.[Name],
+            inserted.IsDefault,
             inserted.CategoryId,
             inserted.[Description],
             inserted.SqlStatement,
@@ -85,8 +88,8 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
-        INTO @ins1 ([Id], [Shape], [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
-        VALUES (@shape, @name, @catid, @desc, @sql, GETDATE(), @user, GETDATE(), @user);
+        INTO @ins1 ([Id], [Shape], [Name], [IsDefault], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        VALUES (@shape, @name, @isDefault, @catid, @desc, @sql, GETDATE(), @user, GETDATE(), @user);
 
 		DECLARE @id UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM @ins1);
 
@@ -113,6 +116,7 @@ BEGIN
             [Id],
 			[Shape],
             [Name],
+            [IsDefault],
             [CategoryId],
             [Description],
             [SqlStatement],
@@ -145,4 +149,5 @@ BEGIN
     END CATCH;
 
 END
+
 GO

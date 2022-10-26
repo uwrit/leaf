@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd'
+import { ConnectDragPreview, ConnectDragSource, DragSource, DragSourceConnector, DragSourceMonitor } from 'react-dnd-cjs'
 import { PanelItem as PanelItemModel } from '../../../models/panel/PanelItem';
 import getDragPreview from '../../../utils/getDragPreview';
 import PanelItemNumericFilter from './PanelItemNumericFilter';

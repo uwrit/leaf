@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, DropTargetMonitor, ConnectDropTarget, DropTarget, DropTargetConnector } from 'react-dnd'
+import { ConnectDragPreview, ConnectDragSource, DropTargetMonitor, ConnectDropTarget, DropTarget, DropTargetConnector } from 'react-dnd-cjs'
 import { Concept } from '../../../models/concept/Concept';
 import { MdAccessTime } from 'react-icons/md';
 import { GoPerson } from 'react-icons/go';

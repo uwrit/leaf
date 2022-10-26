@@ -15,6 +15,7 @@ namespace Model.Admin.Compiler
         // Standard fields
         public Guid Id { get; set; }
         public DatasetQueryUrn UniversalId { get; set; }
+        public bool IsDefault { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }

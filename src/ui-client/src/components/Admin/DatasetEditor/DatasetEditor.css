@@ -329,3 +329,33 @@
     padding: 4px 8px;
     position: absolute;
 }
+
+/* Basic Demographics Custom column names */
+.dataset-editor-main .custom-columns {
+    padding: 0 30px;
+}
+
+.dataset-editor-main .custom-columns label {
+    display: none;
+}
+
+.dataset-editor-main .custom-columns .form-group {
+    margin-bottom: 0;
+    padding: 2px;
+}
+
+.dataset-editor-main .custom-columns .form-group input {
+    height: 30px;
+}
+
+.dataset-editor-main .custom-columns > .row {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-radius: 8px;
+    color: rgb(33, 37, 41);
+    margin-bottom: 2px;
+    max-width: 600px;
+}
+
+.dataset-editor-main .custom-columns > .row .col-md-5 {
+    padding-top: 7px;
+}

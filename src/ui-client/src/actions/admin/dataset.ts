@@ -1,4 +1,4 @@
-import { AdminDatasetQuery } from "../../models/admin/Dataset";
+import { AdminDatasetQuery, AdminDemographicQuery } from "../../models/admin/Dataset";
 import { AdminPanelLoadState } from "../../models/state/AdminState";
 import { AppState } from "../../models/state/AppState";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
@@ -7,6 +7,7 @@ import { PatientListDatasetQuery, PatientListDatasetShape } from "../../models/p
 import { getAdminDataset, createDataset, updateDataset, deleteDataset, upsertDemographicsDataset } from "../../services/admin/datasetApi";
 import { indexDatasets, searchDatasets } from "../../services/datasetSearchApi";
 import { setDataset, removeDataset, setDatasetSearchResult, switchDatasetOldForNew, setDatasetSelected } from "../datasets";
+import { setPatientListCustomColumnNames } from "../cohort/patientList";
 
 export const SET_ADMIN_DATASET = 'SET_ADMIN_DATASET';
 export const SET_ADMIN_DATASET_SQL = 'SET_ADMIN_DATASET_SQL';
@@ -74,14 +75,16 @@ export const saveAdminDataset = (dataset: AdminDatasetQuery) => {
 /*
  * Saves the current demographics dataset.
  */
-export const saveAdminDemographicsDataset = (dataset: AdminDatasetQuery) => {
+export const saveAdminDemographicsDataset = (dataset: AdminDemographicQuery) => {
     return async (dispatch: any, getState: () => AppState) => {
         const state = getState();
+        const networkId = [ ...state.cohort.networkCohorts.keys() ][0];
 
         try {
             dispatch(setNoClickModalState({ message: "Saving", state: NotificationStates.Working }));
             const newAdminDataset = await upsertDemographicsDataset(state, dataset);
             dispatch(setAdminDemographicsDataset(newAdminDataset, false));
+            dispatch(setPatientListCustomColumnNames(networkId, dataset.columnNames));
             dispatch(setSideNotificationState({ state: NotificationStates.Complete, message: 'Dataset Saved' }));
         } catch (err) {
             console.log(err);

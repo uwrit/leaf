@@ -14,7 +14,7 @@ import { setRouteConfig } from './generalUi';
 import { getRoutes } from '../config/routes';
 import { setSessionLoadState } from './session';
 import { ServerStateDTO } from '../models/state/ServerState';
-import { version } from '../../package.json'
+import pkg from '../../package.json'
 
 export const REQUEST_ID_TOKEN = 'REQUEST_ID_TOKEN';
 export const RECEIVE_ID_TOKEN = 'RECEIVE_ID_TOKEN';
@@ -52,7 +52,7 @@ export const getIdToken = () => {
          */ 
         getAuthConfig()
             .then(config => {
-                console.info(`Leaf client running version ${version}`);
+                console.info(`Leaf client running version ${pkg.version}`);
                 console.info(`Leaf server API running version ${config.version.server}`);
                 console.info(`Leaf database running version ${config.version.db}`);
                 dispatch(receiveAuthConfig(config));

@@ -12,5 +12,6 @@ namespace Model.Cohort
     {
         public IEnumerable<PatientDemographic> Patients { get; set; }
         public DemographicStatistics Statistics { get; set; }
+        public Dictionary<string, string> ColumnNames { get; set; }
     }
 }

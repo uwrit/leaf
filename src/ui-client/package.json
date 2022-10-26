@@ -1,6 +1,6 @@
 {
   "name": "ui-client",
-  "version": "3.11.1",
+  "version": "3.11.2",
   "private": true,
   "dependencies": {
     "@types/d3-format": "^1.3.1",
@@ -15,20 +15,21 @@
     "@types/recharts": "^1.8.5",
     "@types/shortid": "0.0.29",
     "axios": "^0.21.2",
+    "babel-jest": "^24.9.0",
     "bootstrap": "^4.3.1",
     "brace": "^0.11.1",
     "hoist-non-react-statics": "^3.3.0",
     "jwt-decode": "^2.2.0",
     "leaflet": "^1.3.1",
     "leaflet-ant-path": "^1.1.2",
-    "moment": "^2.29.2",
+    "moment": "^2.29.4",
     "react": "^17.0.2",
     "react-ace": "^7.0.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-countup": "^4.2.2",
     "react-day-picker": "^7.3.2",
-    "react-dnd": "^9.3.4",
-    "react-dnd-html5-backend": "^9.3.4",
+    "react-dnd-cjs": "^9.5.1",
+    "react-dnd-html5-backend-cjs": "^9.5.1",
     "react-dom": "^17.0.2",
     "react-icons": "^3.7.0",
     "react-leaflet": "^1.9.1",
@@ -36,7 +37,6 @@
     "react-leaflet-div-icon": "^1.1.0",
     "react-paginate": "^6.3.0",
     "react-redux": "^7.1.0",
-    "react-scripts": "^3.4.3",
     "react-textarea-autosize": "^7.1.0",
     "reactstrap": "^8.0.1",
     "recharts": "2.0.0-beta.1",
@@ -44,8 +44,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.10",
-    "sql-formatter": "^2.3.3",
-    "babel-jest": "^24.9.0"
+    "sql-formatter": "^2.3.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -56,16 +55,21 @@
   "devDependencies": {
     "@types/node": "^12.7.2",
     "@types/react-dom": "^16.9.0",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
+    "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "eslint-config-prettier": "^8.2.0",
-    "eslint-plugin-import": "^2.22.1",
+    "@typescript-eslint/parser": "^5.5.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jsdoc": "^32.3.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
-    "eslint-plugin-react": "^7.23.2",
+    "eslint-plugin-react": "^7.27.1",
+    "react-scripts": "^5.0.1",
     "source-map-loader": "^0.2.4",
-    "typescript": "3.4.3"
+    "typescript": "3.7.2"
+  },
+  "resolutions": {
+    "react-scripts/**/eslint-config-react-app": "7.0.1"
   },
   "proxy": "http://localhost:5001",
   "browserslist": [

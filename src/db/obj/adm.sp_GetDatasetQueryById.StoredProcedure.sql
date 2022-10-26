@@ -32,6 +32,7 @@ BEGIN
 		dq.[Description],
 		dq.SqlStatement,
 		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
+        dq.IsDefault,
 		ddq.[Schema],
 		ddq.SqlFieldDate,
 		ddq.SqlFieldValueString,

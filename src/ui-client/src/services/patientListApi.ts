@@ -268,6 +268,7 @@ export const addDemographicsDataset = async (
     await patientListProvider.addDemographics(def, patients, responderId);
     patientList.display = await patientListProvider.getPatients(patientList.configuration) as PatientListRow[];
     patientList.totalPatients = getState().cohort.patientList.totalPatients + patients.length;
+    patientList.configuration.customColumnNames = getState().cohort.patientList.configuration.customColumnNames;
     patientList.state = CohortStateType.LOADED;
     return patientList;
 };

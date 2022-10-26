@@ -57,12 +57,12 @@ namespace Services.Search
         DemographicCompilerContext ReadContextGrid(SqlMapper.GridReader gridReader)
         {
             var queryCtx = gridReader.ReadFirstOrDefault<QueryContext>();
-            var demoQuery = gridReader.ReadFirstOrDefault<DemographicQuery>();
+            var demoQuery = gridReader.ReadFirstOrDefault<DemographicQueryRecord>();
 
             return new DemographicCompilerContext
             {
                 QueryContext = queryCtx,
-                DemographicQuery = demoQuery
+                DemographicQuery = demoQuery.ToDemographicQuery()
             };
         }
 
@@ -101,6 +101,21 @@ namespace Services.Search
                 );
 
                 return ReadContextGrid(grid);
+            }
+        }
+
+        class DemographicQueryRecord
+        {
+            public string SqlStatement { get; set; }
+            public string ColumnNamesJson { get; set; }
+
+            public DemographicQuery ToDemographicQuery()
+            {
+                return new DemographicQuery
+                {
+                    SqlStatement = SqlStatement,
+                    ColumnNames = ColumnNamesSerde.Deserialize(ColumnNamesJson)
+                };
             }
         }
     }

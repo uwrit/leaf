@@ -204,7 +204,7 @@ export class SqlSetRow extends React.PureComponent<Props,State> {
     private generateSequentialIntegerId = () => {
         const { specializationGroups } = this.props.set;
         if (!specializationGroups.size) { return 1; }
-        const max = Math.max.apply(Math, [ ...specializationGroups.values() ].map((s) => s.id)) ;
+        const max = Math.max(...[ ...specializationGroups.values() ].map((s) => s.id)) ;
         return max + 1;
     }
 

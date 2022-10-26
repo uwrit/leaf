@@ -12,9 +12,12 @@ import { Row, Col } from 'reactstrap';
 import { Identifiers } from '../Sections/Identifiers';
 import { Section } from '../../Section/Section';
 import { Constraints } from '../Constraints/Constraints';
-import { AdminDatasetQuery, DatasetQueryCategory } from '../../../../models/admin/Dataset';
+import { AdminDatasetQuery, DatasetQueryCategory, AdminDemographicQuery } from '../../../../models/admin/Dataset';
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
 import { AdminPanelPatientListColumnTemplate } from '../../../../models/patientList/Column';
+import { DemographicsDefTemplate, personId } from '../../../../models/patientList/DatasetDefinitionTemplate';
+import { ClassificationProps } from '../ClassificationProps/ClassificationProps';
+import { Input } from '../../Section/Input';
 
 interface Props {
     categories: Map<number, DatasetQueryCategory>;
@@ -43,6 +46,32 @@ export class FhirTemplateEditor extends React.PureComponent<Props> {
                     expectedColumns={expectedColumns}
                     handleInputChange={inputChangeHandler}
                 />
+                {/* Allow Basic Demographics columns to be renamed */}
+                {dataset.shape === PatientListDatasetShape.Demographics && 
+                <Row>
+                    <Col md={12}>
+                        <Section header='Custom Column Names'>
+                            <p>Override default Basic Demographics column names</p>
+                            <div className='custom-columns'>
+                                {[ ...DemographicsDefTemplate.columns.keys() ].filter(k => k !== 'patientOf').map(k => {
+                                    const val = (dataset as AdminDemographicQuery).columnNames.get(k);
+                                    return (
+                                        <Row key={k}>
+                                            <Col md={5}>{k}</Col>
+                                            <Col md={7}>
+                                                <Input changeHandler={this.handleDemographicCustomColumnRename} propName={k} value={val} />
+                                            </Col>
+                                        </Row>
+                                    )
+                                })}
+                            </div>
+                        </Section>
+                    </Col>
+                </Row>
+                }
+                {dataset.shape !== PatientListDatasetShape.Demographics && 
+                <ClassificationProps {...this.props} />
+                }
                 <Row>
                     <Col md={6}>
                         <Identifiers
@@ -64,5 +93,17 @@ export class FhirTemplateEditor extends React.PureComponent<Props> {
                 </Row>
             </div>
         );
+    }
+
+    private handleDemographicCustomColumnRename = (val: string, column: string) => {
+        const { inputChangeHandler } = this.props;
+        const dataset = this.props.dataset as AdminDemographicQuery;
+        const newMap = new Map(dataset.columnNames);
+        if (val.trim().length) {
+            newMap.set(column, val);
+        } else {
+            newMap.delete(column);
+        } 
+        inputChangeHandler(newMap, 'columnNames');
     }
 };

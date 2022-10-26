@@ -5,7 +5,7 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [app].[sp_GetDashboardConfig]    Script Date: ******/
+/****** Object:  StoredProcedure [app].[sp_GetDashboardConfigById]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -13,21 +13,21 @@ GO
 
 -- =======================================
 -- Author:      Nic Dobbins
--- Create date: 2021/12/3
--- Description: Gets JSON dashboard configuration
+-- Create date: 2022/3/11
+-- Description: Gets configuration and metadata for a dashboard
 -- =======================================
-CREATE PROCEDURE [app].[sp_GetDashboardConfig]
-    @id uniqueidentifier,
+CREATE PROCEDURE [app].[sp_GetDashboardConfigById]
+    @id [uniqueidentifier],
     @user auth.[User],
     @groups auth.GroupMembership READONLY,
-    @admin bit = 0
+	@admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
 
-    SELECT TOP 1 D.Id, D.JsonConfig, D.UiDisplayName, D.UiDisplayDescription
-    FROM [app].[Dashboard] AS D
-    WHERE D.Id = @id
+    SELECT Id, JsonConfig, UiDisplayName, UiDisplayDescription
+    FROM app.Dashboard
+    WHERE Id = @id
 
 END
 

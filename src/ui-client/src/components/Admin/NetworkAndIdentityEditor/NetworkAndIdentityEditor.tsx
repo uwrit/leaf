@@ -168,7 +168,7 @@ export class NetworkAndIdentityEditor extends React.PureComponent<Props,State> {
     private generateSequentialIntegerId = () => {
         const { endpoints } = this.props.data.networkAndIdentity;
         if (!endpoints.size) { return 1; }
-        const max = Math.max.apply(Math, [ ...endpoints.values() ].map((s) => s.id));
+        const max = Math.max(...[ ...endpoints.values() ].map((s) => s.id));
         return max + 1;
     }
 

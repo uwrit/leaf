@@ -710,10 +710,6 @@ var getMultirowDataCsv = function (payload) {
                         row.push(q+valueToCsvString(d)+q);
                     }
                 }
-                for (var j = 0; j < cols.length; j++) {
-                    var d = vals[cols[j].id];
-                    row.push(q+valueToCsvString(d)+q);
-                }
                 rows.push(row.join(','));
             }
         }
@@ -745,7 +741,11 @@ var getSingletonDataCsv = function (payload) {
         });
     }
     // Add column headers
-    rows.push(cols.map(function (col) { return col.id; }).join(','));
+    rows.push(cols.map((col) => {
+        var renamed = config.customColumnNames.get(col.id);
+        if (renamed) return renamed;
+        return col.id;
+    }).join(','));
     // Add rows
     patientMap.forEach(function (p) {
         var row = [];

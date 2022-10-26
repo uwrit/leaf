@@ -63,6 +63,7 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
                             {cols.map((col: PatientListColumn) => (
                                 <Header 
                                     data={col}
+                                    renames={patientList.configuration.customColumnNames}
                                     dispatch={dispatch}
                                     key={`${col.datasetId}_${col.id}`}
                                     onClick={this.handleHeaderCellClick.bind(null, col.index)}

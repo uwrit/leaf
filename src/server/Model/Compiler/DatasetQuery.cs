@@ -21,6 +21,7 @@ namespace Model.Compiler
         string Category { get; set; }
         string Description { get; set; }
         string SqlStatement { get; set; }
+        bool IsDefault { get; set; }
         ICollection<string> Tags { get; set; }
     }
 
@@ -66,6 +67,7 @@ namespace Model.Compiler
         public string Category { get; set; }
         public string Description { get; set; }
         public bool IsEncounterBased { get; set; }
+        public bool IsDefault { get; set; }
         public string SqlStatement { get; set; }
         public ICollection<string> Tags { get; set; }
 

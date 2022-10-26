@@ -18,6 +18,7 @@ GO
 -- =======================================
 CREATE PROCEDURE [adm].[sp_UpdateDynamicDatasetQuery]
     @id UNIQUEIDENTIFIER,
+    @isdefault bit,
     @name nvarchar(200),
     @catid int,
     @desc nvarchar(max),
@@ -55,6 +56,7 @@ BEGIN
 		DECLARE @upd1 TABLE (
             Id uniqueidentifier,
             UniversalId nvarchar(200) null,
+            IsDefault bit not null,
             Shape int not null,
             [Name] nvarchar(200) not null,
             CategoryId int null,
@@ -83,6 +85,7 @@ BEGIN
 		UPDATE app.DatasetQuery
         SET
             [Shape] = -1,
+            [IsDefault] = @isdefault,
             [Name] = @name,
             [CategoryId] = @catid,
             [Description] = @desc,
@@ -92,6 +95,7 @@ BEGIN
 		OUTPUT
             inserted.Id,
             inserted.UniversalId,
+            inserted.IsDefault,
             inserted.Shape,
             inserted.[Name],
             inserted.CategoryId,
@@ -101,7 +105,7 @@ BEGIN
             inserted.CreatedBy,
             inserted.Updated,
             inserted.UpdatedBy
-        INTO @upd1 (Id, UniversalId, Shape, [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        INTO @upd1 (Id, UniversalId, IsDefault, Shape, [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
         WHERE Id = @id;
 
 		DELETE app.DynamicDatasetQuery

@@ -8,9 +8,11 @@
 import { PatientListDatasetShape } from "../patientList/Dataset";
 import { Constraint } from "./Concept";
 import { PatientListColumnType } from "../patientList/Column";
+import { CustomColumnNames } from "../cohort/DemographicDTO";
 
-export interface AdminDemographicQuery {
+export interface AdminDemographicQueryDTO {
     sqlStatement: string;
+    columnNames: CustomColumnNames;
     lastChanged: string;
     changedBy: string;
 }
@@ -26,6 +28,7 @@ interface BaseAdminDatasetQuery {
     sqlStatement: string;
     tags: string[];
     isEncounterBased: boolean;
+    isDefault?: boolean;
     sqlFieldDate?: string;
     sqlFieldValueString?: string;
     sqlFieldValueNumeric?: string;
@@ -39,6 +42,10 @@ export interface AdminDatasetQueryDTO extends BaseAdminDatasetQuery {
 
 export interface AdminDatasetQuery extends BaseAdminDatasetQuery {
     schema?: DynamicDatasetQuerySchema;
+}
+
+export interface AdminDemographicQuery extends AdminDatasetQuery {
+    columnNames: Map<string, string>;
 }
 
 export interface DatasetQueryCategory {

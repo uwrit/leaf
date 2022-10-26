@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DragSourceConnector, DragSourceMonitor, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd'
+import { ConnectDragPreview, ConnectDragSource, ConnectDropTarget, DragSource, DragSourceConnector, DragSourceMonitor, DropTarget, DropTargetConnector, DropTargetMonitor } from 'react-dnd-cjs'
 import { reorderColumns } from '../../actions/cohort/patientList';
 import { compose } from 'redux';
 import { PatientListColumn } from '../../models/patientList/Column';
@@ -16,6 +16,7 @@ interface OwnProps {
     className?: string;
     data: PatientListColumn;
     dispatch: any;
+    renames: Map<string, string>;
     onClick: (idx: number) => any;
     sort: PatientListSort;
 }
@@ -62,7 +63,10 @@ const collectSource = (connector: DragSourceConnector, monitor: DragSourceMonito
 
 class Header extends React.Component<Props> {
     public render() {
-        const { connectDragSource, connectDropTarget, connectDragPreview, data, onClick, isOver, canDrop, isDragging, sort, className } = this.props;
+        const { 
+            connectDragSource, connectDropTarget, connectDragPreview, data, renames, 
+            onClick, isOver, canDrop, isDragging, sort, className 
+        } = this.props;
         const c = className ? className : 'patientlist';
         const classes = [ `${c}-column-header` ];
 
@@ -74,6 +78,13 @@ class Header extends React.Component<Props> {
             else if (sort.sortType === PatientListSortType.DESC) { classes.push('sort-desc'); }
         }
 
+        let display = data.displayName;
+        if (data.datasetId == 'demographics') {
+            if (renames.has(data.id)) {
+                display = renames.get(data.id);
+            }
+        }
+
         return (
             connectDragPreview!(
             connectDragSource!(
@@ -81,7 +92,7 @@ class Header extends React.Component<Props> {
                 <th 
                     className={classes.join(' ')}
                     onClick={onClick.bind(null, data.index)}>
-                    {this.props.data.displayName}
+                    {display}
                 </th>
             )))
         )
