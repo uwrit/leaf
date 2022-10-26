@@ -953,7 +953,11 @@ export default class PatientListWebWorker {
             }
             
             // Add column headers
-            rows.push(cols.map((col: PatientListColumn) => col.id).join(','));
+            rows.push(cols.map((col: PatientListColumn) => {
+                const renamed = config!.customColumnNames.get(col.id);
+                if (renamed) return renamed;
+                return col.id;
+            }).join(','));
 
             // Add rows
             patientMap.forEach((p: Patient) => {

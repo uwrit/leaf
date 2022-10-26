@@ -9,7 +9,7 @@ import React from 'react';
 
 import { connect } from 'react-redux';
 import { getIdToken } from '../actions/auth';
-import { refreshSession, saveSessionAndLogout, refreshServerState } from '../actions/session';
+import { refreshSession, saveSessionAndLogout, refreshServerStateLoop } from '../actions/session';
 import { RouteConfig } from '../config/routes';
 import Attestation from '../containers/Attestation/Attestation';
 import CohortCountBox from '../containers/CohortCountBox/CohortCountBox';
@@ -72,9 +72,8 @@ class App extends React.Component<Props> {
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         this.handleSessionTokenRefresh();
-        this.handleServerStateRefresh();
         dispatch(getIdToken());
-        dispatch(refreshServerState());
+        dispatch(refreshServerStateLoop());
     }
 
     public componentDidUpdate() { 
@@ -142,16 +141,6 @@ class App extends React.Component<Props> {
         }
         setTimeout(this.handleBrowserHeartbeat, this.heartbeatCheckIntervalSeconds * 1000);
         this.lastHeartbeat = now;
-    }
-
-    /*
-     * Poll every few minutes to check for downtimes and notifications from the server.
-     */
-    private async handleServerStateRefresh() {
-        const { dispatch } = this.props;
-        await sleep(this.serverStateCheckIntervalMinutes * 60000);
-        dispatch(refreshServerState());
-        this.handleServerStateRefresh();
     }
 
     /*

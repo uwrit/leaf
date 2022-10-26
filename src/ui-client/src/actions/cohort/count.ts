@@ -213,7 +213,6 @@ const getDemographics = () => {
             }
             dispatch(getPatientListDataset(ds));
         }
-        console.log(getState().cohort.patientList.configuration.customColumnNames);
     };
 };
 

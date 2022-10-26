@@ -142,6 +142,7 @@ namespace Services.Admin.Compiler
                     new
                     {
                         uid = query.UniversalId?.ToString(),
+                        isdefault = query.IsDefault,
                         shape = query.Shape,
                         name = query.Name,
                         catid = query.CategoryId,
@@ -174,6 +175,7 @@ namespace Services.Admin.Compiler
                         desc = query.Description,
                         sql = query.SqlStatement,
                         isEnc = query.IsEncounterBased,
+                        isDefault = query.IsDefault,
                         schema = DynamicDatasetSchemaFieldSerde.Serialize(query.Schema),
                         sqlDate = query.SqlFieldDate,
                         sqlValString = query.SqlFieldValueString,

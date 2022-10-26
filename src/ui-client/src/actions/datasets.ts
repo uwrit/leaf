@@ -102,7 +102,6 @@ export const moveDatasetCategory = (dataset: PatientListDatasetQuery, category: 
     };
 };
 
-
 export const setDatasets = (datasets: PatientListDatasetQuery[], result: DatasetSearchResult): DatasetAction => {
     return {
         result,

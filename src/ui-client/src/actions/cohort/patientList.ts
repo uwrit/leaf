@@ -111,7 +111,7 @@ export const getPatientListDataset = (dataset: PatientListDatasetQuery, dates?: 
                     if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
                         const ds = await fetchDataset(state, nr, queryId, dataset, dates, panelIdx);
-                        const newPl = await addDataset(state, ds, dataset, nr.id);
+                        const newPl = await addDataset(getState, ds, dataset, nr.id);
                         atLeastOneSucceeded = true;
                         newPl.configuration.displayColumns.forEach((c: PatientListColumn, i: number) => c.index = i);
                         dispatch(setPatientListNetworkDatasetReceived(nr.id, dataset.id));

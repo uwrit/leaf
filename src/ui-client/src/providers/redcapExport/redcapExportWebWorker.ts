@@ -168,7 +168,7 @@ export default class REDCapExportWebWorker {
 
             /*
              * Ensure the id generate for each dataset in REDCap has
-             * only valid characters and is wiithin the length limit.
+             * only valid characters and is within the length limit.
              */
             patientList!.forEach((d) => d.datasetId = cleanName(d.datasetId, dsNameLenLimit));
 

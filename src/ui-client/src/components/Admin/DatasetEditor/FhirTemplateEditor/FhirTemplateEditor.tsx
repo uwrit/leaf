@@ -51,13 +51,14 @@ export class FhirTemplateEditor extends React.PureComponent<Props> {
                 <Row>
                     <Col md={12}>
                         <Section header='Custom Column Names'>
+                            <p>Override default Basic Demographics column names</p>
                             <div className='custom-columns'>
-                                {[ ...DemographicsDefTemplate.columns.keys() ].filter(k => k !== personId).map(k => {
+                                {[ ...DemographicsDefTemplate.columns.keys() ].filter(k => k !== 'patientOf').map(k => {
                                     const val = (dataset as AdminDemographicQuery).columnNames.get(k);
                                     return (
-                                        <Row>
-                                            <Col md={3}>{k}</Col>
-                                            <Col md={6}>
+                                        <Row key={k}>
+                                            <Col md={5}>{k}</Col>
+                                            <Col md={7}>
                                                 <Input changeHandler={this.handleDemographicCustomColumnRename} propName={k} value={val} />
                                             </Col>
                                         </Row>
@@ -98,7 +99,11 @@ export class FhirTemplateEditor extends React.PureComponent<Props> {
         const { inputChangeHandler } = this.props;
         const dataset = this.props.dataset as AdminDemographicQuery;
         const newMap = new Map(dataset.columnNames);
-        newMap.set(column, val);
+        if (val.trim().length) {
+            newMap.set(column, val);
+        } else {
+            newMap.delete(column);
+        } 
         inputChangeHandler(newMap, 'columnNames');
     }
 };

@@ -37,7 +37,7 @@ export class ClassificationProps extends React.PureComponent<Props> {
                         <Col md={6}>
                             <Checkbox
                                 changeHandler={inputChangeHandler} propName={'isDefault'} value={dataset.isDefault} 
-                                label='Load by Default' subLabel={'If checked, this dataset will be automatically loaded when users first view the Patient List.'}
+                                label='Load by Default' subLabel={'If checked, this dataset will be automatically loaded when users first view the Patient List with no date filter.'}
                             />
                         </Col>
                         <Col md={6}>

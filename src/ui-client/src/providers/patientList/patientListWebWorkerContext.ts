@@ -6,7 +6,6 @@
  */ 
 
 export const workerContext = `
-console.log("Patient list web worker here!");
 var patientMap = new Map();
 var singletonDatasets = new Map();
 var multirowDatasets = new Map();
@@ -742,7 +741,11 @@ var getSingletonDataCsv = function (payload) {
         });
     }
     // Add column headers
-    rows.push(cols.map(function (col) { return col.id; }).join(','));
+    rows.push(cols.map((col) => {
+        var renamed = config.customColumnNames.get(col.id);
+        if (renamed) return renamed;
+        return col.id;
+    }).join(','));
     // Add rows
     patientMap.forEach(function (p) {
         var row = [];

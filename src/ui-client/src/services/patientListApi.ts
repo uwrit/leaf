@@ -78,7 +78,7 @@ export const clearPreviousPatientList = () => patientListProvider.clearPatients(
  * Add a dataset, then return a new patient list.
  */
 export const addDataset = async (
-    appState: AppState, 
+    getState: () => AppState, 
     datasetDto: PatientListDatasetDTO, 
     queryRef: PatientListDatasetQuery, 
     responderId: number
@@ -93,20 +93,20 @@ export const addDataset = async (
         }
     }
 
-    return handler(appState, datasetDto, queryRef, responderId)
+    return handler(getState, datasetDto, queryRef, responderId)
 };
 
 /*
  * Add a singleton dataset, then return a new patient list.
  */
 const addSingletonDataset = async (
-    appState: AppState, 
+    getState: () => AppState, 
     datasetDto: PatientListDatasetDTO, 
     queryRef: PatientListDatasetQuery, 
     responderId: number
 ): Promise<PatientListState> => {
 
-    const patientList = appState.cohort.patientList;
+    const patientList = getState().cohort.patientList;
     const singletonDatasets = patientList.configuration.singletonDatasets;
     const def = getDatasetDefinition(datasetDto, queryRef);
     const dataset: PatientListDataset = {
@@ -146,13 +146,13 @@ const addSingletonDataset = async (
  * Add a multirow dataset, then return a new patient list.
  */
 const addMultirowDataset = async (
-        appState: AppState, 
+        getState: () => AppState, 
         datasetDto: PatientListDatasetDTO, 
         queryRef: PatientListDatasetQuery, 
         responderId: number
     ): Promise<PatientListState> => {
 
-    const patientList = appState.cohort.patientList;
+    const patientList = getState().cohort.patientList;
     const multirowDatasets = patientList.configuration.multirowDatasets;
     const singletonDatasets = patientList.configuration.singletonDatasets;
     const def = getDatasetDefinition(datasetDto, queryRef);
@@ -215,7 +215,7 @@ const addMultirowDataset = async (
      * Get the latest patient list.
      */
     patientList.display = await getPatients(patientList.configuration) as PatientListRow[];
-    patientList.totalRows = appState.cohort.patientList.totalRows + summaryDef.totalRows!;
+    patientList.totalRows = getState().cohort.patientList.totalRows + summaryDef.totalRows!;
     
     return patientList;
 };
@@ -268,6 +268,7 @@ export const addDemographicsDataset = async (
     await patientListProvider.addDemographics(def, patients, responderId);
     patientList.display = await patientListProvider.getPatients(patientList.configuration) as PatientListRow[];
     patientList.totalPatients = getState().cohort.patientList.totalPatients + patients.length;
+    patientList.configuration.customColumnNames = getState().cohort.patientList.configuration.customColumnNames;
     patientList.state = CohortStateType.LOADED;
     return patientList;
 };

@@ -79,7 +79,7 @@ namespace Services.Admin.Compiler
         class AdminDemographicQueryRecord
         {
             public string SqlStatement { get; set; }
-            public string ColumnNames { get; set; }
+            public string ColumnNamesJson { get; set; }
             public DateTime LastChanged { get; set; }
             public string ChangedBy { get; set; }
 
@@ -88,7 +88,7 @@ namespace Services.Admin.Compiler
                 return new AdminDemographicQuery
                 {
                     SqlStatement = SqlStatement,
-                    ColumnNames = ColumnNamesSerde.Deserialize(ColumnNames),
+                    ColumnNames = ColumnNamesSerde.Deserialize(ColumnNamesJson),
                     LastChanged = LastChanged,
                     ChangedBy = ChangedBy
                 };

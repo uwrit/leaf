@@ -48,8 +48,6 @@ export default class PatientListTable extends React.PureComponent<Props, State> 
         const classes = [ `${c}-table-container`, (this.state.hidden ? 'hidden' : '') ];
         const cols = patientList ? this.props.patientList.configuration.displayColumns : [];
 
-        console.log('PatientListTable', patientList);
-
         return (    
             <div className={classes.join(' ')}>
                 <div className={`${c}-container-overlay`} /> 
