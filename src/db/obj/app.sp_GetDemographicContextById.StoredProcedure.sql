@@ -41,15 +41,8 @@ BEGIN
 
     -- get demographicquery
     SELECT
-        SqlStatement
+        SqlStatement,
+        ColumnNamesJson
     FROM app.DemographicQuery
 END
-
-
-
-
-
-
-
-
 GO

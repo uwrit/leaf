@@ -10,6 +10,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2018/12/21
@@ -66,16 +67,18 @@ BEGIN
     SELECT
         i.Id,
         dq.UniversalId,
+        dq.IsDefault,
         dq.Shape,
         dq.[Name],
         dqc.Category,
         dq.[Description],
         dq.SqlStatement,
-		IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
-		ddq.[Schema],
-		ddq.SqlFieldDate,
-		ddq.SqlFieldValueString,
-		ddq.SqlFieldValueNumeric
+        IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
+        dq.IsText,
+        ddq.[Schema],
+        ddq.SqlFieldDate,
+        ddq.SqlFieldValueString,
+        ddq.SqlFieldValueNumeric
     FROM @ids i
     JOIN app.DatasetQuery dq ON i.Id = dq.Id
 	LEFT JOIN app.DynamicDatasetQuery ddq ON dq.Id = ddq.Id
@@ -89,4 +92,5 @@ BEGIN
     JOIN app.DatasetQueryTag t on i.Id = t.DatasetQueryId
 
 END
+
 GO

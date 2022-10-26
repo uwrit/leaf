@@ -5,27 +5,28 @@
 -- file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ﻿USE [LeafDB]
 GO
-/****** Object:  StoredProcedure [adm].[sp_GetDemographicQuery]    Script Date: ******/
+/****** Object:  StoredProcedure [app].[sp_GetDashboardConfigs]    Script Date: ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
 
 -- =======================================
--- Author:      Cliff Spital
--- Create date: 2019/6/12
--- Description: Fetch the app.DemographicQuery record for an admin.
+-- Author:      Nic Dobbins
+-- Create date: 2022/3/11
+-- Description: Gets configuration and metadata for all dashboards
 -- =======================================
-CREATE PROCEDURE [adm].[sp_GetDemographicQuery]
+CREATE PROCEDURE [app].[sp_GetDashboardConfigs]
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+	@admin bit = 0
 AS
 BEGIN
     SET NOCOUNT ON
 
-    SELECT
-        SqlStatement,
-        ColumnNamesJson,
-        LastChanged,
-        ChangedBy
-    FROM app.DemographicQuery;
+    SELECT Id, JsonConfig, UiDisplayName, UiDisplayDescription
+    FROM app.Dashboard
+
 END
+
 GO

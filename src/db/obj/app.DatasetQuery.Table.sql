@@ -22,6 +22,8 @@ CREATE TABLE [app].[DatasetQuery](
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
+	[IsDefault] [bit] NULL,
+	[IsText] [bit] NULL,
 PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

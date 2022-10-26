@@ -17,12 +17,12 @@ CREATE TABLE [app].[ConceptSqlSet](
 	[SqlSetFrom] [nvarchar](1000) NOT NULL,
 	[SqlFieldDate] [nvarchar](1000) NULL,
 	[SqlFieldEvent] [nvarchar](400) NULL,
-    [Description] NVARCHAR(200) NULL,
 	[Created] [datetime] NOT NULL,
 	[CreatedBy] [nvarchar](1000) NOT NULL,
 	[Updated] [datetime] NOT NULL,
 	[UpdatedBy] [nvarchar](1000) NOT NULL,
 	[EventId] [int] NULL,
+	[Description] [nvarchar](200) NULL,
  CONSTRAINT [PK_ConceptSqlSet] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC

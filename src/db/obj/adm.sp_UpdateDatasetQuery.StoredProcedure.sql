@@ -10,6 +10,7 @@ SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
 GO
+
 -- =======================================
 -- Author:      Cliff Spital
 -- Create date: 2019/6/4
@@ -18,6 +19,7 @@ GO
 CREATE PROCEDURE [adm].[sp_UpdateDatasetQuery]
     @id UNIQUEIDENTIFIER,
     @uid app.UniversalId,
+    @isdefault bit,
     @shape int,
     @name nvarchar(200),
     @catid int,
@@ -57,6 +59,7 @@ BEGIN
 		DECLARE @ins TABLE (
             Id uniqueidentifier,
             UniversalId nvarchar(200) null,
+            IsDefault bit not null,
             Shape int not null,
             [Name] nvarchar(200) not null,
             CategoryId int null,
@@ -72,6 +75,7 @@ BEGIN
         UPDATE app.DatasetQuery
         SET
             UniversalId = @uid,
+            IsDefault = @isdefault,
             Shape = @shape,
             [Name] = @name,
             CategoryId = @catid,
@@ -82,6 +86,7 @@ BEGIN
 		OUTPUT
             inserted.Id,
             inserted.UniversalId,
+            inserted.IsDefault,
             inserted.Shape,
             inserted.Name,
             inserted.CategoryId,
