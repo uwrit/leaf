@@ -1,0 +1,56 @@
+version: '3.3'
+services:
+  db:
+    build:
+      context: ./db/build
+      args:
+        - sapw=${SA_PASSWORD}
+    restart: always
+    ports:
+        - '1433:1433'
+    container_name: leaf_db_demo
+    networks:
+      - leaf
+    # image: 'mcr.microsoft.com/mssql/server:2019-latest'
+
+  server:
+    build: ./server
+    environment:
+      - 'LEAF_APP_DB=${LEAF_APP_DB}'
+      - 'LEAF_CLIN_DB=${LEAF_CLIN_DB}'
+      - 'LEAF_JWT_KEY_PW=${LEAF_JWT_KEY_PW}'
+    restart: always
+    ports:
+      - '5001:5001'
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    container_name: leaf_api_demo
+    volumes:
+      - server-log:/logs
+    depends_on:
+      - db
+    networks:
+      - leaf
+    # image: leaf_api
+
+  ui-client:
+    build:
+      context: ./ui-client
+    container_name: leaf_ui
+    ports:
+      - 80:3000
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    restart: always
+    stdin_open: true
+    depends_on:
+      - db
+      - server
+    networks:
+      - leaf
+
+
+networks:
+  leaf:
+volumes:
+  server-log:
