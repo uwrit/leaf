@@ -1,3 +1,4 @@
+
 export $(xargs <.env)
 # Set configurable stuff
 SA_PASSWORD=Th3PA55--8zz       # DB password
@@ -17,13 +18,13 @@ if [ -z ${LEAF_JWT_KEY_PW+x} ]; then echo "LEAF_JWT_KEY_PW is unset!" exit; fi
 
 #--------------
 # DB
-#--------------
-# sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=$SA_PASSWORD" -p 1433:1433 --name leaf_db_demo mcr.microsoft.com/mssql/server:2019-latest
+# --------------
+# sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Th3PA55--8zz" -p 1433:1433 --name leaf_db_demo mcr.microsoft.com/mssql/server:2019-latest
 
-# sleep 60s  # need to sleep long enough for the bd server to setup
-# # sqlcmd oddly prefers '127.0.0.1' (not 'host.docker.internal'), so use that here
-# # sqlcmd -S localhost,1433 -U SA -P "Th3PA55--8zz"
-# #  SELECT Name from sys.databases;
+# sleep 60s  # need to sleep long enough for the db server to setup
+# sqlcmd oddly prefers '127.0.0.1' (not 'host.docker.internal'), so use that here
+# sqlcmd -S localhost,1433 -U SA -P "Th3PA55--8zz"
+#  SELECT Name from sys.databases;
 
 # sqlcmd -S localhost,1433 -U SA -P "Th3PA55--8zz" -i src/db/build/LeafDB.sql 
 # sqlcmd -S localhost,1433 -U SA -P "Th3PA55--8zz" -d LeafDB -i src/db/build/LeafDB.Init.sql
@@ -59,17 +60,3 @@ sudo docker run \
     # -v ${PWD}:/app \
     # -v ${KEYS_PATH}:/.keys \
     # -v ${SERILOG_DIR}:/logs \
-
-# cd $LEAF_ROOT
-# sudo docker run \
-#     -e "LEAF_APP_DB=Server=$DB_SERVER,1433;Database=LeafDB;uid=sa;Password=$SA_PASSWORD" \
-#     -e "LEAF_CLIN_DB=Server=$DB_SERVER,1433;Database=TestDB;uid=sa;Password=$SA_PASSWORD" \
-#     -e "LEAF_JWT_KEY_PW=$LEAF_JWT_KEY_PW" \
-#     -p 5001:5001 \
-#     -v ${PWD}/src/server:/app \
-#     -v ${KEYS_PATH}:/.keys \
-#     -v ${SERILOG_DIR}:/logs \
-#     --name leaf_api_demo \
-#     -it \
-#     leaf_api /bin/bash
-    # -d \

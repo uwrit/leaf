@@ -19,3 +19,23 @@ CMD [ "npm", "start" ]
 #COPY --from=build-step /app/build /usr/share/nginx/html
 #COPY --from=build-step /app/nginx.conf /etc/nginx/conf.d/default.conf
 #CMD [ "nginx", "-g", "daemon off;" ]
+
+
+
+
+
+
+
+# FROM nginx:latest
+# RUN apt update
+# RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
+# RUN apt install -y nodejs
+# RUN npm install -g typescript@latest
+# RUN mkdir /code
+# COPY . /code
+# RUN cd /code && find . && npm install && npm run build
+
+# RUN mkdir /app
+# RUN cp -R /code/build/* /app/
+
+# COPY ./nginx.conf /etc/nginx/nginx.conf

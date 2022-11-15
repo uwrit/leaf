@@ -19,6 +19,7 @@ services:
       - 'LEAF_APP_DB=${LEAF_APP_DB}'
       - 'LEAF_CLIN_DB=${LEAF_CLIN_DB}'
       - 'LEAF_JWT_KEY_PW=${LEAF_JWT_KEY_PW}'
+      - UnsecuredIsAdmin=${UnsecuredIsAdminProd}
     restart: always
     ports:
       - '5001:5001'
