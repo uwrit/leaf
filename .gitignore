@@ -6,7 +6,7 @@
 .DS_Store
 
 # Ignores
-.env
+*.env*
 *.bak
 /bin
 src/server/keys

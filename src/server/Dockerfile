@@ -7,20 +7,7 @@ RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-p
     && yum -y update                 \
     && yum clean all
 
-RUN useradd leaf                \
-    && groupadd leafg           \
-    && usermod -a -G leafg leaf \
-    && mkdir /data/             \
-    && chown leaf:leafg /data/  \
-    && chmod 775 /data/         
-
-COPY --chown=leaf:leafg . /data/server/
-RUN chmod 775 /data/server/
-
-# VOLUME [ "/app", "/.keys", "/logs" ]
-VOLUME [ "/logs" ]
-
-USER leaf
+VOLUME [ "/app", "/.keys", "/logs" ]
 
 COPY . /app
 COPY ./keys /.keys
