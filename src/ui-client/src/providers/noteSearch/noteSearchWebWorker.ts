@@ -7,7 +7,6 @@
 
 import { generate as generateId } from 'shortid';
 import { Note } from '../../models/cohort/NoteSearch';
-
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
 const FLUSH = 'FLUSH';
@@ -136,7 +135,7 @@ export default class NoteSearchWebWorker {
                 case FLUSH:
                     return flushNotes(payload);
                 case SEARCH:
-                    return search(payload);
+                    return searchNotes(payload);
                 default:
                     return null;
             }
@@ -146,81 +145,19 @@ export default class NoteSearchWebWorker {
             const { requestId } = payload;
             const { notes } = payload;
 
-            for (const note of notes) {
-                indexDocument(note);
-                indexPositionIndices(note);
+            for (const i in notes) {
+                indexDocument(notes[i]);
+                indexPositionIndices(notes[i]);
             }
-
+            console.log(inverted.index)
             return { requestId };
         }
 
         const flushNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
-
             inverted.index = {}
             return { requestId };
         };
-
-        const indexDocument = (note: Note): void => {
-            const spans = splitWithIndex(note.text, " ");
-            // Create dictionary variables
-            for (const span of spans) {
-                if (span.lexeme in this.index) {
-                    // Add word as index
-                    inverted.index[span.lexeme].documents.push(note.id);
-                    inverted.index[span.lexeme].documentPositions.push({
-                        documentName: note.id,
-                        startIndex: span.startCharIndex,
-                        endIndex: span.endCharIndex
-                    });
-                } else {
-                    // Add index with text
-                    inverted.index[span.lexeme] = { 
-                        documents: [note.id], 
-                        positions: {}, 
-                        documentPositions: []
-                     };
-                }
-            }
-        }
-
-        const indexPositionIndices = (note: Note): void => {
-            const spans = note.text.split(" ");
-            for (let i = 0; i < spans.length; i++) {
-                if (!(note.id in inverted.index[spans[i]].positions)) { 
-                    inverted.index[spans[i]].positions[note.id] = [i];
-                } else {
-                    inverted.index[spans[i]].positions[note.id].push(i);
-                }
-            }
-        }
-
-        const bm25 = (terms: string[]): SearchResult => {
-            const result: SearchResult = { };
-
-            // TODO
-
-            return result;
-        };
-
-        const search = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId } = payload;
-            const { terms } = payload;
-
-            //search inverted index for words and their occurrences
-            let result: SearchResult = { };
-
-            for (const token of terms) {
-                if (token in inverted.index) {
-                    if (!(token in result)) { 
-                        result[token] = [inverted.index[token]]; 
-                    } else {
-                        result[token].push(inverted.index[token]);
-                    }
-                }
-            }
-            return { requestId, result };
-        }
 
         const splitWithIndex = (text: string, delimiter: string): IndexedSpan[] => {
             const values: IndexedSpan[] = [];
@@ -235,9 +172,95 @@ export default class NoteSearchWebWorker {
                 index += splits[i].length + delimiter.length;
             }
             return values;
-        }
+        };
+
+        const indexDocument = (note: Note): void => {
+            const spans = splitWithIndex(note.text, " ");
+            // Create dictionary variables
+            for (const i in spans) {
+                if (spans[i].lexeme in this.index) {
+                    // Add word as index
+                    inverted.index[spans[i].lexeme].documents.push(note.id);
+                    inverted.index[spans[i].lexeme].documentPositions.push({
+                        documentName: note.id,
+                        startIndex: spans[i].startCharIndex,
+                        endIndex: spans[i].endCharIndex
+                    });
+                } else {
+                    // Add index with text
+                    inverted.index[spans[i].lexeme] = { 
+                        documents: [note.id], 
+                        positions: {}, 
+                        documentPositions: []
+                     };
+                }
+            }
+        };
+
+        const indexPositionIndices = (note: Note): void => {
+            const spans = note.text.split(" ");
+            for (let i = 0; i < spans.length; i++) {
+                if (!(note.id in inverted.index[spans[i]].positions)) { 
+                    inverted.index[spans[i]].positions[note.id] = [i];
+                } else {
+                    inverted.index[spans[i]].positions[note.id].push(i);
+                }
+            }
+        };
+
+        const bm25 = (terms: string[]): SearchResult => {
+            const result: SearchResult = { };
+
+            // TODO
+
+            return result;
+        };
+
+        const searchNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            let result: SearchResult = { }
+            const { requestId } = payload;
+            const { terms } = payload;
+            //search inverted index for words and their occurrences
+            for (const i in terms) {
+                if (terms[i] in inverted.index) {
+                    if (!(terms[i] in result)) { 
+                        result[terms[i]] = [inverted.index[terms[i]]]; 
+                    } else {
+                        result[terms[i]].push(inverted.index[terms[i]]);
+                    }
+                }
+            }
+            return { requestId, result };
+        };
+
+        const searchIndexAnd = (terms: string[]): SearchResult => {
+            let result: SearchResult = { };
+            for (const token of terms) {
+                if (token in inverted.index) {
+                    if (!(token in result)) { 
+                        result[token] = [inverted.index[token]]; 
+                    } else {
+                        //if every term exists in the result index
+                        result[token].push(inverted.index[token]);
+                    }
+                }
+            return result
+        };
+
+        const searchIndexOr = (terms: string[]): SearchResult => {
+            let result: SearchResult = {};
+            for (const token of terms) {
+                if (token in inverted.index) {
+                    if (!(token in result)) { 
+                        result[token] = [inverted.index[token]]; 
+                    } else {
+                        result[token].push(inverted.index[token]);
+                    }
+                }
+            return result
+        };
     }
 }
-
-
-
+    
+}
+}
