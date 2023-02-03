@@ -41,14 +41,21 @@ interface Position {
     endIndex: number;
 };
 
+interface DocumentText {
+    documentName: string;
+    documentText: string;
+}
+
 interface IndexDocument {
     documents: string[]; 
     positions: { [key: string]: number[] },
     documentPositions: Position[],
+    documentTexts: DocumentText[]
 }
 
 interface IndexedDocuments {
     [key: string]: IndexDocument
+
 }
 
 export interface InvertedIndex {
@@ -126,6 +133,7 @@ export default class NoteSearchWebWorker {
     private workerContext = () => {
 
         let inverted: InvertedIndex = { index: {} };
+        console.log('webworker')
 
         // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload): any => {
@@ -175,12 +183,14 @@ export default class NoteSearchWebWorker {
         };
 
         const indexDocument = (note: Note): void => {
+            note.text = note.text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLocaleLowerCase()
             const spans = splitWithIndex(note.text, " ");
             // Create dictionary variables
             for (const i in spans) {
-                if (spans[i].lexeme in this.index) {
+                if (spans[i].lexeme in inverted.index) {
                     // Add word as index
                     inverted.index[spans[i].lexeme].documents.push(note.id);
+                    inverted.index[spans[i].lexeme].documentTexts.push({documentName: note.id, documentText: note.text})
                     inverted.index[spans[i].lexeme].documentPositions.push({
                         documentName: note.id,
                         startIndex: spans[i].startCharIndex,
@@ -191,7 +201,8 @@ export default class NoteSearchWebWorker {
                     inverted.index[spans[i].lexeme] = { 
                         documents: [note.id], 
                         positions: {}, 
-                        documentPositions: []
+                        documentPositions: [],
+                        documentTexts: []
                      };
                 }
             }
@@ -233,20 +244,48 @@ export default class NoteSearchWebWorker {
             return { requestId, result };
         };
 
-        const searchIndexAnd = (terms: string[]): SearchResult => {
-            let result: SearchResult = { };
-            for (const token of terms) {
-                if (token in inverted.index) {
-                    if (!(token in result)) { 
-                        result[token] = [inverted.index[token]]; 
-                    } else {
-                        //if every term exists in the result index
-                        result[token].push(inverted.index[token]);
-                    }
+        /**const searchIndexAnd(query: string) {
+            const queryWords = query.split(" ");
+                
+            let results: any = {};
+            for (const word of queryWords) {
+              if (word in this.index) {
+                if (!(word in results)) { //if the
+                  results[word] = [this.index[word]];
+                  results[word].push(this.index[word]);
                 }
-            return result
-        };
-
+              }
+            }
+            var uniqueKeys = [];
+            var joinedResults = [];
+            for (const result of Object.keys(results)) {
+              // Get unique keys for joined results
+              if (uniqueKeys.length == 0) { 
+                uniqueKeys = (results[result][0].documents)
+              }
+              else { 
+                uniqueKeys = uniqueKeys.filter(value => results[result][0].documents.includes(value))
+                uniqueKeys = uniqueKeys.filter((c, index) => { return uniqueKeys.indexOf(c) === index; });
+              }
+              
+              // Join results in readt to use format
+              var pos = [...results[result][0].documentPositions]
+              pos.forEach(element => element.index = result)
+              
+              if (joinedResults.length == 0) { 
+                joinedResults = [...results[result][0].documentPositions]
+                joinedResults.forEach(element => element.index = result)
+              } else { joinedResults = joinedResults.concat(pos) }
+            }
+            
+            // Filter documents with correct words
+            var filteredResults = joinedResults.filter( function(result) {
+              return uniqueKeys.indexOf(result.documentName) > -1;
+            })
+            
+            return filteredResults;
+        }*/
+      
         const searchIndexOr = (terms: string[]): SearchResult => {
             let result: SearchResult = {};
             for (const token of terms) {
@@ -262,5 +301,4 @@ export default class NoteSearchWebWorker {
     }
 }
     
-}
 }

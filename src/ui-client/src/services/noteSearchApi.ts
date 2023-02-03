@@ -5,29 +5,29 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import NoteSearchWebWorker from '../providers/noteSearch/noteSearchWebWorker';
+import NoteSearchWebWorker, { SearchResult } from '../providers/noteSearch/noteSearchWebWorker';
 import { Note } from '../models/cohort/NoteSearch';
 import { NoteSearchResult } from '../models/state/CohortState';
 
 const engine = new NoteSearchWebWorker();
 
 export const indexNotes = (notes: Note[]) => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise<void>( async (resolve, reject) => {
         await engine.index(notes);
         resolve();
     });
 };
 
 export const flushNotes = () => {
-    return new Promise( async (resolve, reject) => {
+    return new Promise<void>( async (resolve, reject) => {
         await engine.flush();
         resolve();
     });
 };
 
-export const searchNotes = (terms: string[]): Promise<NoteSearchResult[]> => {
+export const searchNotes = (terms: string[]): Promise<SearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const results = await engine.search(terms) as NoteSearchResult[];
+        const results = await engine.search(terms) as SearchResult;
         resolve(results);
     });
 };

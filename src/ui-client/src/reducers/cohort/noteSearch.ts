@@ -24,7 +24,7 @@ export function defaultNoteSearchState(): NoteSearchState {
                 increment: 1
             }
         },
-        results: [],
+        results: {},
         terms: []
     };
 }
@@ -74,10 +74,11 @@ export function setNoteSearchTerms(state: CohortState, action: NoteSearchAction)
 };
 
 export function setNoteSearchResults(state: CohortState, action: NoteSearchAction): CohortState {
+    console.log(action)
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
-            results: action.searchResults.slice()
+            results: action.searchResults
         }
     });
 };

@@ -15,6 +15,7 @@ import { ConceptId } from '../concept/Concept';
 import { NoteSearchDatasetQuery } from '../patientList/Dataset';
 import { Note } from '../cohort/NoteSearch';
 import { DateBoundary } from '../panel/Date';
+import { SearchResult } from '../../providers/noteSearch/noteSearchWebWorker';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -106,7 +107,7 @@ export interface VisualizationState {
 export interface NoteSearchState {
     datasets: Map<string, NoteSearchDatasetQuery>;
     dateFilter: DateBoundary;
-    results: NoteSearchResult[];
+    results: SearchResult;
     terms: string[];
 }
 

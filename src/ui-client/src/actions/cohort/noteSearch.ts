@@ -16,6 +16,7 @@ import { Note } from "../../models/cohort/NoteSearch";
 import { NoteSearchResult } from "../../models/state/CohortState";
 import { setNoClickModalState } from "../generalUi";
 import { NotificationStates } from "../../models/state/GeneralUiState";
+import { SearchResult } from "../../providers/noteSearch/noteSearchWebWorker";
 
 export const SET_NOTE_DATASETS = 'SET_NOTE_DATASETS';
 export const SET_NOTE_DATASET_CHECKED = 'SET_NOTE_DATASET_CHECKED';
@@ -28,7 +29,7 @@ export interface NoteSearchAction {
     datasets?: PatientListDatasetQuery[];
     dateFilter?: DateBoundary;
     id: number;
-    searchResults?: NoteSearchResult[];
+    searchResults?: SearchResult;
     searchTerms?: string[];
     type: string;
 }
@@ -144,7 +145,7 @@ export const setNoteSearchTerms = (searchTerms: string[]): NoteSearchAction => {
     };
 };
 
-export const setNoteSearchResults = (searchResults: NoteSearchResult[]): NoteSearchAction => {
+export const setNoteSearchResults = (searchResults: SearchResult): NoteSearchAction => {
     return {
         searchResults,
         id: -1,
