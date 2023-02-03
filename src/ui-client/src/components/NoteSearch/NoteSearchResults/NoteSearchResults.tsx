@@ -17,7 +17,8 @@ export class NoteSearchResults extends React.PureComponent<Props> {
 
         return (
             <div className={c}>
-                {results.map((result, i) => {
+                {
+                /**results.map((result, i) => {
                     return (
                         <div key={i} className={`${c}-result`}>
                             <div className={`${c}-result-header`}>
@@ -33,7 +34,15 @@ export class NoteSearchResults extends React.PureComponent<Props> {
                             </div>
                         </div>
                     );
-                })}
+                })*/
+                <div>
+                <div>{  JSON.stringify(Object.entries(results)
+  .map( ([key, value]) => `My key is ${key} and my value is ${JSON.stringify(value[0].documentTexts[0]['documentText'])}` ))
+  
+  }
+                </div>
+            </div>
+                }
             </div>
         );
     }
