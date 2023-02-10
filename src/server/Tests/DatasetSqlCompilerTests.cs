@@ -65,7 +65,7 @@ namespace Tests
         [Fact]
         public async void Observation_Should_Correctly_Reference_LateBound_Parameter()
         {
-            var compilerCtx = GetObservationCompilerContext();
+            var compilerCtx = GetObservationCompilerContext(false, true);
             var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(ObservationColumns.EffectiveDate, executionCtx.CompiledQuery);
@@ -75,7 +75,7 @@ namespace Tests
         [Fact]
         public async void Encounter_Should_Correctly_Reference_LateBound_Parameter()
         {
-            var compilerCtx = GetEncounterCompilerContext();
+            var compilerCtx = GetEncounterCompilerContext(false, true);
             var executionCtx = await datasetSqlCompiler.BuildDatasetSql(compilerCtx);
 
             Assert.Contains(EncounterColumns.AdmitDate, executionCtx.CompiledQuery);

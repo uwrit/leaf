@@ -10,11 +10,22 @@ using Model.Tagging;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using Services.Cohort;
+using Services.Compiler.SqlBuilder;
+using Model.Compiler.SqlBuilder;
+using Model.Options;
+using Tests.Mock.Models.Compiler;
+using Microsoft.Extensions.Options;
 
 namespace Tests
 {
     public class PreflightResourcesTests
     {
+        static readonly IOptions<CompilerOptions> compilerOptions = MockOptions.GenerateOmopOptions();
+        static readonly IOptions<AppDbOptions> appDbOptions = Options.Create(new AppDbOptions());
+        static readonly ISqlDialect dialect = new TSqlDialect();
+        static readonly ICachedCohortPreparer cachedCohortPreparer = new SharedSqlServerCachedCohortPreparer(null, dialect, MockOptions.GenerateOmopOptions());
+
         [Fact]
         public void Empty_ConceptPreflightCheck_Ok()
         {
@@ -32,7 +43,7 @@ namespace Tests
         }
 
         [Fact]
-        public void Concepts_Should_Match_Count_If_Ok()
+        public async void Concepts_Should_Match_Count_If_Ok()
         {
             var first = new QueryRef { Id = Guid.NewGuid(), UniversalId = QueryUrn.From("urn:leaf:query:d7359679-df0d-4604-a2d9-1d3d04417dc2:123456") };
             var second = new QueryRef { Id = Guid.NewGuid(), UniversalId = QueryUrn.From("urn:leaf:query:d7359668-df0d-4604-a2d9-1d3d04417dc2:563423") };
@@ -147,7 +158,11 @@ namespace Tests
                 }
             };
 
-            var concepts = pr.Concepts(new Model.Options.CompilerOptions { Alias = "@", FieldPersonId = "person_id" });
+            var concepts = await pr.Concepts(
+                compilerOptions.Value,
+                new SharedSqlServerCachedCohortPreparer(
+                    new CachedCohortFetcher(appDbOptions, null), dialect, compilerOptions)
+                );
 
             Assert.True(concepts.Count() == 4);
             Assert.Contains(concepts, c => c.Id == c12342);
