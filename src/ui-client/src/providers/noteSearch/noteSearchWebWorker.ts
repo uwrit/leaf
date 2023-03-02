@@ -39,6 +39,7 @@ interface Position {
     documentName: string;
     startIndex: number;
     endIndex: number;
+    context: string;
 };
 
 interface DocumentText {
@@ -143,7 +144,7 @@ export default class NoteSearchWebWorker {
                 case FLUSH:
                     return flushNotes(payload);
                 case SEARCH:
-                    return searchNotes(payload);
+                    return searchNotesAnd(payload);
                 default:
                     return null;
             }
@@ -194,14 +195,18 @@ export default class NoteSearchWebWorker {
                     inverted.index[spans[i].lexeme].documentPositions.push({
                         documentName: note.id,
                         startIndex: spans[i].startCharIndex,
-                        endIndex: spans[i].endCharIndex
+                        endIndex: spans[i].endCharIndex,
+                        context: "..." + note.text.slice(spans[i].startCharIndex-40, spans[i].endCharIndex+40) + "..."
                     });
                 } else {
                     // Add index with text
                     inverted.index[spans[i].lexeme] = { 
                         documents: [note.id], 
                         positions: {}, 
-                        documentPositions: [],
+                        documentPositions: [{documentName: note.id,
+                        startIndex: spans[i].startCharIndex,
+                        endIndex: spans[i].endCharIndex,
+                        context: "..." + note.text.slice(spans[i].startCharIndex-40, spans[i].endCharIndex+40)+"..."}],
                         documentTexts: []
                      };
                 }
@@ -244,47 +249,61 @@ export default class NoteSearchWebWorker {
             return { requestId, result };
         };
 
-        /**const searchIndexAnd(query: string) {
-            const queryWords = query.split(" ");
-                
-            let results: any = {};
-            for (const word of queryWords) {
-              if (word in this.index) {
-                if (!(word in results)) { //if the
-                  results[word] = [this.index[word]];
-                  results[word].push(this.index[word]);
+        const generateSummaries = (): void =>{
+            //update the inverted index to contain summary indices for display
+
+        }
+
+        const searchNotesAnd = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            let result: SearchResult = { }
+
+            const { requestId } = payload;
+            const { terms } = payload;
+
+            for (const i in terms) {
+              if (terms[i] in inverted.index) {
+                if (!(terms[i] in result)) {
+                  result[terms[i]] = [inverted.index[terms[i]]];
+                  result[terms[i]].push(inverted.index[terms[i]]);
                 }
               }
             }
-            var uniqueKeys = [];
-            var joinedResults = [];
-            for (const result of Object.keys(results)) {
+            
+            var uniqueKeys: any[] = [];
+            var joinedResults: any[] = [];
+
+            for (var r in result) {
               // Get unique keys for joined results
               if (uniqueKeys.length == 0) { 
-                uniqueKeys = (results[result][0].documents)
+                uniqueKeys = (result[r][0].documents)
               }
               else { 
-                uniqueKeys = uniqueKeys.filter(value => results[result][0].documents.includes(value))
-                uniqueKeys = uniqueKeys.filter((c, index) => { return uniqueKeys.indexOf(c) === index; });
+                uniqueKeys = uniqueKeys.filter(value => result[r][0].documents.includes(value))
+                uniqueKeys = uniqueKeys.filter((c, index) => {return uniqueKeys.indexOf(c) === index;});
               }
               
               // Join results in readt to use format
-              var pos = [...results[result][0].documentPositions]
-              pos.forEach(element => element.index = result)
-              
+              //var pos = [...result[r][0].documentPositions]
+              var pos = [].concat(result[r][0].documentPositions)
+
+              pos.forEach((element: { documentName: string; }) => element.documentName = r)
               if (joinedResults.length == 0) { 
-                joinedResults = [...results[result][0].documentPositions]
-                joinedResults.forEach(element => element.index = result)
+                //joinedResults = [...result[r][0].documentPositions]
+                joinedResults = [].concat(result[r][0].documentPositions)
+                joinedResults.forEach(element => element.index = r)
               } else { joinedResults = joinedResults.concat(pos) }
+              console.log("joined")
+              console.log(joinedResults)
             }
             
             // Filter documents with correct words
             var filteredResults = joinedResults.filter( function(result) {
               return uniqueKeys.indexOf(result.documentName) > -1;
             })
-            
-            return filteredResults;
-        }*/
+
+
+            return {requestId, result};
+        }
       
         const searchIndexOr = (terms: string[]): SearchResult => {
             let result: SearchResult = {};

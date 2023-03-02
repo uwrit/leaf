@@ -14,37 +14,23 @@ export class NoteSearchResults extends React.PureComponent<Props> {
     public render() {
         const { results } = this.props.noteSearch;
         const c = this.className;
-
         return (
-            <div className={c}>
-                {
-                /**results.map((result, i) => {
+                Object.entries(results).map(([result, val], i) => {
+                    console.log("render")
+                    console.log(val[i].documentPositions[i].context)
                     return (
-                        <div key={i} className={`${c}-result`}>
-                            <div className={`${c}-result-header`}>
-                                <span className={`${c}-result-type`}>{result.note.type}</span>
-                                <span className={`${c}-result-date`}>{result.note.date}</span>
-                            </div>
-                            <div className={`${c}-result-body`}>
-                                <TextareaAutosize
-                                    readOnly={true}
-                                    spellCheck={false}
-                                    value={result.note.text}>
-                                </TextareaAutosize>
+                    <div key={i} className={`${c}-result`}>
+                        <div className={`${c}-result-header`}>
+                        <div key={result}>
+                            {
+                                <p>out: {val[i].documentPositions[i].context}</p>
+                            }
                             </div>
                         </div>
+                        </div>
                     );
-                })*/
-                <div>
-                <div>{  JSON.stringify(Object.entries(results)
-  .map( ([key, value]) => `My key is ${key} and my value is ${JSON.stringify(value[0].documentTexts[0]['documentText'])}` ))
-  
-  }
-                </div>
-            </div>
-                }
-            </div>
+                })
+                           
         );
     }
-
 }
