@@ -45,12 +45,14 @@ export default class StandardAttestationConfirmation extends React.PureComponent
                 ]}
                 {!(isSubmittingAttestation || hasAttested) &&
                 <div className={`${c}-confirmation-footer`}>
+                    {config && !config.attestation.skipModeSelection &&
                     <Button 
                         onClick={handleGoBackClick} 
                         tabIndex={-1}
                         className="leaf-button mr-auto">
                         Go Back
                     </Button>
+                    }
                     <Button 
                         onClick={handleIAgreeClick} 
                         tabIndex={-1}

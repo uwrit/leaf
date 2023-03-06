@@ -32,8 +32,16 @@ interface LogoutConfigDTO {
 
 interface AttestationOptionsDTO {
     enabled: boolean;
+    skipModeSelection: boolean;
     text?: string[];
-    type?: CustomAttestationType
+    type?: CustomAttestationType;
+    credits: AttestationCreditsOptionsDTO;
+}
+
+interface AttestationCreditsOptionsDTO {
+    enabled: boolean;
+    logos: string[];
+    text: string;
 }
 
 interface VersionConfigDTO {

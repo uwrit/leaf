@@ -22,6 +22,10 @@
     overflow-x: hidden;
 }
 
+.attestation-header {
+    padding: 4px 8px !important;
+}
+
 .attestation-header h5 {
     width: 100%;
 }
@@ -361,4 +365,37 @@
 .attestation-custom-html > p,
 .attestation-custom-html > li {
     font-size: 1rem !important;
+}
+
+.attestation-custom-credits {
+    display: flex !important;
+    width: 100%;
+}
+
+.attestation-custom-credits > div {
+    flex-basis: 0;
+    flex-grow: 1;
+}
+
+.attestation-custom-credits-logo-wrapper,
+.attestation-custom-credits-text {
+    text-align: center;
+}
+
+.attestation-custom-credits-text {
+    font-family: Roboto;
+    font-size: 1.1rem;
+    font-weight: 300;
+}
+
+.attestation-custom-credits-text span {
+    border: 1px solid rgb(235,235,235);
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 200px;
+    padding: 4px;
+}
+
+.attestation-custom-credits-logo-wrapper img {
+    height: 50px;
 }

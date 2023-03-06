@@ -12,10 +12,13 @@ namespace Model.Options
     public class AttestationOptions
     {
         public bool Enabled { get; set; }
+        public bool SkipModeSelection { get; set; }
         public string[] Text { get; set; }
 
         public const string TextType = "TEXT";
         public const string HtmlType = "HTML";
+
+        public CreditsOptions Credits = new CreditsOptions();
 
         public CustomAttestationType Type { get; set; }
         public static readonly IEnumerable<string> ValidTypeOptions = new string[] { TextType, HtmlType };
@@ -45,6 +48,13 @@ namespace Model.Options
                     Type = CustomAttestationType.HTML;
                     break;
             }
+        }
+
+        public class CreditsOptions
+        {
+            public bool Enabled { get; set; }
+            public string Text { get; set; }
+            public string[] Logos { get; set; }
         }
     }
 

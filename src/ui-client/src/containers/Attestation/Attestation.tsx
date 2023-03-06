@@ -84,14 +84,24 @@ class Attestation extends React.PureComponent<Props, State> {
     public getSnapshotBeforeUpdate(prevProps: Props): any {
         const { config, isSubmittingAttestation, userContext, hasAttested } = this.props;
         if (hasAttested || isSubmittingAttestation || this.attestSkipStarted) { return null; }
-        if (userContext && config && !config.attestation.enabled) {
-            this.attestSkipStarted = true;
-            this.setState({ 
-                sessionTypeSelected: true, 
-                documentationStatusSelected: true, 
-                identificationTypeSelected: true,
-                attestation: { ...this.state.attestation, isIdentified: !config.cohort.deidentificationEnabled }
-            }, () => this.skipAttestationAndLoadSession());
+        if (userContext && config) {
+            if (!config.attestation.enabled) {
+                this.attestSkipStarted = true;
+                this.setState({ 
+                    sessionTypeSelected: true, 
+                    documentationStatusSelected: true, 
+                    identificationTypeSelected: true,
+                    attestation: { ...this.state.attestation, isIdentified: !config.cohort.deidentificationEnabled }
+                }, () => this.skipAttestationAndLoadSession());
+            } else if (config.attestation.skipModeSelection) {
+                this.attestSkipStarted = true;
+                this.setState({ 
+                    sessionTypeSelected: true, 
+                    documentationStatusSelected: true, 
+                    identificationTypeSelected: true,
+                    attestation: { ...this.state.attestation, isIdentified: !config.cohort.deidentificationEnabled }
+                });
+            }
         }
         return null;
     }
@@ -136,6 +146,8 @@ class Attestation extends React.PureComponent<Props, State> {
                 size="lg"
                 wrapClassName={`${c}-modal-wrap`}>
                 <ModalHeader className={`${c}-header`}>
+
+                    {/* Top logo row (Leaf, ITHS, CD2H) */}
                     <div className={`${c}-leaf-logo-wrapper`}>
                         <img alt='leaf-logo' className={`${c}-leaf-logo`} src={process.env.PUBLIC_URL + '/images/logos/apps/leaf.svg'} />
                         <div className={`${c}-title`}>
@@ -149,7 +161,29 @@ class Attestation extends React.PureComponent<Props, State> {
                     <div className={`${c}-cd2h-logo-wrapper`}>
                         <img alt='cd2h-logo' className={`${c}-cd2h-logo`} src={process.env.PUBLIC_URL + '/images/logos/orgs/cd2h.png'} />
                     </div>
+
+                    {/* Optional instance logo row */}
+                    {config && config.attestation.credits.enabled &&
+                    <div className={`${c}-custom-credits`}>
+                        {config.attestation.credits.logos &&
+                        config.attestation.credits.logos.map(l => {
+                            return (
+                                <div key={l} className={`${c}-custom-credits-logo-wrapper`}>
+                                    <img alt={`'${l}' not found`} className={`${c}-custom-logo`} src={process.env.PUBLIC_URL + l} />
+                                </div>
+                            );
+                        })
+                        }
+                        <div className={`${c}-custom-credits-text`}>
+                            <span>
+                                {config.attestation.credits.text}
+                            </span>
+                        </div>
+                    </div>
+                    }
+
                 </ModalHeader>
+
                 <div className={progressBarClasses.join(' ')} style={{ width: `${sessionLoadProgressPercent}%` }} />
                 {userContext && !userContext.isPhiOkay && 
                 <div className={`${c}-deidentonly`}>

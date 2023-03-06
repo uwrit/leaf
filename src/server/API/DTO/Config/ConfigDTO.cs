@@ -52,8 +52,18 @@ namespace API.DTO.Config
     public class AttestationConfigDTO
     {
         public bool Enabled { get; set; }
+        public bool SkipModeSelection { get; set; }
         public string[] Text { get; set; }
         public CustomAttestationType Type { get; set; }
+
+        public AttestationCreditsDTO Credits { get; set; }
+
+        public class AttestationCreditsDTO
+        {
+            public bool Enabled { get; set; }
+            public string[] Logos { get; set; }
+            public string Text { get; set; }
+        }
     }
 
     public class ClientOptionsDTO

@@ -15,6 +15,14 @@ namespace API.Options
             public const string Enabled = @"Attestation:Enabled";
             public const string Type = @"Attestation:Type";
             public const string Text = @"Attestation:Text";
+            public const string SkipModeSelection = "Attestation:SkipModeSelection";
+
+            public static class Credits
+            {
+                public const string Enabled = @"Attestation:Credits:Enabled";
+                public const string Text = @"Attestation:Credits:Text";
+                public const string Logos = @"Attestation:Credits:Logos";
+            }
         }
     }
 }
