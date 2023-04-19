@@ -12,11 +12,16 @@ IF COLUMNPROPERTY(OBJECT_ID('app.DemographicQuery'), 'ColumnNamesJson', 'ColumnI
 BEGIN
     ALTER TABLE app.DemographicQuery 
     ADD [ColumnNamesJson] NVARCHAR(MAX) NULL
-
-    UPDATE app.DemographicQuery
-    SET [ColumnNamesJson] = '{}'
 END  
 GO
+
+IF (SELECT ColumnNamesJson FROM app.DemographicQuery) IS NULL
+BEGIN
+    UPDATE app.DemographicQuery
+	SET [ColumnNamesJson] = '{}'
+END  
+GO
+
 
 /**
  * Add [IsDefault] to app.DatasetQuery
@@ -25,7 +30,11 @@ IF COLUMNPROPERTY(OBJECT_ID('app.DatasetQuery'), 'IsDefault', 'ColumnId') IS NUL
 BEGIN
     ALTER TABLE app.DatasetQuery 
     ADD [IsDefault] BIT NULL
+END  
+GO
 
+IF (SELECT COUNT(*) FROM app.DatasetQuery WHERE IsDefault IS NULL) > 0
+BEGIN
     UPDATE app.DatasetQuery
     SET [IsDefault] = 0
 END  

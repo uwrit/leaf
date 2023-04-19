@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <!-- <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> -->
     <TieredCompilation>true</TieredCompilation>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
-    <ReleaseVersion>3.1</ReleaseVersion>
+    <ReleaseVersion>6.0</ReleaseVersion>
   </PropertyGroup>
 
   <ItemGroup>

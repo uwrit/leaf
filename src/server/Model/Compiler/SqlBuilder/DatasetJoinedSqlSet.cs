@@ -35,8 +35,8 @@ namespace Model.Compiler.SqlBuilder
 
             Select = new ISelectable[] 
             { 
-                new ExpressedColumn(last.PersonId, DatasetColumns.PersonId),
-                new ExpressedColumn(last.EncounterId, EncounterColumns.EncounterId), 
+                new ExpressedColumn(new Expression(last.PersonId), DatasetColumns.PersonId),
+                new ExpressedColumn(new Expression(last.EncounterId), EncounterColumns.EncounterId), 
                 join.Salt 
             };
             From    = From.Prepend(join);

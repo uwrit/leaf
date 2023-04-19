@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <!-- <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch> -->
     <TieredCompilation>true</TieredCompilation>
-    <ReleaseVersion>3.1</ReleaseVersion>
+    <ReleaseVersion>6.0</ReleaseVersion>
   </PropertyGroup>
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
@@ -20,9 +20,9 @@
     <Folder Include="Admin\Notification\" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Composure" Version="1.1.0" />
+    <PackageReference Include="Composure" Version="1.3.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Compiler\appsettings.json" />

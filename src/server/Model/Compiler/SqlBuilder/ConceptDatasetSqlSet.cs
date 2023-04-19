@@ -41,7 +41,7 @@ namespace Model.Compiler.SqlBuilder
             var encounterId = new ExpressedColumn(
                 new Expression(dialect.Convert(ColumnType.String, EncounterId)),
                 EncounterColumns.EncounterId);
-            var dateField = new ExpressedColumn(Date, ConceptColumns.DateField);
+            var dateField = new ExpressedColumn(new Expression(Date), ConceptColumns.DateField);
 
             cols.Add(personId);
             cols.Add(encounterId);
@@ -49,7 +49,7 @@ namespace Model.Compiler.SqlBuilder
 
             if (PanelItem != null && PanelItem.UseNumericFilter)
             {
-                var numericField = new ExpressedColumn(Number, ConceptColumns.NumberField);
+                var numericField = new ExpressedColumn(new Expression(Number), ConceptColumns.NumberField);
                 cols.Add(numericField);
             }
 
@@ -73,7 +73,7 @@ namespace Model.Compiler.SqlBuilder
         {
             Select = new ISelectable[]
             {
-                new ExpressedColumn(PersonId, DatasetColumns.PersonId),
+                new ExpressedColumn(new Expression(PersonId), DatasetColumns.PersonId),
                 Salt
             };
             From = $"{compilerOptions.AppDb}.app.Cohort";

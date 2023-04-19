@@ -40,7 +40,7 @@ namespace Model.Compiler.SqlBuilder
                 new ExpressedColumn(
                     new Expression(dialect.Convert(ColumnType.String, last.EncounterId)),
                     EncounterColumns.EncounterId),
-                new ExpressedColumn(last.Date, ConceptColumns.DateField),
+                new ExpressedColumn(new Expression(last.Date), ConceptColumns.DateField),
                 join.Salt
             };
             From = From.Prepend(join);
