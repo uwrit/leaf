@@ -51,12 +51,14 @@ export default class CustomAttestationConfirmation extends React.PureComponent<P
                                 className="leaf-button leaf-button-primary">
                                 I Agree
                             </Button>
+                            {config && !config.attestation.skipModeSelection &&
                             <Button 
                                 onClick={handleGoBackClick} 
                                 tabIndex={-1}
                                 className="leaf-button">
                                 Go Back
                             </Button>
+                            }
                         </Col>
                         }
                         {(isSubmittingAttestation || hasAttested) &&

@@ -41,8 +41,8 @@ namespace Model.Compiler.SqlBuilder
 
         public static class Alias
         {
-            public const string Person = "_S";
-            public const string Sequence = "_T";
+            public const string Person = "S";
+            public const string Sequence = "T";
         }
 
         public static class Syntax

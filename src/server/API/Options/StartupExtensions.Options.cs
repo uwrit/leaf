@@ -162,17 +162,29 @@ namespace API.Options
 
             if (attest.Enabled)
             {
+                attest.SkipModeSelection = config.GetValue<bool>(Config.Attestation.SkipModeSelection);
                 attest.WithAttestationType(config.GetValue<string>(Config.Attestation.Type));
                 if (attest.Type != CustomAttestationType.None)
                 {
                     attest.Text = config.GetSection(Config.Attestation.Text).Get<string[]>();
                 }
             }
+
+            var hasCredits = config.TryGetValue<bool>(Config.Attestation.Credits.Enabled, out bool creditsEnabled);
+            if (hasCredits && creditsEnabled)
+            {
+                attest.Credits.Enabled = true;
+                attest.Credits.Text = config.GetValue<string>(Config.Attestation.Credits.Text);
+                attest.Credits.Logos = config.GetSection(Config.Attestation.Credits.Logos).Get<string[]>();
+            }
+
             services.Configure<AttestationOptions>(opts =>
             {
                 opts.Enabled = attest.Enabled;
+                opts.SkipModeSelection = attest.SkipModeSelection;
                 opts.Text = attest.Text;
                 opts.Type = attest.Type;
+                opts.Credits = attest.Credits;
             });
 
             return services;

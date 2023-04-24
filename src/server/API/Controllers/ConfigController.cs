@@ -63,8 +63,15 @@ namespace API.Controllers
                 Attestation = new AttestationConfigDTO
                 {
                     Enabled = attestationOptions.Enabled,
+                    SkipModeSelection = attestationOptions.SkipModeSelection,
                     Text = attestationOptions.Text,
-                    Type = attestationOptions.Type
+                    Type = attestationOptions.Type,
+                    Credits = new AttestationConfigDTO.AttestationCreditsDTO
+                    {
+                        Enabled = attestationOptions.Credits.Enabled,
+                        Logos = attestationOptions.Credits.Logos,
+                        Text = attestationOptions.Credits.Text
+                    }
                 },
                 Cohort = new CohortConfigDTO
                 {

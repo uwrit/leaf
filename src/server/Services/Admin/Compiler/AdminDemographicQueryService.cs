@@ -45,7 +45,12 @@ namespace Services.Admin.Compiler
                     commandType: CommandType.StoredProcedure,
                     commandTimeout: opts.DefaultTimeout);
 
-                return demo.ToAdminDemographicQuery();
+                if (demo != null) return demo.ToAdminDemographicQuery();
+                return new AdminDemographicQuery
+                {
+                    SqlStatement = "",
+                    ColumnNames = new Dictionary<string, string>()
+                };
             }
         }
 
