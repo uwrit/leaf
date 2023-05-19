@@ -6,10 +6,10 @@
  */ 
 
 import React from 'react';
-import './MaintainenceModal.css';
+import './MaintenanceModal.css';
 
 export default class MaintainenceModal extends React.PureComponent {
-    private className = 'maintainence-modal';
+    private className = 'maintenance-modal';
     public render() {
         const c = this.className;
         const classes = [ c ];
@@ -17,7 +17,7 @@ export default class MaintainenceModal extends React.PureComponent {
         return (
             <div className={classes.join(' ')}> 
                 <div className={`${c}-inner`}>
-                    <div>Maintainence Mode</div>
+                    <div>Maintenance Mode</div>
                 </div>
             </div>
         );

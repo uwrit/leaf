@@ -6,7 +6,7 @@
     "@types/d3-format": "^1.3.1",
     "@types/jwt-decode": "^2.2.1",
     "@types/leaflet": "^1.2.14",
-    "@types/react": "^17.0.2",
+    "@types/react": "^18.0.21",
     "@types/react-copy-to-clipboard": "^4.2.6",
     "@types/react-leaflet": "^1.1.5",
     "@types/react-paginate": "^6.2.1",
@@ -14,6 +14,7 @@
     "@types/reactstrap": "^8.0.4",
     "@types/recharts": "^1.8.5",
     "@types/shortid": "0.0.29",
+    "@types/sql-formatter": "^4.0.1",
     "axios": "^0.21.2",
     "babel-jest": "^24.9.0",
     "bootstrap": "^4.3.1",
@@ -23,14 +24,14 @@
     "leaflet": "^1.3.1",
     "leaflet-ant-path": "^1.1.2",
     "moment": "^2.29.4",
-    "react": "^17.0.2",
+    "react": "^18.2.0",
     "react-ace": "^7.0.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-countup": "^4.2.2",
     "react-day-picker": "^7.3.2",
     "react-dnd-cjs": "^9.5.1",
     "react-dnd-html5-backend-cjs": "^9.5.1",
-    "react-dom": "^17.0.2",
+    "react-dom": "^18.2.0",
     "react-icons": "^3.7.0",
     "react-leaflet": "^1.9.1",
     "react-leaflet-ant-path": "^0.1.3",
@@ -44,7 +45,7 @@
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "shortid": "^2.2.10",
-    "sql-formatter": "^2.3.3"
+    "sql-formatter": "^12.1.2"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -58,7 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^5.5.0",
     "@typescript-eslint/eslint-plugin-tslint": "^4.22.0",
     "@typescript-eslint/parser": "^5.5.0",
-    "eslint": "^8.0.0",
+    "eslint": "^7.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.3",
     "eslint-plugin-jsdoc": "^32.3.1",
@@ -66,12 +67,12 @@
     "eslint-plugin-react": "^7.27.1",
     "react-scripts": "^5.0.1",
     "source-map-loader": "^0.2.4",
-    "typescript": "3.7.2"
+    "typescript": "^4.8.4"
   },
   "resolutions": {
     "react-scripts/**/eslint-config-react-app": "7.0.1"
   },
-  "proxy": "http://localhost:5001",
+  "proxy": "http://127.0.0.1:5001",
   "browserslist": [
     ">0.2%",
     "not dead",

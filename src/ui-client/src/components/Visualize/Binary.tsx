@@ -56,11 +56,11 @@ export class Binary extends React.PureComponent<Props> {
                         <BarChart data={leftBars} barCategoryGap={1} layout={'vertical'} margin={{top: 50, right: 0, left: 50, bottom: 50}}>
                             <XAxis type="number" hide={true} axisLine={false} />
                             <Bar barSize={1} dataKey="dummyValue" isAnimationActive={false}>
-                                <LabelList dataKey="label" position="insideBottomRight" />
+                                <LabelList className="value" dataKey="label" position="insideBottomRight" />
                             </Bar>
                             <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
                                 {leftBars.map((d: BinarySplit) => <Cell key={d.label} className={d.label} fill={d.color} />)}
-                                <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="insideRight"/>
+                                <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="right"/>
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>

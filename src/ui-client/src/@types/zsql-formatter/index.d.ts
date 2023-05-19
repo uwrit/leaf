@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-declare module "sql-formatter" {
+declare module "zsql-formatter" {
 
     interface config {
         indent: string;

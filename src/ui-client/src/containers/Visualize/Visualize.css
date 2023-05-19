@@ -135,6 +135,10 @@
     padding-right: -1px;
 }
 
+.visualization-ataglance-left .recharts-text.value {
+    margin-left: -200px;
+}
+
 .visualization-ataglance-right {
     margin-left: 0px;
 }

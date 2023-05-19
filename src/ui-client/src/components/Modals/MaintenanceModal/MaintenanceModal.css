@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-.maintainence-modal {
+.maintenance-modal {
     background-color: white;
     border: 1px solid rgba(61, 180, 71, 0.5);
     border-radius: 4px;
@@ -21,7 +21,7 @@
     animation: pulse-green 2s linear 1s infinite;
 }
 
-.maintainence-modal-inner {
+.maintenance-modal-inner {
     padding: 10px;
     text-align: center;
 }

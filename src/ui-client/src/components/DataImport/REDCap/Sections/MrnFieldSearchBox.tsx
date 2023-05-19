@@ -102,7 +102,9 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
                         }
 
                         return (
-                            <div className={classes.join(' ')} key={opt.field_name} onClick={this.handleDropdownClick.bind(this, i)}>
+                            <div className={classes.join(' ')} 
+                                key={opt.field_name} 
+                                onMouseDown={this.handleDropdownClick.bind(this, i)}>
                                 {opt.field_label}
                                 <span>{opt.field_name}</span>
                             </div>);

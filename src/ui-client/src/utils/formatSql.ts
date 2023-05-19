@@ -5,16 +5,26 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import sqlFormatter from 'sql-formatter';
-
-const formatSql = (rawSql: string) => {
-    return sqlFormatter.format(rawSql, { indent: '    '});
-}
+import { format } from 'sql-formatter';
 
 const formatMultipleSql = (rawSql: string[]) => {
-    return rawSql
-        .map((s: string, i: number) => `/* Query ${i+1} */\n${formatSql(s)}`)
-        .join('\n\n\n');
+    return rawSql.map((s: string, i: number) => {
+        return format(s, { 
+            commaPosition: 'before',
+            expressionWidth: 10000,
+            indentStyle: 'tabularLeft',
+            language: 'tsql'
+        });
+    }).join('\n\n\n');
+}
+
+const formatSql = (rawSql: string) => {
+    return format(rawSql, { 
+            commaPosition: 'before',
+            expressionWidth: 10000,
+            indentStyle: 'tabularLeft',
+            language: 'tsql'
+    });
 }
 
 export default formatSql;

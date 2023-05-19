@@ -12,7 +12,7 @@ export const HttpFactory = {
         return Axios.create({
             headers: {
                 'authorization': `Bearer ${token}`
-            }
+            },
         });
     }
 };
