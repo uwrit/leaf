@@ -7,6 +7,7 @@
 
 import { format } from 'sql-formatter';
 
+
 const formatMultipleSql = (rawSql: string[]) => {
     return rawSql.map((s: string, i: number) => {
         return format(s, { 
