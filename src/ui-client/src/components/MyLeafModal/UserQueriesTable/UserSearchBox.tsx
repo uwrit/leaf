@@ -161,7 +161,7 @@ export default class UserSearchBox extends React.PureComponent<Props, State> {
         const { userQueryState } = this.props;
         const { selectedUserIndex } = this.state;
         const { searchTerm } = userQueryState;
-        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
+        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]) as any;
 
         if (!key || searchTerm.length < this.minSearchCharLength) { return; }
         let newFocus = selectedUserIndex;

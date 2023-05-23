@@ -39,8 +39,9 @@ export const searchNotesByTerms = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const { terms } = state.cohort.noteSearch;
-        const results = await searchNotes(terms);
-        dispatch(setNoteSearchResults(results));
+        await searchNotes(terms);
+        //const results = await searchNotes(terms);
+        //dispatch(setNoteSearchResults(results));
     };
 }
 
@@ -94,7 +95,7 @@ export const getNotes = () => {
                                             }
                                             
                                     },  error => {
-                                        
+                                        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
                                     })
                                     .then(() => resolve(null));
                             });

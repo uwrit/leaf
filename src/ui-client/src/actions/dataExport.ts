@@ -231,7 +231,9 @@ const downloadCsv = (content: string, fileName: string) => {
     const a = document.createElement('a');
 
      // IE10
+     // @ts-ignore
     if (navigator.msSaveBlob) {
+        // @ts-ignore
         navigator.msSaveBlob(packageCsv(content), fileName);
     } else if (URL && 'download' in a) { 
         a.href = URL.createObjectURL(packageCsv(content));

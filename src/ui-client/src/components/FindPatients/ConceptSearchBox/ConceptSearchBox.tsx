@@ -285,7 +285,7 @@ export default class ConceptSearchBox extends React.PureComponent<Props, State> 
         const { conceptsSearchState } = this.props;
         const { selectedHintIndex } = this.state;
         const { term, currentHints } = conceptsSearchState;
-        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
+        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]) as any;
 
         if (!key || term.length < this.minSearchCharLength) { return; }
         let newFocus = selectedHintIndex;

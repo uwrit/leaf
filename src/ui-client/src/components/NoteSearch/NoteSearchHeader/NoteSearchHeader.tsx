@@ -7,8 +7,8 @@ import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
 import { setNoteDatasetChecked, getNotes } from '../../../actions/cohort/noteSearch';
 import CustomDateRangePicker from '../../FindPatients/Panels/CustomDateRangePicker';
 import { pastDates, none } from '../../FindPatients/Panels/DateDropdownOptions';
-import './NoteSearchHeader.css';
 import { SearchTermEditor } from '../SearchTermEditor/SearchTermEditor';
+import './NoteSearchHeader.css';
 
 interface Props {
     dispatch: any;

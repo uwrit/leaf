@@ -287,6 +287,7 @@ export const logout = () => {
          * which should get caught by the IdP to force a re-login.
          */
         else {
+            // @ts-ignore
             window.location.reload(true);
         }
     };

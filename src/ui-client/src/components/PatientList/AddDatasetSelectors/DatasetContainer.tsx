@@ -133,7 +133,7 @@ export default class DatasetContainer extends React.PureComponent<Props> {
 
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
         const { datasets, handleDatasetRequest } = this.props;
-        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
+        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]) as any;
         if (!key || !datasets.displayOrder.size) { return; }
 
         switch (key) {

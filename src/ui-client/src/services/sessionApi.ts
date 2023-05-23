@@ -130,6 +130,7 @@ export const saveSessionAndForceReLogin = (state: AppState) => {
     if (hasData) {
         sessionStorage.setItem(key, JSON.stringify(currState));
     }
+    // @ts-ignore
     window.location.reload(true);
 };
 
@@ -163,6 +164,7 @@ export const attemptLoginRetryIfPossible = (): boolean => {
     const retry = sessionStorage.getItem(key);
     if (!retry) {
         sessionStorage.setItem(key, 'X');
+        // @ts-ignore
         window.location.reload(true);
         return true;
     } else {

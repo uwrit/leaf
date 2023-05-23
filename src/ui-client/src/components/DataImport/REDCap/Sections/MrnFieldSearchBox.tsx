@@ -144,7 +144,7 @@ export default class MrnFieldSearchBox extends React.PureComponent<Props, State>
      * Handle keydowns if up/down/enter.
      */
     private handleSearchKeydown = (k: React.KeyboardEvent<HTMLInputElement>) => {
-        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]);
+        const key = (k.key === ' ' ? keys.Space : keys[k.key as any]) as any;
 
         switch (key) {
             case keys.ArrowUp: 
