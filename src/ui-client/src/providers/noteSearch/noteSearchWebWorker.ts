@@ -163,8 +163,6 @@ export default class NoteSearchWebWorker {
         let unigramIndex: Map<string, TokenPointer> = new Map();
         let docIndex: Map<string, IndexedDocument> = new Map();
 
-        console.log('webworker')
-
         // eslint-disable-next-line
         const handleWorkMessage = (payload: InboundMessagePayload): any => {
             switch (payload.message) {
@@ -196,22 +194,25 @@ export default class NoteSearchWebWorker {
 
                     if (STOP_WORDS.has(lexeme)) continue;
 
-                    if (unigramIndex.has(lexeme)) {
-                        unigramIndex.get(lexeme)!.instances.push(token);
+                    let indexed = unigramIndex.get(lexeme);
+
+                    if (indexed) {
+                        indexed.instances.push(token);
                     } else {
-                        unigramIndex.set(lexeme, { lexeme, instances: [token], next: new Map() });
+                        indexed = { lexeme, instances: [token], next: new Map() };
+                        unigramIndex.set(lexeme, indexed);
                     }
 
                     if (prev) {
-                        if (!prev.next.has(lexeme)) {
-                            prev.next.set(lexeme, unigramIndex.get(lexeme));
+                        let prevIndexed = prev.next.get(lexeme);
+                        if (!prevIndexed) {
+                            prev.next.set(lexeme, indexed);
                         }
                     }
-                    prev = unigramIndex.get(lexeme);
+                    prev = indexed;
                 }
                 docIndex.set(doc.id, doc);
             }
-            console.log(unigramIndex);
             return { requestId };
         }
 
@@ -255,13 +256,6 @@ export default class NoteSearchWebWorker {
                 const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
                 const context = getSearchResultDocumentContext(doc, hits);
                 result.documents.push(context)
-                
-                console.log(doc.id);
-                for (let i = 0; i < v.length; i++) {
-                    const match = v[i];
-                    console.log(doc.text.substring(match.charIndex.start, match.charIndex.end));
-                }
-                
             });
 
             return { requestId, result };

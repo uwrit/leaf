@@ -1,8 +1,7 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
-import TextareaAutosize from 'react-textarea-autosize';
-import './NoteSearchResults.css';
 import { Col, Container, Row } from 'reactstrap';
+import './NoteSearchResults.css';
 
 interface Props {
     dispatch: any;
@@ -24,9 +23,9 @@ export class NoteSearchResults extends React.PureComponent<Props> {
                             <div className={`${c}-document-header`}>
                                 <span></span>
                             </div>
-                                {d.lines.map(l => {
+                                {d.lines.map((l,i) => {
                                     return (
-                                        <Row key={l.index} className={`${c}-line`}>
+                                        <Row key={i} className={`${c}-line`}>
                                             <Col md={1} className={`${c}-line-number`}>{l.index+1}</Col>
                                             <Col md={11} className={`${c}-line-context`}>
                                                 {l.content.map((s,si) => {

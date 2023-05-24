@@ -28,7 +28,6 @@ export const flushNotes = () => {
 export const searchNotes = (terms: NoteSearchTerm[]): Promise<SearchResult> => {
     return new Promise( async (resolve, reject) => {
         const results = await engine.search(terms) as SearchResult;
-        console.log(results);
         resolve(results);
     });
 };

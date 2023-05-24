@@ -1,5 +1,5 @@
 .note-search-results-container {
-    height: calc(100vh - 55px - 84px);
+    height: calc(100vh - 55px - 150px);
     overflow-x: hidden;
     padding: 30px 10% !important;
 }
@@ -27,16 +27,9 @@
     margin: 4px 0;
 }
 
-.note-search-results-line-number.col-md-1 {
-    zpadding-right: 0 !important;
-    zwidth: 20px !important;
-}
-
 .note-search-results-line-number {
     background-color: rgb(245,245,245);
     border-right: 1px solid rgb(225,225,225);
-    zmargin: 0 4px 0 0;
-    zwidth: 20px;
 }
 
 .note-search-results-context {

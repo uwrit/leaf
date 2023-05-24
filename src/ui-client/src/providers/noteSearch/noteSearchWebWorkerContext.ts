@@ -29,7 +29,6 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 var STOP_WORDS = new Set(['\\n', '\\t', '(', ')', '"', ";"]);
 var unigramIndex = new Map();
 var docIndex = new Map();
-console.log('webworker');
 // eslint-disable-next-line
 var handleWorkMessage = function (payload) {
     switch (payload.message) {
@@ -51,11 +50,13 @@ var indexDocuments = function (payload) {
         var tokens = tokenizeDocument(note);
         var doc = { id: note.id, text: note.text };
         var prev = void 0;
+        console.log('processing note ' + i.toString());
         for (var j = 0; j < tokens.length; j++) {
             var token = tokens[j];
             var lexeme = token.lexeme;
             if (STOP_WORDS.has(lexeme))
                 continue;
+            
             if (unigramIndex.has(lexeme)) {
                 unigramIndex.get(lexeme).instances.push(token);
             }
@@ -71,7 +72,6 @@ var indexDocuments = function (payload) {
         }
         docIndex.set(doc.id, doc);
     }
-    console.log(unigramIndex);
     return { requestId: requestId };
 };
 var flushNotes = function (payload) {
@@ -115,11 +115,6 @@ var searchNotes = function (payload) {
         var hits = v.sort(function (a, b) { return a.charIndex.start - b.charIndex.start; });
         var context = getSearchResultDocumentContext(doc, hits);
         result.documents.push(context);
-        console.log(doc.id);
-        for (var i = 0; i < v.length; i++) {
-            var match = v[i];
-            console.log(doc.text.substring(match.charIndex.start, match.charIndex.end));
-        }
     });
     return { requestId: requestId, result: result };
 };

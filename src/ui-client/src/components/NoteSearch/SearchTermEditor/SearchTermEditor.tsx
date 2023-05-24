@@ -80,7 +80,7 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                 if (trimmed.length) {
                     k.preventDefault();
                     const newTerm: NoteSearchTerm = { 
-                        color: this.termColors[terms.length % this.termColors.length],
+                        color: this.termColors[this.termCreateCount++ % this.termColors.length],
                         text: trimmed
                     };
                     dispatch(setNoteSearchTerms(terms.concat([newTerm])));

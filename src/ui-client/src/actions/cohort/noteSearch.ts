@@ -104,6 +104,8 @@ export const getNotes = () => {
                 });
             })
         ).then( async() => {
+            dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));
+            console.log(`${notes.length} total notes`)
             await indexNotes(notes);
             dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
         });
