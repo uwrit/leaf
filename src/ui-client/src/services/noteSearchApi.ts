@@ -7,6 +7,7 @@
 
 import NoteSearchWebWorker, { SearchResult } from '../providers/noteSearch/noteSearchWebWorker';
 import { Note } from '../models/cohort/NoteSearch';
+import { NoteSearchTerm } from '../models/state/CohortState';
 
 const engine = new NoteSearchWebWorker();
 
@@ -24,7 +25,7 @@ export const flushNotes = () => {
     });
 };
 
-export const searchNotes = (terms: string[]): Promise<SearchResult> => {
+export const searchNotes = (terms: NoteSearchTerm[]): Promise<SearchResult> => {
     return new Promise( async (resolve, reject) => {
         const results = await engine.search(terms) as SearchResult;
         console.log(results);

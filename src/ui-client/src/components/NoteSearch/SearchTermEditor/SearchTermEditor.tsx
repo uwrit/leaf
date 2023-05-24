@@ -8,19 +8,25 @@
 import React from 'react';
 import { FormGroup, Label, FormText, Input } from 'reactstrap';
 import { setNoteSearchTerms, searchNotesByTerms } from '../../../actions/cohort/noteSearch';
+import { NoteSearchTerm } from '../../../models/state/CohortState';
+import { AiOutlineClose } from 'react-icons/ai';
 import './SearchTermEditor.css';
 
 interface Props {
     dispatch: any;
-    terms: string[];
+    terms: NoteSearchTerm[];
 }
 
 interface State {
     text: string;
 }
 
+
 export class SearchTermEditor extends React.PureComponent<Props,State> {
     private className = 'note-search-term-editor';
+    private termColors = ['rgb(168,130,229)', 'rgb(245,175,46)', 'rgb(62,203,215)', 'rgb(231,81,164)', 'rgb(84,209,68)', 'rgb(85,129,209)'];
+    private termCreateCount = 0;
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -42,9 +48,13 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                 <div className={`${c}-term-container`}>
                 {terms.map((t,i) => {
                     return (
-                        <div className={`${c}-term`} key={i} onClick={this.handleRemoveTermClick.bind(null,i)}>
-                            {t}
-                            <span>x</span>
+                        <div 
+                            className={`${c}-term`} 
+                            key={i} 
+                            onClick={this.handleRemoveTermClick.bind(null,i)}
+                            style={{ backgroundColor: t.color.replace(')',',0.1)'), borderColor: t.color }}>
+                            {t.text}
+                            <span><AiOutlineClose/></span>
                         </div>
                     )
                 })}
@@ -69,7 +79,11 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
             case 'Enter': {
                 if (trimmed.length) {
                     k.preventDefault();
-                    dispatch(setNoteSearchTerms(terms.concat([trimmed])));
+                    const newTerm: NoteSearchTerm = { 
+                        color: this.termColors[terms.length % this.termColors.length],
+                        text: trimmed
+                    };
+                    dispatch(setNoteSearchTerms(terms.concat([newTerm])));
                     dispatch(searchNotesByTerms());
                     this.setState({ text: '' });
                 }

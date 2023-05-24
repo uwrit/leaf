@@ -8,6 +8,7 @@
 import { generate as generateId } from 'shortid';
 import { Note } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
+import { NoteSearchTerm } from '../../models/state/CohortState';
 
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
@@ -16,7 +17,7 @@ const FLUSH = 'FLUSH';
 interface InboundMessagePartialPayload {
     message: string;
     notes?: Note[];
-    terms?: string[];
+    terms?: NoteSearchTerm[];
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -62,7 +63,7 @@ interface SearchHit {
     charIndex: Indices;
     docId: string;
     lineIndex: number;
-    searchTerm: string;
+    searchTerm: NoteSearchTerm;
 }
 
 interface IndexedDocument {
@@ -71,11 +72,16 @@ interface IndexedDocument {
 }
 
 interface DocumentSearchResult extends IndexedDocument {
-    lines: (TextContext | TextSearchResult)[][]
+    lines: DocumentSearchResultLine[]
+}
+
+interface DocumentSearchResultLine {
+    content: (TextContext | TextSearchResult)[];
+    index: number;
 }
 
 interface TextSearchResult {
-    matchedTerm: string;
+    matchedTerm: NoteSearchTerm;
     text: string;
     type: 'MATCH';
 }
@@ -111,7 +117,7 @@ export default class NoteSearchWebWorker {
 
     //${this.stripFunctionToContext(this.workerContext)}
 
-    public search = (terms: string[]) => {
+    public search = (terms: NoteSearchTerm[]) => {
         return this.postMessage({ message: SEARCH, terms });
     }
 
@@ -223,10 +229,10 @@ export default class NoteSearchWebWorker {
             let precedingHits: Map<string, SearchHit[]> = new Map();
 
             for (let i = 0; i < terms.length; i++) {
-                const termSplit = terms[i].toLocaleLowerCase().split(' ');
-                const hits = termSplit.length > 1
-                    ? searchMultiterm(termSplit)
-                    : searchSingleTerm(termSplit[0]);
+                const term = terms[i];
+                const hits = term.text.split(' ').length > 1
+                    ? searchMultiterm(term)
+                    : searchSingleTerm(term);
 
                 if (!hits.size) return { requestId, result };
 
@@ -262,7 +268,7 @@ export default class NoteSearchWebWorker {
         }
 
         const getSearchResultDocumentContext = (doc: DocumentSearchResult, hits: SearchHit[]): DocumentSearchResult => {
-            const contextCharDistance = 30;
+            const contextCharDistance = 50;
             const groups: SearchHit[][] = [];
 
             // Group by character distance
@@ -293,12 +299,12 @@ export default class NoteSearchWebWorker {
 
             for (let i = 0; i < groups.length; i++) {
                 const group = groups[i];
-                let line: (TextContext | TextSearchResult)[] = [];
+                let line: DocumentSearchResultLine = { index: group[0].lineIndex, content: [] };
                 for (let j = 0; j < group.length; j++) {
                     const backLimit = j > 0 ? group[j].charIndex.start : undefined;
                     const forwLimit = j < group.length-1 ? group[j+1].charIndex.start : undefined;
                     const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
-                    line = line.concat(context);
+                    line.content = line.content.concat(context);
                 }
                 result.lines.push(line);
             }
@@ -343,9 +349,9 @@ export default class NoteSearchWebWorker {
             return output;
         };
 
-        const searchSingleTerm = (term: string): Map<string, SearchHit[]> => {
+        const searchSingleTerm = (term: NoteSearchTerm): Map<string, SearchHit[]> => {
             const result: Map<string, SearchHit[]> = new Map();
-            const hit = unigramIndex.get(term);
+            const hit = unigramIndex.get(term.text.toLocaleLowerCase());
 
             if (hit) {
                 for (let i = 0; i < hit.instances.length; i++) {
@@ -360,8 +366,9 @@ export default class NoteSearchWebWorker {
             return result;
         };
 
-        const searchMultiterm = (terms: string[]): Map<string, SearchHit[]> => {
+        const searchMultiterm = (searchTerm: NoteSearchTerm): Map<string, SearchHit[]> => {
             const result: Map<string, SearchHit[]> = new Map();
+            const terms = searchTerm.text.toLocaleLowerCase().split(' ');
 
             // First term
             const term = terms[0];
@@ -391,7 +398,6 @@ export default class NoteSearchWebWorker {
             expected.forEach((v,k) => {
                 const docId = v[0].docId;
                 const charIndex = { start: v[0].charIndex.start, end: v[v.length-1].charIndex.end };
-                const searchTerm = terms.join(' ');
                 const lineIndex = v[0].lineIndex;
 
                 if (result.has(docId)) {

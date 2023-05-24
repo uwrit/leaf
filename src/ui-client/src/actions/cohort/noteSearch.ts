@@ -13,7 +13,7 @@ import { NetworkIdentity } from "../../models/NetworkResponder";
 import { flushNotes, indexNotes, searchNotes } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { Note } from "../../models/cohort/NoteSearch";
-import { NoteSearchResult } from "../../models/state/CohortState";
+import { NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState } from "../generalUi";
 import { NotificationStates } from "../../models/state/GeneralUiState";
 import { SearchResult } from "../../providers/noteSearch/noteSearchWebWorker";
@@ -30,7 +30,7 @@ export interface NoteSearchAction {
     dateFilter?: DateBoundary;
     id: number;
     searchResults?: SearchResult;
-    searchTerms?: string[];
+    searchTerms?: NoteSearchTerm[];
     type: string;
 }
 
@@ -137,7 +137,7 @@ export const setNoteSearchDateRange = (dateFilter: DateBoundary): NoteSearchActi
     };
 };
 
-export const setNoteSearchTerms = (searchTerms: string[]): NoteSearchAction => {
+export const setNoteSearchTerms = (searchTerms: NoteSearchTerm[]): NoteSearchAction => {
     return {
         searchTerms,
         id: -1,

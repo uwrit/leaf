@@ -108,10 +108,14 @@ export interface NoteSearchState {
     datasets: Map<string, NoteSearchDatasetQuery>;
     dateFilter: DateBoundary;
     results: SearchResult;
-    terms: string[];
+    terms: NoteSearchTerm[];
 }
 
 export interface NoteSearchResult {
     note: Note;
 }
 
+export interface NoteSearchTerm {
+    color: string;
+    text: string;
+}

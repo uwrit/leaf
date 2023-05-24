@@ -10,10 +10,8 @@
  }
 
  .note-search-term-editor-term {
-    background-color: rgba(28, 168, 221, 0.05);
-    border: 1px solid rgba(28, 168, 221, 0.1);
-    border-radius: 4px;
-    color: rgb(28, 168, 221);
+    border: 2px solid rgba(28, 168, 221, 0.1);
+    border-radius: 6px;
     cursor: pointer;
     display: inline-block;
     font-family: Roboto;
@@ -35,5 +33,9 @@
 
 .note-search-term-editor-term > span {
     color: rgb(200,200,200);
-    margin-left: 6px;
+    margin: 0 0 0 6px;
+}
+
+.note-search-term-editor-term > span svg {
+    margin-bottom: -3px;
 }

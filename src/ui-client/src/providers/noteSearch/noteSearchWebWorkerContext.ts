@@ -85,10 +85,10 @@ var searchNotes = function (payload) {
     var result = { documents: [] };
     var precedingHits = new Map();
     var _loop_1 = function (i) {
-        var termSplit = terms[i].toLocaleLowerCase().split(' ');
-        var hits = termSplit.length > 1
-            ? searchMultiterm(termSplit)
-            : searchSingleTerm(termSplit[0]);
+        var term = terms[i];
+        var hits = term.text.split(' ').length > 1
+            ? searchMultiterm(term)
+            : searchSingleTerm(term);
         if (!hits.size)
             return { value: { requestId: requestId, result: result } };
         if (precedingHits.size) {
@@ -110,30 +110,26 @@ var searchNotes = function (payload) {
         if (typeof state_1 === "object")
             return state_1.value;
     }
-    
     precedingHits.forEach(function (v, k) {
         var doc = __assign(__assign({}, docIndex.get(k)), { lines: [] });
         var hits = v.sort(function (a, b) { return a.charIndex.start - b.charIndex.start; });
         var context = getSearchResultDocumentContext(doc, hits);
         result.documents.push(context);
-        
         console.log(doc.id);
-        for (let i = 0; i < v.length; i++) {
-            const match = v[i];
-            //console.log('   ' + doc.text.substring(match.charIndex.start, match.charIndex.end));
+        for (var i = 0; i < v.length; i++) {
+            var match = v[i];
+            console.log(doc.text.substring(match.charIndex.start, match.charIndex.end));
         }
-        
     });
     return { requestId: requestId, result: result };
 };
 var getSearchResultDocumentContext = function (doc, hits) {
-    var contextCharDistance = 30;
+    var contextCharDistance = 50;
     var groups = [];
     // Group by character distance
     for (var i = 0; i < hits.length; i++) {
         var hit = hits[i];
         var group = [hit];
-        
         var nextIndex = 1;
         while (true) {
             var nextHit = i < hits.length - 1 ? hits[i + nextIndex] : undefined;
@@ -152,57 +148,56 @@ var getSearchResultDocumentContext = function (doc, hits) {
         }
     }
     var result = __assign(__assign({}, doc), { lines: [] });
-    for (var i = 0; i < groups.length; i++) {
-        var group = groups[i];
-        var line = [];
-        for (var j = 0; j < group.length; j++) {
-            var backLimit = j > 0 ? group[j].charIndex.end : undefined;
-            var forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
-            var context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
-            line = line.concat(context);
+    for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        let line = { index: group[0].lineIndex, content: [] };
+        for (let j = 0; j < group.length; j++) {
+            const backLimit = j > 0 ? group[j].charIndex.start : undefined;
+            const forwLimit = j < group.length-1 ? group[j+1].charIndex.start : undefined;
+            const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
+            line.content = line.content.concat(context);
         }
         result.lines.push(line);
-        console.log(line)
     }
     return result;
 };
 var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) {
-    const _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
-            const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;                                
-            let backContext = doc.text.substring(_backLimit, hit.charIndex.start);
-            let forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
-
-            if (!backLimit && backContext) backContext = '...' + backContext;
-            if (!forwLimit && forwContext) forwContext += '...';
-
-            let back_i = backContext.length-1;
-            while (back_i > -1) {
-                if (backContext[back_i] === '\\n') {
-                    backContext = backContext.substring(back_i, backContext.length-1);
-                    break;
-                }
-                back_i--;
-            }
-            let forw_i = 1;
-            while (forw_i < forwContext.length-1) {
-                if (forwContext[forw_i] === '\\n') {
-                    forwContext = forwContext.substring(0, forw_i);
-                    break;
-                }
-                forw_i++;
-            }
-
-            const output = [
-                { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
-            ];
-            if (backContext.trim()) output.unshift({ type: "CONTEXT", text: backContext });
-            if (forwContext.trim()) output.push({ type: "CONTEXT", text: forwContext });
-
-            return output;
+    var _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
+    var _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
+    var backContext = doc.text.substring(_backLimit, hit.charIndex.start);
+    var forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
+    if (!backLimit && backContext)
+        backContext = '...' + backContext;
+    if (!forwLimit && forwContext)
+        forwContext += '...';
+    var back_i = backContext.length - 1;
+    while (back_i > -1) {
+        if (backContext[back_i] === '\\n') {
+            backContext = backContext.substring(back_i, backContext.length - 1);
+            break;
+        }
+        back_i--;
+    }
+    var forw_i = 1;
+    while (forw_i < forwContext.length - 1) {
+        if (forwContext[forw_i] === '\\n') {
+            forwContext = forwContext.substring(0, forw_i);
+            break;
+        }
+        forw_i++;
+    }
+    var output = [
+        { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
+    ];
+    if (backContext.trim())
+        output.unshift({ type: "CONTEXT", text: backContext });
+    if (forwContext.trim())
+        output.push({ type: "CONTEXT", text: forwContext });
+    return output;
 };
 var searchSingleTerm = function (term) {
     var result = new Map();
-    var hit = unigramIndex.get(term);
+    var hit = unigramIndex.get(term.text.toLocaleLowerCase());
     if (hit) {
         for (var i = 0; i < hit.instances.length; i++) {
             var instance = hit.instances[i];
@@ -216,8 +211,9 @@ var searchSingleTerm = function (term) {
     }
     return result;
 };
-var searchMultiterm = function (terms) {
+var searchMultiterm = function (searchTerm) {
     var result = new Map();
+    var terms = searchTerm.text.toLocaleLowerCase().split(' ');
     // First term
     var term = terms[0];
     var hit = unigramIndex.get(term);
@@ -245,7 +241,6 @@ var searchMultiterm = function (terms) {
     expected.forEach(function (v, k) {
         var docId = v[0].docId;
         var charIndex = { start: v[0].charIndex.start, end: v[v.length - 1].charIndex.end };
-        var searchTerm = terms.join(' ');
         var lineIndex = v[0].lineIndex;
         if (result.has(docId)) {
             result.get(docId).push({ docId: docId, charIndex: charIndex, lineIndex: lineIndex, searchTerm: searchTerm });
