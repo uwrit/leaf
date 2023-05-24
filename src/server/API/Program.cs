@@ -18,6 +18,7 @@ namespace API
     {
         public static int Main(string[] args)
         {
+
             Log.Logger = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .MinimumLevel.Debug()

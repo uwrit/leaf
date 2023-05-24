@@ -14,23 +14,25 @@ export class NoteSearchResults extends React.PureComponent<Props> {
     public render() {
         const { results } = this.props.noteSearch;
         const c = this.className;
+
         return (
-                Object.entries(results).map(([result, val], i) => {
-                    console.log("render")
-                    console.log(val[i].documentPositions[i].context)
+            <div>
+                {results.documents.map(d => {
                     return (
-                    <div key={i} className={`${c}-result`}>
-                        <div className={`${c}-result-header`}>
-                        <div key={result}>
-                            {
-                                <p>out: {val[i].documentPositions[i].context}</p>
-                            }
-                            </div>
+                        <div key={d.id} className={`${c}-document-pointer`}>
+                            {d.lines.map((l,i) => {
+                                return (
+                                    <div key={i} className={`${c}-line`}>
+                                        {l.map((s,si) => {
+                                            return <span key={si}>{s.text}</span>
+                                        })}
+                                    </div>
+                                );
+                            })}
                         </div>
-                        </div>
-                    );
-                })
-                           
-        );
+                    )
+                })}
+            </div>
+        )
     }
 }

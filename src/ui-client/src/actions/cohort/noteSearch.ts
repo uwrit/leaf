@@ -39,9 +39,8 @@ export const searchNotesByTerms = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const { terms } = state.cohort.noteSearch;
-        await searchNotes(terms);
-        //const results = await searchNotes(terms);
-        //dispatch(setNoteSearchResults(results));
+        const results = await searchNotes(terms);
+        dispatch(setNoteSearchResults(results));
     };
 }
 

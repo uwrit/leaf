@@ -82,6 +82,7 @@ var flushNotes = function (payload) {
 };
 var searchNotes = function (payload) {
     var requestId = payload.requestId, terms = payload.terms;
+    var result = { documents: [] };
     var precedingHits = new Map();
     var _loop_1 = function (i) {
         var termSplit = terms[i].toLocaleLowerCase().split(' ');
@@ -89,7 +90,7 @@ var searchNotes = function (payload) {
             ? searchMultiterm(termSplit)
             : searchSingleTerm(termSplit[0]);
         if (!hits.size)
-            return { value: { requestId: requestId } };
+            return { value: { requestId: requestId, result: result } };
         if (precedingHits.size) {
             var merged_1 = new Map();
             precedingHits.forEach(function (v, k) {
@@ -109,7 +110,6 @@ var searchNotes = function (payload) {
         if (typeof state_1 === "object")
             return state_1.value;
     }
-    var result = { documents: [] };
     
     precedingHits.forEach(function (v, k) {
         var doc = __assign(__assign({}, docIndex.get(k)), { lines: [] });
@@ -120,7 +120,7 @@ var searchNotes = function (payload) {
         console.log(doc.id);
         for (let i = 0; i < v.length; i++) {
             const match = v[i];
-            console.log('   ' + doc.text.substring(match.charIndex.start, match.charIndex.end));
+            //console.log('   ' + doc.text.substring(match.charIndex.start, match.charIndex.end));
         }
         
     });
@@ -133,15 +133,16 @@ var getSearchResultDocumentContext = function (doc, hits) {
     for (var i = 0; i < hits.length; i++) {
         var hit = hits[i];
         var group = [hit];
+        
+        var nextIndex = 1;
         while (true) {
-            var nextIndex = 1;
             var nextHit = i < hits.length - 1 ? hits[i + nextIndex] : undefined;
             // If overlapping
             if (nextHit && hit.lineIndex === nextHit.lineIndex &&
                 (hit.charIndex.end + contextCharDistance) >= (nextHit.charIndex.start - contextCharDistance)) {
                 // Merge lines
                 group.push(nextHit);
-                hits.slice(i + nextIndex, 1);
+                hits.splice(i + nextIndex, 1);
                 nextIndex++;
             }
             else {
@@ -155,41 +156,49 @@ var getSearchResultDocumentContext = function (doc, hits) {
         var group = groups[i];
         var line = [];
         for (var j = 0; j < group.length; j++) {
-            var backLimit = j > 0 ? group[j - 1].charIndex.end : undefined;
+            var backLimit = j > 0 ? group[j].charIndex.end : undefined;
             var forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
             var context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
             line = line.concat(context);
         }
         result.lines.push(line);
+        console.log(line)
     }
     return result;
 };
 var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) {
-    var _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
-    var _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
-    var backContext = '...' + doc.text.substring(_backLimit, hit.charIndex.start);
-    var forwContext = doc.text.substring(hit.charIndex.end, _forwLimit) + '...';
-    var back_i = backContext.length - 1;
-    while (back_i > -1) {
-        if (backContext[back_i] === '\\n') {
-            backContext = backContext.substring(back_i, backContext.length - 1);
-            break;
-        }
-        back_i--;
-    }
-    var forw_i = 1;
-    while (forw_i < forwContext.length - 1) {
-        if (forwContext[forw_i] === '\\n') {
-            forwContext = forwContext.substring(0, forw_i);
-            break;
-        }
-        forw_i++;
-    }
-    return [
-        { type: "CONTEXT", text: backContext, charIndex: { start: back_i, end: hit.charIndex.start } },
-        { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), charIndex: hit.charIndex, matchedTerm: hit.searchTerm },
-        { type: "CONTEXT", text: forwContext, charIndex: { start: hit.charIndex.end, end: forw_i } },
-    ];
+    const _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
+            const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;                                
+            let backContext = doc.text.substring(_backLimit, hit.charIndex.start);
+            let forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
+
+            if (!backLimit && backContext) backContext = '...' + backContext;
+            if (!forwLimit && forwContext) forwContext += '...';
+
+            let back_i = backContext.length-1;
+            while (back_i > -1) {
+                if (backContext[back_i] === '\\n') {
+                    backContext = backContext.substring(back_i, backContext.length-1);
+                    break;
+                }
+                back_i--;
+            }
+            let forw_i = 1;
+            while (forw_i < forwContext.length-1) {
+                if (forwContext[forw_i] === '\\n') {
+                    forwContext = forwContext.substring(0, forw_i);
+                    break;
+                }
+                forw_i++;
+            }
+
+            const output = [
+                { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
+            ];
+            if (backContext.trim()) output.unshift({ type: "CONTEXT", text: backContext });
+            if (forwContext.trim()) output.push({ type: "CONTEXT", text: forwContext });
+
+            return output;
 };
 var searchSingleTerm = function (term) {
     var result = new Map();
