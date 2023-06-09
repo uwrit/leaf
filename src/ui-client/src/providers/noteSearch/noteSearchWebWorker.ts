@@ -9,6 +9,7 @@ import { generate as generateId } from 'shortid';
 import { Note } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
 import { NoteSearchTerm } from '../../models/state/CohortState';
+import { type } from 'os';
 
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
@@ -68,7 +69,9 @@ interface SearchHit {
 
 interface IndexedDocument {
     id: string;
+    date: string;
     text: string;
+    note_type: string;
 }
 
 interface DocumentSearchResult extends IndexedDocument {
@@ -91,14 +94,22 @@ interface TextContext {
     type: 'CONTEXT';
 }
 
+interface RadixNode {
+    children: { [key: string]: RadixNode };
+    isEndOfWord: boolean;
+  }
+
 export interface SearchResult {
     documents: DocumentSearchResult[];
 }
+
+
 
 export default class NoteSearchWebWorker {
     private worker: Worker;
     private reject: any;
     private promiseMap: Map<string, PromiseResolver> = new Map();
+    
 
     constructor() {
         const workerFile = `  
@@ -129,6 +140,8 @@ export default class NoteSearchWebWorker {
         return this.postMessage({ message: FLUSH });
     }
 
+
+
     private postMessage = (payload: InboundMessagePartialPayload) => {
         return new Promise((resolve, reject) => {
             const requestId = generateId();
@@ -156,6 +169,7 @@ export default class NoteSearchWebWorker {
         return messageTypes.map((v: string) => `var ${v} = '${v}';`).join(' ');
     }
 
+    
     private workerContext = () => {
 
         const STOP_WORDS = new Set(['\n','\t','(',')','"',";"]);
@@ -177,6 +191,50 @@ export default class NoteSearchWebWorker {
             }
         };
 
+        const createRadixNode = (): RadixNode => ({
+            children: {},
+            isEndOfWord: false,
+          });
+          
+          const insertWord = (root: RadixNode, word: string): void => {
+            let currentNode = root;
+            for (const char of word) {
+              if (!currentNode.children[char]) {
+                currentNode.children[char] = createRadixNode();
+              }
+              currentNode = currentNode.children[char];
+            }
+            currentNode.isEndOfWord = true;
+          };
+          
+          const searchWords = (root: RadixNode, prefix: string): string[] => {
+            const matchedWords: string[] = [];
+          
+            const traverse = (node: RadixNode, currentPrefix: string) => {
+              if (node.isEndOfWord) {
+                matchedWords.push(prefix + currentPrefix);
+              }
+          
+              for (const char in node.children) {
+                traverse(node.children[char], currentPrefix + char);
+              }
+            };
+          
+            let currentNode = root;
+            for (const char of prefix) {
+              if (!currentNode.children[char]) {
+                return matchedWords;
+              }
+              currentNode = currentNode.children[char];
+            }
+          
+            traverse(currentNode, '');
+          
+            return matchedWords;
+          };
+
+
+
         const indexDocuments = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
             const { notes } = payload;
@@ -184,13 +242,13 @@ export default class NoteSearchWebWorker {
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];
                 const tokens = tokenizeDocument(note);
-                const doc: IndexedDocument = { id: note.id, text: note.text };
-
+                const doc: IndexedDocument = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text };
                 let prev: TokenPointer;
 
                 for (let j = 0; j < tokens.length; j++) {
                     const token  = tokens[j];
                     const lexeme = token.lexeme;
+
 
                     if (STOP_WORDS.has(lexeme)) continue;
 

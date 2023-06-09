@@ -21,7 +21,10 @@ export class NoteSearchResults extends React.PureComponent<Props> {
                     return (
                         <div key={d.id} className={`${c}-document`}>
                             <div className={`${c}-document-header`}>
-                                <span></span>
+                                <span><p>Note ID: {d.id}</p>
+                                <p> Written Date: {d.date}</p>
+                                <p> Note Type: {d.note_type}</p>
+                                </span>
                             </div>
                                 {d.lines.map((l,i) => {
                                     return (

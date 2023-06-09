@@ -48,7 +48,7 @@ var indexDocuments = function (payload) {
     for (var i = 0; i < notes.length; i++) {
         var note = notes[i];
         var tokens = tokenizeDocument(note);
-        var doc = { id: note.id, text: note.text };
+        var doc = { id: note.id, text: note.text, date: note.date.toString(), note_type: note.type};
         var prev = void 0;
         console.log('processing note ' + i.toString());
         for (var j = 0; j < tokens.length; j++) {
