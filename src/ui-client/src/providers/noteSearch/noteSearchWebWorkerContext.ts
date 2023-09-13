@@ -4,7 +4,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
-
 export const workerContext = `
 var __assign = (this && this.__assign) || function () {
     __assign = Object.assign || function(t) {
@@ -38,10 +37,65 @@ var handleWorkMessage = function (payload) {
             return flushNotes(payload);
         case SEARCH:
             return searchNotes(payload);
+        case PREFIX_SEARCH:
+            return searchPrefix(payload);
         default:
             return null;
     }
 };
+var createRadixNode = function () { return ({
+    children: {},
+    isEndOfWord: false,
+}); };
+var radixTree = createRadixNode();
+var insertWord = function(root, phrase) {
+  let currentNode = root
+  const words = phrase.split(" ")
+
+  for (const word of words) {
+    for (const char of word) {
+      if (!currentNode.children[char]) {
+        currentNode.children[char] = createRadixNode()
+      }
+      currentNode = currentNode.children[char]
+    }
+    if (!currentNode.children[" "]) {
+      currentNode.children[" "] = createRadixNode()
+    }
+    currentNode = currentNode.children[" "]
+  }
+  currentNode.isEndOfWord = true
+}
+
+var searchWords = function(root, prefix){
+  const matchedWords = []
+  const words = prefix.split(" ")
+
+  const traverse = (node, currentPrefix) => {
+    if (node.isEndOfWord) {
+      matchedWords.push(prefix + currentPrefix)
+    }
+    for (const char in node.children) {
+      traverse(node.children[char], currentPrefix + (char === " " ? " " : char))
+    }
+  }
+
+  let currentNode = root
+  for (const word of words) {
+    for (const char of word) {
+      if (!currentNode.children[char]) {
+        return matchedWords
+      }
+      currentNode = currentNode.children[char]
+    }
+    if (currentNode.children[" "]) {
+      currentNode = currentNode.children[" "]
+    }
+  }
+  traverse(currentNode, "")
+  return matchedWords
+}
+
 var indexDocuments = function (payload) {
     var requestId = payload.requestId;
     var notes = payload.notes;
@@ -56,7 +110,7 @@ var indexDocuments = function (payload) {
             var lexeme = token.lexeme;
             if (STOP_WORDS.has(lexeme))
                 continue;
-            
+            insertWord(radixTree, lexeme)
             if (unigramIndex.has(lexeme)) {
                 unigramIndex.get(lexeme).instances.push(token);
             }
@@ -72,8 +126,10 @@ var indexDocuments = function (payload) {
         }
         docIndex.set(doc.id, doc);
     }
+    console.log(radixTree)
     return { requestId: requestId };
 };
+
 var flushNotes = function (payload) {
     var requestId = payload.requestId;
     unigramIndex.clear();
@@ -118,6 +174,24 @@ var searchNotes = function (payload) {
     });
     return { requestId: requestId, result: result };
 };
+var searchPrefix = function(payload){
+  const { requestId, prefix } = payload
+
+  // Split prefix into individual words
+  const words = prefix.split(" ")
+
+  // Initialize an array to store the results
+  const results = []
+
+  // Iterate over each word and search for it in the radix tree
+  words.forEach(word => {
+    const matchedWords = searchWords(radixTree, word)
+    results.push(...matchedWords)
+  })
+  console.log('state of SearchPrefix')
+  console.log(results)
+  return { requestId, result: results }
+}
 var getSearchResultDocumentContext = function (doc, hits) {
     var contextCharDistance = 50;
     var groups = [];
@@ -143,13 +217,13 @@ var getSearchResultDocumentContext = function (doc, hits) {
         }
     }
     var result = __assign(__assign({}, doc), { lines: [] });
-    for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
-        let line = { index: group[0].lineIndex, content: [] };
-        for (let j = 0; j < group.length; j++) {
-            const backLimit = j > 0 ? group[j].charIndex.start : undefined;
-            const forwLimit = j < group.length-1 ? group[j+1].charIndex.start : undefined;
-            const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
+    for (var i = 0; i < groups.length; i++) {
+        var group = groups[i];
+        var line = { index: group[0].lineIndex, content: [] };
+        for (var j = 0; j < group.length; j++) {
+            var backLimit = j > 0 ? group[j].charIndex.start : undefined;
+            var forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
+            var context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
             line.content = line.content.concat(context);
         }
         result.lines.push(line);
@@ -246,80 +320,77 @@ var searchMultiterm = function (searchTerm) {
     });
     return result;
 };
-var tokenizeDocument = function (note) {
-    var source = note.text.toLocaleLowerCase();
-    var tokens = [];
-    var spaces = new Set([' ', '\\n', '\\t', '\\r']);
-    var line = 0;
-    var start = 0;
-    var current = 0;
-    var scanToken = function () {
-        var c = advance();
-        switch (c) {
-            case ' ':
-            case '\\r':
-            case '\\t':
-                break;
-            case '\\n':
-                toNewLine();
-                break;
-            default:
-                toToken();
-                break;
-        }
-    };
-    var toNewLine = function () {
-        line++;
-    };
-    var toToken = function () {
-        while (isAlphaNumeric(peek()))
-            advance();
-        addToken();
-    };
-    var peek = function () {
-        if (isAtEnd())
-            return '\0';
-        return source[current];
-    };
-    var isAlpha = function (c) {
-        return (c >= 'a' && c <= 'z') ||
-            (c >= 'A' && c <= 'Z') ||
-            (c === '_' || c === "'");
-    };
-    var isAlphaNumeric = function (c) {
-        return isAlpha(c) || isDigit(c);
-    };
-    var isDigit = function (c) {
-        return c >= '0' && c <= '9';
-    };
-    var isAtEnd = function () {
-        return current >= source.length;
-    };
-    var advance = function () {
-        return source[current++];
-    };
-    var addToken = function () {
-        var text = source.substring(start, current);
-        var token = {
-            lexeme: text,
-            charIndex: { start: start, end: current },
-            docId: note.id,
-            id: note.id + '_' + tokens.length.toString(),
-            index: tokens.length,
-            lineIndex: line
-        };
-        if (tokens.length) {
-            var prev = tokens[tokens.length - 1];
-            if (prev.lineIndex === token.lineIndex) {
-                tokens[tokens.length - 1].nextId = token.id;
-            }
-        }
-        tokens.push(token);
-    };
-    while (!isAtEnd()) {
-        start = current;
-        scanToken();
-    }
-    return tokens;
-};
+var tokenizeDocument = function (note) {  
+    var source = note.text.toLocaleLowerCase();  
+    var tokens = [];  
+    var line = 0;  
+    var start = 0;  
+    var current = 0;  
+  
+    var scanToken = function () {  
+        var c = advance();  
+        switch (c) {  
+            case ' ':  
+            case '\\r':  
+            case '\\t':  
+            case '\\n':  
+                break;  
+            default:  
+                toToken();  
+                break;  
+        }  
+    };  
+  
+    var toNewLine = function () {  
+        line++;  
+    };  
+  
+    var toToken = function () {  
+        while (isAlphaNumeric(peek())) advance();  
+        addToken();  
+    };  
+  
+    var peek = function () {  
+        if (isAtEnd()) return '\\0';  
+        return source[current];  
+    };  
+  
+    var isAlphaNumeric = function (c) {  
+        var regex = /^[a-z0-9]+$/i;  
+        return regex.test(c);  
+    };  
+  
+    var isAtEnd = function () {  
+        return current >= source.length;  
+    };  
+  
+    var advance = function () {  
+        return source[current++];  
+    };  
+  
+    var addToken = function () {  
+        var text = source.substring(start, current);  
+        var token = {  
+            lexeme: text,  
+            charIndex: { start: start, end: current },  
+            docId: note.id,  
+            id: note.id + '_' + tokens.length.toString(),  
+            index: tokens.length,  
+            lineIndex: line  
+        };  
+        if (tokens.length) {  
+            var prev = tokens[tokens.length - 1];  
+            if (prev.lineIndex === token.lineIndex) {  
+                tokens[tokens.length - 1].nextId = token.id;  
+            }  
+        }  
+        tokens.push(token);  
+    };  
+  
+    while (!isAtEnd()) {  
+        start = current;  
+        scanToken();  
+    }  
+    return tokens;  
+};  
 `;

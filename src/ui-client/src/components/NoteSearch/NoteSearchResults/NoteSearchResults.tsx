@@ -14,7 +14,6 @@ export class NoteSearchResults extends React.PureComponent<Props> {
     public render() {
         const { results, terms } = this.props.noteSearch;
         const c = this.className;
-
         return (
             <Container className={`${c}-container`} fluid={true}>
                 {results.documents.map(d => {

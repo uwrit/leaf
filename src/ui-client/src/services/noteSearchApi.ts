@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import NoteSearchWebWorker, { SearchResult } from '../providers/noteSearch/noteSearchWebWorker';
+import NoteSearchWebWorker, { SearchResult, RadixTreeResult } from '../providers/noteSearch/noteSearchWebWorker';
 import { Note } from '../models/cohort/NoteSearch';
 import { NoteSearchTerm } from '../models/state/CohortState';
 
@@ -17,6 +17,13 @@ export const indexNotes = (notes: Note[]) => {
         resolve();
     });
 };
+
+export const searchPrefix = (prefix: string): Promise<RadixTreeResult> => {  
+    return new Promise ( async (resolve, reject) => {
+    const result = await engine.searchPrefix(prefix) as RadixTreeResult;  
+    resolve(result)
+    });
+};  
 
 export const flushNotes = () => {
     return new Promise<void>( async (resolve, reject) => {

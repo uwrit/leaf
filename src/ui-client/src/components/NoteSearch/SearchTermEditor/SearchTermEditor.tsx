@@ -7,8 +7,8 @@
 
 import React from 'react';
 import { FormGroup, Label, FormText, Input } from 'reactstrap';
-import { setNoteSearchTerms, searchNotesByTerms } from '../../../actions/cohort/noteSearch';
-import { NoteSearchTerm } from '../../../models/state/CohortState';
+import { setNoteSearchTerms, searchNotesByTerms, searchPrefixTerms} from '../../../actions/cohort/noteSearch';
+import { NoteSearchTerm, RadixSearchResult } from '../../../models/state/CohortState';
 import { AiOutlineClose } from 'react-icons/ai';
 import './SearchTermEditor.css';
 
@@ -20,7 +20,6 @@ interface Props {
 interface State {
     text: string;
 }
-
 
 export class SearchTermEditor extends React.PureComponent<Props,State> {
     private className = 'note-search-term-editor';
@@ -38,6 +37,7 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
         const { terms } = this.props;
         const { text } = this.state;
         const c = this.className;
+
 
         return (
             <FormGroup className={c}>
@@ -83,8 +83,8 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                         color: this.termColors[this.termCreateCount++ % this.termColors.length],
                         text: trimmed
                     };
-                    dispatch(setNoteSearchTerms(terms.concat([newTerm])));
-                    dispatch(searchNotesByTerms());
+                    //dispatch(setNoteSearchTerms(terms.concat([newTerm])));
+                    //dispatch(searchNotesByTerms());
                     this.setState({ text: '' });
                 }
                 return;
@@ -102,8 +102,10 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
     }
 
     private handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { dispatch } = this.props;
         const newVal = e.currentTarget.value;
         this.setState({ text: newVal });
+        dispatch(searchPrefixTerms(newVal.trim()));
     };
 
     private handleRemoveTermClick = (idx: number) => {

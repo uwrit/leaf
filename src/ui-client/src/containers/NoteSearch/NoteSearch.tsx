@@ -45,7 +45,7 @@ class NoteSearch extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: AppState) => {
     return {
-        noteSearch: state.cohort.noteSearch
+        noteSearch: state.cohort.noteSearch,
     };
 };
 

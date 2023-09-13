@@ -10,19 +10,21 @@ import { DateBoundary } from "../../models/panel/Date";
 import { Dispatch } from "redux";
 import { AppState } from "../../models/state/AppState";
 import { NetworkIdentity } from "../../models/NetworkResponder";
-import { flushNotes, indexNotes, searchNotes } from "../../services/noteSearchApi";
+import { flushNotes, indexNotes, searchNotes, searchPrefix } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { Note } from "../../models/cohort/NoteSearch";
-import { NoteSearchTerm } from "../../models/state/CohortState";
+import { NoteSearchTerm, RadixSearchResult } from "../../models/state/CohortState";
 import { setNoClickModalState } from "../generalUi";
 import { NotificationStates } from "../../models/state/GeneralUiState";
-import { SearchResult } from "../../providers/noteSearch/noteSearchWebWorker";
+import { SearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
 
 export const SET_NOTE_DATASETS = 'SET_NOTE_DATASETS';
 export const SET_NOTE_DATASET_CHECKED = 'SET_NOTE_DATASET_CHECKED';
 export const SET_NOTE_SEARCH_DATERANGE = 'SET_NOTE_SEARCH_DATERANGE';
 export const SET_NOTE_SEARCH_TERMS = 'SET_NOTE_SEARCH_TERMS';
 export const SET_NOTE_SEARCH_RESULTS = 'SET_NOTE_SEARCH_RESULTS';
+export const SET_NOTE_SEARCH_RADIX_TREE = 'SET_NOTE_SEARCH_RADIX_TREE'
+export const SET_NOTE_SEARCH_PREFIX_RESULTS = 'SET_NOTE_SEARCH_PREFIX_RESULTS';  
 
 export interface NoteSearchAction {
     datasetId?: string;
@@ -32,6 +34,7 @@ export interface NoteSearchAction {
     searchResults?: SearchResult;
     searchTerms?: NoteSearchTerm[];
     type: string;
+    prefixResults?: RadixTreeResult; 
 }
 
 // Asynchronous
@@ -44,71 +47,87 @@ export const searchNotesByTerms = () => {
     };
 }
 
-export const getNotes = () => {
-    return async (dispatch: Dispatch, getState: () => AppState) => {
-        const state = getState();
-        const responders: NetworkIdentity[] = [];
-        const noteDatasets = [ ...state.cohort.noteSearch.datasets.values() ].filter(ds => ds.checked);
-        const dates = state.cohort.noteSearch.dateFilter;
-        const notes: Note[] = [];
-        state.responders.forEach((nr) => { 
-            if (nr.enabled || nr.isHomeNode) { 
-                responders.push(nr); 
-            } 
-        });
+export const searchPrefixTerms = (prefix: string) => {  
+    return async (dispatch: Dispatch, getState: () => AppState) => {  
+        const state = getState();  
+        const results = await searchPrefix(prefix);
+        dispatch(setNoteSearchPrefixResults(results));  
+    };  
+}  
+  
 
-        // Clear previous
-        dispatch(setNoClickModalState({ message: "Loading Notes", state: NotificationStates.Working }));
-        await flushNotes();
+export const getNotes = () => {  
+    return async (dispatch: Dispatch, getState: () => AppState) => {  
+        const state = getState();  
+        const responders: NetworkIdentity[] = [];  
+        const noteDatasets = [ ...state.cohort.noteSearch.datasets.values() ].filter(ds => ds.checked);  
+        const dates = state.cohort.noteSearch.dateFilter;  
+        const notes: Note[] = [];  
+        state.responders.forEach((nr) => {   
+            if (nr.enabled || nr.isHomeNode) {   
+                responders.push(nr);   
+            }   
+        });  
+  
+        // Clear previous  
+        dispatch(setNoClickModalState({ message: "Loading Notes", state: NotificationStates.Working }));  
+        await flushNotes();  
+  
+        // Wrap and await each dataset  
+        Promise.all(  
+            noteDatasets.map(ds => {  
+                return new Promise( async(resolve, reject) => {  
+  
+                    // Wrap and await each responder  
+                    await Promise.all(  
+                        responders.map((nr, i) => {   
+                            return new Promise( async(resolve, reject) => {  
+                                let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;  
+  
+                                // Request counts  
+                                fetchDataset(getState(), nr, queryId, ds, dates)  
+                                    .then(  
+                                        response => {  
+                                            const schema = response.schema as PatientListDatasetDynamicSchema;  
+                                            let j = 0;  
+                                            for (const patId of Object.keys(response.results)) {  
+                                                for (const row of response.results[patId]) {  
+                                                    const note: Note = {  
+                                                        responderId: nr.id,   
+                                                        id: `${nr.id}_${j}`,  
+                                                        date: row[schema.sqlFieldDate],  
+                                                        text: row[schema.sqlFieldValueString],  
+                                                        type: ds.name  
+                                                    };  
+                                                    notes.push(note);  
+                                                    j++;  
+                                                }  
+                                            }  
+                                              
+                                    },  error => {  
+                                        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
+                                    })  
+                                    .then(() => resolve(null));  
+                            });  
+                        })            
+                    )  
+                    .then(() => resolve(null));  
+                });  
+            })  
+        ).then( async() => {  
+            dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
+            const result = await indexNotes(notes);  
+            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
+            console.log("state of RadixTree after indexing notes")  
+        });  
+    };  
+};  
 
-        // Wrap and await each dataset
-        Promise.all(
-            noteDatasets.map(ds => {
-                return new Promise( async(resolve, reject) => {
-
-                    // Wrap and await each responder
-                    await Promise.all(
-                        responders.map((nr, i) => { 
-                            return new Promise( async(resolve, reject) => {
-                                let queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-
-                                // Request counts
-                                fetchDataset(getState(), nr, queryId, ds, dates)
-                                    .then(
-                                        response => {
-                                            // FIXME - need to allow non-dynamic as well
-                                            const schema = response.schema as PatientListDatasetDynamicSchema;
-                                            let j = 0;
-                                            for (const patId of Object.keys(response.results)) {
-                                                for (const row of response.results[patId]) {
-                                                    const note: Note = {
-                                                        responderId: nr.id, 
-                                                        id: `${nr.id}_${j}`,
-                                                        date: row[schema.sqlFieldDate],
-                                                        text: row[schema.sqlFieldValueString],
-                                                        type: ds.name
-                                                    };
-                                                    notes.push(note);
-                                                    j++;
-                                                }
-                                            }
-                                            
-                                    },  error => {
-                                        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-                                    })
-                                    .then(() => resolve(null));
-                            });
-                        })          
-                    )
-                    .then(() => resolve(null));
-                });
-            })
-        ).then( async() => {
-            dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));
-            console.log(`${notes.length} total notes`)
-            await indexNotes(notes);
-            dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
-        });
+export const setNoteSearchPrefixResults = (results: RadixTreeResult): NoteSearchAction => { 
+    return  {
+    prefixResults: results,
+    id: -1,
+    type: SET_NOTE_SEARCH_PREFIX_RESULTS
     };
 };
 

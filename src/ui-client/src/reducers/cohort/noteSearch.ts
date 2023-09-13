@@ -25,8 +25,9 @@ export function defaultNoteSearchState(): NoteSearchState {
             }
         },
         results: { documents: [] },
-        terms: []
-    };
+        terms: [],
+        radixSearchResult: {prefix: '', result: []}   
+         };
 }
 
 export function setNoteDatasets(state: CohortState, action: NoteSearchAction): CohortState {
@@ -81,3 +82,13 @@ export function setNoteSearchResults(state: CohortState, action: NoteSearchActio
         }
     });
 };
+
+
+export function setNoteSearchPrefixResults(state: CohortState, action: NoteSearchAction): CohortState {
+    return Object.assign({}, state, {
+        noteSearch: {
+            ...state.noteSearch,
+            prefixResults: action.prefixResults
+        }
+    });
+}

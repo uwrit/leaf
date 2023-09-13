@@ -1,5 +1,5 @@
 import React from 'react';
-import { NoteSearchState } from '../../../models/state/CohortState';
+import { NoteSearchState, RadixSearchResult } from '../../../models/state/CohortState';
 import { NoteSearchDatasetQuery } from '../../../models/patientList/Dataset';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { Container, Col, Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Button } from 'reactstrap';
@@ -33,9 +33,9 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
             showCustomDateRangeBox: false
         }
     }
-    
+     
     public render() {
-        const { dispatch, noteSearch } = this.props;
+        const { dispatch, noteSearch} = this.props;
         const { DOMRect, dateFilterOpen, noteSelectorOpen, showCustomDateRangeBox } = this.state;
         const datasets = [ ...noteSearch.datasets.values() ];
         const selectedCount = datasets.filter(ds => ds.checked).length;
@@ -43,6 +43,8 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
         const anytimeDateFilterClasses = `leaf-dropdown-item ${noteSearch.dateFilter.start.dateIncrementType === DateIncrementType.NONE ? 'selected' : ''}`;
         const anytime: DateBoundary = { start: none, end: none };
         const c = this.className;
+                                                                                                                                                                                                                                                                  
+
 
         return (
             <Container className={c} fluid={true}>
@@ -120,6 +122,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                                 
                             <Button className='leaf-button leaf-button-addnew' disabled={false} onClick={this.handleLoadNotesClick}>
                                 Load Notes
+                                
                             </Button>
 
                             </Col>
@@ -130,9 +133,9 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
 
                     {/* Right side */}
                     <Col md={6}>
-
+/:v
                             {/* Search terms */}
-                            <SearchTermEditor dispatch={dispatch} terms={noteSearch.terms} />
+                            <SearchTermEditor dispatch={dispatch} terms={noteSearch.terms}/>
                     </Col>
                 </Row>
             </Container>
@@ -142,6 +145,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
     private handleLoadNotesClick = () => {
         const { dispatch } = this.props;
         dispatch(getNotes());
+ 
     }
 
     private setDateDropdownItemClasses = (dates: DateBoundary) => {

@@ -15,7 +15,7 @@ import { ConceptId } from '../concept/Concept';
 import { NoteSearchDatasetQuery } from '../patientList/Dataset';
 import { Note } from '../cohort/NoteSearch';
 import { DateBoundary } from '../panel/Date';
-import { SearchResult } from '../../providers/noteSearch/noteSearchWebWorker';
+import { SearchResult, RadixTreeResult } from '../../providers/noteSearch/noteSearchWebWorker';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -109,10 +109,15 @@ export interface NoteSearchState {
     dateFilter: DateBoundary;
     results: SearchResult;
     terms: NoteSearchTerm[];
+    radixSearchResult: RadixTreeResult;
 }
 
 export interface NoteSearchResult {
     note: Note;
+}
+
+export interface RadixSearchResult {
+    searchResult: RadixTreeResult;
 }
 
 export interface NoteSearchTerm {
