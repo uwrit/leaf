@@ -109,15 +109,11 @@ export interface NoteSearchState {
     dateFilter: DateBoundary;
     results: SearchResult;
     terms: NoteSearchTerm[];
-    radixSearchResult: RadixTreeResult;
+    radixSearch: RadixTreeResult;
 }
 
 export interface NoteSearchResult {
     note: Note;
-}
-
-export interface RadixSearchResult {
-    searchResult: RadixTreeResult;
 }
 
 export interface NoteSearchTerm {

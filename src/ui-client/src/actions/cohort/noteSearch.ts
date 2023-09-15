@@ -13,7 +13,7 @@ import { NetworkIdentity } from "../../models/NetworkResponder";
 import { flushNotes, indexNotes, searchNotes, searchPrefix } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { Note } from "../../models/cohort/NoteSearch";
-import { NoteSearchTerm, RadixSearchResult } from "../../models/state/CohortState";
+import { NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState } from "../generalUi";
 import { NotificationStates } from "../../models/state/GeneralUiState";
 import { SearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";

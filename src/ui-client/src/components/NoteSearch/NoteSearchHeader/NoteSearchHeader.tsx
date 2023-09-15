@@ -1,5 +1,5 @@
 import React from 'react';
-import { NoteSearchState, RadixSearchResult } from '../../../models/state/CohortState';
+import { NoteSearchState } from '../../../models/state/CohortState';
 import { NoteSearchDatasetQuery } from '../../../models/patientList/Dataset';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { Container, Col, Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Button } from 'reactstrap';
@@ -35,7 +35,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
     }
      
     public render() {
-        const { dispatch, noteSearch} = this.props;
+        const { dispatch, noteSearch } = this.props;
         const { DOMRect, dateFilterOpen, noteSelectorOpen, showCustomDateRangeBox } = this.state;
         const datasets = [ ...noteSearch.datasets.values() ];
         const selectedCount = datasets.filter(ds => ds.checked).length;
@@ -43,8 +43,8 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
         const anytimeDateFilterClasses = `leaf-dropdown-item ${noteSearch.dateFilter.start.dateIncrementType === DateIncrementType.NONE ? 'selected' : ''}`;
         const anytime: DateBoundary = { start: none, end: none };
         const c = this.className;
-                                                                                                                                                                                                                                                                  
-
+        console.log("state of radixtree in header")
+        console.log(noteSearch.radixSearch)
 
         return (
             <Container className={c} fluid={true}>
@@ -135,7 +135,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                     <Col md={6}>
 /:v
                             {/* Search terms */}
-                            <SearchTermEditor dispatch={dispatch} terms={noteSearch.terms}/>
+                            <SearchTermEditor dispatch={dispatch} terms={noteSearch.terms} radixSearch={noteSearch.radixSearch} />
                     </Col>
                 </Row>
             </Container>

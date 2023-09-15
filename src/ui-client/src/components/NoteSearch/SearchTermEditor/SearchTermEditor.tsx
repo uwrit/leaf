@@ -6,19 +6,23 @@
  */ 
 
 import React from 'react';
-import { FormGroup, Label, FormText, Input } from 'reactstrap';
+import { FormGroup, Label, FormText, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';  
 import { setNoteSearchTerms, searchNotesByTerms, searchPrefixTerms} from '../../../actions/cohort/noteSearch';
-import { NoteSearchTerm, RadixSearchResult } from '../../../models/state/CohortState';
+import { RadixTreeResult } from '../../../providers/noteSearch/noteSearchWebWorker';
+import { NoteSearchTerm } from '../../../models/state/CohortState';
 import { AiOutlineClose } from 'react-icons/ai';
 import './SearchTermEditor.css';
 
 interface Props {
     dispatch: any;
     terms: NoteSearchTerm[];
+    radixSearch: RadixTreeResult;
 }
 
 interface State {
     text: string;
+    dropdownOpen: boolean;  
+
 }
 
 export class SearchTermEditor extends React.PureComponent<Props,State> {
@@ -29,20 +33,26 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            text: ''
+            text: '',
+            dropdownOpen: false  
         }
+        this.toggle = this.toggle.bind(this); 
     }
 
     public render() {
-        const { terms } = this.props;
+        const { terms, radixSearch } = this.props;
         const { text } = this.state;
+        const { dropdownOpen } = this.state;  
         const c = this.className;
+
+        console.log("state of radixtree in search editor")
+        console.log(radixSearch)
 
 
         return (
             <FormGroup className={c}>
                 <Label>
-                    Search Terms
+                    Search Terms    
                     <FormText color="muted">Enter terms to look for in notes. Type 'enter', or 'tab' to add a term.</FormText>
                 </Label>
                 <div className={`${c}-term-container`}>
@@ -65,6 +75,8 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                     onChange={this.handleChange}
                     onKeyDown={this.handleKeydown}
                 />
+
+                
         </FormGroup>
         );
     }
@@ -115,4 +127,14 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
         dispatch(setNoteSearchTerms(newTerms));
         dispatch(searchNotesByTerms());
     }
+    private toggle() {  
+        this.setState(prevState => ({  
+            dropdownOpen: !prevState.dropdownOpen  
+        }));  
+    }  
+  
+    private selectSuggestion(suggestion: string) {  
+        this.setState({ text: suggestion });  
+        this.props.dispatch(searchPrefixTerms(suggestion));  
+    }  
 };

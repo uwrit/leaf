@@ -26,7 +26,10 @@ export function defaultNoteSearchState(): NoteSearchState {
         },
         results: { documents: [] },
         terms: [],
-        radixSearchResult: {prefix: '', result: []}   
+        radixSearch: {  
+            prefix: "", 
+            result: []  
+        }  
          };
 }
 
@@ -88,7 +91,7 @@ export function setNoteSearchPrefixResults(state: CohortState, action: NoteSearc
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
-            prefixResults: action.prefixResults
+            radixSearch: action.prefixResults
         }
     });
 }
