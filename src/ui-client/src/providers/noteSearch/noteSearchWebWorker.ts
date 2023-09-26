@@ -14,13 +14,14 @@ import { type } from 'os';
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
 const FLUSH = 'FLUSH';
-const PREFIX_SEARCH = 'PREFIX_SEARCH'
+const HINT = 'HINT'
 
 interface InboundMessagePartialPayload {
     message: string;
     notes?: Note[];
     terms?: NoteSearchTerm[];
     prefix?: string;
+    // pageIndex
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -76,7 +77,7 @@ interface IndexedDocument {
     note_type: string;
 }
 
-interface DocumentSearchResult extends IndexedDocument {
+export interface DocumentSearchResult extends IndexedDocument {
     lines: DocumentSearchResultLine[]
 }
 
@@ -122,7 +123,7 @@ export default class NoteSearchWebWorker {
     constructor() 
     {
         const workerFile = `  
-            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, PREFIX_SEARCH])}
+            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -150,7 +151,7 @@ export default class NoteSearchWebWorker {
     }
 
     public searchPrefix = (prefix: string) => {  
-        return this.postMessage({ message: PREFIX_SEARCH, prefix });  
+        return this.postMessage({ message: HINT, prefix });  
     }  
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
@@ -207,7 +208,7 @@ export default class NoteSearchWebWorker {
                     return flushNotes(payload);
                 case SEARCH:
                     return searchNotes(payload);
-                case PREFIX_SEARCH:  
+                case HINT:  
                     return searchPrefix(payload); 
                 default:
                     return null;
@@ -287,6 +288,8 @@ export default class NoteSearchWebWorker {
 
 
                     if (STOP_WORDS.has(lexeme)) continue;
+
+                    // Radix-tree check
 
                     let indexed = unigramIndex.get(lexeme);
 
@@ -497,6 +500,8 @@ export default class NoteSearchWebWorker {
                     } else {
                         expected = new Map(matched.map(t => [t.id, [...expected.get(t.id), t]]));
                     }
+                } else {
+                    return result;
                 }
             }
 

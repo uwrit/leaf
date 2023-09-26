@@ -42,8 +42,10 @@ export const searchNotesByTerms = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const { terms } = state.cohort.noteSearch;
+        dispatch(setNoClickModalState({ message: "Searching", state: NotificationStates.Working }));
         const results = await searchNotes(terms);
         dispatch(setNoteSearchResults(results));
+        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     };
 }
 

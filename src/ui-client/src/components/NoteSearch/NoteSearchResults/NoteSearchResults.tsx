@@ -1,6 +1,9 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
 import { Col, Container, Row } from 'reactstrap';
+import { Note } from '../../../models/cohort/NoteSearch';
+import { createPortal } from 'react-dom';
+import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import './NoteSearchResults.css';
 
 interface Props {
@@ -8,17 +11,30 @@ interface Props {
     noteSearch: NoteSearchState;
 }
 
-export class NoteSearchResults extends React.PureComponent<Props> {
+interface State {
+    showFullNoteModal: boolean;
+    note?: DocumentSearchResult;
+}
+
+export class NoteSearchResults extends React.PureComponent<Props, State> {
     private className = 'note-search-results';
+
+    public constructor(props: Props) {
+        super(props);
+        this.state = {
+            showFullNoteModal: false
+        }
+    }
     
     public render() {
         const { results, terms } = this.props.noteSearch;
+        const { showFullNoteModal, note } = this.state;
         const c = this.className;
         return (
             <Container className={`${c}-container`} fluid={true}>
                 {results.documents.map(d => {
                     return (
-                        <div key={d.id} className={`${c}-document`}>
+                        <div key={d.id} className={`${c}-document`} onClick={this.handleNoteClick.bind(null, d)}>
                             <div className={`${c}-document-header`}>
                                 <span><p>Note ID: {d.id}</p>
                                 <p> Written Date: {d.date}</p>
@@ -53,7 +69,20 @@ export class NoteSearchResults extends React.PureComponent<Props> {
                         </div>
                     )
                 })}
+                {createPortal(
+                    <div className={`${c}-modal ${showFullNoteModal ? 'show' : ''}`}>
+                        {note && 
+                        <div>
+                            <textarea readOnly={true} content={note.text}/>
+                        </div>
+                        }
+                    </div>
+                , document.body)}
             </Container>
         )
+    }
+
+    private handleNoteClick = (note: DocumentSearchResult) => {
+        this.setState({ note, showFullNoteModal: true });
     }
 }

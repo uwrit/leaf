@@ -139,6 +139,10 @@ var flushNotes = function (payload) {
 var searchNotes = function (payload) {
     var requestId = payload.requestId, terms = payload.terms;
     var result = { documents: [] };
+    if (!terms.length) {
+        console.log('no terms!')
+        return { requestId, result };
+    }
     var precedingHits = new Map();
     var _loop_1 = function (i) {
         var term = terms[i];
@@ -305,6 +309,8 @@ var searchMultiterm = function (searchTerm) {
             else {
                 expected = new Map(matched.map(function (t) { return [t.id, __spreadArray(__spreadArray([], expected.get(t.id), true), [t], false)]; }));
             }
+        } else {
+            return result;
         }
     }
     expected.forEach(function (v, k) {

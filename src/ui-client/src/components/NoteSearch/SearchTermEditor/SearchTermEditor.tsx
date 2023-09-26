@@ -12,6 +12,8 @@ import { RadixTreeResult } from '../../../providers/noteSearch/noteSearchWebWork
 import { NoteSearchTerm } from '../../../models/state/CohortState';
 import { AiOutlineClose } from 'react-icons/ai';
 import './SearchTermEditor.css';
+import { InformationModalState } from '../../../models/state/GeneralUiState';
+import { showInfoModal } from '../../../actions/generalUi';
 
 interface Props {
     dispatch: any;
@@ -95,9 +97,24 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                         color: this.termColors[this.termCreateCount++ % this.termColors.length],
                         text: trimmed
                     };
+<<<<<<< HEAD
                     //dispatch(setNoteSearchTerms(terms.concat([newTerm])));
                     //dispatch(searchNotesByTerms());
                     this.setState({ text: '' });
+=======
+                    if (terms.find(t => t.text.toLocaleLowerCase() === newTerm.text.toLocaleLowerCase())) {
+                        const info: InformationModalState = {
+                            body: "It looks like you already searched for this term. All search terms must be unique.",
+                            header: "Duplicate term",
+                            show: true
+                        };
+                        dispatch(showInfoModal(info));
+                    } else {
+                        dispatch(setNoteSearchTerms(terms.concat([newTerm])));
+                        dispatch(searchNotesByTerms());
+                        this.setState({ text: '' });
+                    }
+>>>>>>> 31df57ad (handle note search async ui)
                 }
                 return;
             }
