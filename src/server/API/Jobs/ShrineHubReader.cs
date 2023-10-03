@@ -8,17 +8,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Model.Integration.Shrine;
 
 namespace API.Jobs
 {
 	public class ShrineHubReader : BackgroundService
     {
         readonly ILogger<ShrineHubReader> logger;
+        readonly IShrinePollingService shrine;
 
         public ShrineHubReader(
-            ILogger<ShrineHubReader> logger)
+            ILogger<ShrineHubReader> logger,
+            IShrinePollingService shrine)
 		{
             this.logger = logger;
+            this.shrine = shrine;
 		}
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -35,8 +39,14 @@ namespace API.Jobs
                 try
                 {
                     logger.LogInformation("Syncronizing with SHRINE");
-                    //var newState = await serverStateProvider.GetServerState();
-                    //cache.Overwrite(newState);
+                    var result = await shrine.ReadHubMessage();
+
+                    /*
+                    _ = Task.Run(() =>
+                    {
+
+                    });
+                    */
                 }
                 catch (Exception e)
                 {

@@ -31,6 +31,7 @@ using Model.Search;
 using Model.Import;
 using Model.Notification;
 using Model.Obfuscation;
+using Model.Integration.Shrine;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
@@ -47,6 +48,9 @@ using Services.Search;
 using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
+using Services.Integration.Shrine;
+using System.Net.Http;
+using System;
 
 namespace API.Options
 {
@@ -91,6 +95,11 @@ namespace API.Options
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
 
+            services.AddHttpClient<IShrinePollingService, ShrinePollingService>(client =>
+            {
+                client.DefaultRequestHeaders.Add("Accept", @"application/json");
+            });
+
             if (environment.IsProduction())
             {
                 services.AddHostedService<BackgroundCertificateSynchronizer>();
@@ -98,6 +107,7 @@ namespace API.Options
 
             services.AddSingleton<IServerStateCache, ServerStateCache>();
             services.AddSingleton<IServerStateProvider, ServerStateService>();
+            services.AddSingleton<IShrinePollingService, ShrinePollingService>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
@@ -121,6 +131,7 @@ namespace API.Options
             services.AddTransient<IPanelDatasetSqlCompiler, PanelDatasetSqlCompiler>();
             services.AddTransient<PanelDatasetCompilerValidationContextProvider.ICompilerContextProvider, PanelDatasetCompilerContextProvider>();
 
+            services.AddIntegrationServices(environment);
             services.AddAdminServices();
             services.RegisterLeafCore();
 
@@ -178,6 +189,36 @@ namespace API.Options
             services.AddTransient<IUserJwtProvider, JwtProvider>();
             services.AddTransient<IApiJwtProvider, JwtProvider>();
             services.AddTransient<ILoginSaver, LoginSaver>();
+
+            return services;
+        }
+
+        static IServiceCollection AddIntegrationServices(this IServiceCollection services, Microsoft.AspNetCore.Hosting.IHostingEnvironment environment)
+        {
+            var sp = services.BuildServiceProvider();
+            var integrationOpts = sp.GetRequiredService<IOptions<IntegrationOptions>>().Value;
+
+            if (integrationOpts.Enabled)
+            {
+                if (integrationOpts.SHRINE.Enabled)
+                {
+                    services.AddHostedService<ShrineHubReader>();
+
+                    /* Use for testing only!! */
+                    if (!environment.IsProduction())
+                    {
+                        services.AddHttpClient<IShrinePollingService, ShrinePollingService>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                        {
+                            ClientCertificateOptions = ClientCertificateOption.Manual,
+                            //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
+                            ServerCertificateCustomValidationCallback = (request, cert, chain, errors) =>
+                            {
+                                return true;
+                            }
+                        });
+                    }
+                }
+            }
 
             return services;
         }

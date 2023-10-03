@@ -4,13 +4,93 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Model.Integration.Shrine;
+using Model.Options;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Services.Integration.Shrine
 {
 	public class ShrinePollingService : IShrinePollingService
 	{
-		
-	}
+        readonly HttpClient client;
+        readonly SHRINEOptions opts;
+
+        public ShrinePollingService(HttpClient client, IOptions<IntegrationOptions> opts)
+        {
+            this.client = client;
+            this.opts = opts.Value.SHRINE;
+        }
+
+        public async Task<string> ReadHubMessage()
+        {
+            var req = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/receiveMessage/{opts.LocalNodeName}?timeOutSeconds=50"),
+                Method = HttpMethod.Get
+            };
+
+            var resp = await client.SendAsync(req);
+            resp.EnsureSuccessStatusCode();
+
+            var jsonString = await resp.Content.ReadAsStringAsync();
+
+            var deliveryAttemptId = GetDeliveryAttemptId(jsonString);
+            if (deliveryAttemptId != null)
+            {
+                var ack = new HttpRequestMessage
+                {
+                    RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/acknowledge/{deliveryAttemptId}"),
+                    Method = HttpMethod.Put
+                };
+                var ackResp = await client.SendAsync(ack);
+            }    
+
+            return jsonString;
+        }
+
+        private static string GetDeliveryAttemptId(string body)
+        {
+            var raw = JObject.Parse(body);
+
+            if (raw.ContainsKey("deliveryAttemptId"))
+            {
+                return (string)raw["deliveryAttemptId"]["underlying"];
+            }
+            return null;
+        }
+
+        // from https://stackoverflow.com/a/47046191
+        private static void RecurseDeserialize(Dictionary<string, object> result)
+        {
+            //Iterate throgh key/value pairs
+            foreach (var keyValuePair in result.ToArray())
+            {
+                //Check to see if Newtonsoft thinks this is a JArray
+                var jarray = keyValuePair.Value as JArray;
+
+                if (jarray != null)
+                {
+                    //Convert JArray back to json and deserialize to a list of dictionaries
+                    var dictionaries = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(jarray.ToString());
+
+                    //Set the result as the dictionary
+                    result[keyValuePair.Key] = dictionaries;
+
+                    //Iterate throught the dictionaries
+                    foreach (var dictionary in dictionaries)
+                    {
+                        //Recurse
+                        RecurseDeserialize(dictionary);
+                    }
+                }
+            }
+        }
+    }
 }
 

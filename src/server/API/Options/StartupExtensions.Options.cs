@@ -50,6 +50,9 @@ namespace API.Options
             // Import Options
             services.ConfigureImportOptions(configuration);
 
+            // Integrations Options
+            services.ConfigureIntegrationOptions(configuration);
+
             // Authentication Options
             services.ConfigureAuthenticationOptions(configuration);
 
@@ -251,6 +254,34 @@ namespace API.Options
             return services;
         }
 
+        static IServiceCollection ConfigureIntegrationOptions(this IServiceCollection services, IConfiguration config)
+        {
+            var enabled = config.GetValue<bool>(Config.Integration.Enabled);
+
+            if (enabled)
+            {
+                config.TryGetValue(Config.Integration.SHRINE.Enabled, out bool shrineEnabled);
+                if (shrineEnabled)
+                {
+                    var shrine = new SHRINEOptions
+                    {
+                        Enabled = shrineEnabled,
+                        HubApiURI = config.GetValue<string>(Config.Integration.SHRINE.HubApiURI),
+                        LocalNodeId = config.GetValue<long>(Config.Integration.SHRINE.NodeId),
+                        LocalNodeName = config.GetValue<string>(Config.Integration.SHRINE.NodeName),
+                    };
+
+                    services.Configure<IntegrationOptions>(opts =>
+                    {
+                        opts.Enabled = true;
+                        opts.SHRINE = shrine;
+                    });
+                }
+            }
+
+            return services;
+        }
+
         static IServiceCollection ConfigureClientOptions(this IServiceCollection services, IConfiguration config)
         {
             services.Configure<ClientOptions>(opts =>
@@ -412,14 +443,14 @@ namespace API.Options
             // App Db Connection
             services.Configure<AppDbOptions>(opts =>
             {
-                opts.ConnectionString = "Server=localhost:1432;Database=LeafDB;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.App.Connection);
+                opts.ConnectionString = config.GetByProxy(Config.Db.App.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.App.DefaultTimeout);
             });
 
             // Clin Db Connection
             services.Configure<ClinDbOptions>(opts =>
             {
-                opts.ConnectionString = "Server=localhost:1432;Database=SynPuf_OMOP;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.Clin.Connection);
+                opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
                 opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));

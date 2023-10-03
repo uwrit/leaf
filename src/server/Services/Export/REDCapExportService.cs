@@ -10,7 +10,6 @@ using Model.Options;
 using Microsoft.Extensions.Options;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using Model.Export;
 using Newtonsoft.Json.Serialization;
