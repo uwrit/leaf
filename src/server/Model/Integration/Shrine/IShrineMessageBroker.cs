@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Model.Integration.Shrine
 {
-	public interface IShrinePollingService
+	public interface IShrineMessageBroker
 	{
-		public Task<string> ReadHubMessage();
+		public Task<ShrineDeliveryAttempt> ReadHubMessage();
 	}
 }
 

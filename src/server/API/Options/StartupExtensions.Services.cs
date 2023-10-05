@@ -95,7 +95,7 @@ namespace API.Options
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
 
-            services.AddHttpClient<IShrinePollingService, ShrinePollingService>(client =>
+            services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
@@ -107,7 +107,7 @@ namespace API.Options
 
             services.AddSingleton<IServerStateCache, ServerStateCache>();
             services.AddSingleton<IServerStateProvider, ServerStateService>();
-            services.AddSingleton<IShrinePollingService, ShrinePollingService>();
+            services.AddSingleton<IShrineMessageBroker, ShrineMessageBroker>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
@@ -202,12 +202,12 @@ namespace API.Options
             {
                 if (integrationOpts.SHRINE.Enabled)
                 {
-                    services.AddHostedService<ShrineHubReader>();
+                    services.AddHostedService<ShrinePollingService>();
 
                     /* Use for testing only!! */
                     if (!environment.IsProduction())
                     {
-                        services.AddHttpClient<IShrinePollingService, ShrinePollingService>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                        services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                         {
                             ClientCertificateOptions = ClientCertificateOption.Manual,
                             //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,

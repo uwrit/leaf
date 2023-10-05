@@ -443,14 +443,14 @@ namespace API.Options
             // App Db Connection
             services.Configure<AppDbOptions>(opts =>
             {
-                opts.ConnectionString = config.GetByProxy(Config.Db.App.Connection);
+                opts.ConnectionString = "Server=localhost,1432;Database=LeafDB;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.App.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.App.DefaultTimeout);
             });
 
             // Clin Db Connection
             services.Configure<ClinDbOptions>(opts =>
             {
-                opts.ConnectionString = config.GetByProxy(Config.Db.Clin.Connection);
+                opts.ConnectionString = "Server=localhost,1432;Database=SynPuf_OMOP;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.Clin.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
                 opts.WithRdbms(config.GetValue<string>(Config.Db.Clin.RDBMS));
                 opts.Cohort.WithQueryStrategy(config.GetValue<string>(Config.Db.Clin.Cohort.QueryStrategy));

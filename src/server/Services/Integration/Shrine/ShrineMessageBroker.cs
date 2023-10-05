@@ -16,18 +16,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Services.Integration.Shrine
 {
-	public class ShrinePollingService : IShrinePollingService
+	public class ShrineMessageBroker : IShrineMessageBroker
 	{
         readonly HttpClient client;
         readonly SHRINEOptions opts;
 
-        public ShrinePollingService(HttpClient client, IOptions<IntegrationOptions> opts)
+        public ShrineMessageBroker(HttpClient client, IOptions<IntegrationOptions> opts)
         {
             this.client = client;
             this.opts = opts.Value.SHRINE;
         }
 
-        public async Task<string> ReadHubMessage()
+        public async Task<ShrineDeliveryAttempt> ReadHubMessage()
         {
             var req = new HttpRequestMessage
             {
@@ -39,19 +39,16 @@ namespace Services.Integration.Shrine
             resp.EnsureSuccessStatusCode();
 
             var jsonString = await resp.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<ShrineDeliveryAttempt>(jsonString);
 
-            var deliveryAttemptId = GetDeliveryAttemptId(jsonString);
-            if (deliveryAttemptId != null)
+            var ack = new HttpRequestMessage
             {
-                var ack = new HttpRequestMessage
-                {
-                    RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/acknowledge/{deliveryAttemptId}"),
-                    Method = HttpMethod.Put
-                };
-                var ackResp = await client.SendAsync(ack);
-            }    
+                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/acknowledge/{message.DeliveryAttemptId.Underlying}"),
+                Method = HttpMethod.Put
+            };
+            _ = await client.SendAsync(ack);
 
-            return jsonString;
+            return message;
         }
 
         private static string GetDeliveryAttemptId(string body)

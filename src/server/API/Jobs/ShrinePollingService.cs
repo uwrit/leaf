@@ -12,14 +12,14 @@ using Model.Integration.Shrine;
 
 namespace API.Jobs
 {
-	public class ShrineHubReader : BackgroundService
+	public class ShrinePollingService : BackgroundService
     {
-        readonly ILogger<ShrineHubReader> logger;
-        readonly IShrinePollingService shrine;
+        readonly ILogger<ShrinePollingService> logger;
+        readonly IShrineMessageBroker shrine;
 
-        public ShrineHubReader(
-            ILogger<ShrineHubReader> logger,
-            IShrinePollingService shrine)
+        public ShrinePollingService(
+            ILogger<ShrinePollingService> logger,
+            IShrineMessageBroker shrine)
 		{
             this.logger = logger;
             this.shrine = shrine;
@@ -39,18 +39,17 @@ namespace API.Jobs
                 try
                 {
                     logger.LogInformation("Syncronizing with SHRINE");
-                    var result = await shrine.ReadHubMessage();
+                    var message = await shrine.ReadHubMessage();
 
-                    /*
                     _ = Task.Run(() =>
                     {
 
-                    });
-                    */
+                    }, stoppingToken);
                 }
                 catch (Exception e)
                 {
                     logger.LogError("Failed to syncronize with SHRINE. Error: {Error}", e.ToString());
+                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
                 }
                 finally
                 {
