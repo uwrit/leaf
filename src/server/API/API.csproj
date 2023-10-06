@@ -25,9 +25,6 @@
     <Folder Include="DTO\Admin\Network\" />
     <Folder Include="DTO\Config\" />
     <Folder Include="DTO\Notification\" />
-    <Folder Include="DTO\Integration\" />
-    <Folder Include="DTO\Integration\Shrine\" />
-    <Folder Include="DTO\Integration\Shrine\4_1\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.3.2">
@@ -58,8 +55,5 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove=".API.csproj.swp" />
-    <None Remove="DTO\Integration\" />
-    <None Remove="DTO\Integration\Shrine\" />
-    <None Remove="DTO\Integration\Shrine\4_1\" />
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Model.Integration.Shrine;
+using Model.Integration.Shrine.DTO;
 using Model.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -20,6 +21,7 @@ namespace Services.Integration.Shrine
 	{
         readonly HttpClient client;
         readonly SHRINEOptions opts;
+        readonly int TimeOutSeconds = 50;
 
         public ShrineMessageBroker(HttpClient client, IOptions<IntegrationOptions> opts)
         {
@@ -27,19 +29,19 @@ namespace Services.Integration.Shrine
             this.opts = opts.Value.SHRINE;
         }
 
-        public async Task<ShrineDeliveryAttempt> ReadHubMessage()
+        public async Task<ShrineDeliveryContents> ReadHubMessage()
         {
             var req = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/receiveMessage/{opts.LocalNodeName}?timeOutSeconds=50"),
+                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/receiveMessage/{opts.LocalNodeName}?timeOutSeconds={TimeOutSeconds}"),
                 Method = HttpMethod.Get
             };
 
             var resp = await client.SendAsync(req);
-            resp.EnsureSuccessStatusCode();
+            if (!resp.IsSuccessStatusCode) return null;
 
-            var jsonString = await resp.Content.ReadAsStringAsync();
-            var message = JsonConvert.DeserializeObject<ShrineDeliveryAttempt>(jsonString);
+            var jsonMessage = await resp.Content.ReadAsStringAsync();
+            var message = JsonConvert.DeserializeObject<ShrineDeliveryAttemptDTO>(jsonMessage).ToDeliveryAttempt();
 
             var ack = new HttpRequestMessage
             {
@@ -48,7 +50,9 @@ namespace Services.Integration.Shrine
             };
             _ = await client.SendAsync(ack);
 
-            return message;
+            var contents = JsonConvert.DeserializeObject<ShrineDeliveryContentsDTO>(message.Contents);
+
+            return contents.ToContents();
         }
 
         private static string GetDeliveryAttemptId(string body)

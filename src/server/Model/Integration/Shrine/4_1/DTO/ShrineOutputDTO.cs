@@ -6,7 +6,7 @@
 using System;
 using Model.Integration.Shrine4_1;
 
-namespace API.DTO.Integration.Shrine4_1
+namespace Model.Integration.Shrine4_1.DTO
 {
 	public class ShrineOutputDTO
 	{

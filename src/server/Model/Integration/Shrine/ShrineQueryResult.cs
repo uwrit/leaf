@@ -4,17 +4,18 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-
 namespace Model.Integration.Shrine
 {
-	public class ShrineUpdateQueryAtQep
+	public class ShrineQueryResult
 	{
-		public long QueryId { get; set; }
-		public ShrineQueryStatus QueryStatus { get; set; }
-		public DateTime ChangeDate { get; set; }
-		public ShrineQueryStatusType EncodedClass { get; set; }
-		public IEnumerable<ShrineResultProgress> ResultProgresses { get; set; } = new List<ShrineResultProgress>();
-    }
+		public long Id { get; set; }
+
+	}
+
+	public class ShrineQueryNodeResult
+	{
+		public long Id { get; set; }
+		public string Name { get; set; }
+	}
 }
 

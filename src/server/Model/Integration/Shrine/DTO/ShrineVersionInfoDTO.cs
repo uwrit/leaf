@@ -4,9 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Integration.Shrine4_1;
 
-namespace API.DTO.Integration.Shrine4_1
+namespace Model.Integration.Shrine.DTO
 {
     public class ShrineVersionInfoDTO
     {
@@ -21,8 +20,8 @@ namespace API.DTO.Integration.Shrine4_1
             ProtocolVersion = ver.ProtocolVersion;
             ItemVersion = ver.ItemVersion;
             ShrineVersion = ver.ShrineVersion;
-            CreateDate = ((DateTimeOffset)ver.CreateDate).ToUnixTimeSeconds();
-            ChangeDate = ((DateTimeOffset)ver.ChangeDate).ToUnixTimeSeconds();
+            CreateDate = ((DateTimeOffset)ver.CreateDate).ToUnixTimeMilliseconds();
+            ChangeDate = ((DateTimeOffset)ver.ChangeDate).ToUnixTimeMilliseconds();
         }
     }
 
@@ -35,8 +34,8 @@ namespace API.DTO.Integration.Shrine4_1
                 ProtocolVersion = dto.ProtocolVersion,
                 ItemVersion = dto.ItemVersion,
                 ShrineVersion = dto.ShrineVersion,
-                CreateDate = DateTimeOffset.FromUnixTimeSeconds(dto.CreateDate).UtcDateTime,
-                ChangeDate = DateTimeOffset.FromUnixTimeSeconds(dto.ChangeDate).UtcDateTime
+                CreateDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.CreateDate).UtcDateTime,
+                ChangeDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.ChangeDate).UtcDateTime
             };
         }
     }

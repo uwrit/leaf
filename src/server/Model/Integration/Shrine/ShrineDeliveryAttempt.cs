@@ -28,6 +28,7 @@ namespace Model.Integration.Shrine
 
 	public enum ShrineDeliveryContentsType
 	{
+		Unknown,
 		UpdateQueryAtQep,
 		RunQueryForResult,
 		Result

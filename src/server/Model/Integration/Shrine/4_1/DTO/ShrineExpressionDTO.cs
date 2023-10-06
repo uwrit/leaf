@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Model.Integration.Shrine4_1;
 using System.Linq;
 
-namespace API.DTO.Integration.Shrine4_1
+namespace Model.Integration.Shrine4_1.DTO
 {
     public class ShrineQueryDefinitionDTO
     {
@@ -53,8 +53,8 @@ namespace API.DTO.Integration.Shrine4_1
 
         public ShrineConceptGroupDTO(ShrineConceptGroup group) : base(group)
         {
-            StartDate = ((DateTimeOffset)group.StartDate).ToUnixTimeSeconds();
-            EndDate = ((DateTimeOffset)group.EndDate).ToUnixTimeSeconds();
+            StartDate = ((DateTimeOffset)group.StartDate).ToUnixTimeMilliseconds();
+            EndDate = ((DateTimeOffset)group.EndDate).ToUnixTimeMilliseconds();
             OccursAtLeast = group.OccursAtLeast;
             Concepts = new ShrineConjunctionDTO(group.Concepts);
         }
@@ -110,8 +110,8 @@ namespace API.DTO.Integration.Shrine4_1
         {
             return new ShrineConceptGroup
             {
-                StartDate = DateTimeOffset.FromUnixTimeSeconds(dto.StartDate).UtcDateTime,
-                EndDate = DateTimeOffset.FromUnixTimeSeconds(dto.EndDate).UtcDateTime,
+                StartDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.StartDate).UtcDateTime,
+                EndDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.EndDate).UtcDateTime,
                 OccursAtLeast = dto.OccursAtLeast,
                 Concepts = dto.Concepts.ToConjunction()
             };

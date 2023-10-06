@@ -10,7 +10,7 @@ namespace Model.Integration.Shrine
 {
 	public interface IShrineMessageBroker
 	{
-		public Task<ShrineDeliveryAttempt> ReadHubMessage();
+		public Task<ShrineDeliveryContents> ReadHubMessage();
 	}
 }
 

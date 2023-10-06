@@ -202,7 +202,7 @@ namespace API.Options
             {
                 if (integrationOpts.SHRINE.Enabled)
                 {
-                    services.AddHostedService<ShrinePollingService>();
+                    services.AddHostedService<BackgroundShrinePollingService>();
 
                     /* Use for testing only!! */
                     if (!environment.IsProduction())

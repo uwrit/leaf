@@ -4,15 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-namespace Model.Integration.Shrine4_1
+namespace Model.Integration.Shrine
 {
-	public class ShrineVersionInfo
+	public class ShrineResearcher
 	{
-		public int ProtocolVersion { get; set; }
-		public int ItemVersion { get; set; }
-        public string ShrineVersion { get; set; }
-        public DateTime CreateDate { get; set; }
-		public DateTime ChangeDate { get; set; }
+		public long Id { get; set; }
+		public ShrineVersionInfo VersionInfo { get; set; }
+		public string UserName { get; set; }
+		public string UserDomainName { get; set; }
+		public long NodeId { get; set; }
 	}
 }
 

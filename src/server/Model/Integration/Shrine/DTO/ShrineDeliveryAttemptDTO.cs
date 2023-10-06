@@ -4,9 +4,8 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Integration.Shrine;
 
-namespace API.DTO.Integration.Shrine
+namespace Model.Integration.Shrine.DTO
 {
     public class ShrineDeliveryAttemptDTO
     {
@@ -47,6 +46,18 @@ namespace API.DTO.Integration.Shrine
                 MillisecondsToComplete = dto.MillisecondsToComplete,
                 RemainingAttempts = dto.RemainingAttempts,
                 Contents = dto.Contents
+            };
+        }
+
+        public static ShrineDeliveryContents ToContents(this ShrineDeliveryContentsDTO dto)
+        {
+            if (dto == null) return null;
+            _ = Enum.TryParse(dto.ContentsType, out ShrineDeliveryContentsType contentsType);
+            
+            return new ShrineDeliveryContents
+            {
+                Contents = dto.Contents,
+                ContentsType = contentsType
             };
         }
     }
