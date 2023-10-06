@@ -15,15 +15,16 @@ namespace Model.Integration.Shrine
     {
         IEnumerable<ShrineQueryResult> All();
         ShrineQueryResult GetOrDefault(long id);
-        void Overwrite(IEnumerable<ShrineQueryResult> results);
         ShrineQueryResult PopOrDefault(long id);
         void Put(ShrineQueryResult result);
-        void Put(IEnumerable<ShrineQueryResult> results);
+        void Put(ShrineResultProgress nodeResult);
+        void Put(IEnumerable<ShrineResultProgress> nodeResults);
+        void DeleteOlderThan(DateTime earliest);
     }
 
     public class ShrineQueryResultCache : IShrineQueryResultCache
     {
-        Dictionary<long, ShrineQueryResult> store;
+        readonly Dictionary<long, ShrineQueryResult> store;
         readonly ReaderWriterLockSlim sync;
 
         public ShrineQueryResultCache(IEnumerable<ShrineQueryResult> initial)
@@ -53,23 +54,37 @@ namespace Model.Integration.Shrine
         {
             sync.EnterWriteLock();
             store[result.Id] = result;
+            store[result.Id].Updated = DateTime.Now;
             sync.ExitWriteLock();
         }
 
-        public void Put(IEnumerable<ShrineQueryResult> results)
+        public void Put(ShrineResultProgress nodeResult)
         {
             sync.EnterWriteLock();
-            foreach (var result in results)
+            if (!store.ContainsKey(nodeResult.QueryId))
             {
-                store[result.Id] = result;
+                store[nodeResult.QueryId] = new ShrineQueryResult(nodeResult.QueryId);
             }
+            store[nodeResult.QueryId].Results[nodeResult.AdapterNodeId] = nodeResult;
+            store[nodeResult.QueryId].Updated = DateTime.Now;
             sync.ExitWriteLock();
         }
 
-        public void Overwrite(IEnumerable<ShrineQueryResult> results)
+        public void Put(IEnumerable<ShrineResultProgress> nodeResults)
         {
+            if (!nodeResults.Any()) return;
+
             sync.EnterWriteLock();
-            store = results.ToDictionary(ne => ne.Id);
+            var first = nodeResults.First();
+            if (!store.ContainsKey(first.QueryId))
+            {
+                store[first.QueryId] = new ShrineQueryResult(first.QueryId);
+            }
+            foreach (var nodeResult in nodeResults)
+            {
+                store[first.QueryId].Results[nodeResult.AdapterNodeId] = nodeResult;
+            }
+            store[first.QueryId].Updated = DateTime.Now;
             sync.ExitWriteLock();
         }
 
@@ -79,6 +94,19 @@ namespace Model.Integration.Shrine
             store.Remove(id, out var result);
             sync.ExitWriteLock();
             return result;
+        }
+
+        public void DeleteOlderThan(DateTime earliest)
+        {
+            sync.EnterReadLock();
+            foreach (var result in All())
+            {
+                if (result.Updated < earliest)
+                {
+                    store.Remove(result.Id, out var _);
+                }
+            }
+            sync.ExitReadLock();
         }
 
         public IEnumerator<ShrineQueryResult> GetEnumerator()

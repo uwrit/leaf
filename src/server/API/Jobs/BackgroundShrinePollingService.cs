@@ -6,8 +6,10 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using API.DTO.Cohort;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Model.Cohort;
 using Model.Integration.Shrine;
 using Model.Integration.Shrine.DTO;
 using Newtonsoft.Json;
@@ -19,14 +21,20 @@ namespace API.Jobs
         readonly ILogger<BackgroundShrinePollingService> logger;
         readonly IShrineMessageBroker broker;
         readonly IShrineQueryResultCache queryResultCache;
+        readonly IShrineQueryDefinitionConverter converter;
+        readonly CohortCounter counter;
         readonly int ErrorPauseSeconds = 30;
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,
-            IShrineMessageBroker broker)
+            IShrineMessageBroker broker,
+            IShrineQueryDefinitionConverter converter,
+            CohortCounter counter)
 		{
             this.logger = logger;
             this.broker = broker;
+            this.converter = converter;
+            this.counter = counter;
 		}
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -42,7 +50,7 @@ namespace API.Jobs
             {
                 try
                 {
-                    var message = await broker.ReadHubMessage();
+                    var message = await broker.ReadHubMessageAndAcknowledge();
                     if (message == null) continue;
 
                     _ = Task.Run(async () =>
@@ -56,7 +64,7 @@ namespace API.Jobs
 
                             case ShrineDeliveryContentsType.RunQueryForResult:
                                 var run = JsonConvert.DeserializeObject<ShrineRunQueryForResult>(message.Contents);
-                                await HandleRunQueryForResultMessage(run);
+                                await HandleRunQueryForResultMessage(run, stoppingToken);
                                 break;
 
                             case ShrineDeliveryContentsType.Result:
@@ -90,24 +98,28 @@ namespace API.Jobs
 
         void HandleUpdateQueryAtQepMessage(ShrineUpdateQueryAtQep update)
         {
-            switch (update.EncodedClass)
+            if (update.ResultProgresses != null)
             {
-                case ShrineQueryStatusType.UpdateQueryAtQepWithStatus:
-                    break;
-
-                case ShrineQueryStatusType.UpdateQueryReadyForAdapters:
-                    break;
+                queryResultCache.Put(update.ToQueryResult());
             }
         }
 
         void HandleResultMessage(ShrineResultProgress progress)
         {
-
+            queryResultCache.Put(progress);
         }
 
-        async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run)
+        async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run, CancellationToken stoppingToken)
         {
+            var leafQuery = converter.ToLeafQuery(run.Query);
+            var cohort = await counter.Count(leafQuery, stoppingToken);
+            var resp = new CohortCountDTO(cohort);
 
+            if (!cohort.ValidationContext.PreflightPassed)
+            {
+                // Respond with error
+            }
+            // Respond with count
         }
     }
 }

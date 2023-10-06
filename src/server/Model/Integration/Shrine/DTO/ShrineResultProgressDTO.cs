@@ -17,6 +17,8 @@ namespace Model.Integration.Shrine.DTO
         public string StatusMessage { get; set; }
         public long CrcQueryInstanceId { get; set; }
         public string EncodedClass { get; set; }
+        public int Count { get; set; } = -1;
+        public ShrineResultObfuscatingParametersDTO ObfuscatingParameters { get; set; }
 
         public ShrineResultProgressDTO(ShrineResultProgress progress)
         {
@@ -28,6 +30,26 @@ namespace Model.Integration.Shrine.DTO
             Status = new ShrineQueryStatusDTO(progress.Status);
             StatusMessage = progress.StatusMessage;
             CrcQueryInstanceId = progress.CrcQueryInstanceId;
+            EncodedClass = progress.EncodedClass.ToString();
+            Count = progress.Count;
+            ObfuscatingParameters = new ShrineResultObfuscatingParametersDTO(progress.ObfuscatingParameters);
+        }
+    }
+
+    public class ShrineResultObfuscatingParametersDTO
+    {
+        public int BinSize { get; set; }
+        public decimal StdDev { get; set; }
+        public int NoiseClamp { get; set; }
+        public int LowLimit { get; set; }
+
+        public ShrineResultObfuscatingParametersDTO(ShrineResultObfuscatingParameters parameters)
+        {
+            if (parameters == null) return;
+            BinSize = parameters.BinSize;
+            StdDev = parameters.StdDev;
+            NoiseClamp = parameters.NoiseClamp;
+            LowLimit = parameters.LowLimit;
         }
     }
 
@@ -44,7 +66,21 @@ namespace Model.Integration.Shrine.DTO
                 AdapterNodeName = dto.AdapterNodeName,
                 Status = dto.Status.ToStatus(),
                 StatusMessage = dto.StatusMessage,
-                CrcQueryInstanceId = dto.CrcQueryInstanceId
+                CrcQueryInstanceId = dto.CrcQueryInstanceId,
+                Count = dto.Count,
+                ObfuscatingParameters = dto.ObfuscatingParameters?.ToParameters()
+            };
+        }
+
+        public static ShrineResultObfuscatingParameters ToParameters(this ShrineResultObfuscatingParametersDTO dto)
+        {
+            if (dto == null) return null;
+            return new ShrineResultObfuscatingParameters
+            {
+                BinSize = dto.BinSize,
+                StdDev = dto.StdDev,
+                NoiseClamp = dto.NoiseClamp,
+                LowLimit = dto.LowLimit
             };
         }
     }

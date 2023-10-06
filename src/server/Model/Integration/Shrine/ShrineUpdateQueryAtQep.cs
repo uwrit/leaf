@@ -4,6 +4,7 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Model.Integration.Shrine
@@ -14,7 +15,16 @@ namespace Model.Integration.Shrine
 		public ShrineQueryStatus QueryStatus { get; set; }
 		public DateTime ChangeDate { get; set; }
 		public ShrineQueryStatusType EncodedClass { get; set; }
-		public IEnumerable<ShrineResultProgress> ResultProgresses { get; set; } = new List<ShrineResultProgress>();
+		public IEnumerable<ShrineResultProgress> ResultProgresses { get; set; }
+
+		public ShrineQueryResult ToQueryResult()
+		{
+			return new ShrineQueryResult(QueryId)
+			{
+				Updated = ChangeDate,
+				Results = ResultProgresses?.ToDictionary(p => p.QueryId)
+			};
+		}
     }
 }
 

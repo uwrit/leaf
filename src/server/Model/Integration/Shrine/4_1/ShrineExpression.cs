@@ -11,12 +11,16 @@ namespace Model.Integration.Shrine4_1
 	public class ShrineQueryDefinition
 	{
 		public ShrineConjunction Expression { get; set; }
-	}
+    }
 
 	public abstract class ShrineExpression
 	{
 		public int NMustBeTrue { get; set; }
-		public ShrineConjunctionCompare Compare { get; set; } = new ShrineConjunctionCompare();
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int? OccursAtLeast { get; set; }
+        public ShrineConjunction Concepts { get; set; }
+        public ShrineConjunctionCompare Compare { get; set; } = new ShrineConjunctionCompare();
 	}
 
 	public abstract class ShrineGroup : ShrineExpression
@@ -31,10 +35,7 @@ namespace Model.Integration.Shrine4_1
 
 	public class ShrineConceptGroup : ShrineGroup
 	{
-		public DateTime StartDate { get; set; }
-		public DateTime EndDate { get; set; }
-		public int OccursAtLeast { get; set; } = 1;
-		public ShrineConjunction Concepts { get; set; }
+		
 	}
 
 	public class ShrineConcept : ShrineExpression
