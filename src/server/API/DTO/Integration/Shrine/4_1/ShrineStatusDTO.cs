@@ -4,16 +4,17 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
+using Model.Integration.Shrine4_1;
 
-namespace Model.Integration.Shrine4_1.DTO
+namespace API.DTO.Integration.Shrine4_1
 {
     public class ShrineStatusDTO
     {
-        public string Status { get; set; }
+        public string EncodedClass { get; set; }
 
         public ShrineStatusDTO(ShrineStatus status)
         {
-            Status = status.Status.ToString();
+            EncodedClass = status.EncodedClass.ToString();
         }
     }
 
@@ -21,10 +22,10 @@ namespace Model.Integration.Shrine4_1.DTO
     {
         public static ShrineStatus ToStatus(this ShrineStatusDTO dto)
         {
-            _ = Enum.TryParse(dto.Status, out ShrineStatusType status);
+            _ = Enum.TryParse(dto.EncodedClass, out ShrineStatusType status);
             return new ShrineStatus
             {
-                Status = status
+                EncodedClass = status
             };
         }
     }

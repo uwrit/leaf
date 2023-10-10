@@ -23,6 +23,7 @@ namespace Model.Integration.Shrine
 	public class ShrineDeliveryContents
 	{
 		public string Contents { get; set; }
+		public long ContentsSubject { get; set; }
 		public ShrineDeliveryContentsType ContentsType { get; set; }
     }
 
@@ -31,6 +32,7 @@ namespace Model.Integration.Shrine
 		Unknown,
 		UpdateQueryAtQep,
 		RunQueryForResult,
+		RunQueryAtHub,
 		Result
 	}
 }

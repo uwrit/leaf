@@ -8,12 +8,13 @@ namespace Model.Integration.Shrine4_1
 {
 	public class ShrineStatus
 	{
-		public ShrineStatusType Status { get; set; }
+		public ShrineStatusType EncodedClass { get; set; }
 	}
 
     public enum ShrineStatusType
     {
-        ReadyForAdapters
+        ReadyForAdapters,
+        SentToHub
     }
 }
 

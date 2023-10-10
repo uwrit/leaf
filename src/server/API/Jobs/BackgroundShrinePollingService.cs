@@ -7,11 +7,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using API.DTO.Cohort;
+using API.DTO.Integration.Shrine;
+using API.Integration.Shrine;
+using API.Integration.Shrine4_1;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Model.Cohort;
 using Model.Integration.Shrine;
-using Model.Integration.Shrine.DTO;
 using Newtonsoft.Json;
 
 namespace API.Jobs
@@ -19,16 +21,16 @@ namespace API.Jobs
 	public class BackgroundShrinePollingService : BackgroundService
     {
         readonly ILogger<BackgroundShrinePollingService> logger;
-        readonly IShrineMessageBroker broker;
-        readonly IShrineQueryResultCache queryResultCache;
-        readonly IShrineQueryDefinitionConverter converter;
+        readonly ShrineMessageBroker broker;
         readonly CohortCounter counter;
+        readonly IShrineQueryResultCache queryResultCache;
+        readonly ShrineQueryDefinitionConverter converter;
         readonly int ErrorPauseSeconds = 30;
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,
-            IShrineMessageBroker broker,
-            IShrineQueryDefinitionConverter converter,
+            ShrineQueryDefinitionConverter converter,
+            ShrineMessageBroker broker,
             CohortCounter counter)
 		{
             this.logger = logger;
@@ -113,13 +115,18 @@ namespace API.Jobs
         {
             var leafQuery = converter.ToLeafQuery(run.Query);
             var cohort = await counter.Count(leafQuery, stoppingToken);
-            var resp = new CohortCountDTO(cohort);
+            var count = new CohortCountDTO(cohort);
 
             if (!cohort.ValidationContext.PreflightPassed)
             {
                 // Respond with error
             }
             // Respond with count
+            var response = new ShrineDeliveryContents
+            {
+                // TODO
+            };
+            // _ = await broker.SendMessageToHub()
         }
     }
 }

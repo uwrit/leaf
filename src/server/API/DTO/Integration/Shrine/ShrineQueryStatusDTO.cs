@@ -4,11 +4,15 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-namespace Model.Integration.Shrine.DTO
+using Model.Integration.Shrine;
+
+namespace API.DTO.Integration.Shrine
 {
     public class ShrineQueryStatusDTO
     {
         public string EncodedClass { get; set; }
+
+        public ShrineQueryStatusDTO() { }
 
         public ShrineQueryStatusDTO(ShrineQueryStatus status)
         {

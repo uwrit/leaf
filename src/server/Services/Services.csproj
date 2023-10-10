@@ -39,8 +39,6 @@
     <Folder Include="Admin\Notification\" />
     <Folder Include="Compiler\" />
     <Folder Include="Compiler\SqlBuilder\" />
-    <Folder Include="Integration\" />
-    <Folder Include="Integration\Shrine\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,7 +49,5 @@
     <None Remove="System.Data.OracleClient" />
     <None Remove="Google.Cloud.BigQuery.V2" />
     <None Remove="Compiler\SqlBuilder\" />
-    <None Remove="Integration\" />
-    <None Remove="Integration\Shrine\" />
   </ItemGroup>
 </Project>

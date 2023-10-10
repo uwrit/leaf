@@ -8,11 +8,13 @@ using System.Collections.Generic;
 using Model.Integration.Shrine4_1;
 using System.Linq;
 
-namespace Model.Integration.Shrine4_1.DTO
+namespace API.DTO.Integration.Shrine4_1
 {
     public class ShrineQueryDefinitionDTO
     {
         public ShrineConjunctionDTO Expression { get; set; }
+
+        public ShrineQueryDefinitionDTO() { }
 
         public ShrineQueryDefinitionDTO(ShrineQueryDefinition definition)
         {
@@ -24,6 +26,8 @@ namespace Model.Integration.Shrine4_1.DTO
     {
         public int NMustBeTrue { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
+
+        public ShrineGroupDTO() { }
 
         public ShrineGroupDTO(ShrineGroup expr)
         {
@@ -38,6 +42,8 @@ namespace Model.Integration.Shrine4_1.DTO
         public ShrineConjunctionCompareDTO Compare { get; set; }
         public IEnumerable<ShrineConceptGroupDTO> Possibilities { get; set; }
 
+        public ShrineConjunctionDTO() { }
+
         public ShrineConjunctionDTO(ShrineConjunction conjunction)
         {
             Possibilities = conjunction.Possibilities.Select(p => new ShrineConceptGroupDTO(p));
@@ -49,14 +55,32 @@ namespace Model.Integration.Shrine4_1.DTO
         public long StartDate { get; set; }
         public long EndDate { get; set; }
         public int OccursAtLeast { get; set; } = 1;
-        public ShrineConjunctionDTO Concepts { get; set; }
+        public ShrineConceptConjunctionDTO Concepts { get; set; }
+
+        public ShrineConceptGroupDTO() { }
 
         public ShrineConceptGroupDTO(ShrineConceptGroup group) : base(group)
         {
             StartDate = ((DateTimeOffset)group.StartDate).ToUnixTimeMilliseconds();
             EndDate = ((DateTimeOffset)group.EndDate).ToUnixTimeMilliseconds();
-            OccursAtLeast = group.OccursAtLeast;
-            Concepts = new ShrineConjunctionDTO(group.Concepts);
+            OccursAtLeast = group.OccursAtLeast.HasValue ? (int)group.OccursAtLeast : 1;
+            Concepts = new ShrineConceptConjunctionDTO(group.Concepts);
+        }
+    }
+
+    public class ShrineConceptConjunctionDTO
+    {
+        public int NMustBeTrue { get; set; }
+        public ShrineConjunctionCompareDTO Compare { get; set; }
+        public IEnumerable<ShrineConceptDTO> Possibilities { get; set; }
+
+        public ShrineConceptConjunctionDTO() { }
+
+        public ShrineConceptConjunctionDTO(ShrineConceptConjunction conjunction)
+        {
+            NMustBeTrue = conjunction.NMustBeTrue;
+            Compare = new ShrineConjunctionCompareDTO(conjunction.Compare);
+            Possibilities = conjunction.Possibilities.Select(p => new ShrineConceptDTO(p));
         }
     }
 
@@ -66,6 +90,8 @@ namespace Model.Integration.Shrine4_1.DTO
         public string TermPath { get; set; }
         public string Constraint { get; set; }
         public static readonly string EncodedClass = "Concept";
+
+        public ShrineConceptDTO() { }
 
         public ShrineConceptDTO(ShrineConcept concept)
         {
@@ -78,6 +104,8 @@ namespace Model.Integration.Shrine4_1.DTO
     public class ShrineConjunctionCompareDTO
     {
         public string EncodedClass { get; set; }
+
+        public ShrineConjunctionCompareDTO() { }
 
         public ShrineConjunctionCompareDTO(ShrineConjunctionCompare compare)
         {
@@ -126,6 +154,17 @@ namespace Model.Integration.Shrine4_1.DTO
                 Possibilities = dto.Possibilities.Select(p => p.ToConceptGroup())
             };
         }
+
+        public static ShrineConceptConjunction ToConjunction(this ShrineConceptConjunctionDTO dto)
+        {
+            return new ShrineConceptConjunction
+            {
+                NMustBeTrue = dto.NMustBeTrue,
+                Compare = dto.Compare.ToCompare(),
+                Possibilities = dto.Possibilities.Select(p => p.ToConcept())
+            };
+        }
+
 
         public static ShrineQueryDefinition ToDefinition(this ShrineQueryDefinitionDTO dto)
         {

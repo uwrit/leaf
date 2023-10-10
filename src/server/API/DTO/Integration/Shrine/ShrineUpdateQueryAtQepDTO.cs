@@ -6,8 +6,9 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Model.Integration.Shrine;
 
-namespace Model.Integration.Shrine.DTO
+namespace API.DTO.Integration.Shrine
 {
     public class ShrineUpdateQueryAtQepDTO
     {
@@ -16,6 +17,8 @@ namespace Model.Integration.Shrine.DTO
         public long ChangeDate { get; set; }
         public string EncodedClass { get; set; }
         public IEnumerable<ShrineResultProgressDTO> ResultProgresses { get; set; }
+
+        public ShrineUpdateQueryAtQepDTO() { }
 
         public ShrineUpdateQueryAtQepDTO(ShrineUpdateQueryAtQep update)
         {

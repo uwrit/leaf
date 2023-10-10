@@ -4,7 +4,9 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-namespace Model.Integration.Shrine.DTO
+using Model.Integration.Shrine;
+
+namespace API.DTO.Integration.Shrine
 {
     public class ShrineResultProgressDTO
     {
@@ -19,6 +21,8 @@ namespace Model.Integration.Shrine.DTO
         public string EncodedClass { get; set; }
         public int Count { get; set; } = -1;
         public ShrineResultObfuscatingParametersDTO ObfuscatingParameters { get; set; }
+
+        public ShrineResultProgressDTO() { }
 
         public ShrineResultProgressDTO(ShrineResultProgress progress)
         {

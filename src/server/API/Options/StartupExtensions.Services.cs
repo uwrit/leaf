@@ -9,6 +9,7 @@ using API.Jobs;
 using API.Jwt;
 using API.Middleware.Federation;
 using API.Middleware.Logging;
+using API.Integration.Shrine;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -31,7 +32,6 @@ using Model.Search;
 using Model.Import;
 using Model.Notification;
 using Model.Obfuscation;
-using Model.Integration.Shrine;
 using Services.Admin.Compiler;
 using Services.Admin.Network;
 using Services.Admin.Query;
@@ -48,9 +48,7 @@ using Services.Search;
 using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
-using Services.Integration.Shrine;
 using System.Net.Http;
-using System;
 
 namespace API.Options
 {
@@ -95,7 +93,7 @@ namespace API.Options
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
 
-            services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>(client =>
+            services.AddHttpClient<ShrineMessageBroker>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
@@ -107,7 +105,6 @@ namespace API.Options
 
             services.AddSingleton<IServerStateCache, ServerStateCache>();
             services.AddSingleton<IServerStateProvider, ServerStateService>();
-            services.AddSingleton<IShrineMessageBroker, ShrineMessageBroker>();
             services.AddTransient<ConceptHintSearcher.IConceptHintSearchService, ConceptHintSearchService>();
             services.AddTransient<ConceptTreeSearcher.IConceptTreeReader, ConceptTreeReader>();
             services.AddTransient<PreflightResourceChecker.IPreflightConceptReader, PreflightResourceReader>();
@@ -203,11 +200,12 @@ namespace API.Options
                 if (integrationOpts.SHRINE.Enabled)
                 {
                     services.AddHostedService<BackgroundShrinePollingService>();
+                    services.AddTransient<ShrineMessageBroker>();
 
                     /* Use for testing only!! */
                     if (!environment.IsProduction())
                     {
-                        services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                        services.AddHttpClient<ShrineMessageBroker>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                         {
                             ClientCertificateOptions = ClientCertificateOption.Manual,
                             //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,

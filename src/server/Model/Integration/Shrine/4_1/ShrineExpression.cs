@@ -30,13 +30,18 @@ namespace Model.Integration.Shrine4_1
 
 	public class ShrineConjunction : ShrineExpression
 	{
-		public IEnumerable<ShrineExpression> Possibilities { get; set; } = new List<ShrineExpression>();
+		public IEnumerable<ShrineConceptGroup> Possibilities { get; set; } = new List<ShrineConceptGroup>();
 	}
 
-	public class ShrineConceptGroup : ShrineGroup
+	public class ShrineConceptConjunction : ShrineExpression
 	{
-		
+		public IEnumerable<ShrineConcept> Possibilities { get; set; } = new List<ShrineConcept>();
 	}
+
+    public class ShrineConceptGroup : ShrineGroup
+	{
+		public new ShrineConceptConjunction Concepts { get; set; }
+    }
 
 	public class ShrineConcept : ShrineExpression
     {

@@ -4,20 +4,19 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
+using API.DTO.Integration.Shrine;
 using Microsoft.Extensions.Options;
 using Model.Integration.Shrine;
-using Model.Integration.Shrine.DTO;
 using Model.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Services.Integration.Shrine
+namespace API.Integration.Shrine
 {
-	public class ShrineMessageBroker : IShrineMessageBroker
+	public class ShrineMessageBroker
 	{
         readonly HttpClient client;
         readonly SHRINEOptions opts;
@@ -38,10 +37,15 @@ namespace Services.Integration.Shrine
             };
 
             var resp = await client.SendAsync(req);
-            if (!resp.IsSuccessStatusCode) return null;
+            if (!resp.IsSuccessStatusCode)
+            {
+                req.Dispose();
+                return null;
+            }
 
             var jsonMessage = await resp.Content.ReadAsStringAsync();
             var message = JsonConvert.DeserializeObject<ShrineDeliveryAttemptDTO>(jsonMessage).ToDeliveryAttempt();
+            req.Dispose();
 
             var ack = new HttpRequestMessage
             {
@@ -49,10 +53,27 @@ namespace Services.Integration.Shrine
                 Method = HttpMethod.Put
             };
             _ = await client.SendAsync(ack);
+            ack.Dispose();
 
             var contents = JsonConvert.DeserializeObject<ShrineDeliveryContentsDTO>(message.Contents);
 
             return contents.ToContents();
+        }
+
+        public async Task SendMessageToHub(ShrineDeliveryContents contents)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/sendMessage/hub"),
+                Method = HttpMethod.Put,
+                Content = new StringContent(
+                    JsonConvert.SerializeObject(new ShrineDeliveryContentsDTO(contents)),
+                    Encoding.UTF8,
+                    "application/x-www-form-urlencoded"
+                )
+            };
+            _ = await client.SendAsync(request);
+            request.Dispose();
         }
 
         private static string GetDeliveryAttemptId(string body)
