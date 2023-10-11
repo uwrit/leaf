@@ -16,8 +16,14 @@ using Newtonsoft.Json.Linq;
 
 namespace API.Integration.Shrine
 {
-	public class ShrineMessageBroker
-	{
+    public interface IShrineMessageBroker
+    {
+        Task<ShrineDeliveryContents> ReadHubMessageAndAcknowledge();
+        Task SendMessageToHub(ShrineDeliveryContents contents);
+    }
+
+    public class ShrineMessageBroker : IShrineMessageBroker
+    {
         readonly HttpClient client;
         readonly SHRINEOptions opts;
         readonly int TimeOutSeconds = 50;

@@ -120,7 +120,7 @@ namespace Model.Compiler
         /// <returns>The panels.</returns>
         /// <param name="panels">PanelDTOs.</param>
         /// <param name="importRefs">Import panel items referenced in panels.</param>
-        public IEnumerable<IPanelDTO> CrosswalkImportIds(IEnumerable<IPanelDTO> panels, IEnumerable<ImportRef> importRefs)
+        public static IEnumerable<IPanelDTO> CrosswalkImportIds(IEnumerable<IPanelDTO> panels, IEnumerable<ImportRef> importRefs)
         {
             var mapped = panels.Select(p => p).ToList();
 
@@ -152,7 +152,12 @@ namespace Model.Compiler
 
             var map = new Dictionary<string, ResourceRef>(localQuery.Panels
                                 .GetConcepts()
-                                .Select(c => new KeyValuePair<string, ResourceRef>(key: c.UniversalId.ToString(), value: new ResourceRef { Id = c.Id, UniversalId = c.UniversalId.ToString() })));
+                                .Select(c =>
+                                    new KeyValuePair<string, ResourceRef>(
+                                        key: c.UniversalId.ToString(),
+                                        value: new ResourceRef { Id = c.Id, UniversalId = c.UniversalId.ToString() })
+                                    )
+                                );
 
             var items = definition.Panels
                 .SelectMany(p => p.SubPanels)
@@ -217,7 +222,7 @@ namespace Model.Compiler
             return GetPanels(panels, feder);
         }
 
-        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, LocalConceptMap concepts)
+        static IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, LocalConceptMap concepts)
         {
             var converted = new List<Panel>();
 
@@ -230,7 +235,7 @@ namespace Model.Compiler
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, LocalConceptMap concepts)
+        static ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, LocalConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
@@ -244,7 +249,7 @@ namespace Model.Compiler
             return subs;
         }
 
-        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, LocalConceptMap concepts)
+        static IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, LocalConceptMap concepts)
         {
             var items = new List<PanelItem>();
 
@@ -257,7 +262,7 @@ namespace Model.Compiler
             return items;
         }
 
-        IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, FederatedConceptMap concepts)
+        static IEnumerable<Panel> GetPanels(IEnumerable<IPanelDTO> panels, FederatedConceptMap concepts)
         {
             var converted = new List<Panel>();
 
@@ -270,7 +275,7 @@ namespace Model.Compiler
             return converted;
         }
 
-        ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, FederatedConceptMap concepts)
+        static ICollection<SubPanel> GetSubPanels(IEnumerable<ISubPanelDTO> dtos, FederatedConceptMap concepts)
         {
             var subs = new List<SubPanel>();
 
@@ -284,7 +289,7 @@ namespace Model.Compiler
             return subs;
         }
 
-        IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, FederatedConceptMap concepts)
+        static IEnumerable<PanelItem> GetPanelItems(IEnumerable<IPanelItemDTO> dtos, FederatedConceptMap concepts)
         {
             var items = new List<PanelItem>();
 

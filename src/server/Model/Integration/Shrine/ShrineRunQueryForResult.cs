@@ -14,6 +14,7 @@ namespace Model.Integration.Shrine
 		public ShrineNode Node { get; set; }
 		public ShrineTopic Topic { get; set; }
 		public ShrineResultProgress ResultProgress { get; set; }
+		public ShrineResearcher Researcher { get; set; }
 		public int ProtocolVersion { get; set; }
 	}
 }

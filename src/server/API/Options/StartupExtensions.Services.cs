@@ -10,6 +10,7 @@ using API.Jwt;
 using API.Middleware.Federation;
 using API.Middleware.Logging;
 using API.Integration.Shrine;
+using API.Integration.Shrine4_1;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -49,6 +50,7 @@ using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
 using System.Net.Http;
+using Model.Integration.Shrine;
 
 namespace API.Options
 {
@@ -93,7 +95,7 @@ namespace API.Options
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
 
-            services.AddHttpClient<ShrineMessageBroker>(client =>
+            services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>(client =>
             {
                 client.DefaultRequestHeaders.Add("Accept", @"application/json");
             });
@@ -200,12 +202,14 @@ namespace API.Options
                 if (integrationOpts.SHRINE.Enabled)
                 {
                     services.AddHostedService<BackgroundShrinePollingService>();
-                    services.AddTransient<ShrineMessageBroker>();
+                    services.AddTransient<IShrineMessageBroker, ShrineMessageBroker>();
+                    services.AddTransient<ShrineQueryDefinitionConverter>();
+                    services.AddSingleton<IShrineQueryResultCache, ShrineQueryResultCache>();
 
                     /* Use for testing only!! */
                     if (!environment.IsProduction())
                     {
-                        services.AddHttpClient<ShrineMessageBroker>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+                        services.AddHttpClient<IShrineMessageBroker, ShrineMessageBroker>().ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
                         {
                             ClientCertificateOptions = ClientCertificateOption.Manual,
                             //ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,

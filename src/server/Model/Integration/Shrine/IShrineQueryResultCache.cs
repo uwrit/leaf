@@ -18,6 +18,7 @@ namespace Model.Integration.Shrine
         ShrineQueryResult PopOrDefault(long id);
         void Put(ShrineQueryResult result);
         void Put(ShrineResultProgress nodeResult);
+        void Put(long id, ShrineResearcher user);
         void Put(IEnumerable<ShrineResultProgress> nodeResults);
         void DeleteOlderThan(DateTime earliest);
     }
@@ -55,6 +56,17 @@ namespace Model.Integration.Shrine
             sync.EnterWriteLock();
             store[result.Id] = result;
             store[result.Id].Updated = DateTime.Now;
+            sync.ExitWriteLock();
+        }
+
+        public void Put(long id, ShrineResearcher user)
+        {
+            sync.EnterWriteLock();
+            if (!store.ContainsKey(id))
+            {
+                store[id] = new ShrineQueryResult(id);
+            }
+            store[id].User = user;
             sync.ExitWriteLock();
         }
 

@@ -10,34 +10,42 @@ using API.DTO.Cohort;
 using API.DTO.Integration.Shrine;
 using API.Integration.Shrine;
 using API.Integration.Shrine4_1;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Model.Authorization;
 using Model.Cohort;
 using Model.Integration.Shrine;
 using Newtonsoft.Json;
 
 namespace API.Jobs
 {
-	public class BackgroundShrinePollingService : BackgroundService
+    public class BackgroundShrinePollingService : BackgroundService
     {
         readonly ILogger<BackgroundShrinePollingService> logger;
-        readonly ShrineMessageBroker broker;
-        readonly CohortCounter counter;
+        readonly IShrineMessageBroker broker;
         readonly IShrineQueryResultCache queryResultCache;
+        readonly IServiceScopeFactory serviceScopeFactory;
+        readonly CohortCounter counter;
         readonly ShrineQueryDefinitionConverter converter;
         readonly int ErrorPauseSeconds = 30;
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,
-            ShrineQueryDefinitionConverter converter,
-            ShrineMessageBroker broker,
-            CohortCounter counter)
-		{
+            IShrineMessageBroker broker,
+            IShrineQueryResultCache queryResultCache,
+            IServiceScopeFactory serviceScopeFactory,
+            ShrineQueryDefinitionConverter converter
+            //CohortCounter counter
+            )
+        {
             this.logger = logger;
             this.broker = broker;
+            this.queryResultCache = queryResultCache;
+            this.serviceScopeFactory = serviceScopeFactory;
             this.converter = converter;
-            this.counter = counter;
-		}
+            //this.counter = counter;
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -97,7 +105,7 @@ namespace API.Jobs
 
             logger.LogInformation("BackgroundShrinePollingService is stopped");
         }
-
+        
         void HandleUpdateQueryAtQepMessage(ShrineUpdateQueryAtQep update)
         {
             if (update.ResultProgresses != null)
@@ -113,19 +121,25 @@ namespace API.Jobs
 
         async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run, CancellationToken stoppingToken)
         {
-            var leafQuery = converter.ToLeafQuery(run.Query);
-            var cohort = await counter.Count(leafQuery, stoppingToken);
-            var count = new CohortCountDTO(cohort);
+            using (var scope = serviceScopeFactory.CreateAsyncScope())
+            {
+                
+                queryResultCache.Put(run.Query.Id, run.Researcher);
 
-            if (!cohort.ValidationContext.PreflightPassed)
-            {
-                // Respond with error
+                var leafQuery = converter.ToLeafQuery(run.Query);
+                //var cohort = await counter.Count(leafQuery, stoppingToken);
+                //var count = new CohortCountDTO(cohort);
             }
+
+            //if (!cohort.ValidationContext.PreflightPassed)
+            //{
+            // Respond with error
+            //}
             // Respond with count
-            var response = new ShrineDeliveryContents
-            {
-                // TODO
-            };
+            //var response = new ShrineDeliveryContents
+            //{
+            // TODO
+            //};
             // _ = await broker.SendMessageToHub()
         }
     }

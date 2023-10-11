@@ -12,6 +12,7 @@ namespace Model.Integration.Shrine
 	{
 		public long Id { get; set; }
 		public DateTime Updated = DateTime.Now;
+		public ShrineResearcher User { get; set; }
 		public Dictionary<long, ShrineResultProgress> Results = new();
 
 		public ShrineQueryResult(long id)
