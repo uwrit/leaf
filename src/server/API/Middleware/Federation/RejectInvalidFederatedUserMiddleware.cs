@@ -15,9 +15,9 @@ namespace API.Middleware.Federation
         readonly IUserContext user;
         readonly ILogger<RejectInvalidFederatedUserMiddleware> logger;
 
-        public RejectInvalidFederatedUserMiddleware(IUserContext userContext, ILogger<RejectInvalidFederatedUserMiddleware> logger)
+        public RejectInvalidFederatedUserMiddleware(IUserContextProvider userContextProvider, ILogger<RejectInvalidFederatedUserMiddleware> logger)
         {
-            this.user = userContext;
+            this.user = userContextProvider.GetUserContext();
             this.logger = logger;
         }
 

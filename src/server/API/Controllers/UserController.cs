@@ -25,9 +25,6 @@ namespace API.Controllers
     {
         readonly ILogger<UserController> logger;
         readonly AuthenticationOptions authenticationOptions;
-        readonly LeafVersionOptions versionOptions;
-        readonly CohortOptions cohortOptions;
-        readonly ClientOptions clientOptions;
         readonly IUserJwtProvider jwtProvider;
         readonly IUserContext userContext;
 
@@ -38,14 +35,11 @@ namespace API.Controllers
             IOptions<CohortOptions> cohortOptions,
             IOptions<ClientOptions> clientOptions,
             IUserJwtProvider userJwtProvider,
-            IUserContext userContext)
+            IUserContextProvider userContextProvider)
         {
             this.logger = logger;
             this.authenticationOptions = authenticationOptions.Value;
-            this.versionOptions = versionOptions.Value;
-            this.cohortOptions = cohortOptions.Value;
-            this.clientOptions = clientOptions.Value;
-            this.userContext = userContext;
+            this.userContext = userContextProvider.GetUserContext();
             jwtProvider = userJwtProvider;
         }
 

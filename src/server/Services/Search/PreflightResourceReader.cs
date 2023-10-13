@@ -28,10 +28,10 @@ namespace Services.Search
 
         public PreflightResourceReader(
             IOptions<AppDbOptions> options,
-            IUserContext userContext)
+            IUserContextProvider userContextProvider)
         {
             opts = options.Value;
-            user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         public async Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs)

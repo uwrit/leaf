@@ -18,7 +18,7 @@ namespace API.Integration.Shrine
 {
     public interface IShrineMessageBroker
     {
-        Task<ShrineDeliveryContents> ReadHubMessageAndAcknowledge();
+        Task<(HttpResponseMessage, ShrineDeliveryContents)> ReadHubMessageAndAcknowledge();
         Task SendMessageToHub(ShrineDeliveryContents contents);
     }
 
@@ -34,7 +34,7 @@ namespace API.Integration.Shrine
             this.opts = opts.Value.SHRINE;
         }
 
-        public async Task<ShrineDeliveryContents> ReadHubMessageAndAcknowledge()
+        public async Task<(HttpResponseMessage, ShrineDeliveryContents)> ReadHubMessageAndAcknowledge()
         {
             var req = new HttpRequestMessage
             {
@@ -43,10 +43,10 @@ namespace API.Integration.Shrine
             };
 
             var resp = await client.SendAsync(req);
-            if (!resp.IsSuccessStatusCode)
+            if (!resp.IsSuccessStatusCode || resp.Content == null)
             {
                 req.Dispose();
-                return null;
+                return (resp, null);
             }
 
             var jsonMessage = await resp.Content.ReadAsStringAsync();
@@ -63,7 +63,7 @@ namespace API.Integration.Shrine
 
             var contents = JsonConvert.DeserializeObject<ShrineDeliveryContentsDTO>(message.Contents);
 
-            return contents.ToContents();
+            return (resp, contents.ToContents());
         }
 
         public async Task SendMessageToHub(ShrineDeliveryContents contents)

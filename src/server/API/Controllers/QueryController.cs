@@ -30,11 +30,11 @@ namespace API.Controllers
         readonly QueryManager manager;
         readonly IUserContext user;
 
-        public QueryController(QueryManager manager, ILogger<QueryController> logger, IUserContext userContext)
+        public QueryController(QueryManager manager, ILogger<QueryController> logger, IUserContextProvider userContextProvider)
         {
             log = logger;
             this.manager = manager;
-            user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         [Authorize(Policy = Access.Institutional)]

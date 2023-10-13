@@ -12,7 +12,6 @@ using Microsoft.Extensions.Logging;
 using Model.Authorization;
 using Model.Compiler;
 using Model.Extensions;
-using Model.Search;
 using Model.Tagging;
 using Model.Error;
 using System.Data.Common;
@@ -49,14 +48,14 @@ namespace Model.Search
             IQueryService service,
             IOptions<DeidentificationOptions> obfuscationOptions,
             ILogger<QueryManager> log,
-            IUserContext user,
+            IUserContextProvider userContextProvider,
             PanelConverter converter,
             PanelValidator validator)
         {
             this.service = service;
             this.deidentOpts = obfuscationOptions.Value;
             this.log = log;
-            this.user = user;
+            this.user = userContextProvider.GetUserContext();
             this.converter = converter;
             this.validator = validator;
         }

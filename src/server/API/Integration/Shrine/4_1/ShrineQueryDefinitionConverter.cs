@@ -130,7 +130,7 @@ namespace API.Integration.Shrine4_1
             };
         }
 
-        static long GenerateRandomLongId()
+        public static long GenerateRandomLongId()
         {
             return LongRandom(100000000000000000, 999999999999999999, new Random());
         }

@@ -10,11 +10,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Admin;
 using Model.Authorization;
-using Model.Error;
 using Model.Options;
 using Model.Tagging;
 using Services.Search;
@@ -30,10 +27,10 @@ namespace Services.Admin.Compiler
 
         public AdminConceptService(
             IOptions<AppDbOptions> options,
-            IUserContext userContext)
+            IUserContextProvider userContextProvider)
         {
             opts = options.Value;
-            user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         public async Task<AdminConcept> CreateAsync(AdminConcept c)

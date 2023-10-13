@@ -6,15 +6,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Admin;
 using Model.Tagging;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Model.Error;
 using System.Linq;
 using Model.Authorization;
 using Model.Admin.Compiler;
@@ -28,10 +25,10 @@ namespace Services.Admin.Compiler
 
         public AdminSpecializationService(
             IOptions<AppDbOptions> options,
-            IUserContext userContext)
+            IUserContextProvider userContextProvider)
         {
             opts = options.Value;
-            user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         public async Task<Specialization> CreateAsync(Specialization spec)

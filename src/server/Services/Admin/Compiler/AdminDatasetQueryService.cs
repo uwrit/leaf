@@ -9,7 +9,6 @@ using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using Model.Options;
-using Model.Error;
 using Model.Admin.Compiler;
 using Model.Authorization;
 using Model.Tagging;
@@ -18,7 +17,6 @@ using Microsoft.Extensions.Options;
 using Dapper;
 using Model.Compiler;
 using Services.Tables;
-using Model.Extensions;
 using Services.Search;
 
 namespace Services.Admin.Compiler
@@ -28,10 +26,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminDatasetQueryService(IOptions<AppDbOptions> opts, IUserContext userContext)
+        public AdminDatasetQueryService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
         {
             this.opts = opts.Value;
-            this.user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         public async Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id)

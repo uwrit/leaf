@@ -42,11 +42,11 @@ namespace Model.Search
 
         public PreflightResourceChecker(
             IPreflightResourceReader reader,
-            IUserContext user,
+            IUserContextProvider userContextProvider,
             ILogger<PreflightResourceChecker> log)
         {
             this.reader = reader;
-            this.user = user;
+            this.user = userContextProvider.GetUserContext(0);
             this.log = log;
         }
 

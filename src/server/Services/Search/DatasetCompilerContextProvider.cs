@@ -33,11 +33,11 @@ namespace Services.Search
         };
 
         public DatasetCompilerContextProvider(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> dbOptions,
             ILogger<DatasetCompilerContextProvider> logger)
         {
-            user = userContext;
+            user = userContextProvider.GetUserContext();
             log = logger;
             opts = dbOptions.Value;
         }

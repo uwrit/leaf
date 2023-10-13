@@ -34,11 +34,11 @@ namespace Services.Search
         readonly AppDbOptions dbOpts;
 
         public QueryService(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> dbOpts
         )
         {
-            user = userContext;
+            user = userContextProvider.GetUserContext();
             this.dbOpts = dbOpts.Value;
         }
 

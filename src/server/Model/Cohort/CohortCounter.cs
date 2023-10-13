@@ -55,7 +55,7 @@ namespace Model.Cohort
             ICohortCacheService cohortCache,
             IObfuscationService obfuscator,
             ILogger<CohortCounter> log,
-            IUserContext user = null)
+            IUserContextProvider userContextProvider)
         {
             this.runtime = opts.Value.Runtime;
             this.deidentOpts = deidentOpts.Value;
@@ -64,7 +64,7 @@ namespace Model.Cohort
             this.counter = counter;
             this.obfuscator = obfuscator;
             this.cohortCache = cohortCache;
-            this.user = user;
+            this.user = userContextProvider.GetUserContext();
             this.log = log;
         }
 

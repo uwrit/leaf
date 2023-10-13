@@ -5,20 +5,14 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using Model.Options;
-using Model.Error;
 using Model.Admin.Compiler;
 using Model.Authorization;
-using Model.Tagging;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Dapper;
-using Model.Compiler;
-using Services.Tables;
-using Model.Extensions;
 using Services.Search;
 
 namespace Services.Admin.Compiler
@@ -28,10 +22,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminDemographicQueryService(IOptions<AppDbOptions> opts, IUserContext userContext)
+        public AdminDemographicQueryService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
         {
             this.opts = opts.Value;
-            this.user = userContext;
+            this.user = userContextProvider.GetUserContext();
         }
 
         public async Task<AdminDemographicQuery> GetDemographicQueryAsync()

@@ -36,11 +36,11 @@ namespace Services.Search
         };
 
         public PanelDatasetCompilerContextProvider(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> options,
             ILogger<PanelDatasetCompilerContextProvider> logger)
         {
-            user = userContext;
+            user = userContextProvider.GetUserContext();
             opts = options.Value;
             log = logger;
         }

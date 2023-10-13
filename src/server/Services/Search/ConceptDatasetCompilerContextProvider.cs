@@ -33,11 +33,11 @@ namespace Services.Search
         readonly ILogger<ConceptDatasetCompilerContextProvider> log;
 
         public ConceptDatasetCompilerContextProvider(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> options,
             ILogger<ConceptDatasetCompilerContextProvider> logger)
         {
-            user = userContext;
+            user = userContextProvider.GetUserContext();
             opts = options.Value;
             log = logger;
         }

@@ -24,10 +24,10 @@ namespace Services.Search
         readonly AppDbOptions opts;
 
         public DatasetQueryFetcher(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> dbOptions)
         {
-            user = userContext;
+            user = userContextProvider.GetUserContext();
             opts = dbOptions.Value;
         }
 

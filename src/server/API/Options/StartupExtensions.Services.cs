@@ -62,6 +62,7 @@ namespace API.Options
         {
             services.AddHttpContextAccessor();
 
+            services.AddScoped<IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserContext, HttpUserContext>();
             services.AddTransient<UserContextLoggingMiddleware>();
             services.AddTransient<RejectInvalidFederatedUserMiddleware>();
@@ -204,6 +205,7 @@ namespace API.Options
                     services.AddHostedService<BackgroundShrinePollingService>();
                     services.AddTransient<IShrineMessageBroker, ShrineMessageBroker>();
                     services.AddTransient<ShrineQueryDefinitionConverter>();
+                    services.AddSingleton<IShrineUserQueryCache, ShrineUserContextCache>();
                     services.AddSingleton<IShrineQueryResultCache, ShrineQueryResultCache>();
 
                     /* Use for testing only!! */

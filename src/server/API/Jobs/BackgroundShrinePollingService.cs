@@ -6,8 +6,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using API.DTO.Cohort;
 using API.DTO.Integration.Shrine;
+using API.Authorization;
 using API.Integration.Shrine;
 using API.Integration.Shrine4_1;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +17,8 @@ using Model.Authorization;
 using Model.Cohort;
 using Model.Integration.Shrine;
 using Newtonsoft.Json;
+using API.DTO.Cohort;
+using Model.Compiler;
 
 namespace API.Jobs
 {
@@ -25,6 +27,7 @@ namespace API.Jobs
         readonly ILogger<BackgroundShrinePollingService> logger;
         readonly IShrineMessageBroker broker;
         readonly IShrineQueryResultCache queryResultCache;
+        readonly IShrineUserQueryCache userQueryCache;
         readonly IServiceScopeFactory serviceScopeFactory;
         readonly CohortCounter counter;
         readonly ShrineQueryDefinitionConverter converter;
@@ -34,17 +37,19 @@ namespace API.Jobs
             ILogger<BackgroundShrinePollingService> logger,
             IShrineMessageBroker broker,
             IShrineQueryResultCache queryResultCache,
+            IShrineUserQueryCache userQueryCache,
             IServiceScopeFactory serviceScopeFactory,
-            ShrineQueryDefinitionConverter converter
-            //CohortCounter counter
+            ShrineQueryDefinitionConverter converter,
+            CohortCounter counter
             )
         {
             this.logger = logger;
             this.broker = broker;
             this.queryResultCache = queryResultCache;
+            this.userQueryCache = userQueryCache;
             this.serviceScopeFactory = serviceScopeFactory;
             this.converter = converter;
-            //this.counter = counter;
+            this.counter = counter;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -60,8 +65,15 @@ namespace API.Jobs
             {
                 try
                 {
-                    var message = await broker.ReadHubMessageAndAcknowledge();
-                    if (message == null) continue;
+                    var (response, message) = await broker.ReadHubMessageAndAcknowledge();
+                    if (message == null)
+                    {
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            // Error, delay before next poll
+                            await Task.Delay(TimeSpan.FromSeconds(ErrorPauseSeconds), stoppingToken);
+                        }
+                    }
 
                     _ = Task.Run(async () =>
                     {
@@ -97,10 +109,6 @@ namespace API.Jobs
                     logger.LogError($"BackgroundShrinePollingService pausing {ErrorPauseSeconds} seconds.");
                     await Task.Delay(TimeSpan.FromSeconds(ErrorPauseSeconds), stoppingToken);
                 }
-                finally
-                {
-                    // No need to delay next poll on Leaf end. SHRINE already long polls on other side
-                }
             }
 
             logger.LogInformation("BackgroundShrinePollingService is stopped");
@@ -121,26 +129,45 @@ namespace API.Jobs
 
         async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run, CancellationToken stoppingToken)
         {
-            using (var scope = serviceScopeFactory.CreateAsyncScope())
-            {
-                
-                queryResultCache.Put(run.Query.Id, run.Researcher);
+            IUserContext user;
+            IPatientCountQueryDTO query;
+            var cached = userQueryCache.GetOrDefault(run.Query.Id);
 
-                var leafQuery = converter.ToLeafQuery(run.Query);
-                //var cohort = await counter.Count(leafQuery, stoppingToken);
-                //var count = new CohortCountDTO(cohort);
+            // If run by a Leaf user, grab from cache
+            if (cached != null)
+            {
+                user = cached.User;
+                query = cached.Query;
             }
 
-            //if (!cohort.ValidationContext.PreflightPassed)
-            //{
-            // Respond with error
-            //}
-            // Respond with count
-            //var response = new ShrineDeliveryContents
-            //{
-            // TODO
-            //};
-            // _ = await broker.SendMessageToHub()
+            // Else not from Leaf, so set user context and transform query defintion
+            else
+            {
+                user = new ShrineUserContext(run.Researcher);
+                query = converter.ToLeafQuery(run.Query);
+            }
+
+            // Create scope to ensure query run as this user
+            using (var scope = serviceScopeFactory.CreateAsyncScope())
+            {
+                var userContextProvider = scope.ServiceProvider.GetRequiredService<UserContextProvider>();
+                userContextProvider.SetUserContext(user);
+                queryResultCache.Put(run.Query.Id, run.Researcher);
+
+                var cohort = await counter.Count(query, stoppingToken);
+                var count = new CohortCountDTO(cohort);
+
+                if (!cohort.ValidationContext.PreflightPassed)
+                {
+                    // TODO Respond with error
+                }
+
+                var response = new ShrineDeliveryContents
+                {
+                    // TODO Respond with count in SHRINE format
+                };
+                // _ = await broker.SendMessageToHub()
+            }
         }
     }
 }

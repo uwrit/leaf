@@ -6,14 +6,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Model.Admin;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Options;
 using System.Data.SqlClient;
 using System.Data;
 using Dapper;
-using Model.Error;
 using Model.Authorization;
 using Model.Admin.Compiler;
 
@@ -26,10 +23,10 @@ namespace Services.Admin.Compiler
 
         public AdminConceptEventService(
             IOptions<AppDbOptions> options,
-            IUserContext userContext)
+            IUserContextProvider userContextProvider)
         {
             opts = options.Value;
-            user = userContext;
+            user = userContextProvider.GetUserContext();
         }
 
         public async Task<ConceptEvent> CreateAsync(ConceptEvent ev)

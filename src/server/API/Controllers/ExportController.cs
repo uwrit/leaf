@@ -12,9 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
-using Model.Export;
 using Model.Options;
-using Services.Export;
 
 namespace API.Controllers
 {

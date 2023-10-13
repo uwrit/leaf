@@ -33,12 +33,12 @@ namespace Model.Compiler
 
         public PanelConverter(
             PreflightResourceChecker preflightSearch,
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<CompilerOptions> compilerOptions,
             ICachedCohortPreparer cohortPreparer,
             ILogger<PanelConverter> logger)
         {
-            user = userContext;
+            this.user = userContextProvider.GetUserContext();
             this.preflightSearch = preflightSearch;
             this.compilerOptions = compilerOptions.Value;
             this.cohortPreparer = cohortPreparer;

@@ -42,7 +42,7 @@ namespace Model.Cohort
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider (
-            IUserContext user,
+            IUserContextProvider userContextProvider,
             DemographicCompilerValidationContextProvider contextProvider,
             IOptions<ClientOptions> clientOpts,
             IOptions<DeidentificationOptions> deidentOpts,
@@ -50,7 +50,7 @@ namespace Model.Cohort
             IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
         {
-            this.user = user;
+            this.user = userContextProvider.GetUserContext();
             this.contextProvider = contextProvider;
             this.compiler = compiler;
             this.executor = executor;

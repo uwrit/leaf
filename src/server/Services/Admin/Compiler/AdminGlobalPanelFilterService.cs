@@ -21,10 +21,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminGlobalPanelFilterService(IOptions<AppDbOptions> opts, IUserContext userContext)
+        public AdminGlobalPanelFilterService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
         {
             this.opts = opts.Value;
-            this.user = userContext;
+            this.user = userContextProvider.GetUserContext();
         }
 
         public async Task<IEnumerable<AdminGlobalPanelFilter>> GetAsync()

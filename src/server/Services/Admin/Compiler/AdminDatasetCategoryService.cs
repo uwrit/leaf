@@ -9,16 +9,11 @@ using System.Linq;
 using System.Data.SqlClient;
 using System.Data;
 using Model.Options;
-using Model.Error;
 using Model.Admin.Compiler;
 using Model.Authorization;
-using Model.Tagging;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Dapper;
-using Model.Compiler;
-using Services.Tables;
-using Model.Extensions;
 
 namespace Services.Admin.Compiler
 {
@@ -28,10 +23,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
 
         public AdminDatasetCategoryService(
-            IUserContext userContext,
+            IUserContextProvider userContextProvider,
             IOptions<AppDbOptions> opts)
         {
-            this.user = userContext;
+            user = userContextProvider.GetUserContext();
             this.opts = opts.Value;
         }
 
