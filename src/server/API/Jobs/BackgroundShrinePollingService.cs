@@ -7,6 +7,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using API.DTO.Integration.Shrine;
+using API.DTO.Cohort;
 using API.Authorization;
 using API.Integration.Shrine;
 using API.Integration.Shrine4_1;
@@ -17,8 +18,9 @@ using Model.Authorization;
 using Model.Cohort;
 using Model.Integration.Shrine;
 using Newtonsoft.Json;
-using API.DTO.Cohort;
 using Model.Compiler;
+using Model.Options;
+using Microsoft.Extensions.Options;
 
 namespace API.Jobs
 {
@@ -29,7 +31,7 @@ namespace API.Jobs
         readonly IShrineQueryResultCache queryResultCache;
         readonly IShrineUserQueryCache userQueryCache;
         readonly IServiceScopeFactory serviceScopeFactory;
-        readonly CohortCounter counter;
+        readonly SHRINEOptions opts;
         readonly ShrineQueryDefinitionConverter converter;
         readonly int ErrorPauseSeconds = 30;
 
@@ -39,8 +41,8 @@ namespace API.Jobs
             IShrineQueryResultCache queryResultCache,
             IShrineUserQueryCache userQueryCache,
             IServiceScopeFactory serviceScopeFactory,
-            ShrineQueryDefinitionConverter converter,
-            CohortCounter counter
+            IOptions<SHRINEOptions> opts,
+            ShrineQueryDefinitionConverter converter
             )
         {
             this.logger = logger;
@@ -49,7 +51,7 @@ namespace API.Jobs
             this.userQueryCache = userQueryCache;
             this.serviceScopeFactory = serviceScopeFactory;
             this.converter = converter;
-            this.counter = counter;
+            this.opts = opts.Value;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -75,6 +77,8 @@ namespace API.Jobs
                         }
                     }
 
+                    
+
                     _ = Task.Run(async () =>
                     {
                         switch (message.ContentsType)
@@ -85,8 +89,20 @@ namespace API.Jobs
                                 break;
 
                             case ShrineDeliveryContentsType.RunQueryForResult:
-                                var run = JsonConvert.DeserializeObject<ShrineRunQueryForResult>(message.Contents);
-                                await HandleRunQueryForResultMessage(run, stoppingToken);
+                                try
+                                {
+                                    var dto = JsonConvert.DeserializeObject<ShrineRunQueryForResultDTO>(message.Contents);
+                                    var run = dto.ToRunQueryForResult();
+                                    await HandleRunQueryForResultMessage(run, stoppingToken);
+                                }
+                                catch (JsonSerializationException ex)
+                                {
+                                    logger.LogError("BackgroundShrinePollingService failed to parse SHRINE message. Error: {Error}", ex.ToString());
+                                }
+                                catch (Exception ex)
+                                {
+                                    logger.LogError("BackgroundShrinePollingService failed to parse SHRINE message. Error: {Error}", ex.ToString());
+                                }
                                 break;
 
                             case ShrineDeliveryContentsType.Result:
@@ -106,7 +122,7 @@ namespace API.Jobs
                 catch (Exception e)
                 {
                     logger.LogError("BackgroundShrinePollingService failed to synchronize with SHRINE. Error: {Error}", e.ToString());
-                    logger.LogError($"BackgroundShrinePollingService pausing {ErrorPauseSeconds} seconds.");
+                    logger.LogInformation($"BackgroundShrinePollingService pausing {ErrorPauseSeconds} seconds.");
                     await Task.Delay(TimeSpan.FromSeconds(ErrorPauseSeconds), stoppingToken);
                 }
             }
@@ -129,30 +145,14 @@ namespace API.Jobs
 
         async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run, CancellationToken stoppingToken)
         {
-            IUserContext user;
-            IPatientCountQueryDTO query;
-            var cached = userQueryCache.GetOrDefault(run.Query.Id);
-
-            // If run by a Leaf user, grab from cache
-            if (cached != null)
-            {
-                user = cached.User;
-                query = cached.Query;
-            }
-
-            // Else not from Leaf, so set user context and transform query defintion
-            else
-            {
-                user = new ShrineUserContext(run.Researcher);
-                query = converter.ToLeafQuery(run.Query);
-            }
+            var (user, query) = GetContext(run);
 
             // Create scope to ensure query run as this user
             using (var scope = serviceScopeFactory.CreateAsyncScope())
             {
-                var userContextProvider = scope.ServiceProvider.GetRequiredService<UserContextProvider>();
+                var userContextProvider = scope.ServiceProvider.GetRequiredService<IUserContextProvider>();
                 userContextProvider.SetUserContext(user);
-                queryResultCache.Put(run.Query.Id, run.Researcher);
+                var counter = scope.ServiceProvider.GetRequiredService<CohortCounter>();
 
                 var cohort = await counter.Count(query, stoppingToken);
                 var count = new CohortCountDTO(cohort);
@@ -162,12 +162,45 @@ namespace API.Jobs
                     // TODO Respond with error
                 }
 
+                queryResultCache.Put(run.Query.Id, run.Researcher);
+
+                var result = new ShrineResultProgress
+                {
+                    Id = 1, //ShrineQueryDefinitionConverter.GenerateRandomLongId(),
+                    VersionInfo = new ShrineVersionInfo { },
+                    QueryId = run.Query.Id,
+                    AdapterNodeId = opts.Node.Id,
+                    AdapterNodeName = opts.Node.Name,
+                    Status = new ShrineQueryStatus { EncodedClass = ShrineQueryStatusType.ResultFromCRC },
+                    StatusMessage = "FINISHED",
+                    Count = count.Result.Value,
+                    ObfuscatingParameters = new ShrineResultObfuscatingParameters
+                    {
+                        BinSize = 5, StdDev = 6.5M, NoiseClamp = count.Result.PlusMinus, LowLimit = 10 // TODO don't hardcode
+                    },
+                    EncodedClass = ShrineQueryStatusType.CrcResult
+                };
                 var response = new ShrineDeliveryContents
                 {
-                    // TODO Respond with count in SHRINE format
+                    ContentsSubject = run.Query.Id,
+                    Contents = JsonConvert.SerializeObject(result)
                 };
-                // _ = await broker.SendMessageToHub()
+                _ = await broker.SendMessageToHub(response);
             }
+        }
+
+        (IUserContext, IPatientCountQueryDTO) GetContext(ShrineRunQueryForResult run)
+        {
+            var cached = userQueryCache.GetOrDefault(run.Query.Id);
+
+            // If run by a Leaf user, grab from cache
+            if (cached != null)
+            {
+                return (cached.User, cached.Query);
+            }
+
+            // Else not from Leaf, so set user context and transform query defintion
+            return (new ShrineUserContext(run.Researcher), converter.ToLeafQuery(run.Query));
         }
     }
 }

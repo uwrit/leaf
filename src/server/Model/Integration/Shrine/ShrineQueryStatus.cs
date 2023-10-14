@@ -14,6 +14,7 @@ namespace Model.Integration.Shrine
     public enum ShrineQueryStatusType
     {
         Unknown,
+        SentToAdapters,
         ReceivedAtHub,
         UpdateQueryAtQepWithStatus,
         UpdateQueryReadyForAdapters,
@@ -21,7 +22,8 @@ namespace Model.Integration.Shrine
         SubmittedToCRC,
         ResultProgress,
         ReceivedByAdapter,
-        CrcResult
+        CrcResult,
+        ResultFromCRC
     }
 }
 

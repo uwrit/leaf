@@ -28,11 +28,11 @@ namespace Services.Admin.Compiler
         public AdminConceptSqlSetService(
             ILogger<AdminConceptSqlSetService> logger,
             IOptions<AppDbOptions> options,
-            IUserContextProvider userContextProvider)
+            IUserContext user)
         {
             this.logger = logger;
             opts = options.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<ConceptSqlSet> CreateAsync(ConceptSqlSet set)

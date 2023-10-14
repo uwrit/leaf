@@ -267,8 +267,17 @@ namespace API.Options
                     {
                         Enabled = shrineEnabled,
                         HubApiURI = config.GetValue<string>(Config.Integration.SHRINE.HubApiURI),
-                        LocalNodeId = config.GetValue<long>(Config.Integration.SHRINE.NodeId),
-                        LocalNodeName = config.GetValue<string>(Config.Integration.SHRINE.NodeName),
+                        Node = new SHRINEOptions.LocalNode
+                        {
+                            Id = config.GetValue<long>(Config.Integration.SHRINE.Node.Id),
+                            Name = config.GetValue<string>(Config.Integration.SHRINE.Node.Name)
+                        },
+                        Topic = new SHRINEOptions.DefaultTopic
+                        {
+                            Id = config.GetValue<long>(Config.Integration.SHRINE.Topic.Id),
+                            Name = config.GetValue<string>(Config.Integration.SHRINE.Topic.Name),
+                            Description = config.GetValue<string>(Config.Integration.SHRINE.Topic.Description)
+                        }
                     };
 
                     services.Configure<IntegrationOptions>(opts =>

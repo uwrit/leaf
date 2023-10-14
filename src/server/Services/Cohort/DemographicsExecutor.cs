@@ -28,7 +28,7 @@ namespace Services.Cohort
         readonly DeidentificationOptions deidentOpts;
 
         public DemographicsExecutor(
-            IUserContextProvider userContextProvider,
+            IUserContext user,
             ISqlProviderQueryExecutor queryExecutor,
             ILogger<DemographicsExecutor> log,
             IOptions<ClinDbOptions> dbOpts,
@@ -37,7 +37,7 @@ namespace Services.Cohort
             this.log = log;
             this.dbOpts = dbOpts.Value;
             this.deidentOpts = deidentOpts.Value;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
             this.queryExecutor = queryExecutor;
         }
 

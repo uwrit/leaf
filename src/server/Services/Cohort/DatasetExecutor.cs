@@ -27,13 +27,13 @@ namespace Services.Cohort
         readonly DeidentificationOptions deidentOpts;
 
         public DatasetExecutor(
-            IUserContextProvider userContextProvider,
+            IUserContext user,
             ISqlProviderQueryExecutor queryExecutor,
             ILogger<DatasetExecutor> log,
             IOptions<ClinDbOptions> dbOpts,
             IOptions<DeidentificationOptions> deidentOpts)
         {
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
             this.queryExecutor = queryExecutor;
             this.log = log;
             this.dbOpts = dbOpts.Value;

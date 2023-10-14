@@ -23,10 +23,10 @@ namespace Services.Admin.Compiler
 
         public AdminConceptEventService(
             IOptions<AppDbOptions> options,
-            IUserContextProvider userContextProvider)
+            IUserContext user)
         {
             opts = options.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<ConceptEvent> CreateAsync(ConceptEvent ev)

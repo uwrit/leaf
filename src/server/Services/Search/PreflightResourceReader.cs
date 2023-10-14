@@ -10,7 +10,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
@@ -31,7 +30,7 @@ namespace Services.Search
             IUserContextProvider userContextProvider)
         {
             opts = options.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = userContextProvider.GetUserContext();
         }
 
         public async Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs)

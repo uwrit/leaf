@@ -12,6 +12,8 @@ namespace API.DTO.Integration.Shrine4_1
     {
         public string EncodedClass { get; set; }
 
+        public ShrineStatusDTO() { }
+
         public ShrineStatusDTO(ShrineStatus status)
         {
             EncodedClass = status.EncodedClass.ToString();

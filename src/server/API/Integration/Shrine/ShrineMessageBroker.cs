@@ -19,7 +19,7 @@ namespace API.Integration.Shrine
     public interface IShrineMessageBroker
     {
         Task<(HttpResponseMessage, ShrineDeliveryContents)> ReadHubMessageAndAcknowledge();
-        Task SendMessageToHub(ShrineDeliveryContents contents);
+        Task<HttpResponseMessage> SendMessageToHub(ShrineDeliveryContents contents);
     }
 
     public class ShrineMessageBroker : IShrineMessageBroker
@@ -38,7 +38,7 @@ namespace API.Integration.Shrine
         {
             var req = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/receiveMessage/{opts.LocalNodeName}?timeOutSeconds={TimeOutSeconds}"),
+                RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/receiveMessage/{opts.Node.Name}?timeOutSeconds={TimeOutSeconds}"),
                 Method = HttpMethod.Get
             };
 
@@ -66,7 +66,7 @@ namespace API.Integration.Shrine
             return (resp, contents.ToContents());
         }
 
-        public async Task SendMessageToHub(ShrineDeliveryContents contents)
+        public async Task<HttpResponseMessage> SendMessageToHub(ShrineDeliveryContents contents)
         {
             var request = new HttpRequestMessage
             {
@@ -78,8 +78,10 @@ namespace API.Integration.Shrine
                     "application/x-www-form-urlencoded"
                 )
             };
-            _ = await client.SendAsync(request);
+            var response = await client.SendAsync(request);
             request.Dispose();
+
+            return response;
         }
 
         private static string GetDeliveryAttemptId(string body)

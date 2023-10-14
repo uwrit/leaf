@@ -34,12 +34,12 @@ namespace Services.Import
         public ImportService(
             IOptions<AppDbOptions> dbOptions, 
             ILogger<ImportService> logger,
-            IUserContextProvider userContextProvider
+            IUserContext user
         )
         {
             this.dbOptions = dbOptions.Value;
             this.logger = logger;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<IEnumerable<ImportMetadata>> GetAllImportMetadataAsync()

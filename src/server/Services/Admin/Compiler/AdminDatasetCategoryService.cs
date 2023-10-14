@@ -23,10 +23,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
 
         public AdminDatasetCategoryService(
-            IUserContextProvider userContextProvider,
+            IUserContext user,
             IOptions<AppDbOptions> opts)
         {
-            user = userContextProvider.GetUserContext();
+            this.user = user;
             this.opts = opts.Value;
         }
 

@@ -17,9 +17,9 @@ namespace API.DTO.Integration.Shrine
         public string AdapterNodeName { get; set; }
         public ShrineQueryStatusDTO Status { get; set; }
         public string StatusMessage { get; set; }
-        public long CrcQueryInstanceId { get; set; }
+        public long? CrcQueryInstanceId { get; set; }
         public string EncodedClass { get; set; }
-        public int Count { get; set; } = -1;
+        public int? Count { get; set; }
         public ShrineResultObfuscatingParametersDTO ObfuscatingParameters { get; set; }
 
         public ShrineResultProgressDTO() { }
@@ -33,9 +33,9 @@ namespace API.DTO.Integration.Shrine
             AdapterNodeName = progress.AdapterNodeName;
             Status = new ShrineQueryStatusDTO(progress.Status);
             StatusMessage = progress.StatusMessage;
-            CrcQueryInstanceId = progress.CrcQueryInstanceId;
+            CrcQueryInstanceId = progress?.CrcQueryInstanceId;
             EncodedClass = progress.EncodedClass.ToString();
-            Count = progress.Count;
+            Count = progress?.Count;
             ObfuscatingParameters = new ShrineResultObfuscatingParametersDTO(progress.ObfuscatingParameters);
         }
     }
@@ -61,6 +61,8 @@ namespace API.DTO.Integration.Shrine
     {
         public static ShrineResultProgress ToProgress(this ShrineResultProgressDTO dto)
         {
+            _ = Enum.TryParse(dto.EncodedClass, out ShrineQueryStatusType type);
+
             return new ShrineResultProgress
             {
                 Id = dto.Id,
@@ -71,8 +73,9 @@ namespace API.DTO.Integration.Shrine
                 Status = dto.Status.ToStatus(),
                 StatusMessage = dto.StatusMessage,
                 CrcQueryInstanceId = dto.CrcQueryInstanceId,
-                Count = dto.Count,
-                ObfuscatingParameters = dto.ObfuscatingParameters?.ToParameters()
+                Count = dto.Count ?? -1,
+                ObfuscatingParameters = dto.ObfuscatingParameters?.ToParameters(),
+                EncodedClass = type
             };
         }
 

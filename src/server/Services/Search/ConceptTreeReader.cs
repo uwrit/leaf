@@ -38,10 +38,10 @@ namespace Services.Search
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public ConceptTreeReader(IOptions<AppDbOptions> dbOpts, IUserContextProvider userContextProvider)
+        public ConceptTreeReader(IOptions<AppDbOptions> dbOpts, IUserContext user)
         {
             opts = dbOpts.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<Concept> GetAsync(Guid id)

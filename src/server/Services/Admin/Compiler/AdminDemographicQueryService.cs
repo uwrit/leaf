@@ -22,10 +22,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminDemographicQueryService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
+        public AdminDemographicQueryService(IOptions<AppDbOptions> opts, IUserContext user)
         {
             this.opts = opts.Value;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<AdminDemographicQuery> GetDemographicQueryAsync()

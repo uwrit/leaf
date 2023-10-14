@@ -16,7 +16,7 @@ namespace Model.Integration.Shrine
 		public string AdapterNodeName { get; set; }
 		public ShrineQueryStatus Status { get; set; }
 		public string StatusMessage { get; set; }
-		public long CrcQueryInstanceId { get; set; }
+		public long? CrcQueryInstanceId { get; set; }
 		public ShrineQueryStatusType EncodedClass { get; set; }
 		public int Count { get; set; } = -1;
         public ShrineResultObfuscatingParameters ObfuscatingParameters { get; set; }

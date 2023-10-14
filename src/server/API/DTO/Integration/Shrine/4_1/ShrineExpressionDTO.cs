@@ -25,6 +25,7 @@ namespace API.DTO.Integration.Shrine4_1
     public abstract class ShrineGroupDTO
     {
         public int NMustBeTrue { get; set; }
+        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
 
         public ShrineGroupDTO() { }
@@ -39,6 +40,7 @@ namespace API.DTO.Integration.Shrine4_1
     public class ShrineConjunctionDTO
     {
         public int NMustBeTrue { get; set; }
+        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
         public IEnumerable<ShrineConceptGroupDTO> Possibilities { get; set; }
 
@@ -52,8 +54,8 @@ namespace API.DTO.Integration.Shrine4_1
 
     public class ShrineConceptGroupDTO : ShrineGroupDTO
     {
-        public long StartDate { get; set; }
-        public long EndDate { get; set; }
+        public long? StartDate { get; set; }
+        public long? EndDate { get; set; }
         public int OccursAtLeast { get; set; } = 1;
         public ShrineConceptConjunctionDTO Concepts { get; set; }
 
@@ -61,8 +63,8 @@ namespace API.DTO.Integration.Shrine4_1
 
         public ShrineConceptGroupDTO(ShrineConceptGroup group) : base(group)
         {
-            StartDate = ((DateTimeOffset)group.StartDate).ToUnixTimeMilliseconds();
-            EndDate = ((DateTimeOffset)group.EndDate).ToUnixTimeMilliseconds();
+            StartDate = group.StartDate != null ? ((DateTimeOffset)group.StartDate).ToUnixTimeMilliseconds() : null;
+            EndDate = group.EndDate != null ? ((DateTimeOffset)group.EndDate).ToUnixTimeMilliseconds() : null;
             OccursAtLeast = group.OccursAtLeast.HasValue ? (int)group.OccursAtLeast : 1;
             Concepts = new ShrineConceptConjunctionDTO(group.Concepts);
         }
@@ -71,6 +73,7 @@ namespace API.DTO.Integration.Shrine4_1
     public class ShrineConceptConjunctionDTO
     {
         public int NMustBeTrue { get; set; }
+        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
         public IEnumerable<ShrineConceptDTO> Possibilities { get; set; }
 
@@ -138,8 +141,8 @@ namespace API.DTO.Integration.Shrine4_1
         {
             return new ShrineConceptGroup
             {
-                StartDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.StartDate).UtcDateTime,
-                EndDate = DateTimeOffset.FromUnixTimeMilliseconds(dto.EndDate).UtcDateTime,
+                StartDate = dto.StartDate != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)dto.StartDate).UtcDateTime : null,
+                EndDate = dto.EndDate != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)dto.EndDate).UtcDateTime : null,
                 OccursAtLeast = dto.OccursAtLeast,
                 Concepts = dto.Concepts.ToConjunction()
             };

@@ -26,10 +26,10 @@ namespace Services.Admin.Compiler
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminDatasetQueryService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
+        public AdminDatasetQueryService(IOptions<AppDbOptions> opts, IUserContext user)
         {
             this.opts = opts.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<AdminDatasetQuery> GetDatasetQueryByIdAsync(Guid id)

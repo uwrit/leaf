@@ -70,7 +70,7 @@ namespace Services.Cohort
                     }
 
                     var cohortTable = new PatientCohortTable(queryId, cohort.SeasonedPatients(exportLimit, queryId));
-                    rowCount = cohortTable.Rows.Count();
+                    rowCount = cohortTable.Rows.Length;
 
                     using (var bc = new SqlBulkCopy(cn))
                     {

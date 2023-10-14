@@ -62,8 +62,8 @@ namespace API.Options
         {
             services.AddHttpContextAccessor();
 
-            services.AddScoped<IUserContextProvider, UserContextProvider>();
             services.AddScoped<IUserContext, HttpUserContext>();
+            services.AddScoped<IUserContextProvider, UserContextProvider>();
             services.AddTransient<UserContextLoggingMiddleware>();
             services.AddTransient<RejectInvalidFederatedUserMiddleware>();
 
@@ -203,8 +203,9 @@ namespace API.Options
                 if (integrationOpts.SHRINE.Enabled)
                 {
                     services.AddHostedService<BackgroundShrinePollingService>();
-                    services.AddTransient<IShrineMessageBroker, ShrineMessageBroker>();
+                    services.AddHostedService<BackgroundShrineCacheSynchronizer>();
                     services.AddTransient<ShrineQueryDefinitionConverter>();
+                    services.AddTransient<IShrineMessageBroker, ShrineMessageBroker>();
                     services.AddSingleton<IShrineUserQueryCache, ShrineUserContextCache>();
                     services.AddSingleton<IShrineQueryResultCache, ShrineQueryResultCache>();
 

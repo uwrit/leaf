@@ -26,20 +26,14 @@ namespace API.Controllers
         readonly ILogger<UserController> logger;
         readonly AuthenticationOptions authenticationOptions;
         readonly IUserJwtProvider jwtProvider;
-        readonly IUserContext userContext;
 
         public UserController(
             ILogger<UserController> logger,
             IOptions<AuthenticationOptions> authenticationOptions,
-            IOptions<LeafVersionOptions> versionOptions,
-            IOptions<CohortOptions> cohortOptions,
-            IOptions<ClientOptions> clientOptions,
-            IUserJwtProvider userJwtProvider,
-            IUserContextProvider userContextProvider)
+            IUserJwtProvider userJwtProvider)
         {
             this.logger = logger;
             this.authenticationOptions = authenticationOptions.Value;
-            this.userContext = userContextProvider.GetUserContext();
             jwtProvider = userJwtProvider;
         }
 
@@ -70,18 +64,20 @@ namespace API.Controllers
         [HttpGet("attest")]
         public ActionResult<AccessTokenDTO> Attest(
             [FromQuery] Attestation attestation,
+            [FromServices] IUserContextProvider userContextProvider,
             [FromServices] IInvalidatedTokenCache invalidatedCache)
         {
-            if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
+            var user = userContextProvider.GetUserContext();
+            if (authenticationOptions.Mechanism != user.AuthenticationMechanism)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized);
             }
 
             try
             {
-                if (invalidatedCache.IsInvalidated(userContext.IdNonce))
+                if (invalidatedCache.IsInvalidated(user.IdNonce))
                 {
-                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce, attestation);
+                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", user.IdNonce, attestation);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 
@@ -101,18 +97,21 @@ namespace API.Controllers
         [Authorize(Policy = TokenType.Access)]
         [Authorize(Policy = Access.Institutional)]
         [HttpGet("refresh")]
-        public ActionResult<AccessTokenDTO> Refresh([FromServices] IInvalidatedTokenCache invalidatedCache)
+        public ActionResult<AccessTokenDTO> Refresh(
+            [FromServices] IInvalidatedTokenCache invalidatedCache,
+            [FromServices] IUserContextProvider userContextProvider)
         {
-            if (authenticationOptions.Mechanism != userContext.AuthenticationMechanism)
+            var user = userContextProvider.GetUserContext();
+            if (authenticationOptions.Mechanism != user.AuthenticationMechanism)
             {
                 return StatusCode(StatusCodes.Status401Unauthorized);
             }
 
             try
             {
-                if (invalidatedCache.IsInvalidated(userContext.IdNonce))
+                if (invalidatedCache.IsInvalidated(user.IdNonce))
                 {
-                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", userContext.IdNonce);
+                    logger.LogWarning("Id token is invalidated. IdNonce:{IdNonce} Attestation:{@Attestation}", user.IdNonce);
                     return StatusCode(StatusCodes.Status401Unauthorized);
                 }
 

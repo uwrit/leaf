@@ -18,13 +18,13 @@ namespace Model.Integration.Shrine
         ShrineUserQueryEntry GetOrDefault(long id);
         ShrineUserQueryEntry PopOrDefault(long id);
         void Put(long id, IUserContext user, IPatientCountQueryDTO query);
-        void DeleteOlderThan(DateTime earliest);
+        int DeleteOlderThan(DateTime earliest);
     }
 
 	public class ShrineUserContextCache : IShrineUserQueryCache
     {
-        readonly Dictionary<long, ShrineUserQueryEntry> store;
-        readonly ReaderWriterLockSlim sync;
+        readonly Dictionary<long, ShrineUserQueryEntry> store = new Dictionary<long, ShrineUserQueryEntry>();
+        readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
 
         public IEnumerable<ShrineUserQueryEntry> All()
         {
@@ -57,17 +57,22 @@ namespace Model.Integration.Shrine
             sync.ExitWriteLock();
         }
 
-        public void DeleteOlderThan(DateTime earliest)
+        public int DeleteOlderThan(DateTime earliest)
         {
-            sync.EnterReadLock();
+            var deleteCount = 0;
+
+            sync.EnterWriteLock();
             foreach (var user in All())
             {
                 if (user.Added < earliest)
                 {
                     store.Remove(user.QueryId, out var _);
+                    deleteCount++;
                 }
             }
-            sync.ExitReadLock();
+            sync.ExitWriteLock();
+
+            return deleteCount;
         }
 
         public IEnumerator<ShrineUserQueryEntry> GetEnumerator()

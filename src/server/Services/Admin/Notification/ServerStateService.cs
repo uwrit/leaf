@@ -22,10 +22,10 @@ namespace Services.Admin.Notification
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public AdminServerStateService(IOptions<AppDbOptions> opts, IUserContextProvider userContextProvider)
+        public AdminServerStateService(IOptions<AppDbOptions> opts, IUserContext user)
         {
             this.opts = opts.Value;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<AdminServerState> GetServerStateAsync()

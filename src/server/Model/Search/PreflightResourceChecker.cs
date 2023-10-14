@@ -46,7 +46,7 @@ namespace Model.Search
             ILogger<PreflightResourceChecker> log)
         {
             this.reader = reader;
-            this.user = userContextProvider.GetUserContext(0);
+            this.user = userContextProvider.GetUserContext();
             this.log = log;
         }
 

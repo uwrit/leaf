@@ -48,14 +48,14 @@ namespace Model.Search
             IQueryService service,
             IOptions<DeidentificationOptions> obfuscationOptions,
             ILogger<QueryManager> log,
-            IUserContextProvider userContextProvider,
+            IUserContext user,
             PanelConverter converter,
             PanelValidator validator)
         {
             this.service = service;
             this.deidentOpts = obfuscationOptions.Value;
             this.log = log;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
             this.converter = converter;
             this.validator = validator;
         }

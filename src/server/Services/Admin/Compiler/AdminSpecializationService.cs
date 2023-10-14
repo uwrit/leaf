@@ -25,10 +25,10 @@ namespace Services.Admin.Compiler
 
         public AdminSpecializationService(
             IOptions<AppDbOptions> options,
-            IUserContextProvider userContextProvider)
+            IUserContext user)
         {
             opts = options.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<Specialization> CreateAsync(Specialization spec)

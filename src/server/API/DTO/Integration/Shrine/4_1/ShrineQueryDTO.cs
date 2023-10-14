@@ -25,6 +25,8 @@ namespace API.DTO.Integration.Shrine4_1
         public string FlaggedMessage { get; set; }
         public string EncodedClass { get; set; }
 
+        public ShrineQueryDTO() { }
+
         public ShrineQueryDTO(ShrineQuery query)
         {
             Id = query.Id;
@@ -45,7 +47,7 @@ namespace API.DTO.Integration.Shrine4_1
 
     public static class ShrineQueryExtensions
     {
-        public static ShrineQuery ToQuery(ShrineQueryDTO dto)
+        public static ShrineQuery ToQuery(this ShrineQueryDTO dto)
         {
             _ = Enum.TryParse(dto.EncodedClass, out ShrineQueryType type);
             return new ShrineQuery

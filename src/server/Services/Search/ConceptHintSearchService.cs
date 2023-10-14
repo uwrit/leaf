@@ -28,10 +28,10 @@ namespace Services.Search
         readonly AppDbOptions opts;
         readonly IUserContext user;
 
-        public ConceptHintSearchService(IOptions<AppDbOptions> dbOptions, IUserContextProvider userContextProvider)
+        public ConceptHintSearchService(IOptions<AppDbOptions> dbOptions, IUserContext user)
         {
             opts = dbOptions.Value;
-            user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         /// <summary>

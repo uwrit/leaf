@@ -18,8 +18,19 @@ namespace API.Options
                 public const string Section = @"Integration:SHRINE";
                 public const string Enabled = @"Integration:SHRINE:Enabled";
                 public const string HubApiURI = @"Integration:SHRINE:HubApiURI";
-                public const string NodeId = @"Integration:SHRINE:LocalNodeId";
-                public const string NodeName = @"Integration:SHRINE:LocalNodeName";
+
+                public static class Node
+                {
+                    public const string Id = @"Integration:SHRINE:Node:Id";
+                    public const string Name = @"Integration:SHRINE:Node:Name";
+                }
+
+                public static class Topic
+                {
+                    public const string Id = @"Integration:SHRINE:Topic:Id";
+                    public const string Name = @"Integration:SHRINE:Topic:Name";
+                    public const string Description = @"Integration:SHRINE:Topic:Description";
+                }
             }
         }
     }

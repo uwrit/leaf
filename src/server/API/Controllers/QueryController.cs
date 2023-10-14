@@ -28,13 +28,11 @@ namespace API.Controllers
     {
         readonly ILogger<QueryController> log;
         readonly QueryManager manager;
-        readonly IUserContext user;
 
-        public QueryController(QueryManager manager, ILogger<QueryController> logger, IUserContextProvider userContextProvider)
+        public QueryController(QueryManager manager, ILogger<QueryController> logger)
         {
             log = logger;
             this.manager = manager;
-            user = userContextProvider.GetUserContext();
         }
 
         [Authorize(Policy = Access.Institutional)]
@@ -81,6 +79,7 @@ namespace API.Controllers
         public async Task<ActionResult<QuerySaveResponseDTO>> Save(
             string id,
             [FromBody] QuerySaveDTO querySave,
+            [FromServices] IUserContext user,
             CancellationToken cancelToken)
         {
             try

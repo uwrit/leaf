@@ -17,8 +17,21 @@ namespace Model.Options
     {
         public bool Enabled { get; set; } = false;
         public string HubApiURI { get; set; }
-        public long LocalNodeId { get; set; }
-        public string LocalNodeName { get; set; }
+        public LocalNode Node { get; set; }
+        public DefaultTopic Topic { get; set; }
+
+        public class LocalNode
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+        }
+
+        public class DefaultTopic
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+            public string Description { get; set; }
+        }
     }
 }
 

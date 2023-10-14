@@ -29,11 +29,11 @@ namespace Services.Search
         readonly ILogger<DemographicCompilerContextProvider> log;
 
         public DemographicCompilerContextProvider(
-            IUserContextProvider userContextProvider,
+            IUserContext user,
             IOptions<AppDbOptions> options,
             ILogger<DemographicCompilerContextProvider> logger)
         {
-            user = userContextProvider.GetUserContext();
+            this.user = user;
             opts = options.Value;
             log = logger;
         }

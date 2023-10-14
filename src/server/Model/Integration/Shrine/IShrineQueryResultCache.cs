@@ -20,13 +20,13 @@ namespace Model.Integration.Shrine
         void Put(ShrineResultProgress nodeResult);
         void Put(long id, ShrineResearcher user);
         void Put(IEnumerable<ShrineResultProgress> nodeResults);
-        void DeleteOlderThan(DateTime earliest);
+        int DeleteOlderThan(DateTime earliest);
     }
 
     public class ShrineQueryResultCache : IShrineQueryResultCache
     {
-        readonly Dictionary<long, ShrineQueryResult> store;
-        readonly ReaderWriterLockSlim sync;
+        readonly Dictionary<long, ShrineQueryResult> store = new Dictionary<long, ShrineQueryResult>();
+        readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
 
         public ShrineQueryResultCache(IEnumerable<ShrineQueryResult> initial)
         {
@@ -108,17 +108,22 @@ namespace Model.Integration.Shrine
             return result;
         }
 
-        public void DeleteOlderThan(DateTime earliest)
+        public int DeleteOlderThan(DateTime earliest)
         {
-            sync.EnterReadLock();
+            var deleteCount = 0;
+
+            sync.EnterWriteLock();
             foreach (var result in All())
             {
                 if (result.Updated < earliest)
                 {
                     store.Remove(result.Id, out var _);
+                    deleteCount++;
                 }
             }
-            sync.ExitReadLock();
+            sync.ExitWriteLock();
+
+            return deleteCount;
         }
 
         public IEnumerator<ShrineQueryResult> GetEnumerator()

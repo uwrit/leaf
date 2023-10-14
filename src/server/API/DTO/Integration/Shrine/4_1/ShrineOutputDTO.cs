@@ -12,7 +12,9 @@ namespace API.DTO.Integration.Shrine4_1
 	{
 		public string EncodedClass { get; set; }
 
-		public ShrineOutputDTO(ShrineOutput output)
+		public ShrineOutputDTO() { }
+
+        public ShrineOutputDTO(ShrineOutput output)
 		{
 			EncodedClass = output.EncodedClass.ToString();
 		}

@@ -24,10 +24,10 @@ namespace Services.Cohort
         readonly AppDbOptions dbOptions;
         readonly IUserContext user;
 
-        public CachedCohortFetcher(IOptions<AppDbOptions> dbOptions, IUserContextProvider userContextProvider)
+        public CachedCohortFetcher(IOptions<AppDbOptions> dbOptions, IUserContext user)
         {
             this.dbOptions = dbOptions.Value;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<IEnumerable<CachedCohortRecord>> FetchCohortAsync(Guid queryId, bool exportedOnly)

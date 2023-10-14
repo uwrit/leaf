@@ -24,10 +24,10 @@ namespace Services.Admin.Network
 
         public AdminNetworkEndpointUpdater(
             IOptions<AppDbOptions> dbOptions,
-            IUserContextProvider userContextProvider)
+            IUserContext user)
         {
             opts = dbOptions.Value;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<NetworkEndpoint> UpdateEndpointAsync(NetworkEndpoint item)

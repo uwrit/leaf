@@ -30,11 +30,11 @@ namespace Model.Notification
         readonly IUserContext user;
         readonly ILogger<NotificationManager> log;
 
-        public NotificationManager(INotificationService service, ILogger<NotificationManager> log, IUserContextProvider userContextProvider)
+        public NotificationManager(INotificationService service, ILogger<NotificationManager> log, IUserContext user)
         {
             svc = service;
             this.log = log;
-            this.user = userContextProvider.GetUserContext();
+            this.user = user;
         }
 
         public async Task<bool> SendUserInquiry(UserInquiry inquiry)

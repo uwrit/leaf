@@ -24,7 +24,7 @@ namespace API.Integration.Shrine4_1
             {
                 return new PanelDTO
                 {
-                    IncludePanel = conceptGroup.NMustBeTrue > 0,
+                    IncludePanel = conceptGroup.Concepts.NMustBeTrue > 0,
                     Index = i,
                     Domain = PanelDomain.Panel,
                     DateFilter = conceptGroup.StartDate.HasValue ?
@@ -40,7 +40,7 @@ namespace API.Integration.Shrine4_1
                         {
                             IncludeSubPanel = true,
                             Index = 0,
-                            MinimumCount = conceptGroup.NMustBeTrue,
+                            MinimumCount = conceptGroup.OccursAtLeast.HasValue ? (int)conceptGroup.OccursAtLeast : 1,
                             PanelIndex = i,
                             PanelItems = conceptGroup.Concepts.Possibilities.Select((c,j) =>
                             {
@@ -132,7 +132,7 @@ namespace API.Integration.Shrine4_1
 
         public static long GenerateRandomLongId()
         {
-            return LongRandom(100000000000000000, 999999999999999999, new Random());
+            return LongRandom(10000000000000000, 999999999999999999, new Random());
         }
 
         static long LongRandom(long min, long max, Random rand)
