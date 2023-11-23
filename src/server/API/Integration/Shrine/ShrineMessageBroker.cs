@@ -13,6 +13,7 @@ using Model.Integration.Shrine;
 using Model.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace API.Integration.Shrine
 {
@@ -27,6 +28,10 @@ namespace API.Integration.Shrine
         readonly HttpClient client;
         readonly SHRINEOptions opts;
         readonly int TimeOutSeconds = 50;
+        readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
 
         public ShrineMessageBroker(HttpClient client, IOptions<IntegrationOptions> opts)
         {
@@ -73,7 +78,7 @@ namespace API.Integration.Shrine
                 RequestUri = new Uri($"{opts.HubApiURI}/shrine-api/mom/sendMessage/hub"),
                 Method = HttpMethod.Put,
                 Content = new StringContent(
-                    JsonConvert.SerializeObject(new ShrineDeliveryContentsDTO(contents)),
+                    JsonConvert.SerializeObject(new ShrineDeliveryContentsDTO(contents), serializerSettings),
                     Encoding.UTF8,
                     "application/x-www-form-urlencoded"
                 )

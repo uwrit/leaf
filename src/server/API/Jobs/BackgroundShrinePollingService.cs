@@ -21,6 +21,7 @@ using Newtonsoft.Json;
 using Model.Compiler;
 using Model.Options;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
 
 namespace API.Jobs
 {
@@ -34,6 +35,10 @@ namespace API.Jobs
         readonly SHRINEOptions opts;
         readonly ShrineQueryDefinitionConverter converter;
         readonly int ErrorPauseSeconds = 30;
+        readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new CamelCasePropertyNamesContractResolver()
+        };
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,
@@ -41,7 +46,7 @@ namespace API.Jobs
             IShrineQueryResultCache queryResultCache,
             IShrineUserQueryCache userQueryCache,
             IServiceScopeFactory serviceScopeFactory,
-            IOptions<SHRINEOptions> opts,
+            IOptions<IntegrationOptions> opts,
             ShrineQueryDefinitionConverter converter
             )
         {
@@ -51,7 +56,7 @@ namespace API.Jobs
             this.userQueryCache = userQueryCache;
             this.serviceScopeFactory = serviceScopeFactory;
             this.converter = converter;
-            this.opts = opts.Value;
+            this.opts = opts.Value.SHRINE;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -76,8 +81,6 @@ namespace API.Jobs
                             await Task.Delay(TimeSpan.FromSeconds(ErrorPauseSeconds), stoppingToken);
                         }
                     }
-
-                    
 
                     _ = Task.Run(async () =>
                     {
@@ -145,7 +148,14 @@ namespace API.Jobs
 
         async Task HandleRunQueryForResultMessage(ShrineRunQueryForResult run, CancellationToken stoppingToken)
         {
+            // Let hub know query received
+            await SendQueryReceievedByAdapter(run.Query.Id);
+
+            // Get user context, convert query
             var (user, query) = GetContext(run);
+
+            // Let hub know query converted, executing
+            await SendQuerySubmittedToCrc(run.Query.Id);
 
             // Create scope to ensure query run as this user
             using (var scope = serviceScopeFactory.CreateAsyncScope())
@@ -164,29 +174,72 @@ namespace API.Jobs
 
                 queryResultCache.Put(run.Query.Id, run.Researcher);
 
-                var result = new ShrineResultProgress
-                {
-                    Id = 1, //ShrineQueryDefinitionConverter.GenerateRandomLongId(),
-                    VersionInfo = new ShrineVersionInfo { },
-                    QueryId = run.Query.Id,
-                    AdapterNodeId = opts.Node.Id,
-                    AdapterNodeName = opts.Node.Name,
-                    Status = new ShrineQueryStatus { EncodedClass = ShrineQueryStatusType.ResultFromCRC },
-                    StatusMessage = "FINISHED",
-                    Count = count.Result.Value,
-                    ObfuscatingParameters = new ShrineResultObfuscatingParameters
-                    {
-                        BinSize = 5, StdDev = 6.5M, NoiseClamp = count.Result.PlusMinus, LowLimit = 10 // TODO don't hardcode
-                    },
-                    EncodedClass = ShrineQueryStatusType.CrcResult
-                };
-                var response = new ShrineDeliveryContents
-                {
-                    ContentsSubject = run.Query.Id,
-                    Contents = JsonConvert.SerializeObject(result)
-                };
-                _ = await broker.SendMessageToHub(response);
+                // Let hub know query result
+                await SendQueryResult(run.Query.Id, count);
             }
+        }
+
+        async Task SendQueryResult(long queryId, CohortCountDTO count)
+        {
+            var message = new ShrineUpdateResultWithCrcResult
+            {
+                QueryId = queryId,
+                AdapterNodeKey = opts.Node.Key,
+                Count = count.Result.Value,
+                CrcQueryInstanceId = 42,
+                Breakdowns = null,
+                ObfuscatingParameters = new ShrineResultObfuscatingParameters
+                {
+                    BinSize = 5,
+                    StdDev = 6.5M,
+                    NoiseClamp = 10,
+                    LowLimit = 10
+                },
+                Status = new ShrineQueryStatus { EncodedClass = ShrineQueryStatusType.ResultFromCRC },
+                StatusMessage = "FINISHED",
+                AdapterTime = DateTime.Now,
+                EncodedClass = ShrineQueryStatusType.UpdateResultWithCrcResult
+            };
+            var dto = new ShrineUpdateResultWithCrcResultDTO(message);
+
+            var response = new ShrineDeliveryContents
+            {
+                ContentsSubject = queryId,
+                Contents = JsonConvert.SerializeObject(dto, serializerSettings),
+                ContentsType = ShrineDeliveryContentsType.UpdateResult
+            };
+            _ = await broker.SendMessageToHub(response);
+        }
+
+        async Task SendQueryReceievedByAdapter(long queryId)
+        {
+            await SendQueryReceivedMessage(queryId, ShrineQueryStatusType.ReceivedByAdapter, ShrineQueryStatusType.UpdateResultWithProgress);
+        }
+
+        async Task SendQuerySubmittedToCrc(long queryId)
+        {
+            await SendQueryReceivedMessage(queryId, ShrineQueryStatusType.SubmittedToCRC, ShrineQueryStatusType.UpdateResultWithProgress);
+        }
+
+        async Task SendQueryReceivedMessage(long queryId, ShrineQueryStatusType innerClass, ShrineQueryStatusType outerClass)
+        {
+            var message = new ShrineUpdateResultWithProgress
+            {
+                QueryId = queryId,
+                AdapterNodeKey = opts.Node.Key,
+                Status = new ShrineQueryStatus { EncodedClass = innerClass },
+                AdapterTime = DateTime.Now,
+                EncodedClass = outerClass
+            };
+            var dto = new ShrineUpdateResultWithProgressDTO(message);
+
+            var response = new ShrineDeliveryContents
+            {
+                ContentsSubject = queryId,
+                Contents = JsonConvert.SerializeObject(dto, serializerSettings),
+                ContentsType = ShrineDeliveryContentsType.UpdateResult
+            };
+            _ = await broker.SendMessageToHub(response);
         }
 
         (IUserContext, IPatientCountQueryDTO) GetContext(ShrineRunQueryForResult run)

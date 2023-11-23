@@ -22,6 +22,7 @@ namespace API.Options
                 public static class Node
                 {
                     public const string Id = @"Integration:SHRINE:Node:Id";
+                    public const string Key = @"Integration:SHRINE:Node:Key";
                     public const string Name = @"Integration:SHRINE:Node:Name";
                 }
 

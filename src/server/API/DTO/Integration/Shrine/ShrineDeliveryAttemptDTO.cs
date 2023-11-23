@@ -26,13 +26,16 @@ namespace API.DTO.Integration.Shrine
     public class ShrineDeliveryContentsDTO
     {
         public string Contents { get; set; }
+        public long ContentsSubject { get; set; }
         public string ContentsType { get; set; }
+        public int ProtocolVersion = 2;
 
         public ShrineDeliveryContentsDTO() { }
 
         public ShrineDeliveryContentsDTO(ShrineDeliveryContents contents)
         {
             Contents = contents.Contents;
+            ContentsSubject = contents.ContentsSubject;
             ContentsType = contents.ContentsType.ToString();
         }
     }
@@ -62,6 +65,7 @@ namespace API.DTO.Integration.Shrine
             return new ShrineDeliveryContents
             {
                 Contents = dto.Contents,
+                ContentsSubject = dto.ContentsSubject,
                 ContentsType = contentsType
             };
         }

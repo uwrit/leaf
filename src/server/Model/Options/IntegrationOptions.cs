@@ -23,6 +23,7 @@ namespace Model.Options
         public class LocalNode
         {
             public long Id { get; set; }
+            public string Key { get; set; }
             public string Name { get; set; }
         }
 

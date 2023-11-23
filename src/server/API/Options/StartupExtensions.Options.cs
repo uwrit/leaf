@@ -270,6 +270,7 @@ namespace API.Options
                         Node = new SHRINEOptions.LocalNode
                         {
                             Id = config.GetValue<long>(Config.Integration.SHRINE.Node.Id),
+                            Key = config.GetValue<string>(Config.Integration.SHRINE.Node.Key),
                             Name = config.GetValue<string>(Config.Integration.SHRINE.Node.Name)
                         },
                         Topic = new SHRINEOptions.DefaultTopic

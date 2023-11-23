@@ -25,6 +25,7 @@ namespace Model.Integration.Shrine
 		public string Contents { get; set; }
 		public long ContentsSubject { get; set; }
 		public ShrineDeliveryContentsType ContentsType { get; set; }
+		public int ProtocolVersion = 2;
     }
 
 	public enum ShrineDeliveryContentsType
@@ -33,7 +34,8 @@ namespace Model.Integration.Shrine
 		UpdateQueryAtQep,
 		RunQueryForResult,
 		RunQueryAtHub,
-		Result
+		Result,
+		UpdateResult
 	}
 }
 

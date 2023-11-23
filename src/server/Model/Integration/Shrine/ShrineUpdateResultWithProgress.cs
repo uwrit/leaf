@@ -6,26 +6,15 @@
 using System;
 namespace Model.Integration.Shrine
 {
-    public class ShrineQueryStatus
-    {
+	public class ShrineUpdateResultWithProgress
+	{
+        public long QueryId { get; set; }
+        public string AdapterNodeKey { get; set; }
+        public ShrineQueryStatus Status { get; set; }
+        public string StatusMessage { get; set; }
+        public long? CrcQueryInstanceId { get; set; }
+        public DateTime AdapterTime { get; set; }
         public ShrineQueryStatusType EncodedClass { get; set; }
-    }
-
-    public enum ShrineQueryStatusType
-    {
-        Unknown,
-        SentToAdapters,
-        ReceivedAtHub,
-        UpdateQueryAtQepWithStatus,
-        UpdateQueryReadyForAdapters,
-        IdAssigned,
-        SubmittedToCRC,
-        ResultProgress,
-        ReceivedByAdapter,
-        CrcResult,
-        ResultFromCRC,
-        UpdateResultWithProgress,
-        UpdateResultWithCrcResult
     }
 }
 
