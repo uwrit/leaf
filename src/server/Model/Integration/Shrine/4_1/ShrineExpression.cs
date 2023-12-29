@@ -5,6 +5,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
+using Model.Compiler;
 
 namespace Model.Integration.Shrine4_1
 {
@@ -45,33 +46,18 @@ namespace Model.Integration.Shrine4_1
     public class ShrineTimelineSubsequentEvent
     {
         public ShrineConceptGroup ConceptGroup { get; set; }
-        public ShrineTimelineSubsequentEventOccurrence PreviousOccurrence { get; set; }
-        public ShrineTimelineSubsequentEventOccurrence ThisOccurrence { get; set; }
+        public ShrineOccurrence PreviousOccurrence { get; set; }
+        public ShrineOccurrence ThisOccurrence { get; set; }
         public ShrineTimelineSubsequentEventTimeConstraint TimeConstraint { get; set; }
 
         public ShrineTimelineSubsequentEvent() { }
     }
 
-    public class ShrineTimelineSubsequentEventOccurrence
-    {
-        public string EncodedClass { get; set; }
-    }
-
     public class ShrineTimelineSubsequentEventTimeConstraint
     {
-        public ShrineOperator Operator { get; set; }
+        public NumericFilterType Operator { get; set; }
+        public DateIncrementType TimeUnit { get; set; }
         public int Value { get; set; }
-        public ShrineTimeUnit TimeUnit { get; set; }
-    }
-
-    public class ShrineOperator
-    {
-        public string EncodedClass { get; set; }
-    }
-
-    public class ShrineTimeUnit
-    {
-        public string EncodedClass { get; set; }
     }
 
     public class ShrineConceptConjunction : ShrineExpression

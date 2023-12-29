@@ -10,9 +10,9 @@ namespace Model.Compiler
     {
         None,
         GreaterThan,
-        GreaterThanOrEqualTo,
+        GreaterThanOrEqual,
         LessThan,
-        LessThanOrEqualTo,
+        LessThanOrEqual,
         EqualTo,
         Between
     }

@@ -215,9 +215,9 @@ namespace Model.Compiler
             {
                 case NumericFilterType.EqualTo:
                 case NumericFilterType.GreaterThan:
-                case NumericFilterType.GreaterThanOrEqualTo:
+                case NumericFilterType.GreaterThanOrEqual:
                 case NumericFilterType.LessThan:
-                case NumericFilterType.LessThanOrEqualTo:
+                case NumericFilterType.LessThanOrEqual:
                     throwIfNotLength(1);
                     return;
                 case NumericFilterType.Between:

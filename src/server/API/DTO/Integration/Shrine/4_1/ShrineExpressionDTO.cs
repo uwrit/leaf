@@ -4,9 +4,10 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using System.Collections.Generic;
-using Model.Integration.Shrine4_1;
 using System.Linq;
+using System.Collections.Generic;
+using Model.Compiler;
+using Model.Integration.Shrine4_1;
 
 namespace API.DTO.Integration.Shrine4_1
 {
@@ -22,10 +23,21 @@ namespace API.DTO.Integration.Shrine4_1
         }
     }
 
-    public abstract class ShrineGroupDTO
+    public class ShrineAnonymousEncodedClassDTO
+    {
+        public string EncodedClass { get; set; }
+
+        public ShrineAnonymousEncodedClassDTO() { }
+
+        public ShrineAnonymousEncodedClassDTO(string encodedClass)
+        {
+            EncodedClass = encodedClass;
+        }
+    }
+
+    public abstract class ShrineGroupDTO : ShrineAnonymousEncodedClassDTO
     {
         public int NMustBeTrue { get; set; }
-        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
 
         public ShrineGroupDTO() { }
@@ -37,18 +49,21 @@ namespace API.DTO.Integration.Shrine4_1
         }
     }
 
-    public class ShrineConjunctionDTO
+    public class ShrineConjunctionDTO : ShrineAnonymousEncodedClassDTO
     {
         public int NMustBeTrue { get; set; }
-        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
         public IEnumerable<ShrineConceptGroupOrTimelineDTO> Possibilities { get; set; }
 
-        public ShrineConjunctionDTO() { }
+        public ShrineConjunctionDTO()
+        {
+            EncodedClass = "Conjunction";
+        }
 
         public ShrineConjunctionDTO(ShrineConjunction conjunction)
         {
-            Possibilities = conjunction.Possibilities.Select(p => new ShrineConceptGroupDTO(p));
+            EncodedClass = "Conjunction";
+            Possibilities = conjunction.Possibilities.Select(p => new ShrineConceptGroupOrTimelineDTO(p));
         }
     }
 
@@ -59,38 +74,53 @@ namespace API.DTO.Integration.Shrine4_1
 
         public bool IsConceptGroup => First == null;
         public bool IsTimeline => First != null;
+
+        public ShrineConceptGroupOrTimelineDTO(ShrineConceptGroupOrTimeline cg)
+        {
+            if (cg.IsConceptGroup)
+            {
+                Concepts = new ShrineConceptConjunctionDTO(cg.Concepts);
+                EncodedClass = "ConceptGroup";
+            }
+            else
+            {
+                First = new ShrineConceptGroupDTO(cg.First);
+                Subsequent = cg.Subsequent.Select(s => new ShrineTimelineSubsequentEventDTO(s));
+                EncodedClass = "Timeline";
+            }
+        }
     }
 
     public class ShrineTimelineSubsequentEventDTO
     {
         public ShrineConceptGroupDTO ConceptGroup { get; set; }
-        public ShrineTimelineSubsequentEventOccurrenceDTO PreviousOccurrence { get; set; }
-        public ShrineTimelineSubsequentEventOccurrenceDTO ThisOccurrence { get; set; }
+        public ShrineAnonymousEncodedClassDTO PreviousOccurrence { get; set; }
+        public ShrineAnonymousEncodedClassDTO ThisOccurrence { get; set; }
         public ShrineTimelineSubsequentEventTimeConstraintDTO TimeConstraint { get; set; }
 
         public ShrineTimelineSubsequentEventDTO() { }
-    }
 
-    public class ShrineTimelineSubsequentEventOccurrenceDTO
-    {
-        public string EncodedClass { get; set; }
+        public ShrineTimelineSubsequentEventDTO(ShrineTimelineSubsequentEvent sub)
+        {
+            ConceptGroup = new ShrineConceptGroupDTO(sub.ConceptGroup);
+            PreviousOccurrence = new ShrineAnonymousEncodedClassDTO(sub.PreviousOccurrence.ToString());
+            ThisOccurrence = new ShrineAnonymousEncodedClassDTO(sub.ThisOccurrence.ToString());
+            TimeConstraint = sub.TimeConstraint != null ? new ShrineTimelineSubsequentEventTimeConstraintDTO(sub.TimeConstraint) : null;
+        }
     }
 
     public class ShrineTimelineSubsequentEventTimeConstraintDTO
     {
-        public ShrineOperatorDTO Operator { get; set; }
-        public double Value { get; set; }
-        public ShrineTimeUnitDTO TimeUnit { get; set; }
-    }
+        public ShrineAnonymousEncodedClassDTO Operator { get; set; }
+        public ShrineAnonymousEncodedClassDTO TimeUnit { get; set; }
+        public int Value { get; set; }
 
-    public class ShrineOperatorDTO
-    {
-        public string EncodedClass { get; set; }
-    }
-
-    public class ShrineTimeUnitDTO
-    {
-        public string EncodedClass { get; set; }
+        public ShrineTimelineSubsequentEventTimeConstraintDTO(ShrineTimelineSubsequentEventTimeConstraint timeConstraint)
+        {
+            Operator = new ShrineAnonymousEncodedClassDTO(timeConstraint.Operator.ToString());
+            TimeUnit = new ShrineAnonymousEncodedClassDTO(timeConstraint.TimeUnit.ToString());
+            Value = timeConstraint.Value;
+        }
     }
 
     public class ShrineConceptGroupDTO : ShrineGroupDTO
@@ -111,10 +141,9 @@ namespace API.DTO.Integration.Shrine4_1
         }
     }
 
-    public class ShrineConceptConjunctionDTO
+    public class ShrineConceptConjunctionDTO : ShrineAnonymousEncodedClassDTO
     {
         public int NMustBeTrue { get; set; }
-        public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
         public IEnumerable<ShrineConceptDTO> Possibilities { get; set; }
 
@@ -145,10 +174,8 @@ namespace API.DTO.Integration.Shrine4_1
         }
     }
 
-    public class ShrineConjunctionCompareDTO
+    public class ShrineConjunctionCompareDTO : ShrineAnonymousEncodedClassDTO
     {
-        public string EncodedClass { get; set; }
-
         public ShrineConjunctionCompareDTO() { }
 
         public ShrineConjunctionCompareDTO(ShrineConjunctionCompare compare)
@@ -189,13 +216,53 @@ namespace API.DTO.Integration.Shrine4_1
             };
         }
 
+        public static ShrineConceptGroupOrTimeline ToConceptGroupOrTimeline(this ShrineConceptGroupOrTimelineDTO dto)
+        {
+            return new ShrineConceptGroupOrTimeline
+            {
+                StartDate = dto.StartDate != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)dto.StartDate).UtcDateTime : null,
+                EndDate = dto.EndDate != null ? DateTimeOffset.FromUnixTimeMilliseconds((long)dto.EndDate).UtcDateTime : null,
+                OccursAtLeast = dto.OccursAtLeast,
+                Concepts = dto.IsConceptGroup ? dto.Concepts.ToConjunction() : null,
+                First = dto.IsTimeline ? dto.First.ToConceptGroup() : null,
+                Subsequent = dto.IsTimeline ? dto.Subsequent.Select(s => s.ToSubsequentEvent()) : null
+            };
+        }
+
         public static ShrineConjunction ToConjunction(this ShrineConjunctionDTO dto)
         {
             return new ShrineConjunction
             {
                 NMustBeTrue = dto.NMustBeTrue,
                 Compare = dto.Compare.ToCompare(),
-                Possibilities = dto.Possibilities.Select(p => p.ToConceptGroup())
+                Possibilities = dto.Possibilities.Select(p => p.ToConceptGroupOrTimeline())
+            };
+        }
+
+        public static ShrineTimelineSubsequentEvent ToSubsequentEvent(this ShrineTimelineSubsequentEventDTO dto)
+        {
+            _ = Enum.TryParse(dto.PreviousOccurrence.EncodedClass, out ShrineOccurrence previousOccurrence);
+            _ = Enum.TryParse(dto.ThisOccurrence.EncodedClass, out ShrineOccurrence thisOccurrence);
+
+            return new ShrineTimelineSubsequentEvent
+            {
+                ConceptGroup = dto.ConceptGroup.ToConceptGroup(),
+                PreviousOccurrence = previousOccurrence,
+                ThisOccurrence = thisOccurrence,
+                TimeConstraint = dto?.TimeConstraint.ToTimeConstraint()
+            };
+        }
+
+        public static ShrineTimelineSubsequentEventTimeConstraint ToTimeConstraint(this ShrineTimelineSubsequentEventTimeConstraintDTO dto)
+        {
+            _ = Enum.TryParse(dto.Operator.EncodedClass, out NumericFilterType op);
+            _ = Enum.TryParse(dto.TimeUnit.EncodedClass, out DateIncrementType timeUnit);
+
+            return new ShrineTimelineSubsequentEventTimeConstraint
+            {
+                Operator = op,
+                TimeUnit = timeUnit,
+                Value = dto.Value
             };
         }
 

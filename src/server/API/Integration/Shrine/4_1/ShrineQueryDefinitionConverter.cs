@@ -21,8 +21,9 @@ namespace API.Integration.Shrine4_1
         public IPatientCountQueryDTO ToLeafQuery(ShrineQuery shrineQuery)
         {
             var possibilities = shrineQuery.QueryDefinition.Expression.Possibilities;
-            var panels = possibilities.Select(
-                (grp, i) => grp.IsConceptGroup ? ShrineConceptGroupToPanelDTO(grp, i) : ShrineTimelineToPanelDTO(grp, i)
+            var panels = possibilities.Select((grp, i) => grp.IsConceptGroup
+                ? ShrineConceptGroupToPanelDTO(grp, i)
+                : ShrineTimelineToPanelDTO(grp, i)
             );
 
             return new PatientCountQueryDTO
@@ -108,7 +109,7 @@ namespace API.Integration.Shrine4_1
                     JoinSequence = new SubPanelJoinSequence
                     {
                         Increment = sub.TimeConstraint != null ? sub.TimeConstraint.Value : -1,
-                        DateIncrementType = DateIncrementType.Day, // FIX
+                        DateIncrementType = sub.TimeConstraint.TimeUnit,
                         SequenceType = SequenceType.AnytimeFollowing
                     },
                     PanelIndex = i,
@@ -175,36 +176,84 @@ namespace API.Integration.Shrine4_1
                         },
                         Possibilities = panels.Select(p =>
                         {
-                            var subpanel = p.SubPanels.First();
-
-                            return new ShrineConceptGroup
-                            {
-                                Concepts = new ShrineConceptConjunction
-                                {
-                                    NMustBeTrue = p.IncludePanel ? 1 : 0,
-                                    Compare = new ShrineConjunctionCompare
-                                    {
-                                        EncodedClass = p.IncludePanel ? ShrineConjunctionComparison.AtLeast : ShrineConjunctionComparison.AtMost,
-                                    },
-                                    Possibilities = subpanel.PanelItems.Select(pi =>
-                                    {
-                                        return new ShrineConcept
-                                        {
-                                            DisplayName = pi.Resource.UiDisplayName,
-                                            TermPath = pi.Resource.UniversalId.ToString().Replace(UniversalIdPrefix, ""),
-                                            Constraint = null
-                                        };
-                                    }),
-                                    StartDate = p.DateFilter?.Start?.Date,
-                                    EndDate = p.DateFilter?.End?.Date,
-                                    OccursAtLeast = p.IncludePanel ? subpanel.MinimumCount : 0
-                                }
-                            };
+                            return p.SubPanels.Count() == 1
+                                ? LeafNonSequenceToShrineConceptGroup(p)
+                                : LeafSequenceToShrineTimeline(p);
                         })
                     }
                 }
             };
         }
+
+        ShrineConceptGroupOrTimeline LeafNonSequenceToShrineConceptGroup(IPanelDTO panel)
+        {
+            var subpanel = panel.SubPanels.First();
+
+            return new ShrineConceptGroupOrTimeline
+            {
+                Concepts = LeafSubPanelToShrineConceptConjunction(panel, subpanel)
+            };
+        }
+
+        ShrineConceptGroupOrTimeline LeafSequenceToShrineTimeline(IPanelDTO panel)
+        {
+            var firstSubpanel = panel.SubPanels.First();
+            var first = new ShrineConceptGroup
+            {
+                Concepts = LeafSubPanelToShrineConceptConjunction(panel, firstSubpanel)
+            };
+
+            var subsequent = panel.SubPanels.Skip(1).Select(subpanel =>
+            {
+                return new ShrineTimelineSubsequentEvent
+                {
+                    ConceptGroup = new ShrineConceptGroup
+                    {
+                        Concepts = LeafSubPanelToShrineConceptConjunction(panel, subpanel)
+                    },
+                    PreviousOccurrence = ShrineOccurrence.Any,
+                    ThisOccurrence = ShrineOccurrence.Any,
+                    TimeConstraint = subpanel.JoinSequence.SequenceType == SequenceType.WithinFollowing
+                        ? new ShrineTimelineSubsequentEventTimeConstraint
+                        {
+                            Operator = NumericFilterType.LessThanOrEqual,
+                            TimeUnit = subpanel.JoinSequence.DateIncrementType,
+                            Value = subpanel.JoinSequence.Increment
+                        }
+                        : null
+                };
+            });
+
+            return new ShrineConceptGroupOrTimeline
+            {
+                First = first,
+                Subsequent = subsequent
+            };
+        }
+
+        ShrineConceptConjunction LeafSubPanelToShrineConceptConjunction(IPanelDTO panel, ISubPanelDTO subpanel)
+        {
+            return new ShrineConceptConjunction
+            {
+                NMustBeTrue = panel.IncludePanel ? 1 : 0,
+                Compare = new ShrineConjunctionCompare
+                {
+                    EncodedClass = panel.IncludePanel ? ShrineConjunctionComparison.AtLeast : ShrineConjunctionComparison.AtMost,
+                },
+                Possibilities = subpanel.PanelItems.Select(pi =>
+                {
+                    return new ShrineConcept
+                    {
+                        DisplayName = pi.Resource.UiDisplayName,
+                        TermPath = pi.Resource.UniversalId.ToString().Replace(UniversalIdPrefix, ""),
+                        Constraint = null
+                    };
+                }),
+                StartDate = panel.DateFilter?.Start?.Date,
+                EndDate = panel.DateFilter?.End?.Date,
+                OccursAtLeast = panel.IncludePanel ? subpanel.MinimumCount : 0
+            };
+    }
 
         public static long GenerateRandomLongId()
         {

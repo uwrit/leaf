@@ -198,13 +198,13 @@ namespace Model.Compiler.SqlBuilder
                     case NumericFilterType.GreaterThan:
                         where.Add(Number > val1);
                         return;
-                    case NumericFilterType.GreaterThanOrEqualTo:
+                    case NumericFilterType.GreaterThanOrEqual:
                         where.Add(Number >= val1);
                         return;
                     case NumericFilterType.LessThan:
                         where.Add(Number < val1);
                         return;
-                    case NumericFilterType.LessThanOrEqualTo:
+                    case NumericFilterType.LessThanOrEqual:
                         where.Add(Number <= val1);
                         return;
                     case NumericFilterType.EqualTo:
