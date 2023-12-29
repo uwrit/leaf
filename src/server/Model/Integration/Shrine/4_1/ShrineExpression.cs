@@ -30,10 +30,51 @@ namespace Model.Integration.Shrine4_1
 
 	public class ShrineConjunction : ShrineExpression
 	{
-		public IEnumerable<ShrineConceptGroup> Possibilities { get; set; } = new List<ShrineConceptGroup>();
+		public IEnumerable<ShrineConceptGroupOrTimeline> Possibilities { get; set; } = new List<ShrineConceptGroupOrTimeline>();
 	}
 
-	public class ShrineConceptConjunction : ShrineExpression
+    public class ShrineConceptGroupOrTimeline : ShrineConceptGroup
+    {
+        public ShrineConceptGroup First { get; set; }
+        public IEnumerable<ShrineTimelineSubsequentEvent> Subsequent { get; set; } = new List<ShrineTimelineSubsequentEvent>();
+
+        public bool IsConceptGroup => First == null;
+        public bool IsTimeline => First != null;
+    }
+
+    public class ShrineTimelineSubsequentEvent
+    {
+        public ShrineConceptGroup ConceptGroup { get; set; }
+        public ShrineTimelineSubsequentEventOccurrence PreviousOccurrence { get; set; }
+        public ShrineTimelineSubsequentEventOccurrence ThisOccurrence { get; set; }
+        public ShrineTimelineSubsequentEventTimeConstraint TimeConstraint { get; set; }
+
+        public ShrineTimelineSubsequentEvent() { }
+    }
+
+    public class ShrineTimelineSubsequentEventOccurrence
+    {
+        public string EncodedClass { get; set; }
+    }
+
+    public class ShrineTimelineSubsequentEventTimeConstraint
+    {
+        public ShrineOperator Operator { get; set; }
+        public int Value { get; set; }
+        public ShrineTimeUnit TimeUnit { get; set; }
+    }
+
+    public class ShrineOperator
+    {
+        public string EncodedClass { get; set; }
+    }
+
+    public class ShrineTimeUnit
+    {
+        public string EncodedClass { get; set; }
+    }
+
+    public class ShrineConceptConjunction : ShrineExpression
 	{
 		public IEnumerable<ShrineConcept> Possibilities { get; set; } = new List<ShrineConcept>();
 	}
@@ -41,6 +82,18 @@ namespace Model.Integration.Shrine4_1
     public class ShrineConceptGroup : ShrineGroup
 	{
 		public new ShrineConceptConjunction Concepts { get; set; }
+    }
+
+	public class ShrineTimelineGroup : ShrineGroup
+	{
+		public ShrineConceptGroup ConceptGroup { get; set; }
+
+    }
+
+	public class ShrineTimeline : ShrineGroup
+	{
+		public ShrineConceptGroup First { get; set; }
+		public IEnumerable<int> Subsequent { get; set; }
     }
 
 	public class ShrineConcept : ShrineExpression
@@ -60,6 +113,12 @@ namespace Model.Integration.Shrine4_1
 		AtLeast,
 		Exactly,
 		AtMost
+	}
+
+	public enum ShrineOccurrence
+	{
+		Any,
+		First
 	}
 }
 

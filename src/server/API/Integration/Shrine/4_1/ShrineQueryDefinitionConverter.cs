@@ -20,21 +20,34 @@ namespace API.Integration.Shrine4_1
 
         public IPatientCountQueryDTO ToLeafQuery(ShrineQuery shrineQuery)
         {
-            var panels = shrineQuery.QueryDefinition.Expression.Possibilities.Select((conceptGroup, i) =>
+            var possibilities = shrineQuery.QueryDefinition.Expression.Possibilities;
+            var panels = possibilities.Select(
+                (grp, i) => grp.IsConceptGroup ? ShrineConceptGroupToPanelDTO(grp, i) : ShrineTimelineToPanelDTO(grp, i)
+            );
+
+            return new PatientCountQueryDTO
             {
-                return new PanelDTO
-                {
-                    IncludePanel = conceptGroup.Concepts.NMustBeTrue > 0,
-                    Index = i,
-                    Domain = PanelDomain.Panel,
-                    DateFilter = conceptGroup.StartDate.HasValue ?
+                QueryId = Guid.NewGuid().ToString(),
+                Panels = panels,
+                PanelFilters = Array.Empty<PanelFilterDTO>()
+            };
+        }
+
+        PanelDTO ShrineConceptGroupToPanelDTO(ShrineConceptGroup conceptGroup, int i)
+        {
+            return new PanelDTO
+            {
+                IncludePanel = conceptGroup.Concepts.NMustBeTrue > 0,
+                Index = i,
+                Domain = PanelDomain.Panel,
+                DateFilter = conceptGroup.StartDate.HasValue ?
                         new DateBoundary
                         {
                             Start = new DateFilter { Date = conceptGroup.StartDate.Value },
                             End = new DateFilter { Date = conceptGroup.EndDate.Value }
                         }
                         : null,
-                    SubPanels = new List<SubPanelDTO>
+                SubPanels = new List<SubPanelDTO>
                     {
                         new SubPanelDTO
                         {
@@ -58,14 +71,77 @@ namespace API.Integration.Shrine4_1
                             })
                         }
                     }
+            };
+        }
+
+        PanelDTO ShrineTimelineToPanelDTO(ShrineConceptGroupOrTimeline timeline, int i)
+        {
+            var first = new SubPanelDTO
+            {
+                IncludeSubPanel = timeline.First.NMustBeTrue > 0,
+                Index = 0,
+                MinimumCount = timeline.First.NMustBeTrue,
+                PanelIndex = i,
+                PanelItems = timeline.First.Concepts.Possibilities.Select((c, j) =>
+                {
+                    return new PanelItemDTO
+                    {
+                        Index = j,
+                        SubPanelIndex = 0,
+                        PanelIndex = i,
+                        Resource = new ResourceRef
+                        {
+                            UiDisplayName = c.DisplayName,
+                            UniversalId = UniversalIdPrefix + c.TermPath
+                        }
+                    };
+                })
+            };
+
+            var subsequent = timeline.Subsequent.Select((sub, i) =>
+            {
+                return new SubPanelDTO
+                {
+                    IncludeSubPanel = sub.ConceptGroup.NMustBeTrue > 0,
+                    Index = i + 1,
+                    MinimumCount = sub.ConceptGroup.NMustBeTrue,
+                    JoinSequence = new SubPanelJoinSequence
+                    {
+                        Increment = sub.TimeConstraint != null ? sub.TimeConstraint.Value : -1,
+                        DateIncrementType = DateIncrementType.Day, // FIX
+                        SequenceType = SequenceType.AnytimeFollowing
+                    },
+                    PanelIndex = i,
+                    PanelItems = sub.ConceptGroup.Concepts.Possibilities.Select((c, j) =>
+                    {
+                        return new PanelItemDTO
+                        {
+                            Index = j,
+                            SubPanelIndex = 0,
+                            PanelIndex = i,
+                            Resource = new ResourceRef
+                            {
+                                UiDisplayName = c.DisplayName,
+                                UniversalId = UniversalIdPrefix + c.TermPath
+                            }
+                        };
+                    })
                 };
             });
 
-            return new PatientCountQueryDTO
+            return new PanelDTO
             {
-                QueryId = Guid.NewGuid().ToString(),
-                Panels = panels,
-                PanelFilters = Array.Empty<PanelFilterDTO>()
+                IncludePanel = timeline.Concepts.NMustBeTrue > 0,
+                Index = i,
+                Domain = PanelDomain.Panel,
+                DateFilter = timeline.StartDate.HasValue ?
+                        new DateBoundary
+                        {
+                            Start = new DateFilter { Date = timeline.StartDate.Value },
+                            End = new DateFilter { Date = timeline.EndDate.Value }
+                        }
+                        : null,
+                SubPanels = new List<SubPanelDTO>() { first }.Union(subsequent)
             };
         }
 

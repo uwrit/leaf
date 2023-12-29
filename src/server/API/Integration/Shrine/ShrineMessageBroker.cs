@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using Model.Integration.Shrine;
 using Model.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 
 namespace API.Integration.Shrine
@@ -48,15 +47,18 @@ namespace API.Integration.Shrine
             };
 
             var resp = await client.SendAsync(req);
+            req.Dispose();
             if (!resp.IsSuccessStatusCode || resp.Content == null)
             {
-                req.Dispose();
                 return (resp, null);
             }
 
             var jsonMessage = await resp.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(jsonMessage))
+            {
+                return (resp, null);
+            }
             var message = JsonConvert.DeserializeObject<ShrineDeliveryAttemptDTO>(jsonMessage).ToDeliveryAttempt();
-            req.Dispose();
 
             var ack = new HttpRequestMessage
             {
@@ -87,17 +89,6 @@ namespace API.Integration.Shrine
             request.Dispose();
 
             return response;
-        }
-
-        private static string GetDeliveryAttemptId(string body)
-        {
-            var raw = JObject.Parse(body);
-
-            if (raw.ContainsKey("deliveryAttemptId"))
-            {
-                return (string)raw["deliveryAttemptId"]["underlying"];
-            }
-            return null;
         }
     }
 }

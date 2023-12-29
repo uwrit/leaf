@@ -42,7 +42,7 @@ namespace API.DTO.Integration.Shrine4_1
         public int NMustBeTrue { get; set; }
         public string EncodedClass { get; set; }
         public ShrineConjunctionCompareDTO Compare { get; set; }
-        public IEnumerable<ShrineConceptGroupDTO> Possibilities { get; set; }
+        public IEnumerable<ShrineConceptGroupOrTimelineDTO> Possibilities { get; set; }
 
         public ShrineConjunctionDTO() { }
 
@@ -50,6 +50,47 @@ namespace API.DTO.Integration.Shrine4_1
         {
             Possibilities = conjunction.Possibilities.Select(p => new ShrineConceptGroupDTO(p));
         }
+    }
+
+    public class ShrineConceptGroupOrTimelineDTO : ShrineConceptGroupDTO
+    {
+        public ShrineConceptGroupDTO First { get; set; }
+        public IEnumerable<ShrineTimelineSubsequentEventDTO> Subsequent { get; set; } = new List<ShrineTimelineSubsequentEventDTO>();
+
+        public bool IsConceptGroup => First == null;
+        public bool IsTimeline => First != null;
+    }
+
+    public class ShrineTimelineSubsequentEventDTO
+    {
+        public ShrineConceptGroupDTO ConceptGroup { get; set; }
+        public ShrineTimelineSubsequentEventOccurrenceDTO PreviousOccurrence { get; set; }
+        public ShrineTimelineSubsequentEventOccurrenceDTO ThisOccurrence { get; set; }
+        public ShrineTimelineSubsequentEventTimeConstraintDTO TimeConstraint { get; set; }
+
+        public ShrineTimelineSubsequentEventDTO() { }
+    }
+
+    public class ShrineTimelineSubsequentEventOccurrenceDTO
+    {
+        public string EncodedClass { get; set; }
+    }
+
+    public class ShrineTimelineSubsequentEventTimeConstraintDTO
+    {
+        public ShrineOperatorDTO Operator { get; set; }
+        public double Value { get; set; }
+        public ShrineTimeUnitDTO TimeUnit { get; set; }
+    }
+
+    public class ShrineOperatorDTO
+    {
+        public string EncodedClass { get; set; }
+    }
+
+    public class ShrineTimeUnitDTO
+    {
+        public string EncodedClass { get; set; }
     }
 
     public class ShrineConceptGroupDTO : ShrineGroupDTO
