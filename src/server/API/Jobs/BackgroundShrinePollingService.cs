@@ -33,8 +33,9 @@ namespace API.Jobs
         readonly IShrineUserQueryCache userQueryCache;
         readonly IServiceScopeFactory serviceScopeFactory;
         readonly SHRINEOptions opts;
-        readonly ShrineQueryDefinitionConverter converter;
-        readonly int ErrorPauseSeconds = 30;
+        readonly ShrineQueryDefinitionConverter queryConverter;
+        readonly ShrineDemographicsConverter demographicsConverter;
+        readonly int ErrorPauseSeconds = 3;
         readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -47,7 +48,8 @@ namespace API.Jobs
             IShrineUserQueryCache userQueryCache,
             IServiceScopeFactory serviceScopeFactory,
             IOptions<IntegrationOptions> opts,
-            ShrineQueryDefinitionConverter converter
+            ShrineQueryDefinitionConverter queryConverter,
+            ShrineDemographicsConverter demographicsConverter
             )
         {
             this.logger = logger;
@@ -55,7 +57,8 @@ namespace API.Jobs
             this.queryResultCache = queryResultCache;
             this.userQueryCache = userQueryCache;
             this.serviceScopeFactory = serviceScopeFactory;
-            this.converter = converter;
+            this.queryConverter = queryConverter;
+            this.demographicsConverter = demographicsConverter;
             this.opts = opts.Value.SHRINE;
         }
 
@@ -157,6 +160,13 @@ namespace API.Jobs
             // Let hub know query converted, executing
             await SendQuerySubmittedToCrc(run.Query.Id);
 
+            // Query conversion failed, tell hub no patients
+            if (query == null)
+            {
+                await SendFailedQueryResult(run.Query.Id);
+                return;
+            }
+
             // Create scope to ensure query run as this user
             using (var scope = serviceScopeFactory.CreateAsyncScope())
             {
@@ -169,25 +179,50 @@ namespace API.Jobs
 
                 if (!cohort.ValidationContext.PreflightPassed)
                 {
-                    // TODO Respond with error
+                    await SendFailedQueryResult(run.Query.Id);
+                    return;
                 }
 
                 queryResultCache.Put(run.Query.Id, run.Researcher);
 
-                // Let hub know query result
-                await SendQueryResult(run.Query.Id, count);
+                // Check if we need to get demographics as well
+                if (run.Query.Output == Model.Integration.Shrine4_1.ShrineOutputType.DemographicsAndCount)
+                {
+                    var queryRef = new QueryRef(count.QueryId);
+                    var demographicsProvider = scope.ServiceProvider.GetRequiredService<DemographicProvider>();
+                    var demographics = await demographicsProvider.GetDemographicsAsync(queryRef, stoppingToken);
+                    var breakdowns = demographicsConverter.ToShrineBreakdown(demographics);
+
+                    // Let hub know demographics result
+                    await SendQueryResult(run.Query.Id, count.Result.Value, breakdowns);
+                }
+                else
+                {
+                    // Let hub know query result
+                    await SendQueryResult(run.Query.Id, count.Result.Value);
+                }
             }
         }
 
-        async Task SendQueryResult(long queryId, CohortCountDTO count)
+        async Task SendFailedQueryResult(long queryId)
+        {
+            await SendQueryResult(queryId, -1);
+        }
+
+        async Task SendQueryResult(long queryId, int count)
+        {
+            await SendQueryResult(queryId, count, null);
+        }
+
+        async Task SendQueryResult(long queryId, int count, ShrineBreakdown breakdowns)
         {
             var message = new ShrineUpdateResultWithCrcResult
             {
                 QueryId = queryId,
                 AdapterNodeKey = opts.Node.Key,
-                Count = count.Result.Value,
+                Count = count,
                 CrcQueryInstanceId = 42,
-                Breakdowns = null,
+                Breakdowns = breakdowns,
                 ObfuscatingParameters = new ShrineResultObfuscatingParameters
                 {
                     BinSize = 5,
@@ -253,7 +288,17 @@ namespace API.Jobs
             }
 
             // Else not from Leaf, so set user context and transform query defintion
-            return (new ShrineUserContext(run.Researcher), converter.ToLeafQuery(run.Query));
+            IPatientCountQueryDTO query = null;
+            try
+            {
+                query = queryConverter.ToLeafQuery(run.Query);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Failed to convert SHRINE query to Leaf query. SHRINE query: {@Query}. Error: {Error}", run.Query, ex.ToString());
+            }
+
+            return (new ShrineUserContext(run.Researcher), query);
         }
     }
 }

@@ -22,11 +22,11 @@ namespace Model.Compiler.PanelSqlCompiler
         readonly CompilerOptions compilerOptions;
 
         public PanelSqlCompiler(
-            IUserContext user,
+            IUserContextProvider userContextProvider,
             ISqlDialect dialect,
             IOptions<CompilerOptions> compilerOptions)
         {
-            this.user = user;
+            this.user = userContextProvider.GetUserContext();
             this.dialect = dialect;
             this.compilerOptions = compilerOptions.Value;
         }

@@ -12,9 +12,9 @@ namespace Model.Integration.Shrine4_1
 	{
 		public long Id { get; set; }
 		public ShrineVersionInfo VersionInfo { get; set; }
-		public ShrineStatus Status { get; set; }
-		public ShrineQueryDefinition QueryDefinition { get; set; }
-		public ShrineOutput Output { get; set; }
+        public ShrineQueryDefinition QueryDefinition { get; set; }
+        public ShrineStatusType Status { get; set; }
+		public ShrineOutputType Output { get; set; }
 		public string QueryName { get; set; }
 		public long NodeOfOriginId { get; set; }
 		public long ResearcherId { get; set; }
@@ -29,5 +29,17 @@ namespace Model.Integration.Shrine4_1
 	{
 		QueryProgress
 	}
+
+    public enum ShrineOutputType
+    {
+        Count,
+        DemographicsAndCount
+    }
+
+    public enum ShrineStatusType
+    {
+        ReadyForAdapters,
+        SentToHub
+    }
 }
 

@@ -13,9 +13,9 @@ namespace API.DTO.Integration.Shrine4_1
     {
         public long Id { get; set; }
         public ShrineVersionInfoDTO VersionInfo { get; set; }
-        public ShrineStatusDTO Status { get; set; }
         public ShrineQueryDefinitionDTO QueryDefinition { get; set; }
-        public ShrineOutputDTO Output { get; set; }
+        public ShrineAnonymousEncodedClassDTO Output { get; set; }
+        public ShrineAnonymousEncodedClassDTO Status { get; set; }
         public string QueryName { get; set; }
         public long NodeOfOriginId { get; set; }
         public long ResearcherId { get; set; }
@@ -31,9 +31,9 @@ namespace API.DTO.Integration.Shrine4_1
         {
             Id = query.Id;
             VersionInfo = new ShrineVersionInfoDTO(query.VersionInfo);
-            Status = new ShrineStatusDTO(query.Status);
             QueryDefinition = new ShrineQueryDefinitionDTO(query.QueryDefinition);
-            Output = new ShrineOutputDTO(query.Output);
+            Status = new ShrineAnonymousEncodedClassDTO(query.Status.ToString());
+            Output = new ShrineAnonymousEncodedClassDTO(query.Output.ToString());
             QueryName = query.QueryName;
             NodeOfOriginId = query.NodeOfOriginId;
             ResearcherId = query.ResearcherId;
@@ -50,13 +50,16 @@ namespace API.DTO.Integration.Shrine4_1
         public static ShrineQuery ToQuery(this ShrineQueryDTO dto)
         {
             _ = Enum.TryParse(dto.EncodedClass, out ShrineQueryType type);
+            _ = Enum.TryParse(dto.Status.EncodedClass, out ShrineStatusType status);
+            _ = Enum.TryParse(dto.Output.EncodedClass, out ShrineOutputType output);
+
             return new ShrineQuery
             {
                 Id = dto.Id,
                 VersionInfo = dto.VersionInfo.ToVersionInfo(),
-                Status = dto.Status.ToStatus(),
+                Status = status,
                 QueryDefinition = dto.QueryDefinition.ToDefinition(),
-                Output = dto.Output.ToOutput(),
+                Output = output,
                 QueryName = dto.QueryName,
                 NodeOfOriginId = dto.NodeOfOriginId,
                 ResearcherId = dto.ResearcherId,

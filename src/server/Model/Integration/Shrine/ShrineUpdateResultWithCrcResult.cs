@@ -8,9 +8,14 @@ namespace Model.Integration.Shrine
 {
 	public class ShrineUpdateResultWithCrcResult : ShrineUpdateResultWithProgress
 	{
-        public string Breakdowns { get; set; }
+        public ShrineBreakdown Breakdowns { get; set; }
         public ShrineResultObfuscatingParameters ObfuscatingParameters { get; set; }
         public int Count { get; set; }
+    }
+
+    public class ShrineBreakdown
+    {
+        public object[] Counts { get; set; }
     }
 }
 

@@ -10,15 +10,29 @@ namespace API.DTO.Integration.Shrine
 {
 	public class ShrineUpdateResultWithCrcResultDTO : ShrineUpdateResultWithProgressDTO
 	{
-		public string Breakdowns { get; set; }
-		public ShrineResultObfuscatingParametersDTO ObfuscatingParameters { get; set; }
+        public ShrineBreakdownDTO Breakdowns { get; set; }
+        public ShrineResultObfuscatingParametersDTO ObfuscatingParameters { get; set; }
 		public int Count { get; set; }
 
 		public ShrineUpdateResultWithCrcResultDTO(ShrineUpdateResultWithCrcResult update) : base(update)
 		{
 			ObfuscatingParameters = new ShrineResultObfuscatingParametersDTO(update.ObfuscatingParameters);
 			Count = update.Count;
+            if (update.Breakdowns != null)
+            {
+                Breakdowns = new ShrineBreakdownDTO(update.Breakdowns);
+            }
 		}
+    }
+
+    public class ShrineBreakdownDTO
+    {
+        public object[] Counts { get; set; }
+
+        public ShrineBreakdownDTO(ShrineBreakdown breakdown)
+        {
+            Counts = breakdown.Counts;
+        }
     }
 
     public static class ShrineUpdateResultWithCrcResultDTOExtensions
@@ -37,10 +51,16 @@ namespace API.DTO.Integration.Shrine
                 AdapterTime = DateTimeOffset.FromUnixTimeMilliseconds(dto.AdapterTime).UtcDateTime,
                 EncodedClass = type,
                 ObfuscatingParameters = dto.ObfuscatingParameters.ToParameters(),
-                Count = dto.Count
+                Count = dto.Count,
+                Breakdowns = dto?.Breakdowns.ToBreakdown()
             };
 
             return output;
+        }
+
+        public static ShrineBreakdown ToBreakdown(this ShrineBreakdownDTO dto)
+        {
+            return new ShrineBreakdown { Counts = dto.Counts };
         }
     }
 }

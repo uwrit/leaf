@@ -132,7 +132,7 @@ namespace API.Integration.Shrine4_1
 
             return new PanelDTO
             {
-                IncludePanel = timeline.Concepts.NMustBeTrue > 0,
+                IncludePanel = timeline.First.Concepts.NMustBeTrue > 0,
                 Index = i,
                 Domain = PanelDomain.Panel,
                 DateFilter = timeline.StartDate.HasValue ?
@@ -161,10 +161,7 @@ namespace API.Integration.Shrine4_1
                     CreateDate = DateTime.Now,
                     ChangeDate = DateTime.Now
                 },
-                Status = new ShrineStatus
-                {
-                    EncodedClass = ShrineStatusType.SentToHub
-                },
+                Status = ShrineStatusType.SentToHub,
                 QueryDefinition = new ShrineQueryDefinition
                 {
                     Expression = new ShrineConjunction

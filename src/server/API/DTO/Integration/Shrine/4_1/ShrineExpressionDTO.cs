@@ -75,6 +75,8 @@ namespace API.DTO.Integration.Shrine4_1
         public bool IsConceptGroup => First == null;
         public bool IsTimeline => First != null;
 
+        public ShrineConceptGroupOrTimelineDTO() { }
+
         public ShrineConceptGroupOrTimelineDTO(ShrineConceptGroupOrTimeline cg)
         {
             if (cg.IsConceptGroup)
@@ -114,6 +116,8 @@ namespace API.DTO.Integration.Shrine4_1
         public ShrineAnonymousEncodedClassDTO Operator { get; set; }
         public ShrineAnonymousEncodedClassDTO TimeUnit { get; set; }
         public int Value { get; set; }
+
+        public ShrineTimelineSubsequentEventTimeConstraintDTO() { }
 
         public ShrineTimelineSubsequentEventTimeConstraintDTO(ShrineTimelineSubsequentEventTimeConstraint timeConstraint)
         {

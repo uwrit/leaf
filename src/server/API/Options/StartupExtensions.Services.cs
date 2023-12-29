@@ -27,6 +27,7 @@ using Model.Compiler;
 using Model.Compiler.SqlBuilder;
 using Model.Compiler.PanelSqlCompiler;
 using Model.Export;
+using Model.Integration.Shrine;
 using Model.Network;
 using Model.Options;
 using Model.Search;
@@ -50,7 +51,6 @@ using Services.Import;
 using Services.Notification;
 using Services.Obfuscation;
 using System.Net.Http;
-using Model.Integration.Shrine;
 
 namespace API.Options
 {
@@ -205,6 +205,7 @@ namespace API.Options
                     services.AddHostedService<BackgroundShrinePollingService>();
                     services.AddHostedService<BackgroundShrineCacheSynchronizer>();
                     services.AddTransient<ShrineQueryDefinitionConverter>();
+                    services.AddTransient<ShrineDemographicsConverter>();
                     services.AddTransient<IShrineMessageBroker, ShrineMessageBroker>();
                     services.AddSingleton<IShrineUserQueryCache, ShrineUserContextCache>();
                     services.AddSingleton<IShrineQueryResultCache, ShrineQueryResultCache>();
