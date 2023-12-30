@@ -24,6 +24,7 @@ namespace API.Controllers
         readonly ClientOptions clientOptions;
         readonly AttestationOptions attestationOptions;
         readonly DeidentificationOptions deidentOptions;
+        readonly IntegrationOptions integrationOptions;
         readonly IServerStateCache serverStateCache;
 
         public ConfigController(
@@ -33,6 +34,7 @@ namespace API.Controllers
             IOptions<ClientOptions> clientOptions,
             IOptions<AttestationOptions> attestationOptions,
             IOptions<DeidentificationOptions> deidentOptions,
+            IOptions<IntegrationOptions> integrationOptions,
             IServerStateCache serverStateCache)
         {
             this.authenticationOptions = authenticationOptions.Value;
@@ -41,6 +43,7 @@ namespace API.Controllers
             this.clientOptions = clientOptions.Value;
             this.attestationOptions = attestationOptions.Value;
             this.deidentOptions = deidentOptions.Value;
+            this.integrationOptions = integrationOptions.Value;
             this.serverStateCache = serverStateCache;
         }
 
@@ -112,6 +115,15 @@ namespace API.Controllers
                 {
                     Server = versionOptions.Version.ToString(),
                     Db = serverStateCache.GetServerState().Db.Version.ToString()
+                },
+                Integration = new IntegrationConfigDTO
+                {
+                    Enabled = integrationOptions.Enabled,
+                    Shrine = integrationOptions.SHRINE != null
+                        ? new IntegrationConfigDTO.IntegrationTypeDTO
+                        {
+                            Enabled = integrationOptions.SHRINE.Enabled
+                        } : null
                 }
             };
 

@@ -25,8 +25,8 @@ namespace Model.Integration.Shrine
 
     public class ShrineQueryResultCache : IShrineQueryResultCache
     {
-        readonly Dictionary<long, ShrineQueryResult> store = new Dictionary<long, ShrineQueryResult>();
-        readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
+        readonly Dictionary<long, ShrineQueryResult> store = new();
+        readonly ReaderWriterLockSlim sync = new();
 
         public ShrineQueryResultCache(IEnumerable<ShrineQueryResult> initial)
         {

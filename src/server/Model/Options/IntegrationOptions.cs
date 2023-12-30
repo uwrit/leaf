@@ -10,14 +10,15 @@ namespace Model.Options
     public class IntegrationOptions
 	{
         public bool Enabled { get; set; } = false;
-        public SHRINEOptions SHRINE { get; set; }
+        public ShrineIntegrationOptions SHRINE { get; set; }
     }
 
-    public class SHRINEOptions : IEnabled
+    public class ShrineIntegrationOptions : IEnabled
     {
         public bool Enabled { get; set; } = false;
         public string HubApiURI { get; set; }
         public LocalNode Node { get; set; }
+        public LocalResearcher Researcher { get; set; }
         public DefaultTopic Topic { get; set; }
 
         public class LocalNode
@@ -25,6 +26,13 @@ namespace Model.Options
             public long Id { get; set; }
             public string Key { get; set; }
             public string Name { get; set; }
+        }
+
+        public class LocalResearcher
+        {
+            public long Id { get; set; }
+            public string Name { get; set; }
+            public string Domain { get; set; }
         }
 
         public class DefaultTopic

@@ -32,14 +32,10 @@ namespace API.Jobs
         readonly IShrineQueryResultCache queryResultCache;
         readonly IShrineUserQueryCache userQueryCache;
         readonly IServiceScopeFactory serviceScopeFactory;
-        readonly SHRINEOptions opts;
+        readonly ShrineIntegrationOptions opts;
         readonly ShrineQueryDefinitionConverter queryConverter;
         readonly ShrineDemographicsConverter demographicsConverter;
         readonly int ErrorPauseSeconds = 3;
-        readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
-        {
-            ContractResolver = new CamelCasePropertyNamesContractResolver()
-        };
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,
@@ -83,6 +79,7 @@ namespace API.Jobs
                             // Error, delay before next poll
                             await Task.Delay(TimeSpan.FromSeconds(ErrorPauseSeconds), stoppingToken);
                         }
+                        continue;
                     }
 
                     _ = Task.Run(async () =>
@@ -237,13 +234,7 @@ namespace API.Jobs
             };
             var dto = new ShrineUpdateResultWithCrcResultDTO(message);
 
-            var response = new ShrineDeliveryContents
-            {
-                ContentsSubject = queryId,
-                Contents = JsonConvert.SerializeObject(dto, serializerSettings),
-                ContentsType = ShrineDeliveryContentsType.UpdateResult
-            };
-            _ = await broker.SendMessageToHub(response);
+            _ = await broker.SendMessageToHub(queryId, dto, ShrineDeliveryContentsType.UpdateResult);
         }
 
         async Task SendQueryReceievedByAdapter(long queryId)
@@ -268,13 +259,7 @@ namespace API.Jobs
             };
             var dto = new ShrineUpdateResultWithProgressDTO(message);
 
-            var response = new ShrineDeliveryContents
-            {
-                ContentsSubject = queryId,
-                Contents = JsonConvert.SerializeObject(dto, serializerSettings),
-                ContentsType = ShrineDeliveryContentsType.UpdateResult
-            };
-            _ = await broker.SendMessageToHub(response);
+            _ = await broker.SendMessageToHub(queryId, dto, ShrineDeliveryContentsType.UpdateResult);
         }
 
         (IUserContext, IPatientCountQueryDTO) GetContext(ShrineRunQueryForResult run)

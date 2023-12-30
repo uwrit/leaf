@@ -19,7 +19,7 @@ namespace API.DTO.Integration.Shrine4_1
         public string QueryName { get; set; }
         public long NodeOfOriginId { get; set; }
         public long ResearcherId { get; set; }
-        public int TopicId { get; set; }
+        public long TopicId { get; set; }
         public string ProjectName { get; set; }
         public bool Flagged { get; set; }
         public string FlaggedMessage { get; set; }

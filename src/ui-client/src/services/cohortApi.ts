@@ -32,6 +32,33 @@ export function fetchCount(
 };
 
 /**
+ * Initiate patient count query to SHRINE
+ */
+export const submitSHRINEQuery = (
+        state: AppState, nr: NetworkIdentity, panelFilters: PanelFilter[], panels: PanelDTO[], queryId: string, cancelToken: CancelTokenSource
+    ) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    const request = http.post(`${nr.address}/api/integration/shrine/count`, { 
+        cancelToken: cancelToken.token,
+        panelFilters,
+        panels, 
+        queryId, 
+    });
+    return request;
+};
+
+export const fetchSHRINEQueryResults = (
+        state: AppState, 
+        nr: NetworkIdentity, 
+        shrineQueryId: number
+    ) => {
+    const { token } = state.session.context!;
+    const http = HttpFactory.authenticated(token);
+    return http.get(`${nr.address}/api/integration/shrine/cohort/${shrineQueryId}/count`);
+};
+
+/**
  * Fetch demographics (shared by patient list and visuzalization)
  * based on already run patient counts.
  */
@@ -129,11 +156,11 @@ export const fetchAvailableDatasets = async (state: AppState): Promise<PatientLi
  */
 const deriveDateTicks = (date: DateFilter): number => {
     const dateTypeKeyMap = new Map([
-        [DateIncrementType.HOUR, 'h'],
-        [DateIncrementType.DAY, 'd'],
-        [DateIncrementType.WEEK, 'w'],
+        [DateIncrementType.HOUR,  'h'],
+        [DateIncrementType.DAY,   'd'],
+        [DateIncrementType.WEEK,  'w'],
         [DateIncrementType.MONTH, 'M'],
-        [DateIncrementType.YEAR, 'y']
+        [DateIncrementType.YEAR,  'y']
     ]);
 
     if (date.dateIncrementType === DateIncrementType.NOW) {

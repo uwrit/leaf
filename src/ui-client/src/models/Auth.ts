@@ -16,6 +16,7 @@ export interface ConfigDTO {
     attestation: AttestationOptionsDTO;
     cohort: CohortConfigDTO;
     client: ClientOptions;
+    integration: IntegrationConfigDTO;
     version: VersionConfigDTO;
 }
 
@@ -47,6 +48,15 @@ interface AttestationCreditsOptionsDTO {
 interface VersionConfigDTO {
     db: string;
     server: string;
+}
+
+interface IntegrationConfigDTO {
+    enabled: boolean;
+    shrine?: IntegrationTypeDTO;
+}
+
+interface IntegrationTypeDTO {
+    enabled: boolean;
 }
 
 export enum CustomAttestationType {

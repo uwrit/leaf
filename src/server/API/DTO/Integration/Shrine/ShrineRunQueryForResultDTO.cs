@@ -26,10 +26,10 @@ namespace API.DTO.Integration.Shrine
         public ShrineRunQueryForResultDTO(ShrineRunQueryForResult runQueryForResult)
         {
             Query = new ShrineQueryDTO(runQueryForResult.Query);
-            Node = new ShrineNodeDTO(runQueryForResult.Node);
-            Topic = new ShrineTopicDTO(runQueryForResult.Topic);
-            ResultProgress = new ShrineResultProgressDTO(runQueryForResult.ResultProgress);
-            Researcher = new ShrineResearcherDTO(runQueryForResult.Researcher);
+            Node = runQueryForResult.Node != null ? new ShrineNodeDTO(runQueryForResult.Node) : null;
+            Topic = runQueryForResult.Topic != null ? new ShrineTopicDTO(runQueryForResult.Topic) : null;
+            ResultProgress = runQueryForResult.ResultProgress != null ? new ShrineResultProgressDTO(runQueryForResult.ResultProgress) : null;
+            Researcher = runQueryForResult.Researcher != null ? new ShrineResearcherDTO(runQueryForResult.Researcher) : null;
             ProtocolVersion = runQueryForResult.ProtocolVersion;
         }
     }

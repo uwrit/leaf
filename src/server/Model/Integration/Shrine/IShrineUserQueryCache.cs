@@ -23,8 +23,8 @@ namespace Model.Integration.Shrine
 
 	public class ShrineUserContextCache : IShrineUserQueryCache
     {
-        readonly Dictionary<long, ShrineUserQueryEntry> store = new Dictionary<long, ShrineUserQueryEntry>();
-        readonly ReaderWriterLockSlim sync = new ReaderWriterLockSlim();
+        readonly Dictionary<long, ShrineUserQueryEntry> store = new();
+        readonly ReaderWriterLockSlim sync = new();
 
         public IEnumerable<ShrineUserQueryEntry> All()
         {

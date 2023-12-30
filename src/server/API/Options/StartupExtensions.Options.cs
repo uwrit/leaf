@@ -263,17 +263,23 @@ namespace API.Options
                 config.TryGetValue(Config.Integration.SHRINE.Enabled, out bool shrineEnabled);
                 if (shrineEnabled)
                 {
-                    var shrine = new SHRINEOptions
+                    var shrine = new ShrineIntegrationOptions
                     {
                         Enabled = shrineEnabled,
                         HubApiURI = config.GetValue<string>(Config.Integration.SHRINE.HubApiURI),
-                        Node = new SHRINEOptions.LocalNode
+                        Node = new ShrineIntegrationOptions.LocalNode
                         {
                             Id = config.GetValue<long>(Config.Integration.SHRINE.Node.Id),
                             Key = config.GetValue<string>(Config.Integration.SHRINE.Node.Key),
                             Name = config.GetValue<string>(Config.Integration.SHRINE.Node.Name)
                         },
-                        Topic = new SHRINEOptions.DefaultTopic
+                        Researcher = new ShrineIntegrationOptions.LocalResearcher
+                        {
+                            Id = config.GetValue<long>(Config.Integration.SHRINE.Researcher.Id),
+                            Name = config.GetValue<string>(Config.Integration.SHRINE.Researcher.Name),
+                            Domain = config.GetValue<string>(Config.Integration.SHRINE.Researcher.Domain)
+                        },
+                        Topic = new ShrineIntegrationOptions.DefaultTopic
                         {
                             Id = config.GetValue<long>(Config.Integration.SHRINE.Topic.Id),
                             Name = config.GetValue<string>(Config.Integration.SHRINE.Topic.Name),

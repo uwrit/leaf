@@ -8,15 +8,23 @@ using System.Collections.Generic;
 using System.Linq;
 using API.DTO.Cohort;
 using API.DTO.Compiler;
+using Microsoft.Extensions.Options;
 using Model.Compiler;
 using Model.Integration.Shrine;
 using Model.Integration.Shrine4_1;
+using Model.Options;
 
 namespace API.Integration.Shrine4_1
 {
     public class ShrineQueryDefinitionConverter
     {
         readonly string UniversalIdPrefix = $"urn:leaf:concept:shrine:";
+        readonly ShrineIntegrationOptions opts;
+
+        public ShrineQueryDefinitionConverter(IOptions<ShrineIntegrationOptions> opts)
+        {
+            this.opts = opts.Value;
+        }
 
         public IPatientCountQueryDTO ToLeafQuery(ShrineQuery shrineQuery)
         {
@@ -79,9 +87,9 @@ namespace API.Integration.Shrine4_1
         {
             var first = new SubPanelDTO
             {
-                IncludeSubPanel = timeline.First.NMustBeTrue > 0,
+                IncludeSubPanel = timeline.First.Concepts.NMustBeTrue > 0,
                 Index = 0,
-                MinimumCount = timeline.First.NMustBeTrue,
+                MinimumCount = timeline.First.Concepts.NMustBeTrue,
                 PanelIndex = i,
                 PanelItems = timeline.First.Concepts.Possibilities.Select((c, j) =>
                 {
@@ -109,7 +117,7 @@ namespace API.Integration.Shrine4_1
                     JoinSequence = new SubPanelJoinSequence
                     {
                         Increment = sub.TimeConstraint != null ? sub.TimeConstraint.Value : -1,
-                        DateIncrementType = sub.TimeConstraint.TimeUnit,
+                        DateIncrementType = sub.TimeConstraint != null ? sub.TimeConstraint.TimeUnit : DateIncrementType.None,
                         SequenceType = SequenceType.AnytimeFollowing
                     },
                     PanelIndex = i,
@@ -173,12 +181,21 @@ namespace API.Integration.Shrine4_1
                         },
                         Possibilities = panels.Select(p =>
                         {
-                            return p.SubPanels.Count() == 1
+                            return p.SubPanels.Count() > 1 && p.SubPanels.ElementAt(1).PanelItems.Any()
                                 ? LeafNonSequenceToShrineConceptGroup(p)
                                 : LeafSequenceToShrineTimeline(p);
                         })
                     }
-                }
+                },
+                Output = ShrineOutputType.Count,
+                QueryName = "Query"
+                /*
+                NodeOfOriginId = opts.Node.Id,
+                ResearcherId = opts.Researcher.Id,
+                TopicId = opts.Topic.Id,
+                ProjectName = "Query",
+                Flagged = false
+                */
             };
         }
 
@@ -254,7 +271,11 @@ namespace API.Integration.Shrine4_1
 
         public static long GenerateRandomLongId()
         {
-            return LongRandom(10000000000000000, 999999999999999999, new Random());
+            //return LongRandom(10000000000000000, long.MaxValue, new Random());
+            Random random = new();
+            byte[] bytes = new byte[8];
+            random.NextBytes(bytes);
+            return BitConverter.ToInt64(bytes, 0);
         }
 
         static long LongRandom(long min, long max, Random rand)

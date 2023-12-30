@@ -20,13 +20,14 @@ namespace API.Integration.Shrine
     {
         Task<(HttpResponseMessage, ShrineDeliveryContents)> ReadHubMessageAndAcknowledge();
         Task<HttpResponseMessage> SendMessageToHub(ShrineDeliveryContents contents);
+        Task<HttpResponseMessage> SendMessageToHub(long queryId, object contents, ShrineDeliveryContentsType type);
     }
 
     public class ShrineMessageBroker : IShrineMessageBroker
     {
         readonly HttpClient client;
-        readonly SHRINEOptions opts;
-        readonly int TimeOutSeconds = 50;
+        readonly ShrineIntegrationOptions opts;
+        readonly int TimeOutSeconds = 5;
         readonly JsonSerializerSettings serializerSettings = new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver()
@@ -71,6 +72,17 @@ namespace API.Integration.Shrine
             var contents = JsonConvert.DeserializeObject<ShrineDeliveryContentsDTO>(message.Contents);
 
             return (resp, contents.ToContents());
+        }
+
+        public async Task<HttpResponseMessage> SendMessageToHub(long queryId, object contents, ShrineDeliveryContentsType type)
+        {
+            var delivery = new ShrineDeliveryContents
+            {
+                ContentsSubject = queryId,
+                Contents = JsonConvert.SerializeObject(contents, serializerSettings),
+                ContentsType = type
+            };
+            return await SendMessageToHub(delivery);
         }
 
         public async Task<HttpResponseMessage> SendMessageToHub(ShrineDeliveryContents contents)

@@ -253,7 +253,7 @@ namespace API.DTO.Integration.Shrine4_1
                 ConceptGroup = dto.ConceptGroup.ToConceptGroup(),
                 PreviousOccurrence = previousOccurrence,
                 ThisOccurrence = thisOccurrence,
-                TimeConstraint = dto?.TimeConstraint.ToTimeConstraint()
+                TimeConstraint = dto.TimeConstraint != null ? dto.TimeConstraint.ToTimeConstraint() : null
             };
         }
 

@@ -15,6 +15,7 @@ namespace API.DTO.Config
         public CohortConfigDTO Cohort { get; set; }
         public ClientOptionsDTO Client { get;set; }
         public VersionConfigDTO Version { get; set; }
+        public IntegrationConfigDTO Integration { get; set; }
     }
 
     public class AuthenticationConfigDTO
@@ -105,5 +106,16 @@ namespace API.DTO.Config
     {
         public string Server { get; set; }
         public string Db { get; set; }
+    }
+
+    public class IntegrationConfigDTO
+    {
+        public bool Enabled { get; set; }
+        public IntegrationTypeDTO Shrine { get; set; }
+
+        public class IntegrationTypeDTO
+        {
+            public bool Enabled { get; set; }
+        }
     }
 }

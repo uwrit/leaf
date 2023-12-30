@@ -26,6 +26,13 @@ namespace API.Options
                     public const string Name = @"Integration:SHRINE:Node:Name";
                 }
 
+                public static class Researcher
+                {
+                    public const string Id = @"Integration:SHRINE:Researcher:Id";
+                    public const string Name = @"Integration:SHRINE:Researcher:Name";
+                    public const string Domain = @"Integration:SHRINE:Researcher:Domain";
+                }
+
                 public static class Topic
                 {
                     public const string Id = @"Integration:SHRINE:Topic:Id";

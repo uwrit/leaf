@@ -15,7 +15,7 @@ import { NetworkIdentity, NetworkResponderMap } from '../../models/NetworkRespon
 import { panelToDto } from '../../models/panel/Panel';
 import { PanelFilter } from '../../models/panel/PanelFilter';
 import { aggregateStatistics } from '../../services/cohortAggregatorApi';
-import { fetchCount, fetchDemographics } from '../../services/cohortApi';
+import { fetchCount, fetchDemographics, fetchSHRINEQueryResults, submitSHRINEQuery } from '../../services/cohortApi';
 import { clearPreviousPatientList } from '../../services/patientListApi';
 import { formatMultipleSql } from '../../utils/formatSql';
 import { getPatientListFromNewBaseDataset, getPatientListDataset, setPatientListCustomColumnNames } from './patientList';
@@ -27,6 +27,7 @@ import { allowAllDatasets } from '../../services/datasetSearchApi';
 import { clearAllTimelinesData } from '../../services/timelinesApi';
 import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
 import { sleep } from '../../utils/Sleep';
+import { ShrineQueryResult } from '../../models/integration/ShrineQueryResult';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -58,6 +59,36 @@ export interface CohortCountAction {
  * If a result comes back after query is cancelled, it is discarded.
  */
 export const getCounts = () => {
+    return async (dispatch: any, getState: () => AppState) => {
+        const state = getState();
+        const integration = state.auth.config.integration;
+
+        if (!integration.enabled) {
+            dispatch(getDirectCounts());
+        } else if (integration.shrine?.enabled) {
+            const cancelSource = Axios.CancelToken.source();
+            const panels = state.panels.map(p => panelToDto(p));
+            const panelFilters = state.panelFilters.filter((pf: PanelFilter) => pf.isActive);
+            const homeNode = state.responders.get(0);
+            const queryId = state.cohort.networkCohorts.get(homeNode.id)!.count.queryId
+            const response = await submitSHRINEQuery(getState(), homeNode, panelFilters, panels, queryId, cancelSource);
+            const shrineQueryId = response.data as number;
+
+            let resultsComplete = false;
+            let i = 1;
+            while (true) {
+                const response = await fetchSHRINEQueryResults(getState(), homeNode, shrineQueryId);
+                const results = response.data as ShrineQueryResult;
+                console.log(results);
+                await sleep(1000);
+                i++;
+                if (i >= 10) break;
+            }
+        }
+    };
+}
+
+export const getDirectCounts = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         let atLeastOneSucceeded = false;
         let atleastOneCached = false;
