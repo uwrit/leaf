@@ -39,6 +39,7 @@ namespace Model.Cohort
         readonly IUserContext user;
         readonly ClientOptions clientOpts;
         readonly DeidentificationOptions deidentOpts;
+        readonly IntegrationOptions integrationOpts;
         readonly ILogger<DemographicProvider> log;
 
         public DemographicProvider(
@@ -46,6 +47,7 @@ namespace Model.Cohort
             DemographicCompilerValidationContextProvider contextProvider,
             IOptions<ClientOptions> clientOpts,
             IOptions<DeidentificationOptions> deidentOpts,
+            IOptions<IntegrationOptions> integrationOpts,
             IDemographicSqlCompiler compiler,
             IDemographicsExecutor executor,
             ILogger<DemographicProvider> log)
@@ -56,6 +58,7 @@ namespace Model.Cohort
             this.executor = executor;
             this.clientOpts = clientOpts.Value;
             this.deidentOpts = deidentOpts.Value;
+            this.integrationOpts = integrationOpts.Value;
             this.log = log;
         }
 
@@ -130,7 +133,7 @@ namespace Model.Cohort
             {
                 throw new Exception("Both Visualize and Patient List are disabled");
             }
-            if (deidentOpts.Cohort.Noise.Enabled)
+            if (deidentOpts.Cohort.Noise.Enabled && !integrationOpts.Enabled)
             {
                 throw new Exception("Demographics cannot be returned if Cohort De-identification Noise is enabled");
             }

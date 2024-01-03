@@ -21,7 +21,6 @@ using Newtonsoft.Json;
 using Model.Compiler;
 using Model.Options;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Serialization;
 
 namespace API.Jobs
 {
@@ -32,6 +31,7 @@ namespace API.Jobs
         readonly IShrineQueryResultCache queryResultCache;
         readonly IShrineUserQueryCache userQueryCache;
         readonly IServiceScopeFactory serviceScopeFactory;
+        readonly DeidentificationOptions deidentOpts;
         readonly ShrineIntegrationOptions opts;
         readonly ShrineQueryDefinitionConverter queryConverter;
         readonly ShrineDemographicsConverter demographicsConverter;
@@ -43,6 +43,7 @@ namespace API.Jobs
             IShrineQueryResultCache queryResultCache,
             IShrineUserQueryCache userQueryCache,
             IServiceScopeFactory serviceScopeFactory,
+            IOptions<DeidentificationOptions> deidentOpts,
             IOptions<IntegrationOptions> opts,
             ShrineQueryDefinitionConverter queryConverter,
             ShrineDemographicsConverter demographicsConverter
@@ -56,6 +57,7 @@ namespace API.Jobs
             this.queryConverter = queryConverter;
             this.demographicsConverter = demographicsConverter;
             this.opts = opts.Value.SHRINE;
+            this.deidentOpts = deidentOpts.Value;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -104,7 +106,7 @@ namespace API.Jobs
                                 }
                                 catch (Exception ex)
                                 {
-                                    logger.LogError("BackgroundShrinePollingService failed to parse SHRINE message. Error: {Error}", ex.ToString());
+                                    logger.LogError("BackgroundShrinePollingService encountered an error. Error: {Error}", ex.ToString());
                                 }
                                 break;
 
@@ -224,8 +226,12 @@ namespace API.Jobs
                 {
                     BinSize = 5,
                     StdDev = 6.5M,
-                    NoiseClamp = 10,
-                    LowLimit = 10
+                    NoiseClamp = deidentOpts.Cohort.Enabled && deidentOpts.Cohort.Noise.Enabled
+                        ? Math.Max(deidentOpts.Cohort.Noise.LowerBound, deidentOpts.Cohort.Noise.UpperBound)
+                        : 10,
+                    LowLimit = deidentOpts.Cohort.Enabled && deidentOpts.Cohort.LowCellSizeMasking.Enabled
+                        ? deidentOpts.Cohort.LowCellSizeMasking.Threshold
+                        : 10
                 },
                 Status = new ShrineQueryStatus { EncodedClass = ShrineQueryStatusType.ResultFromCRC },
                 StatusMessage = "FINISHED",

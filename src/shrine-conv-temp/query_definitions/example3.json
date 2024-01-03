@@ -1,0 +1,121 @@
+{
+    "query": {
+        "id": 8698691030503797154,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 2,
+            "createDate": 1696532276852,
+            "changeDate": 1696532276923
+        },
+        "status": {
+            "encodedClass": "SentToHub"
+        },
+        "queryDefinition": {
+            "expression": {
+                "nMustBeTrue": 1,
+                "compare": {
+                    "encodedClass": "AtLeast"
+                },
+                "possibilities": [
+                    {
+                        "first": {
+                            "concepts": {
+                                "nMustBeTrue": 1,
+                                "compare": {
+                                    "encodedClass": "AtLeast"
+                                },
+                                "possibilities": [
+                                    {
+                                        "displayName": "Certain conditions originating in the perinatal period (760-779.99)",
+                                        "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Certain conditions originating in the perinatal period (760-779.99)\\\\",
+                                        "constraint": null,
+                                        "encodedClass": "Concept"
+                                    },
+                                    {
+                                        "displayName": "Complications of pregnancy, childbirth, and the puerperium (630-679.99)",
+                                        "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Complications of pregnancy, childbirth, and the puerperium (630-679.99)\\\\",
+                                        "constraint": null,
+                                        "encodedClass": "Concept"
+                                    }
+                                ]
+                            },
+                            "startDate": 946713600000,
+                            "endDate": 3482204400000,
+                            "occursAtLeast": 2
+                        },
+                        "subsequent": [
+                            {
+                                "conceptGroup": {
+                                    "concepts": {
+                                        "nMustBeTrue": 1,
+                                        "compare": {
+                                            "encodedClass": "AtLeast"
+                                        },
+                                        "possibilities": [
+                                            {
+                                                "displayName": "Diseases of the circulatory system (390-459.99)",
+                                                "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Diseases of the circulatory system (390-459.99)\\\\",
+                                                "constraint": null,
+                                                "encodedClass": "Concept"
+                                            }
+                                        ]
+                                    },
+                                    "startDate": null,
+                                    "endDate": null,
+                                    "occursAtLeast": 1
+                                },
+                                "previousOccurrence": {
+                                    "encodedClass": "First"
+                                },
+                                "thisOccurrence": {
+                                    "encodedClass": "First"
+                                },
+                                "timeConstraint": null
+                            }
+                        ],
+                        "encodedClass": "Timeline"
+                    }
+                ],
+                "encodedClass": "Conjunction"
+            }
+        },
+        "output": {
+            "encodedClass": "Count"
+        },
+        "queryName": "temporal1",
+        "nodeOfOriginId": 4833369576181865609,
+        "researcherId": -1447032461,
+        "topicId": 1,
+        "projectName": "Testing",
+        "flagged": false,
+        "flaggedMessage": null
+    },
+    "researcher": {
+        "id": -1447032461,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "userName": "demo",
+        "userDomainName": "i2b2demo",
+        "nodeId": 4833369576181865609
+    },
+    "topic": {
+        "id": 1481654093,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "researcherId": -1447032461,
+        "name": "Testing",
+        "description": "This is a topic for testing SHRINE 2020 (1)"
+    },
+    "protocolVersion": 2
+}

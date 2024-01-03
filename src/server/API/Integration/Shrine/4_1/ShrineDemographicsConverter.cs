@@ -60,16 +60,16 @@ namespace API.Integration.Shrine4_1
             {
 				// Note: the spaces are not a typo. SHRINE (I assume unintentionally?) has spaces before buckets,
 				// so we have to match them to get viz to line up
-                new object[] { "  0-9 years old",   CheckIfZero(zero) },
-                new object[] { "  10-17 years old", CheckIfZero(ten) },
-                new object[] { "  18-34 years old", CheckIfZero(eighteen) },
-                new object[] { "  35-44 years old", CheckIfZero(thirtyfive) },
-                new object[] { "  45-54 years old", CheckIfZero(fortyfive) },
-                new object[] { "  55-64 years old", CheckIfZero(fiftyfive) },
-                new object[] { "  65-74 years old", CheckIfZero(sixtyfive) },
-                new object[] { "  75-84 years old", CheckIfZero(seventyfive) },
-                new object[] { ">= 65 years old",   CheckIfZero(sixtyfiveplus) },
-                new object[] { ">= 85 years old",   CheckIfZero(eightyfive) }
+                new object[] { "  0-9 years old",   NegativeOneIfZero(zero) },
+                new object[] { "  10-17 years old", NegativeOneIfZero(ten) },
+                new object[] { "  18-34 years old", NegativeOneIfZero(eighteen) },
+                new object[] { "  35-44 years old", NegativeOneIfZero(thirtyfive) },
+                new object[] { "  45-54 years old", NegativeOneIfZero(fortyfive) },
+                new object[] { "  55-64 years old", NegativeOneIfZero(fiftyfive) },
+                new object[] { "  65-74 years old", NegativeOneIfZero(sixtyfive) },
+                new object[] { "  75-84 years old", NegativeOneIfZero(seventyfive) },
+                new object[] { ">= 65 years old",   NegativeOneIfZero(sixtyfiveplus) },
+                new object[] { ">= 85 years old",   NegativeOneIfZero(eightyfive) }
             };
 
             return new ShrineBreakdown
@@ -84,7 +84,7 @@ namespace API.Integration.Shrine4_1
 			};
         }
 
-		static int CheckIfZero(int value) => value == 0 ? -1 : value;
+		static int NegativeOneIfZero(int value) => value == 0 ? -1 : value;
 
 		static string Capitalize(string text) => char.ToUpper(text[0]) + text.Remove(0, 1);
     }

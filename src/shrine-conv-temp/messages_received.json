@@ -1,0 +1,397 @@
+// 1 - UpdateQueryAtQep
+{
+    "queryId": 100523611964537284,
+    "queryStatus": {
+        "encodedClass": "ReceivedAtHub"
+    },
+    "changeDate": 1696525308901,
+    "encodedClass": "UpdateQueryAtQepWithStatus"
+}
+// 2 - UpdateQueryAtQep
+{
+    "queryId": 100523611964537284,
+    "changeDate": 1696525309001,
+    "resultProgresses": [
+        {
+            "id": 1784089895897391647,
+            "versionInfo": {
+                "protocolVersion": 2,
+                "shrineVersion": "4.1.0-SNAPSHOT",
+                "itemVersion": 1,
+                "createDate": 1696525309001,
+                "changeDate": 1696525309001
+            },
+            "queryId": 100523611964537284,
+            "adapterNodeId": 3854912477537176565,
+            "adapterNodeName": "Local Node 2",
+            "status": {
+                "encodedClass": "IdAssigned"
+            },
+            "statusMessage": null,
+            "crcQueryInstanceId": null
+        },
+        {
+            "id": 1702258560717024998,
+            "versionInfo": {
+                "protocolVersion": 2,
+                "shrineVersion": "4.1.0-SNAPSHOT",
+                "itemVersion": 1,
+                "createDate": 1696525309001,
+                "changeDate": 1696525309001
+            },
+            "queryId": 100523611964537284,
+            "adapterNodeId": 8304711555476111654,
+            "adapterNodeName": "Leaf Test",
+            "status": {
+                "encodedClass": "IdAssigned"
+            },
+            "statusMessage": null,
+            "crcQueryInstanceId": null
+        },
+        {
+            "id": 4279393489486628251,
+            "versionInfo": {
+                "protocolVersion": 2,
+                "shrineVersion": "4.1.0-SNAPSHOT",
+                "itemVersion": 1,
+                "createDate": 1696525309001,
+                "changeDate": 1696525309001
+            },
+            "queryId": 100523611964537284,
+            "adapterNodeId": 3698283121779390840,
+            "adapterNodeName": "Local Node 1",
+            "status": {
+                "encodedClass": "IdAssigned"
+            },
+            "statusMessage": null,
+            "crcQueryInstanceId": null
+        }
+    ],
+    "encodedClass": "UpdateQueryReadyForAdapters"
+}
+// 3 - RunQueryForResult
+{
+    "query": {
+        "id": 100523611964537284,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 4,
+            "createDate": 1696525308735,
+            "changeDate": 1696525309001
+        },
+        "status": {
+            "encodedClass": "ReadyForAdapters"
+        },
+        "queryDefinition": {
+            "expression": {
+                "nMustBeTrue": 1,
+                "compare": {
+                    "encodedClass": "AtLeast"
+                },
+                "possibilities": [
+                    {
+                        "concepts": {
+                            "nMustBeTrue": 1,
+                            "compare": {
+                                "encodedClass": "AtLeast"
+                            },
+                            "possibilities": [
+                                {
+                                    "displayName": "45-54 years old",
+                                    "termPath": "\\\\SHRINE\\SHRINE\\Demographics\\Age\\45-54 years old\\",
+                                    "constraint": null,
+                                    "encodedClass": "Concept"
+                                }
+                            ]
+                        },
+                        "startDate": null,
+                        "endDate": null,
+                        "occursAtLeast": 1,
+                        "encodedClass": "ConceptGroup"
+                    }
+                ],
+                "encodedClass": "Conjunction"
+            }
+        },
+        "output": {
+            "encodedClass": "Count"
+        },
+        "queryName": "Test from code",
+        "nodeOfOriginId": 8304711555476111654,
+        "researcherId": 24823904,
+        "topicId": 1,
+        "projectName": "Testing 2",
+        "flagged": false,
+        "flaggedMessage": null,
+        "encodedClass": "QueryProgress"
+    },
+    "researcher": {
+        "id": 24823904,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "userName": "demo",
+        "userDomainName": "i2b2demo",
+        "nodeId": 8304711555476111654
+    },
+    "node": {
+        "id": 8304711555476111654,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 1691522665369,
+            "changeDate": 1691522665369
+        },
+        "name": "Leaf Test",
+        "key": "leaftest",
+        "userDomainName": "leaftest",
+        "momQueueName": "leaftest",
+        "adminEmail": "",
+        "sendQueries": true,
+        "understandsProtocol": 2,
+        "momId": "leaftest"
+    },
+    "topic": {
+        "id": 1481654093,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "researcherId": 24823904,
+        "name": "Testing",
+        "description": "This is a topic for testing SHRINE 2020 (1)"
+    },
+    "resultProgress": {
+        "id": 1702258560717024998,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 2,
+            "createDate": 1696525309001,
+            "changeDate": 1696525309083
+        },
+        "queryId": 100523611964537284,
+        "adapterNodeId": 8304711555476111654,
+        "adapterNodeName": "Leaf Test",
+        "status": {
+            "encodedClass": "SentToAdapter"
+        },
+        "statusMessage": null,
+        "crcQueryInstanceId": null
+    },
+    "protocolVersion": 2
+}
+// 4 - Result
+{
+    "id": 1784089895897391647,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 2,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309081
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3854912477537176565,
+    "adapterNodeName": "Local Node 2",
+    "status": {
+        "encodedClass": "SentToAdapter"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 5 - Result
+{
+    "id": 1702258560717024998,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 2,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309083
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 8304711555476111654,
+    "adapterNodeName": "Leaf Test",
+    "status": {
+        "encodedClass": "SentToAdapter"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 6 - Result
+{
+    "id": 4279393489486628251,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 2,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309084
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3698283121779390840,
+    "adapterNodeName": "Local Node 1",
+    "status": {
+        "encodedClass": "SentToAdapter"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 7 - Result
+{
+    "id": 4279393489486628251,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 2,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309155
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3698283121779390840,
+    "adapterNodeName": "Local Node 1",
+    "status": {
+        "encodedClass": "ReceivedByAdapter"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 8 - UpdateQueryAtQep
+{
+    "queryId": 100523611964537284,
+    "queryStatus": {
+        "encodedClass": "SentToAdapters"
+    },
+    "changeDate": 1696525309299,
+    "encodedClass": "UpdateQueryAtQepWithStatus"
+}
+// 9 - Result
+{
+    "id": 1784089895897391647,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 3,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309163
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3854912477537176565,
+    "adapterNodeName": "Local Node 2",
+    "status": {
+        "encodedClass": "ReceivedByAdapter"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 10 - Result
+{
+    "id": 4279393489486628251,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 3,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309415
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3698283121779390840,
+    "adapterNodeName": "Local Node 1",
+    "status": {
+        "encodedClass": "SubmittedToCRC"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 11 - Result
+{
+    "id": 1784089895897391647,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 4,
+        "createDate": 1696525309001,
+        "changeDate": 1696525309473
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3854912477537176565,
+    "adapterNodeName": "Local Node 2",
+    "status": {
+        "encodedClass": "SubmittedToCRC"
+    },
+    "statusMessage": null,
+    "crcQueryInstanceId": null,
+    "encodedClass": "ResultProgress"
+}
+// 12 - Result
+{
+    "id": 4279393489486628251,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 4,
+        "createDate": 1696525309001,
+        "changeDate": 1696525313734
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3698283121779390840,
+    "adapterNodeName": "Local Node 1",
+    "status": {
+        "encodedClass": "ResultFromCRC"
+    },
+    "statusMessage": "FINISHED",
+    "crcQueryInstanceId": 2095,
+    "count": 40,
+    "obfuscatingParameters": {
+        "binSize": 5,
+        "stdDev": 6.5,
+        "noiseClamp": 10,
+        "lowLimit": 10
+    },
+    "breakdowns": null,
+    "encodedClass": "CrcResult"
+}
+// 13 - Result
+{
+    "id": 1784089895897391647,
+    "versionInfo": {
+        "protocolVersion": 2,
+        "shrineVersion": "4.1.0-SNAPSHOT",
+        "itemVersion": 5,
+        "createDate": 1696525309001,
+        "changeDate": 1696525314404
+    },
+    "queryId": 100523611964537284,
+    "adapterNodeId": 3854912477537176565,
+    "adapterNodeName": "Local Node 2",
+    "status": {
+        "encodedClass": "ResultFromCRC"
+    },
+    "statusMessage": "FINISHED",
+    "crcQueryInstanceId": 2065,
+    "count": 35,
+    "obfuscatingParameters": {
+        "binSize": 5,
+        "stdDev": 6.5,
+        "noiseClamp": 10,
+        "lowLimit": 10
+    },
+    "breakdowns": null,
+    "encodedClass": "CrcResult"
+}

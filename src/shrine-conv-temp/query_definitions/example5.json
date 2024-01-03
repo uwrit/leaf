@@ -1,0 +1,171 @@
+{
+    "query": {
+        "id": 5030016659568223369,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 2,
+            "createDate": 1703811975809,
+            "changeDate": 1703811975842
+        },
+        "status": {
+            "encodedClass": "SentToHub"
+        },
+        "queryDefinition": {
+            "expression": {
+                "nMustBeTrue": 2,
+                "compare": {
+                    "encodedClass": "AtLeast"
+                },
+                "possibilities": [
+                    {
+                        "concepts": {
+                            "nMustBeTrue": 1,
+                            "compare": {
+                                "encodedClass": "AtLeast"
+                            },
+                            "possibilities": [
+                                {
+                                    "displayName": "Female",
+                                    "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Demographics\\\\Gender\\\\Female\\\\",
+                                    "constraint": null,
+                                    "encodedClass": "Concept"
+                                }
+                            ]
+                        },
+                        "startDate": null,
+                        "endDate": null,
+                        "occursAtLeast": 1,
+                        "encodedClass": "ConceptGroup"
+                    },
+                    {
+                        "first": {
+                            "concepts": {
+                                "nMustBeTrue": 1,
+                                "compare": {
+                                    "encodedClass": "AtLeast"
+                                },
+                                "possibilities": [
+                                    {
+                                        "displayName": "Congenital anomalies (740-759.99)",
+                                        "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Congenital anomalies (740-759.99)\\\\",
+                                        "constraint": null,
+                                        "encodedClass": "Concept"
+                                    }
+                                ]
+                            },
+                            "startDate": null,
+                            "endDate": null,
+                            "occursAtLeast": 1
+                        },
+                        "subsequent": [
+                            {
+                                "conceptGroup": {
+                                    "concepts": {
+                                        "nMustBeTrue": 1,
+                                        "compare": {
+                                            "encodedClass": "AtLeast"
+                                        },
+                                        "possibilities": [
+                                            {
+                                                "displayName": "Diseases of the blood and blood-forming organs (280-289.99)",
+                                                "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Diseases of the blood and blood-forming organs (280-289.99)\\\\",
+                                                "constraint": null,
+                                                "encodedClass": "Concept"
+                                            }
+                                        ]
+                                    },
+                                    "startDate": 1696205040000,
+                                    "endDate": 1702688640000,
+                                    "occursAtLeast": 1
+                                },
+                                "previousOccurrence": {
+                                    "encodedClass": "Any"
+                                },
+                                "thisOccurrence": {
+                                    "encodedClass": "Any"
+                                },
+                                "timeConstraint": null
+                            },
+                            {
+                                "conceptGroup": {
+                                    "concepts": {
+                                        "nMustBeTrue": 1,
+                                        "compare": {
+                                            "encodedClass": "AtLeast"
+                                        },
+                                        "possibilities": [
+                                            {
+                                                "displayName": "Diseases of the musculoskeletal system and connective tissue (710-739.99)",
+                                                "termPath": "\\\\\\\\SHRINE\\\\SHRINE\\\\Diagnoses\\\\Diseases of the musculoskeletal system and connective tissue (710-739.99)\\\\",
+                                                "constraint": null,
+                                                "encodedClass": "Concept"
+                                            }
+                                        ]
+                                    },
+                                    "startDate": null,
+                                    "endDate": null,
+                                    "occursAtLeast": 1
+                                },
+                                "previousOccurrence": {
+                                    "encodedClass": "First"
+                                },
+                                "thisOccurrence": {
+                                    "encodedClass": "Any"
+                                },
+                                "timeConstraint": {
+                                    "operator": {
+                                        "encodedClass": "GreaterThanOrEqual"
+                                    },
+                                    "value": 5,
+                                    "timeUnit": {
+                                        "encodedClass": "Day"
+                                    }
+                                }
+                            }
+                        ],
+                        "encodedClass": "Timeline"
+                    }
+                ],
+                "encodedClass": "Conjunction"
+            }
+        },
+        "output": {
+            "encodedClass": "Count"
+        },
+        "queryName": "Test21",
+        "nodeOfOriginId": 4833369576181865609,
+        "researcherId": -1447032461,
+        "topicId": 1,
+        "projectName": "Testing",
+        "flagged": false,
+        "flaggedMessage": null
+    },
+    "researcher": {
+        "id": -1447032461,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "userName": "demo",
+        "userDomainName": "i2b2demo",
+        "nodeId": 4833369576181865609
+    },
+    "topic": {
+        "id": 1481654093,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "researcherId": -1447032461,
+        "name": "Testing",
+        "description": "This is a topic for testing SHRINE 2020 (1)"
+    },
+    "protocolVersion": 2
+}

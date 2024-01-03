@@ -1,0 +1,120 @@
+{
+    "query": {
+        "id": 100523611964537284,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 4,
+            "createDate": 1696525308735,
+            "changeDate": 1696525309001
+        },
+        "status": {
+            "encodedClass": "ReadyForAdapters"
+        },
+        "queryDefinition": {
+            "expression": {
+                "nMustBeTrue": 1,
+                "compare": {
+                    "encodedClass": "AtLeast"
+                },
+                "possibilities": [
+                    {
+                        "concepts": {
+                            "nMustBeTrue": 1,
+                            "compare": {
+                                "encodedClass": "AtLeast"
+                            },
+                            "possibilities": [
+                                {
+                                    "displayName": "45-54 years old",
+                                    "termPath": "\\\\SHRINE\\SHRINE\\Demographics\\Age\\45-54 years old\\",
+                                    "constraint": null,
+                                    "encodedClass": "Concept"
+                                }
+                            ]
+                        },
+                        "startDate": null,
+                        "endDate": null,
+                        "occursAtLeast": 1,
+                        "encodedClass": "ConceptGroup"
+                    }
+                ],
+                "encodedClass": "Conjunction"
+            }
+        },
+        "output": {
+            "encodedClass": "Count"
+        },
+        "queryName": "Test from code",
+        "nodeOfOriginId": 8304711555476111654,
+        "researcherId": 24823904,
+        "topicId": 1,
+        "projectName": "Testing 2",
+        "flagged": false,
+        "flaggedMessage": null,
+        "encodedClass": "QueryProgress"
+    },
+    "researcher": {
+        "id": 24823904,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "userName": "demo",
+        "userDomainName": "i2b2demo",
+        "nodeId": 8304711555476111654
+    },
+    "node": {
+        "id": 8304711555476111654,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 1691522665369,
+            "changeDate": 1691522665369
+        },
+        "name": "Leaf Test",
+        "key": "leaftest",
+        "userDomainName": "leaftest",
+        "momQueueName": "leaftest",
+        "adminEmail": "",
+        "sendQueries": true,
+        "understandsProtocol": 2,
+        "momId": "leaftest"
+    },
+    "topic": {
+        "id": 1481654093,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 1,
+            "createDate": 0,
+            "changeDate": 0
+        },
+        "researcherId": 24823904,
+        "name": "Testing",
+        "description": "This is a topic for testing SHRINE 2020 (1)"
+    },
+    "resultProgress": {
+        "id": 1702258560717024998,
+        "versionInfo": {
+            "protocolVersion": 2,
+            "shrineVersion": "4.1.0-SNAPSHOT",
+            "itemVersion": 2,
+            "createDate": 1696525309001,
+            "changeDate": 1696525309083
+        },
+        "queryId": 100523611964537284,
+        "adapterNodeId": 8304711555476111654,
+        "adapterNodeName": "Leaf Test",
+        "status": {
+            "encodedClass": "SentToAdapter"
+        },
+        "statusMessage": null,
+        "crcQueryInstanceId": null
+    },
+    "protocolVersion": 2
+}

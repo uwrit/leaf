@@ -17,7 +17,6 @@ using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Integration.Shrine;
 using Model.Options;
-using Newtonsoft.Json;
 
 namespace API.Controllers
 {
