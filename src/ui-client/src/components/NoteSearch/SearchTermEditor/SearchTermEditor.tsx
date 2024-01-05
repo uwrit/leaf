@@ -7,18 +7,18 @@
 
 import React from 'react';
 import { FormGroup, Label, FormText, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';  
-import { setNoteSearchTerms, searchNotesByTerms, searchPrefixTerms} from '../../../actions/cohort/noteSearch';
+import { setNoteSearchTerms, searchNotesByTerms } from '../../../actions/cohort/noteSearch';
 import { RadixTreeResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import { NoteSearchTerm } from '../../../models/state/CohortState';
 import { AiOutlineClose } from 'react-icons/ai';
-import './SearchTermEditor.css';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { showInfoModal } from '../../../actions/generalUi';
+import './SearchTermEditor.css';
 
 interface Props {
     dispatch: any;
     terms: NoteSearchTerm[];
-    radixSearch: RadixTreeResult;
+    radixSearch?: RadixTreeResult;
 }
 
 interface State {
@@ -97,11 +97,6 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                         color: this.termColors[this.termCreateCount++ % this.termColors.length],
                         text: trimmed
                     };
-<<<<<<< HEAD
-                    //dispatch(setNoteSearchTerms(terms.concat([newTerm])));
-                    //dispatch(searchNotesByTerms());
-                    this.setState({ text: '' });
-=======
                     if (terms.find(t => t.text.toLocaleLowerCase() === newTerm.text.toLocaleLowerCase())) {
                         const info: InformationModalState = {
                             body: "It looks like you already searched for this term. All search terms must be unique.",
@@ -114,7 +109,6 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
                         dispatch(searchNotesByTerms());
                         this.setState({ text: '' });
                     }
->>>>>>> 31df57ad (handle note search async ui)
                 }
                 return;
             }
@@ -134,7 +128,7 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
         const { dispatch } = this.props;
         const newVal = e.currentTarget.value;
         this.setState({ text: newVal });
-        dispatch(searchPrefixTerms(newVal.trim()));
+        // dispatch(searchPrefixTerms(newVal.trim()));
     };
 
     private handleRemoveTermClick = (idx: number) => {
@@ -152,6 +146,6 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
   
     private selectSuggestion(suggestion: string) {  
         this.setState({ text: suggestion });  
-        this.props.dispatch(searchPrefixTerms(suggestion));  
+        // this.props.dispatch(searchPrefixTerms(suggestion));  
     }  
 };

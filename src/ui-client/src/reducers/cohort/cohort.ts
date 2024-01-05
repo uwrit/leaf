@@ -102,7 +102,7 @@ import {
     removeTimelinesConceptDataset
 } from './timelines';
 import { SET_NOTE_DATASET_CHECKED, NoteSearchAction, SET_NOTE_DATASETS, SET_NOTE_SEARCH_TERMS, SET_NOTE_SEARCH_RESULTS, SET_NOTE_SEARCH_PREFIX_RESULTS} from '../../actions/cohort/noteSearch';
-import { setNoteDatasetChecked, setNoteDatasets, defaultNoteSearchState, setNoteSearchTerms, setNoteSearchResults, setNoteSearchPrefixResults } from './noteSearch';
+import { setNoteDatasets, defaultNoteSearchState, setNoteSearchTerms, setNoteSearchResults, setNoteSearchPrefixResults } from './noteSearch';
 
 export const defaultCohortState = (): CohortState => {
     return {
@@ -344,8 +344,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setTimelinesNetworkPanelDataset(state, CohortStateType.IN_ERROR, action);            
 
         // Note Search
-        case SET_NOTE_DATASET_CHECKED:
-            return setNoteDatasetChecked(state, action);
+        //case SET_NOTE_DATASET_CHECKED:
+        //    return setNoteDatasetChecked(state, action);
         case SET_NOTE_DATASETS:
             return setNoteDatasets(state, action);
         case SET_NOTE_SEARCH_TERMS:

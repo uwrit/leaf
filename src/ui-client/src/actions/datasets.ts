@@ -8,7 +8,7 @@
 import { PatientListDatasetQuery, DatasetSearchResult, CategorizedDatasetRef } from "../models/patientList/Dataset";
 import { AppState } from "../models/state/AppState";
 import { Dispatch } from "redux";
-import { searchDatasets, allowAllDatasets, setAdminMode } from "../services/datasetSearchApi";
+import { searchDatasets, allowAllDatasets, setSearchMode } from "../services/datasetSearchApi";
 
 export const SET_DATASET = 'SET_DATASET';
 export const SET_DATASET_SELECTED = 'SET_DATASET_SELECTED';
@@ -51,9 +51,11 @@ export const resetPatientListDatasets = () => {
 
 export const setAdminDatasetSearchMode = (admin: boolean) => {
     return async (dispatch: Dispatch<any>, getState: () => AppState) => {
-        const results = await setAdminMode(admin);
-        dispatch(setDatasetSearchResult(results));
-        dispatch(setDatasetSearchTerm(''));
+        if (admin) {
+            const results = await setSearchMode('ADMIN');
+            dispatch(setDatasetSearchResult(results));
+            dispatch(setDatasetSearchTerm(''));
+        }
     };
 };
 

@@ -6,331 +6,401 @@
  */ 
 
 export const workerContext = `
-var handleWorkMessage = function (payload) {
-    switch (payload.message) {
-        case REINDEX_DATASETS:
-            return reindexCacheFromExternal(payload);
-        case SEARCH_DATASETS:
-            return searchDatasets(payload);
-        case ALLOW_DATASET_IN_SEARCH:
-            return allowDataset(payload);
-        case ALLOW_ALL_DATASETS:
-            return allowAllDatasets(payload);
-        case SET_ADMIN_MODE:
-            return setAdminMode(payload);
-        default:
-            return null;
-    }
-};
+// eslint-disable-next-line
+const handleWorkMessage = payload => {
+  switch (payload.message) {
+    case REINDEX_DATASETS:
+      return reindexCacheFromExternal(payload)
+    case SEARCH_DATASETS:
+      return searchDatasets(payload)
+    case ALLOW_DATASET_IN_SEARCH:
+      return allowDataset(payload)
+    case ALLOW_ALL_DATASETS:
+      return allowAllDatasets(payload)
+    case SET_SEARCH_MODE:
+      return setSearchMode(payload)
+    default:
+      return null
+  }
+}
+
 /*
  * Shared cache.
  */
-var demographics = { id: 'demographics', shape: 3, category: '', name: 'Basic Demographics', tags: [] };
-var firstCharCache = new Map();
-var excluded = new Map([[demographics.id, demographics]]);
-var allDs = new Map();
+const demographics = {
+  id: "demographics",
+  shape: 3,
+  category: "",
+  isEncounterBased: false,
+  name: "Basic Demographics",
+  tags: []
+}
+const firstCharCache = new Map()
+let excluded = new Map([
+  [PATIENT_LIST, new Map([[demographics.id, demographics]])],
+  [NOTE_SEARCH, new Map([[demographics.id, demographics]])]
+])
+let allDs = new Map()
+let currentMode = PATIENT_LIST;
+
 /*
  * Admin-facing cache.
  */
-var isAdmin = false;
-var allCatDsAdmin = new Map();
-var defaultOrderAdmin = new Map();
+//let allCatDsAdmin: Map<string, CategorizedDatasetRef> = new Map();
+//let defaultOrderAdmin: Map<string, PatientListDatasetQueryIndex> = new Map();
+
 /*
  * User-facing cache.
  */
-var allCatDs = new Map();
-var defaultOrder = new Map();
+let allCatDs = new Map()
+let defaultOrder = new Map()
+
 /*
- * Set whether the worker should return search results to an admin (i.e., no exclusions),
- * or to a user.
+ * Set whether the worker should return search results to an admin (i.e., no exclusions), patient list datasets, or note search datasets.
  */
-var setAdminMode = function (payload) {
-    var requestId = payload.requestId, admin = payload.admin;
-    isAdmin = admin;
-    return { requestId: requestId, result: returnDefault() };
-};
+const setSearchMode = payload => {
+  const { requestId, searchMode } = payload
+  currentMode = searchMode
+  return { requestId, result: returnDefault() }
+}
+
 /*
  * Return the default display depending on whether the current mode is admin or user.
  */
-var returnDefault = function () {
-    if (isAdmin) {
-        return { categories: allCatDsAdmin, displayOrder: defaultOrderAdmin };
-    }
-    return { categories: allCatDs, displayOrder: defaultOrder };
-};
+
+const returnDefault = () => {
+    console.log(['returnDefault', allCatDs.get(currentMode), defaultOrder.get(currentMode) ])
+  return {
+    categories: allCatDs.get(currentMode),
+    displayOrder: defaultOrder.get(currentMode)
+  }
+}
+
 /*
  * Flatten categorized datasets map into an array of datasets.
  */
-var getAllDatasetsArray = function () {
-    var copy = new Map(allDs);
-    if (!isAdmin) {
-        copy.delete(demographics.id);
-    }
-    return [ ...copy.values() ];
-};
+const getAllDatasetsArray = () => {
+  const copy = new Map(allDs)
+  if (currentMode !== ADMIN) {
+    copy.delete(demographics.id)
+  }
+  return [ ...copy.values() ].filter(ds => filterByMode(ds));
+}
+
+const getDefaultExcluded = () => {
+  return new Map([
+    [PATIENT_LIST, new Map([[demographics.id, demographics]])],
+    [NOTE_SEARCH, new Map([[demographics.id, demographics]])]
+  ])
+}
+
 /*
  * Reset excluded datasets cache. Called when users
  * reset the cohort and the patient list too is reset.
  */
-var allowAllDatasets = function (payload) {
-    var requestId = payload.requestId;
-    excluded.clear();
-    excluded.set(demographics.id, demographics);
-    /*
-     * Get default display and sort order.
-     */
-    var reSorted = dedupeAndSort(getAllDatasetsArray());
-    allCatDs = reSorted.categories;
-    defaultOrder = reSorted.displayOrder;
-    return { requestId: requestId, result: returnDefault() };
-};
+const allowAllDatasets = payload => {
+  const { requestId } = payload
+
+  excluded = getDefaultExcluded()
+  /*
+   * Get default display and sort order.
+   */
+  //const reSorted = dedupeAndSort(getAllDatasetsArray());
+  //allCatDs = reSorted.categories;
+  //defaultOrder = reSorted.displayOrder;
+
+  return { requestId, result: returnDefault() }
+}
+
 /*
  * Allow or disallow a dataset to be included in search results.
  * Called as users add/remove datasets from the patient list screen.
  */
-var allowDataset = function (payload) {
-    var datasetId = payload.datasetId, allow = payload.allow;
-    if (allow) {
-        excluded.delete(datasetId);
+const allowDataset = payload => {
+  const { datasetId, allow } = payload
+
+  if (allow) {
+    excluded.get(currentMode).delete(datasetId)
+  } else {
+    const ds = allDs.get(datasetId)
+    if (ds) {
+      excluded.get(currentMode).set(ds.id, ds)
     }
-    else {
-        var ds = allDs.get(datasetId);
-        if (ds) {
-            excluded.set(ds.id, ds);
-        }
-    }
-    var datasets = getAllDatasetsArray().filter((ds) => !excluded.has(ds.id));
-    var reSorted = dedupeAndSort(datasets);
-    allCatDs = reSorted.categories;
-    defaultOrder = reSorted.displayOrder;
-    return searchDatasets(payload);
-};
+  }
+  const datasets = getAllDatasetsArray().filter((ds) => !excluded.get(currentMode).has(ds.id));
+  const reSorted = dedupeAndSort(datasets);
+  allCatDs.set(currentMode, reSorted.categories);
+  defaultOrder.set(currentMode, reSorted.displayOrder);
+
+  return searchDatasets(payload)
+}
+
 /*
  * Search through available datasets.
  */
-var searchDatasets = function (payload) {
-    var searchString = payload.searchString, requestId = payload.requestId;
-    var terms = searchString.trim().split(' ');
-    var termCount = terms.length;
-    var firstTerm = terms[0];
-    var datasets = firstCharCache.get(firstTerm[0]);
-    var dsOut = [];
-    if (!searchString) {
-        return { requestId: requestId, result: returnDefault() };
+const searchDatasets = payload => {
+  const { searchString, requestId } = payload
+  const terms = searchString.trim().split(" ")
+  const termCount = terms.length
+  const firstTerm = terms[0]
+  const datasets = firstCharCache.get(firstTerm[0])
+  const dsOut = []
+
+  if (!searchString) {
+    return { requestId, result: returnDefault() }
+  }
+  if (!datasets) {
+    return {
+      requestId,
+      result: { categories: new Map(), displayOrder: new Map() }
     }
-    if (!datasets) {
-        return { requestId: requestId, result: { categories: new Map(), displayOrder: new Map() } };
+  }
+
+  // ******************
+  // First term
+  // ******************
+
+  /*
+   * Foreach dataset compare with search term one. If demographics
+   * are disabled this is for a user, so leave out excluded datasets.
+   */
+  if (currentMode !== ADMIN) {
+    for (let i1 = 0; i1 < datasets.length; i1++) {
+      const ds = datasets[i1]
+      if (
+        !excluded.get(currentMode).has(ds.id) &&
+        ds.token.startsWith(firstTerm)
+      ) {
+        dsOut.push(ds)
+      }
     }
-    // ******************
-    // First term
-    // ******************
     /*
-     * Foreach dataset compare with search term one. If demographics
-     * are disabled this is for a user, so leave out excluded datasets.
+     * Else this is for an admin in the admin panel, so there are no exclusions.
      */
-    if (!isAdmin) {
-        for (var i1 = 0; i1 < datasets.length; i1++) {
-            var ds = datasets[i1];
-            if (!excluded.has(ds.id) && ds.token.startsWith(firstTerm)) {
-                dsOut.push(ds);
-            }
-        }
-        /*
-         * Else this is for an admin in the admin panel, so there are no exclusions.
-         */
+  } else {
+    for (let i1 = 0; i1 < datasets.length; i1++) {
+      const ds = datasets[i1]
+      if (ds.token.startsWith(firstTerm)) {
+        dsOut.push(ds)
+      }
     }
-    else {
-        for (var i1 = 0; i1 < datasets.length; i1++) {
-            var ds = datasets[i1];
-            if (ds.token.startsWith(firstTerm)) {
-                dsOut.push(ds);
-            }
-        }
-    }
-    if (terms.length === 1) {
-        return { requestId: requestId, result: dedupeAndSortTokenized(dsOut) };
-    }
-    // ******************
-    // Following terms
-    // ******************
+  }
+
+  if (terms.length === 1) {
+    return { requestId, result: dedupeAndSortTokenized(dsOut) }
+  }
+
+  // ******************
+  // Following terms
+  // ******************
+
+  /*
+   * For datasets found in loop one
+   */
+  const dsFinal = []
+  for (let dsIdx = 0; dsIdx < dsOut.length; dsIdx++) {
+    const otherTokens = dsOut[dsIdx].tokenArray.slice()
+    let hitCount = 1
+
     /*
-     * For datasets found in loop one
+     * Foreach term after the first (e.g. [ 'white', 'blood' ])
+     * filter what first loop found and remove if no hit
      */
-    var dsFinal = [];
-    for (var dsIdx = 0; dsIdx < dsOut.length; dsIdx++) {
-        var otherTokens = dsOut[dsIdx].tokenArray.slice();
-        var hitCount = 1;
-        /*
-         * Foreach term after the first (e.g. [ 'white', 'blood' ])
-         * filter what first loop found and remove if no hit
-         */
-        for (var i2 = 1; i2 < termCount; i2++) {
-            var term = terms[i2];
-            /*
-             * For each other term associated with the dataset name
-             */
-            for (var j = 0; j < otherTokens.length; j++) {
-                if (otherTokens[j].startsWith(term)) {
-                    hitCount++;
-                    otherTokens.splice(j, 1);
-                    break;
-                }
-            }
-            if (!otherTokens.length)
-                break;
+    for (let i2 = 1; i2 < termCount; i2++) {
+      const term = terms[i2]
+
+      /*
+       * For each other term associated with the dataset name
+       */
+      for (let j = 0; j < otherTokens.length; j++) {
+        if (otherTokens[j].startsWith(term)) {
+          hitCount++
+          otherTokens.splice(j, 1)
+          break
         }
-        if (hitCount === termCount) {
-            dsFinal.push(dsOut[dsIdx]);
-        }
+      }
+      if (!otherTokens.length) break
     }
-    return { requestId: requestId, result: dedupeAndSortTokenized(dsFinal) };
-};
+    if (hitCount === termCount) {
+      dsFinal.push(dsOut[dsIdx])
+    }
+  }
+
+  return { requestId, result: dedupeAndSortTokenized(dsFinal) }
+}
+
 /*
  * Extract datasets from tokenized refs and returns
  * a sorted, deduped result array.
  */
-var dedupeAndSortTokenized = function (refs) {
-    var ds = refs.map(function (r) { return r.dataset; });
-    return dedupeAndSort(ds);
-};
+const dedupeAndSortTokenized = refs => {
+  let ds = refs.map(r => r.dataset)
+  if (currentMode === PATIENT_LIST) {
+    ds = ds.filter(d => !d.isText)
+  } else if (currentMode === NOTE_SEARCH) {
+    ds = ds.filter(d => d.isText)
+  }
+  return dedupeAndSort(ds)
+}
+
+const filterByMode = (ref) => {
+  if (currentMode === ADMIN) return true
+  else if (currentMode === PATIENT_LIST) return !Boolean(ref.isText)
+  else if (currentMode === NOTE_SEARCH) return Boolean(ref.isText)
+}
+
 /*
  * Remove duplicates, sort alphabetically, and
  * return a displayable categorized array of datasets.
  */
-var dedupeAndSort = function (refs) {
-    var addedDatasets = new Set();
-    var addedRefs = [];
-    var out = new Map();
-    var displayOrder = new Map();
-    var includesDemographics = false;
-    /*
-     * Get unique only.
-     */
-    for (var i = 0; i < refs.length; i++) {
-        var ref = refs[i];
-        if (!addedDatasets.has(ref.id)) {
-            if (ref.shape === 3) {
-                includesDemographics = true;
-            }
-            else {
-                if (!ref.category) {
-                    ref.category = '';
-                }
-                addedRefs.push(ref);
-                addedDatasets.add(ref.id);
-            }
+const dedupeAndSort = refs => {
+  const addedDatasets = new Set()
+  const addedRefs = []
+  const out = new Map()
+  const displayOrder = new Map()
+  let includesDemographics = false
+
+  /*
+   * Get unique only.
+   */
+  for (let i = 0; i < refs.length; i++) {
+    const ref = refs[i]
+    if (!addedDatasets.has(ref.id)) {
+      if (ref.shape === 3) {
+        includesDemographics = true
+      } else {
+        if (!ref.category) {
+          ref.category = ""
         }
+        addedRefs.push(ref)
+        addedDatasets.add(ref.id)
+      }
     }
-    /*
-     * Sort.
-     */
-    var sortedRefs = addedRefs.sort(function (a, b) {
-        if (a.category === b.category) {
-            return a.name > b.name ? 1 : -1;
-        }
-        return a.category > b.category ? 1 : -1;
-    });
-    if (includesDemographics) {
-        sortedRefs.unshift(demographics);
+  }
+
+  /*
+   * Sort
+   */
+  const sortedRefs = addedRefs.sort((a, b) => {
+    if (a.category === b.category) {
+      return a.name > b.name ? 1 : -1
     }
-    var len = sortedRefs.length;
-    var lastIdx = len - 1;
-    /*
-     * Add to map.
-     */
-    for (var i = 0; i < len; i++) {
-        var ref = sortedRefs[i];
-        var catObj = out.get(ref.category);
-        var order = {
-            prevId: i > 0 ? sortedRefs[i - 1].id : sortedRefs[lastIdx].id,
-            nextId: i < lastIdx ? sortedRefs[i + 1].id : sortedRefs[0].id
-        };
-        displayOrder.set(ref.id, order);
-        if (catObj) {
-            catObj.datasets.set(ref.id, ref);
-        }
-        else {
-            out.set(ref.category, { category: ref.category, datasets: new Map([[ref.id, ref]]) });
-        }
+    return a.category > b.category ? 1 : -1
+  })
+  if (includesDemographics) {
+    sortedRefs.unshift(demographics)
+  }
+  const len = sortedRefs.length
+  const lastIdx = len - 1
+
+  /*
+   * Add to map
+   */
+  for (let i = 0; i < len; i++) {
+    const ref = sortedRefs[i]
+    const catObj = out.get(ref.category)
+    const order = {
+      prevId: i > 0 ? sortedRefs[i - 1].id : sortedRefs[lastIdx].id,
+      nextId: i < lastIdx ? sortedRefs[i + 1].id : sortedRefs[0].id
     }
-    return { categories: out, displayOrder: displayOrder };
-};
-var reindexCacheFromExternal = function (payload) {
-    var requestId = payload.requestId, datasets = payload.datasets;
-    var sorted = reindexCacheCache(datasets);
-    return { requestId: requestId, result: sorted };
-};
+    displayOrder.set(ref.id, order)
+
+    if (catObj) {
+      catObj.datasets.set(ref.id, ref)
+    } else {
+      out.set(ref.category, {
+        category: ref.category,
+        datasets: new Map([[ref.id, ref]])
+      })
+    }
+  }
+  return { categories: out, displayOrder }
+}
+
+const reindexCacheFromExternal = payload => {
+  const { requestId, datasets } = payload
+  const sorted = reindexCache(datasets)
+  return { requestId, result: sorted }
+}
+
 /*
  * Reset the dataset search cache and (re)load
  * it with inbound datasets.
  */
-var reindexCacheCache = function (datasets) {
-    /*
-     * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
-     */
-    var all = datasets.slice().filter(function (ds) { return ds.shape !== 3; });
-    all.unshift(demographics);
-    allDs.clear();
-    allCatDs.clear();
-    allCatDsAdmin.clear();
-    allCatDsAdmin.set('', { category: '', datasets: new Map([[demographics.id, demographics]]) });
-    firstCharCache.clear();
-    excluded.clear();
-    excluded.set(demographics.id, demographics);
-    /*
-     * Foreach dataset
-     */
-    for (var i = 0; i < all.length; i++) {
-        var ds = all[i];
+const reindexCache = datasets => {
+  /*
+   * Ensure 'Demographics'-shaped datasets are excluded (they shouldn't be here, but just to be safe).
+   */
+  const all = datasets.slice().filter(ds => ds.shape !== 3)
+  all.unshift(demographics)
+  allDs.clear()
+  allCatDs.clear()
+  //allCatDsAdmin.clear();
+  //allCatDsAdmin.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
+  firstCharCache.clear()
+  excluded = getDefaultExcluded()
 
-        if (ds.isText) {
-            continue;
-        }
+  /*
+   * Foreach dataset
+   */
+  for (let i = 0; i < all.length; i++) {
+    const ds = all[i]
 
-        var tokens = ds.name.toLowerCase().split(' ').concat(ds.tags.map(t => t.toLowerCase()));
-        if (ds.category) {
-            tokens = tokens.concat(ds.category.toLowerCase().split(' '));
-        }
-        if (ds.description) {
-            tokens = tokens.concat(ds.description.toLowerCase().split(' '));
-        }
-        allDs.set(ds.id, ds);
-        var _loop_1 = function (j) {
-            var token = tokens[j];
-            var ref = {
-                id: ds.id,
-                dataset: ds,
-                token: token,
-                tokenArray: tokens.filter(function (t) { return t !== token; })
-            };
-            var firstChar = token[0];
-            /*
-             * Cache the first first character for quick lookup.
-             */
-            if (!firstCharCache.has(firstChar)) {
-                firstCharCache.set(firstChar, [ref]);
-            }
-            else {
-                firstCharCache.get(firstChar).push(ref);
-            }
-        };
-        for (var j = 0; j <= tokens.length - 1; j++) {
-            _loop_1(j);
-        }
+    let tokens = ds.name
+      .toLowerCase()
+      .split(" ")
+      .concat(ds.tags.map(t => t.toLowerCase()))
+    if (ds.category) {
+      tokens = tokens.concat(ds.category.toLowerCase().split(" "))
     }
-    /*
-     * Set admin search default display.
-     */
-    var adminSorted = dedupeAndSort(all);
-    allCatDsAdmin = adminSorted.categories;
-    defaultOrderAdmin = adminSorted.displayOrder;
-    /*
-     * Set user search default display.
-     */
-    all.shift();
-    var userSorted = dedupeAndSort(all);
-    allCatDs = userSorted.categories;
-    defaultOrder = userSorted.displayOrder;
-    return userSorted;
+    if (ds.description) {
+      tokens = tokens.concat(ds.description.toLowerCase().split(" "))
+    }
+    allDs.set(ds.id, ds)
+
+    for (let j = 0; j <= tokens.length - 1; j++) {
+      const token = tokens[j]
+      const ref = {
+        id: ds.id,
+        dataset: ds,
+        token,
+        tokenArray: tokens.filter(t => t !== token)
+      }
+      const firstChar = token[0]
+
+      /*
+       * Cache the first first character for quick lookup.
+       */
+      if (!firstCharCache.has(firstChar)) {
+        firstCharCache.set(firstChar, [ref])
+      } else {
+        firstCharCache.get(firstChar).push(ref)
+      }
+    }
+  }
+
+  /*
+   * Set admin search default display.
+   */
+  //const adminSorted = dedupeAndSort(all);
+  //allCatDsAdmin = adminSorted.categories;
+  //defaultOrderAdmin = adminSorted.displayOrder;
+
+  /*
+   * Set user search default display.
+   */
+  all.shift()
+  const trueCurrentMode = currentMode;
+  for (const mode of [ADMIN, PATIENT_LIST, NOTE_SEARCH]) {
+    currentMode = mode;
+    const filtered = all.slice().filter(d => filterByMode(d));
+    const sorted = dedupeAndSort(filtered);
+    console.log(['reindexCache', mode, all, filtered, sorted])
+    allCatDs.set(mode, sorted.categories)
+    defaultOrder.set(mode, sorted.displayOrder)
+  }
+  mode = trueCurrentMode;
+
+  return returnDefault()
 };
 `;

@@ -9,9 +9,22 @@ import { NoteSearchState, CohortState, CohortStateType } from '../../models/stat
 import { NoteSearchDatasetQuery } from '../../models/patientList/Dataset';
 import { NoteSearchAction } from '../../actions/cohort/noteSearch';
 import { DateIncrementType } from '../../models/panel/Date';
+import { PatientListSortType } from '../../models/patientList/Configuration';
 
 export function defaultNoteSearchState(): NoteSearchState {
     return {
+        configuration: {
+            displayColumns: [],
+            isFetching: false,
+            multirowDatasets: new Map(),
+            pageNumber: 0,
+            pageSize: 50,
+            singletonDatasets: new Map(),
+            sort: { 
+                sortType: PatientListSortType.NONE
+            }
+        },
+        /*
         datasets: new Map<string, NoteSearchDatasetQuery>(),
         dateFilter: {
             display: 'Anytime',
@@ -24,13 +37,14 @@ export function defaultNoteSearchState(): NoteSearchState {
                 increment: 1
             }
         },
+        */
         results: { documents: [] },
         terms: [],
-        radixSearch: {  
+        lookaheads: {  
             prefix: "", 
             result: []  
         }  
-         };
+    };
 }
 
 export function setNoteDatasets(state: CohortState, action: NoteSearchAction): CohortState {
@@ -51,6 +65,7 @@ export function setNoteDatasets(state: CohortState, action: NoteSearchAction): C
     });
 };
 
+/*
 export function setNoteDatasetChecked(state: CohortState, action: NoteSearchAction): CohortState {
     const datasets = new Map(state.noteSearch.datasets);
     const ds = datasets.get(action.datasetId!);
@@ -67,6 +82,7 @@ export function setNoteDatasetChecked(state: CohortState, action: NoteSearchActi
         }
     });
 };
+*/
 
 export function setNoteSearchTerms(state: CohortState, action: NoteSearchAction): CohortState {
     return Object.assign({}, state, {

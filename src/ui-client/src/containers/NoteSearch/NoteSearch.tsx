@@ -8,13 +8,16 @@
 import { connect } from 'react-redux';
 import React from 'react';
 import { NoteSearchHeader } from '../../components/NoteSearch/NoteSearchHeader/NoteSearchHeader';
-import { AppState } from '../../models/state/AppState';
-import { NoteSearchState } from '../../models/state/CohortState';
+import { AppState, DatasetsState } from '../../models/state/AppState';
+import { CohortState } from '../../models/state/CohortState';
 import { NoteSearchResults } from '../../components/NoteSearch/NoteSearchResults/NoteSearchResults';
+import { NetworkResponderMap } from '../../models/NetworkResponder';
 import './NoteSearch.css';
 
 interface StateProps {
-    noteSearch: NoteSearchState;
+    cohort: CohortState;
+    datasets: DatasetsState;
+    responders: NetworkResponderMap;
 }
 
 interface DispatchProps { 
@@ -29,15 +32,18 @@ class NoteSearch extends React.PureComponent<Props> {
     private className = 'note-search';
 
     public render() {
+        const { dispatch, cohort } = this.props;
         const c = this.className;
 
         return (
-            <div className={c}>
+            <div className={`${c} scrollable-offset-by-header`}>
+
                 {/* Header */}
                 <NoteSearchHeader {...this.props} />
 
                 {/* Highlighted notes */}
-                <NoteSearchResults {...this.props} />
+                <NoteSearchResults dispatch={dispatch} noteSearch={cohort.noteSearch} />
+                
             </div>
         );
     }
@@ -45,7 +51,9 @@ class NoteSearch extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: AppState) => {
     return {
-        noteSearch: state.cohort.noteSearch,
+        cohort: state.cohort,
+        datasets: state.datasets,
+        responders: state.responders
     };
 };
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { NoteSearchState } from '../../../models/state/CohortState';
-import { NoteSearchDatasetQuery } from '../../../models/patientList/Dataset';
+import { CohortState, NoteSearchState } from '../../../models/state/CohortState';
+import { NoteSearchDatasetQuery, PatientListDatasetDefinition } from '../../../models/patientList/Dataset';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { Container, Col, Row, Dropdown, DropdownToggle, DropdownMenu, DropdownItem, Button } from 'reactstrap';
 import CheckboxSlider from '../../Other/CheckboxSlider/CheckboxSlider';
@@ -8,11 +8,18 @@ import { setNoteDatasetChecked, getNotes } from '../../../actions/cohort/noteSea
 import CustomDateRangePicker from '../../FindPatients/Panels/CustomDateRangePicker';
 import { pastDates, none } from '../../FindPatients/Panels/DateDropdownOptions';
 import { SearchTermEditor } from '../SearchTermEditor/SearchTermEditor';
+import { DatasetsState } from '../../../models/state/AppState';
+import DatasetColumnSelector from '../../PatientList/DatasetColumnSelector';
+import AddDatasetButton from '../../PatientList/AddDatasetButton/AddDatasetButton';
+import { NetworkResponderMap } from '../../../models/NetworkResponder';
+import { createPortal } from 'react-dom';
 import './NoteSearchHeader.css';
 
 interface Props {
+    cohort: CohortState;
+    datasets: DatasetsState;
     dispatch: any;
-    noteSearch: NoteSearchState;
+    responders: NetworkResponderMap;
 }
 
 interface State {
@@ -35,120 +42,136 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
     }
      
     public render() {
-        const { dispatch, noteSearch } = this.props;
+        const { cohort, datasets, dispatch, responders } = this.props;
         const { DOMRect, dateFilterOpen, noteSelectorOpen, showCustomDateRangeBox } = this.state;
-        const datasets = [ ...noteSearch.datasets.values() ];
+        const datasetDefs: PatientListDatasetDefinition[] = [ ...cohort.noteSearch.configuration.singletonDatasets.values() ];
+        /*
         const selectedCount = datasets.filter(ds => ds.checked).length;
         const customDateFilterClasses = `leaf-dropdown-item ${noteSearch.dateFilter.start.dateIncrementType === DateIncrementType.SPECIFIC ? 'selected' : ''}`;
         const anytimeDateFilterClasses = `leaf-dropdown-item ${noteSearch.dateFilter.start.dateIncrementType === DateIncrementType.NONE ? 'selected' : ''}`;
+        const datasets = [ ...noteSearch.datasets.values() ];
+        */
         const anytime: DateBoundary = { start: none, end: none };
         const c = this.className;
-        console.log("state of radixtree in header")
-        console.log(noteSearch.radixSearch)
+        //console.log("state of radixtree in header")
+        //console.log(noteSearch.radixSearch)
 
         return (
-            <Container className={c} fluid={true}>
-                <Row>
-                    <Col md={6}>
+            <div className={c}>
+                <div className='left'>
+                    <div className='patientlist-dataset-column-selector-container'>
+                        <div className={`${c}-dataset-text-info`}>Current Datasets (click to edit columns)</div>
+                        {datasetDefs.map((d) => <span key={d.id}>{d.displayName}</span>)}
+                        {datasetDefs.length < datasets.all.size &&
+                        <AddDatasetButton
+                            cohortMap={cohort.networkCohorts}
+                            configuration={cohort.noteSearch.configuration} 
+                            datasets={datasets}
+                            dispatch={dispatch} 
+                            responderMap={responders}
+                        />}
+                    </div>
+                </div>
 
-                        {/* Left side */}
-                        <Row>
+                    {/* Left side 
+                    <Row>
 
-                            {/* Left-left - Note type and date selectors */}
-                            <Col md={6}>
+                        Left-left - Note type and date selectors
+                        <Col md={6}>
 
-                                {/* Note type selector */}
-                                <Dropdown 
-                                    className={`${c}-note-type-dropdown`}
-                                    isOpen={noteSelectorOpen} 
-                                    toggle={this.toggleNoteSelector}
-                                    >
-                                    <DropdownToggle caret={true}>
-                                        Select Note Types ({selectedCount} current)
-                                    </DropdownToggle>
-                                    <DropdownMenu className={`${c}-note-type-selector`}>
-                                        {datasets.map(ds => {
-                                            return (
-                                                <div key={ds.id} className={`${c}-note-type`}
-                                                    onClick={this.handleDatasetCheckClick.bind(null, ds)}>
-                                                    <Row>
-                                                        <Col md={3}>
-                                                            <CheckboxSlider 
-                                                                checked={ds.checked} 
-                                                                onClick={this.handleDatasetCheckClick.bind(null, ds)}
-                                                            />
-                                                        </Col>
-                                                        <Col md={9}>
-                                                            {ds.name}
-                                                        </Col>
-                                                    </Row>
-                                                </div>
-                                            );
-                                        })}
-                                    </DropdownMenu>
-                                </Dropdown>
+                            {/* Note type selector */}
+                            {/*
+                            <Dropdown 
+                                className={`${c}-note-type-dropdown`}
+                                isOpen={noteSelectorOpen} 
+                                toggle={this.toggleNoteSelector}
+                                >
+                                <DropdownToggle caret={true}>
+                                    Select Note Types ({selectedCount} current)
+                                </DropdownToggle>
+                                <DropdownMenu className={`${c}-note-type-selector`}>
+                                    {datasets.map(ds => {
+                                        return (
+                                            <div key={ds.id} className={`${c}-note-type`}
+                                                onClick={this.handleDatasetCheckClick.bind(null, ds)}>
+                                                <Row>
+                                                    <Col md={3}>
+                                                        <CheckboxSlider 
+                                                            checked={ds.checked} 
+                                                            onClick={this.handleDatasetCheckClick.bind(null, ds)}
+                                                        />
+                                                    </Col>
+                                                    <Col md={9}>
+                                                        {ds.name}
+                                                    </Col>
+                                                </Row>
+                                            </div>
+                                        );
+                                    })}
+                                </DropdownMenu>
+                            </Dropdown>
 
-                                {/* Date filter */}
-                                <Dropdown 
-                                    className={`${c}-date-dropdown`}
-                                    isOpen={dateFilterOpen} 
-                                    toggle={this.toggleDateFilterSelector}
-                                    >
-                                    <DropdownToggle caret={true}>
-                                        {noteSearch.dateFilter.display}
-                                    </DropdownToggle>
-                                    <DropdownMenu className={`${c}-note-date-selector`}>
-                                    <DropdownItem className={anytimeDateFilterClasses} onClick={null}>Anytime</DropdownItem>
-                                        <DropdownItem divider={true} />
-                                        <DropdownItem className={customDateFilterClasses} onClick={null}>Custom Date Range</DropdownItem>
-                                        <DropdownItem divider={true} />
-                                        {pastDates.map((opt) => (
-                                            <DropdownItem className={this.setDateDropdownItemClasses(opt)} key={opt.display} onClick={null}>{opt.display}</DropdownItem>
-                                        ))}
-                                    </DropdownMenu>
-                                </Dropdown>
-                                {showCustomDateRangeBox &&
-                                <CustomDateRangePicker
-                                    dateFilter={noteSearch.dateFilter}
-                                    handleDateRangeSelect={null}
-                                    parentDomRect={DOMRect!}
-                                    toggleCustomDateRangeBox={this.toggleDateFilterSelector}
-                                />
-                                }
-                            </Col>
+                             Date filter 
+                            <Dropdown 
+                                className={`${c}-date-dropdown`}
+                                isOpen={dateFilterOpen} 
+                                toggle={this.toggleDateFilterSelector}
+                                >
+                                <DropdownToggle caret={true}>
+                                    {noteSearch.dateFilter.display}
+                                </DropdownToggle>
+                                <DropdownMenu className={`${c}-note-date-selector`}>
+                                <DropdownItem className={anytimeDateFilterClasses} onClick={null}>Anytime</DropdownItem>
+                                    <DropdownItem divider={true} />
+                                    <DropdownItem className={customDateFilterClasses} onClick={null}>Custom Date Range</DropdownItem>
+                                    <DropdownItem divider={true} />
+                                    {pastDates.map((opt) => (
+                                        <DropdownItem className={this.setDateDropdownItemClasses(opt)} key={opt.display} onClick={null}>{opt.display}</DropdownItem>
+                                    ))}
+                                </DropdownMenu>
+                            </Dropdown>
+                            {showCustomDateRangeBox &&
+                            <CustomDateRangePicker
+                                dateFilter={noteSearch.dateFilter}
+                                handleDateRangeSelect={null}
+                                parentDomRect={DOMRect!}
+                                toggleCustomDateRangeBox={this.toggleDateFilterSelector}
+                            />
+                            }
+                            */}
 
-                            {/* Get notes button */}
-                            <Col md={6}>
-                                
-                            <Button className='leaf-button leaf-button-addnew' disabled={false} onClick={this.handleLoadNotesClick}>
-                                Load Notes
-                                
-                            </Button>
+                        {/* Get notes button 
+                        <Col md={6}>
+                            
+                        <Button className='leaf-button leaf-button-addnew' disabled={false} onClick={this.handleLoadNotesClick}>
+                            Load Notes
+                            
+                        </Button>
 
-                            </Col>
+                        </Col>
 
-                        </Row>
+                    </Row>
 
-                    </Col>
+                </Col>
+                        */}
 
-                    {/* Right side */}
-                    <Col md={6}>
-/:v
-                            {/* Search terms */}
-                            <SearchTermEditor dispatch={dispatch} terms={noteSearch.terms} radixSearch={noteSearch.radixSearch} />
-                    </Col>
-                </Row>
-            </Container>
+                {/* Right side */}
+                <div className='right'>
+
+                        {/* Search terms */}
+                        <SearchTermEditor dispatch={dispatch} terms={cohort.noteSearch.terms}/>
+                </div>
+            </div>
         );
     }
 
     private handleLoadNotesClick = () => {
         const { dispatch } = this.props;
-        dispatch(getNotes());
- 
+        // dispatch(getNotes());
     }
 
     private setDateDropdownItemClasses = (dates: DateBoundary) => {
+        /*
         const { dateFilter } = this.props.noteSearch;
         return `leaf-dropdown-item ${
             dates.start.dateIncrementType === dateFilter.start.dateIncrementType &&
@@ -157,6 +180,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
             dates.end.increment! === dateFilter.end.increment!
             ? 'selected' : ''
         }`;
+        */
     }
 
     private handleCustomDateSelectionClick = (e: any) => {

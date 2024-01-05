@@ -12,9 +12,7 @@ import { DemographicStatistics } from '../cohort/DemographicDTO';
 import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
 import { ConceptId } from '../concept/Concept';
-import { NoteSearchDatasetQuery } from '../patientList/Dataset';
 import { Note } from '../cohort/NoteSearch';
-import { DateBoundary } from '../panel/Date';
 import { SearchResult, RadixTreeResult } from '../../providers/noteSearch/noteSearchWebWorker';
 
 export enum CohortStateType {
@@ -105,11 +103,12 @@ export interface VisualizationState {
 }
 
 export interface NoteSearchState {
-    datasets: Map<string, NoteSearchDatasetQuery>;
-    dateFilter: DateBoundary;
+    configuration: PatientListConfiguration;
+    //datasets: Map<string, NoteSearchDatasetQuery>;
+    //dateFilter: DateBoundary;
     results: SearchResult;
     terms: NoteSearchTerm[];
-    radixSearch: RadixTreeResult;
+    lookaheads: RadixTreeResult;
 }
 
 export interface NoteSearchResult {

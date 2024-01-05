@@ -110,7 +110,7 @@ var indexDocuments = function (payload) {
             var lexeme = token.lexeme;
             if (STOP_WORDS.has(lexeme))
                 continue;
-            insertWord(radixTree, lexeme)
+            //insertWord(radixTree, lexeme)
             if (unigramIndex.has(lexeme)) {
                 unigramIndex.get(lexeme).instances.push(token);
             }

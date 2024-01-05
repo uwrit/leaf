@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import DatasetSearchEngineWebWorker from "../providers/datasetSearch/datasetSearchWebWorker";
+import DatasetSearchEngineWebWorker, { DatasetSearchMode } from "../providers/datasetSearch/datasetSearchWebWorker";
 import { PatientListDatasetQuery, DatasetSearchResult } from "../models/patientList/Dataset";
 
 
@@ -40,9 +40,9 @@ export const allowAllDatasets = (): Promise<DatasetSearchResult> => {
     });
 };
 
-export const setAdminMode = (admin: boolean): Promise<DatasetSearchResult> => {
+export const setSearchMode = (searchMode: DatasetSearchMode): Promise<DatasetSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const result = await engine.setAdminMode(admin) as DatasetSearchResult;
+        const result = await engine.setSearchMode(searchMode) as DatasetSearchResult;
         resolve(result);
     });
 };

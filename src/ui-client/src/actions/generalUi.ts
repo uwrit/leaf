@@ -28,6 +28,9 @@ import { getExtensionRootConcepts } from '../services/queryApi';
 import { sendUserInquiry } from '../services/notificationApi';
 import { setExtensionRootConcepts } from './concepts';
 import { setImportsMetadata } from './dataImport';
+import { setSearchMode } from '../services/datasetSearchApi';
+import { DatasetSearchMode } from '../providers/datasetSearch/datasetSearchWebWorker';
+import { setDatasetSearchResult } from './datasets';
 
 export const SET_MYLEAF_TAB = 'SET_MYLEAF_TAB';
 export const SET_COHORT_COUNT_BOX_STATE = 'SET_COHORT_COUNT_BOX_STATE';
@@ -73,10 +76,10 @@ export const handleSidebarTabClick = (route: Routes) => {
         const currentRoute = state.generalUi.currentRoute;
         const cohortCountState = state.cohort.count.state;
 
-        if (route === currentRoute) {
-            return;
-        } 
-        else if (currentRoute === Routes.AdminPanel && admin && (
+        if (route === currentRoute) return;
+        else if (route === Routes.FindPatients) {
+            dispatch(setRoute(route));
+        } else if (currentRoute === Routes.AdminPanel && admin && (
             admin.concepts.changed ||
             admin.sqlSets.changed  || 
             admin.datasets.changed || 
@@ -88,16 +91,19 @@ export const handleSidebarTabClick = (route: Routes) => {
                 show: true
             };
             dispatch(showInfoModal(info));
-        } else if (route === Routes.FindPatients) {
-            dispatch(setRoute(route));
-        } else if (route === Routes.AdminPanel) {
-            dispatch(setRoute(route));
-            dispatch(loadAdminPanelDataIfNeeded());
-        } else if (cohortCountState === CohortStateType.LOADED)  {
+        } else if (cohortCountState === CohortStateType.LOADED) {
+            if (route === Routes.PatientList || route === Routes.NoteSearch) {
+                const mode: DatasetSearchMode = route === Routes.PatientList ? 'PATIENT_LIST' : 'NOTE_SEARCH';
+                const datasets = await setSearchMode(mode);
+                dispatch(setDatasetSearchResult(datasets));
+            }  
             if (route === Routes.PatientList || route === Routes.Visualize) {
                 dispatch(getDemographicsIfNeeded());
             }
+            dispatch(setRoute(route));  
+        } else if (route === Routes.AdminPanel && admin) {
             dispatch(setRoute(route));
+            dispatch(loadAdminPanelDataIfNeeded());
         }
     };
 };

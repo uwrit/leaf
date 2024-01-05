@@ -157,6 +157,7 @@ export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
             const noteDatasets = datasets.filter(ds => ds.isText);
             dispatch(setDatasets(datasets, datasetsCategorized));
             dispatch(setNoteDatasets(noteDatasets));
+            console.log(datasetsCategorized);
             
             /**
              * Load saved queries
