@@ -10,7 +10,7 @@ import { GoCloudDownload } from 'react-icons/go';
 import { connect } from 'react-redux';
 import { Col, Row } from 'reactstrap';
 import { Action, Dispatch } from 'redux';
-import { setPatientListPagination } from '../../actions/cohort/patientList';
+import { getPatientListDataset, setPatientListPagination } from '../../actions/cohort/patientList';
 import { toggleExportDataModal } from '../../actions/generalUi';
 import LoaderIcon from '../../components/Other/LoaderIcon/LoaderIcon';
 import AddDatasetButton from '../../components/PatientList/AddDatasetButton/AddDatasetButton';
@@ -151,7 +151,8 @@ class PatientList extends React.PureComponent<Props, State> {
                                 cohortMap={cohort.networkCohorts}
                                 configuration={patientList.configuration} 
                                 datasets={datasets}
-                                dispatch={dispatch} 
+                                dispatch={dispatch}
+                                handleDatasetRequest={getPatientListDataset} 
                                 responderMap={responders}
                             />
                             }

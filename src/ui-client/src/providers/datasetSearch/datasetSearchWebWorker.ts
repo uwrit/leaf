@@ -145,16 +145,6 @@ export default class DatasetSearchEngineWebWorker {
         ]);
         let allDs: Map<string, PatientListDatasetQuery> = new Map();
         let currentMode: DatasetSearchMode = PATIENT_LIST;
-
-        /*
-         * Admin-facing cache.
-         */
-        //let allCatDsAdmin: Map<string, CategorizedDatasetRef> = new Map();
-        //let defaultOrderAdmin: Map<string, PatientListDatasetQueryIndex> = new Map();
-
-        /*
-         * User-facing cache.
-         */
         let allCatDs: Map<DatasetSearchMode, Map<string, CategorizedDatasetRef>> = new Map();
         let defaultOrder: Map<DatasetSearchMode, Map<string, PatientListDatasetQueryIndex>> = new Map();
 
@@ -170,9 +160,7 @@ export default class DatasetSearchEngineWebWorker {
         /*
          * Return the default display depending on whether the current mode is admin or user.
          */
-
         const returnDefault = (): DatasetSearchResult => {
-            console.log(['returnDefault', allCatDs.get(currentMode), defaultOrder.get(currentMode) ])
             return { 
                 categories: allCatDs.get(currentMode), 
                 displayOrder: defaultOrder.get(currentMode) 
@@ -208,9 +196,9 @@ export default class DatasetSearchEngineWebWorker {
             /*
              * Get default display and sort order.
              */
-            //const reSorted = dedupeAndSort(getAllDatasetsArray());
-            //allCatDs = reSorted.categories;
-            //defaultOrder = reSorted.displayOrder;
+            const reSorted = dedupeAndSort(getAllDatasetsArray());
+            allCatDs.set(currentMode, reSorted.categories);
+            defaultOrder.set(currentMode, reSorted.displayOrder);
 
             return { requestId, result: returnDefault() };
         };
@@ -343,6 +331,7 @@ export default class DatasetSearchEngineWebWorker {
 
         const filterByMode = (ref: PatientListDatasetQuery): boolean => {
             if (currentMode === ADMIN) return true;
+            if (ref.id === demographics.id) return false;
             else if (currentMode === PATIENT_LIST) return !ref.isText;
             else if (currentMode === NOTE_SEARCH) return !!ref.isText;
         };
@@ -467,7 +456,6 @@ export default class DatasetSearchEngineWebWorker {
             /*
              * Set user search default display.
              */
-            all.shift();
             const trueCurrentMode = currentMode;
             for (const mode of [ADMIN, PATIENT_LIST, NOTE_SEARCH]) {
                 currentMode = mode as DatasetSearchMode;

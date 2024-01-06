@@ -22,6 +22,7 @@ interface Props {
     cohortMap: Map<number, NetworkCohortState>;
     configuration: PatientListConfiguration;
     datasets: DatasetsState;
+    handleDatasetRequest: (ds: PatientListDatasetQuery, selectedDates: DateBoundary, selectedEncounterPanel: number) => void;
     responderMap: NetworkResponderMap;
     dispatch: any;
 }
@@ -78,7 +79,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     public render() {
         const c = this.className;
         const { selectedDates, selectedEncounterPanel, showSelectorModal, showDates } = this.state;
-        const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
+        const { datasets, configuration, dispatch, cohortMap, handleDatasetRequest, responderMap } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
 
@@ -130,6 +131,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         handleClickClose={this.handleClickClose}
                         handleEncounterPanelSelect={this.handleEncounterPanelSelect}
                         handleDatasetSelect={this.handleDatasetOptionClick}
+                        handleDatasetRequest={handleDatasetRequest}
                         handleDateSelect={this.handleDateOptionClick}
                         selectedDates={selectedDates}
                         selectedEncounterPanel={selectedEncounterPanel}

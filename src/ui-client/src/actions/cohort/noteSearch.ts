@@ -13,20 +13,18 @@ import { NetworkIdentity } from "../../models/NetworkResponder";
 import { flushNotes, indexNotes, searchNotes, searchPrefix } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { Note } from "../../models/cohort/NoteSearch";
-import { CohortStateType, NoteSearchTerm } from "../../models/state/CohortState";
+import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
 import { SearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
 
-export const SET_NOTE_DATASETS = 'SET_NOTE_DATASETS';
-export const SET_NOTE_DATASET_CHECKED = 'SET_NOTE_DATASET_CHECKED';
-export const SET_NOTE_SEARCH_DATERANGE = 'SET_NOTE_SEARCH_DATERANGE';
 export const SET_NOTE_SEARCH_TERMS = 'SET_NOTE_SEARCH_TERMS';
 export const SET_NOTE_SEARCH_RESULTS = 'SET_NOTE_SEARCH_RESULTS';
-export const SET_NOTE_SEARCH_RADIX_TREE = 'SET_NOTE_SEARCH_RADIX_TREE'
+export const SET_NOTE_SEARCH_CONFIGURATION = 'SET_NOTE_SEARCH_CONFIGURATION';
 export const SET_NOTE_SEARCH_PREFIX_RESULTS = 'SET_NOTE_SEARCH_PREFIX_RESULTS';  
 
-export interface NoteSearchAction {
+export interface CohortNoteSearchAction {
+    configuration?: NoteSearchConfiguration;
     datasetId?: string;
     datasets?: PatientListDatasetQuery[];
     dateFilter?: DateBoundary;
@@ -60,7 +58,7 @@ export const searchPrefixTerms = (prefix: string) => {
 */ 
   
 
-export const getNotes = (dataset: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {  
+export const getNotesDataset = (dataset: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {  
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const responders: NetworkIdentity[] = [];
@@ -131,42 +129,25 @@ export const getNotes = (dataset: PatientListDatasetQuery, dates?: DateBoundary,
     }
 };  
 
-export const setNoteSearchPrefixResults = (results: RadixTreeResult): NoteSearchAction => { 
+export const setNoteSearchPrefixResults = (results: RadixTreeResult): CohortNoteSearchAction => { 
     return  {
-    prefixResults: results,
-    id: -1,
-    type: SET_NOTE_SEARCH_PREFIX_RESULTS
+        prefixResults: results,
+        id: -1,
+        type: SET_NOTE_SEARCH_PREFIX_RESULTS
     };
 };
 
 
 // Synchronous
-export const setNoteDatasets = (datasets: PatientListDatasetQuery[]): NoteSearchAction => {
+export const setNoteSearchConfiguration = (configuration: NoteSearchConfiguration): CohortNoteSearchAction => {
     return {
-        datasets,
+        configuration,
         id: -1,
-        type: SET_NOTE_DATASETS
+        type: SET_NOTE_SEARCH_CONFIGURATION
     };
 };
 
-export const setNoteDatasetChecked = (datasetId: string): NoteSearchAction => {
-    return {
-        datasetId,
-        id: -1,
-        type: SET_NOTE_DATASET_CHECKED
-    };
-};
-
-
-export const setNoteSearchDateRange = (dateFilter: DateBoundary): NoteSearchAction => {
-    return {
-        dateFilter,
-        id: -1,
-        type: SET_NOTE_DATASET_CHECKED
-    };
-};
-
-export const setNoteSearchTerms = (searchTerms: NoteSearchTerm[]): NoteSearchAction => {
+export const setNoteSearchTerms = (searchTerms: NoteSearchTerm[]): CohortNoteSearchAction => {
     return {
         searchTerms,
         id: -1,
@@ -174,7 +155,7 @@ export const setNoteSearchTerms = (searchTerms: NoteSearchTerm[]): NoteSearchAct
     };
 };
 
-export const setNoteSearchResults = (searchResults: SearchResult): NoteSearchAction => {
+export const setNoteSearchResults = (searchResults: SearchResult): CohortNoteSearchAction => {
     return {
         searchResults,
         id: -1,

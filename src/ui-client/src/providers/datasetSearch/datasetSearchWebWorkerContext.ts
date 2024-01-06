@@ -41,17 +41,7 @@ let excluded = new Map([
   [NOTE_SEARCH, new Map([[demographics.id, demographics]])]
 ])
 let allDs = new Map()
-let currentMode = PATIENT_LIST;
-
-/*
- * Admin-facing cache.
- */
-//let allCatDsAdmin: Map<string, CategorizedDatasetRef> = new Map();
-//let defaultOrderAdmin: Map<string, PatientListDatasetQueryIndex> = new Map();
-
-/*
- * User-facing cache.
- */
+let currentMode = PATIENT_LIST
 let allCatDs = new Map()
 let defaultOrder = new Map()
 
@@ -67,9 +57,7 @@ const setSearchMode = payload => {
 /*
  * Return the default display depending on whether the current mode is admin or user.
  */
-
 const returnDefault = () => {
-    console.log(['returnDefault', allCatDs.get(currentMode), defaultOrder.get(currentMode) ])
   return {
     categories: allCatDs.get(currentMode),
     displayOrder: defaultOrder.get(currentMode)
@@ -84,7 +72,7 @@ const getAllDatasetsArray = () => {
   if (currentMode !== ADMIN) {
     copy.delete(demographics.id)
   }
-  return [ ...copy.values() ].filter(ds => filterByMode(ds));
+  return [...copy.values()].filter(ds => filterByMode(ds))
 }
 
 const getDefaultExcluded = () => {
@@ -105,9 +93,9 @@ const allowAllDatasets = payload => {
   /*
    * Get default display and sort order.
    */
-  //const reSorted = dedupeAndSort(getAllDatasetsArray());
-  //allCatDs = reSorted.categories;
-  //defaultOrder = reSorted.displayOrder;
+  const reSorted = dedupeAndSort(getAllDatasetsArray())
+  allCatDs.set(currentMode, reSorted.categories)
+  defaultOrder.set(currentMode, reSorted.displayOrder)
 
   return { requestId, result: returnDefault() }
 }
@@ -127,10 +115,12 @@ const allowDataset = payload => {
       excluded.get(currentMode).set(ds.id, ds)
     }
   }
-  const datasets = getAllDatasetsArray().filter((ds) => !excluded.get(currentMode).has(ds.id));
-  const reSorted = dedupeAndSort(datasets);
-  allCatDs.set(currentMode, reSorted.categories);
-  defaultOrder.set(currentMode, reSorted.displayOrder);
+  const datasets = getAllDatasetsArray().filter(
+    ds => !excluded.get(currentMode).has(ds.id)
+  )
+  const reSorted = dedupeAndSort(datasets)
+  allCatDs.set(currentMode, reSorted.categories)
+  defaultOrder.set(currentMode, reSorted.displayOrder)
 
   return searchDatasets(payload)
 }
@@ -243,10 +233,11 @@ const dedupeAndSortTokenized = refs => {
   return dedupeAndSort(ds)
 }
 
-const filterByMode = (ref) => {
+const filterByMode = ref => {
   if (currentMode === ADMIN) return true
-  else if (currentMode === PATIENT_LIST) return !Boolean(ref.isText)
-  else if (currentMode === NOTE_SEARCH) return Boolean(ref.isText)
+  if (ref.id === demographics.id) return false
+  else if (currentMode === PATIENT_LIST) return !ref.isText
+  else if (currentMode === NOTE_SEARCH) return !!ref.isText
 }
 
 /*
@@ -335,8 +326,6 @@ const reindexCache = datasets => {
   all.unshift(demographics)
   allDs.clear()
   allCatDs.clear()
-  //allCatDsAdmin.clear();
-  //allCatDsAdmin.set('', { category: '', datasets: new Map([[ demographics.id, demographics ]]) });
   firstCharCache.clear()
   excluded = getDefaultExcluded()
 
@@ -380,27 +369,18 @@ const reindexCache = datasets => {
   }
 
   /*
-   * Set admin search default display.
-   */
-  //const adminSorted = dedupeAndSort(all);
-  //allCatDsAdmin = adminSorted.categories;
-  //defaultOrderAdmin = adminSorted.displayOrder;
-
-  /*
    * Set user search default display.
    */
-  all.shift()
-  const trueCurrentMode = currentMode;
+  const trueCurrentMode = currentMode
   for (const mode of [ADMIN, PATIENT_LIST, NOTE_SEARCH]) {
-    currentMode = mode;
-    const filtered = all.slice().filter(d => filterByMode(d));
-    const sorted = dedupeAndSort(filtered);
-    console.log(['reindexCache', mode, all, filtered, sorted])
+    currentMode = mode
+    const filtered = all.slice().filter(d => filterByMode(d))
+    const sorted = dedupeAndSort(filtered)
     allCatDs.set(mode, sorted.categories)
     defaultOrder.set(mode, sorted.displayOrder)
   }
-  mode = trueCurrentMode;
+  currentMode = trueCurrentMode
 
   return returnDefault()
-};
+}
 `;

@@ -32,9 +32,8 @@ import { setAdminNetworkIdentity } from './admin/networkAndIdentity';
 import { clearCurrentUserToken, getUserTokenAndContext } from '../services/authApi';
 import { setImportOptions } from './dataImport';
 import { ImportOptionsDTO } from '../models/state/Import';
-import { getIdToken, receiveIdToken, failureIdToken, setServerState } from './auth';
+import { receiveIdToken, failureIdToken, setServerState } from './auth';
 import { getRoutes } from '../config/routes';
-import { setNoteDatasets } from './cohort/noteSearch';
 
 export const SUBMIT_ATTESTATION = 'SUBMIT_ATTESTATION';
 export const ERROR_ATTESTATION = 'ERROR_ATTESTATION';
@@ -154,10 +153,7 @@ export const loadSession = (attestation: Attestation, ctx: SessionContext) => {
             dispatch(setSessionLoadState('Loading Patient List Datasets', 60));
             const datasets = await fetchAvailableDatasets(getState());
             const datasetsCategorized = await indexDatasets(datasets);
-            const noteDatasets = datasets.filter(ds => ds.isText);
             dispatch(setDatasets(datasets, datasetsCategorized));
-            dispatch(setNoteDatasets(noteDatasets));
-            console.log(datasetsCategorized);
             
             /**
              * Load saved queries

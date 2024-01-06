@@ -101,8 +101,20 @@ import {
     setTimelinesPanelIndexId,
     removeTimelinesConceptDataset
 } from './timelines';
-import { SET_NOTE_DATASET_CHECKED, NoteSearchAction, SET_NOTE_DATASETS, SET_NOTE_SEARCH_TERMS, SET_NOTE_SEARCH_RESULTS, SET_NOTE_SEARCH_PREFIX_RESULTS} from '../../actions/cohort/noteSearch';
-import { setNoteDatasets, defaultNoteSearchState, setNoteSearchTerms, setNoteSearchResults, setNoteSearchPrefixResults } from './noteSearch';
+import { 
+    CohortNoteSearchAction, 
+    SET_NOTE_SEARCH_TERMS, 
+    SET_NOTE_SEARCH_RESULTS, 
+    SET_NOTE_SEARCH_PREFIX_RESULTS,
+    SET_NOTE_SEARCH_CONFIGURATION
+} from '../../actions/cohort/noteSearch';
+import { 
+    defaultNoteSearchState, 
+    setNoteSearchTerms, 
+    setNoteSearchResults, 
+    setNoteSearchPrefixResults, 
+    setNoteSearchConfiguration
+} from './noteSearch';
 
 export const defaultCohortState = (): CohortState => {
     return {
@@ -274,7 +286,7 @@ const errorCohortDemographics = (state: CohortState, action: CohortCountAction):
     };
 };
 
-type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction | NoteSearchAction;
+type CohortAction = CohortCountAction | CohortVisualizationAction | CohortPatientListAction | CohortNoteSearchAction;
 
 export const cohort = (state: CohortState = defaultCohortState(), action: CohortAction): CohortState => {
     switch (action.type) {
@@ -344,10 +356,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setTimelinesNetworkPanelDataset(state, CohortStateType.IN_ERROR, action);            
 
         // Note Search
-        //case SET_NOTE_DATASET_CHECKED:
-        //    return setNoteDatasetChecked(state, action);
-        case SET_NOTE_DATASETS:
-            return setNoteDatasets(state, action);
+        case SET_NOTE_SEARCH_CONFIGURATION:
+            return setNoteSearchConfiguration(state, action);
         case SET_NOTE_SEARCH_TERMS:
             return setNoteSearchTerms(state, action);
         case SET_NOTE_SEARCH_RESULTS:

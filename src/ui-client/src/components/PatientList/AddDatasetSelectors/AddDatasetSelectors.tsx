@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { Col, Row, Button } from 'reactstrap';
-import { getPatientListDataset } from '../../../actions/cohort/patientList';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
 import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import DatasetContainer from './DatasetContainer';
@@ -25,6 +24,7 @@ interface Props {
     handleClickClose: () => void;
     handleDatasetSelect: (dataset: PatientListDatasetQuery) => void;
     handleEncounterPanelSelect: (panelIndex: number | undefined) => void;
+    handleDatasetRequest: (ds: PatientListDatasetQuery, selectedDates: DateBoundary, selectedEncounterPanel: number) => void;
     handleDateSelect: (date: DateBoundary) => void;
     selectedDates?: DateBoundary;
     selectedEncounterPanel?: number;
@@ -174,11 +174,11 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
     }
 
     private handleDatasetRequest = () => {
-        const { datasets, selectedDates, selectedEncounterPanel, dispatch, handleDatasetSelect } = this.props;
+        const { datasets, selectedDates, selectedEncounterPanel, dispatch, handleDatasetSelect, handleDatasetRequest } = this.props;
 
         if (datasets.selected) {
             const ds = datasets.all.get(datasets.selected)!;
-            dispatch(getPatientListDataset(ds, selectedDates, selectedEncounterPanel));
+            dispatch(handleDatasetRequest(ds, selectedDates, selectedEncounterPanel));
             handleDatasetSelect(ds);
         }
     }

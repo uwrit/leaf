@@ -103,12 +103,14 @@ export interface VisualizationState {
 }
 
 export interface NoteSearchState {
-    configuration: PatientListConfiguration;
-    //datasets: Map<string, NoteSearchDatasetQuery>;
-    //dateFilter: DateBoundary;
+    configuration: NoteSearchConfiguration;
     results: SearchResult;
     terms: NoteSearchTerm[];
     lookaheads: RadixTreeResult;
+}
+
+export interface NoteSearchConfiguration extends PatientListConfiguration {
+    
 }
 
 export interface NoteSearchResult {

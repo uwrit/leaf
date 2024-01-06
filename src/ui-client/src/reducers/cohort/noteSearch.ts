@@ -7,8 +7,7 @@
 
 import { NoteSearchState, CohortState, CohortStateType } from '../../models/state/CohortState';
 import { NoteSearchDatasetQuery } from '../../models/patientList/Dataset';
-import { NoteSearchAction } from '../../actions/cohort/noteSearch';
-import { DateIncrementType } from '../../models/panel/Date';
+import { CohortNoteSearchAction } from '../../actions/cohort/noteSearch';
 import { PatientListSortType } from '../../models/patientList/Configuration';
 
 export function defaultNoteSearchState(): NoteSearchState {
@@ -24,20 +23,6 @@ export function defaultNoteSearchState(): NoteSearchState {
                 sortType: PatientListSortType.NONE
             }
         },
-        /*
-        datasets: new Map<string, NoteSearchDatasetQuery>(),
-        dateFilter: {
-            display: 'Anytime',
-            end: {
-                dateIncrementType: DateIncrementType.NONE,
-                increment: 1
-            },
-            start: {
-                dateIncrementType: DateIncrementType.NONE,
-                increment: 1
-            }
-        },
-        */
         results: { documents: [] },
         terms: [],
         lookaheads: {  
@@ -47,44 +32,16 @@ export function defaultNoteSearchState(): NoteSearchState {
     };
 }
 
-export function setNoteDatasets(state: CohortState, action: NoteSearchAction): CohortState {
-    const datasets = new Map<string, NoteSearchDatasetQuery>();
-    for (const ds of action.datasets!) {
-        datasets.set(ds.id, {
-            ...ds,
-            checked: false,
-            status: CohortStateType.NOT_LOADED
-        })
-    }
-    
+export function setNoteSearchConfiguration(state: CohortState, action: CohortNoteSearchAction): CohortState {
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
-            datasets
+            configuration: action.configuration
         }
     });
 };
 
-/*
-export function setNoteDatasetChecked(state: CohortState, action: NoteSearchAction): CohortState {
-    const datasets = new Map(state.noteSearch.datasets);
-    const ds = datasets.get(action.datasetId!);
-
-    if (ds) {
-        ds.checked = !ds.checked;
-    }
-    datasets.set(action.datasetId, ds);
-
-    return Object.assign({}, state, {
-        noteSearch: {
-            ...state.noteSearch,
-            datasets
-        }
-    });
-};
-*/
-
-export function setNoteSearchTerms(state: CohortState, action: NoteSearchAction): CohortState {
+export function setNoteSearchTerms(state: CohortState, action: CohortNoteSearchAction): CohortState {
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
@@ -93,7 +50,7 @@ export function setNoteSearchTerms(state: CohortState, action: NoteSearchAction)
     });
 };
 
-export function setNoteSearchResults(state: CohortState, action: NoteSearchAction): CohortState {
+export function setNoteSearchResults(state: CohortState, action: CohortNoteSearchAction): CohortState {
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
@@ -103,7 +60,7 @@ export function setNoteSearchResults(state: CohortState, action: NoteSearchActio
 };
 
 
-export function setNoteSearchPrefixResults(state: CohortState, action: NoteSearchAction): CohortState {
+export function setNoteSearchPrefixResults(state: CohortState, action: CohortNoteSearchAction): CohortState {
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,

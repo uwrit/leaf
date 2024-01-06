@@ -9,7 +9,6 @@ import { generate as generateId } from 'shortid';
 import { Note } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
 import { NoteSearchTerm } from '../../models/state/CohortState';
-import { type } from 'os';
 
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
