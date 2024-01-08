@@ -44,3 +44,17 @@
 .note-search-header-note-type:hover {
     background-color: rgba(28,168,221,0.2) !important;
 }
+
+.note-search-header-note-dataset {
+    background-color: white;
+    border: 1px solid rgba(28, 170, 221, 0.699);
+    border-radius: 8px;
+    color: #1CA8DD;
+    cursor: pointer;
+    margin: 0 10px;
+    padding: 5px 8px;
+}
+
+.note-search-header-note-dataset:hover {
+    background-color: rgba(28, 170, 221, 0.2);
+}

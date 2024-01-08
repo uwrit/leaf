@@ -6,13 +6,14 @@
  */ 
 
 import { CancelTokenSource } from 'axios';
-import { PatientListConfiguration } from '../patientList/Configuration';
+import { BaseDatasetViewConfigurationConfiguration, PatientListConfiguration } from '../patientList/Configuration';
 import { PatientListRow } from '../patientList/Patient';
 import { DemographicStatistics } from '../cohort/DemographicDTO';
 import { TimelinesConfiguration } from '../timelines/Configuration';
 import { TimelinesAggregateDataset, TimelinesPatientDataRow } from '../timelines/Data';
 import { ConceptId } from '../concept/Concept';
 import { NoteSearchResult, RadixTreeResult } from '../../providers/noteSearch/noteSearchWebWorker';
+import { PatientListDatasetQuery } from '../patientList/Dataset';
 
 export enum CohortStateType {
     REQUESTING = 1,
@@ -108,8 +109,8 @@ export interface NoteSearchState {
     lookaheads: RadixTreeResult;
 }
 
-export interface NoteSearchConfiguration extends PatientListConfiguration {
-    
+export interface NoteSearchConfiguration extends BaseDatasetViewConfigurationConfiguration {
+    datasets: PatientListDatasetQuery[];
 }
 
 export interface NoteSearchTerm {

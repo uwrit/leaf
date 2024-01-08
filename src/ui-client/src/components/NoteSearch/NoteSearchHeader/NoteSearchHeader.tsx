@@ -1,6 +1,5 @@
 import React from 'react';
 import { CohortState } from '../../../models/state/CohortState';
-import { PatientListDatasetDefinition } from '../../../models/patientList/Dataset';
 import { getNotesDataset } from '../../../actions/cohort/noteSearch';
 import { SearchTermEditor } from '../SearchTermEditor/SearchTermEditor';
 import { DatasetsState } from '../../../models/state/AppState';
@@ -36,7 +35,6 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
      
     public render() {
         const { cohort, datasets, dispatch, responders } = this.props;
-        const datasetDefs: PatientListDatasetDefinition[] = [ ...cohort.noteSearch.configuration.singletonDatasets.values() ];
         const c = this.className;
 
         return (
@@ -45,9 +43,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                 {/* Left side */}
                 <div className='left'>
                     <div className='patientlist-dataset-column-selector-container'>
-                        <div className={`${c}-dataset-text-info`}>Current Datasets (click to edit columns)</div>
-                        {datasetDefs.map((d) => <span key={d.id}>{d.displayName}</span>)}
-                        {datasetDefs.length < datasets.all.size &&
+                        <div className={`${c}-dataset-text-info`}>Current Clinical Note Types:</div>
                         <AddDatasetButton
                             cohortMap={cohort.networkCohorts}
                             configuration={cohort.noteSearch.configuration} 
@@ -55,7 +51,14 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                             dispatch={dispatch}
                             handleDatasetRequest={getNotesDataset} 
                             responderMap={responders}
-                        />}
+                        />
+                    </div>
+                    <div>
+                        {cohort.noteSearch.configuration.datasets.map((d) => {
+                            return (
+                                <span className={`${c}-note-dataset`} key={d.id}>{d.name}</span>
+                            );
+                        })}
                     </div>
                 </div>
 

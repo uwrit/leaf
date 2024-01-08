@@ -8,7 +8,6 @@
 import React from 'react';
 import { Col, Row, Button } from 'reactstrap';
 import { DateBoundary, DateIncrementType } from '../../../models/panel/Date';
-import { PatientListConfiguration } from '../../../models/patientList/Configuration';
 import DatasetContainer from './DatasetContainer';
 import { DatasetsState } from '../../../models/state/AppState';
 import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
@@ -17,7 +16,6 @@ import CustomDateRangePicker from '../../FindPatients/Panels/CustomDateRangePick
 
 interface Props {
     className?: string;
-    configuration: PatientListConfiguration;
     dates: DateBoundary[];
     datasets: DatasetsState;
     dispatch: any;

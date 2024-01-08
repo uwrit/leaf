@@ -17,13 +17,16 @@ export interface PatientListSort {
     sortType: PatientListSortType;
 }
 
-export interface PatientListConfiguration {
-    multirowDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
-    singletonDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
-    displayColumns: PatientListColumn[];
+export interface BaseDatasetViewConfigurationConfiguration {
     isFetching: boolean;
     fetchingDataset?: string;
     pageNumber: number;
     pageSize: number;
+}
+
+export interface PatientListConfiguration extends BaseDatasetViewConfigurationConfiguration {
+    multirowDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
+    singletonDatasets: Map<PatientListDatasetId, PatientListDatasetDefinition>;
+    displayColumns: PatientListColumn[];
     sort: PatientListSort;
 }

@@ -41,7 +41,7 @@ const indexDocuments = (payload) => {
                 const note = {
                     responderId: result.responder.id,
                     id: result.responder.id + '_' + j.toString(),
-                    date: new Date(row[schema.sqlFieldDate]),
+                    date: row[schema.sqlFieldDate],
                     personId: patId,
                     text: row[schema.sqlFieldValueString],
                     type: result.query.name
@@ -55,7 +55,13 @@ const indexDocuments = (payload) => {
     for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         const tokens = tokenizeDocument(note);
-        const doc = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text, personId: note.personId };
+        const doc = {
+            id: note.id,
+            date: note.date ? new Date(note.date) : undefined,
+            note_type: note.type,
+            text: note.text,
+            personId: note.personId
+        };
         let prev;
         for (let j = 0; j < tokens.length; j++) {
             const token = tokens[j];

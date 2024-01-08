@@ -11,7 +11,7 @@ import ResponderStatusSummary from '../ResponderStatus/ResponderStatusSummary';
 import { NetworkResponderMap } from '../../../models/NetworkResponder';
 import { NetworkCohortState } from '../../../models/state/CohortState';
 import { DateBoundary, DateFilter, DateIncrementType } from '../../../models/panel/Date';
-import { PatientListConfiguration } from '../../../models/patientList/Configuration';
+import { BaseDatasetViewConfigurationConfiguration } from '../../../models/patientList/Configuration';
 import { createPortal } from 'react-dom';
 import { DatasetsState } from '../../../models/state/AppState';
 import { setDatasetSelected } from '../../../actions/datasets';
@@ -20,7 +20,7 @@ import './AddDatasetButton.css';
 
 interface Props {
     cohortMap: Map<number, NetworkCohortState>;
-    configuration: PatientListConfiguration;
+    configuration: BaseDatasetViewConfigurationConfiguration;
     datasets: DatasetsState;
     handleDatasetRequest: (ds: PatientListDatasetQuery, selectedDates: DateBoundary, selectedEncounterPanel: number) => void;
     responderMap: NetworkResponderMap;
@@ -125,7 +125,6 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                     <AddDatasetSelectors 
                         dates={dates}
                         dispatch={dispatch} 
-                        configuration={configuration} 
                         className={c}
                         datasets={datasets}
                         handleClickClose={this.handleClickClose}

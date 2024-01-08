@@ -5,25 +5,18 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { NoteSearchState, CohortState, CohortStateType } from '../../models/state/CohortState';
-import { NoteSearchDatasetQuery } from '../../models/patientList/Dataset';
+import { NoteSearchState, CohortState } from '../../models/state/CohortState';
 import { CohortNoteSearchAction } from '../../actions/cohort/noteSearch';
-import { PatientListSortType } from '../../models/patientList/Configuration';
 
 export function defaultNoteSearchState(): NoteSearchState {
     return {
         configuration: {
-            displayColumns: [],
+            datasets: [],
             isFetching: false,
-            multirowDatasets: new Map(),
             pageNumber: 0,
-            pageSize: 10,
-            singletonDatasets: new Map(),
-            sort: { 
-                sortType: PatientListSortType.NONE
-            }
+            pageSize: 10
         },
-        results: { documents: [] },
+        results: { documents: [], totalDocuments: 0, totalPatients: 0, totalTermHits: 0 },
         terms: [],
         lookaheads: {  
             prefix: "", 

@@ -72,6 +72,7 @@ export const setNoteSearchPagination = (id: number) => {
 
         // Update patient list display based on newest responder results
         dispatch(setNoteSearchResults(newDocs.results));
+        dispatch(setNoteSearchConfiguration(newDocs.configuration));
     };
 };
 
@@ -118,10 +119,13 @@ export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoun
         .then( async () => {
             if (atLeastOneSucceeded) {
                 dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
+                const config = Object.assign({}, state.cohort.noteSearch.configuration, { pageNumber: 0 });
                 const results = await indexNotes(datasets);
                 const visibleDatasets = await allowDatasetInSearch(query.id, false, state.datasets.searchTerm);
+                config.datasets.push(query);
                 dispatch(setDatasetSearchResult(visibleDatasets));
                 dispatch(setNoteSearchResults(results));
+                dispatch(setNoteSearchConfiguration(config));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
             } else {
                 const info: InformationModalState = {
