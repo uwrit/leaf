@@ -118,9 +118,10 @@ export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoun
         .then( async () => {
             if (atLeastOneSucceeded) {
                 dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
-                await indexNotes(datasets);
+                const results = await indexNotes(datasets);
                 const visibleDatasets = await allowDatasetInSearch(query.id, false, state.datasets.searchTerm);
                 dispatch(setDatasetSearchResult(visibleDatasets));
+                dispatch(setNoteSearchResults(results));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
             } else {
                 const info: InformationModalState = {

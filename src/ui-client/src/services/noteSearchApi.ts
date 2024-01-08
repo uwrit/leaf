@@ -11,10 +11,10 @@ import { NoteSearchConfiguration, NoteSearchTerm } from '../models/state/CohortS
 
 const engine = new NoteSearchWebWorker();
 
-export const indexNotes = (datasets: NoteDatasetContext[]) => {
-    return new Promise<void>( async (resolve, reject) => {
-        await engine.index(datasets);
-        resolve();
+export const indexNotes = (datasets: NoteDatasetContext[]): Promise<NoteSearchResult> => {
+    return new Promise( async (resolve, reject) => {
+        const results = await engine.index(datasets) as NoteSearchResult;
+        resolve(results);
     });
 };
 

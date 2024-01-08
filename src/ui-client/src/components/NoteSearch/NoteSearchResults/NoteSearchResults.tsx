@@ -33,8 +33,16 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
         const { showFullNoteModal, note } = this.state;
         const c = this.className;
 
+        /** 
+         * No terms yet
+         **/
+
+        /** 
+         * No hits
+         **/
+
         let paginate;
-        if (results.totalDocuments > noteSearch.configuration.pageSize) {
+        if (results.documents.length && results.totalDocuments > noteSearch.configuration.pageSize) {
             paginate = 
                 <Paginate 
                     dispatch={dispatch}
@@ -45,11 +53,23 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                 />;
         }
 
-        console.log(noteSearch.results);
-
         return (
             <Container className={`${c}-container`} fluid={true}>
-                {paginate}
+                <Row>
+                    <Col md={6}>
+                        {noteSearch.results.totalDocuments &&
+                        <div className={`${c}-doccount-container`}>
+                            <span>Found </span>
+                            <span className={`${c}-doccount`}>{noteSearch.results.totalDocuments.toLocaleString()} documents</span>
+                            <span> for </span>
+                            <span className={`${c}-doccount`}>{noteSearch.results.totalPatients.toLocaleString()} unique patients</span>
+                        </div>
+                        }
+                    </Col>
+                    <Col md={6}>
+                        {paginate}
+                    </Col>
+                </Row>
                 {results.documents.map(d => {
                     return (
                         <div key={d.id} className={`${c}-document`} onClick={this.handleNoteClick.bind(null, d)}>

@@ -222,6 +222,7 @@ export default class NoteSearchWebWorker {
             const { requestId } = payload;
             const { datasets } = payload;
             const notes: Note[] = [];
+            const patients = new Set();
 
             /* Process as notes */
             for (let i = 0; i < datasets.length; i++) {
@@ -229,6 +230,9 @@ export default class NoteSearchWebWorker {
                 const schema = result.dataset.schema as PatientListDatasetDynamicSchema
                 let j = 0;
                 for (const patId of Object.keys(result.dataset.results)) {
+                    if (!patients.has(patId)) {
+                        patients.add(patId);
+                    }
                     for (const row of result.dataset.results[patId]) {
                         const note: Note = {
                             responderId: result.responder.id,
@@ -279,7 +283,15 @@ export default class NoteSearchWebWorker {
                 }
                 docIndex.set(doc.id, doc);
             }
-            return { requestId };
+
+            resultsCache = { 
+                documents: [], 
+                totalDocuments: notes.length, 
+                totalPatients: patients.size, 
+                totalTermHits: 0 
+            };
+
+            return { requestId, result: resultsCache };
         }
 
         const flushNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {

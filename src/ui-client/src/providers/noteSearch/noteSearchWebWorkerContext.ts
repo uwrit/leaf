@@ -27,12 +27,16 @@ const indexDocuments = (payload) => {
     const { requestId } = payload;
     const { datasets } = payload;
     const notes = [];
+    const patients = new Set();
     /* Process as notes */
     for (let i = 0; i < datasets.length; i++) {
         const result = datasets[i];
         const schema = result.dataset.schema;
         let j = 0;
         for (const patId of Object.keys(result.dataset.results)) {
+            if (!patients.has(patId)) {
+                patients.add(patId);
+            }
             for (const row of result.dataset.results[patId]) {
                 const note = {
                     responderId: result.responder.id,
@@ -77,7 +81,13 @@ const indexDocuments = (payload) => {
         }
         docIndex.set(doc.id, doc);
     }
-    return { requestId };
+    resultsCache = {
+        documents: [],
+        totalDocuments: notes.length,
+        totalPatients: patients.size,
+        totalTermHits: 0
+    };
+    return { requestId, result: resultsCache };
 };
 const flushNotes = (payload) => {
     const { requestId } = payload;
