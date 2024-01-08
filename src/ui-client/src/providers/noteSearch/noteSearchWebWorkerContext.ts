@@ -5,31 +5,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 export const workerContext = `
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
-var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
-    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-        if (ar || !(i in from)) {
-            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-            ar[i] = from[i];
-        }
-    }
-    return to.concat(ar || Array.prototype.slice.call(from));
-};
-var STOP_WORDS = new Set(['\\n', '\\t', '(', ')', '"', ";"]);
-var unigramIndex = new Map();
-var docIndex = new Map();
+const STOP_WORDS = new Set(['\\n', '\\t', '(', ')', '"', ";"]);
+let unigramIndex = new Map();
+let docIndex = new Map();
 // eslint-disable-next-line
-var handleWorkMessage = function (payload) {
+const handleWorkMessage = (payload) => {
     switch (payload.message) {
         case INDEX:
             return indexDocuments(payload);
@@ -37,13 +17,10 @@ var handleWorkMessage = function (payload) {
             return flushNotes(payload);
         case SEARCH:
             return searchNotes(payload);
-        case PREFIX_SEARCH:
-            return searchPrefix(payload);
         default:
             return null;
     }
 };
-
 const indexDocuments = (payload) => {
     const { requestId } = payload;
     const { datasets } = payload;
@@ -99,66 +76,53 @@ const indexDocuments = (payload) => {
     }
     return { requestId };
 };
-
-
-var flushNotes = function (payload) {
-    var requestId = payload.requestId;
+const flushNotes = (payload) => {
+    const { requestId } = payload;
     unigramIndex.clear();
     docIndex.clear();
-    return { requestId: requestId };
+    return { requestId };
 };
-var searchNotes = function (payload) {
-    var requestId = payload.requestId, terms = payload.terms;
-    var result = { documents: [] };
-    if (!terms.length) {
-        console.log('no terms!')
-        return { requestId, result };
-    }
-    var precedingHits = new Map();
-    var _loop_1 = function (i) {
-        var term = terms[i];
-        var hits = term.text.split(' ').length > 1
-            ? searchMultiterm(term)
-            : searchSingleTerm(term);
+const searchNotes = (payload) => {
+    const { requestId, terms } = payload;
+    const result = { documents: [] };
+    let precedingHits = new Map();
+    for (let i = 0; i < terms.length; i++) {
+        const term = terms[i];
+        const hits = search(term);
         if (!hits.size)
-            return { value: { requestId: requestId, result: result } };
+            return { requestId, result };
         if (precedingHits.size) {
-            var merged_1 = new Map();
-            precedingHits.forEach(function (v, k) {
+            const merged = new Map();
+            precedingHits.forEach((v, k) => {
                 if (hits.has(k)) {
-                    var both = hits.get(k).concat(v);
-                    merged_1.set(k, both);
+                    const both = hits.get(k).concat(v);
+                    merged.set(k, both);
                 }
             });
-            precedingHits = merged_1;
+            precedingHits = merged;
         }
         else {
             precedingHits = hits;
         }
-    };
-    for (var i = 0; i < terms.length; i++) {
-        var state_1 = _loop_1(i);
-        if (typeof state_1 === "object")
-            return state_1.value;
     }
-    precedingHits.forEach(function (v, k) {
-        var doc = __assign(__assign({}, docIndex.get(k)), { lines: [] });
-        var hits = v.sort(function (a, b) { return a.charIndex.start - b.charIndex.start; });
-        var context = getSearchResultDocumentContext(doc, hits);
+    precedingHits.forEach((v, k) => {
+        const doc = Object.assign(Object.assign({}, docIndex.get(k)), { lines: [] });
+        const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
+        const context = getSearchResultDocumentContext(doc, hits);
         result.documents.push(context);
     });
-    return { requestId: requestId, result: result };
+    return { requestId, result };
 };
-var getSearchResultDocumentContext = function (doc, hits) {
-    var contextCharDistance = 50;
-    var groups = [];
+const getSearchResultDocumentContext = (doc, hits) => {
+    const contextCharDistance = 50;
+    const groups = [];
     // Group by character distance
-    for (var i = 0; i < hits.length; i++) {
-        var hit = hits[i];
-        var group = [hit];
-        var nextIndex = 1;
+    for (let i = 0; i < hits.length; i++) {
+        const hit = hits[i];
+        const group = [hit];
+        let nextIndex = 1;
         while (true) {
-            var nextHit = i < hits.length - 1 ? hits[i + nextIndex] : undefined;
+            const nextHit = i < hits.length - 1 ? hits[i + nextIndex] : undefined;
             // If overlapping
             if (nextHit && hit.lineIndex === nextHit.lineIndex &&
                 (hit.charIndex.end + contextCharDistance) >= (nextHit.charIndex.start - contextCharDistance)) {
@@ -173,30 +137,30 @@ var getSearchResultDocumentContext = function (doc, hits) {
             }
         }
     }
-    var result = __assign(__assign({}, doc), { lines: [] });
-    for (var i = 0; i < groups.length; i++) {
-        var group = groups[i];
-        var line = { index: group[0].lineIndex, content: [] };
-        for (var j = 0; j < group.length; j++) {
-            var backLimit = j > 0 ? group[j].charIndex.start : undefined;
-            var forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
-            var context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
+    const result = Object.assign(Object.assign({}, doc), { lines: [] });
+    for (let i = 0; i < groups.length; i++) {
+        const group = groups[i];
+        let line = { index: group[0].lineIndex, content: [] };
+        for (let j = 0; j < group.length; j++) {
+            const backLimit = j > 0 ? group[j].charIndex.start : undefined;
+            const forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
+            const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
             line.content = line.content.concat(context);
         }
         result.lines.push(line);
     }
     return result;
 };
-var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) {
-    var _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
-    var _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
-    var backContext = doc.text.substring(_backLimit, hit.charIndex.start);
-    var forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
+const getContext = (doc, hit, contextCharDistance, backLimit, forwLimit) => {
+    const _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
+    const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
+    let backContext = doc.text.substring(_backLimit, hit.charIndex.start);
+    let forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
     if (!backLimit && backContext)
         backContext = '...' + backContext;
     if (!forwLimit && forwContext)
         forwContext += '...';
-    var back_i = backContext.length - 1;
+    let back_i = backContext.length - 1;
     while (back_i > -1) {
         if (backContext[back_i] === '\\n') {
             backContext = backContext.substring(back_i, backContext.length - 1);
@@ -204,7 +168,7 @@ var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) 
         }
         back_i--;
     }
-    var forw_i = 1;
+    let forw_i = 1;
     while (forw_i < forwContext.length - 1) {
         if (forwContext[forw_i] === '\\n') {
             forwContext = forwContext.substring(0, forw_i);
@@ -212,7 +176,7 @@ var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) 
         }
         forw_i++;
     }
-    var output = [
+    const output = [
         { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
     ];
     if (backContext.trim())
@@ -221,135 +185,295 @@ var getContext = function (doc, hit, contextCharDistance, backLimit, forwLimit) 
         output.push({ type: "CONTEXT", text: forwContext });
     return output;
 };
-var searchSingleTerm = function (term) {
-    var result = new Map();
-    var hit = unigramIndex.get(term.text.toLocaleLowerCase());
+const searchSingleTerm = (term) => {
+    const result = new Map();
+    const hit = unigramIndex.get(term.text.toLocaleLowerCase());
     if (hit) {
-        for (var i = 0; i < hit.instances.length; i++) {
-            var instance = hit.instances[i];
+        for (let i = 0; i < hit.instances.length; i++) {
+            const instance = hit.instances[i];
             if (result.has(instance.docId)) {
-                result.get(instance.docId).push(__assign(__assign({}, instance), { searchTerm: term }));
+                result.get(instance.docId).push(Object.assign(Object.assign({}, instance), { searchTerm: term }));
             }
             else {
-                result.set(instance.docId, [__assign(__assign({}, instance), { searchTerm: term })]);
+                result.set(instance.docId, [Object.assign(Object.assign({}, instance), { searchTerm: term })]);
             }
         }
     }
     return result;
 };
-var searchMultiterm = function (searchTerm) {
-    var result = new Map();
-    var terms = searchTerm.text.toLocaleLowerCase().split(' ');
+const searchMultiterm = (searchTerm) => {
+    const result = new Map();
+    const terms = searchTerm.text.toLocaleLowerCase().split(' ');
     // First term
-    var term = terms[0];
-    var hit = unigramIndex.get(term);
+    const term = terms[0];
+    const hit = unigramIndex.get(term);
     if (!hit)
         return result;
-    var expected = new Map(hit.instances.filter(function (t) { return !!t.nextId; }).map(function (t) { return [t.nextId, [t]]; }));
-    var next = hit.next;
+    let expected = new Map(hit.instances.filter(t => !!t.nextId).map(t => [t.nextId, [t]]));
+    let next = hit.next;
     // Following
-    for (var j = 1; j < terms.length; j++) {
-        var term_1 = terms[j];
-        var hit_1 = next.get(term_1);
-        if (hit_1) {
-            var matched = hit_1.instances.filter(function (t) { return expected.has(t.id); });
+    for (let j = 1; j < terms.length; j++) {
+        const term = terms[j];
+        const hit = next.get(term);
+        if (hit) {
+            let matched = hit.instances.filter(t => expected.has(t.id));
             if (!matched.length)
                 return result;
             if (j < terms.length - 1) {
-                expected = new Map(matched.filter(function (t) { return !!t.nextId; }).map(function (t) { return [t.nextId, __spreadArray(__spreadArray([], expected.get(t.id), true), [t], false)]; }));
-                next = hit_1.next;
+                expected = new Map(matched.filter(t => !!t.nextId).map(t => [t.nextId, [...expected.get(t.id), t]]));
+                next = hit.next;
             }
             else {
-                expected = new Map(matched.map(function (t) { return [t.id, __spreadArray(__spreadArray([], expected.get(t.id), true), [t], false)]; }));
+                expected = new Map(matched.map(t => [t.id, [...expected.get(t.id), t]]));
             }
-        } else {
+        }
+        else {
             return result;
         }
     }
-    expected.forEach(function (v, k) {
-        var docId = v[0].docId;
-        var charIndex = { start: v[0].charIndex.start, end: v[v.length - 1].charIndex.end };
-        var lineIndex = v[0].lineIndex;
+    expected.forEach((v, k) => {
+        const docId = v[0].docId;
+        const charIndex = { start: v[0].charIndex.start, end: v[v.length - 1].charIndex.end };
+        const lineIndex = v[0].lineIndex;
         if (result.has(docId)) {
-            result.get(docId).push({ docId: docId, charIndex: charIndex, lineIndex: lineIndex, searchTerm: searchTerm });
+            result.get(docId).push({ docId, charIndex, lineIndex, searchTerm });
         }
         else {
-            result.set(docId, [{ docId: docId, charIndex: charIndex, lineIndex: lineIndex, searchTerm: searchTerm }]);
+            result.set(docId, [{ docId, charIndex, lineIndex, searchTerm }]);
         }
     });
     return result;
 };
-var tokenizeDocument = function (note) {  
-    var source = note.text.toLocaleLowerCase();  
-    var tokens = [];  
-    var line = 0;  
-    var start = 0;  
-    var current = 0;  
-  
-    var scanToken = function () {  
-        var c = advance();  
-        switch (c) {  
-            case ' ':  
-            case '\\r':  
-            case '\\t':  
-            case '\\n':  
-                break;  
-            default:  
-                toToken();  
-                break;  
-        }  
-    };  
-  
-    var toNewLine = function () {  
-        line++;  
-    };  
-  
-    var toToken = function () {  
-        while (isAlphaNumeric(peek())) advance();  
-        addToken();  
-    };  
-  
-    var peek = function () {  
-        if (isAtEnd()) return '\\0';  
-        return source[current];  
-    };  
-  
-    var isAlphaNumeric = function (c) {  
-        var regex = /^[a-z0-9]+$/i;  
-        return regex.test(c);  
-    };  
-  
-    var isAtEnd = function () {  
-        return current >= source.length;  
-    };  
-  
-    var advance = function () {  
-        return source[current++];  
-    };  
-  
-    var addToken = function () {  
-        var text = source.substring(start, current);  
-        var token = {  
-            lexeme: text,  
-            charIndex: { start: start, end: current },  
-            docId: note.id,  
-            id: note.id + '_' + tokens.length.toString(),  
-            index: tokens.length,  
-            lineIndex: line  
-        };  
-        if (tokens.length) {  
-            var prev = tokens[tokens.length - 1];  
-            if (prev.lineIndex === token.lineIndex) {  
-                tokens[tokens.length - 1].nextId = token.id;  
-            }  
-        }  
-        tokens.push(token);  
-    };  
-  
-    while (!isAtEnd()) {  
-        start = current;  
-        scanToken();  
-    }  
-    return tokens;  
-};  
+const getHitPointers = (term) => {
+    const cleaned = term.trim().toLocaleLowerCase();
+    if (cleaned.startsWith('(') && cleaned.indexOf(')') > -1) {
+        return getParenHitPointers(cleaned);
+    }
+    if (cleaned.indexOf('|') > -1 && cleaned.indexOf('(') === -1 && cleaned.indexOf(')') === -1) {
+        return getOrHitPointers(cleaned.split('|').filter(t => t.trim().length));
+    }
+    if (cleaned.indexOf(' ') > -1) {
+        return getSequenceHitPointers(cleaned);
+    }
+    if (cleaned.indexOf('*') > -1) {
+        return getWildcardHitPointers(cleaned);
+    }
+    const direct = unigramIndex.get(cleaned);
+    if (!direct) {
+        return {
+            instances: [], lexeme: term, next: new Map()
+        };
+    }
+    return direct;
+};
+const getWildcardHitPointers = (term) => {
+    const startsWith = [...unigramIndex.values()].filter(v => v.lexeme.startsWith(term.replace('*', '')));
+    return unionPointers(startsWith);
+};
+const getOrHitPointers = (terms) => {
+    const pointers = terms.map(t => getHitPointers(t));
+    return unionPointers(pointers);
+};
+const getParenHitPointers = (term) => {
+    const firstOpenParen = term.indexOf('(');
+    const lastCloseParen = term.lastIndexOf(')');
+    const unparened = term.substring(firstOpenParen + 1, lastCloseParen);
+    return getHitPointers(unparened);
+};
+const splitTerms = (term) => {
+    const cleanedTerm = term.trim();
+    const terms = [];
+    let current = 0;
+    let lastAdd = 0;
+    while (current < cleanedTerm.length) {
+        const c = cleanedTerm[current];
+        if (c === '(') {
+            const currentTextWindow = cleanedTerm.substring(current);
+            let closeParenIndex = currentTextWindow.lastIndexOf(')');
+            if (closeParenIndex > -1) {
+                closeParenIndex += current;
+                const precedingText = cleanedTerm.substring(lastAdd, current).trim();
+                const parentText = cleanedTerm.substring(current, closeParenIndex + 1).trim();
+                terms.push(precedingText);
+                terms.push(parentText);
+                lastAdd = closeParenIndex + 1;
+                current = closeParenIndex;
+            }
+            else {
+                break;
+            }
+        }
+        current++;
+    }
+    if (terms.length) {
+        if (lastAdd < cleanedTerm.length - 1) {
+            terms.push(cleanedTerm.substring(lastAdd));
+        }
+        return terms
+            .map(t => t.indexOf('(') === -1 ? t.split(' ') : [t])
+            .flatMap(t => t)
+            .filter(t => t.trim().length);
+    }
+    if (cleanedTerm.indexOf('|') === -1) {
+        return cleanedTerm.split(' ').filter(t => t.length);
+    }
+    return [cleanedTerm];
+};
+const getSequenceHitPointers = (searchTerm) => {
+    const terms = splitTerms(searchTerm);
+    const output = {
+        instances: [],
+        lexeme: searchTerm,
+        next: new Map()
+    };
+    // First term
+    const term = terms[0];
+    const hit = getHitPointers(term);
+    if (!hit)
+        return output;
+    let expected = new Map(hit.instances.filter(t => !!t.nextId).map(t => [t.nextId, [t]]));
+    let next = hit.next;
+    // Following
+    for (let j = 1; j < terms.length; j++) {
+        const term = terms[j];
+        if (STOP_WORDS.has(term)) {
+            continue;
+        }
+        const hit = getHitPointers(term);
+        if (hit) {
+            let matched = hit.instances.filter(t => expected.has(t.id));
+            if (!matched.length)
+                return output;
+            if (j < terms.length - 1) {
+                expected = new Map(matched.filter(t => !!t.nextId).map(t => [t.nextId, [...expected.get(t.id), t]]));
+                next = hit.next;
+            }
+            else {
+                expected = new Map(matched.map(t => [t.id, [...expected.get(t.id), t]]));
+            }
+        }
+        else {
+            return output;
+        }
+    }
+    expected.forEach((v, k) => {
+        const e = expected.get(k);
+        const last = v[v.length - 1];
+        expected.set(k, [Object.assign(Object.assign({}, e[0]), { charIndex: { start: e[0].charIndex.start, end: last.charIndex.end }, nextId: last.nextId })]);
+    });
+    output.instances = [...expected.values()].map(v => v[0]);
+    return output;
+};
+const unionPointers = (pointers) => {
+    const instances = pointers.flatMap(v => v.instances);
+    const next = new Map();
+    for (const pointer of pointers) {
+        const current = next.get(pointer.lexeme);
+        if (current) {
+            current.instances = current.instances.concat(pointer.instances);
+        }
+        else {
+            next.set(pointer.lexeme, pointer);
+        }
+    }
+    return {
+        instances,
+        lexeme: pointers.map(p => p.lexeme).join(' | '),
+        next
+    };
+};
+const search = (term) => {
+    const result = new Map();
+    const hit = getSequenceHitPointers(term.text);
+    if (hit) {
+        for (let i = 0; i < hit.instances.length; i++) {
+            const instance = hit.instances[i];
+            if (result.has(instance.docId)) {
+                result.get(instance.docId).push(Object.assign(Object.assign({}, instance), { searchTerm: term }));
+            }
+            else {
+                result.set(instance.docId, [Object.assign(Object.assign({}, instance), { searchTerm: term })]);
+            }
+        }
+    }
+    return result;
+};
+const tokenizeDocument = (note) => {
+    const source = note.text.toLocaleLowerCase();
+    const tokens = [];
+    const spaces = new Set([' ', '\\n', '\\t', '\\r']);
+    let line = 0;
+    let start = 0;
+    let current = 0;
+    const scanToken = () => {
+        const c = advance();
+        switch (c) {
+            case ' ':
+            case '\\r':
+            case '\\t':
+                break;
+            case '\\n':
+                toNewLine();
+                break;
+            default:
+                toToken();
+                break;
+        }
+    };
+    const toNewLine = () => {
+        line++;
+    };
+    const toToken = () => {
+        while (!isSpecialCharacter(peek()) && isAlphaNumeric(peek()))
+            advance();
+        addToken();
+    };
+    const peek = () => {
+        if (isAtEnd())
+            return '\0';
+        return source[current];
+    };
+    const isAlpha = (c) => {
+        return (c >= 'a' && c <= 'z') ||
+            (c >= 'A' && c <= 'Z');
+    };
+    const isAlphaNumeric = (c) => {
+        return isAlpha(c) || isDigit(c);
+    };
+    const isDigit = (c) => {
+        return c >= '0' && c <= '9';
+    };
+    const isAtEnd = () => {
+        return current >= source.length;
+    };
+    const isSpecialCharacter = (c) => {
+        return !isAlphaNumeric(c);
+    };
+    const advance = () => {
+        return source[current++];
+    };
+    const addToken = () => {
+        const text = source.substring(start, current);
+        const token = {
+            lexeme: text,
+            charIndex: { start, end: current },
+            docId: note.id,
+            id: note.id + '_' + tokens.length.toString(),
+            index: tokens.length,
+            lineIndex: line
+        };
+        if (tokens.length) {
+            const prev = tokens[tokens.length - 1];
+            if (prev.lineIndex === token.lineIndex) {
+                tokens[tokens.length - 1].nextId = token.id;
+            }
+        }
+        tokens.push(token);
+    };
+    while (!isAtEnd()) {
+        start = current;
+        scanToken();
+    }
+    return tokens;
+};
 `;

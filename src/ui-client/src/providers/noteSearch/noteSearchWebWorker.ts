@@ -289,9 +289,7 @@ export default class NoteSearchWebWorker {
 
             for (let i = 0; i < terms.length; i++) {
                 const term = terms[i];
-                const hits = term.text.split(' ').length > 1
-                    ? searchMultiterm(term)
-                    : searchSingleTerm(term);
+                const hits = search(term);
 
                 if (!hits.size) return { requestId, result };
 
@@ -461,6 +459,173 @@ export default class NoteSearchWebWorker {
                 }
             });
 
+            return result;
+        };
+
+        const getHitPointers = (term: string): TokenPointer => {
+            const cleaned = term.trim().toLocaleLowerCase();
+ 
+            if (cleaned.startsWith('(') && cleaned.indexOf(')') > -1) {
+                return getParenHitPointers(cleaned);
+            }
+            if (cleaned.indexOf('|') > -1 && cleaned.indexOf('(') === -1 && cleaned.indexOf(')') === -1) {
+               return getOrHitPointers(cleaned.split('|').filter(t => t.trim().length));
+            }
+            if (cleaned.indexOf(' ') > -1) {
+                return getSequenceHitPointers(cleaned);
+            }
+            if (cleaned.indexOf('*') > -1) {
+                return getWildcardHitPointers(cleaned);
+            }
+ 
+            const direct = unigramIndex.get(cleaned);
+            if (!direct) {
+                return {
+                    instances: [], lexeme: term, next: new Map()
+                }
+            }
+            return direct;
+        }
+ 
+        const getWildcardHitPointers = (term: string): TokenPointer => {
+            const startsWith = [ ...unigramIndex.values() ].filter(v => v.lexeme.startsWith(term.replace('*', '')));
+            return unionPointers(startsWith);
+        }
+ 
+        const getOrHitPointers = (terms: string[]): TokenPointer => {
+            const pointers = terms.map(t => getHitPointers(t));
+            return unionPointers(pointers);
+        }
+ 
+        const getParenHitPointers = (term: string): TokenPointer => {
+            const firstOpenParen = term.indexOf('(');
+            const lastCloseParen = term.lastIndexOf(')');
+            const unparened = term.substring(firstOpenParen + 1, lastCloseParen);
+            return getHitPointers(unparened);
+        }
+ 
+        const splitTerms = (term: string): string[] => {
+            const cleanedTerm = term.trim();
+            const terms: string[] = [];
+            let current = 0;
+            let lastAdd = 0;
+            while (current < cleanedTerm.length) {
+                const c = cleanedTerm[current];
+                if (c === '(') {
+                    const currentTextWindow = cleanedTerm.substring(current)
+                    let closeParenIndex = currentTextWindow.lastIndexOf(')');
+                    if (closeParenIndex > -1) {
+                        closeParenIndex += current;
+                        const precedingText = cleanedTerm.substring(lastAdd, current).trim();
+                        const parentText = cleanedTerm.substring(current, closeParenIndex + 1).trim()
+                        terms.push(precedingText);
+                        terms.push(parentText)
+                        lastAdd = closeParenIndex + 1;
+                        current = closeParenIndex;
+                    } else {
+                        break;
+                    }
+                }
+                current++;
+            }
+            if (terms.length) {
+                if (lastAdd < cleanedTerm.length - 1) {
+                    terms.push(cleanedTerm.substring(lastAdd));
+                }
+                return terms
+                    .map(t => t.indexOf('(') === -1 ? t.split(' ') : [t])
+                    .flatMap(t => t)
+                    .filter(t => t.trim().length)
+            }
+            if (cleanedTerm.indexOf('|') === -1) {
+                return cleanedTerm.split(' ').filter(t => t.length);
+            }
+            return [cleanedTerm];
+        }
+ 
+        const getSequenceHitPointers = (searchTerm: string): TokenPointer => {
+            const terms = splitTerms(searchTerm);
+            const output: TokenPointer = {
+                instances: [],
+                lexeme: searchTerm,
+                next: new Map()
+            };
+ 
+            // First term
+            const term = terms[0];
+            const hit = getHitPointers(term);
+ 
+            if (!hit) return output;
+            let expected = new Map(hit.instances.filter(t => !!t.nextId).map(t => [t.nextId!, [t]]));
+            let next = hit.next;
+ 
+            // Following
+            for (let j = 1; j < terms.length; j++) {
+                const term = terms[j];
+                if (STOP_WORDS.has(term)) {
+                    continue;
+                }
+                const hit = getHitPointers(term);
+                if (hit) {
+                    let matched = hit.instances.filter(t => expected.has(t.id));
+                    if (!matched.length) return output;
+ 
+                    if (j < terms.length-1) {
+                        expected = new Map(matched.filter(t => !!t.nextId).map(t => [t.nextId!, [...expected.get(t.id), t]]));
+                        next = hit.next;
+                    } else {
+                        expected = new Map(matched.map(t => [t.id, [...expected.get(t.id), t]]));
+                    }
+                } else {
+                    return output;
+                }
+            }
+ 
+            expected.forEach((v,k) => {
+                const e = expected.get(k);
+                const last = v[v.length-1];
+                expected.set(k, [{ ...e[0], charIndex: { start: e[0].charIndex.start, end: last.charIndex.end }, nextId: last.nextId }]);
+            });
+ 
+            output.instances = [ ...expected.values() ].map(v => v[0]);
+            return output;
+        }
+ 
+        const unionPointers = (pointers: TokenPointer[]): TokenPointer => {
+            const instances = pointers.flatMap(v => v.instances);
+           
+            const next: Map<string, TokenPointer> = new Map();
+            for (const pointer of pointers) {
+                const current = next.get(pointer.lexeme);
+                if (current) {
+                    current.instances = current.instances.concat(pointer.instances);
+                } else {
+                    next.set(pointer.lexeme, pointer);
+                }
+            }
+           
+            return {
+                instances,
+                lexeme: pointers.map(p => p.lexeme).join(' | '),
+                next
+            };
+        }
+ 
+        const search = (term: NoteSearchTerm): Map<string, SearchHit[]> => {
+            const result: Map<string, SearchHit[]> = new Map();
+            const hit = getSequenceHitPointers(term.text);
+ 
+            if (hit) {
+                for (let i = 0; i < hit.instances.length; i++) {
+                    const instance = hit.instances[i];
+ 
+                    if (result.has(instance.docId)) {
+                        result.get(instance.docId)!.push({ ...instance, searchTerm: term });
+                    } else {
+                        result.set(instance.docId, [{ ...instance, searchTerm: term }]);
+                    }
+                }
+            }
             return result;
         };
 
