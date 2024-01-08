@@ -1,9 +1,10 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
 import { Col, Container, Row } from 'reactstrap';
-import { Note } from '../../../models/cohort/NoteSearch';
 import { createPortal } from 'react-dom';
 import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
+import Paginate from '../../PatientList/Paginate';
+import { setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
 import './NoteSearchResults.css';
 
 interface Props {
@@ -27,11 +28,28 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
     }
     
     public render() {
-        const { results, terms } = this.props.noteSearch;
+        const { dispatch, noteSearch } = this.props;
+        const { configuration, results, terms } = this.props.noteSearch;
         const { showFullNoteModal, note } = this.state;
         const c = this.className;
+
+        let paginate;
+        if (results.totalDocuments > noteSearch.configuration.pageSize) {
+            paginate = 
+                <Paginate 
+                    dispatch={dispatch}
+                    handlePageCountClick={this.handlePageCountClick}
+                    pageNumber={configuration.pageNumber}
+                    pageSize={configuration.pageSize}
+                    totalElements={results.totalDocuments}
+                />;
+        }
+
+        console.log(noteSearch.results);
+
         return (
             <Container className={`${c}-container`} fluid={true}>
+                {paginate}
                 {results.documents.map(d => {
                     return (
                         <div key={d.id} className={`${c}-document`} onClick={this.handleNoteClick.bind(null, d)}>
@@ -69,7 +87,7 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                         </div>
                     )
                 })}
-                {createPortal(
+                {/*createPortal(
                     <div className={`${c}-modal ${showFullNoteModal ? 'show' : ''}`}>
                         {note && 
                         <div>
@@ -77,12 +95,20 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                         </div>
                         }
                     </div>
-                , document.body)}
+                    , document.body)*/}
             </Container>
         )
     }
 
     private handleNoteClick = (note: DocumentSearchResult) => {
         this.setState({ note, showFullNoteModal: true });
+    }
+
+    private handlePageCountClick = (data: any) => {
+        const { dispatch, noteSearch } = this.props;
+        const page = data.selected;
+        if (page !== noteSearch.configuration.pageNumber) {
+            dispatch(setNoteSearchPagination(page));
+        }
     }
 }

@@ -17,7 +17,7 @@ export function defaultNoteSearchState(): NoteSearchState {
             isFetching: false,
             multirowDatasets: new Map(),
             pageNumber: 0,
-            pageSize: 50,
+            pageSize: 10,
             singletonDatasets: new Map(),
             sort: { 
                 sortType: PatientListSortType.NONE

@@ -8,7 +8,7 @@
 import { generate as generateId } from 'shortid';
 import { Note, NoteDatasetContext } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
-import { NoteSearchTerm } from '../../models/state/CohortState';
+import { NoteSearchConfiguration, NoteSearchTerm } from '../../models/state/CohortState';
 import { PatientListDatasetDynamicSchema } from '../../models/patientList/Dataset';
 
 const SEARCH = 'SEARCH';
@@ -17,11 +17,11 @@ const FLUSH = 'FLUSH';
 const HINT = 'HINT'
 
 interface InboundMessagePartialPayload {
+    config?: NoteSearchConfiguration;
     datasets?: NoteDatasetContext[];
     message: string;
     terms?: NoteSearchTerm[];
     prefix?: string;
-    // pageIndex
 }
 
 interface InboundMessagePayload extends InboundMessagePartialPayload {
@@ -73,6 +73,7 @@ interface SearchHit {
 interface IndexedDocument {
     id: string;
     date: string;
+    personId: string;
     text: string;
     note_type: string;
 }
@@ -102,8 +103,11 @@ interface RadixNode {
     isEndOfWord: boolean;
 }
 
-export interface SearchResult {
+export interface NoteSearchResult {
     documents: DocumentSearchResult[];
+    totalDocuments: number;
+    totalPatients: number;
+    totalTermHits: number;
 }
 
 export interface RadixTree {
@@ -137,8 +141,8 @@ export default class NoteSearchWebWorker {
 
     //${this.stripFunctionToContext(this.workerContext)}
 
-    public search = (terms: NoteSearchTerm[]) => {
-        return this.postMessage({ message: SEARCH, terms });
+    public search = (config: NoteSearchConfiguration, terms: NoteSearchTerm[]) => {
+        return this.postMessage({ message: SEARCH, config, terms });
     }
 
     public index = (datasets: NoteDatasetContext[]) => {
@@ -195,6 +199,8 @@ export default class NoteSearchWebWorker {
     private workerContext = () => {
         const STOP_WORDS = new Set(['\n', '\t', '(', ')', '"', ";"]);
 
+        let resultsCache: NoteSearchResult;
+        let resultsCacheTerms = '';
         let unigramIndex: Map<string, TokenPointer> = new Map();
         let docIndex: Map<string, IndexedDocument> = new Map();
 
@@ -228,6 +234,7 @@ export default class NoteSearchWebWorker {
                             responderId: result.responder.id,
                             id: result.responder.id + '_' + j.toString(),
                             date: new Date(row[schema.sqlFieldDate]),
+                            personId: patId,
                             text: row[schema.sqlFieldValueString],
                             type: result.query.name
                         };
@@ -241,7 +248,7 @@ export default class NoteSearchWebWorker {
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];
                 const tokens = tokenizeDocument(note);
-                const doc: IndexedDocument = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text };
+                const doc: IndexedDocument = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text, personId: note.personId };
                 let prev: TokenPointer;
 
                 for (let j = 0; j < tokens.length; j++) {
@@ -282,10 +289,24 @@ export default class NoteSearchWebWorker {
             return { requestId };
         };
 
+        const returnPaginatedResults = (config: NoteSearchConfiguration): NoteSearchResult => {
+            const offset = config.pageNumber * config.pageSize;
+            const sliced = resultsCache.documents.slice(offset, offset + config.pageSize);
+            return { ...resultsCache, documents: sliced };
+        }
+
         const searchNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, terms } = payload;
-            const result: SearchResult = { documents: [] };
+            const { requestId, config, terms } = payload;
+            const result: NoteSearchResult = { documents: [], totalDocuments: 0, totalPatients: 0, totalTermHits: 0 };
+            const searchTerms = terms.join("_");
             let precedingHits: Map<string, SearchHit[]> = new Map();
+
+            /**
+             * If user simply paginating, return cached results
+             **/
+            if (resultsCache && searchTerms === resultsCacheTerms) {
+                return { requestId, result: returnPaginatedResults(config) };
+            }
 
             for (let i = 0; i < terms.length; i++) {
                 const term = terms[i];
@@ -311,10 +332,16 @@ export default class NoteSearchWebWorker {
                 const doc: DocumentSearchResult = { ...docIndex.get(k)!, lines: [] };
                 const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
                 const context = getSearchResultDocumentContext(doc, hits);
-                result.documents.push(context)
+                result.documents.push(context);
+                result.totalTermHits += hits.length;
             });
+            result.totalPatients = new Set(result.documents.map(d => d.personId)).size;
+            result.totalDocuments = result.documents.length;
 
-            return { requestId, result };
+            resultsCache = result;
+            resultsCacheTerms = searchTerms;
+
+            return { requestId, result: returnPaginatedResults(config) };
         }
 
         const getSearchResultDocumentContext = (doc: DocumentSearchResult, hits: SearchHit[]): DocumentSearchResult => {

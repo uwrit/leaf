@@ -7,13 +7,12 @@
 import { NetworkIdentity } from "../NetworkResponder";
 import { PatientListDatasetDTO, PatientListDatasetQuery } from "../patientList/Dataset";
 
- 
-
 
 export interface NoteDTO {
     responderId: number;
     date: string | Date;
     id: string;
+    personId: string;
     text: string;
     type: string;
 }

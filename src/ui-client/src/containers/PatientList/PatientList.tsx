@@ -76,7 +76,18 @@ class PatientList extends React.PureComponent<Props, State> {
                 totalResponders++;
             }
         });
-        const showPaginate = patientList.totalPatients > patientList.configuration.pageSize;
+
+        let paginate;
+        if (patientList.totalPatients > patientList.configuration.pageSize) {
+            paginate = 
+                <Paginate 
+                    dispatch={dispatch}
+                    handlePageCountClick={this.handlePageCountClick}
+                    pageNumber={patientList.configuration.pageNumber}
+                    pageSize={patientList.configuration.pageSize}
+                    totalElements={patientList.totalPatients}
+                />;
+        }
 
         /*
          * If too many patients for caching, let user know.
@@ -176,28 +187,14 @@ class PatientList extends React.PureComponent<Props, State> {
                         </div>
                     </Col>
                 </Row>
-                {showPaginate &&
-                <Paginate 
-                    dispatch={dispatch}
-                    handlePageCountClick={this.handlePageCountClick}
-                    patientList={patientList}
-                    totalPatients={patientList.totalPatients}
-                />
-                }
+                {paginate}
                 <PatientListTable
                     className={c}
                     dispatch={dispatch}
                     responders={responders}
                     patientList={patientList}
                 />
-                {showPaginate && patientList.totalPatients > 25 &&
-                <Paginate 
-                    dispatch={dispatch}
-                    handlePageCountClick={this.handlePageCountClick}
-                    patientList={patientList}
-                    totalPatients={patientList.totalPatients}
-                />
-                }
+                {paginate}
             </div>
         )
     }

@@ -6,6 +6,8 @@
  */ 
 export const workerContext = `
 const STOP_WORDS = new Set(['\\n', '\\t', '(', ')', '"', ";"]);
+let resultsCache;
+let resultsCacheTerms = '';
 let unigramIndex = new Map();
 let docIndex = new Map();
 // eslint-disable-next-line
@@ -36,6 +38,7 @@ const indexDocuments = (payload) => {
                     responderId: result.responder.id,
                     id: result.responder.id + '_' + j.toString(),
                     date: new Date(row[schema.sqlFieldDate]),
+                    personId: patId,
                     text: row[schema.sqlFieldValueString],
                     type: result.query.name
                 };
@@ -48,7 +51,7 @@ const indexDocuments = (payload) => {
     for (let i = 0; i < notes.length; i++) {
         const note = notes[i];
         const tokens = tokenizeDocument(note);
-        const doc = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text };
+        const doc = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text, personId: note.personId };
         let prev;
         for (let j = 0; j < tokens.length; j++) {
             const token = tokens[j];
@@ -82,10 +85,22 @@ const flushNotes = (payload) => {
     docIndex.clear();
     return { requestId };
 };
+const returnPaginatedResults = (config) => {
+    const offset = config.pageNumber * config.pageSize;
+    const sliced = resultsCache.documents.slice(offset, offset + config.pageSize);
+    return Object.assign(Object.assign({}, resultsCache), { documents: sliced });
+};
 const searchNotes = (payload) => {
-    const { requestId, terms } = payload;
-    const result = { documents: [] };
+    const { requestId, config, terms } = payload;
+    const result = { documents: [], totalDocuments: 0, totalPatients: 0, totalTermHits: 0 };
+    const searchTerms = terms.join("_");
     let precedingHits = new Map();
+    /**
+     * If user simply paginating, return cached results
+     **/
+    if (resultsCache && searchTerms === resultsCacheTerms) {
+        return { requestId, result: returnPaginatedResults(config) };
+    }
     for (let i = 0; i < terms.length; i++) {
         const term = terms[i];
         const hits = search(term);
@@ -110,8 +125,13 @@ const searchNotes = (payload) => {
         const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
         const context = getSearchResultDocumentContext(doc, hits);
         result.documents.push(context);
+        result.totalTermHits += hits.length;
     });
-    return { requestId, result };
+    result.totalPatients = new Set(result.documents.map(d => d.personId)).size;
+    result.totalDocuments = result.documents.length;
+    resultsCache = result;
+    resultsCacheTerms = searchTerms;
+    return { requestId, result: returnPaginatedResults(config) };
 };
 const getSearchResultDocumentContext = (doc, hits) => {
     const contextCharDistance = 50;

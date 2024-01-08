@@ -174,12 +174,13 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
     }
 
     private handleDatasetRequest = () => {
-        const { datasets, selectedDates, selectedEncounterPanel, dispatch, handleDatasetSelect, handleDatasetRequest } = this.props;
+        const { datasets, selectedDates, selectedEncounterPanel, dispatch, handleDatasetSelect, handleDatasetRequest, handleClickClose } = this.props;
 
         if (datasets.selected) {
             const ds = datasets.all.get(datasets.selected)!;
             dispatch(handleDatasetRequest(ds, selectedDates, selectedEncounterPanel));
             handleDatasetSelect(ds);
+            handleClickClose();
         }
     }
 }

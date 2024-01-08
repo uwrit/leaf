@@ -8,35 +8,36 @@
 import React from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'
 import ReactPaginate from 'react-paginate';
-import { PatientListState } from '../../models/state/CohortState';
 import './Paginate.css';
 
 interface Props {
     className?: string;
     dispatch: any;
     handlePageCountClick: (data: any) => any;
-    patientList: PatientListState;
-    totalPatients: number;
+    pageNumber: number;
+    pageSize: number;
+    totalElements: number;
 }
 
 export default class Paginate extends React.PureComponent<Props> {
     public render() {
-        const { className, patientList, totalPatients } = this.props;
+        const { className, pageNumber, pageSize, totalElements } = this.props;
         const c = className || 'patientlist';
-        const pageCount = Math.ceil(totalPatients / patientList.configuration.pageSize);
+        const pageCount = Math.ceil(totalElements / pageSize);
 
         return (
-            <ReactPaginate previousLabel={<FaChevronLeft/>}
-                       nextLabel={<FaChevronRight/>}
-                       breakLabel={<span>...</span>}
-                       breakClassName={'break'}
-                       forcePage={patientList.configuration.pageNumber}
-                       pageCount={pageCount}
-                       marginPagesDisplayed={2}
-                       pageRangeDisplayed={5}
-                       onPageChange={this.props.handlePageCountClick}
-                       containerClassName={`${c}-pagination`}
-                       activeClassName={'active'} 
+            <ReactPaginate 
+                previousLabel={<FaChevronLeft/>}
+                nextLabel={<FaChevronRight/>}
+                breakLabel={<span>...</span>}
+                breakClassName={'break'}
+                forcePage={pageNumber}
+                pageCount={pageCount}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={this.props.handlePageCountClick}
+                containerClassName={`${c}-pagination`}
+                activeClassName={'active'} 
             />
         );
     }

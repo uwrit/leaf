@@ -26,6 +26,7 @@ import { panelHasLocalOnlyConcepts } from '../../utils/panelUtils';
 import { allowAllDatasets } from '../../services/datasetSearchApi';
 import { clearAllTimelinesData } from '../../services/timelinesApi';
 import { setDatasetSearchResult, setDatasetSearchTerm } from '../datasets';
+import { flushNotes } from '../../services/noteSearchApi';
 
 export const REGISTER_NETWORK_COHORTS = 'REGISTER_NETWORK_COHORTS';
 export const COHORT_COUNT_SET = 'COHORT_COUNT_SET';
@@ -73,9 +74,10 @@ export const getCounts = () => {
         });
         dispatch(setCohortCountStarted(state.responders, cancelSource));
 
-        // Clear patient list & timeline data
+        // Clear patient list, note search, timeline data
         await clearPreviousPatientList();
         await clearAllTimelinesData();
+        await flushNotes();
 
         // Wrap entire query action in Promise.all
         Promise.all(

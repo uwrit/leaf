@@ -5,18 +5,20 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, PatientListDatasetDynamicSchema, PatientListDatasetShape, PatientListDatasetResults, PatientListDatasetDTO } from "../../models/patientList/Dataset";
+import { PatientListDatasetQuery, PatientListDatasetShape } from "../../models/patientList/Dataset";
 import { DateBoundary } from "../../models/panel/Date";
 import { Dispatch } from "redux";
 import { AppState } from "../../models/state/AppState";
 import { NetworkIdentity } from "../../models/NetworkResponder";
-import { flushNotes, indexNotes, searchNotes, searchPrefix } from "../../services/noteSearchApi";
+import { indexNotes, searchNotes } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
-import { Note, NoteDatasetContext } from "../../models/cohort/NoteSearch";
+import { NoteDatasetContext } from "../../models/cohort/NoteSearch";
 import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { SearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
+import { NoteSearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
+import { allowDatasetInSearch } from "../../services/datasetSearchApi";
+import { setDatasetSearchResult } from "../datasets";
 
 export const SET_NOTE_SEARCH_TERMS = 'SET_NOTE_SEARCH_TERMS';
 export const SET_NOTE_SEARCH_RESULTS = 'SET_NOTE_SEARCH_RESULTS';
@@ -29,7 +31,7 @@ export interface CohortNoteSearchAction {
     datasets?: PatientListDatasetQuery[];
     dateFilter?: DateBoundary;
     id: number;
-    searchResults?: SearchResult;
+    searchResults?: NoteSearchResult;
     searchTerms?: NoteSearchTerm[];
     type: string;
     prefixResults?: RadixTreeResult; 
@@ -39,9 +41,9 @@ export interface CohortNoteSearchAction {
 export const searchNotesByTerms = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
-        const { terms } = state.cohort.noteSearch;
+        const { configuration, terms } = state.cohort.noteSearch;
         dispatch(setNoClickModalState({ message: "Searching", state: NotificationStates.Working }));
-        const results = await searchNotes(terms);
+        const results = await searchNotes(configuration, terms);
         dispatch(setNoteSearchResults(results));
         dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     };
@@ -56,7 +58,22 @@ export const searchPrefixTerms = (prefix: string) => {
     };  
 } 
 */ 
-  
+
+/*
+ * Updates the patient list based on new paginated state.
+ */
+export const setNoteSearchPagination = (id: number) => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        const newDocs = getState().cohort.noteSearch;
+        newDocs.configuration = Object.assign({}, newDocs.configuration, { pageNumber: id });
+        
+        // Get updated documents
+        newDocs.results = await searchNotes(newDocs.configuration, newDocs.terms);
+
+        // Update patient list display based on newest responder results
+        dispatch(setNoteSearchResults(newDocs.results));
+    };
+};
 
 export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {  
     return async (dispatch: Dispatch, getState: () => AppState) => {
@@ -101,7 +118,9 @@ export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoun
         .then( async () => {
             if (atLeastOneSucceeded) {
                 dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
-                await indexNotes(datasets);  
+                await indexNotes(datasets);
+                const visibleDatasets = await allowDatasetInSearch(query.id, false, state.datasets.searchTerm);
+                dispatch(setDatasetSearchResult(visibleDatasets));
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
             } else {
                 const info: InformationModalState = {
@@ -142,7 +161,7 @@ export const setNoteSearchTerms = (searchTerms: NoteSearchTerm[]): CohortNoteSea
     };
 };
 
-export const setNoteSearchResults = (searchResults: SearchResult): CohortNoteSearchAction => {
+export const setNoteSearchResults = (searchResults: NoteSearchResult): CohortNoteSearchAction => {
     return {
         searchResults,
         id: -1,
