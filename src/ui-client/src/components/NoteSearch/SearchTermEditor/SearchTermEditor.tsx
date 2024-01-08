@@ -6,7 +6,7 @@
  */ 
 
 import React from 'react';
-import { FormGroup, Label, FormText, Input, Dropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';  
+import { FormGroup, Label, FormText, Input } from 'reactstrap';  
 import { setNoteSearchTerms, searchNotesByTerms } from '../../../actions/cohort/noteSearch';
 import { RadixTreeResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import { NoteSearchTerm } from '../../../models/state/CohortState';
@@ -42,14 +42,9 @@ export class SearchTermEditor extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { terms, radixSearch } = this.props;
+        const { terms } = this.props;
         const { text } = this.state;
-        const { dropdownOpen } = this.state;  
         const c = this.className;
-
-        console.log("state of radixtree in search editor")
-        console.log(radixSearch)
-
 
         return (
             <FormGroup className={c}>

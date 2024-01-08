@@ -3,7 +3,11 @@
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */ 
+ */
+import { NetworkIdentity } from "../NetworkResponder";
+import { PatientListDatasetDTO, PatientListDatasetQuery } from "../patientList/Dataset";
+
+ 
 
 
 export interface NoteDTO {
@@ -14,6 +18,10 @@ export interface NoteDTO {
     type: string;
 }
 
-export interface Note extends NoteDTO {
-    
+export interface Note extends NoteDTO {}
+
+export interface NoteDatasetContext {
+    dataset: PatientListDatasetDTO;
+    query: PatientListDatasetQuery;
+    responder: NetworkIdentity;
 }

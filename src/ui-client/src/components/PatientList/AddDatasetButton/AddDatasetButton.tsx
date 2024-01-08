@@ -198,7 +198,6 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
 
     private handleBlur = () => {
         const { isFetching } = this.props.configuration;
-        return;
 
         if (this.mouseOut && !isFetching) {
             this.setState({ showSelectorModal: false });

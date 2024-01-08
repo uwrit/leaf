@@ -5,14 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import { PatientListDatasetQuery, PatientListDatasetDynamicSchema, PatientListDatasetShape } from "../../models/patientList/Dataset";
+import { PatientListDatasetQuery, PatientListDatasetDynamicSchema, PatientListDatasetShape, PatientListDatasetResults, PatientListDatasetDTO } from "../../models/patientList/Dataset";
 import { DateBoundary } from "../../models/panel/Date";
 import { Dispatch } from "redux";
 import { AppState } from "../../models/state/AppState";
 import { NetworkIdentity } from "../../models/NetworkResponder";
 import { flushNotes, indexNotes, searchNotes, searchPrefix } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
-import { Note } from "../../models/cohort/NoteSearch";
+import { Note, NoteDatasetContext } from "../../models/cohort/NoteSearch";
 import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
@@ -58,13 +58,15 @@ export const searchPrefixTerms = (prefix: string) => {
 */ 
   
 
-export const getNotesDataset = (dataset: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {  
+export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoundary, panelIndex?: number) => {  
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const responders: NetworkIdentity[] = [];
-        const notes: Note[] = [];  
+        const datasets: NoteDatasetContext[] = [];
         let atLeastOneSucceeded = false;
         let panelIdx = panelIndex;
+
+        dispatch(setNoClickModalState({ message: "Loading Notes", state: NotificationStates.Working }));  
 
         /**
          * Determine true panel index, if applicable (removing empty panels)
@@ -77,32 +79,17 @@ export const getNotesDataset = (dataset: PatientListDatasetQuery, dates?: DateBo
         state.responders.forEach((nr: NetworkIdentity) => { 
             const crt = state.cohort.networkCohorts.get(nr.id)!;
             if (nr.enabled && ((nr.isHomeNode && !nr.isGateway) || !nr.isHomeNode) &&
-                crt.count.state === CohortStateType.LOADED && 
-                crt.patientList.state === CohortStateType.LOADED
+                crt.count.state === CohortStateType.LOADED
             ) { responders.push(nr); }
         });
 
         Promise.all(responders.map((nr: NetworkIdentity, i: number) => { 
             return new Promise( async (resolve, reject) => {
                 try {
-                    if (nr.isHomeNode || (dataset.universalId && dataset.shape !== PatientListDatasetShape.Dynamic)) {
+                    if (nr.isHomeNode || (query.universalId && query.shape !== PatientListDatasetShape.Dynamic)) {
                         const queryId = state.cohort.networkCohorts.get(nr.id)!.count.queryId;
-                        const response = await fetchDataset(state, nr, queryId, dataset, dates, panelIdx);
-                        const schema = response.schema as PatientListDatasetDynamicSchema;  
-                        let j = 0;  
-                        for (const patId of Object.keys(response.results)) {  
-                            for (const row of response.results[patId]) {  
-                                const note: Note = {  
-                                    responderId: nr.id,   
-                                    id: `${nr.id}_${j}`,  
-                                    date: row[schema.sqlFieldDate],  
-                                    text: row[schema.sqlFieldValueString],  
-                                    type: dataset.name  
-                                };  
-                                notes.push(note);  
-                                j++;  
-                            }  
-                        }
+                        const dataset = await fetchDataset(state, nr, queryId, query, dates, panelIdx);
+                        datasets.push({ dataset, responder: nr, query });
                         atLeastOneSucceeded = true;
                     }
                 } catch (err) {
@@ -114,7 +101,7 @@ export const getNotesDataset = (dataset: PatientListDatasetQuery, dates?: DateBo
         .then( async () => {
             if (atLeastOneSucceeded) {
                 dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
-                await indexNotes(notes);  
+                await indexNotes(datasets);  
                 dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));  
             } else {
                 const info: InformationModalState = {

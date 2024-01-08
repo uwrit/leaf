@@ -43,92 +43,63 @@ var handleWorkMessage = function (payload) {
             return null;
     }
 };
-var createRadixNode = function () { return ({
-    children: {},
-    isEndOfWord: false,
-}); };
-var radixTree = createRadixNode();
-var insertWord = function(root, phrase) {
-  let currentNode = root
-  const words = phrase.split(" ")
 
-  for (const word of words) {
-    for (const char of word) {
-      if (!currentNode.children[char]) {
-        currentNode.children[char] = createRadixNode()
-      }
-      currentNode = currentNode.children[char]
+const indexDocuments = (payload) => {
+    const { requestId } = payload;
+    const { datasets } = payload;
+    const notes = [];
+    /* Process as notes */
+    for (let i = 0; i < datasets.length; i++) {
+        const result = datasets[i];
+        const schema = result.dataset.schema;
+        let j = 0;
+        for (const patId of Object.keys(result.dataset.results)) {
+            for (const row of result.dataset.results[patId]) {
+                const note = {
+                    responderId: result.responder.id,
+                    id: result.responder.id + '_' + j.toString(),
+                    date: new Date(row[schema.sqlFieldDate]),
+                    text: row[schema.sqlFieldValueString],
+                    type: result.query.name
+                };
+                notes.push(note);
+                j++;
+            }
+        }
     }
-    if (!currentNode.children[" "]) {
-      currentNode.children[" "] = createRadixNode()
-    }
-    currentNode = currentNode.children[" "]
-  }
-  currentNode.isEndOfWord = true
-}
-
-var searchWords = function(root, prefix){
-  const matchedWords = []
-  const words = prefix.split(" ")
-
-  const traverse = (node, currentPrefix) => {
-    if (node.isEndOfWord) {
-      matchedWords.push(prefix + currentPrefix)
-    }
-    for (const char in node.children) {
-      traverse(node.children[char], currentPrefix + (char === " " ? " " : char))
-    }
-  }
-
-  let currentNode = root
-  for (const word of words) {
-    for (const char of word) {
-      if (!currentNode.children[char]) {
-        return matchedWords
-      }
-      currentNode = currentNode.children[char]
-    }
-    if (currentNode.children[" "]) {
-      currentNode = currentNode.children[" "]
-    }
-  }
-  traverse(currentNode, "")
-  return matchedWords
-}
-
-var indexDocuments = function (payload) {
-    var requestId = payload.requestId;
-    var notes = payload.notes;
-    for (var i = 0; i < notes.length; i++) {
-        var note = notes[i];
-        var tokens = tokenizeDocument(note);
-        var doc = { id: note.id, text: note.text, date: note.date.toString(), note_type: note.type};
-        var prev = void 0;
-        console.log('processing note ' + i.toString());
-        for (var j = 0; j < tokens.length; j++) {
-            var token = tokens[j];
-            var lexeme = token.lexeme;
+    /* Index text */
+    for (let i = 0; i < notes.length; i++) {
+        const note = notes[i];
+        const tokens = tokenizeDocument(note);
+        const doc = { id: note.id, date: note.date.toString(), note_type: note.type, text: note.text };
+        let prev;
+        for (let j = 0; j < tokens.length; j++) {
+            const token = tokens[j];
+            const lexeme = token.lexeme;
             if (STOP_WORDS.has(lexeme))
                 continue;
-            //insertWord(radixTree, lexeme)
-            if (unigramIndex.has(lexeme)) {
-                unigramIndex.get(lexeme).instances.push(token);
+            // Radix-tree check
+            let indexed = unigramIndex.get(lexeme);
+            if (indexed) {
+                indexed.instances.push(token);
             }
             else {
-                unigramIndex.set(lexeme, { lexeme: lexeme, instances: [token], next: new Map() });
+                indexed = { lexeme, instances: [token], next: new Map() };
+                unigramIndex.set(lexeme, indexed);
             }
             if (prev) {
-                if (!prev.next.has(lexeme)) {
-                    prev.next.set(lexeme, unigramIndex.get(lexeme));
+                let prevIndexed = prev.next.get(lexeme);
+                if (!prevIndexed) {
+                    prev.next.set(lexeme, indexed);
                 }
             }
-            prev = unigramIndex.get(lexeme);
+            prev = indexed;
         }
         docIndex.set(doc.id, doc);
     }
-    console.log(radixTree)
-    return { requestId: requestId };
+    return { requestId };
 };
+
 
 var flushNotes = function (payload) {
     var requestId = payload.requestId;
@@ -178,24 +149,6 @@ var searchNotes = function (payload) {
     });
     return { requestId: requestId, result: result };
 };
-var searchPrefix = function(payload){
-  const { requestId, prefix } = payload
-
-  // Split prefix into individual words
-  const words = prefix.split(" ")
-
-  // Initialize an array to store the results
-  const results = []
-
-  // Iterate over each word and search for it in the radix tree
-  words.forEach(word => {
-    const matchedWords = searchWords(radixTree, word)
-    results.push(...matchedWords)
-  })
-  console.log('state of SearchPrefix')
-  console.log(results)
-  return { requestId, result: results }
-}
 var getSearchResultDocumentContext = function (doc, hits) {
     var contextCharDistance = 50;
     var groups = [];

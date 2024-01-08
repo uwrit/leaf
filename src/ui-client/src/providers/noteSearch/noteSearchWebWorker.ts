@@ -6,9 +6,10 @@
  */
 
 import { generate as generateId } from 'shortid';
-import { Note } from '../../models/cohort/NoteSearch';
+import { Note, NoteDatasetContext } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
 import { NoteSearchTerm } from '../../models/state/CohortState';
+import { PatientListDatasetDynamicSchema } from '../../models/patientList/Dataset';
 
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
@@ -16,8 +17,8 @@ const FLUSH = 'FLUSH';
 const HINT = 'HINT'
 
 interface InboundMessagePartialPayload {
+    datasets?: NoteDatasetContext[];
     message: string;
-    notes?: Note[];
     terms?: NoteSearchTerm[];
     prefix?: string;
     // pageIndex
@@ -99,13 +100,13 @@ interface TextContext {
 interface RadixNode {
     children: { [key: string]: RadixNode };
     isEndOfWord: boolean;
-  }
+}
 
 export interface SearchResult {
     documents: DocumentSearchResult[];
 }
 
-export interface RadixTree{
+export interface RadixTree {
     tree: RadixNode;
 }
 
@@ -119,8 +120,7 @@ export default class NoteSearchWebWorker {
     private reject: any;
     private promiseMap: Map<string, PromiseResolver> = new Map();
 
-    constructor() 
-    {
+    constructor() {
         const workerFile = `  
             ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT])}
             ${workerContext}
@@ -132,7 +132,7 @@ export default class NoteSearchWebWorker {
         const blob = new Blob([workerFile], { type: 'text/javascript' });
         this.worker = new Worker(URL.createObjectURL(blob));
         this.worker.onmessage = result => this.handleReturnPayload(result);
-        this.worker.onerror = error => { console.log(error)};
+        this.worker.onerror = error => { console.log(error) };
     }
 
     //${this.stripFunctionToContext(this.workerContext)}
@@ -141,17 +141,17 @@ export default class NoteSearchWebWorker {
         return this.postMessage({ message: SEARCH, terms });
     }
 
-    public index = (notes: Note[]) => {
-        return this.postMessage({ message: INDEX, notes });
+    public index = (datasets: NoteDatasetContext[]) => {
+        return this.postMessage({ message: INDEX, datasets });
     }
 
     public flush = () => {
         return this.postMessage({ message: FLUSH });
     }
 
-    public searchPrefix = (prefix: string) => {  
-        return this.postMessage({ message: HINT, prefix });  
-    }  
+    public searchPrefix = (prefix: string) => {
+        return this.postMessage({ message: HINT, prefix });
+    }
 
     private postMessage = (payload: InboundMessagePartialPayload) => {
         return new Promise((resolve, reject) => {
@@ -193,7 +193,7 @@ export default class NoteSearchWebWorker {
     }
 
     private workerContext = () => {
-        const STOP_WORDS = new Set(['\n','\t','(',')','"',";"]);
+        const STOP_WORDS = new Set(['\n', '\t', '(', ')', '"', ";"]);
 
         let unigramIndex: Map<string, TokenPointer> = new Map();
         let docIndex: Map<string, IndexedDocument> = new Map();
@@ -207,74 +207,37 @@ export default class NoteSearchWebWorker {
                     return flushNotes(payload);
                 case SEARCH:
                     return searchNotes(payload);
-                case HINT:  
-                    return searchPrefix(payload); 
                 default:
                     return null;
             }
         };
 
-        const createRadixNode = (): RadixNode => ({
-            children: {},
-            isEndOfWord: false,
-          });
-
-        let radixTree: RadixNode = createRadixNode();
-
-
-        
-  
-    const insertWord = (root: RadixNode, phrase: string): void => {  
-        let currentNode = root;  
-        const words = phrase.split(' ');  
-    
-        for (const word of words) {  
-            for (const char of word) {  
-                if (!currentNode.children[char]) {  
-                    currentNode.children[char] = createRadixNode();  
-                }  
-                currentNode = currentNode.children[char];  
-            }  
-            if (!currentNode.children[' ']) {  
-                currentNode.children[' '] = createRadixNode();  
-            }  
-            currentNode = currentNode.children[' '];  
-        }  
-        currentNode.isEndOfWord = true;  
-    };  
-    
-    const searchWords = (root: RadixNode, prefix: string): string[] => {  
-        const matchedWords: string[] = [];  
-        const words = prefix.split(' ');  
-    
-        const traverse = (node: RadixNode, currentPrefix: string) => {  
-            if (node.isEndOfWord) {  
-                matchedWords.push(prefix + currentPrefix);  
-            }  
-            for (const char in node.children) {  
-                traverse(node.children[char], currentPrefix + (char === ' ' ? ' ' : char));  
-            }  
-        };  
-  
-    let currentNode = root;  
-    for (const word of words) {  
-        for (const char of word) {  
-            if (!currentNode.children[char]) {  
-                return matchedWords;  
-            }  
-            currentNode = currentNode.children[char];  
-        }  
-        if (currentNode.children[' ']) {  
-            currentNode = currentNode.children[' '];  
-        }  
-    }  
-    traverse(currentNode, '');  
-    return matchedWords;  
-};  
         const indexDocuments = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
-            const { notes } = payload;
+            const { datasets } = payload;
+            const notes: Note[] = [];
 
+            /* Process as notes */
+            for (let i = 0; i < datasets.length; i++) {
+                const result = datasets[i];
+                const schema = result.dataset.schema as PatientListDatasetDynamicSchema
+                let j = 0;
+                for (const patId of Object.keys(result.dataset.results)) {
+                    for (const row of result.dataset.results[patId]) {
+                        const note: Note = {
+                            responderId: result.responder.id,
+                            id: result.responder.id + '_' + j.toString(),
+                            date: new Date(row[schema.sqlFieldDate]),
+                            text: row[schema.sqlFieldValueString],
+                            type: result.query.name
+                        };
+                        notes.push(note);
+                        j++;
+                    }
+                }
+            }
+
+            /* Index text */
             for (let i = 0; i < notes.length; i++) {
                 const note = notes[i];
                 const tokens = tokenizeDocument(note);
@@ -282,7 +245,7 @@ export default class NoteSearchWebWorker {
                 let prev: TokenPointer;
 
                 for (let j = 0; j < tokens.length; j++) {
-                    const token  = tokens[j];
+                    const token = tokens[j];
                     const lexeme = token.lexeme;
 
 
@@ -334,7 +297,7 @@ export default class NoteSearchWebWorker {
 
                 if (precedingHits.size) {
                     const merged: Map<string, SearchHit[]> = new Map();
-                    precedingHits.forEach((v,k) => {
+                    precedingHits.forEach((v, k) => {
                         if (hits.has(k)) {
                             const both = hits.get(k)!.concat(v);
                             merged.set(k, both);
@@ -346,7 +309,7 @@ export default class NoteSearchWebWorker {
                 }
             }
 
-            precedingHits.forEach((v,k) => {
+            precedingHits.forEach((v, k) => {
                 const doc: DocumentSearchResult = { ...docIndex.get(k)!, lines: [] };
                 const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
                 const context = getSearchResultDocumentContext(doc, hits);
@@ -355,24 +318,6 @@ export default class NoteSearchWebWorker {
 
             return { requestId, result };
         }
-
-    const searchPrefix = (payload: InboundMessagePayload): OutboundMessagePayload => {  
-        const { requestId, prefix } = payload;  
-    
-        // Split prefix into individual words  
-        const words = prefix.split(' ');  
-    
-        // Initialize an array to store the results  
-        const results: string[] = [];  
-    
-        // Iterate over each word and search for it in the radix tree  
-        words.forEach(word => {  
-            const matchedWords = searchWords(radixTree, word);  
-            results.push(...matchedWords);  
-        });  
-    
-        return { requestId, result: results };  
-    };  
 
         const getSearchResultDocumentContext = (doc: DocumentSearchResult, hits: SearchHit[]): DocumentSearchResult => {
             const contextCharDistance = 50;
@@ -385,15 +330,15 @@ export default class NoteSearchWebWorker {
 
                 let nextIndex = 1;
                 while (true) {
-                    const nextHit = i < hits.length-1 ? hits[i+nextIndex] : undefined;
+                    const nextHit = i < hits.length - 1 ? hits[i + nextIndex] : undefined;
 
                     // If overlapping
-                    if (nextHit && hit.lineIndex === nextHit.lineIndex && 
+                    if (nextHit && hit.lineIndex === nextHit.lineIndex &&
                         (hit.charIndex.end + contextCharDistance) >= (nextHit.charIndex.start - contextCharDistance)) {
 
                         // Merge lines
                         group.push(nextHit);
-                        hits.splice(i+nextIndex, 1);
+                        hits.splice(i + nextIndex, 1);
                         nextIndex++;
                     } else {
                         groups.push(group);
@@ -409,7 +354,7 @@ export default class NoteSearchWebWorker {
                 let line: DocumentSearchResultLine = { index: group[0].lineIndex, content: [] };
                 for (let j = 0; j < group.length; j++) {
                     const backLimit = j > 0 ? group[j].charIndex.start : undefined;
-                    const forwLimit = j < group.length-1 ? group[j+1].charIndex.start : undefined;
+                    const forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
                     const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
                     line.content = line.content.concat(context);
                 }
@@ -419,27 +364,27 @@ export default class NoteSearchWebWorker {
             return result;
         };
 
-        const getContext = (doc: DocumentSearchResult, hit: SearchHit, contextCharDistance: number, 
-                            backLimit?: number, forwLimit?: number): (TextContext | TextSearchResult)[] => {
-            
+        const getContext = (doc: DocumentSearchResult, hit: SearchHit, contextCharDistance: number,
+            backLimit?: number, forwLimit?: number): (TextContext | TextSearchResult)[] => {
+
             const _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
-            const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;                                
+            const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
             let backContext = doc.text.substring(_backLimit, hit.charIndex.start);
             let forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
 
             if (!backLimit && backContext) backContext = '...' + backContext;
             if (!forwLimit && forwContext) forwContext += '...';
 
-            let back_i = backContext.length-1;
+            let back_i = backContext.length - 1;
             while (back_i > -1) {
                 if (backContext[back_i] === '\n') {
-                    backContext = backContext.substring(back_i, backContext.length-1);
+                    backContext = backContext.substring(back_i, backContext.length - 1);
                     break;
                 }
                 back_i--;
             }
             let forw_i = 1;
-            while (forw_i < forwContext.length-1) {
+            while (forw_i < forwContext.length - 1) {
                 if (forwContext[forw_i] === '\n') {
                     forwContext = forwContext.substring(0, forw_i);
                     break;
@@ -493,7 +438,7 @@ export default class NoteSearchWebWorker {
                     let matched = hit.instances.filter(t => expected.has(t.id));
                     if (!matched.length) return result;
 
-                    if (j < terms.length-1) {
+                    if (j < terms.length - 1) {
                         expected = new Map(matched.filter(t => !!t.nextId).map(t => [t.nextId!, [...expected.get(t.id), t]]));
                         next = hit.next;
                     } else {
@@ -504,9 +449,9 @@ export default class NoteSearchWebWorker {
                 }
             }
 
-            expected.forEach((v,k) => {
+            expected.forEach((v, k) => {
                 const docId = v[0].docId;
-                const charIndex = { start: v[0].charIndex.start, end: v[v.length-1].charIndex.end };
+                const charIndex = { start: v[0].charIndex.start, end: v[v.length - 1].charIndex.end };
                 const lineIndex = v[0].lineIndex;
 
                 if (result.has(docId)) {
@@ -519,97 +464,96 @@ export default class NoteSearchWebWorker {
             return result;
         };
 
-    const tokenizeDocument = (note: Note) => {  
-        const source = note.text.toLocaleLowerCase();  
-        const tokens: TokenInstance[] = [];  
-        const spaces = new Set([' ','\n','\t','\r']);  
-        let line = 0;  
-        let start = 0;  
-        let current = 0;  
-    
-        const scanToken = () => {  
-            const c = advance();  
-    
-            switch(c)  
-            {  
-                case ' ':  
-                case '\r':  
-                case '\t':  
-                    break;  
-    
-                case '\n':  
-                    toNewLine();  
-                    break;  
-    
-                default:  
-                    toToken();  
-                    break;  
-            }  
-        };  
-    
-        const toNewLine = () => {  
-            line++;  
-        };  
-    
-        const toToken = () => {  
-            while (!isSpecialCharacter(peek()) && isAlphaNumeric(peek())) advance();  
-            addToken();  
-        };  
-    
-        const peek = () => {  
-            if (isAtEnd()) return '\0';  
-            return source[current];  
-        };  
-    
-        const isAlpha = (c: string): Boolean => {  
-            return (c >= 'a' && c <= 'z') ||  
-                (c >= 'A' && c <= 'Z');  
-        };  
-    
-        const isAlphaNumeric = (c: string) => {  
-            return isAlpha(c) || isDigit(c);  
-        };  
-    
-        const isDigit = (c: string) => {  
-            return c >= '0' && c <= '9';  
-        };  
-    
-        const isAtEnd = () => {  
-            return current >= source.length;  
-        };  
-    
-        const isSpecialCharacter = (c: string): Boolean => {  
-            return !isAlphaNumeric(c);  
-        };  
-    
-        const advance = () => {  
-            return source[current++];  
-        };  
-    
-        const addToken = () => {  
-            const text = source.substring(start, current);  
-            const token: TokenInstance = {   
-                lexeme: text,   
-                charIndex: { start, end: current },   
-                docId: note.id,   
-                id: note.id + '_' + tokens.length.toString(),  
-                index: tokens.length,  
-                lineIndex: line  
-            };  
-            if (tokens.length) {  
-                const prev = tokens[tokens.length-1];  
-                if (prev.lineIndex === token.lineIndex) {  
-                    tokens[tokens.length-1].nextId = token.id;  
-                }  
-            }  
-            tokens.push(token);  
-        };  
-    
-        while (!isAtEnd()) {  
-            start = current;  
-            scanToken();  
-        }  
-        return tokens;  
-    };  
+        const tokenizeDocument = (note: Note) => {
+            const source = note.text.toLocaleLowerCase();
+            const tokens: TokenInstance[] = [];
+            const spaces = new Set([' ', '\n', '\t', '\r']);
+            let line = 0;
+            let start = 0;
+            let current = 0;
+
+            const scanToken = () => {
+                const c = advance();
+
+                switch (c) {
+                    case ' ':
+                    case '\r':
+                    case '\t':
+                        break;
+
+                    case '\n':
+                        toNewLine();
+                        break;
+
+                    default:
+                        toToken();
+                        break;
+                }
+            };
+
+            const toNewLine = () => {
+                line++;
+            };
+
+            const toToken = () => {
+                while (!isSpecialCharacter(peek()) && isAlphaNumeric(peek())) advance();
+                addToken();
+            };
+
+            const peek = () => {
+                if (isAtEnd()) return '\0';
+                return source[current];
+            };
+
+            const isAlpha = (c: string): Boolean => {
+                return (c >= 'a' && c <= 'z') ||
+                    (c >= 'A' && c <= 'Z');
+            };
+
+            const isAlphaNumeric = (c: string) => {
+                return isAlpha(c) || isDigit(c);
+            };
+
+            const isDigit = (c: string) => {
+                return c >= '0' && c <= '9';
+            };
+
+            const isAtEnd = () => {
+                return current >= source.length;
+            };
+
+            const isSpecialCharacter = (c: string): Boolean => {
+                return !isAlphaNumeric(c);
+            };
+
+            const advance = () => {
+                return source[current++];
+            };
+
+            const addToken = () => {
+                const text = source.substring(start, current);
+                const token: TokenInstance = {
+                    lexeme: text,
+                    charIndex: { start, end: current },
+                    docId: note.id,
+                    id: note.id + '_' + tokens.length.toString(),
+                    index: tokens.length,
+                    lineIndex: line
+                };
+                if (tokens.length) {
+                    const prev = tokens[tokens.length - 1];
+                    if (prev.lineIndex === token.lineIndex) {
+                        tokens[tokens.length - 1].nextId = token.id;
+                    }
+                }
+                tokens.push(token);
+            };
+
+            while (!isAtEnd()) {
+                start = current;
+                scanToken();
+            }
+            return tokens;
+        };
     }
 }

@@ -1,5 +1,6 @@
 .note-search-results-container {
     height: calc(100vh - 55px - 150px);
+    margin-top:1px;
     overflow-x: hidden;
     padding: 30px 10% !important;
 }

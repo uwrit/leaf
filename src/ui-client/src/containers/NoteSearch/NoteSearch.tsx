@@ -36,7 +36,7 @@ class NoteSearch extends React.PureComponent<Props> {
         const c = this.className;
 
         return (
-            <div className={`${c} scrollable-offset-by-header`}>
+            <div className={`${c} zscrollable-offset-by-header`}>
 
                 {/* Header */}
                 <NoteSearchHeader {...this.props} />

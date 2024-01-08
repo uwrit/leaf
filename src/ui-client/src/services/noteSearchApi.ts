@@ -6,22 +6,22 @@
  */ 
 
 import NoteSearchWebWorker, { SearchResult, RadixTreeResult } from '../providers/noteSearch/noteSearchWebWorker';
-import { Note } from '../models/cohort/NoteSearch';
+import { NoteDatasetContext } from '../models/cohort/NoteSearch';
 import { NoteSearchTerm } from '../models/state/CohortState';
 
 const engine = new NoteSearchWebWorker();
 
-export const indexNotes = (notes: Note[]) => {
+export const indexNotes = (datasets: NoteDatasetContext[]) => {
     return new Promise<void>( async (resolve, reject) => {
-        await engine.index(notes);
+        await engine.index(datasets);
         resolve();
     });
 };
 
 export const searchPrefix = (prefix: string): Promise<RadixTreeResult> => {  
     return new Promise ( async (resolve, reject) => {
-    const result = await engine.searchPrefix(prefix) as RadixTreeResult;  
-    resolve(result)
+        const result = await engine.searchPrefix(prefix) as RadixTreeResult;  
+        resolve(result)
     });
 };  
 
