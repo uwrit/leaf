@@ -110,7 +110,7 @@ export interface NoteSearchState {
 }
 
 export interface NoteSearchConfiguration extends BaseDatasetViewConfigurationConfiguration {
-    datasets: PatientListDatasetQuery[];
+    datasets: Map<string, PatientListDatasetQuery>;
 }
 
 export interface NoteSearchTerm {

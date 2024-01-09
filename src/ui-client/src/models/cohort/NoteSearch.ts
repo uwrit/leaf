@@ -11,6 +11,7 @@ import { PatientListDatasetDTO, PatientListDatasetQuery } from "../patientList/D
 export interface NoteDTO {
     responderId: number;
     date: string | Date;
+    datasetId: string;
     id: string;
     personId: string;
     text: string;

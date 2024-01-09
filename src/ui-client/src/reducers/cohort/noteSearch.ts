@@ -11,7 +11,7 @@ import { CohortNoteSearchAction } from '../../actions/cohort/noteSearch';
 export function defaultNoteSearchState(): NoteSearchState {
     return {
         configuration: {
-            datasets: [],
+            datasets: new Map(),
             isFetching: false,
             pageNumber: 0,
             pageSize: 10
@@ -29,7 +29,7 @@ export function setNoteSearchConfiguration(state: CohortState, action: CohortNot
     return Object.assign({}, state, {
         noteSearch: {
             ...state.noteSearch,
-            configuration: action.configuration
+            configuration: Object.assign({}, action.configuration)
         }
     });
 };

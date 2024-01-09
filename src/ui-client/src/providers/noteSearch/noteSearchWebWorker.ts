@@ -9,15 +9,17 @@ import { generate as generateId } from 'shortid';
 import { Note, NoteDatasetContext } from '../../models/cohort/NoteSearch';
 import { workerContext } from './noteSearchWebWorkerContext';
 import { NoteSearchConfiguration, NoteSearchTerm } from '../../models/state/CohortState';
-import { PatientListDatasetDynamicSchema } from '../../models/patientList/Dataset';
+import { PatientListDatasetDynamicSchema, PatientListDatasetQuery } from '../../models/patientList/Dataset';
 
 const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
 const FLUSH = 'FLUSH';
+const REMOVE = 'REMOVE';
 const HINT = 'HINT'
 
 interface InboundMessagePartialPayload {
     config?: NoteSearchConfiguration;
+    dataset?: PatientListDatasetQuery;
     datasets?: NoteDatasetContext[];
     message: string;
     terms?: NoteSearchTerm[];
@@ -49,6 +51,7 @@ interface Indices {
 
 interface TokenInstance {
     charIndex: Indices;
+    datasetId: string;
     docId: string;
     id: string;
     lexeme: string;
@@ -73,9 +76,10 @@ interface SearchHit {
 interface IndexedDocument {
     id: string;
     date?: Date;
+    datasetId: string;
     personId: string;
     text: string;
-    note_type: string;
+    type: string;
 }
 
 export interface DocumentSearchResult extends IndexedDocument {
@@ -126,7 +130,7 @@ export default class NoteSearchWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT])}
+            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT, REMOVE])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -151,6 +155,10 @@ export default class NoteSearchWebWorker {
 
     public flush = () => {
         return this.postMessage({ message: FLUSH });
+    }
+
+    public removeDataset = (config: NoteSearchConfiguration, dataset: PatientListDatasetQuery, terms: NoteSearchTerm[]) => {
+        return this.postMessage({ message: REMOVE, dataset, config, terms });
     }
 
     public searchPrefix = (prefix: string) => {
@@ -213,9 +221,26 @@ export default class NoteSearchWebWorker {
                     return flushNotes(payload);
                 case SEARCH:
                     return searchNotes(payload);
+                case REMOVE:
+                    return removeDataset(payload);
                 default:
                     return null;
             }
+        };
+        
+        const removeDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { dataset } = payload;
+            docIndex.forEach((v,k,m) => {
+                if (v.datasetId === dataset.id) {
+                    m.delete(k);
+                }
+            });
+            unigramIndex.forEach((v,k,m) => {
+                v.instances = v.instances.filter(inst => inst.datasetId !== dataset.id);
+            });
+            console.log([docIndex, unigramIndex])
+
+            return searchNotes(payload);
         };
 
         const indexDocuments = (payload: InboundMessagePayload): OutboundMessagePayload => {
@@ -238,6 +263,7 @@ export default class NoteSearchWebWorker {
                             responderId: result.responder.id,
                             id: result.responder.id + '_' + j.toString(),
                             date: row[schema.sqlFieldDate],
+                            datasetId: result.query.id,
                             personId: patId,
                             text: row[schema.sqlFieldValueString],
                             type: result.query.name
@@ -253,11 +279,8 @@ export default class NoteSearchWebWorker {
                 const note = notes[i];
                 const tokens = tokenizeDocument(note);
                 const doc: IndexedDocument = { 
-                    id: note.id, 
-                    date: note.date ? new Date(note.date) : undefined, 
-                    note_type: note.type, 
-                    text: note.text, 
-                    personId: note.personId 
+                    ...note,
+                    date: note.date ? new Date(note.date) : undefined
                 };
                 let prev: TokenPointer;
 
@@ -442,69 +465,6 @@ export default class NoteSearchWebWorker {
             if (forwContext.trim()) output.push({ type: "CONTEXT", text: forwContext });
 
             return output;
-        };
-
-        const searchSingleTerm = (term: NoteSearchTerm): Map<string, SearchHit[]> => {
-            const result: Map<string, SearchHit[]> = new Map();
-            const hit = unigramIndex.get(term.text.toLocaleLowerCase());
-
-            if (hit) {
-                for (let i = 0; i < hit.instances.length; i++) {
-                    const instance = hit.instances[i];
-                    if (result.has(instance.docId)) {
-                        result.get(instance.docId)!.push({ ...instance, searchTerm: term });
-                    } else {
-                        result.set(instance.docId, [{ ...instance, searchTerm: term }]);
-                    }
-                }
-            }
-            return result;
-        };
-
-        const searchMultiterm = (searchTerm: NoteSearchTerm): Map<string, SearchHit[]> => {
-            const result: Map<string, SearchHit[]> = new Map();
-            const terms = searchTerm.text.toLocaleLowerCase().split(' ');
-
-            // First term
-            const term = terms[0];
-            const hit = unigramIndex.get(term);
-
-            if (!hit) return result;
-            let expected = new Map(hit.instances.filter(t => !!t.nextId).map(t => [t.nextId!, [t]]));
-            let next = hit.next;
-
-            // Following
-            for (let j = 1; j < terms.length; j++) {
-                const term = terms[j];
-                const hit = next.get(term);
-                if (hit) {
-                    let matched = hit.instances.filter(t => expected.has(t.id));
-                    if (!matched.length) return result;
-
-                    if (j < terms.length - 1) {
-                        expected = new Map(matched.filter(t => !!t.nextId).map(t => [t.nextId!, [...expected.get(t.id), t]]));
-                        next = hit.next;
-                    } else {
-                        expected = new Map(matched.map(t => [t.id, [...expected.get(t.id), t]]));
-                    }
-                } else {
-                    return result;
-                }
-            }
-
-            expected.forEach((v, k) => {
-                const docId = v[0].docId;
-                const charIndex = { start: v[0].charIndex.start, end: v[v.length - 1].charIndex.end };
-                const lineIndex = v[0].lineIndex;
-
-                if (result.has(docId)) {
-                    result.get(docId)!.push({ docId, charIndex, lineIndex, searchTerm });
-                } else {
-                    result.set(docId, [{ docId, charIndex, lineIndex, searchTerm }]);
-                }
-            });
-
-            return result;
         };
 
         const getHitPointers = (term: string): TokenPointer => {
@@ -745,6 +705,7 @@ export default class NoteSearchWebWorker {
                 const token: TokenInstance = {
                     lexeme: text,
                     charIndex: { start, end: current },
+                    datasetId: note.datasetId,
                     docId: note.id,
                     id: note.id + '_' + tokens.length.toString(),
                     index: tokens.length,

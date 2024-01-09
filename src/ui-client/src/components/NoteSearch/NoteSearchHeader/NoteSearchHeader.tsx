@@ -1,11 +1,12 @@
 import React from 'react';
 import { CohortState } from '../../../models/state/CohortState';
-import { getNotesDataset } from '../../../actions/cohort/noteSearch';
+import { getNotesDataset, removeNoteDataset } from '../../../actions/cohort/noteSearch';
 import { SearchTermEditor } from '../SearchTermEditor/SearchTermEditor';
 import { DatasetsState } from '../../../models/state/AppState';
 import AddDatasetButton from '../../PatientList/AddDatasetButton/AddDatasetButton';
 import { NetworkResponderMap } from '../../../models/NetworkResponder';
 import './NoteSearchHeader.css';
+import { PatientListDatasetQuery } from '../../../models/patientList/Dataset';
 
 interface Props {
     cohort: CohortState;
@@ -54,9 +55,11 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                         />
                     </div>
                     <div>
-                        {cohort.noteSearch.configuration.datasets.map((d) => {
+                        {[ ...cohort.noteSearch.configuration.datasets.values() ].map((d) => {
                             return (
-                                <span className={`${c}-note-dataset`} key={d.id}>{d.name}</span>
+                                <span className={`${c}-note-dataset`} key={d.id} onClick={this.handleDatasetClick.bind(null, d)}>
+                                    {d.name}
+                                </span>
                             );
                         })}
                     </div>
@@ -69,5 +72,10 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
 
             </div>
         );
+    }
+
+    private handleDatasetClick = (dataset: PatientListDatasetQuery) => {
+        const { dispatch } = this.props;
+        dispatch(removeNoteDataset(dataset));
     }
 }

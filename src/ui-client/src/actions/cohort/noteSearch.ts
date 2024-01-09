@@ -10,7 +10,7 @@ import { DateBoundary } from "../../models/panel/Date";
 import { Dispatch } from "redux";
 import { AppState } from "../../models/state/AppState";
 import { NetworkIdentity } from "../../models/NetworkResponder";
-import { indexNotes, searchNotes } from "../../services/noteSearchApi";
+import { indexNotes, removeDataset, searchNotes } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { NoteDatasetContext } from "../../models/cohort/NoteSearch";
 import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
@@ -42,9 +42,11 @@ export const searchNotesByTerms = () => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const { configuration, terms } = state.cohort.noteSearch;
+        const config = Object.assign({}, configuration, { pageNumber: 0 });
         dispatch(setNoClickModalState({ message: "Searching", state: NotificationStates.Working }));
-        const results = await searchNotes(configuration, terms);
+        const results = await searchNotes(config, terms);
         dispatch(setNoteSearchResults(results));
+        dispatch(setNoteSearchConfiguration(config));
         dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     };
 }
@@ -60,11 +62,37 @@ export const searchPrefixTerms = (prefix: string) => {
 */ 
 
 /*
- * Updates the patient list based on new paginated state.
+ * Removes a dataset from note search 
+ */
+export const removeNoteDataset = (dataset: PatientListDatasetQuery) => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        const state = getState();
+        const { noteSearch } = getState().cohort;
+        const { configuration, terms } = noteSearch;
+        const config = Object.assign({}, configuration);
+        config.datasets.delete(dataset.id);
+
+        dispatch(setNoClickModalState({ message: "Deleting", state: NotificationStates.Working }));
+
+        const newDocs = Object.assign({}, getState().cohort.noteSearch);
+        newDocs.configuration = Object.assign({}, newDocs.configuration, { pageNumber: 0 });
+        
+        // Get updated documents
+        newDocs.results = await removeDataset(config, dataset, noteSearch.terms);
+        const visibleDatasets = await allowDatasetInSearch(dataset.id, true, state.datasets.searchTerm);
+        dispatch(setNoteSearchResults(newDocs.results));
+        dispatch(setNoteSearchConfiguration(newDocs.configuration));
+        dispatch(setDatasetSearchResult(visibleDatasets));
+        dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
+    };
+};
+
+/*
+ * Updates note search based on new paginated state.
  */
 export const setNoteSearchPagination = (id: number) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
-        const newDocs = getState().cohort.noteSearch;
+        const newDocs = Object.assign({}, getState().cohort.noteSearch);
         newDocs.configuration = Object.assign({}, newDocs.configuration, { pageNumber: id });
         
         // Get updated documents
@@ -122,7 +150,7 @@ export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoun
                 const config = Object.assign({}, state.cohort.noteSearch.configuration, { pageNumber: 0 });
                 const results = await indexNotes(datasets);
                 const visibleDatasets = await allowDatasetInSearch(query.id, false, state.datasets.searchTerm);
-                config.datasets.push(query);
+                config.datasets.set(query.id, query);
                 dispatch(setDatasetSearchResult(visibleDatasets));
                 dispatch(setNoteSearchResults(results));
                 dispatch(setNoteSearchConfiguration(config));

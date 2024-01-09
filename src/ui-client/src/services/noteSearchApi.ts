@@ -8,12 +8,20 @@
 import NoteSearchWebWorker, { NoteSearchResult, RadixTreeResult } from '../providers/noteSearch/noteSearchWebWorker';
 import { NoteDatasetContext } from '../models/cohort/NoteSearch';
 import { NoteSearchConfiguration, NoteSearchTerm } from '../models/state/CohortState';
+import { PatientListDatasetQuery } from '../models/patientList/Dataset';
 
 const engine = new NoteSearchWebWorker();
 
 export const indexNotes = (datasets: NoteDatasetContext[]): Promise<NoteSearchResult> => {
     return new Promise( async (resolve, reject) => {
         const results = await engine.index(datasets) as NoteSearchResult;
+        resolve(results);
+    });
+};
+
+export const removeDataset = (config: NoteSearchConfiguration, dataset: PatientListDatasetQuery, terms: NoteSearchTerm[]): Promise<NoteSearchResult> => {
+    return new Promise( async (resolve, reject) => {
+        const results = await engine.removeDataset(config, dataset, terms) as NoteSearchResult;
         resolve(results);
     });
 };

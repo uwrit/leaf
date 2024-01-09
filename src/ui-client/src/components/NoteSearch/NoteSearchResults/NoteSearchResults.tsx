@@ -1,7 +1,6 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
 import { Col, Container, Row } from 'reactstrap';
-import { createPortal } from 'react-dom';
 import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import Paginate from '../../PatientList/Paginate';
 import { setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
@@ -32,33 +31,17 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
         const { configuration, results, terms } = this.props.noteSearch;
         const { showFullNoteModal, note } = this.state;
         const c = this.className;
-        let noDataBox;
+        let noDataText;
 
         if (terms.length === 0 && results.totalDocuments === 0) {
-            noDataBox = (
-                <div className={`${c}-no-terms`}>
-                    <p>
-                        Click "+ Add More Data" to add types of documents to search through, then enter terms to search for in the upper-right
-                    </p>
-                </div>
-            );
+            noDataText = 'Click "+ Add More Data" to add types of documents to search through, then enter terms to search for in the upper-right';
         } else if (terms.length && results.totalDocuments === 0) {
-            noDataBox = (
-                <div className={`${c}-no-hits`}>
-                    <p>
-                        Whoops! Looks like that search didn't find any documents
-                    </p>
-                </div>
-            );
-        } else if (configuration.datasets.length && !terms.length) {
-            noDataBox = (
-                <div className={`${c}-no-hits`}>
-                    <p>
-                        Enter search terms in the upper-right
-                    </p>
-                </div>
-            );
+            noDataText = "Whoops! Looks like that search didn't find any documents";
+        } else if (configuration.datasets.size && !terms.length) {
+            noDataText = "Enter search terms in the upper-right";
         }
+
+        console.log(configuration.pageNumber);
 
         let paginate;
         if (results.documents.length && results.totalDocuments > noteSearch.configuration.pageSize) {
@@ -96,12 +79,17 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                     </Col>
                 </Row>
                 }
-                {noDataBox}
+                {noDataText && 
+                <div className={`${c}-no-hits`}>
+                    <p>
+                        {noDataText}
+                    </p>
+                </div>}
                 {results.documents.map(d => {
                     return (
                         <div key={d.id} className={`${c}-document`} onClick={this.handleNoteClick.bind(null, d)}>
                             <div className={`${c}-document-header`}>
-                                <div>{d.note_type}</div>
+                                <div>{d.type}</div>
                                 <div>{d.date ? d.date.toLocaleDateString("en-US") : null}</div>
                             </div>
                                 {d.lines.map((l,i) => {
@@ -138,15 +126,6 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                         {paginate}
                     </Col>
                 </Row>
-                {/*createPortal(
-                    <div className={`${c}-modal ${showFullNoteModal ? 'show' : ''}`}>
-                        {note && 
-                        <div>
-                            <textarea readOnly={true} content={note.text}/>
-                        </div>
-                        }
-                    </div>
-                    , document.body)*/}
             </Container>
         )
     }
