@@ -24,6 +24,7 @@ export const SET_NOTE_SEARCH_TERMS = 'SET_NOTE_SEARCH_TERMS';
 export const SET_NOTE_SEARCH_RESULTS = 'SET_NOTE_SEARCH_RESULTS';
 export const SET_NOTE_SEARCH_CONFIGURATION = 'SET_NOTE_SEARCH_CONFIGURATION';
 export const SET_NOTE_SEARCH_PREFIX_RESULTS = 'SET_NOTE_SEARCH_PREFIX_RESULTS';  
+export const SET_NOTE_SEARCH_FULL_NOTE = 'SET_NOTE_SEARCH_FULL_NOTE';
 
 export interface CohortNoteSearchAction {
     configuration?: NoteSearchConfiguration;
@@ -31,6 +32,7 @@ export interface CohortNoteSearchAction {
     datasets?: PatientListDatasetQuery[];
     dateFilter?: DateBoundary;
     id: number;
+    note?: DocumentSearchResult;
     searchResults?: NoteSearchResult;
     searchTerms?: NoteSearchTerm[];
     type: string;
@@ -55,7 +57,13 @@ export const getHighlightedNote = (note: DocumentSearchResult) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const results = await getHighlightedNoteFromResults(note);
-        console.log(results);
+        dispatch(setFullNote(results));
+    };
+};
+
+export const discardHighlightedNote = () => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        dispatch(setFullNote());
     };
 };
 
@@ -208,5 +216,13 @@ export const setNoteSearchResults = (searchResults: NoteSearchResult): CohortNot
         searchResults,
         id: -1,
         type: SET_NOTE_SEARCH_RESULTS
+    };
+};
+
+export const setFullNote = (note?: DocumentSearchResult): CohortNoteSearchAction => {
+    return {
+        note,
+        id: -1,
+        type: SET_NOTE_SEARCH_FULL_NOTE
     };
 };

@@ -106,14 +106,16 @@ import {
     SET_NOTE_SEARCH_TERMS, 
     SET_NOTE_SEARCH_RESULTS, 
     SET_NOTE_SEARCH_PREFIX_RESULTS,
-    SET_NOTE_SEARCH_CONFIGURATION
+    SET_NOTE_SEARCH_CONFIGURATION,
+    SET_NOTE_SEARCH_FULL_NOTE
 } from '../../actions/cohort/noteSearch';
 import { 
     defaultNoteSearchState, 
     setNoteSearchTerms, 
     setNoteSearchResults, 
     setNoteSearchPrefixResults, 
-    setNoteSearchConfiguration
+    setNoteSearchConfiguration,
+    setNoteSearchFullNote
 } from './noteSearch';
 
 export const defaultCohortState = (): CohortState => {
@@ -364,6 +366,8 @@ export const cohort = (state: CohortState = defaultCohortState(), action: Cohort
             return setNoteSearchResults(state, action);
         case SET_NOTE_SEARCH_PREFIX_RESULTS:  
             return setNoteSearchPrefixResults(state, action);  
+        case SET_NOTE_SEARCH_FULL_NOTE:
+            return setNoteSearchFullNote(state, action);
 
         // Patient List
         case SET_PATIENT_LIST_DISPLAY:

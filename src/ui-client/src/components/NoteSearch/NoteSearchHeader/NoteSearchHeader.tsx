@@ -59,6 +59,7 @@ export class NoteSearchHeader extends React.PureComponent<Props, State> {
                             return (
                                 <span className={`${c}-note-dataset`} key={d.id} onClick={this.handleDatasetClick.bind(null, d)}>
                                     {d.name}
+                                    <span className={`${c}-note-dataset-remove`}>✕</span>
                                 </span>
                             );
                         })}

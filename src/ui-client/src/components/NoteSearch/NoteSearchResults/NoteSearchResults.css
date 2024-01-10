@@ -8,17 +8,19 @@
 .note-search-results-document {
     border: 1px solid rgb(230,230,230);
     border-radius: 8px;
-    box-shadow: rgba(213, 234, 244, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 3px 4px;
     cursor: pointer;
     margin: 10px 0;
     overflow: hidden;
     overflow-y: auto;
     padding: 10px;
+    transition: box-shadow .3s;
     width: 80%;
 }
 
 .note-search-results-document:hover {
     border-color: rgb(186, 67, 223);
+    box-shadow: rgba(213, 234, 244, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
 .note-search-results-document-header {
@@ -46,7 +48,15 @@
 }
 
 .note-search-results-context {
+    border: 1px solid transparent;
+    border-radius: 4px;
     color: rgb(70,70,70);
+    padding: 2px;
+}
+
+.note-search-results-context:hover {
+    background-color: rgba(186, 67, 223, 0.05);
+    border-color: rgb(186, 67, 223);
 }
 
 .note-search-results-match {
@@ -94,4 +104,38 @@
 
 .note-search-results-doccount-container .note-search-results-doccount {
     color: rgb(186, 67, 223);
+}
+
+.modal-dialog.note-search-results-fullnote-modal {
+    border: none;
+    box-shadow: rgba(213, 234, 244, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
+    max-width: calc(100vw - 500px);
+}
+
+.modal-dialog.note-search-results-fullnote-modal .modal-body {
+    height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding: 0;
+}
+
+.modal-dialog.note-search-results-fullnote-modal .modal-body .note-search-results-document {
+    border: none !important;
+    border-radius: 0;
+    cursor: default;
+    margin: 0;
+    width: 100%;
+}
+
+.modal-dialog.note-search-results-fullnote-modal .modal-header {
+    background-color: rgb(245,245,245);
+    display: block;
+}
+
+.note-search-results-fullnote-modal-close {
+    cursor: pointer;
+    float: right;
+}
+
+.note-search-results-fullnote-modal-close:hover {
+    color: red;
 }

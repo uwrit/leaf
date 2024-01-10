@@ -52,6 +52,14 @@ export function setNoteSearchResults(state: CohortState, action: CohortNoteSearc
     });
 };
 
+export function setNoteSearchFullNote(state: CohortState, action: CohortNoteSearchAction): CohortState {
+    return Object.assign({}, state, {
+        noteSearch: {
+            ...state.noteSearch,
+            fullNote: action.note
+        }
+    });
+};
 
 export function setNoteSearchPrefixResults(state: CohortState, action: CohortNoteSearchAction): CohortState {
     return Object.assign({}, state, {
@@ -60,4 +68,4 @@ export function setNoteSearchPrefixResults(state: CohortState, action: CohortNot
             radixSearch: action.prefixResults
         }
     });
-}
+};

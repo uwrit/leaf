@@ -3,7 +3,7 @@ import { NoteSearchState } from '../../../models/state/CohortState';
 import { Col, Container, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import Paginate from '../../PatientList/Paginate';
-import { getHighlightedNote, setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
+import { getHighlightedNote, setFullNote, setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
 import { NoteSearchResultDocument } from './NoteSearchResultDocument';
 import './NoteSearchResults.css';
 
@@ -14,7 +14,6 @@ interface Props {
 
 interface State {
     showFullNoteModal: boolean;
-    note?: DocumentSearchResult;
 }
 
 export class NoteSearchResults extends React.PureComponent<Props, State> {
@@ -29,8 +28,8 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
     
     public render() {
         const { dispatch, noteSearch } = this.props;
-        const { configuration, results, terms } = this.props.noteSearch;
-        const { showFullNoteModal, note } = this.state;
+        const { configuration, results, terms, fullNote } = this.props.noteSearch;
+        const { showFullNoteModal } = this.state;
         const c = this.className;
         let noDataText;
 
@@ -102,31 +101,38 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                     </Col>
                 </Row>  
 
-                <Modal isOpen={note && showFullNoteModal} backdrop>
+                <Modal 
+                    className={`${c}-fullnote-modal`}
+                    isOpen={fullNote && showFullNoteModal} 
+                    backdrop={false}
+                    onBlur={this.handleCloseModalClick.bind(null)}>
                     <ModalHeader>
-                        {note &&
-                        <div className={`${c}-document-header`}>
-                            <div>{note.type}</div>
-                            <div>{note.date ? note.date.toLocaleDateString("en-US") : null}</div>
+                        <div 
+                            className={`${c}-fullnote-modal-close`} 
+                            onClick={this.handleCloseModalClick.bind(null)}>
+                            ✕
                         </div>
-                        }
                     </ModalHeader>
                     <ModalBody>
-                        {note &&
-                        <NoteSearchResultDocument document={note} />               
+                        {fullNote &&
+                        <NoteSearchResultDocument document={fullNote} />               
                         }
                     </ModalBody>
-                    <ModalFooter>
-                    </ModalFooter>
                 </Modal>
 
             </Container>
         )
     }
 
+    private handleCloseModalClick = () => {
+        const { dispatch } = this.props;
+        this.setState({ showFullNoteModal: false });
+        dispatch(setFullNote());
+    }
+
     private handleNoteClick = (note: DocumentSearchResult) => {
         const { dispatch } = this.props;
-        this.setState({ note, showFullNoteModal: true });
+        this.setState({ showFullNoteModal: true });
         dispatch(getHighlightedNote(note));
     }
 

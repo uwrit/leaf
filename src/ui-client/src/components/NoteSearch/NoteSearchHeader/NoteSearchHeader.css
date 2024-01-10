@@ -56,5 +56,15 @@
 }
 
 .note-search-header-note-dataset:hover {
-    background-color: rgba(28, 170, 221, 0.2);
+    background-color: rgba(28, 170, 221, 0.08);
+}
+
+.note-search-header-note-dataset-remove {
+    color: red;
+    display: none;
+    margin-left: 8px;
+}
+
+.note-search-header-note-dataset:hover .note-search-header-note-dataset-remove { 
+    display: inherit;
 }
