@@ -5,16 +5,23 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */ 
 
-import NoteSearchWebWorker, { NoteSearchResult, RadixTreeResult } from '../providers/noteSearch/noteSearchWebWorker';
+import NoteSearchWebWorker, { DocumentSearchResult, NoteSearchResult, RadixTreeResult } from '../providers/noteSearch/noteSearchWebWorker';
 import { NoteDatasetContext } from '../models/cohort/NoteSearch';
 import { NoteSearchConfiguration, NoteSearchTerm } from '../models/state/CohortState';
 import { PatientListDatasetQuery } from '../models/patientList/Dataset';
 
 const engine = new NoteSearchWebWorker();
 
-export const indexNotes = (datasets: NoteDatasetContext[]): Promise<NoteSearchResult> => {
+export const getHighlightedNoteFromResults = (note: DocumentSearchResult): Promise<DocumentSearchResult> => {
     return new Promise( async (resolve, reject) => {
-        const results = await engine.index(datasets) as NoteSearchResult;
+        const results = await engine.getHighlightedNote(note) as DocumentSearchResult;
+        resolve(results);
+    });
+};
+
+export const indexNotes = (config: NoteSearchConfiguration, datasets: NoteDatasetContext[], terms: NoteSearchTerm[]): Promise<NoteSearchResult> => {
+    return new Promise( async (resolve, reject) => {
+        const results = await engine.index(config, datasets, terms) as NoteSearchResult;
         resolve(results);
     });
 };

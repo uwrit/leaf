@@ -1,9 +1,10 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
-import { Col, Container, Row } from 'reactstrap';
+import { Col, Container, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
 import Paginate from '../../PatientList/Paginate';
-import { setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
+import { getHighlightedNote, setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
+import { NoteSearchResultDocument } from './NoteSearchResultDocument';
 import './NoteSearchResults.css';
 
 interface Props {
@@ -85,53 +86,48 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                         {noDataText}
                     </p>
                 </div>}
-                {results.documents.map(d => {
-                    return (
-                        <div key={d.id} className={`${c}-document`} onClick={this.handleNoteClick.bind(null, d)}>
-                            <div className={`${c}-document-header`}>
-                                <div>{d.type}</div>
-                                <div>{d.date ? d.date.toLocaleDateString("en-US") : null}</div>
-                            </div>
-                                {d.lines.map((l,i) => {
-                                    return (
-                                        <Row key={i} className={`${c}-line`}>
-                                            <Col md={1} className={`${c}-line-number`}>{l.index+1}</Col>
-                                            <Col md={11} className={`${c}-line-context`}>
-                                                {l.content.map((s,si) => {
-                                                    switch (s.type) {
-                                                        case "CONTEXT": 
-                                                            return <span className={`${c}-context`} key={si}>{s.text}</span>;
-                                                        default:        
-                                                            const color = s.matchedTerm.color;
-                                                            return (
-                                                                <span 
-                                                                    className={`${c}-match`} 
-                                                                    key={si}
-                                                                    style={{ backgroundColor: color.replace(')',',0.1)'), borderColor: color }}>
-                                                                        {s.text}
-                                                                </span>
-                                                            );
-                                                    }
-                                                })}
-                                            </Col>
-                                        </Row>
-                                    );
-                                })}
-                        </div>
-                    )
-                })}
+
+                {/* Documents */}
+                {results.documents.map(d => 
+                    <NoteSearchResultDocument 
+                        key={d.id}
+                        document={d} 
+                        noteClickHandler={this.handleNoteClick} 
+                    />)
+                }
                 <Row>
                     <Col md={6}/>
                     <Col md={6}>
                         {paginate}
                     </Col>
-                </Row>
+                </Row>  
+
+                <Modal isOpen={note && showFullNoteModal} backdrop>
+                    <ModalHeader>
+                        {note &&
+                        <div className={`${c}-document-header`}>
+                            <div>{note.type}</div>
+                            <div>{note.date ? note.date.toLocaleDateString("en-US") : null}</div>
+                        </div>
+                        }
+                    </ModalHeader>
+                    <ModalBody>
+                        {note &&
+                        <NoteSearchResultDocument document={note} />               
+                        }
+                    </ModalBody>
+                    <ModalFooter>
+                    </ModalFooter>
+                </Modal>
+
             </Container>
         )
     }
 
     private handleNoteClick = (note: DocumentSearchResult) => {
+        const { dispatch } = this.props;
         this.setState({ note, showFullNoteModal: true });
+        dispatch(getHighlightedNote(note));
     }
 
     private handlePageCountClick = (data: any) => {

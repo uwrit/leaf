@@ -10,13 +10,13 @@ import { DateBoundary } from "../../models/panel/Date";
 import { Dispatch } from "redux";
 import { AppState } from "../../models/state/AppState";
 import { NetworkIdentity } from "../../models/NetworkResponder";
-import { indexNotes, removeDataset, searchNotes } from "../../services/noteSearchApi";
+import { getHighlightedNoteFromResults, indexNotes, removeDataset, searchNotes } from "../../services/noteSearchApi";
 import { fetchDataset } from "../../services/cohortApi";
 import { NoteDatasetContext } from "../../models/cohort/NoteSearch";
 import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { NoteSearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
+import { DocumentSearchResult, NoteSearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
 import { allowDatasetInSearch } from "../../services/datasetSearchApi";
 import { setDatasetSearchResult } from "../datasets";
 
@@ -49,7 +49,15 @@ export const searchNotesByTerms = () => {
         dispatch(setNoteSearchConfiguration(config));
         dispatch(setNoClickModalState({ state: NotificationStates.Hidden }));
     };
-}
+};
+
+export const getHighlightedNote = (note: DocumentSearchResult) => {
+    return async (dispatch: Dispatch, getState: () => AppState) => {
+        const state = getState();
+        const results = await getHighlightedNoteFromResults(note);
+        console.log(results);
+    };
+};
 
 /*
 export const searchPrefixTerms = (prefix: string) => {  
@@ -147,8 +155,9 @@ export const getNotesDataset = (query: PatientListDatasetQuery, dates?: DateBoun
         .then( async () => {
             if (atLeastOneSucceeded) {
                 dispatch(setNoClickModalState({ message: "Analyzing text", state: NotificationStates.Working }));  
+                const terms = state.cohort.noteSearch.terms;
                 const config = Object.assign({}, state.cohort.noteSearch.configuration, { pageNumber: 0 });
-                const results = await indexNotes(datasets);
+                const results = await indexNotes(config, datasets, terms);
                 const visibleDatasets = await allowDatasetInSearch(query.id, false, state.datasets.searchTerm);
                 config.datasets.set(query.id, query);
                 dispatch(setDatasetSearchResult(visibleDatasets));

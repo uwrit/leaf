@@ -15,6 +15,7 @@ const SEARCH = 'SEARCH';
 const INDEX = 'INDEX';
 const FLUSH = 'FLUSH';
 const REMOVE = 'REMOVE';
+const GET_NOTE = 'GET_NOTE';
 const HINT = 'HINT'
 
 interface InboundMessagePartialPayload {
@@ -22,6 +23,7 @@ interface InboundMessagePartialPayload {
     dataset?: PatientListDatasetQuery;
     datasets?: NoteDatasetContext[];
     message: string;
+    searchResults?: DocumentSearchResult;
     terms?: NoteSearchTerm[];
     prefix?: string;
 }
@@ -79,6 +81,7 @@ interface IndexedDocument {
     datasetId: string;
     personId: string;
     text: string;
+    tokens: TokenInstance[];
     type: string;
 }
 
@@ -89,6 +92,7 @@ export interface DocumentSearchResult extends IndexedDocument {
 interface DocumentSearchResultLine {
     content: (TextContext | TextSearchResult)[];
     index: number;
+    searchHits: SearchHit[];
 }
 
 interface TextSearchResult {
@@ -130,7 +134,7 @@ export default class NoteSearchWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT, REMOVE])}
+            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT, REMOVE, GET_NOTE])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -149,8 +153,8 @@ export default class NoteSearchWebWorker {
         return this.postMessage({ message: SEARCH, config, terms });
     }
 
-    public index = (datasets: NoteDatasetContext[]) => {
-        return this.postMessage({ message: INDEX, datasets });
+    public index = (config: NoteSearchConfiguration, datasets: NoteDatasetContext[], terms: NoteSearchTerm[]) => {
+        return this.postMessage({ message: INDEX, datasets, terms, config });
     }
 
     public flush = () => {
@@ -159,6 +163,10 @@ export default class NoteSearchWebWorker {
 
     public removeDataset = (config: NoteSearchConfiguration, dataset: PatientListDatasetQuery, terms: NoteSearchTerm[]) => {
         return this.postMessage({ message: REMOVE, dataset, config, terms });
+    }
+
+    public getHighlightedNote = (searchResults: DocumentSearchResult) => {
+        return this.postMessage({ message: GET_NOTE, searchResults})
     }
 
     public searchPrefix = (prefix: string) => {
@@ -207,6 +215,7 @@ export default class NoteSearchWebWorker {
     private workerContext = () => {
         const STOP_WORDS = new Set(['\n', '\t', '(', ')', '"', ";"]);
 
+        let notes: Note[] = [];
         let resultsCache: NoteSearchResult;
         let resultsCacheTerms = '';
         let unigramIndex: Map<string, TokenPointer> = new Map();
@@ -216,48 +225,40 @@ export default class NoteSearchWebWorker {
         const handleWorkMessage = (payload: InboundMessagePayload): any => {
             switch (payload.message) {
                 case INDEX:
-                    return indexDocuments(payload);
+                    return populateIndices(payload);
                 case FLUSH:
-                    return flushNotes(payload);
+                    return flushIndices(payload);
                 case SEARCH:
                     return searchNotes(payload);
                 case REMOVE:
-                    return removeDataset(payload);
+                    return unindexDataset(payload);
+                case GET_NOTE:
+                    return getSearchResultFullDocument(payload);
                 default:
                     return null;
             }
         };
-        
-        const removeDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
+
+        const unindexDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { dataset } = payload;
-            docIndex.forEach((v,k,m) => {
-                if (v.datasetId === dataset.id) {
-                    m.delete(k);
-                }
-            });
-            unigramIndex.forEach((v,k,m) => {
-                v.instances = v.instances.filter(inst => inst.datasetId !== dataset.id);
-            });
-            console.log([docIndex, unigramIndex])
+
+            notes = notes.filter(n => n.datasetId !== dataset.id);
+            resultsCacheTerms = '';
+
+            flushIndices(payload);
+            index(payload);
 
             return searchNotes(payload);
         };
 
-        const indexDocuments = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId } = payload;
+        const preprocess = (payload: InboundMessagePayload) => {
             const { datasets } = payload;
-            const notes: Note[] = [];
-            const patients = new Set();
 
-            /* Process as notes */
             for (let i = 0; i < datasets.length; i++) {
                 const result = datasets[i];
                 const schema = result.dataset.schema as PatientListDatasetDynamicSchema
                 let j = 0;
                 for (const patId of Object.keys(result.dataset.results)) {
-                    if (!patients.has(patId)) {
-                        patients.add(patId);
-                    }
                     for (const row of result.dataset.results[patId]) {
                         const note: Note = {
                             responderId: result.responder.id,
@@ -273,6 +274,22 @@ export default class NoteSearchWebWorker {
                     }
                 }
             }
+        };
+
+        const populateIndices = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            /* Populate the [notes] variable */
+            preprocess(payload);
+
+            /* Populate the index */
+            index(payload);
+
+            /* Return any search results */
+            return searchNotes(payload);
+        };
+
+        const index = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId } = payload;
+            const patients = new Set();
 
             /* Index text */
             for (let i = 0; i < notes.length; i++) {
@@ -280,21 +297,22 @@ export default class NoteSearchWebWorker {
                 const tokens = tokenizeDocument(note);
                 const doc: IndexedDocument = { 
                     ...note,
+                    tokens,
                     date: note.date ? new Date(note.date) : undefined
                 };
                 let prev: TokenPointer;
+
+                if (!patients.has(note.personId)) {
+                    patients.add(note.personId);
+                }
 
                 for (let j = 0; j < tokens.length; j++) {
                     const token = tokens[j];
                     const lexeme = token.lexeme;
 
-
                     if (STOP_WORDS.has(lexeme)) continue;
 
-                    // Radix-tree check
-
                     let indexed = unigramIndex.get(lexeme);
-
                     if (indexed) {
                         indexed.instances.push(token);
                     } else {
@@ -321,9 +339,9 @@ export default class NoteSearchWebWorker {
             };
 
             return { requestId, result: resultsCache };
-        }
+        };
 
-        const flushNotes = (payload: InboundMessagePayload): OutboundMessagePayload => {
+        const flushIndices = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { requestId } = payload;
             unigramIndex.clear();
             docIndex.clear();
@@ -417,11 +435,11 @@ export default class NoteSearchWebWorker {
 
             for (let i = 0; i < groups.length; i++) {
                 const group = groups[i];
-                let line: DocumentSearchResultLine = { index: group[0].lineIndex, content: [] };
+                let line: DocumentSearchResultLine = { index: group[0].lineIndex, content: [], searchHits: group };
                 for (let j = 0; j < group.length; j++) {
                     const backLimit = j > 0 ? group[j].charIndex.start : undefined;
                     const forwLimit = j < group.length - 1 ? group[j + 1].charIndex.start : undefined;
-                    const context = getContext(doc, group[j], contextCharDistance, backLimit, forwLimit);
+                    const context = getContext(doc.text, group[j], contextCharDistance, backLimit, forwLimit);
                     line.content = line.content.concat(context);
                 }
                 result.lines.push(line);
@@ -430,13 +448,64 @@ export default class NoteSearchWebWorker {
             return result;
         };
 
-        const getContext = (doc: DocumentSearchResult, hit: SearchHit, contextCharDistance: number,
+        const getSearchResultFullDocument = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, searchResults } = payload;
+            const indexedDoc = docIndex.get(searchResults.id);
+            const indexedSearchHitLines = new Map(searchResults.lines.map(l => [l.index, l.searchHits]));
+            const output: DocumentSearchResult = { ...searchResults, lines: [] };
+            const lines = new Map(indexedDoc.text.split('\n').map((l,i) => [i, l]));
+            const text = indexedDoc.text;
+            
+            let offset = 0;
+            lines.forEach((lineText, lineIdx) => {
+
+                /* If any search hits on this line */
+                if (indexedSearchHitLines.has(lineIdx)) {
+                    const hits = [ ...indexedSearchHitLines.get(lineIdx).values() ];
+                    const line: DocumentSearchResultLine = { content: [], index: lineIdx, searchHits: hits };
+                    let backIdx = 0;
+                    let forwIdx = 0;
+                    for (let i = 0; i < hits.length; i++) {
+                        const hit = hits[i];
+                        const next = i === hits.length-1 ? undefined : hits[i+1];
+                        forwIdx = next ? next.charIndex.start-offset : lineText.length;
+
+                        /* Preceding text */
+                        if (text.substring(backIdx, hit.charIndex.start)) {
+                            line.content.push({ type: 'CONTEXT', text: lineText.substring(backIdx, hit.charIndex.start-offset) })
+                        }
+                        /* Text found by search term */
+                        line.content.push({ type: 'MATCH', text: lineText.substring(hit.charIndex.start-offset, hit.charIndex.end-offset), matchedTerm: hit.searchTerm });
+
+                        /* Following text */
+                        if (text.substring(hit.charIndex.end, forwIdx)) {
+                            line.content.push({ type: 'CONTEXT', text: lineText.substring(hit.charIndex.end-offset, forwIdx) })
+                        }
+                        
+                        backIdx = forwIdx;
+                        output.lines.push(line);
+                    }
+
+                /* Else no search hits on this line, so add entire line */
+                } else {
+                    const line: DocumentSearchResultLine = {
+                        content: [{ type: 'CONTEXT', text: lineText }], index: lineIdx, searchHits: []
+                    };
+                    output.lines.push(line);
+                }
+                offset += lineText.length + 1;
+            });
+            
+            return { requestId, result: output };
+        };
+
+        const getContext = (fullText: string, hit: SearchHit, contextCharDistance: number,
             backLimit?: number, forwLimit?: number): (TextContext | TextSearchResult)[] => {
 
             const _backLimit = backLimit === undefined ? hit.charIndex.start - contextCharDistance : backLimit;
             const _forwLimit = forwLimit === undefined ? hit.charIndex.end + contextCharDistance : forwLimit;
-            let backContext = doc.text.substring(_backLimit, hit.charIndex.start);
-            let forwContext = doc.text.substring(hit.charIndex.end, _forwLimit);
+            let backContext = fullText.substring(_backLimit, hit.charIndex.start);
+            let forwContext = fullText.substring(hit.charIndex.end, _forwLimit);
 
             if (!backLimit && backContext) backContext = '...' + backContext;
             if (!forwLimit && forwContext) forwContext += '...';
@@ -459,7 +528,7 @@ export default class NoteSearchWebWorker {
             }
 
             const output: (TextContext | TextSearchResult)[] = [
-                { type: "MATCH", text: doc.text.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
+                { type: "MATCH", text: fullText.substring(hit.charIndex.start, hit.charIndex.end), matchedTerm: hit.searchTerm }
             ];
             if (backContext.trim()) output.unshift({ type: "CONTEXT", text: backContext });
             if (forwContext.trim()) output.push({ type: "CONTEXT", text: forwContext });
@@ -637,7 +706,6 @@ export default class NoteSearchWebWorker {
         const tokenizeDocument = (note: Note) => {
             const source = note.text.toLocaleLowerCase();
             const tokens: TokenInstance[] = [];
-            const spaces = new Set([' ', '\n', '\t', '\r']);
             let line = 0;
             let start = 0;
             let current = 0;
