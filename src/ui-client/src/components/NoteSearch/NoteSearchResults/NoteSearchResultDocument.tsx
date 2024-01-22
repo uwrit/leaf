@@ -1,10 +1,10 @@
 import React from 'react';
-import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
+import { SearchResultDocument } from '../../../providers/noteSearch/noteSearchWebWorker';
 import { Col, Row } from 'reactstrap';
 
 interface Props {
-    noteClickHandler?: (d: DocumentSearchResult) => any;
-    document: DocumentSearchResult;
+    noteClickHandler?: (d: SearchResultDocument) => any;
+    document: SearchResultDocument;
 }
 
 export class NoteSearchResultDocument extends React.PureComponent<Props> {

@@ -16,7 +16,7 @@ import { NoteDatasetContext } from "../../models/cohort/NoteSearch";
 import { CohortStateType, NoteSearchConfiguration, NoteSearchTerm } from "../../models/state/CohortState";
 import { setNoClickModalState, showInfoModal } from "../generalUi";
 import { InformationModalState, NotificationStates } from "../../models/state/GeneralUiState";
-import { DocumentSearchResult, NoteSearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
+import { SearchResultDocument, NoteSearchResult, RadixTreeResult } from "../../providers/noteSearch/noteSearchWebWorker";
 import { allowDatasetInSearch } from "../../services/datasetSearchApi";
 import { setDatasetSearchResult } from "../datasets";
 
@@ -32,7 +32,7 @@ export interface CohortNoteSearchAction {
     datasets?: PatientListDatasetQuery[];
     dateFilter?: DateBoundary;
     id: number;
-    note?: DocumentSearchResult;
+    note?: SearchResultDocument;
     searchResults?: NoteSearchResult;
     searchTerms?: NoteSearchTerm[];
     type: string;
@@ -53,7 +53,7 @@ export const searchNotesByTerms = () => {
     };
 };
 
-export const getHighlightedNote = (note: DocumentSearchResult) => {
+export const getHighlightedNote = (note: SearchResultDocument) => {
     return async (dispatch: Dispatch, getState: () => AppState) => {
         const state = getState();
         const results = await getHighlightedNoteFromResults(note);
@@ -219,7 +219,7 @@ export const setNoteSearchResults = (searchResults: NoteSearchResult): CohortNot
     };
 };
 
-export const setFullNote = (note?: DocumentSearchResult): CohortNoteSearchAction => {
+export const setFullNote = (note?: SearchResultDocument): CohortNoteSearchAction => {
     return {
         note,
         id: -1,

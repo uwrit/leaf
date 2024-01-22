@@ -1,7 +1,7 @@
 import React from 'react';
 import { NoteSearchState } from '../../../models/state/CohortState';
 import { Col, Container, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
-import { DocumentSearchResult } from '../../../providers/noteSearch/noteSearchWebWorker';
+import { SearchResultDocument } from '../../../providers/noteSearch/noteSearchWebWorker';
 import Paginate from '../../PatientList/Paginate';
 import { getHighlightedNote, setFullNote, setNoteSearchPagination } from '../../../actions/cohort/noteSearch';
 import { NoteSearchResultDocument } from './NoteSearchResultDocument';
@@ -41,8 +41,6 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
             noDataText = "Enter search terms in the upper-right";
         }
 
-        console.log(configuration.pageNumber);
-
         let paginate;
         if (results.documents.length && results.totalDocuments > noteSearch.configuration.pageSize) {
             paginate = 
@@ -69,7 +67,7 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
                                 <span className={`${c}-doccount`}>{noteSearch.results.totalPatients.toLocaleString()} unique patients</span>
                             </div>
                             <div className={`${c}-info`}>
-                                Click on a note to view the full contents in detail
+                                Click on a note to view full contents in detail
                             </div>
                         </div>
                         }
@@ -130,7 +128,7 @@ export class NoteSearchResults extends React.PureComponent<Props, State> {
         dispatch(setFullNote());
     }
 
-    private handleNoteClick = (note: DocumentSearchResult) => {
+    private handleNoteClick = (note: SearchResultDocument) => {
         const { dispatch } = this.props;
         this.setState({ showFullNoteModal: true });
         dispatch(getHighlightedNote(note));

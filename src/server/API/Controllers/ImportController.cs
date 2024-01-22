@@ -77,18 +77,11 @@ namespace API.Controllers
                 {
                     return NotFound();
                 }
-                ImportMetadata meta = null;
+
                 var isGuid = Guid.TryParse(id, out var guidId);
-                if (isGuid)
-                {
-                    // Get by leaf internal Id
-                    meta = await importer.GetImportMetadata(guidId);
-                }
-                else
-                {
-                    // Get by sourceId
-                    meta = await importer.GetImportMetadata(id);
-                }
+                var meta = isGuid
+                    ? await importer.GetImportMetadata(guidId)
+                    : await importer.GetImportMetadata(id);
 
                 if (meta == null)
                 {

@@ -18,6 +18,7 @@
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
     <Folder Include="Admin\Notification\" />
+    <Folder Include="NoteSearch\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.1.0" />
@@ -27,6 +28,7 @@
   <ItemGroup>
     <None Remove="Compiler\appsettings.json" />
     <None Remove="Admin\Notification\" />
+    <None Remove="NoteSearch\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Import\ImportMappingQuery.cs" />

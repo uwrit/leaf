@@ -25,9 +25,16 @@ const handleWorkMessage = (payload) => {
             return unindexDataset(payload);
         case GET_NOTE:
             return getSearchResultFullDocument(payload);
+        case SELECTED:
+            return setSelected(payload);
         default:
             return null;
     }
+};
+const setSelected = (payload) => {
+    const { requestId, document, selected } = payload;
+    docIndex.get(document.id).selected = selected;
+    return { requestId };
 };
 const unindexDataset = (payload) => {
     const { dataset } = payload;
@@ -204,10 +211,10 @@ const getSearchResultDocumentContext = (doc, hits) => {
     return result;
 };
 const getSearchResultFullDocument = (payload) => {
-    const { requestId, searchResults } = payload;
-    const indexedDoc = docIndex.get(searchResults.id);
-    const indexedSearchHitLines = new Map(searchResults.lines.map(l => [l.index, l.searchHits]));
-    const output = Object.assign(Object.assign({}, searchResults), { lines: [] });
+    const { requestId, document } = payload;
+    const indexedDoc = docIndex.get(document.id);
+    const indexedSearchHitLines = new Map(document.lines.map(l => [l.index, l.searchHits]));
+    const output = Object.assign(Object.assign({}, document), { lines: [] });
     const lines = new Map(indexedDoc.text.split('\\n').map((l, i) => [i, l]));
     const text = indexedDoc.text;
     let offset = 0;

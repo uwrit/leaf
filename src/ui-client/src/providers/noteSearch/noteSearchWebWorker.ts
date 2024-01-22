@@ -17,13 +17,15 @@ const FLUSH = 'FLUSH';
 const REMOVE = 'REMOVE';
 const GET_NOTE = 'GET_NOTE';
 const HINT = 'HINT'
+const SELECTED = 'SELECTED';
 
 interface InboundMessagePartialPayload {
     config?: NoteSearchConfiguration;
     dataset?: PatientListDatasetQuery;
     datasets?: NoteDatasetContext[];
+    document?: SearchResultDocument;
     message: string;
-    searchResults?: DocumentSearchResult;
+    selected?: boolean;
     terms?: NoteSearchTerm[];
     prefix?: string;
 }
@@ -80,13 +82,14 @@ interface IndexedDocument {
     date?: Date;
     datasetId: string;
     personId: string;
+    selected?: boolean;
     text: string;
     tokens: TokenInstance[];
     type: string;
 }
 
-export interface DocumentSearchResult extends IndexedDocument {
-    lines: DocumentSearchResultLine[]
+export interface SearchResultDocument extends IndexedDocument {
+    lines: DocumentSearchResultLine[];
 }
 
 interface DocumentSearchResultLine {
@@ -112,7 +115,7 @@ interface RadixNode {
 }
 
 export interface NoteSearchResult {
-    documents: DocumentSearchResult[];
+    documents: SearchResultDocument[];
     totalDocuments: number;
     totalPatients: number;
     totalTermHits: number;
@@ -134,7 +137,7 @@ export default class NoteSearchWebWorker {
 
     constructor() {
         const workerFile = `  
-            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT, REMOVE, GET_NOTE])}
+            ${this.addMessageTypesToContext([INDEX, FLUSH, SEARCH, HINT, REMOVE, GET_NOTE, SELECTED])}
             ${workerContext}
             self.onmessage = function(e) {  
                 self.postMessage(handleWorkMessage.call(this, e.data, postMessage)); 
@@ -165,8 +168,12 @@ export default class NoteSearchWebWorker {
         return this.postMessage({ message: REMOVE, dataset, config, terms });
     }
 
-    public getHighlightedNote = (searchResults: DocumentSearchResult) => {
-        return this.postMessage({ message: GET_NOTE, searchResults})
+    public getHighlightedNote = (document: SearchResultDocument) => {
+        return this.postMessage({ message: GET_NOTE, document})
+    }
+
+    public setNoteSelected = (document: SearchResultDocument, selected: boolean) => {
+        return this.postMessage({ message: SELECTED, document, selected})
     }
 
     public searchPrefix = (prefix: string) => {
@@ -234,10 +241,19 @@ export default class NoteSearchWebWorker {
                     return unindexDataset(payload);
                 case GET_NOTE:
                     return getSearchResultFullDocument(payload);
+                case SELECTED:
+                    return setSelected(payload);
                 default:
                     return null;
             }
         };
+
+        const setSelected = (payload: InboundMessagePayload): OutboundMessagePayload => {
+            const { requestId, document, selected } = payload;
+            docIndex.get(document.id).selected = selected;
+
+            return { requestId }
+        }
 
         const unindexDataset = (payload: InboundMessagePayload): OutboundMessagePayload => {
             const { dataset } = payload;
@@ -388,7 +404,7 @@ export default class NoteSearchWebWorker {
             }
 
             precedingHits.forEach((v, k) => {
-                const doc: DocumentSearchResult = { ...docIndex.get(k)!, lines: [] };
+                const doc: SearchResultDocument = { ...docIndex.get(k)!, lines: [] };
                 const hits = v.sort((a, b) => a.charIndex.start - b.charIndex.start);
                 const context = getSearchResultDocumentContext(doc, hits);
                 result.documents.push(context);
@@ -403,7 +419,7 @@ export default class NoteSearchWebWorker {
             return { requestId, result: returnPaginatedResults(config) };
         }
 
-        const getSearchResultDocumentContext = (doc: DocumentSearchResult, hits: SearchHit[]): DocumentSearchResult => {
+        const getSearchResultDocumentContext = (doc: SearchResultDocument, hits: SearchHit[]): SearchResultDocument => {
             const contextCharDistance = 50;
             const groups: SearchHit[][] = [];
 
@@ -431,7 +447,7 @@ export default class NoteSearchWebWorker {
                 }
             }
 
-            const result: DocumentSearchResult = { ...doc, lines: [] };
+            const result: SearchResultDocument = { ...doc, lines: [] };
 
             for (let i = 0; i < groups.length; i++) {
                 const group = groups[i];
@@ -449,10 +465,10 @@ export default class NoteSearchWebWorker {
         };
 
         const getSearchResultFullDocument = (payload: InboundMessagePayload): OutboundMessagePayload => {
-            const { requestId, searchResults } = payload;
-            const indexedDoc = docIndex.get(searchResults.id);
-            const indexedSearchHitLines = new Map(searchResults.lines.map(l => [l.index, l.searchHits]));
-            const output: DocumentSearchResult = { ...searchResults, lines: [] };
+            const { requestId, document } = payload;
+            const indexedDoc = docIndex.get(document.id);
+            const indexedSearchHitLines = new Map(document.lines.map(l => [l.index, l.searchHits]));
+            const output: SearchResultDocument = { ...document, lines: [] };
             const lines = new Map(indexedDoc.text.split('\n').map((l,i) => [i, l]));
             const text = indexedDoc.text;
             

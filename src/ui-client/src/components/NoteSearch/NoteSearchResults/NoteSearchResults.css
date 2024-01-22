@@ -19,7 +19,7 @@
 }
 
 .note-search-results-document:hover {
-    border-color: rgb(186, 67, 223);
+    border-color: rgb(24, 155, 202);
     box-shadow: rgba(213, 234, 244, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
 }
 
@@ -55,8 +55,8 @@
 }
 
 .note-search-results-context:hover {
-    background-color: rgba(186, 67, 223, 0.05);
-    border-color: rgb(186, 67, 223);
+    background-color: rgba(24, 155, 202, 0.05);
+    border-color: rgb(24, 155, 202);
 }
 
 .note-search-results-match {
