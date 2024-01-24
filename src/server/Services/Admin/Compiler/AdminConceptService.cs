@@ -212,7 +212,7 @@ namespace Services.Admin.Compiler
         public bool? IsSpecializable { get; set; }
         public string SqlSetWhere { get; set; }
         public string SqlFieldNumeric { get; set; }
-        public Model.Compiler.Shape FhirResourceShapeId { get; set; }
+        public Model.Compiler.Shape? FhirResourceShapeId { get; set; }
         public string FhirSearchParameters { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
