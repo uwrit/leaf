@@ -33,6 +33,8 @@ namespace Services.Search
         public string SqlFieldDate { get; set; }
         public string SqlFieldNumeric { get; set; }
         public string SqlFieldEvent { get; set; }
+        public int FhirResourceShapeId { get; set; }
+        public string FhirSearchParameters { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }
@@ -66,6 +68,8 @@ namespace Services.Search
             SqlFieldDate = c.SqlFieldDate;
             SqlFieldNumeric = c.SqlFieldNumeric;
             SqlFieldEvent = c.SqlFieldEvent;
+            FhirResourceShapeId = (int)c.FhirResourceShapeId;
+            FhirSearchParameters = c.FhirSearchParameters;
             UiDisplayName = c.UiDisplayName;
             UiDisplayText = c.UiDisplayText;
             UiDisplaySubtext = c.UiDisplaySubtext;
@@ -106,6 +110,8 @@ namespace Services.Search
                 SqlFieldDate = SqlFieldDate,
                 SqlFieldNumeric = SqlFieldNumeric,
                 SqlFieldEvent = SqlFieldEvent,
+                FhirResourceShapeId = (Shape)FhirResourceShapeId,
+                FhirSearchParameters = FhirSearchParameters,
                 UiDisplayName = UiDisplayName,
                 UiDisplayText = UiDisplayText,
                 UiDisplaySubtext = UiDisplaySubtext,

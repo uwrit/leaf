@@ -18,6 +18,9 @@ namespace Model.Options
         public const string ORACLE = "ORACLE";
         public const string BIGQUERY = "BIGQUERY";
 
+        public const string SQL = "SQL";
+        public const string FHIR = "FHIR";
+
         string connectionString;
         public string ConnectionString
         {
@@ -44,6 +47,36 @@ namespace Model.Options
                 }
                 defaultTimeout = value;
             }
+        }
+
+        public QueryMode Mode { get; set; }
+
+        public void WithMode(string value)
+        {
+            var tmp = value.ToUpper();
+            if (!IsValidMode(tmp))
+            {
+                throw new LeafConfigurationException($"{value} is not a supported Mode!");
+            }
+
+            switch (tmp)
+            {
+                case SQL:
+                    Mode = QueryMode.SQL;
+                    break;
+                case FHIR:
+                    Mode = QueryMode.FHIR;
+                    break;
+            }
+        }
+
+        public static readonly IEnumerable<string> ValidMode = new string[] { SQL, FHIR };
+        static bool IsValidMode(string value) => ValidMode.Contains(value);
+
+        public enum QueryMode
+        {
+            SQL = 1,
+            FHIR = 2
         }
 
         public RdbmsType Rdbms { get; set; }
@@ -141,6 +174,13 @@ namespace Model.Options
                 CTE = 1,
                 Parallel = 2
             }
+        }
+
+        public ClinDbFhirOptions Fhir = new ClinDbFhirOptions();
+
+        public class ClinDbFhirOptions
+        {
+            public string ApiURI { get; set; }
         }
     }
 }

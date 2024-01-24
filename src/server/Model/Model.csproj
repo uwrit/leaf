@@ -18,15 +18,17 @@
     <Folder Include="Admin\Network\" />
     <Folder Include="Notification\" />
     <Folder Include="Admin\Notification\" />
+    <Folder Include="Cohort\FHIR\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Composure" Version="1.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="Compiler\appsettings.json" />
     <None Remove="Admin\Notification\" />
+    <None Remove="Cohort\FHIR\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Import\ImportMappingQuery.cs" />

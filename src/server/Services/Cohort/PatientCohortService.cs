@@ -7,10 +7,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Model.Cohort;
 using Model.Compiler;
 using Model.Options;
 
-namespace Model.Cohort
+namespace Services.Cohort
 {
     public abstract class PatientCohortService : CohortCounter.IPatientCohortService
     {

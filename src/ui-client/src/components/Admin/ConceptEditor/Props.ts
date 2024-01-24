@@ -10,8 +10,10 @@ import { Concept as UserConcept } from "../../../models/concept/Concept";
 import { ConceptSqlSet } from "../../../models/admin/Concept";
 import { SqlConfiguration } from "../../../models/admin/Configuration";
 import AdminState from "../../../models/state/AdminState";
+import { ConfigDTO } from "../../../models/Auth";
 
-export interface EditorPaneProps { 
+export interface EditorPaneProps {
+    config: ConfigDTO;
     data: AdminState;
     dispatch: any;
     toggleSqlPreview: (show: boolean) => any;

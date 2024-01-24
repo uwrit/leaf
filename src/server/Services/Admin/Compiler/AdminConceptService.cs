@@ -10,11 +10,8 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Model.Admin;
 using Model.Authorization;
-using Model.Error;
 using Model.Options;
 using Model.Tagging;
 using Services.Search;
@@ -59,6 +56,8 @@ namespace Services.Admin.Compiler
                             sqlSetId = c.SqlSetId,
                             sqlSetWhere = c.SqlSetWhere,
                             sqlFieldNumeric = c.SqlFieldNumeric,
+                            fhirShapeId = c.FhirResourceShapeId,
+                            fhirSearchParams = c.FhirSearchParameters,
                             uiDisplayName = c.UiDisplayName,
                             uiDisplayText = c.UiDisplayText,
                             uiDisplaySubtext = c.UiDisplaySubtext,
@@ -136,6 +135,8 @@ namespace Services.Admin.Compiler
                             sqlSetId = c.SqlSetId,
                             sqlSetWhere = c.SqlSetWhere,
                             sqlFieldNumeric = c.SqlFieldNumeric,
+                            fhirShapeId = c.FhirResourceShapeId,
+                            fhirSearchParams = c.FhirSearchParameters,
                             uiDisplayName = c.UiDisplayName,
                             uiDisplayText = c.UiDisplayText,
                             uiDisplaySubtext = c.UiDisplaySubtext,
@@ -211,6 +212,8 @@ namespace Services.Admin.Compiler
         public bool? IsSpecializable { get; set; }
         public string SqlSetWhere { get; set; }
         public string SqlFieldNumeric { get; set; }
+        public Model.Compiler.Shape FhirResourceShapeId { get; set; }
+        public string FhirSearchParameters { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }
@@ -237,6 +240,8 @@ namespace Services.Admin.Compiler
                 IsSpecializable = IsSpecializable,
                 SqlSetWhere = SqlSetWhere,
                 SqlFieldNumeric = SqlFieldNumeric,
+                FhirResourceShapeId = FhirResourceShapeId,
+                FhirSearchParameters = FhirSearchParameters,
                 UiDisplayName = UiDisplayName,
                 UiDisplayText = UiDisplayText,
                 UiDisplaySubtext = UiDisplaySubtext,

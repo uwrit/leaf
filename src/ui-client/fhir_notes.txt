@@ -1,0 +1,17 @@
+https://www.hl7.org/fhir/search_filter.html
+https://www.hl7.org/fhir/search.html#_include
+http://hl7.org/fhir/R4/resourcelist.html
+http://hapi.fhir.org/search?serverId=home_r4&pretty=true&_summary=&resource=AllergyIntolerance&param.0.0=&param.0.1=&param.0.2=&param.0.3=&param.0.name=date&param.0.type=date&_include=AllergyIntolerance%3Apatient&sort_by=&sort_direction=&resource-search-limit=
+https://www.hl7.org/fhir/uv/bulkdata/authorization/index.html
+https://docs.fire.ly/projects/Firely-NET-SDK/en/latest/client/paging.html
+https://docs.fire.ly/projects/Firely-NET-SDK/en/latest/client/search.html#searching-within-a-specific-type-of-resource
+
+http://hapi.fhir.org/baseR4/Person?birthdate=gt1999-09-13&_elements=id
+http://hapi.fhir.org/baseR4/Encounter?date=gt2024-01-24&_elements=subject,patient
+http://hapi.fhir.org/baseR4/Condition?code:not=http://snomed.info/sct|&_elements=subject,patient
+http://hapi.fhir.org/baseR4/AllergyIntolerance?_elements=patient,subject
+
+https://learn.microsoft.com/en-us/azure/healthcare-apis/fhir/search-samples
+
+https://www.hl7.org/fhir/search.html#token
+

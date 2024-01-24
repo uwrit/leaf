@@ -188,59 +188,68 @@ namespace API.Options
             var clinDbOpts = sp.GetRequiredService<IOptions<ClinDbOptions>>().Value;
             var compilerOpts = sp.GetRequiredService<IOptions<CompilerOptions>>().Value;
 
-            // Query strategy
-            switch (clinDbOpts.Cohort.QueryStrategy)
+            if (clinDbOpts.Mode == ClinDbOptions.QueryMode.SQL)
             {
-                case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE:
-                    services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
-                    break;
+                // Query strategy
+                switch (clinDbOpts.Cohort.QueryStrategy)
+                {
+                    case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.CTE:
+                        services.AddTransient<CohortCounter.IPatientCohortService, CtePatientCohortService>();
+                        break;
 
-                case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel:
-                    services.AddTransient<CohortCounter.IPatientCohortService, ParallelPatientCohortService>();
-                    break;
+                    case ClinDbOptions.ClinDbCohortOptions.QueryStrategyOptions.Parallel:
+                        services.AddTransient<CohortCounter.IPatientCohortService, ParallelPatientCohortService>();
+                        break;
+                }
+
+                // Target clinical RDBMS
+                switch (clinDbOpts.Rdbms)
+                {
+                    case ClinDbOptions.RdbmsType.SqlServer:
+                        services.AddTransient<ISqlDialect, TSqlDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, SqlServerQueryExecutor>();
+
+                        if (compilerOpts.SharedDbServer)
+                        {
+                            services.AddTransient<ICachedCohortPreparer, SharedSqlServerCachedCohortPreparer>();
+                        }
+                        else
+                        {
+                            services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
+                        }
+                        break;
+                    case ClinDbOptions.RdbmsType.MySql:
+                        services.AddTransient<ISqlDialect, MySqlDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, MySqlQueryExecutor>();
+                        services.AddTransient<ICachedCohortPreparer, MySqlCachedCohortPreparer>();
+                        break;
+                    case ClinDbOptions.RdbmsType.MariaDb:
+                        services.AddTransient<ISqlDialect, MariaDbDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, MariaDbQueryExecutor>();
+                        services.AddTransient<ICachedCohortPreparer, MariaDbCachedCohortPreparer>();
+                        break;
+                    case ClinDbOptions.RdbmsType.PostgreSql:
+                        services.AddTransient<ISqlDialect, PostgreSqlDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, PostgreSqlQueryExecutor>();
+                        services.AddTransient<ICachedCohortPreparer, PostgreSqlCachedCohortPreparer>();
+                        break;
+                    case ClinDbOptions.RdbmsType.Oracle:
+                        services.AddTransient<ISqlDialect, PlSqlDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, OracleQueryExecutor>();
+                        services.AddTransient<ICachedCohortPreparer, OracleCachedCohortPreparer>();
+                        break;
+                    case ClinDbOptions.RdbmsType.BigQuery:
+                        services.AddTransient<ISqlDialect, BigQuerySqlDialect>();
+                        services.AddTransient<ISqlProviderQueryExecutor, BigQueryQueryExecutor>();
+                        services.AddTransient<ICachedCohortPreparer, BigQuerySqlCachedCohortPreparer>();
+                        break;
+                }
             }
-
-            // Target clinical RDBMS
-            switch (clinDbOpts.Rdbms)
+            else if (clinDbOpts.Mode == ClinDbOptions.QueryMode.FHIR)
             {
-                case ClinDbOptions.RdbmsType.SqlServer:
-                    services.AddTransient<ISqlDialect, TSqlDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, SqlServerQueryExecutor>();
-
-                    if (compilerOpts.SharedDbServer)
-                    {
-                        services.AddTransient<ICachedCohortPreparer, SharedSqlServerCachedCohortPreparer>();
-                    }
-                    else
-                    {
-                        services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
-                    }
-                    break;
-                case ClinDbOptions.RdbmsType.MySql:
-                    services.AddTransient<ISqlDialect, MySqlDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, MySqlQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, MySqlCachedCohortPreparer>();
-                    break;
-                case ClinDbOptions.RdbmsType.MariaDb:
-                    services.AddTransient<ISqlDialect, MariaDbDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, MariaDbQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, MariaDbCachedCohortPreparer>();
-                    break;
-                case ClinDbOptions.RdbmsType.PostgreSql:
-                    services.AddTransient<ISqlDialect, PostgreSqlDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, PostgreSqlQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, PostgreSqlCachedCohortPreparer>();
-                    break;
-                case ClinDbOptions.RdbmsType.Oracle:
-                    services.AddTransient<ISqlDialect, PlSqlDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, OracleQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, OracleCachedCohortPreparer>();
-                    break;
-                case ClinDbOptions.RdbmsType.BigQuery:
-                    services.AddTransient<ISqlDialect, BigQuerySqlDialect>();
-                    services.AddTransient<ISqlProviderQueryExecutor, BigQueryQueryExecutor>();
-                    services.AddTransient<ICachedCohortPreparer, BigQuerySqlCachedCohortPreparer>();
-                    break;
+                services.AddTransient<CohortCounter.IPatientCohortService, FhirCohortService>();
+                services.AddTransient<ISqlDialect, TSqlDialect>();
+                services.AddTransient<ICachedCohortPreparer, SqlServerCachedCohortPreparer>();
             }
 
             return services;

@@ -6,6 +6,7 @@
  */ 
 
 import { PatientCountPerYear } from "../concept/Concept";
+import { PatientListDatasetShape } from "../patientList/Dataset";
 
 export interface ConceptSqlSetDTO {
     id: number,
@@ -83,6 +84,8 @@ export interface Concept {
     sqlSetId?: number;
     sqlSetWhere?: string;
     sqlFieldNumeric?: string;
+    fhirResourceShapeId?: PatientListDatasetShape;
+    fhirSearchParameters?: string;
     uiDisplayName: string;
     uiDisplayText: string;
     uiDisplaySubtext?: string;

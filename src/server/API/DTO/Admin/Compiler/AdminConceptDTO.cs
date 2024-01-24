@@ -28,6 +28,8 @@ namespace API.DTO.Admin.Compiler
         public bool? IsSpecializable { get; set; }
         public string SqlSetWhere { get; set; }
         public string SqlFieldNumeric { get; set; }
+        public Shape? FhirResourceShapeId { get; set; }
+        public string FhirSearchParameters { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }
@@ -62,6 +64,8 @@ namespace API.DTO.Admin.Compiler
             IsSpecializable = c.IsSpecializable;
             SqlSetWhere = c.SqlSetWhere;
             SqlFieldNumeric = c.SqlFieldNumeric;
+            FhirResourceShapeId = c.FhirResourceShapeId;
+            FhirSearchParameters = c.FhirSearchParameters;
             UiDisplayName = c.UiDisplayName;
             UiDisplayText = c.UiDisplayText;
             UiDisplaySubtext = c.UiDisplaySubtext;
@@ -96,6 +100,8 @@ namespace API.DTO.Admin.Compiler
                 IsSpecializable = dto.IsSpecializable,
                 SqlSetWhere = dto.SqlSetWhere,
                 SqlFieldNumeric = dto.SqlFieldNumeric,
+                FhirResourceShapeId = dto.FhirResourceShapeId,
+                FhirSearchParameters = dto.FhirSearchParameters,
                 UiDisplayName = dto.UiDisplayName,
                 UiDisplayText = dto.UiDisplayText,
                 UiDisplaySubtext = dto.UiDisplaySubtext,

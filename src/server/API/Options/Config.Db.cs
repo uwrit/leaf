@@ -22,6 +22,7 @@ namespace API.Options
             }
             public static class Clin
             {
+                public const string Mode = @"Db:Clin:Mode";
                 public const string Section = @"Db:Clin";
                 public const string Connection = @"Db:Clin:Connection";
                 public const string DefaultTimeout = @"Db:Clin:DefaultTimeout";
@@ -31,6 +32,11 @@ namespace API.Options
                 {
                     public const string QueryStrategy = @"Db:Clin:Cohort:QueryStrategy";
                     public const string MaxParallelThreads = @"Db:Clin:Cohort:MaxParallelThreads";
+                }
+
+                public static class FHIR
+                {
+                    public const string ApiURI = @"Db:Clin:FHIR:ApiURI";
                 }
             }
         }

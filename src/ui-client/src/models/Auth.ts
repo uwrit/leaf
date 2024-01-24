@@ -11,11 +11,17 @@ export enum AuthMechanismType {
     Saml2 = 2
 }
 
+export enum DbQueryMode {
+    SQL = 1,
+    FHIR = 2
+}
+
 export interface ConfigDTO {
     authentication: AuthenticationConfigDTO;
     attestation: AttestationOptionsDTO;
     cohort: CohortConfigDTO;
     client: ClientOptions;
+    db: DbConfigDTO;
     version: VersionConfigDTO;
 }
 
@@ -47,6 +53,10 @@ interface AttestationCreditsOptionsDTO {
 interface VersionConfigDTO {
     db: string;
     server: string;
+}
+
+interface DbConfigDTO {
+    mode: DbQueryMode;
 }
 
 export enum CustomAttestationType {

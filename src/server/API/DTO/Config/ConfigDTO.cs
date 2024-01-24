@@ -15,6 +15,7 @@ namespace API.DTO.Config
         public CohortConfigDTO Cohort { get; set; }
         public ClientOptionsDTO Client { get;set; }
         public VersionConfigDTO Version { get; set; }
+        public DbConfigDTO Db { get; set; }
     }
 
     public class AuthenticationConfigDTO
@@ -105,5 +106,10 @@ namespace API.DTO.Config
     {
         public string Server { get; set; }
         public string Db { get; set; }
+    }
+
+    public class DbConfigDTO
+    {
+        public ClinDbOptions.QueryMode Mode { get; set; }
     }
 }

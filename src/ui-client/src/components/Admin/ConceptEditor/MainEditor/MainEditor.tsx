@@ -25,6 +25,8 @@ import { updateUserConceptFromAdminChange, createEmptyConcept } from '../../../.
 import { setAdminConceptSqlSet } from '../../../../actions/admin/sqlSet';
 import { setAdminPanelPane } from '../../../../actions/admin/admin';
 import { WhatsThis } from '../../../Other/WhatsThis/WhatsThis';
+import { DbQueryMode } from '../../../../models/Auth';
+import { FhirEditor } from '../Sections/FhirEditor';
 
 const showConceptStatus = new Set([ AdminPanelLoadState.LOADING, AdminPanelLoadState.LOADED ]);
 
@@ -42,7 +44,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { data, dispatch, togglePanelPreview, toggleSqlPreview, toggleOverlay } = this.props;
+        const { config, data, dispatch, togglePanelPreview, toggleSqlPreview, toggleOverlay } = this.props;
         const { configuration } = data;
         const { changed, currentAdminConcept, currentUserConcept, state } = data.concepts;
         const { sets } = data.sqlSets
@@ -121,7 +123,8 @@ export class MainEditor extends React.PureComponent<Props,State> {
                             <SpecializationDropdowns data={sectionProps} set={sets.get(currentAdminConcept.sqlSetId!)}/>
                         </Col>
                         <Col md={6} className={`${c}-inner-column-right`}>
-                            <SqlEditor data={sectionProps} />
+                            {config.db.mode === DbQueryMode.SQL && <SqlEditor data={sectionProps} />}
+                            {config.db.mode === DbQueryMode.FHIR && <FhirEditor data={sectionProps} />}
                             <Identifiers data={sectionProps} />
                             <Constraints data={sectionProps}/>
                         </Col>

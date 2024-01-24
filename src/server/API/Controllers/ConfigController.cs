@@ -24,6 +24,7 @@ namespace API.Controllers
         readonly ClientOptions clientOptions;
         readonly AttestationOptions attestationOptions;
         readonly DeidentificationOptions deidentOptions;
+        readonly ClinDbOptions clinDbOptions;
         readonly IServerStateCache serverStateCache;
 
         public ConfigController(
@@ -33,6 +34,7 @@ namespace API.Controllers
             IOptions<ClientOptions> clientOptions,
             IOptions<AttestationOptions> attestationOptions,
             IOptions<DeidentificationOptions> deidentOptions,
+            IOptions<ClinDbOptions> clinDbOptions,
             IServerStateCache serverStateCache)
         {
             this.authenticationOptions = authenticationOptions.Value;
@@ -41,6 +43,7 @@ namespace API.Controllers
             this.clientOptions = clientOptions.Value;
             this.attestationOptions = attestationOptions.Value;
             this.deidentOptions = deidentOptions.Value;
+            this.clinDbOptions = clinDbOptions.Value;
             this.serverStateCache = serverStateCache;
         }
 
@@ -107,6 +110,10 @@ namespace API.Controllers
                         Email = clientOptions.Help.Email,
                         URI = clientOptions.Help.URI
                     }
+                },
+                Db = new DbConfigDTO
+                {
+                    Mode = clinDbOptions.Mode
                 },
                 Version = new VersionConfigDTO
                 {

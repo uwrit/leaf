@@ -15,10 +15,12 @@ import { NetworkAndIdentityEditor } from '../../components/Admin/NetworkAndIdent
 import { SqlSetEditor } from '../../components/Admin/SqlSetEditor/SqlSetEditor';
 import { PanelFilterEditor } from '../../components/Admin/PanelFilterEditor/PanelFilterEditor';
 import { GlobalPanelFilterEditor } from '../../components/Admin/GlobalPanelFilterEditor/GlobalPanelFilterEditor';
+import { ConfigDTO } from '../../models/Auth';
 import './AdminPanel.css';
 
 interface StateProps { 
     admin?: AdminState;
+    config: ConfigDTO;
     datasets: DatasetsState;
 }
 interface DispatchProps {
@@ -46,11 +48,11 @@ class AdminPanel extends React.PureComponent<Props> {
     }
 
     private getContent = () => {
-        const { admin, dispatch, datasets } = this.props;
+        const { admin, config, dispatch, datasets } = this.props;
 
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
-                return <ConceptEditor data={admin!} dispatch={dispatch} />;
+                return <ConceptEditor config={config} data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.PANEL_FILTERS:
                 return <PanelFilterEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.GLOBAL_PANEL_FILTERS:
@@ -70,6 +72,7 @@ class AdminPanel extends React.PureComponent<Props> {
 const mapStateToProps = (state: AppState): StateProps => {
     return {
         admin: state.admin,
+        config: state.auth.config,
         datasets: state.datasets
     };
 }

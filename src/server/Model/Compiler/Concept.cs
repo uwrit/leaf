@@ -27,6 +27,8 @@ namespace Model.Compiler
         public string SqlFieldDate { get; set; }
         public string SqlFieldNumeric { get; set; }
         public string SqlFieldEvent { get; set; }
+        public Shape FhirResourceShapeId { get; set; }
+        public string FhirSearchParameters { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
         public string UiDisplaySubtext { get; set; }

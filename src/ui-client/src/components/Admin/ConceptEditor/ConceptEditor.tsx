@@ -12,9 +12,11 @@ import AdminState from '../../../models/state/AdminState';
 import { MainEditor } from './MainEditor/MainEditor';
 import { SqlPreview } from './Previews/SqlPreview/SqlPreview';
 import { PanelPreview } from './Previews/PanelPreview/PanelPreview';
+import { ConfigDTO } from '../../../models/Auth';
 import './ConceptEditor.css';
 
 interface Props { 
+    config: ConfigDTO;
     data: AdminState;
     dispatch: any;
 }
@@ -38,7 +40,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { showPanelPreview, showSqlPreview } = this.state;
-        const { data, dispatch } = this.props;
+        const { config, data, dispatch } = this.props;
         const c = this.className;
 
         return (
@@ -51,6 +53,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                         </Col>
                         <div className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
                             <MainEditor 
+                                config={config}
                                 data={data} dispatch={dispatch} 
                                 togglePanelPreview={this.togglePanelPreview} 
                                 toggleSqlPreview={this.toggleSqlPreview} 

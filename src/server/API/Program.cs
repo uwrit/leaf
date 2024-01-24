@@ -5,12 +5,13 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.IO;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Json;
 using API.Options;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore;
 
 namespace API
 {
