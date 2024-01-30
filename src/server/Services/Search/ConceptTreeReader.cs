@@ -35,18 +35,20 @@ namespace Services.Search
         const string queryRoots = @"app.sp_GetRootConcepts";
         const string queryRootsPanelFilters = @"app.sp_GetRootsPanelFilters";
 
-        readonly AppDbOptions opts;
+        readonly AppDbOptions appDbOpts;
+        readonly ClinDbOptions clinDbOpts;
         readonly IUserContext user;
 
-        public ConceptTreeReader(IOptions<AppDbOptions> dbOpts, IUserContext userContext)
+        public ConceptTreeReader(IOptions<AppDbOptions> appDbOpts, IOptions<ClinDbOptions> clinDbOpts, IUserContext userContext)
         {
-            opts = dbOpts.Value;
+            this.appDbOpts = appDbOpts.Value;
+            this.clinDbOpts = clinDbOpts.Value;
             user = userContext;
         }
 
         public async Task<Concept> GetAsync(Guid id)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -59,17 +61,17 @@ namespace Services.Search
                             groups = GroupMembership.From(user),
                             admin = user.IsAdmin
                         },
-                        commandTimeout: opts.DefaultTimeout,
+                        commandTimeout: appDbOpts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
 
-                return HydratedConceptReader.Read(grid).FirstOrDefault();
+                return HydratedConceptReader.Read(grid, clinDbOpts).FirstOrDefault();
             }
         }
 
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<Guid> ids)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -82,17 +84,17 @@ namespace Services.Search
                         groups = GroupMembership.From(user),
                         admin = user.IsAdmin
                     },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<IEnumerable<Concept>> GetAsync(HashSet<string> universalIds)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -105,17 +107,17 @@ namespace Services.Search
                         groups = GroupMembership.From(user),
                         admin = user.IsAdmin
                     },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<IEnumerable<Concept>> GetChildrenAsync(Guid parentId)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -128,17 +130,17 @@ namespace Services.Search
                             groups = GroupMembership.From(user),
                             admin = user.IsAdmin
                         },
-                        commandTimeout: opts.DefaultTimeout,
+                        commandTimeout: appDbOpts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<IEnumerable<Concept>> GetWithParentsAsync(HashSet<Guid> ids)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -151,17 +153,17 @@ namespace Services.Search
                             groups = GroupMembership.From(user),
                             admin = user.IsAdmin
                         },
-                        commandTimeout: opts.DefaultTimeout,
+                        commandTimeout: appDbOpts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<IEnumerable<Concept>> GetWithParentsBySearchTermAsync(Guid? rootId, string[] terms)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -175,45 +177,45 @@ namespace Services.Search
                         groups = GroupMembership.From(user),
                         admin = user.IsAdmin
                     },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<IEnumerable<Concept>> GetRootsAsync()
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
                 var grid = await cn.QueryMultipleAsync(
                     queryRoots,
                     new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return HydratedConceptReader.Read(grid);
+                return HydratedConceptReader.Read(grid, clinDbOpts);
             }
         }
 
         public async Task<ConceptTree> GetTreetopAsync()
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
                 var grid = await cn.QueryMultipleAsync(
                     queryRootsPanelFilters,
                     new { user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                var roots = HydratedConceptReader.Read(grid);
+                var roots = HydratedConceptReader.Read(grid, clinDbOpts);
                 var filterRecords = grid.Read<PanelFilterRecord>();
                 var filters = filterRecords.Select(f => f.ToPanelFilter());
 

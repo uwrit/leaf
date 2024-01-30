@@ -29,16 +29,19 @@ namespace Services.Search
         const string contextByQueryUIdConceptId = @"app.sp_GetConceptDatasetContextByQueryUIdConceptId";
 
         readonly IUserContext user;
-        readonly AppDbOptions opts;
+        readonly AppDbOptions appDbOpts;
+        readonly ClinDbOptions clinDbOpts;
         readonly ILogger<ConceptDatasetCompilerContextProvider> log;
 
         public ConceptDatasetCompilerContextProvider(
             IUserContext userContext,
-            IOptions<AppDbOptions> options,
+            IOptions<AppDbOptions> appDbOpts,
+            IOptions<ClinDbOptions> clinDbOpts,
             ILogger<ConceptDatasetCompilerContextProvider> logger)
         {
             user = userContext;
-            opts = options.Value;
+            this.appDbOpts = appDbOpts.Value;
+            this.clinDbOpts = clinDbOpts.Value;
             log = logger;
         }
 
@@ -73,7 +76,7 @@ namespace Services.Search
         PanelDatasetCompilerContext ReadContextGrid(ConceptDatasetExecutionRequest request, SqlMapper.GridReader gridReader)
         {
             var queryCtx = gridReader.Read<QueryContext>().FirstOrDefault();
-            var concept = HydratedConceptReader.Read(gridReader).FirstOrDefault();
+            var concept = HydratedConceptReader.Read(gridReader, clinDbOpts).FirstOrDefault();
             var pi = request.PanelItem;
             var panel = new Panel
             {
@@ -110,7 +113,7 @@ namespace Services.Search
             log.LogInformation("Getting ConceptDatasetCompilerContext by QueryId and ConceptId");
             var queryid = request.QueryRef.Id.Value;
             var conceptid = conceptRef.Id.Value;
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -118,7 +121,7 @@ namespace Services.Search
                     contextByQueryIdConceptId,
                     new { queryid, conceptid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
+                    commandTimeout: appDbOpts.DefaultTimeout
                 );
 
                 return ReadContextGrid(request, grid);
@@ -130,7 +133,7 @@ namespace Services.Search
             log.LogInformation("Getting ConceptDatasetCompilerContext by QueryId and ConceptUId");
             var queryid = request.QueryRef.Id.Value;
             var conceptuid = conceptRef.UniversalId.ToString();
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -138,7 +141,7 @@ namespace Services.Search
                     contextByQueryIdConceptUId,
                     new { queryid, conceptuid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
+                    commandTimeout: appDbOpts.DefaultTimeout
                 );
 
                 return ReadContextGrid(request, grid);
@@ -150,7 +153,7 @@ namespace Services.Search
             log.LogInformation("Getting ConceptDatasetCompilerContext by QueryUId and ConceptUId");
             var queryuid = request.QueryRef.UniversalId.ToString();
             var uid = conceptRef.UniversalId.ToString();
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -158,7 +161,7 @@ namespace Services.Search
                     contextByQueryUIdConceptUId,
                     new { queryuid, uid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
+                    commandTimeout: appDbOpts.DefaultTimeout
                 );
 
                 return ReadContextGrid(request, grid);
@@ -170,7 +173,7 @@ namespace Services.Search
             log.LogInformation("Getting ConceptDatasetCompilerContext by QueryUId and ConceptId");
             var queryuid = request.QueryRef.UniversalId.ToString();
             var conceptid = conceptRef.Id.Value;
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -178,7 +181,7 @@ namespace Services.Search
                     contextByQueryUIdConceptId,
                     new { queryuid, conceptid, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
                     commandType: CommandType.StoredProcedure,
-                    commandTimeout: opts.DefaultTimeout
+                    commandTimeout: appDbOpts.DefaultTimeout
                 );
 
                 return ReadContextGrid(request, grid);

@@ -8,12 +8,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Dapper;
 using Model.Compiler;
+using Model.Options;
 
 namespace Services.Search
 {
     public static class HydratedConceptReader
     {
-        public static IEnumerable<Concept> Read(SqlMapper.GridReader grid)
+        public static IEnumerable<Concept> Read(SqlMapper.GridReader grid, ClinDbOptions opts)
         {
             var concepts = grid.Read<ConceptRecord>();
             var groups = grid.Read<ConceptSpecializationGroupContext>();
@@ -27,7 +28,7 @@ namespace Services.Search
             var conceptJoin = concepts.GroupJoin(groupJoin,
                 c => c.Id,
                 g => g.conceptId,
-                (cr, gs) => cr.Concept(gs.Select(g => g.grp).ToArray()));
+                (cr, gs) => cr.Concept(gs.Select(g => g.grp).ToArray(), opts));
 
             return conceptJoin;
         }

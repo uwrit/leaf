@@ -15,6 +15,7 @@ import { SubPanel, SubPanelJoinSequence } from '../../../models/panel/SubPanel';
 import { CohortStateType } from '../../../models/state/CohortState';
 import Panel from './Panel';
 import { NumericFilter } from '../../../models/panel/NumericFilter';
+import { DbQueryMode } from '../../../models/Auth';
 import { 
     deselectSpecialization, setPanelDateFilter, setPanelInclusion, setSubPanelCount, 
     setSubPanelInclusion, selectSpecialization, addPanelItem, setPanelItemNumericFilter, hidePanelItem, removePanelItem, setSubPanelJoinSequence
@@ -22,6 +23,7 @@ import {
 
 interface Props {
     dispatch: any;
+    mode: DbQueryMode;
     panels: PanelModel[];
     queryState: CohortStateType;
 }
@@ -107,8 +109,8 @@ export class PanelGroup extends React.PureComponent<Props> {
     }
 
     private handleAddPanelItem = (concept: Concept, subPanel: SubPanel) => {
-        const { dispatch } = this.props;
-        dispatch(addPanelItem(concept, subPanel.panelIndex, subPanel.index));
+        const { dispatch, mode } = this.props;
+        dispatch(addPanelItem(concept, subPanel.panelIndex, subPanel.index, mode));
     }
 
     private handlePanelItemNumericFilter = (panelItem: PanelItem, filter: NumericFilter) => {
@@ -123,8 +125,8 @@ export class PanelGroup extends React.PureComponent<Props> {
     }
 
     private handleRemovePanelItem = (panelItem: PanelItem) => {
-        const { dispatch } = this.props;
-        dispatch(removePanelItem(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index));
+        const { dispatch, mode } = this.props;
+        dispatch(removePanelItem(panelItem.concept, panelItem.panelIndex, panelItem.subPanelIndex, panelItem.index, mode));
     }
 
     private handleSubPanelJoinSequence = (subPanel: SubPanel, joinSequence: SubPanelJoinSequence) => {

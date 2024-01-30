@@ -10,7 +10,6 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Model.Authorization;
 using Model.Compiler;
@@ -23,20 +22,23 @@ namespace Services.Search
 {
     public class PreflightResourceReader : PreflightResourceChecker.IPreflightResourceReader
     {
-        readonly AppDbOptions opts;
+        readonly AppDbOptions appDbOpts;
+        readonly ClinDbOptions clinDbOpts;
         readonly IUserContext user;
 
         public PreflightResourceReader(
-            IOptions<AppDbOptions> options,
+            IOptions<AppDbOptions> appDbOpts,
+            IOptions<ClinDbOptions> clinDbOpts,
             IUserContext userContext)
         {
-            opts = options.Value;
+            this.appDbOpts = appDbOpts.Value;
+            this.clinDbOpts = clinDbOpts.Value;
             user = userContext;
         }
 
         public async Task<PreflightResources> GetResourcesByIdsAsync(ResourceRefs refs)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -54,17 +56,17 @@ namespace Services.Search
                         sessionType = user.SessionType,
                         admin = user.IsAdmin
                     },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return PreflightReader.ReadResourcesById(grid, refs);
+                return PreflightReader.ReadResourcesById(grid, refs, clinDbOpts);
             }
         }
 
         public async Task<PreflightResources> GetResourcesByUniversalIdsAsync(ResourceRefs refs)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -82,33 +84,33 @@ namespace Services.Search
                         sessionType = user.SessionType,
                         admin = user.IsAdmin
                     },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return PreflightReader.ReadResourcesByUId(grid, refs);
+                return PreflightReader.ReadResourcesByUId(grid, refs, clinDbOpts);
             }
         }
 
         public async Task<PreflightConcepts> GetConceptsByIdAsync(Guid conceptId)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
                 var grid = await cn.QueryMultipleAsync(
                     ConceptPreflightSql.singleId,
                     new { id = conceptId, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
-                return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadConcepts(grid, clinDbOpts);
             }
         }
 
         public async Task<PreflightConcepts> GetConceptsByUniversalIdAsync(Urn universalId)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -116,16 +118,16 @@ namespace Services.Search
                 var grid = await cn.QueryMultipleAsync(
                     ConceptPreflightSql.singleId,
                     new { id = conceptId, user = user.UUID, groups = GroupMembership.From(user), admin = user.IsAdmin },
-                    commandTimeout: opts.DefaultTimeout,
+                    commandTimeout: appDbOpts.DefaultTimeout,
                     commandType: CommandType.StoredProcedure
                 );
-                return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadConcepts(grid, clinDbOpts);
             }
         }
 
         public async Task<PreflightConcepts> GetConceptsByIdsAsync(HashSet<Guid> conceptIds)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -138,17 +140,17 @@ namespace Services.Search
                             admin = user.IsAdmin,
                             sessionType = user.SessionType
                         },
-                        commandTimeout: opts.DefaultTimeout,
+                        commandTimeout: appDbOpts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
 
-                return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadConcepts(grid, clinDbOpts);
             }
         }
 
         public async Task<PreflightConcepts> GetConceptsByUniversalIdsAsync(HashSet<string> conceptUids)
         {
-            using (var cn = new SqlConnection(opts.ConnectionString))
+            using (var cn = new SqlConnection(appDbOpts.ConnectionString))
             {
                 await cn.OpenAsync();
 
@@ -161,11 +163,11 @@ namespace Services.Search
                             admin = user.IsAdmin,
                             sessionType = user.SessionType
                         },
-                        commandTimeout: opts.DefaultTimeout,
+                        commandTimeout: appDbOpts.DefaultTimeout,
                         commandType: CommandType.StoredProcedure
                     );
 
-                return PreflightReader.ReadConcepts(grid);
+                return PreflightReader.ReadConcepts(grid, clinDbOpts);
             }
         }
 
@@ -186,10 +188,10 @@ namespace Services.Search
 
     static class PreflightReader
     {
-        public static PreflightResources ReadResourcesById(SqlMapper.GridReader grid, ResourceRefs refs)
+        public static PreflightResources ReadResourcesById(SqlMapper.GridReader grid, ResourceRefs refs, ClinDbOptions clinDbOptions)
         {
             var pq = ReadQueriesById(grid);
-            var pc = ReadConcepts(grid);
+            var pc = ReadConcepts(grid, clinDbOptions);
             var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
@@ -201,10 +203,10 @@ namespace Services.Search
             };
         }
 
-        public static PreflightResources ReadResourcesByUId(SqlMapper.GridReader grid, ResourceRefs refs)
+        public static PreflightResources ReadResourcesByUId(SqlMapper.GridReader grid, ResourceRefs refs, ClinDbOptions clinDbOptions)
         {
             var pq = ReadQueriesByUId(grid);
-            var pc = ReadConcepts(grid);
+            var pc = ReadConcepts(grid, clinDbOptions);
             var im = ReadImportsById(grid, refs.Imports);
             var pf = ReadGlobalPanelFilters(grid);
 
@@ -216,10 +218,10 @@ namespace Services.Search
             };
         }
 
-        public static PreflightConcepts ReadConcepts(SqlMapper.GridReader grid)
+        public static PreflightConcepts ReadConcepts(SqlMapper.GridReader grid, ClinDbOptions clinDbOpts)
         {
             var preflight = grid.Read<ConceptPreflightCheckResultRecord>();
-            var concepts = HydratedConceptReader.Read(grid);
+            var concepts = HydratedConceptReader.Read(grid, clinDbOpts);
 
             return new PreflightConcepts
             {

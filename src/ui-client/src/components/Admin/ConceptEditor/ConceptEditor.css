@@ -347,3 +347,9 @@
 .concept-editor-fhir-values > div:last-child {
     padding-left: 4px;
 }
+
+.concept-editor-fhir-values .concept-editor.dropdown > button > div,
+.concept-editor-fhir-values .dropdown-item {
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+}

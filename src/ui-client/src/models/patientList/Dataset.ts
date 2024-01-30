@@ -40,7 +40,9 @@ export enum PatientListDatasetShape {
     Immunization = 6,
     Allergy = 7,
     MedicationRequest = 8,
-    MedicationAdministration = 9
+    MedicationAdministration = 9,
+    Person = 10,
+    Patient = 11
 }
 
 /*

@@ -8,6 +8,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Model.Compiler;
 using Model.Tagging;
+using Model.Options;
 
 namespace Services.Search
 {
@@ -82,10 +83,15 @@ namespace Services.Search
             EventTypeId = c.EventTypeId;
         }
 
-        public Concept Concept(ICollection<ConceptSpecializationGroup> groups)
+        public Concept Concept(ICollection<ConceptSpecializationGroup> groups, ClinDbOptions opts)
         {
             var concept = Concept();
             concept.SpecializationGroups = groups.ToList();
+            if (opts.Mode == ClinDbOptions.QueryMode.FHIR && concept.FhirResourceShapeId != Shape.Unknown)
+            {
+                var nonLongitudinalResources = new Shape[] { Shape.Person, Shape.Patient };
+                concept.IsEncounterBased = !nonLongitudinalResources.Contains(concept.FhirResourceShapeId);
+            }
             return concept;
         }
 

@@ -10,6 +10,8 @@ import { Concept as UserConcept } from '../../models/concept/Concept';
 import { SqlConfiguration } from '../../models/admin/Configuration';
 import formatSql from '../formatSql';
 import { generate as generateId } from 'shortid';
+import { DefTemplates } from '../../models/patientList/DatasetDefinitionTemplate';
+import { PatientListDatasetShape } from '../../models/patientList/Dataset';
 
 const year = new Date().getFullYear();
 
@@ -46,7 +48,9 @@ export const updateUserConceptFromAdminChange = (userConcept: any, propName: str
     if (sqlSet) {
         out.isEncounterBased = sqlSet.isEncounterBased;
     }
-
+    if (propName === 'fhirResourceShapeId') {
+        out.isEncounterBased = val !== PatientListDatasetShape.Person && val !== PatientListDatasetShape.Patient;
+    }
     if (alwaysAdd.has(propName) || (userConcept[propName] !== undefined && !neverAdd.has(propName))) {
         out[propName] = val;
     }

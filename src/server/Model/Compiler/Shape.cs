@@ -11,6 +11,7 @@ namespace Model.Compiler
     {
         Concept = -2,
         Dynamic = -1,
+        Unknown = 0,
         Observation = 1,
         Encounter = 2,
         Demographic = 3,
@@ -19,7 +20,9 @@ namespace Model.Compiler
         Immunization = 6,
         Allergy = 7,
         MedicationRequest = 8,
-        MedicationAdministration = 9
+        MedicationAdministration = 9,
+        Person = 10,
+        Patient = 11
     }
 
     public static class DatasetColumns

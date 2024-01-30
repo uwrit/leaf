@@ -94,7 +94,7 @@ export class MainEditor extends React.PureComponent<Props,State> {
                 }
 
                 {/* Create a SQL Set link, used at initial setup */}
-                {data.state === AdminPanelLoadState.LOADED && sets.size === 0 &&
+                {data.state === AdminPanelLoadState.LOADED && sets.size === 0 && config.db.mode === DbQueryMode.SQL &&
                 <div className={`${c}-start`}>
                     <p>Hi there! It looks like you need to create Concepts to connect to your clinical data.</p>
                     <p>

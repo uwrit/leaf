@@ -37,6 +37,7 @@ namespace API.Options
                 public static class FHIR
                 {
                     public const string ApiURI = @"Db:Clin:FHIR:ApiURI";
+                    public const string Count = @"Db:Clin:FHIR:Count";
                 }
             }
         }

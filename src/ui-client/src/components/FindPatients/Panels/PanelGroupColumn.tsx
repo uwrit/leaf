@@ -19,8 +19,10 @@ import { PanelGroup } from './PanelGroup';
 import { getPanelItemCount, panelHasErrors } from '../../../utils/panelUtils';
 import { InformationModalState } from '../../../models/state/GeneralUiState';
 import { CohortStateType } from '../../../models/state/CohortState';
+import { DbQueryMode } from '../../../models/Auth';
 
 interface StateProps {
+    mode: DbQueryMode;
     panelFilters: PanelFilterModel[];
     panels: PanelModel[];
     queryState: CohortStateType;
@@ -99,7 +101,7 @@ class PanelGroupColumn extends React.Component<Props> {
     }
 
     public render() {
-        const { dispatch, panels, panelFilters, queryState } = this.props;
+        const { dispatch, mode, panels, panelFilters, queryState } = this.props;
         return (
             <div>
                 <div className="find-patients-toprow">
@@ -108,7 +110,7 @@ class PanelGroupColumn extends React.Component<Props> {
                     </div>
                 </div>
                 <PanelFilterGroup dispatch={dispatch} filters={panelFilters} />
-                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} />
+                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} mode={mode} />
             </div>
         );
     }
@@ -116,6 +118,7 @@ class PanelGroupColumn extends React.Component<Props> {
 
 const mapStateToProps = (state: AppState): StateProps => {
     return { 
+        mode: state.auth.config.db.mode,
         panelFilters: state.panelFilters,
         panels: state.panels,
         queryState: state.cohort.count.state

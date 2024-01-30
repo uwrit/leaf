@@ -10,7 +10,6 @@ import { FormGroup, DropdownToggle } from 'reactstrap';
 import { FaChevronDown } from 'react-icons/fa';
 import { Dropdown as BSDropdown, DropdownMenu, DropdownItem } from 'reactstrap'
 import { PatientListDatasetShape } from '../../../../models/patientList/Dataset';
-import { DefTemplates } from '../../../../models/patientList/DatasetDefinitionTemplate';
 
 interface Props {
     clickHandler: (shape: PatientListDatasetShape) => any;
@@ -19,35 +18,32 @@ interface Props {
 
 interface State {
     isOpen: boolean;
-    shapes: PatientListDatasetShape[];
 }
 
 export class ShapeDropdown extends React.PureComponent<Props,State> {
     private className = 'concept-editor';
+    private shapes: [PatientListDatasetShape, string][] = [
+        [ PatientListDatasetShape.Allergy, 'Allergy' ],
+        [ PatientListDatasetShape.Condition, 'Condition' ],
+        [ PatientListDatasetShape.Encounter, 'Encounter' ],
+        [ PatientListDatasetShape.Immunization, 'Immunization' ],
+        [ PatientListDatasetShape.MedicationAdministration, 'MedAdmin' ],
+        [ PatientListDatasetShape.MedicationRequest, 'MedRequest' ],
+        [ PatientListDatasetShape.Observation, 'Observation' ],
+        [ PatientListDatasetShape.Patient, 'Patient' ],
+        [ PatientListDatasetShape.Person, 'Person' ]
+    ];
+
     constructor(props: Props) {
         super(props);
         this.state = {
-            isOpen: false,
-            shapes: []
+            isOpen: false
         }
-    }
-
-    public componentDidMount() {
-        let shapes: PatientListDatasetShape[] = [];
-
-        DefTemplates.forEach((t) => { 
-            if (t.shape !== PatientListDatasetShape.Demographics) { 
-                shapes.push(t.shape);
-            }
-        });
-        shapes = shapes.sort((a,b) => PatientListDatasetShape[a] > PatientListDatasetShape[b] ? 1 : -1);
-
-        this.setState({ shapes });
     }
 
     public render() {
         const { clickHandler, selected } = this.props;
-        const { isOpen, shapes } = this.state;
+        const { isOpen } = this.state;
         const c = this.className;
 
         return (
@@ -64,12 +60,13 @@ export class ShapeDropdown extends React.PureComponent<Props,State> {
                             <div className={`admin-panel-dropdown-item-container`}>
                                 
                                 {/* FHIR Template shapes */}
-                                {shapes.map((s) => {
+                                {this.shapes.map((s) => {
+                                    var [shape, name] = s;
                                     return (
                                         <DropdownItem 
-                                            key={s}
-                                            onClick={clickHandler.bind(null,s)}>
-                                            {PatientListDatasetShape[s]}
+                                            key={shape}
+                                            onClick={clickHandler.bind(null, shape)}>
+                                            {name}
                                         </DropdownItem>
                                     );
                                 })}

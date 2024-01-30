@@ -181,6 +181,7 @@ namespace Model.Options
         public class ClinDbFhirOptions
         {
             public string ApiURI { get; set; }
+            public int Count { get; set; }
         }
     }
 }

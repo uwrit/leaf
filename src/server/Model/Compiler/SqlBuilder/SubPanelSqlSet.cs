@@ -43,8 +43,8 @@ namespace Model.Compiler.SqlBuilder
             ISqlDialect dialect)
         {
             var union = subpanel.PanelItems.Select(pi => new PanelItemSequentialSqlSet(panel, subpanel, pi, compilerOptions, dialect));
-            this.Panel = panel;
-            this.SubPanel = subpanel;
+            Panel = panel;
+            SubPanel = subpanel;
 
             Add(union);
             SetSelect();

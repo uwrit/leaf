@@ -10,6 +10,7 @@ import { DateBoundary } from '../models/panel/Date';
 import { NumericFilter } from '../models/panel/NumericFilter';
 import { SubPanelJoinSequence } from '../models/panel/SubPanel';
 import { Panel } from '../models/panel/Panel';
+import { DbQueryMode } from '../models/Auth';
 
 export const ADD_PANEL_ITEM = 'ADD_PANEL_ITEM';
 export const REMOVE_PANEL_ITEM = 'REMOVE_PANEL_ITEM';
@@ -30,6 +31,7 @@ export interface PanelItemAction {
     concept: Concept;
     conceptSpecialization?: ConceptSpecialization;
     conceptSpecializationGroup?: ConceptSpecializationGroup;
+    mode?: DbQueryMode;
     panelIndex: number;
     subPanelIndex: number;
     panelItemIndex?: number;
@@ -64,7 +66,7 @@ export const setPanelItemNumericFilter = (
     };
 };
 
-export const addPanelItem = (concept: Concept, panelIndex: number, subPanelIndex: number): PanelItemAction => {
+export const addPanelItem = (concept: Concept, panelIndex: number, subPanelIndex: number, mode: DbQueryMode): PanelItemAction => {
     return {
         concept,
         panelIndex,
@@ -73,7 +75,8 @@ export const addPanelItem = (concept: Concept, panelIndex: number, subPanelIndex
     };
 };
 
-export const removePanelItem = (concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number): PanelItemAction => {
+export const removePanelItem = (
+    concept: Concept, panelIndex: number, subPanelIndex: number, panelItemIndex: number, mode: DbQueryMode): PanelItemAction => {
     return {
         concept,
         panelIndex,

@@ -33,6 +33,7 @@ import { RecencyFilterType } from '../models/panel/RecencyFilter';
 import { SequenceType } from '../models/panel/SubPanel';
 import { ConceptSpecialization } from '../models/concept/Concept';
 import { SavedQuery } from '../models/Query';
+import { DbQueryMode } from '../models/Auth';
 
 const ANYTIME = 'Anytime';
 
@@ -80,8 +81,8 @@ export const defaultPanelState = (): Panel[] => {
     return defaultPanels;
 };
 
-const addSubPanelIfNeeded = (panel: Panel): Panel => {
-    if (panel.subPanels[panel.subPanels.length - 1].panelItems.length > 0) {
+const addSubPanelIfNeeded = (panel: Panel, mode: DbQueryMode): Panel => {
+    if (panel.subPanels[panel.subPanels.length - 1].panelItems.length > 0 && mode === DbQueryMode.SQL) {
         panel.subPanels.push({
             dateFilter: {
                 dateIncrementType: DateIncrementType.NONE,
@@ -153,6 +154,7 @@ const updatePanel = (state: Panel[], action: PanelAction): Panel[] => {
 };
 
 const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
+    const mode = action.mode;
     const newpanels: Panel[] = state.slice();
     const panel = Object.assign({}, newpanels[action.panelIndex]);
     const subpanel = panel.subPanels[action.subPanelIndex];
@@ -190,7 +192,7 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
             }
 
             // Add a new subpanel if the current last subpanel now has at least 1 panel item
-            newpanels[action.panelIndex] = addSubPanelIfNeeded(panel);
+            newpanels[action.panelIndex] = addSubPanelIfNeeded(panel, mode);
             return newpanels;
 
         case REMOVE_PANEL_ITEM:
@@ -210,7 +212,7 @@ const updatePanelItems = (state: Panel[], action: PanelItemAction): Panel[] => {
             resetSubPanelIndexes(panel);
 
             // Add a new subpanel if the current last subpanel now has at least 1 panel item
-            newpanels[action.panelIndex] = addSubPanelIfNeeded(panel);
+            newpanels[action.panelIndex] = addSubPanelIfNeeded(panel, mode);
             return newpanels;
 
         case HIDE_PANEL_ITEM:

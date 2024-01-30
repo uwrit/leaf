@@ -434,6 +434,7 @@ namespace API.Options
                 // FHIR-only opts
                 else if (opts.Mode == ClinDbOptions.QueryMode.FHIR) {
                     opts.Fhir.ApiURI = config.GetValue<string>(Config.Db.Clin.FHIR.ApiURI);
+                    opts.Fhir.Count = config.GetValue<int>(Config.Db.Clin.FHIR.Count);
                 }
 
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.Clin.DefaultTimeout);
