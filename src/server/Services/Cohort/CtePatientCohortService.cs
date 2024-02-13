@@ -35,7 +35,7 @@ namespace Services.Cohort
             return new PatientCohort
             {
                 QueryId = query.QueryId,
-                PatientIds = await GetPatientSetAsync(cteQuery, query.DependentQueryIds, token),
+                PatientIds = new HashSet<string>(), //await GetPatientSetAsync(cteQuery, query.DependentQueryIds, token),
                 SqlStatements = new string[] { cteQuery.SqlStatement },
                 Panels = query.Panels.Where(p => p.Domain == PanelDomain.Panel)
             };

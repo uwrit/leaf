@@ -7,6 +7,9 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using API.DTO.Cohort;
+using API.DTO.Integration.Shrine;
+using API.DTO.Integration.Shrine4_1;
+using API.Integration.Shrine4_1;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,10 +18,18 @@ using Model.Authorization;
 using Model.Cohort;
 using Model.Compiler;
 using Model.Error;
+using Newtonsoft.Json;
 
 namespace API.Controllers
 {
-    [Authorize(Policy = TokenType.Access)]
+    public class Test
+    {
+        public string QueryJSON { get; set; }
+    }
+
+    //[Authorize(Policy = TokenType.Access)]
+    [AllowAnonymous]
+    [Produces("application/json")]
     [Route("api/cohort/count")]
     public class CohortCountController : Controller
     {
@@ -29,7 +40,30 @@ namespace API.Controllers
             log = logger;
         }
 
-        [HttpPost]
+        [HttpPost("shrine")]
+        public async Task<ActionResult<string[]>> ShrineCount(
+            [FromBody] Test input,
+            [FromServices] ShrineQueryDefinitionConverter queryConverter,
+            [FromServices] CohortCounter counter,
+        CancellationToken cancelToken)
+        {
+            try
+            {
+                var dto = JsonConvert.DeserializeObject<ShrineQueryDTO>(input.QueryJSON);
+                var shrineQuery = dto.ToQuery();
+
+                var query = queryConverter.ToLeafQuery(shrineQuery);
+                var cohort = await counter.Count(query, cancelToken);
+
+                return Ok(cohort.Count.SqlStatements);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+            [HttpPost]
         public async Task<ActionResult<CohortCountDTO>> Count(
             [FromBody] PatientCountQueryDTO patientCountQuery,
             [FromServices] CohortCounter counter,

@@ -51,7 +51,7 @@ namespace Model.Compiler.PanelSqlCompiler
                 default:
                     return string.Empty;
             }
-            ValidateSql(sql);
+            //ValidateSql(sql);
             return sql;
         }
 

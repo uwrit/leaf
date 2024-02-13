@@ -13,7 +13,6 @@ namespace Model.Compiler
     {
         public Concept Concept { get; set; }
         public IEnumerable<ConceptSpecialization> Specializations { get; set; }
-        public string SqlRecencyFilter { get; set; }
         public bool UseNumericFilter
         {
             get

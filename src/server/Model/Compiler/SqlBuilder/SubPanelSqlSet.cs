@@ -57,8 +57,8 @@ namespace Model.Compiler.SqlBuilder
 
             PersonId = new Column(first.PersonId);
             EncounterId = new Column(first.EncounterId);
-            Date = new AutoAliasedColumn(first.Date.Name, first.Date.AliasMarker);
             EventId = new EventIdColumn(first.EventId);
+            Date = new AutoAliasedColumn(first.Date.Name, first.Date.AliasMarker);
         }
     }
 }

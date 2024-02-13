@@ -41,7 +41,7 @@ namespace API.DTO.Integration.Shrine4_1
             ProjectName = query.ProjectName;
             Flagged = query.Flagged;
             FlaggedMessage = query.FlaggedMessage;
-            EncodedClass = query.EncodedClass.ToString();
+            EncodedClass = query?.EncodedClass.ToString();
         }
     }
 
@@ -49,18 +49,18 @@ namespace API.DTO.Integration.Shrine4_1
     {
         public static ShrineQuery ToQuery(this ShrineQueryDTO dto)
         {
-            _ = Enum.TryParse(dto.EncodedClass, out ShrineQueryType type);
-            _ = Enum.TryParse(dto.Status.EncodedClass, out ShrineStatusType status);
-            _ = Enum.TryParse(dto.Output.EncodedClass, out ShrineOutputType output);
+            _ = Enum.TryParse(dto?.EncodedClass, out ShrineQueryType type);
+            _ = Enum.TryParse(dto?.Status?.EncodedClass, out ShrineStatusType status);
+            _ = Enum.TryParse(dto?.Output?.EncodedClass, out ShrineOutputType output);
 
             return new ShrineQuery
             {
                 Id = dto.Id,
-                VersionInfo = dto.VersionInfo.ToVersionInfo(),
+                VersionInfo = dto?.VersionInfo?.ToVersionInfo(),
                 Status = status,
                 QueryDefinition = dto.QueryDefinition.ToDefinition(),
                 Output = output,
-                QueryName = dto.QueryName,
+                QueryName = dto?.QueryName,
                 NodeOfOriginId = dto.NodeOfOriginId,
                 ResearcherId = dto.ResearcherId,
                 TopicId = dto.TopicId,

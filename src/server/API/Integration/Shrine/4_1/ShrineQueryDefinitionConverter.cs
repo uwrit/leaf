@@ -49,11 +49,11 @@ namespace API.Integration.Shrine4_1
                 IncludePanel = conceptGroup.Concepts.NMustBeTrue > 0,
                 Index = i,
                 Domain = PanelDomain.Panel,
-                DateFilter = conceptGroup.StartDate.HasValue ?
+                DateFilter = conceptGroup.StartDate.HasValue || conceptGroup.EndDate.HasValue ?
                         new DateBoundary
                         {
-                            Start = new DateFilter { Date = conceptGroup.StartDate.Value },
-                            End = new DateFilter { Date = conceptGroup.EndDate.Value }
+                            Start = new DateFilter { Date = conceptGroup.StartDate ?? new DateTime(1900, 1, 1), DateIncrementType = DateIncrementType.Specific },
+                            End = new DateFilter { Date = conceptGroup.EndDate ?? DateTime.Now, DateIncrementType = DateIncrementType.Specific }
                         }
                         : null,
                 SubPanels = new List<SubPanelDTO>
@@ -98,6 +98,9 @@ namespace API.Integration.Shrine4_1
                         Index = j,
                         SubPanelIndex = 0,
                         PanelIndex = i,
+                        RecencyFilter = timeline.Subsequent.First().PreviousOccurrence == ShrineOccurrence.First
+                            ? RecencyFilterType.Min
+                            : RecencyFilterType.None,
                         Resource = new ResourceRef
                         {
                             UiDisplayName = c.DisplayName,
@@ -113,7 +116,7 @@ namespace API.Integration.Shrine4_1
                 {
                     IncludeSubPanel = sub.ConceptGroup.NMustBeTrue > 0,
                     Index = i + 1,
-                    MinimumCount = sub.ConceptGroup.NMustBeTrue,
+                    MinimumCount = (int)sub.ConceptGroup.OccursAtLeast,
                     JoinSequence = new SubPanelJoinSequence
                     {
                         Increment = sub.TimeConstraint != null ? sub.TimeConstraint.Value : -1,
@@ -128,6 +131,9 @@ namespace API.Integration.Shrine4_1
                             Index = j,
                             SubPanelIndex = 0,
                             PanelIndex = i,
+                            RecencyFilter = sub.ThisOccurrence == ShrineOccurrence.First
+                                ? RecencyFilterType.Min
+                                : RecencyFilterType.None,
                             Resource = new ResourceRef
                             {
                                 UiDisplayName = c.DisplayName,

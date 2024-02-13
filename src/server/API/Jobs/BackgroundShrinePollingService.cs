@@ -35,7 +35,7 @@ namespace API.Jobs
         readonly ShrineIntegrationOptions opts;
         readonly ShrineQueryDefinitionConverter queryConverter;
         readonly ShrineDemographicsConverter demographicsConverter;
-        readonly int ErrorPauseSeconds = 3;
+        readonly int ErrorPauseSeconds = 300;
 
         public BackgroundShrinePollingService(
             ILogger<BackgroundShrinePollingService> logger,

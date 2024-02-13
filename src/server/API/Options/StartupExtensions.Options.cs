@@ -459,7 +459,8 @@ namespace API.Options
             // App Db Connection
             services.Configure<AppDbOptions>(opts =>
             {
-                opts.ConnectionString = "Server=localhost,1432;Database=LeafDB;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.App.Connection);
+                //opts.ConnectionString = "Server=localhost,1432;Database=LeafDB;uid=sa;Password=Jefferson407!;"; //config.GetByProxy(Config.Db.App.Connection);
+                opts.ConnectionString = config.GetByProxy(Config.Db.App.Connection);
                 opts.DefaultTimeout = config.GetValue<int>(Config.Db.App.DefaultTimeout);
             });
 

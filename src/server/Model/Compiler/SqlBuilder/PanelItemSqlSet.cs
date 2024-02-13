@@ -24,12 +24,31 @@ namespace Model.Compiler.SqlBuilder
 
         internal override void SetSelect()
         {
-            Select = new[] { PersonId, EncounterId, Date, EventId };
+            if (!panelitem.UseRecencyFilter)
+            {
+                Select = new[] { PersonId, EncounterId, Date, EventId };
+            }
+            else
+            {
+                Select = new ISelectable[] { PersonId, EncounterId, AggregateDate, EventId };
+            }
         }
 
         internal override void SetGroupBy()
         {
-            // Do nothing. Group By clauses in a sequence are added in the parent PanelSequentialSqlSet.
+            if (panelitem.UseRecencyFilter)
+            {
+                if (concept.IsEventBased)
+                {
+                    GroupBy = new[] { PersonId, EncounterId, EventId };
+                }
+                else
+                {
+                    GroupBy = new[] { PersonId, EncounterId };
+                }
+            }
+
+            // Otherwise do nothing. Group By clauses in a sequence are added in the parent PanelSequentialSqlSet.
         }
 
         internal override void SetHaving()
@@ -41,17 +60,18 @@ namespace Model.Compiler.SqlBuilder
 
     class PanelItemSqlSet : NamedSet
     {
-        readonly CompilerOptions compilerOptions;
-        readonly Panel panel;
-        readonly SubPanel subpanel;
-        readonly PanelItem panelitem;
-        readonly Concept concept;
+        readonly internal CompilerOptions compilerOptions;
+        readonly internal  Panel panel;
+        readonly internal SubPanel subpanel;
+        readonly internal PanelItem panelitem;
+        readonly internal Concept concept;
         readonly List<IEvaluatable> where = new List<IEvaluatable>();
 
         internal ISqlDialect dialect;
         internal Column PersonId;
         internal Column EncounterId;
         internal EventIdColumn EventId;
+        internal ExpressedColumn AggregateDate;
         internal AutoAliasedColumn Date;
         internal AutoAliasedColumn Number;
 
@@ -101,6 +121,12 @@ namespace Model.Compiler.SqlBuilder
             {
                 EncounterId = new Column(compilerOptions.FieldEncounterId, this);
                 Date = new AutoAliasedColumn(concept.SqlFieldDate, aliasMarker, this);
+
+                if (panelitem.UseRecencyFilter)
+                {
+                    var op = panelitem.RecencyFilter == RecencyFilterType.Min ? "MIN" : "MAX";
+                    AggregateDate = new ExpressedColumn(new Expression($"{op}({Date})"), Date.Name.Replace(aliasMarker + ".", ""));
+                }
             }
             if (concept.IsEventBased)
             {
@@ -163,7 +189,7 @@ namespace Model.Compiler.SqlBuilder
                 var start = GetDateExpression(panel.DateFilter.Start);
                 var end = GetDateExpression(panel.DateFilter.End, true);
 
-                if (panel.PanelType == PanelType.Sequence && subpanel.Index > 0)
+                if (panel.PanelType == PanelType.Sequence && subpanel.Index > 0 && !panelitem.UseRecencyFilter)
                 {
                     var offset = new Expression(dialect.DateAdd(DateIncrementType.Month, -6, start));
                     where.Add(Date >= offset);

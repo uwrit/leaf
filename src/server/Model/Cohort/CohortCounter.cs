@@ -180,6 +180,16 @@ namespace Model.Cohort
 
             token.ThrowIfCancellationRequested();
 
+            // DEBUGGING ONLY
+            return new Result
+            {
+                ValidationContext = ctx,
+                Count = new PatientCount
+                {
+                    SqlStatements = cohort.SqlStatements
+                }
+            };
+
             var cached = await CacheCohort(cohort);
             var result = new Result
             {

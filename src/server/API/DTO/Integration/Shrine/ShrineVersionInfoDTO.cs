@@ -20,6 +20,8 @@ namespace API.DTO.Integration.Shrine
 
         public ShrineVersionInfoDTO(ShrineVersionInfo ver)
         {
+            if (ver == null) return;
+
             ProtocolVersion = ver.ProtocolVersion;
             ItemVersion = ver.ItemVersion;
             ShrineVersion = ver.ShrineVersion;
