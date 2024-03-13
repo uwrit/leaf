@@ -1,6 +1,6 @@
 FROM centos:7
 RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm \
-    && yum -y install dotnet-sdk-3.1 \
+    && yum -y install dotnet-sdk-6.0 \
     && yum -y install shadow-utils   \
     && yum -y install util-linux     \
     && yum -y install vim-minimal    \
