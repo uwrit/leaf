@@ -9,13 +9,9 @@ RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-p
  
 RUN useradd leaf                \
     && groupadd leafg           \
-    && usermod -a -G leafg leaf \
-    && mkdir /data/             \
-    && chown leaf:leafg /data/  \
-    && chmod 775 /data/         
- 
-COPY --chown=leaf:leafg . /data/server/
-RUN chmod 775 /data/server/
+    && usermod -a -G leafg leaf
+
+COPY --chown=leaf:leafg . /app
 
 VOLUME [ "/app", "/.keys", "/logs" ]
  
