@@ -49,43 +49,59 @@ export class DynamicDatasetProps extends React.PureComponent<Props> {
         return (
             <Section header='Dynamic Properties'>
                 <Container fluid={true} className={`dataset-editor-dynamic-properties`}>
+
                     <Row>
                         <Col md={6}>
                             <Checkbox
                                 changeHandler={inputChangeHandler} propName={'isEncounterBased'} value={dataset.isEncounterBased} 
                                 label='Has Encounters' subLabel={'If checked, this dataset will be assumed to have multiple rows per patient with associated date and encounterId columns'}
                             />
-                            <Row>
-                                {dataset.isEncounterBased &&
-                                <DynamicPropDropdown
-                                    clickHandler={inputChangeHandler} label={'Date Column'} options={dateCols} prop={'sqlFieldDate'}
-                                    selected={dataset.sqlFieldDate} sublabel={'Date-type column to summarize the earliest and latest rows. Required if dataset has encounters'}
-                                    locked={locked} required={true}
-                                />
-                                }
-                            </Row>
                         </Col>
                         <Col md={6}>
-                            <Row>
-                                {dataset.isEncounterBased &&
-                                <DynamicPropDropdown
-                                    clickHandler={inputChangeHandler} label={'String Value Column'} options={strCols} prop={'sqlFieldValueString'}
-                                    selected={dataset.sqlFieldValueString} sublabel={'String-type column to summarize the earliest and latest row values. If a Numeric Value Column is defined this will be ignored'}
-                                    locked={locked} required={true}
-                                />
-                                }
-                            </Row>
-                            <Row>
-                                {dataset.isEncounterBased &&
-                                <DynamicPropDropdown 
-                                    clickHandler={inputChangeHandler} label={'Numeric Value Column'} options={numCols} prop={'sqlFieldValueNumeric'}
-                                    selected={dataset.sqlFieldValueNumeric} sublabel={'Optional numeric-type column to provide statistical summary values'}
-                                    locked={locked}
-                                />
-                                }
-                            </Row>
+                            {dataset.isEncounterBased &&
+                            <DynamicPropDropdown
+                                clickHandler={inputChangeHandler} label={'Date Column'} options={dateCols} prop={'sqlFieldDate'}
+                                selected={dataset.sqlFieldDate} sublabel={'Date-type column to summarize the earliest and latest rows. Required if dataset has encounters'}
+                                locked={locked} required={true}
+                            />}
                         </Col>
                     </Row>
+
+                    <Row>
+                        <Col md={6}>
+                            <Checkbox
+                                changeHandler={inputChangeHandler} propName={'isNote'} value={dataset.isNote} 
+                                label='Is Clinical Note or Document' subLabel={'If checked, the dataset will be made available for text search using the Note Search feature'}
+                            />
+                        </Col>
+                        <Col md={6}>
+                            {dataset.isNote &&
+                            <DynamicPropDropdown
+                                clickHandler={inputChangeHandler} label={'De-identified Note String Column'} options={strCols} prop={'sqlFieldDeidValueString'}
+                                selected={dataset.sqlFieldDeidValueString} sublabel={'Column of de-identified note text. If available, this de-identified text will be used for Note Search in De-identified Mode. If not, the dataset will only be available in Identified Mode.'}
+                                locked={locked}
+                            />}
+                        </Col>
+                    </Row>
+
+                    {dataset.isEncounterBased &&
+                    <Row>
+                        <Col md={6}>
+                            <DynamicPropDropdown
+                                clickHandler={inputChangeHandler} label={'String Value Column'} options={strCols} prop={'sqlFieldValueString'}
+                                selected={dataset.sqlFieldValueString} sublabel={'String-type column to summarize the earliest and latest row values. If the dataset represents Clinical Notes, this column should have the identified text'}
+                                locked={locked} required={true}
+                            />
+                        </Col>
+                        <Col md={6}>
+                            <DynamicPropDropdown 
+                                clickHandler={inputChangeHandler} label={'Numeric Value Column'} options={numCols} prop={'sqlFieldValueNumeric'}
+                                selected={dataset.sqlFieldValueNumeric} sublabel={'Optional numeric-type column. If a column is selected, the dataset will be assumed to be numeric and statistical summaries generated for each patient'}
+                                locked={locked}
+                            />
+                        </Col>
+                    </Row>}
+
                 </Container>
             </Section>
         );

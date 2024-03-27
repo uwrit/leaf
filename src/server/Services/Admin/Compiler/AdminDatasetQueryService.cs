@@ -104,9 +104,11 @@ namespace Services.Admin.Compiler
                         desc = query.Description,
                         sql = query.SqlStatement,
                         isEnc = query.IsEncounterBased,
+                        isNote = query.IsNote,
                         schema = DynamicDatasetSchemaFieldSerde.Serialize(query.Schema),
                         sqlDate = query.SqlFieldDate,
                         sqlValString = query.SqlFieldValueString,
+                        sqlValDeidString = query.SqlFieldDeidValueString,
                         sqlValNum = query.SqlFieldValueNumeric,
                         tags = DatasetQueryTagTable.From(query.Tags),
                         constraints = ResourceConstraintTable.From(query),
@@ -172,9 +174,11 @@ namespace Services.Admin.Compiler
                         desc = query.Description,
                         sql = query.SqlStatement,
                         isEnc = query.IsEncounterBased,
+                        isNote = query.IsNote,
                         schema = DynamicDatasetSchemaFieldSerde.Serialize(query.Schema),
                         sqlDate = query.SqlFieldDate,
                         sqlValString = query.SqlFieldValueString,
+                        sqlValDeidString = query.SqlFieldDeidValueString,
                         sqlValNum = query.SqlFieldValueNumeric,
                         tags = DatasetQueryTagTable.From(query.Tags),
                         constraints = ResourceConstraintTable.From(query),
@@ -223,8 +227,10 @@ namespace Services.Admin.Compiler
             public string Description { get; set; }
             public string SqlStatement { get; set; }
             public bool IsEncounterBased { get; set; }
+            public bool IsNote { get; set; }
             public string SqlFieldDate { get; set; }
             public string SqlFieldValueString { get; set; }
+            public string SqlFieldDeidValueString { get; set; }
             public string SqlFieldValueNumeric { get; set; }
             public string Schema { get; set; }
             public DateTime Created { get; set; }
@@ -276,9 +282,11 @@ namespace Services.Admin.Compiler
                     CategoryId = query.CategoryId,
                     Description = query.Description,
                     IsEncounterBased = query.IsEncounterBased,
+                    IsNote = query.IsNote,
                     SqlStatement = query.SqlStatement,
                     SqlFieldDate = query.SqlFieldDate,
                     SqlFieldValueString = query.SqlFieldValueString,
+                    SqlFieldDeidValueString = query.SqlFieldDeidValueString,
                     SqlFieldValueNumeric = query.SqlFieldValueNumeric,
                     Schema = DynamicDatasetSchemaFieldSerde.Deserialize(query.Schema),
                     Created = query.Created,

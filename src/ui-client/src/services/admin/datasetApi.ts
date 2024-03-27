@@ -67,6 +67,7 @@ export const getAdminDemographicsDataset = async (state: AppState): Promise<Admi
         id: 'demographics',
         constraints: [],
         isEncounterBased: false,
+        isNote: false,
         name: 'Basic Demographics',
         shape: PatientListDatasetShape.Demographics,
         sqlStatement: ds.sqlStatement ? ds.sqlStatement : 'SELECT FROM dbo.table',

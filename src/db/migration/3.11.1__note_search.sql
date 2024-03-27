@@ -1,18 +1,18 @@
-/**
- * Update version
- */
-UPDATE ref.[Version]
-SET [Version] = '3.12.0'
-GO
 
 
 /**
- * Add [Description] to app.ConceptSqlSet
+ * Add Note Search related columns to app.DynamicDatasetQuery
  */
-IF COLUMNPROPERTY(OBJECT_ID('app.DatasetQuery'), 'IsText', 'ColumnId') IS NULL
+IF COLUMNPROPERTY(OBJECT_ID('app.DynamicDatasetQuery'), 'IsNote', 'ColumnId') IS NULL
 BEGIN
-    ALTER TABLE app.DatasetQuery 
-    ADD [IsText] BIT NULL
+    ALTER TABLE app.DynamicDatasetQuery 
+    ADD [IsNote] BIT NULL
+END
+
+IF COLUMNPROPERTY(OBJECT_ID('app.DynamicDatasetQuery'), 'SqlFieldDeidValueString', 'ColumnId') IS NULL
+BEGIN
+    ALTER TABLE app.DynamicDatasetQuery 
+    ADD [SqlFieldDeidValueString] nvarchar(1000) NULL
 END
 GO
 
@@ -79,10 +79,11 @@ BEGIN
         dq.[Description],
         dq.SqlStatement,
         IsEncounterBased = ISNULL(ddq.IsEncounterBased, 1),
-        dq.IsText,
+        IsNote           = ISNULL(ddq.IsNote, 0),
         ddq.[Schema],
         ddq.SqlFieldDate,
         ddq.SqlFieldValueString,
+        ddq.SqlFieldDeidValueString,
         ddq.SqlFieldValueNumeric
     FROM @ids i
     JOIN app.DatasetQuery dq ON i.Id = dq.Id
@@ -412,4 +413,397 @@ BEGIN
 
 END
 
+GO
+
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/7/22
+-- Description: Create a dynamic datasetquery.
+-- =======================================
+ALTER PROCEDURE [adm].[sp_CreateDynamicDatasetQuery]
+	@shape INT,
+    @name nvarchar(200),
+    @catid int,
+    @desc nvarchar(max),
+    @sql nvarchar(4000),
+	@isEnc bit,
+    @isNote bit,
+	@schema nvarchar(max),
+	@sqlDate nvarchar(1000) = NULL,
+	@sqlValString nvarchar(1000) = NULL,
+    @sqlValDeidString nvarchar(1000) = NULL,
+	@sqlValNum nvarchar(1000) = NULL,
+    @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+    
+    IF (app.fn_NullOrWhitespace(@name) = 1)
+        THROW 70400, N'DatasetQuery.Name is required.', 1;
+
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
+        THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
+
+	IF (app.fn_NullOrWhitespace(@schema) = 1)
+        THROW 70400, N'DatasetQuery.Schema is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        DECLARE @ins1 TABLE (
+            [Id] uniqueidentifier,
+			[Shape] int not null,
+            [Name] nvarchar(200) not null,
+            [CategoryId] int null,
+            [Description] nvarchar(max) null,
+            [SqlStatement] nvarchar(4000) not null,
+			[Schema] nvarchar(max) null,
+			[IsEncounterBased] bit null,
+            [IsNote] bit null,
+            [IsDefault] bit null,
+			[SqlFieldDate] nvarchar(1000) null,
+			[SqlFieldValueString] nvarchar(1000) null,
+            [SqlFieldDeidValueString] nvarchar(1000) null,
+			[SqlFieldValueNumeric] nvarchar(1000) null,
+            [Created] datetime not null,
+            [CreatedBy] nvarchar(1000) not null,
+            [Updated] datetime not null,
+            [UpdatedBy] nvarchar(1000) not null
+        );
+
+		DECLARE @ins2 TABLE (
+            [Id] uniqueidentifier,
+			[Schema] nvarchar(max) null,
+			[IsEncounterBased] bit null,
+            [IsNote] bit null,
+			[SqlFieldDate] nvarchar(1000) null,
+			[SqlFieldValueString] nvarchar(1000) null,
+            [SqlFieldDeidValueString] nvarchar(1000) null,
+			[SqlFieldValueNumeric] nvarchar(1000) null
+        );
+
+		INSERT INTO app.DatasetQuery ([Shape], [Name], IsDefault, CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        OUTPUT
+            inserted.Id,
+			inserted.Shape,
+            inserted.[Name],
+            inserted.IsDefault,
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
+        INTO @ins1 ([Id], [Shape], [Name], [IsDefault], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        VALUES (@shape, @name, 0, @catid, @desc, @sql, GETDATE(), @user, GETDATE(), @user);
+
+		DECLARE @id UNIQUEIDENTIFIER = (SELECT TOP 1 Id FROM @ins1);
+
+        INSERT INTO app.DynamicDatasetQuery ([Id], [Schema], IsEncounterBased, IsNote, SqlFieldDate, SqlFieldValueString, SqlFieldDeidValueString, SqlFieldValueNumeric)
+		OUTPUT
+            inserted.Id,
+			inserted.[Schema],
+			inserted.[IsEncounterBased],
+            inserted.[IsNote],
+			inserted.[SqlFieldDate],
+			inserted.[SqlFieldValueString],
+            inserted.[SqlFieldDeidValueString],
+			inserted.[SqlFieldValueNumeric]
+        INTO @ins2 ([Id], [Schema], [IsEncounterBased], [IsNote], [SqlFieldDate], [SqlFieldValueString], [SqlFieldDeidValueString], [SqlFieldValueNumeric])
+        VALUES (@id, @schema, @isEnc, @isNote, @sqlDate, @sqlValString, @sqlValDeidString, @sqlValNum);
+
+		UPDATE @ins1
+		SET [Schema] = i2.[Schema]
+		  , [IsEncounterBased] = i2.[IsEncounterBased]
+          , [IsNote] = i2.IsNote
+  		  , [SqlFieldDate] = i2.[SqlFieldDate]
+		  , [SqlFieldValueString] = i2.[SqlFieldValueString]
+          , [SqlFieldDeidValueString] = i2.[SqlFieldDeidValueString]
+ 		  , [SqlFieldValueNumeric] = i2.[SqlFieldValueNumeric]
+		FROM @ins2 AS i2
+        
+        SELECT
+            [Id],
+			[Shape],
+            [Name],
+            [IsDefault],
+            [CategoryId],
+            [Description],
+            [SqlStatement],
+			[Schema],
+			[IsEncounterBased],
+            [IsNote],
+			[SqlFieldDate],
+			[SqlFieldValueString],
+            [SqlFieldDeidValueString],
+			[SqlFieldValueNumeric],
+            [Created],
+            [CreatedBy],
+            [Updated],
+            [UpdatedBy]
+        FROM @ins1;
+
+        INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
+        SELECT @id, Tag
+        FROM @tags;
+
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
+-- =======================================
+-- Author:      Nic Dobbins
+-- Create date: 2019/7/22
+-- Description: Update a dynamic datasetquery.
+-- =======================================
+ALTER PROCEDURE [adm].[sp_UpdateDynamicDatasetQuery]
+    @id UNIQUEIDENTIFIER,
+    --@isdefault bit,
+    @name nvarchar(200),
+    @catid int,
+    @desc nvarchar(max),
+    @sql nvarchar(4000),
+	@isEnc bit,
+    @isNote bit,
+	@schema nvarchar(max),
+	@sqlDate nvarchar(1000) = NULL,
+	@sqlValString nvarchar(1000) = NULL,
+    @sqlValDeidString nvarchar(1000) = NULL,
+	@sqlValNum nvarchar(1000) = NULL,
+    @tags app.DatasetQueryTagTable READONLY,
+    @constraints auth.ResourceConstraintTable READONLY,
+    @user auth.[User]
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    IF (@id IS NULL)
+        THROW 70400, N'DatasetQuery.Id is required.', 1;
+    
+    IF (app.fn_NullOrWhitespace(@name) = 1)
+        THROW 70400, N'DatasetQuery.Name is required.', 1;
+
+    IF (app.fn_NullOrWhitespace(@sql) = 1)
+        THROW 70400, N'DatasetQuery.SqlStatement is required.', 1;
+
+	IF (app.fn_NullOrWhitespace(@schema) = 1)
+        THROW 70400, N'DatasetQuery.Schema is required.', 1;
+    
+    BEGIN TRAN;
+    BEGIN TRY
+
+        IF NOT EXISTS (SELECT Id FROM app.DatasetQuery WHERE Id = @id)
+            THROW 70404, N'DatasetQuery not found.', 1;
+
+		DECLARE @upd1 TABLE (
+            Id uniqueidentifier,
+            UniversalId nvarchar(200) null,
+            IsDefault bit not null,
+            Shape int not null,
+            [Name] nvarchar(200) not null,
+            CategoryId int null,
+            [Description] nvarchar(max) null,
+            SqlStatement nvarchar(4000) not null,
+			IsEncounterBased bit null,
+            IsNote bit null,
+			[Schema] nvarchar(max) null,
+			SqlFieldDate nvarchar(1000) null,
+			SqlFieldValueString nvarchar(1000) null,
+            SqlFieldDeidValueString nvarchar(1000) null,
+			SqlFieldValueNumeric nvarchar(1000) null,
+            Created datetime not null,
+            CreatedBy nvarchar(1000) not null,
+            Updated datetime not null,
+            UpdatedBy nvarchar(1000) not null
+        );
+
+		DECLARE @upd2 TABLE (
+            Id uniqueidentifier,
+			IsEncounterBased bit null,
+            IsNote bit null,
+			[Schema] nvarchar(max) null,
+			SqlFieldDate nvarchar(1000) null,
+			SqlFieldValueString nvarchar(1000) null,
+            SqlFieldDeidValueString nvarchar(1000) null,
+			SqlFieldValueNumeric nvarchar(1000) null
+        );
+
+		UPDATE app.DatasetQuery
+        SET
+            [Shape] = -1,
+            [IsDefault] = 0,
+            [Name] = @name,
+            [CategoryId] = @catid,
+            [Description] = @desc,
+            [SqlStatement] = @sql,
+            [Updated] = GETDATE(),
+            [UpdatedBy] = @user
+		OUTPUT
+            inserted.Id,
+            inserted.UniversalId,
+            inserted.IsDefault,
+            inserted.Shape,
+            inserted.[Name],
+            inserted.CategoryId,
+            inserted.[Description],
+            inserted.SqlStatement,
+            inserted.Created,
+            inserted.CreatedBy,
+            inserted.Updated,
+            inserted.UpdatedBy
+        INTO @upd1 (Id, UniversalId, IsDefault, Shape, [Name], CategoryId, [Description], SqlStatement, Created, CreatedBy, Updated, UpdatedBy)
+        WHERE Id = @id;
+
+		DELETE app.DynamicDatasetQuery
+		WHERE Id = @id
+
+        INSERT INTO app.DynamicDatasetQuery ([Id], [IsEncounterBased], [IsNote], [Schema], [SqlFieldDate], [SqlFieldValueString], [SqlFieldDeidValueString], [SqlFieldValueNumeric])
+		OUTPUT
+            inserted.Id,
+            inserted.[IsEncounterBased],
+            inserted.[IsNote],
+			inserted.[Schema],
+			inserted.[SqlFieldDate],
+			inserted.[SqlFieldValueString],
+            inserted.[SqlFieldDeidValueString],
+			inserted.[SqlFieldValueNumeric]
+        INTO @upd2 ([Id], [IsEncounterBased], [IsNote], [Schema], [SqlFieldDate], [SqlFieldValueString], [SqlFieldDeidValueString], [SqlFieldValueNumeric])
+		VALUES (@id, @isEnc, @isNote, @schema, @sqlDate, @sqlValString, @sqlValDeidString, @sqlValNum)
+
+		UPDATE @upd1
+		SET 
+			[IsEncounterBased] = i2.[IsEncounterBased],
+            [IsNote] = i2.[IsNote],
+ 			[Schema] = i2.[Schema],
+			[SqlFieldDate] = i2.[SqlFieldDate],
+			[SqlFieldValueString] = i2.[SqlFieldValueString],
+            [SqlFieldDeidValueString] = i2.[SqlFieldDeidValueString],
+            [SqlFieldValueNumeric] = i2.[SqlFieldValueNumeric]
+		FROM @upd2 AS i2
+
+		SELECT * FROM @upd1
+
+        DELETE FROM app.DatasetQueryTag
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO app.DatasetQueryTag (DatasetQueryId, Tag)
+        OUTPUT inserted.DatasetQueryId, inserted.Tag
+        SELECT @id, Tag
+        FROM @tags;
+
+        DELETE FROM auth.DatasetQueryConstraint
+        WHERE DatasetQueryId = @id;
+
+        INSERT INTO auth.DatasetQueryConstraint (DatasetQueryId, ConstraintId, ConstraintValue)
+        OUTPUT inserted.DatasetQueryId, inserted.ConstraintId, inserted.ConstraintValue
+        SELECT @id, ConstraintId, ConstraintValue
+        FROM @constraints;
+
+        COMMIT;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK;
+        THROW;
+    END CATCH;
+
+END
+GO
+
+-- =======================================
+-- Author:      Cliff Spital
+-- Create date: 2018/12/5
+-- Description: Retrieves the app.Query.Pepper and app.DatasetQuery by Query.Id and DatasetQuery.Id.
+-- =======================================
+ALTER PROCEDURE [app].[sp_GetDatasetContextById]
+    @datasetid UNIQUEIDENTIFIER,
+    @queryid UNIQUEIDENTIFIER,
+	@joinpanel BIT,
+    @user auth.[User],
+    @groups auth.GroupMembership READONLY,
+    @admin bit = 0
+AS
+BEGIN
+    SET NOCOUNT ON
+
+    -- queryconstraint ok?
+    IF (auth.fn_UserIsAuthorizedForQueryById(@user, @groups, @queryid, @admin) = 0)
+    BEGIN;
+        DECLARE @query403 nvarchar(400) = @user + N' is not authorized to execute query ' + app.fn_StringifyGuid(@queryid);
+        THROW 70403, @query403, 1;
+    END;
+
+    -- datasetconstraint ok?
+    IF (auth.fn_UserIsAuthorizedForDatasetQueryById(@user, @groups, @datasetid, @admin) = 0)
+    BEGIN;
+        DECLARE @dataset403 nvarchar(400) = @user + N' is not authorized to execute dataset ' + app.fn_StringifyGuid(@datasetid);
+        THROW 70403, @dataset403, 1;
+    END;
+
+    -- get pepper
+    SELECT
+        QueryId = Id,
+        Pepper,
+		[Definition] = CASE WHEN @joinpanel = 0 THEN NULL ELSE [Definition] END
+    FROM
+        app.Query
+    WHERE Id = @queryid;
+
+	-- dynamic
+	IF EXISTS (SELECT 1 FROM app.DynamicDatasetQuery ddq WHERE ddq.Id = @datasetid)
+		BEGIN
+			SELECT
+				ddq.Id,
+				dq.[Name],
+				dq.SqlStatement,
+				ddq.IsEncounterBased,
+                ddq.IsNote,
+				ddq.[Schema],
+				ddq.SqlFieldDate,
+				ddq.SqlFieldValueString,
+                ddq.SqlFieldDeidValueString,
+				ddq.SqlFieldValueNumeric,
+				dq.Shape
+			FROM
+				app.DynamicDatasetQuery ddq
+			JOIN app.DatasetQuery dq ON ddq.Id = dq.Id
+			LEFT JOIN
+				app.DatasetQueryCategory dqc ON dq.CategoryId = dqc.Id
+			WHERE
+				ddq.Id = @datasetid;
+		END
+
+	-- else shaped
+	ELSE
+		BEGIN
+			SELECT
+				dq.Id,
+				dq.UniversalId,
+				dq.Shape,
+				dq.Name,
+				dq.SqlStatement
+			FROM
+				app.DatasetQuery dq
+			LEFT JOIN
+				app.DatasetQueryCategory dqc ON dq.CategoryId = dqc.Id
+			WHERE
+				dq.Id = @datasetid;
+		END
+
+END
 GO

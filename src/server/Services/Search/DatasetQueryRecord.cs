@@ -4,7 +4,6 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
-using Model.Cohort;
 using Model.Compiler;
 using Model.Tagging;
 
@@ -16,7 +15,7 @@ namespace Services.Search
         public Guid? Id { get; set; }
         public string UniversalId { get; set; }
         public bool IsEncounterBased { get; set; }
-        public bool IsText { get; set; }
+        public bool IsNote { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public string Category { get; set; }
@@ -33,7 +32,7 @@ namespace Services.Search
                 Id = Id,
                 UniversalId = DatasetQueryUrn.From(UniversalId),
                 IsEncounterBased = IsEncounterBased,
-                IsText = IsText,
+                IsNote = IsNote,
                 Shape = Shape,
                 Name = Name,
                 Category = Category,
@@ -47,6 +46,7 @@ namespace Services.Search
     {
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
+        public string SqlFieldDeidValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }
         public string Schema { get; set; }
 
@@ -65,9 +65,10 @@ namespace Services.Search
             SqlStatement = dq.SqlStatement;
             SqlFieldDate = dq.SqlFieldDate;
             SqlFieldValueString = dq.SqlFieldValueString;
+            SqlFieldDeidValueString = dq.SqlFieldDeidValueString;
             SqlFieldValueNumeric = dq.SqlFieldValueNumeric;
             IsEncounterBased = dq.IsEncounterBased;
-            IsText = dq.IsText;
+            IsNote = dq.IsNote;
             Schema = DynamicDatasetSchemaFieldSerde.Serialize(dq.Schema);
         }
 
@@ -83,9 +84,10 @@ namespace Services.Search
                 SqlStatement = SqlStatement,
                 SqlFieldDate = SqlFieldDate,
                 SqlFieldValueString = SqlFieldValueString,
+                SqlFieldDeidValueString = SqlFieldDeidValueString,
                 SqlFieldValueNumeric = SqlFieldValueNumeric,
                 IsEncounterBased = IsEncounterBased,
-                IsText = IsText,
+                IsNote = IsNote,
                 Schema = DynamicDatasetSchemaFieldSerde.Deserialize(Schema)
             };
         }

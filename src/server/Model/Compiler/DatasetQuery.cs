@@ -16,7 +16,7 @@ namespace Model.Compiler
         Guid? Id { get; set; }
         Urn UniversalId { get; set; }
         bool IsEncounterBased { get; set; }
-        bool IsText { get; set; }
+        bool IsNote { get; set; }
         Shape Shape { get; set; }
         string Name { get; set; }
         string Category { get; set; }
@@ -67,7 +67,7 @@ namespace Model.Compiler
         public string Category { get; set; }
         public string Description { get; set; }
         public bool IsEncounterBased { get; set; }
-        public bool IsText { get; set; }
+        public bool IsNote { get; set; }
         public string SqlStatement { get; set; }
         public ICollection<string> Tags { get; set; }
 
@@ -86,6 +86,7 @@ namespace Model.Compiler
     {
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
+        public string SqlFieldDeidValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }
         public DynamicDatasetQuerySchema Schema { get; set; }
     }

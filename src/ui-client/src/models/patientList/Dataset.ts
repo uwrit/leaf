@@ -62,6 +62,7 @@ export interface PatientListDatasetDynamicSchema extends PatientListDatasetSchem
     isEncounterBased: boolean;
     sqlFieldDate?: string;
     sqlFieldValueString?: string;
+    sqlFieldDeidValueString?: string;
     sqlFieldValueNumeric?: string;
 }
 
@@ -96,7 +97,7 @@ export interface PatientListDatasetQueryDTO {
     description?: string;
     name: string;
     isEncounterBased: boolean;
-    isText?: boolean;
+    isNote?: boolean;
     shape: PatientListDatasetShape;
     tags: string[];
     universalId?: string;

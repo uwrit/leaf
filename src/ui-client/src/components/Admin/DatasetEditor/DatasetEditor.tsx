@@ -470,6 +470,7 @@ export class DatasetEditor extends React.PureComponent<Props,State> {
             id,
             constraints: [],
             isEncounterBased: true,
+            isNote: false,
             name,
             shape,
             sqlStatement: `SELECT   FROM dbo.table`,

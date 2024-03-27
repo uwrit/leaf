@@ -5,7 +5,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Model.Compiler;
 using Model.Admin.Compiler;
 using Model.Tagging;
@@ -17,7 +16,7 @@ namespace API.DTO.Admin.Compiler
         public Guid Id { get; set; }
         public string UniversalId { get; set; }
         public bool IsEncounterBased { get; set; }
-        public bool IsText { get; set; }
+        public bool IsNote { get; set; }
         public Shape Shape { get; set; }
         public string Name { get; set; }
         public int? CategoryId { get; set; }
@@ -25,6 +24,7 @@ namespace API.DTO.Admin.Compiler
         public string SqlStatement { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
+        public string SqlFieldDeidValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }
         public DynamicDatasetQuerySchema Schema { get; set; }
         public DateTime Created { get; set; }
@@ -52,9 +52,10 @@ namespace API.DTO.Admin.Compiler
                 Description = q.Description,
                 SqlStatement = q.SqlStatement,
                 IsEncounterBased = q.IsEncounterBased,
-                IsText = q.IsText,
+                IsNote = q.IsNote,
                 SqlFieldDate = q.SqlFieldDate,
                 SqlFieldValueString = q.SqlFieldValueString,
+                SqlFieldDeidValueString = q.SqlFieldDeidValueString,
                 SqlFieldValueNumeric = q.SqlFieldValueNumeric,
                 Schema = q.Schema,
                 Created = q.Created,
@@ -79,9 +80,10 @@ namespace API.DTO.Admin.Compiler
                 Description = q.Description,
                 SqlStatement = q.SqlStatement,
                 IsEncounterBased = q.IsEncounterBased,
-                IsText = q.IsText,
+                IsNote = q.IsNote,
                 SqlFieldDate = q.SqlFieldDate,
                 SqlFieldValueString = q.SqlFieldValueString,
+                SqlFieldDeidValueString = q.SqlFieldDeidValueString,
                 SqlFieldValueNumeric = q.SqlFieldValueNumeric,
                 Schema = q.Schema,
                 Created = q.Created,

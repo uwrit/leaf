@@ -274,6 +274,17 @@ export default class NoteSearchWebWorker {
                 const result = datasets[i];
                 const schema = result.dataset.schema as PatientListDatasetDynamicSchema
                 let j = 0;
+                
+                // Determine name of text field data are in
+                let textCol = '';
+                const patIds = Object.keys(result.dataset.results);
+                if (patIds.length > 0) {
+                    const row = result.dataset.results[patIds[0]][0]
+                    if (row.hasOwnProperty(schema.sqlFieldValueString)) textCol = schema.sqlFieldValueString;
+                    else if (row.hasOwnProperty(schema.sqlFieldDeidValueString)) textCol = schema.sqlFieldDeidValueString;
+                    else return;
+                }
+
                 for (const patId of Object.keys(result.dataset.results)) {
                     for (const row of result.dataset.results[patId]) {
                         const note: Note = {
@@ -282,7 +293,7 @@ export default class NoteSearchWebWorker {
                             date: row[schema.sqlFieldDate],
                             datasetId: result.query.id,
                             personId: patId,
-                            text: row[schema.sqlFieldValueString],
+                            text: row[textCol],
                             type: result.query.name
                         };
                         notes.push(note);

@@ -103,9 +103,11 @@ namespace Services.Cohort
 
         public override IEnumerable<ShapedDataset> Marshal(ILeafDbDataReader reader, bool anonymize, DeidentificationOptions opts)
         {
-            var fields = (_context.DatasetQuery as DynamicDatasetQuery).Schema.Fields
+            var query = (_context.DatasetQuery as DynamicDatasetQuery);
+            var fields = query.Schema.Fields
                 .Where(f => _schema.Fields.Any(sf => sf.Name.Equals(f.Name, StringComparison.InvariantCultureIgnoreCase))
-                    && (!anonymize || !f.Phi || (f.Phi && f.Mask)))
+                    && (!anonymize || !f.Phi || (f.Phi && f.Mask))
+                    && (!query.IsNote || IncludeNoteField(anonymize, query, f)))
                 .Select(f => f.ToSchemaField());
             var records = new List<ShapedDataset>();
             var converter = GetConverter(anonymize, fields, opts);
@@ -117,6 +119,16 @@ namespace Services.Cohort
                 records.Add(dyn);
             }
             return records;
+        }
+
+        bool IncludeNoteField(bool anonymize, DynamicDatasetQuery query, DynamicDatasetQuerySchemaFieldRecord field)
+        {
+            if (!query.IsNote) return true;
+
+            if (anonymize && query.SqlFieldValueString == field.Name) return false;
+            if (!anonymize && query.SqlFieldDeidValueString == field.Name) return false;
+
+            return true;
         }
 
         Func<DynamicDatasetRecord, DynamicShapedDatumSet> GetConverter(bool anonymize, IEnumerable<SchemaFieldSelector> fields, DeidentificationOptions opts)

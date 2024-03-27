@@ -322,9 +322,9 @@ export default class DatasetSearchEngineWebWorker {
         const dedupeAndSortTokenized = (refs: TokenizedDatasetRef[]): DatasetSearchResult => {
             let ds = refs.map((r) => r.dataset);
             if (currentMode === PATIENT_LIST) {
-                ds = ds.filter(d => !d.isText);
+                ds = ds.filter(d => !d.isNote);
             } else if (currentMode === NOTE_SEARCH) {
-                ds = ds.filter(d => d.isText);
+                ds = ds.filter(d => d.isNote);
             }
             return dedupeAndSort(ds);
         };
@@ -332,8 +332,8 @@ export default class DatasetSearchEngineWebWorker {
         const filterByMode = (ref: PatientListDatasetQuery): boolean => {
             if (currentMode === ADMIN) return true;
             if (ref.id === demographics.id) return false;
-            else if (currentMode === PATIENT_LIST) return !ref.isText;
-            else if (currentMode === NOTE_SEARCH) return !!ref.isText;
+            else if (currentMode === PATIENT_LIST) return !ref.isNote;
+            else if (currentMode === NOTE_SEARCH) return !!ref.isNote;
         };
 
         /*

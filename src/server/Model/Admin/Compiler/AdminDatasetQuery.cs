@@ -22,12 +22,13 @@ namespace Model.Admin.Compiler
         public string SqlStatement { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public IEnumerable<Constraint> Constraints { get; set; }
-        public bool IsText { get; set; }
+        public bool IsNote { get; set; }
 
         // Dynamic-only fields
         public bool IsEncounterBased { get; set; }
         public string SqlFieldDate { get; set; }
         public string SqlFieldValueString { get; set; }
+        public string SqlFieldDeidValueString { get; set; }
         public string SqlFieldValueNumeric { get; set; }
         public DynamicDatasetQuerySchema Schema { get; set; }
 

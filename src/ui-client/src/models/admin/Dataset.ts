@@ -26,8 +26,10 @@ interface BaseAdminDatasetQuery {
     sqlStatement: string;
     tags: string[];
     isEncounterBased: boolean;
+    isNote: boolean;
     sqlFieldDate?: string;
     sqlFieldValueString?: string;
+    sqlFieldDeidValueString?: string;
     sqlFieldValueNumeric?: string;
     unsaved?: boolean;
     changed?: boolean;
