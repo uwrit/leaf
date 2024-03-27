@@ -213,7 +213,7 @@ namespace Model.Compiler
 
             switch (filter.FilterType)
             {
-                case NumericFilterType.EqualTo:
+                case NumericFilterType.Equal:
                 case NumericFilterType.GreaterThan:
                 case NumericFilterType.GreaterThanOrEqual:
                 case NumericFilterType.LessThan:

@@ -165,7 +165,7 @@ namespace API.DTO.Integration.Shrine4_1
     {
         public string DisplayName { get; set; }
         public string TermPath { get; set; }
-        public string Constraint { get; set; }
+        public ShrineConceptConstraintDTO Constraint { get; set; }
         public static readonly string EncodedClass = "Concept";
 
         public ShrineConceptDTO() { }
@@ -174,7 +174,28 @@ namespace API.DTO.Integration.Shrine4_1
         {
             DisplayName = concept.DisplayName;
             TermPath = concept.TermPath;
-            Constraint = concept.Constraint;
+            Constraint = new ShrineConceptConstraintDTO(concept.Constraint);
+        }
+    }
+
+    public class ShrineConceptConstraintDTO
+    {
+        public ShrineAnonymousEncodedClassDTO Operator { get; set; }
+        public decimal? Value { get; set; }
+        public decimal? Value1 { get; set; }
+        public decimal? Value2 { get; set; }
+        public string Unit { get; set; }
+        public string EncodedClass { get; set; }
+
+        public ShrineConceptConstraintDTO() { }
+
+        public ShrineConceptConstraintDTO(ShrineConceptConstraint constraint)
+        {
+            Operator = new ShrineAnonymousEncodedClassDTO { EncodedClass = constraint.Operator.ToString() };
+            Value = constraint.Value;
+            Value1 = constraint.Value1;
+            Value2 = constraint.Value2;
+            Unit = constraint.Unit;
         }
     }
 
@@ -205,7 +226,30 @@ namespace API.DTO.Integration.Shrine4_1
             {
                 DisplayName = dto.DisplayName,
                 TermPath = dto.TermPath,
-                Constraint = dto.Constraint
+                Constraint = dto.Constraint != null ? dto.Constraint.ToConstraint() : null
+            };
+        }
+
+        public static ShrineConceptConstraint ToConstraint(this ShrineConceptConstraintDTO dto)
+        {
+            NumericFilterType op = NumericFilterType.None;
+            if (dto.Operator != null)
+            {
+                _ = Enum.TryParse(dto.Operator.EncodedClass, out NumericFilterType filterType);
+                op = filterType;
+            }
+            if (op == NumericFilterType.None && dto.Value1.HasValue && dto.Value2.HasValue)
+            {
+                op = NumericFilterType.Between;
+            }
+
+            return new ShrineConceptConstraint
+            {
+                Operator = op,
+                Value = dto.Value,
+                Value1 = dto.Value1,
+                Value2 = dto.Value2,
+                Unit = dto.Unit
             };
         }
 

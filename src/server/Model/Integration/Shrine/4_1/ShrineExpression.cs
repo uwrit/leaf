@@ -86,7 +86,16 @@ namespace Model.Integration.Shrine4_1
     {
 		public string DisplayName { get; set; }
 		public string TermPath { get; set; }
-		public string Constraint { get; set; }
+		public ShrineConceptConstraint Constraint { get; set; }
+	}
+
+	public class ShrineConceptConstraint
+	{
+		public NumericFilterType Operator { get; set; }
+		public decimal? Value { get; set; }
+        public decimal? Value1 { get; set; }
+        public decimal? Value2 { get; set; }
+        public string Unit { get; set; }
 	}
 
 	public class ShrineConjunctionCompare

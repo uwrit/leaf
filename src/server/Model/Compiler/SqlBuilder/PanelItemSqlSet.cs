@@ -233,7 +233,7 @@ namespace Model.Compiler.SqlBuilder
                     case NumericFilterType.LessThanOrEqual:
                         where.Add(Number <= val1);
                         return;
-                    case NumericFilterType.EqualTo:
+                    case NumericFilterType.Equal:
                         where.Add(Number == val1);
                         return;
                     case NumericFilterType.Between:

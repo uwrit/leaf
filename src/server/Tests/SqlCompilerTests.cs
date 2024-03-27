@@ -86,7 +86,7 @@ namespace Tests
              * Two WHERE clauses
              */
             pi.Concept.SqlFieldNumeric = "Num";
-            pi.NumericFilter = new NumericFilter { Filter = new[] { 5.0M }, FilterType = NumericFilterType.EqualTo };
+            pi.NumericFilter = new NumericFilter { Filter = new[] { 5.0M }, FilterType = NumericFilterType.Equal };
             ob = new SubPanelSqlSet(panel, Options, dialect);
 
             Assert.Contains("WHERE 1 = 1 AND Num = 5.0", ob.ToString());

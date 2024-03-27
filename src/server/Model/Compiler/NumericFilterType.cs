@@ -13,7 +13,7 @@ namespace Model.Compiler
         GreaterThanOrEqual,
         LessThan,
         LessThanOrEqual,
-        EqualTo,
+        Equal,
         Between
     }
 }

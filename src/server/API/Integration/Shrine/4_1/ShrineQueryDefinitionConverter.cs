@@ -71,6 +71,15 @@ namespace API.Integration.Shrine4_1
                                     Index = j,
                                     SubPanelIndex = 0,
                                     PanelIndex = i,
+                                    NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                                        ? new NumericFilter
+                                        {
+                                            FilterType = c.Constraint.Operator,
+                                            Filter = c.Constraint.Value != null
+                                                ? new decimal[] { (decimal)c.Constraint.Value }
+                                                : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 } 
+                                        }
+                                        : null,
                                     Resource = new ResourceRef
                                     {
                                         UiDisplayName = c.DisplayName,
@@ -101,6 +110,15 @@ namespace API.Integration.Shrine4_1
                         RecencyFilter = timeline.Subsequent.First().PreviousOccurrence == ShrineOccurrence.First
                             ? RecencyFilterType.Min
                             : RecencyFilterType.None,
+                        NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                            ? new NumericFilter
+                            {
+                                FilterType = c.Constraint.Operator,
+                                Filter = c.Constraint.Value != null
+                                    ? new decimal[] { (decimal)c.Constraint.Value }
+                                    : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 }
+                            }
+                            : null,
                         Resource = new ResourceRef
                         {
                             UiDisplayName = c.DisplayName,
@@ -134,6 +152,15 @@ namespace API.Integration.Shrine4_1
                             RecencyFilter = sub.ThisOccurrence == ShrineOccurrence.First
                                 ? RecencyFilterType.Min
                                 : RecencyFilterType.None,
+                            NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                                ? new NumericFilter
+                                {
+                                    FilterType = c.Constraint.Operator,
+                                    Filter = c.Constraint.Value != null
+                                        ? new decimal[] { (decimal)c.Constraint.Value }
+                                        : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 }
+                                }
+                                : null,
                             Resource = new ResourceRef
                             {
                                 UiDisplayName = c.DisplayName,
@@ -195,13 +222,6 @@ namespace API.Integration.Shrine4_1
                 },
                 Output = ShrineOutputType.Count,
                 QueryName = "Query"
-                /*
-                NodeOfOriginId = opts.Node.Id,
-                ResearcherId = opts.Researcher.Id,
-                TopicId = opts.Topic.Id,
-                ProjectName = "Query",
-                Flagged = false
-                */
             };
         }
 
@@ -266,7 +286,15 @@ namespace API.Integration.Shrine4_1
                     {
                         DisplayName = pi.Resource.UiDisplayName,
                         TermPath = pi.Resource.UniversalId.ToString().Replace(UniversalIdPrefix, ""),
-                        Constraint = null
+                        Constraint = pi.NumericFilter != null && pi.NumericFilter.FilterType != NumericFilterType.None
+                            ? new ShrineConceptConstraint
+                            {
+                                Operator = pi.NumericFilter.FilterType,
+                                Value =  pi.NumericFilter.FilterType != NumericFilterType.Between ? pi.NumericFilter.Filter.First() : null,
+                                Value1 = pi.NumericFilter.FilterType == NumericFilterType.Between ? pi.NumericFilter.Filter.First() : null,
+                                Value2 = pi.NumericFilter.FilterType == NumericFilterType.Between ? pi.NumericFilter.Filter.Last()  : null
+                            }
+                            : null
                     };
                 }),
                 StartDate = panel.DateFilter?.Start?.Date,
