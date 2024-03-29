@@ -71,11 +71,11 @@ namespace API.Integration.Shrine4_1
                                     Index = j,
                                     SubPanelIndex = 0,
                                     PanelIndex = i,
-                                    NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                                    NumericFilter = c?.Constraint != null && c?.Constraint?.Operator != NumericFilterType.None
                                         ? new NumericFilter
                                         {
                                             FilterType = c.Constraint.Operator,
-                                            Filter = c.Constraint.Value != null
+                                            Filter = c.Constraint.Value.HasValue
                                                 ? new decimal[] { (decimal)c.Constraint.Value }
                                                 : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 } 
                                         }
