@@ -1,6 +1,6 @@
 FROM centos:7
 RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm \
-    && yum -y install dotnet-sdk-3.1 \
+    && yum -y install dotnet-sdk-6.0 \
     && yum -y install shadow-utils   \
     && yum -y install util-linux     \
     && yum -y install vim-minimal    \
@@ -9,13 +9,9 @@ RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-p
  
 RUN useradd leaf                \
     && groupadd leafg           \
-    && usermod -a -G leafg leaf \
-    && mkdir /data/             \
-    && chown leaf:leafg /data/  \
-    && chmod 775 /data/         
- 
-COPY --chown=leaf:leafg . /data/server/
-RUN chmod 775 /data/server/
+    && usermod -a -G leafg leaf
+
+COPY --chown=leaf:leafg . /app
 
 VOLUME [ "/app", "/.keys", "/logs" ]
  
