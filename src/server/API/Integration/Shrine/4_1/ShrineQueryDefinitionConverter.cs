@@ -110,11 +110,11 @@ namespace API.Integration.Shrine4_1
                         RecencyFilter = timeline.Subsequent.First().PreviousOccurrence == ShrineOccurrence.First
                             ? RecencyFilterType.Min
                             : RecencyFilterType.None,
-                        NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                        NumericFilter = c?.Constraint != null && c?.Constraint?.Operator != NumericFilterType.None
                             ? new NumericFilter
                             {
                                 FilterType = c.Constraint.Operator,
-                                Filter = c.Constraint.Value != null
+                                Filter = c.Constraint.Value.HasValue
                                     ? new decimal[] { (decimal)c.Constraint.Value }
                                     : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 }
                             }
@@ -152,11 +152,11 @@ namespace API.Integration.Shrine4_1
                             RecencyFilter = sub.ThisOccurrence == ShrineOccurrence.First
                                 ? RecencyFilterType.Min
                                 : RecencyFilterType.None,
-                            NumericFilter = c != null && c.Constraint.Operator != NumericFilterType.None
+                            NumericFilter = c?.Constraint != null && c?.Constraint?.Operator != NumericFilterType.None
                                 ? new NumericFilter
                                 {
                                     FilterType = c.Constraint.Operator,
-                                    Filter = c.Constraint.Value != null
+                                    Filter = c.Constraint.Value.HasValue
                                         ? new decimal[] { (decimal)c.Constraint.Value }
                                         : new decimal[] { (decimal)c.Constraint.Value1, (decimal)c.Constraint.Value2 }
                                 }
