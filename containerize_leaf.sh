@@ -21,7 +21,7 @@ if [ -z ${KEYS_PATH+x} ]; then echo "Couldn't find cert+key path! Are you sure L
 # DB
 #--------------
 docker run -d -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=$SA_PASSWORD" -p 1433:1433 --name leaf_db_demo mcr.microsoft.com/mssql/server:2017-latest 
-sleep 10s
+sleep 10
 # sqlcmd oddly prefers '127.0.0.1' (not 'host.docker.internal'), so use that here
 sqlcmd -S '127.0.0.1' -U SA -P $SA_PASSWORD -i src/db/build/LeafDB.sql 
 sqlcmd -S '127.0.0.1' -U SA -P $SA_PASSWORD -d LeafDB -i src/db/build/LeafDB.Init.sql
