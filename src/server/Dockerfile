@@ -1,13 +1,8 @@
-FROM centos:7
-RUN rpm -Uvh https://packages.microsoft.com/config/centos/7/packages-microsoft-prod.rpm \
-    && yum -y install dotnet-sdk-6.0 \
-    && yum -y install shadow-utils   \
-    && yum -y install util-linux     \
-    && yum -y install vim-minimal    \
-    && yum -y update                 \
-    && yum clean all
- 
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
 RUN useradd leaf                \
+    && mkdir /home/leaf/        \
+    && chown leaf /home/leaf/   \
     && groupadd leafg           \
     && usermod -a -G leafg leaf
 
