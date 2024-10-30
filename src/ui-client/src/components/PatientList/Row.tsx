@@ -35,7 +35,7 @@ export default class Row extends React.Component<Props> {
                     View details ({row.detailRowCount ? row.detailRowCount : 0} rows)<FaChevronDown />
                 </td>
                 {row.values.map((v: any, i: number) => {
-                    return <Tuple key={`${row.compoundId}_${columns[i].id}`} index={index} type={columns[i].type} value={v}/>
+                    return <Tuple key={`${row.compoundId}_${columns[i].id}`} index={index} column={columns[i]} value={v}/>
                 })}
             </tr>),
             (<tr key={`${row.compoundId}_drilldown`} className={`${c}-row-drilldown ${openClass}`}>

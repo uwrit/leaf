@@ -7,12 +7,12 @@
 
 import React from 'react';
 import { Line, LineChart } from 'recharts';
-import { XY, PatientListColumnType } from '../../models/patientList/Column';
+import { XY, PatientListColumnType, PatientListColumn } from '../../models/patientList/Column';
 
 interface Props {
     className?: string;
+    column: PatientListColumn;
     index: number;
-    type: PatientListColumnType;
     value: any;
 }
 
@@ -36,12 +36,12 @@ export default class Tuple extends React.PureComponent<Props> {
     private lastSparklineValIndex: number = 0;
     
     public render() {
-        const { className, type } = this.props;
+        const { className, column } = this.props;
         const c = className ? className : 'patientlist';
         const val = this.getValueDisplay();
 
         return (
-            <td className={`${c}-tuple ${PatientListColumnType[type]}`}>
+            <td className={`${c}-tuple ${PatientListColumnType[column.type]}`}>
                 {val}
             </td>
         )
@@ -79,10 +79,11 @@ export default class Tuple extends React.PureComponent<Props> {
     }
 
     private getValueDisplay = () => {
-        const { type, value } = this.props;
+        const { column, value } = this.props;
         return (
-              type === PatientListColumnType.Sparkline ? this.createSparkline(value) 
-            : type === PatientListColumnType.DateTime && !!value ? new Date(value).toLocaleString() 
+              column.type === PatientListColumnType.Sparkline ? this.createSparkline(value) 
+            : column.type === PatientListColumnType.DateTime && !!value ? new Date(value).toLocaleString() 
+            : column.id === 'age' && value === -1 ? '>89'
             : value
         );
     }

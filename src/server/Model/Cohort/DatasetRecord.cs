@@ -301,7 +301,7 @@ namespace Model.Cohort
                 AddressState = AddressState.ValueElseUnknown(),
                 Ethnicity = Ethnicity.ValueElseUnknown(),
                 Gender = Gender.ValueElseUnknown(),
-                Age = Age > 89 ? 89 : Age,
+                Age = Age > 89 ? -1 : Age,
                 Language = Language.ValueElseUnknown(),
                 MaritalStatus = MaritalStatus.ValueElseUnknown(),
                 Race = Race.ValueElseUnknown(),
