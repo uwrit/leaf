@@ -60,7 +60,7 @@ export class Binary extends React.PureComponent<Props> {
                             </Bar>
                             <Bar animationBegin={delay} barSize={config.barSize} dataKey="value" isAnimationActive={true} >
                                 {leftBars.map((d: BinarySplit) => <Cell key={d.label} className={d.label} fill={d.color} />)}
-                                <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="insideRight"/>
+                                <LabelList dataKey="value" formatter={this.formatNegativeNumber} position="insideRight" offset={-38} />
                             </Bar>
                         </BarChart>
                     </ResponsiveContainer>
