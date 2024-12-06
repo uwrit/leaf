@@ -1,4 +1,3 @@
-# copy_schema.py
 import psycopg2
 import pyodbc
 import pandas as pd
