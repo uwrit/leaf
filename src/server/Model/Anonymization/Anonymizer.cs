@@ -145,13 +145,24 @@ namespace Model.Anonymization
         {
             var rand = new Random(salt.GetHashCode());
             var value = (System.DateTime)prop.GetValue(record);
+
+            // Get a random shift value between LowerBound and UpperBound (inclusive)
+            // The shift amount will be consistent for the same salt value
+            // This ensures that related dates are shifted by the same amount
+            // For example, if a patient has multiple visit dates, they will all be shifted by the same number of days
+            // The shift is applied using the DateShifter function which was configured in FuzzParameters
+            // (e.g. shifting by days, hours, or minutes)
             var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
 
-            // Clamp shift if needed
+            // Check if shifting forward (positive shift) would exceed DateTime.MaxValue
+            // If so, limit the shift to prevent overflow
             if (shift > 0 && value > System.DateTime.MaxValue.AddDays(-shift))
             {
                 shift = (int)(System.DateTime.MaxValue - value).TotalDays;
             }
+            // If the shift would push the date beyond DateTime.MaxValue,
+            // limit the shift to the maximum possible days that can be added
+            // while staying within valid DateTime range
             else if (shift < 0 && value < System.DateTime.MinValue.AddDays(-shift))
             {
                 shift = -(int)(value - System.DateTime.MinValue).TotalDays;
