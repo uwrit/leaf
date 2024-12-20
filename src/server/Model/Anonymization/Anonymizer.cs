@@ -89,8 +89,8 @@ namespace Model.Anonymization
         protected virtual Dictionary<Type, Actor> TypeMap => new Dictionary<Type, Actor>
         {
             { typeof(string), Fuzzer.String },
-            { typeof(DateTime), Fuzzer.DateTime },
-            { typeof(DateTime?), Fuzzer.NullableDateTime },
+            { typeof(System.DateTime), Fuzzer.DateTimeActor },
+            { typeof(System.DateTime?), Fuzzer.NullableDateTimeActor },
         };
     }
 
@@ -141,24 +141,65 @@ namespace Model.Anonymization
             prop.SetValue(record, composite.GetConsistentHashCode().ToString());
         };
 
-        public static readonly Actor DateTime = (record, prop, salt, pepper, parameters) =>
+        public static readonly Actor DateTimeActor = (record, prop, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
-            var value = (DateTime)prop.GetValue(record);
+            var value = (System.DateTime)prop.GetValue(record);
+
+            // Get a random shift value between LowerBound and UpperBound (inclusive)
+            // The shift amount will be consistent for the same salt value
+            // This ensures that related dates are shifted by the same amount
+            // For example, if a patient has multiple visit dates, they will all be shifted by the same number of days
+            // The shift is applied using the DateShifter function which was configured in FuzzParameters
+            // (e.g. shifting by days, hours, or minutes)
             var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
 
-            prop.SetValue(record, parameters.DateShifter(value, shift));
+            // Check if shifting forward (positive shift) would exceed DateTime.MaxValue
+            // If so, limit the shift to prevent overflow
+            if (shift > 0 && value > System.DateTime.MaxValue.AddDays(-shift))
+            {
+                shift = (int)(System.DateTime.MaxValue - value).TotalDays;
+            }
+            // If the shift would push the date beyond DateTime.MaxValue,
+            // limit the shift to the maximum possible days that can be added
+            // while staying within valid DateTime range
+            else if (shift < 0 && value < System.DateTime.MinValue.AddDays(-shift))
+            {
+                shift = -(int)(value - System.DateTime.MinValue).TotalDays;
+            }
+
+            System.DateTime shiftedDate;
+            try
+            {
+                shiftedDate = parameters.DateShifter(value, shift);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                shiftedDate = (shift < 0) ? System.DateTime.MinValue : System.DateTime.MaxValue;
+            }
+
+            prop.SetValue(record, shiftedDate);
         };
 
-        public static readonly Actor NullableDateTime = (record, prop, salt, pepper, parameters) =>
+        public static readonly Actor NullableDateTimeActor = (record, prop, salt, pepper, parameters) =>
         {
             var rand = new Random(salt.GetHashCode());
-            var value = (DateTime?)prop.GetValue(record);
+            var value = (System.DateTime?)prop.GetValue(record);
 
             if (value.HasValue)
             {
                 var shift = rand.Next(parameters.LowerBound, parameters.UpperBound);
-                prop.SetValue(record, parameters.DateShifter(value.Value, shift));
+                System.DateTime shiftedDate;
+                try
+                {
+                    shiftedDate = parameters.DateShifter(value.Value, shift);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    shiftedDate = (shift < 0) ? System.DateTime.MinValue : System.DateTime.MaxValue;
+                }
+
+                prop.SetValue(record, shiftedDate);
             }
         };
     }
