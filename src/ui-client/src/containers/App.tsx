@@ -36,6 +36,8 @@ import { sleep } from '../utils/Sleep';
 import NotificationModal from '../components/Modals/NotificationModal/NotificationModal';
 import MaintainenceModal from '../components/Modals/MaintainenceModal/MaintainenceModal';
 import './App.css';
+import { firebaseAuth } from '../firebase/auth';
+import { onAuthStateChanged, User } from "@firebase/auth";
 
 interface OwnProps {
 }
@@ -59,21 +61,58 @@ interface StateProps {
     userQuestion: UserInquiryState;
 }
 
+interface state {
+    currentUser: "loading" | null | {};
+}
+
 type Props = StateProps & DispatchProps & OwnProps;
 let inactivityTimer: NodeJS.Timer;
 
-class App extends React.Component<Props> {
+
+class App extends React.Component<Props, state> {
     private sessionTokenRefreshMinutes = 4;
     private serverStateCheckIntervalMinutes = 1;
     private heartbeatCheckIntervalSeconds = 10;
     private lastHeartbeat = new Date();
 
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            currentUser: "loading"
+        };
+    }
+
     public componentDidMount() {
+        console.log('componentDidMount');
+        console.log(this.state.currentUser);
+        console.log(process.env.PUBLIC_URL);
+        console.log(process.env);
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         this.handleSessionTokenRefresh();
         dispatch(getIdToken());
         dispatch(refreshServerStateLoop());
+
+        // Add Firebase auth state listener
+        this.unsubscribeAuth = onAuthStateChanged(firebaseAuth, async (user) => {
+            const idToken = await user?.getIdToken(true);
+            
+            if (user) {
+                const newUser: any = user;
+                newUser.idToken = idToken;  
+                this.setState({ currentUser: newUser });
+            } else {
+                this.setState({ currentUser: null });
+            }
+        });
+    }
+
+    private unsubscribeAuth: (() => void) | undefined;
+
+    public componentWillUnmount() {
+        if (this.unsubscribeAuth) {
+            this.unsubscribeAuth();
+        }
     }
 
     public componentDidUpdate() { 
@@ -96,7 +135,23 @@ class App extends React.Component<Props> {
         if (browser) { classes.push(BrowserType[browser.type].toLowerCase())};
 
         return (
-            <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+            this.state.currentUser === "loading" 
+            ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>
+            : this.state.currentUser === null ?
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                Please Login to 
+                <span>
+                    <a href="https://staging.century.health" 
+                        style={{ color: 'blue', marginLeft: '5px', marginRight: '5px' }}
+                     target="_blank"
+                    >
+                        Century Health
+                    </a>
+                </span>
+                to continue.
+            </div>
+            : <div className={classes.join(' ')} onMouseDown={this.handleActivity} onKeyDown={this.handleActivity}>
+                {this.state.currentUser + ' Current User'}
                 <Attestation />
                 <CohortCountBox />
                 <Header />
