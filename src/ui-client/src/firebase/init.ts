@@ -7,7 +7,6 @@ const storageBucket = process.env.REACT_APP_FIREBASE_STORAGE_BUCKET
 const messagingSenderId = process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID
 const appId = process.env.REACT_APP_FIREBASE_APP_ID
 
-console.log(apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId, 'firebase config');
 const firebaseConfig = {
   apiKey,
   authDomain,
