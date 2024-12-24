@@ -83,6 +83,10 @@ class App extends React.Component<Props, state> {
     }
 
     public componentDidMount() {
+        console.log('componentDidMount');
+        console.log(this.state.currentUser);
+        console.log(process.env.PUBLIC_URL);
+        console.log(process.env);
         const { dispatch } = this.props;
         this.handleBrowserHeartbeat();
         this.handleSessionTokenRefresh();
