@@ -255,6 +255,9 @@ namespace API.Options
         {
             services.Configure<ClientOptions>(opts =>
             {
+                // Find Patients
+                opts.FindPatients.AllowEmptyConcepts = config.GetValue<bool>(Config.Client.FindPatients.AllowEmptyConcepts);
+
                 // Map
                 opts.Map.Enabled = config.GetValue<bool>(Config.Client.Map.Enabled);
                 opts.Map.TileURI = config.GetValue<string>(Config.Client.Map.TileURI);

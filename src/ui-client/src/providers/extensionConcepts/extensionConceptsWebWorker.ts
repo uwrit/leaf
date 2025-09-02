@@ -251,6 +251,7 @@ export default class ExtensionConceptsWebWorker {
                 isPatientCountAutoCalculated: false,
                 isParent: false,
                 isSpecializable: false,
+                isQueryable: false,
                 rootId: '',
                 uiDisplayName: '',
                 uiDisplayText: '',

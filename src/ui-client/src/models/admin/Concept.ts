@@ -78,6 +78,7 @@ export interface Concept {
     isRoot: boolean;
     isPatientCountAutoCalculated: boolean;
     isSpecializable: boolean;
+    isQueryable: boolean;
     constraints: Constraint[];
     specializationGroups: SpecializationGroupRelationship[];
     sqlSetId?: number;

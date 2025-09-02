@@ -29,7 +29,7 @@ import Scrollers from '../../components/PatientList/Scrollers/Scrollers';
 import './PatientList.css';
 
 interface OwnProps {
-    
+    allowEmptyConcepts: boolean;
 }
 interface StateProps {
     auth: AuthorizationState;
@@ -61,7 +61,7 @@ class PatientList extends React.PureComponent<Props, State> {
     }
 
     public render() {
-        const { auth, exportState, cohort, datasets, isIdentified, patientList, responders, dispatch, showExportModal } = this.props;
+        const { auth, exportState, cohort, datasets, isIdentified, patientList, responders, dispatch, showExportModal, allowEmptyConcepts } = this.props;
         const c = this.className;
         const classes = [ `${c}-container`, 'scrollable-offset-by-header' ];
         const datasetDefs: PatientListDatasetDefinition[] = [ ...patientList.configuration.singletonDatasets.values() ];
@@ -152,6 +152,7 @@ class PatientList extends React.PureComponent<Props, State> {
                                 datasets={datasets}
                                 dispatch={dispatch} 
                                 responderMap={responders}
+                                allowEmptyConcepts={allowEmptyConcepts}
                             />
                             }
                         </div>

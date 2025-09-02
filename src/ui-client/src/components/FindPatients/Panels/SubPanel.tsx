@@ -30,6 +30,7 @@ interface OwnProps {
     subPanel: SubPanelModel;
     index: number;
     queryState: CohortStateType;
+    allowEmptyConcepts: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -41,7 +42,12 @@ const panelTarget = {
         handlers.handleAddPanelItem(concept, subPanel);
     },
     canDrop (props: Props, monitor: DropTargetMonitor) {
-        return props.queryState !== CohortStateType.REQUESTING;
+        const concept: Concept = monitor.getItem();
+        return (
+            props.queryState !== CohortStateType.REQUESTING &&
+            concept != null &&
+            (props.allowEmptyConcepts || concept.isQueryable)
+        );
     }
 }
 

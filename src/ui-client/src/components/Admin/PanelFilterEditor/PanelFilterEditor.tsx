@@ -21,6 +21,7 @@ import './PanelFilterEditor.css';
 interface Props { 
     data: AdminState;
     dispatch: any;
+    allowEmptyConcepts: boolean;
 }
 
 interface State {
@@ -40,7 +41,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
     }
 
     public render() {
-        const { data, dispatch } = this.props;
+        const { data, dispatch, allowEmptyConcepts } = this.props;
         const { selectedFilterId, forceValidation, showPreview } = this.state;
         const { panelFilters } = data;
         const { changed } = panelFilters;
@@ -60,7 +61,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                         {/* Concepts (can be dragged over) */}
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
                             <div className={`${c}-column-left-overlay ${showPreview ? 'show' : ''}`}></div>
-                            <ConceptColumnContainer />
+                            <ConceptColumnContainer allowEmptyConcepts={allowEmptyConcepts} />
                         </Col>
 
                         {/* Panel Filter Editor */}
@@ -97,6 +98,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                                                 dispatch={dispatch} 
                                                 panelFilter={pf} 
                                                 forceValidation={forceValidation}
+                                                allowEmptyConcepts={allowEmptyConcepts}
                                                 togglePreview={this.togglePanelFilterPreview}
                                             />);
                                     })

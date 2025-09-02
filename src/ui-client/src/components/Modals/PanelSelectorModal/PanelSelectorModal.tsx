@@ -20,6 +20,7 @@ interface OwnProps {
     headerText: string;
     handleByPanelSelect: (panelIndex?: number) => void;
     toggle: () => void;
+    allowEmptyConcepts: boolean;
 }
 interface StateProps {
     panels: PanelModel[];
@@ -57,7 +58,7 @@ class PanelSelectorModal extends React.PureComponent<Props, State> {
     }
     
     public render() {
-        const { panels, headerText, toggle } = this.props;
+        const { panels, headerText, toggle, allowEmptyConcepts } = this.props;
         const c = this.className;
         const modalClasses = [ `${c}-modal`, (this.state.shown ? 'shown' : '') ];
 
@@ -83,6 +84,7 @@ class PanelSelectorModal extends React.PureComponent<Props, State> {
                                                 isFirst={i===0}
                                                 panel={p}
                                                 queryState={CohortStateType.LOADED}
+                                                allowEmptyConcepts={allowEmptyConcepts}
                                             />
                                         </div>
                                     </Col>

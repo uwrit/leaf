@@ -27,6 +27,7 @@ interface OwnProps {
     concept: Concept;
     dispatch: any;
     isSelected: boolean;
+    allowEmptyConcepts: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -44,7 +45,8 @@ const conceptNodeTarget = {
             con !== props.concept && 
             !con.isExtension && 
             !props.concept.isExtension &&
-            con.id !== props.concept.parentId
+            con.id !== props.concept.parentId &&
+            (props.allowEmptyConcepts || con.isQueryable)
         );
     }
 }

@@ -68,12 +68,17 @@ namespace API.DTO.Config
 
     public class ClientOptionsDTO
     {
+        public FindPatientsDTO FindPatients = new FindPatientsDTO();
         public MapOptionsDTO Map = new MapOptionsDTO();
         public VisualizeOptionsDTO Visualize = new VisualizeOptionsDTO();
         public TimelinesOptionsDTO Timelines = new TimelinesOptionsDTO();
         public PatientListOptionsDTO PatientList = new PatientListOptionsDTO();
         public HelpOptionsDTO Help = new HelpOptionsDTO();
 
+        public class FindPatientsDTO
+        {
+            public bool AllowEmptyConcepts { get; set; }
+        }
         public class MapOptionsDTO
         {
             public bool Enabled { get; set; }

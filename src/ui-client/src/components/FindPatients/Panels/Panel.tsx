@@ -25,11 +25,14 @@ export interface Props {
     isFirst: boolean;
     panel: PanelModel,
     queryState: CohortStateType;
+    allowEmptyConcepts: boolean;
 }
 
 export default class Panel extends React.PureComponent<Props> {
+    static defaultProps = { allowEmptyConcepts: true };
+    
     public render() {
-        const { isFirst, panel, queryState, maybeHandlers } = this.props;
+        const { isFirst, panel, queryState, maybeHandlers, allowEmptyConcepts } = this.props;
         const isDateFiltered = 
             panel.dateFilter.end.dateIncrementType !== DateIncrementType.NONE && 
             panel.dateFilter.start.dateIncrementType !== DateIncrementType.NONE;
@@ -71,6 +74,7 @@ export default class Panel extends React.PureComponent<Props> {
                             panel={this.props.panel}
                             subPanel={subpanel}
                             queryState={queryState}
+                            allowEmptyConcepts={allowEmptyConcepts}
                         />
                     ))}
                 </div>

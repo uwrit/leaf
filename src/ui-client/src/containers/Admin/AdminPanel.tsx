@@ -25,7 +25,7 @@ interface DispatchProps {
     dispatch: any;
 }
 interface OwnProps {
-
+    allowEmptyConcepts: boolean;
 }
 type Props = StateProps & DispatchProps & OwnProps;
 
@@ -46,13 +46,13 @@ class AdminPanel extends React.PureComponent<Props> {
     }
 
     private getContent = () => {
-        const { admin, dispatch, datasets } = this.props;
+        const { admin, dispatch, datasets, allowEmptyConcepts } = this.props;
 
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
-                return <ConceptEditor data={admin!} dispatch={dispatch} />;
+                return <ConceptEditor data={admin!} dispatch={dispatch} allowEmptyConcepts={allowEmptyConcepts} />;
             case AdminPanelPane.PANEL_FILTERS:
-                return <PanelFilterEditor data={admin!} dispatch={dispatch} />;
+                return <PanelFilterEditor data={admin!} dispatch={dispatch} allowEmptyConcepts={allowEmptyConcepts} />;
             case AdminPanelPane.GLOBAL_PANEL_FILTERS:
                 return <GlobalPanelFilterEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.SQL_SETS:
