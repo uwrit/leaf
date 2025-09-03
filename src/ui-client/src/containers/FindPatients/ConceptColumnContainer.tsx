@@ -30,6 +30,8 @@ interface OwnProps {
 type Props = StateProps & DispatchProps & OwnProps;
 
 class ConceptTreeColumn extends React.Component<Props> {
+    static defaultProps = { allowEmptyConcepts: true };
+
     public render() {
         const { allowReparent, concepts, conceptSearch, dispatch, allowEmptyConcepts } = this.props;
         const tree = this.props.concepts.currentTree;

@@ -111,7 +111,6 @@ class Timelines extends React.Component<Props, State> {
                     headerText={'Which event should be the index event?'} 
                     handleByPanelSelect={this.handlePanelSelect}
                     toggle={this.toggleShowPanelSelector}
-                    allowEmptyConcepts={allowEmptyConcepts}
                 />
                 }
 

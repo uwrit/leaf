@@ -50,7 +50,7 @@ class AdminPanel extends React.PureComponent<Props> {
 
         switch (admin!.activePane) {
             case AdminPanelPane.CONCEPTS:
-                return <ConceptEditor data={admin!} dispatch={dispatch} allowEmptyConcepts={allowEmptyConcepts} />;
+                return <ConceptEditor data={admin!} dispatch={dispatch} />;
             case AdminPanelPane.PANEL_FILTERS:
                 return <PanelFilterEditor data={admin!} dispatch={dispatch} allowEmptyConcepts={allowEmptyConcepts} />;
             case AdminPanelPane.GLOBAL_PANEL_FILTERS:

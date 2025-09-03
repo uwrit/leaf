@@ -17,7 +17,6 @@ import './ConceptEditor.css';
 interface Props { 
     data: AdminState;
     dispatch: any;
-    allowEmptyConcepts: boolean;
 }
 
 interface State {
@@ -39,7 +38,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
 
     public render() {
         const { showPanelPreview, showSqlPreview } = this.state;
-        const { data, dispatch, allowEmptyConcepts } = this.props;
+        const { data, dispatch } = this.props;
         const c = this.className;
 
         return (
@@ -48,7 +47,7 @@ export class ConceptEditor extends React.PureComponent<Props,State> {
                     <Row className={`${c}-container-row`}>
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
                             <div className={`${c}-column-left-overlay ${showSqlPreview || showPanelPreview ? 'show' : ''}`}></div>
-                            <ConceptColumnContainer allowEmptyConcepts={allowEmptyConcepts} />
+                            <ConceptColumnContainer />
                         </Col>
                         <div className={`${c}-column-right admin-panel-editor scrollable-offset-by-header`}>
                             <MainEditor 

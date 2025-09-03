@@ -61,7 +61,7 @@ export class PanelFilterEditor extends React.PureComponent<Props,State> {
                         {/* Concepts (can be dragged over) */}
                         <Col md={4} lg={4} xl={5} className={`${c}-column-left`}>
                             <div className={`${c}-column-left-overlay ${showPreview ? 'show' : ''}`}></div>
-                            <ConceptColumnContainer allowEmptyConcepts={allowEmptyConcepts} />
+                            <ConceptColumnContainer />
                         </Col>
 
                         {/* Panel Filter Editor */}

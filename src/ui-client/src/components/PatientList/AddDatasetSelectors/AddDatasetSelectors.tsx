@@ -115,7 +115,6 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
                     headerText={`Which Encounters would you like ${selected.name} data from?`} 
                     handleByPanelSelect={this.handleEncounterPanelSelect}
                     toggle={this.hideEncounterPanelModal}
-                    allowEmptyConcepts={allowEmptyConcepts}
                 />
                 }
             </div>
