@@ -30,13 +30,15 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface OwnProps { }
+interface OwnProps {
+    allowEmptyConcepts: boolean;
+}
 
 type Props = StateProps & DispatchProps & OwnProps;
 
 class PanelGroupColumn extends React.Component<Props> {
     public handleQueryClick = () => {
-        const { queryState, dispatch, panels } = this.props;
+        const { queryState, dispatch, panels, allowEmptyConcepts } = this.props;
         switch (queryState) {
             case CohortStateType.NOT_LOADED: {
                 const hasPanelItems = !!getPanelItemCount(panels);
@@ -99,7 +101,7 @@ class PanelGroupColumn extends React.Component<Props> {
     }
 
     public render() {
-        const { dispatch, panels, panelFilters, queryState } = this.props;
+        const { dispatch, panels, panelFilters, queryState, allowEmptyConcepts } = this.props;
         return (
             <div>
                 <div className="find-patients-toprow">
@@ -108,7 +110,7 @@ class PanelGroupColumn extends React.Component<Props> {
                     </div>
                 </div>
                 <PanelFilterGroup dispatch={dispatch} filters={panelFilters} />
-                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} />
+                <PanelGroup dispatch={dispatch} panels={panels} queryState={queryState} allowEmptyConcepts={allowEmptyConcepts} />
             </div>
         );
     }

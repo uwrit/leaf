@@ -7,6 +7,8 @@
 
 import Axios, { AxiosInstance } from 'axios';
 
+Axios.defaults.baseURL = 'http://localhost:5001';
+
 export const HttpFactory = {
     authenticated(token?: string): AxiosInstance {
         return Axios.create({

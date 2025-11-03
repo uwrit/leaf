@@ -31,7 +31,9 @@ export enum TimelinesOverlayMode {
     RequestingData = 3
 }
 
-interface OwnProps { }
+interface OwnProps {
+    allowEmptyConcepts: boolean;
+}
 interface StateProps {
     auth: AuthorizationState;
     patientCount: number;
@@ -71,7 +73,7 @@ class Timelines extends React.Component<Props, State> {
 
     public render() {
         const c = this.className;
-        const { dispatch, auth, patientCount, timelines } = this.props;
+        const { dispatch, auth, patientCount, timelines, allowEmptyConcepts } = this.props;
         const { overlayMode, showPanelSelector, showConcepts } = this.state;
         const hasConcepts =  timelines.configuration.panels.size > 0;
         const config = timelines.configuration;
@@ -99,7 +101,7 @@ class Timelines extends React.Component<Props, State> {
                     overlay={true}
                     toggle={this.toggleShowConcepts}>
                     <div>
-                        <ConceptColumnContainer />
+                        <ConceptColumnContainer allowEmptyConcepts={allowEmptyConcepts} />
                     </div>
                 </DirectionalSlider>
 
@@ -188,6 +190,7 @@ class Timelines extends React.Component<Props, State> {
                                 handleOverlayModeChange={this.handleOverlayModeChange}
                                 handleShowConceptsChange={this.toggleShowConcepts}
                                 dispatch={dispatch} mode={overlayMode} timelines={timelines}
+                                allowEmptyConcepts={allowEmptyConcepts}
                             />}
 
                             {/* Charts */}

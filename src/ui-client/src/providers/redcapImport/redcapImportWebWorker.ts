@@ -448,6 +448,7 @@ export default class REDCapImportWebWorker {
                 isEventBased: false,
                 isPatientCountAutoCalculated: false,
                 isSpecializable: false,
+                isQueryable: false,
                 isExtension: true,
                 isFetching: false,
                 isOpen: false,

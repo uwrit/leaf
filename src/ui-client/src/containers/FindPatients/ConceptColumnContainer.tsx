@@ -23,13 +23,17 @@ interface DispatchProps {
     dispatch: any;
 }
 
-interface OwnProps { }
+interface OwnProps {
+    allowEmptyConcepts: boolean;
+}
 
 type Props = StateProps & DispatchProps & OwnProps;
 
 class ConceptTreeColumn extends React.Component<Props> {
+    static defaultProps = { allowEmptyConcepts: true };
+
     public render() {
-        const { allowReparent, concepts, conceptSearch, dispatch } = this.props;
+        const { allowReparent, concepts, conceptSearch, dispatch, allowEmptyConcepts } = this.props;
         const tree = this.props.concepts.currentTree;
         const roots = !concepts.showSearchTree
             ? concepts.roots
@@ -49,6 +53,7 @@ class ConceptTreeColumn extends React.Component<Props> {
                     dispatch={dispatch}
                     roots={roots} 
                     selectedId={concepts.selectedId}
+                    allowEmptyConcepts={allowEmptyConcepts}
                 />
             </div>
         );

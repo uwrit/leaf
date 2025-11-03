@@ -82,6 +82,10 @@ namespace API.Controllers
                 },
                 Client = new ClientOptionsDTO
                 {
+                    FindPatients = new ClientOptionsDTO.FindPatientsDTO
+                    {
+                        AllowEmptyConcepts = clientOptions.FindPatients.AllowEmptyConcepts
+                    },
                     Map = new ClientOptionsDTO.MapOptionsDTO
                     {
                         Enabled = clientOptions.Map.Enabled,

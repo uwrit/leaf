@@ -29,6 +29,7 @@ interface Props {
     selectedDates?: DateBoundary;
     selectedEncounterPanel?: number;
     showDates: boolean;
+    allowEmptyConcepts: boolean;
 }
 
 interface State {
@@ -49,7 +50,7 @@ export default class AddDatasetSelectors extends React.PureComponent<Props,State
     }
 
     public render() {
-        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates, selectedEncounterPanel } = this.props;
+        const { datasets, className, dates, dispatch, handleDatasetSelect, handleClickClose, showDates, selectedEncounterPanel, allowEmptyConcepts } = this.props;
         const { showEncounterPanelModal, showCustomDateRangeBox, DOMRect } = this.state;
         const c = className ? className : 'patientlist-add-dataset';
         const selected = datasets.all.get(datasets.selected);
