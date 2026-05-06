@@ -1,6 +1,8 @@
+<!--
 > ⚠️ Since @ndobb departure, we are trying to identify a maintainer and funding plan for this project to live on and continue recieving feature updates. As such, it is *temporarily* in **Maintenance Mode** and you should plan to support any required code changes for your instance yourself. UW-RIT is capable of consulting regarding deployments, backend management, and data formatting plans as we have numerous `leaf` instances running.
 > 
 > Updates will be posted here as we make internal decisions. Thank you for your understanding and patience.
+-->
 
 # Leaf &middot; [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](https://github.com/uwrit/leaf/pulls)
 <a><img src="/src/ui-client/public/images/logos/apps/leaf.svg" width="120px" align="left" hspace="10" vspace="6"></a>
