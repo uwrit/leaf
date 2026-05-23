@@ -11,6 +11,11 @@ namespace API.Options
     {
         public static class Client
         {
+            public static class FindPatients
+            {
+                public const string Section = @"Client:FindPatients";
+                public const string AllowEmptyConcepts = @"Client:FindPatients:AllowEmptyConcepts";
+            }
             public static class Map
             {
                 public const string Section = @"Client:Map";

@@ -20,6 +20,7 @@ namespace API.DTO.Compiler
         public bool IsParent { get; set; }
         public bool IsEncounterBased { get; set; }
         public bool IsPatientCountAutoCalculated { get; set; }
+        public bool IsQueryable { get; set; }
         public bool IsSpecializable { get; set; }
         public string UiDisplayName { get; set; }
         public string UiDisplayText { get; set; }
@@ -58,6 +59,11 @@ namespace API.DTO.Compiler
             UiDisplayEventName = c.UiDisplayEventName;
             UiNumericDefaultText = c.UiNumericDefaultText;
             EventTypeId = c.EventTypeId;
+
+            // A field is queryable by default, but can be considered ineligible for querying
+            // if it doesn't have query fields (WHERE and numeric) defined.
+            IsQueryable = !(string.IsNullOrWhiteSpace(c.SqlFieldNumeric)
+                            && string.IsNullOrWhiteSpace(c.SqlSetWhere));
         }
     }
 

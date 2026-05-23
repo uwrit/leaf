@@ -34,6 +34,7 @@ interface OwnProps {
     dispatch: any;
     parentShown: boolean;
     selectedId: string;
+    allowEmptyConcepts: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -69,7 +70,7 @@ class ConceptTreeNode extends React.Component<Props> {
     }
 
     public render() {
-        const { allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId, connectDragSource } = this.props;
+        const { allowReparent, allowRerender, concept, concepts, dispatch, parentShown, selectedId, allowEmptyConcepts, connectDragSource } = this.props;
         const c = 'concept-tree-node';
         const arrowClasses = [ `${c}-arrow` ];
         const mainClasses = [ c ];
@@ -115,6 +116,7 @@ class ConceptTreeNode extends React.Component<Props> {
                                 concept={concept}
                                 dispatch={dispatch}
                                 isSelected={isSelected}
+                                allowEmptyConcepts={allowEmptyConcepts}
                             />
 
                             {/* Learn More */}
@@ -138,6 +140,7 @@ class ConceptTreeNode extends React.Component<Props> {
                                             dispatch={dispatch}
                                             parentShown={concept.isOpen}
                                             selectedId={selectedId}
+                                            allowEmptyConcepts={allowEmptyConcepts}
                                         />
                                     ))}
                                 </Collapse>

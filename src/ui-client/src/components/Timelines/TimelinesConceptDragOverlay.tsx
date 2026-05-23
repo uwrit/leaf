@@ -38,6 +38,7 @@ interface OwnProps {
     handleShowConceptsChange: () => any;
     mode: TimelinesOverlayMode;
     timelines: TimelinesState;
+    allowEmptyConcepts: boolean;
 }
 
 type Props = DndProps & OwnProps
@@ -74,7 +75,7 @@ const conceptNodeTarget = {
     },
     canDrop(props: Props, monitor: DropTargetMonitor) {
         const con = (monitor.getItem() as Concept);
-        return !con.isExtension && con.isEncounterBased;
+        return !con.isExtension && con.isEncounterBased && (props.allowEmptyConcepts || con.isQueryable);
     }
 }
 
@@ -103,7 +104,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
     public render() {
         const c = this.className;
         const { hovered, panel } = this.state;
-        const { connectDropTarget, canDrop, isOver, mode } = this.props;
+        const { connectDropTarget, canDrop, isOver, mode, allowEmptyConcepts } = this.props;
         const panelHandlers = this.packageHandlers();
 
         return (
@@ -134,7 +135,7 @@ class TimelinesConceptDragOverlay extends React.PureComponent<Props, State> {
                 {mode === TimelinesOverlayMode.ConfiguringConcept && panel &&
                 <div className={`${c}-inner selecting`}>
                     <div className={`${c}-panel-selection-container`}>
-                        <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers}/>
+                        <Panel panel={panel} isFirst={true} queryState={CohortStateType.LOADED} maybeHandlers={panelHandlers} allowEmptyConcepts={allowEmptyConcepts}/>
                         <div className={`${c}-panel-selection-explanation`}>
                             <span>Specify any date, numeric, or other filters, then click</span>
                             <span className={`${c}-panel-selection-emphasis`}>Add to Timeline</span>

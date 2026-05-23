@@ -11,17 +11,21 @@ import ConceptColumnContainer from '../../containers/FindPatients/ConceptColumnC
 import PanelGroupColumn from './Panels/PanelGroupColumn';
 import './FindPatients.css';
 
-export class FindPatients extends React.PureComponent {
-    
+interface Props {
+    allowEmptyConcepts: boolean;
+}
+
+export class FindPatients extends React.PureComponent<Props> {
     public render() {
+        const { allowEmptyConcepts } = this.props;
         return (
             <Container fluid={true}>
                 <Row className="find-patients-screen">
                     <Col md={4} lg={4} xl={5} className="find-patients-column-left">
-                        <ConceptColumnContainer />
+                        <ConceptColumnContainer allowEmptyConcepts={allowEmptyConcepts} />
                     </Col>
                     <Col md={8} lg={8} xl={7} className="find-patients-column-right scrollable-offset-by-header">
-                        <PanelGroupColumn />
+                        <PanelGroupColumn allowEmptyConcepts={allowEmptyConcepts} />
                     </Col>
                 </Row>
             </Container>

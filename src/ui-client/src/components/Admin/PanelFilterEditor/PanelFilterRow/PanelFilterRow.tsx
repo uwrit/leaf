@@ -29,6 +29,7 @@ interface OwnProps {
     forceValidation: boolean;
     panelFilter: PanelFilter;
     togglePreview: (show: boolean, selectedFilterId: number) => any;
+    allowEmptyConcepts: boolean;
 }
 
 type Props = DndProps & OwnProps;
@@ -47,7 +48,8 @@ const panelTarget = {
     },
     canDrop (props: Props, monitor: DropTargetMonitor) {
         const concept: Concept = monitor.getItem();
-        return !isNonstandard(concept.universalId);
+        return (props.allowEmptyConcepts || concept.isQueryable)
+            && !isNonstandard(concept.universalId);
     }
 }
 

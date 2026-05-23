@@ -64,11 +64,16 @@ interface CohortConfigDTO {
 export interface AppConfig extends ConfigDTO { }
 
 export interface ClientOptions {
+    findPatients: FindPatientsOptions;
     map: MapOptions;
     visualize: VisualizeOptions;
     timelines: TimelinesOptions;
     patientList: PatientListOptions;
     help: HelpOptions;
+}
+
+interface FindPatientsOptions {
+    allowEmptyConcepts: boolean;
 }
 
 interface MapOptions {

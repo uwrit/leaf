@@ -19,11 +19,12 @@ interface Props {
     roots: string[];
     tree: ConceptMap;
     selectedId: string;
+    allowEmptyConcepts: boolean;
 }
 
 export default class ConceptTree extends React.Component<Props> {
     public render() {
-        const { tree, allowReparent, allowRerender, dispatch, selectedId } = this.props;
+        const { tree, allowReparent, allowRerender, dispatch, selectedId, allowEmptyConcepts } = this.props;
         const roots = this.props.roots.map(id => tree.get(id)!).sort(this.sortRoots);
 
         return (
@@ -39,7 +40,8 @@ export default class ConceptTree extends React.Component<Props> {
                             concepts={tree}
                             dispatch={dispatch}
                             parentShown={true}
-                            selectedId={selectedId} 
+                            selectedId={selectedId}
+                            allowEmptyConcepts={allowEmptyConcepts}
                         />
                 )})}
             </div>

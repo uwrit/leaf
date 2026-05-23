@@ -24,6 +24,7 @@ interface Props {
     dispatch: any;
     panels: PanelModel[];
     queryState: CohortStateType;
+    allowEmptyConcepts: boolean;
 }
 
 export interface PanelHandlers {
@@ -42,7 +43,7 @@ export interface PanelHandlers {
 
 export class PanelGroup extends React.PureComponent<Props> {
     public render() {
-        const { panels, queryState } = this.props;
+        const { panels, queryState, allowEmptyConcepts } = this.props;
         const handlers = this.packageHandlers();
 
         return (
@@ -54,6 +55,7 @@ export class PanelGroup extends React.PureComponent<Props> {
                         isFirst={i === 0}
                         panel={panel}
                         queryState={queryState}
+                        allowEmptyConcepts={allowEmptyConcepts}
                     />
                 )}
             </Row>

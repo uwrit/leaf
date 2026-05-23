@@ -24,6 +24,7 @@ interface Props {
     datasets: DatasetsState;
     responderMap: NetworkResponderMap;
     dispatch: any;
+    allowEmptyConcepts: boolean;
 }
 
 interface State {
@@ -78,7 +79,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
     public render() {
         const c = this.className;
         const { selectedDates, selectedEncounterPanel, showSelectorModal, showDates } = this.state;
-        const { datasets, configuration, dispatch, cohortMap, responderMap } = this.props;
+        const { datasets, configuration, dispatch, cohortMap, responderMap, allowEmptyConcepts } = this.props;
         const modalClasses = [ `${c}-select-container` ];
         const overlayClasses = [ `${c}-overlay` ];
 
@@ -134,6 +135,7 @@ export default class AddDatasetButton extends React.PureComponent<Props, State> 
                         selectedDates={selectedDates}
                         selectedEncounterPanel={selectedEncounterPanel}
                         showDates={showDates}
+                        allowEmptyConcepts={allowEmptyConcepts}
                     />
                 </div>
             );

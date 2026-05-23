@@ -143,6 +143,7 @@ export const generateDummyPanel = (): Panel => {
                     isParent: false,
                     isPatientCountAutoCalculated: false,
                     isSpecializable: false,
+                    isQueryable: false,
                     uiDisplayName: '',
                     uiDisplayText: '',
                     childrenLoaded: false,
